@@ -23,6 +23,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.idea/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -44,6 +45,14 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
+
+#Qt Designer compiled python
+ui_Mslice.py
+QuickView/getter_ui.py
+QuickView/ui_mock.py
+
+#compiled_python
+*.pyc
 
 # Translations
 *.mo
