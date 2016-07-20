@@ -15,6 +15,10 @@ class MainQuickView():
 
 
     def get_workspace_manager_presenter(self):
+        """
+
+        :rtype: WorkspaceManagerPresenter
+        """
         return self._workspaceManagerPresenter
 
 if __name__ == '__main__':

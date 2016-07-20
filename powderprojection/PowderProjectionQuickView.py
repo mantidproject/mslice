@@ -1,8 +1,8 @@
 from quickview.QuickView import QuickView
-from powderprojection.PowderProjectionCalculatorPresenter import PowderProjectionCalculatorPresenter
+from powderprojection.PowderProjectionPresenter import PowderProjectionPresenter
 
 class PowderProjectionQuickView(QuickView):
     def __init__(self,commands):
         super(PowderProjectionQuickView,self).__init__(commands)
-        self._presenter = PowderProjectionCalculatorPresenter(self)
+        self._presenter = PowderProjectionPresenter(self)
 

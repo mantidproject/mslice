@@ -39,9 +39,17 @@ class Getter(Ui_Dialog,QtGui.QDialog):
             self._data = str(QtGui.QFileDialog.getOpenFileName())
         self._done = True
         self.accept()
+
+
 def displayMessage(title,*args):
-    args_and_types = [(str(arg)+' '+str(type(arg)) ) for arg in args]
+    args_and_types = [(str(arg) + ' ' + str(type(arg))) for arg in args]
+    if not args_and_types:
+        args_and_types=['']
+    #Pad message box so whole title is visible
+    padding = len(title) * '   '
+    args_and_types[0] += padding
     messageBox = QtGui.QMessageBox()
     messageBox.setWindowTitle(title)
     messageBox.setText('\n'.join(args_and_types))
+    messageBox.setGeometry(100,100,4000,200)
     messageBox.exec_()
