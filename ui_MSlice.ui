@@ -1,0 +1,2183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1194</width>
+    <height>862</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_6">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>912</width>
+          <height>821</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QWidget" name="guiControls" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QTabWidget" name="tabWidgetFilesWorkspaces_2">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <widget class="QWidget" name="tabWidgetFilesWorkspacesPage2_2">
+               <attribute name="title">
+                <string>Workspace Manager</string>
+               </attribute>
+               <layout class="QGridLayout" name="gridLayout_3">
+                <item row="2" column="1">
+                 <widget class="QPushButton" name="btnWorkspaceSave">
+                  <property name="text">
+                   <string>Save</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>354</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_107">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="4">
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>5</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1" rowspan="2" colspan="3">
+                 <widget class="QTableWidget" name="tblWorkspaces">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="sizeIncrement">
+                   <size>
+                    <width>5</width>
+                    <height>5</height>
+                   </size>
+                  </property>
+                  <property name="dragEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectRows</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="rowCount">
+                   <number>12</number>
+                  </property>
+                  <property name="columnCount">
+                   <number>5</number>
+                  </property>
+                  <attribute name="horizontalHeaderVisible">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderCascadingSectionResizes">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderDefaultSectionSize">
+                   <number>100</number>
+                  </attribute>
+                  <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderStretchLastSection">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderVisible">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderCascadingSectionResizes">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderDefaultSectionSize">
+                   <number>18</number>
+                  </attribute>
+                  <attribute name="verticalHeaderHighlightSections">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderMinimumSectionSize">
+                   <number>15</number>
+                  </attribute>
+                  <attribute name="verticalHeaderStretchLastSection">
+                   <bool>false</bool>
+                  </attribute>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <row/>
+                  <column>
+                   <property name="text">
+                    <string>Select</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Workspace</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Type</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Saved</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Size</string>
+                   </property>
+                  </column>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QPushButton" name="btnWorkspaceRemove">
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="5" rowspan="2">
+                 <widget class="QGroupBox" name="groupBox_4">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>120</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="title">
+                   <string>Workspace Options:</string>
+                  </property>
+                  <widget class="QPushButton" name="btnLoad">
+                   <property name="geometry">
+                    <rect>
+                     <x>20</x>
+                     <y>30</y>
+                     <width>80</width>
+                     <height>23</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>Load</string>
+                   </property>
+                  </widget>
+                  <widget class="QPushButton" name="btnWorkspaceGroup">
+                   <property name="geometry">
+                    <rect>
+                     <x>20</x>
+                     <y>60</y>
+                     <width>81</width>
+                     <height>23</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>Group Selected</string>
+                   </property>
+                  </widget>
+                  <widget class="QPushButton" name="btnWorkspaceCompose">
+                   <property name="geometry">
+                    <rect>
+                     <x>20</x>
+                     <y>90</y>
+                     <width>80</width>
+                     <height>23</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>Compose</string>
+                   </property>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="tabWidgetFilesWorkspacesPage1_2">
+               <attribute name="title">
+                <string>Status</string>
+               </attribute>
+               <layout class="QGridLayout" name="gridLayout_18">
+                <item row="0" column="0" rowspan="2">
+                 <layout class="QGridLayout" name="gridLayout_14">
+                  <item row="0" column="2">
+                   <widget class="QPushButton" name="btnStatusLog">
+                    <property name="text">
+                     <string>Save Log</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <spacer name="horizontalSpacer_9">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="labelStatus_2">
+                    <property name="text">
+                     <string>Status Area</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0" colspan="3">
+                   <widget class="QTextEdit" name="txtStatusLog">
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QGroupBox" name="groupBox_11">
+                  <property name="font">
+                   <font>
+                    <weight>50</weight>
+                    <bold>false</bold>
+                    <underline>false</underline>
+                   </font>
+                  </property>
+                  <property name="title">
+                   <string>System Status</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_3">
+                   <item>
+                    <layout class="QGridLayout" name="gridLayout_17">
+                     <item row="0" column="0" colspan="2">
+                      <widget class="QLabel" name="label_132">
+                       <property name="font">
+                        <font>
+                         <underline>false</underline>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Memory Usage</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QProgressBar" name="prgStatusMemory">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="value">
+                        <number>24</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="labelMaxMem_2">
+                       <property name="text">
+                        <string>Max Mem:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1" colspan="2">
+                      <spacer name="horizontalSpacer_12">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>77</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QGridLayout" name="gridLayout_16">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_164">
+                       <property name="font">
+                        <font>
+                         <underline>false</underline>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>CPU Usage</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1" rowspan="2">
+                      <widget class="QProgressBar" name="prgStatusCPUUsage">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="value">
+                        <number>24</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0" rowspan="2">
+                      <widget class="QLabel" name="labelCPUCount_2">
+                       <property name="text">
+                        <string>CPU count:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <spacer name="horizontalSpacer_13">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QGroupBox" name="groupBox_7">
+                  <property name="font">
+                   <font>
+                    <underline>false</underline>
+                   </font>
+                  </property>
+                  <property name="title">
+                   <string>Application Status</string>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_15">
+                   <item row="1" column="0" colspan="2">
+                    <widget class="QLabel" name="labelElapsedTime_2">
+                     <property name="text">
+                      <string>Elapsed Time: 0 H  0 M</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_108">
+                     <property name="text">
+                      <string>Progress</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="2">
+                    <spacer name="horizontalSpacer_10">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>277</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="0" column="1" colspan="3">
+                    <widget class="QProgressBar" name="prgStatusProgress">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="value">
+                      <number>24</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTabWidget" name="SampleTabWidget_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <widget class="QWidget" name="PowderTab_3">
+               <attribute name="title">
+                <string>Powder</string>
+               </attribute>
+               <layout class="QGridLayout" name="gridLayout_2">
+                <item row="1" column="1">
+                 <widget class="QGroupBox" name="groupBox">
+                  <property name="title">
+                   <string>Projection</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_4">
+                   <item>
+                    <layout class="QGridLayout" name="gridLayout">
+                     <property name="sizeConstraint">
+                      <enum>QLayout::SetNoConstraint</enum>
+                     </property>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_208">
+                       <property name="text">
+                        <string>u1</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QComboBox" name="cmbPowderU1">
+                       <item>
+                        <property name="text">
+                         <string>Energy</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>|Q|</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2Theta</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Det Group Number</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Time Channel</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_210">
+                       <property name="text">
+                        <string>u2</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QComboBox" name="cmbPowderU2">
+                       <item>
+                        <property name="text">
+                         <string>Energy</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>|Q|</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2Theta</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Det Group Number</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Time Channel</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item row="1" column="2">
+                      <widget class="QLabel" name="label">
+                       <property name="text">
+                        <string>Units</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QComboBox" name="cmbPowderUnits"/>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QPushButton" name="btnPowderCalculateProjection">
+                       <property name="text">
+                        <string>Calculate Projection</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <spacer name="verticalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Minimum</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="1" column="0">
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Minimum</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="2" column="1">
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>167</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="1" column="2">
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Expanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="SingleCrystalTab_3">
+               <attribute name="title">
+                <string>Single Crystal</string>
+               </attribute>
+               <layout class="QGridLayout" name="gridLayout_8">
+                <item row="0" column="2" rowspan="3">
+                 <layout class="QVBoxLayout" name="verticalLayout">
+                  <item>
+                   <widget class="QPushButton" name="btnSingleCheckWorkspace">
+                    <property name="text">
+                     <string>Check Workspace</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnSingleSaveParams">
+                    <property name="text">
+                     <string>Save Params</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnSingleLoadParams">
+                    <property name="text">
+                     <string>Load Params</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnSingleDefaultParams">
+                    <property name="text">
+                     <string>Default Params</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="verticalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item row="1" column="3">
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QGroupBox" name="groupBoxViewingAxes_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>114</height>
+                   </size>
+                  </property>
+                  <property name="title">
+                   <string>Viewing Axes:</string>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_9">
+                   <item row="0" column="1">
+                    <widget class="QLabel" name="label_218">
+                     <property name="text">
+                      <string>a*</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <widget class="QLabel" name="label_216">
+                     <property name="text">
+                      <string>b*</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="3">
+                    <widget class="QLabel" name="label_217">
+                     <property name="text">
+                      <string>c*</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="4">
+                    <widget class="QLabel" name="label_219">
+                     <property name="text">
+                      <string>Label</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="5">
+                    <widget class="QLabel" name="label_220">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>Fold</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="6">
+                    <widget class="QLabel" name="label_221">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>Center</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="7">
+                    <widget class="QLabel" name="label_222">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>Direction</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_214">
+                     <property name="text">
+                      <string>u1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="lneSingleAU1">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="2">
+                    <widget class="QLineEdit" name="lneSingleBU1">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="3">
+                    <widget class="QLineEdit" name="lneSingleCU1">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="4">
+                    <widget class="QLineEdit" name="lneSingleU1Label">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>H</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="5">
+                    <widget class="QCheckBox" name="chkSingleU1Fold">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="tristate">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="6">
+                    <widget class="QLineEdit" name="lneSingleU1Center">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="7">
+                    <widget class="QComboBox" name="cmbSingleU1Direction">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <item>
+                      <property name="text">
+                       <string>-</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Auto</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>+</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="label_215">
+                     <property name="text">
+                      <string>u2</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="lneSingleAU2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="2">
+                    <widget class="QLineEdit" name="lneSingleBU2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="3">
+                    <widget class="QLineEdit" name="lneSingleCU2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="4">
+                    <widget class="QLineEdit" name="lneSingleU2Label">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>K</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="5">
+                    <widget class="QCheckBox" name="chkSingleU2Fold">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="6">
+                    <widget class="QLineEdit" name="lneSingleU2Center">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="7">
+                    <widget class="QComboBox" name="cmbSingleU2Direction">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <item>
+                      <property name="text">
+                       <string>-</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Auto</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>+</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="label_223">
+                     <property name="text">
+                      <string>u3</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QLineEdit" name="lneSingleAU3">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="2">
+                    <widget class="QLineEdit" name="lneSingleBU3">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="3">
+                    <widget class="QLineEdit" name="lneSingleCU3">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="4">
+                    <widget class="QLineEdit" name="lneSingleU3Label">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>L</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="5">
+                    <widget class="QCheckBox" name="chkSingleU3Fold">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="6">
+                    <widget class="QLineEdit" name="lneSingleU3Center">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="7">
+                    <widget class="QComboBox" name="cmbSingleU3Direction">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <item>
+                      <property name="text">
+                       <string>-</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Auto</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>+</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QGroupBox" name="groupBox_16">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="title">
+                   <string>Info:</string>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_2">
+                   <item>
+                    <widget class="QLabel" name="lblSingleEi">
+                     <property name="text">
+                      <string>Ei:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="lblSingleStartAngle">
+                     <property name="text">
+                      <string>Start Angle:</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QWidget" name="widget" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>117</height>
+                   </size>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_7">
+                   <item row="1" column="1">
+                    <spacer name="verticalSpacer_3">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QPushButton" name="btnSingleCalculateProjections">
+                     <property name="text">
+                      <string>Calculate Projections</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0" colspan="2">
+                    <widget class="QGroupBox" name="groupBox_14">
+                     <property name="minimumSize">
+                      <size>
+                       <width>171</width>
+                       <height>70</height>
+                      </size>
+                     </property>
+                     <property name="title">
+                      <string/>
+                     </property>
+                     <widget class="QLineEdit" name="lneSingleWorkspacePrefix">
+                      <property name="geometry">
+                       <rect>
+                        <x>10</x>
+                        <y>30</y>
+                        <width>131</width>
+                        <height>20</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>_SCProj</string>
+                      </property>
+                     </widget>
+                     <widget class="QLabel" name="label_233">
+                      <property name="geometry">
+                       <rect>
+                        <x>10</x>
+                        <y>10</y>
+                        <width>171</width>
+                        <height>16</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>Projection Workspace Suffix</string>
+                      </property>
+                     </widget>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <spacer name="horizontalSpacer_5">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>37</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QGroupBox" name="groupBoxSCUnitCellLatticeParams_3">
+                  <property name="title">
+                   <string>Unit Cell Lattice Parameters:</string>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_4">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_224">
+                     <property name="text">
+                      <string>a(A)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="lneSingleA">
+                     <property name="text">
+                      <string>10</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <widget class="QLabel" name="label_225">
+                     <property name="text">
+                      <string>b(A)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="3">
+                    <widget class="QLineEdit" name="lneSingleB">
+                     <property name="text">
+                      <string>10</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="4">
+                    <widget class="QLabel" name="label_226">
+                     <property name="text">
+                      <string>c(A)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="5">
+                    <widget class="QLineEdit" name="lneSingleC">
+                     <property name="text">
+                      <string>10</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="labelSCUCalpha_2">
+                     <property name="font">
+                      <font>
+                       <family>Symbol</family>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>a(*)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="lneSingleAlpha">
+                     <property name="text">
+                      <string>90</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="2">
+                    <widget class="QLabel" name="labelSCUCbeta_2">
+                     <property name="font">
+                      <font>
+                       <family>Symbol</family>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>b(*)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="3">
+                    <widget class="QLineEdit" name="lneSingleBeta">
+                     <property name="text">
+                      <string>90</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="4">
+                    <widget class="QLabel" name="labelSCUCgamma_2">
+                     <property name="font">
+                      <font>
+                       <family>Symbol</family>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>g(*)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="5">
+                    <widget class="QLineEdit" name="lneSingleGamma">
+                     <property name="text">
+                      <string>90</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QGroupBox" name="groupBoxSCCrystalOrientation_3">
+                  <property name="title">
+                   <string>Crystal Orientation:</string>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_5">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_227">
+                     <property name="text">
+                      <string>ux</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="5">
+                    <widget class="QLineEdit" name="lneSingleVz">
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="5">
+                    <widget class="QLineEdit" name="lneSingleUz1">
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="4">
+                    <widget class="QLabel" name="label_229">
+                     <property name="text">
+                      <string>uz</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="4">
+                    <widget class="QLabel" name="label_232">
+                     <property name="text">
+                      <string>vz</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="3">
+                    <widget class="QLineEdit" name="lneSingleVy">
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="2">
+                    <widget class="QLabel" name="label_231">
+                     <property name="text">
+                      <string>vy</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <widget class="QLabel" name="label_228">
+                     <property name="text">
+                      <string>uy</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="3">
+                    <widget class="QLineEdit" name="lneSingleUy1">
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="lneSingleVx">
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_230">
+                     <property name="text">
+                      <string>vx</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="lneSingleUx1">
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QGroupBox" name="groupBox_15">
+                  <property name="font">
+                   <font>
+                    <weight>50</weight>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="title">
+                   <string>Goniometer Settings:</string>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_6">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_234">
+                     <property name="text">
+                      <string>Psi Offset</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="lneSinglePsiOffset">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <widget class="QLabel" name="label_235">
+                     <property name="text">
+                      <string>Motor Name</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="3">
+                    <widget class="QLineEdit" name="lneSingleMotorname">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTabWidget" name="ViewTabWidget_2">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="SliceTab_3">
+               <attribute name="title">
+                <string>Slice</string>
+               </attribute>
+               <layout class="QGridLayout" name="gridLayout_11">
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="gridLayout_10">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_10">
+                    <property name="text">
+                     <string>x</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="cmbSliceXAxis"/>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QLabel" name="label_12">
+                    <property name="text">
+                     <string>from</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QLineEdit" name="lneSliceXStart"/>
+                  </item>
+                  <item row="0" column="4">
+                   <widget class="QLabel" name="label_267">
+                    <property name="text">
+                     <string>to</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="5" colspan="2">
+                   <widget class="QLineEdit" name="lneSliceXEnd"/>
+                  </item>
+                  <item row="0" column="7">
+                   <widget class="QLabel" name="label_268">
+                    <property name="text">
+                     <string>step</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="8">
+                   <widget class="QLineEdit" name="lneSliceXStep">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_11">
+                    <property name="text">
+                     <string>y</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="cmbSliceYAxis"/>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QLabel" name="label_271">
+                    <property name="text">
+                     <string>from</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="3">
+                   <widget class="QLineEdit" name="lneSliceYStart"/>
+                  </item>
+                  <item row="1" column="4">
+                   <widget class="QLabel" name="label_270">
+                    <property name="text">
+                     <string>to</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="5" colspan="2">
+                   <widget class="QLineEdit" name="lneSliceYEnd"/>
+                  </item>
+                  <item row="1" column="7">
+                   <widget class="QLabel" name="label_255">
+                    <property name="text">
+                     <string>step</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="8">
+                   <widget class="QLineEdit" name="lneSliceYStep">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0" colspan="2">
+                   <widget class="QLabel" name="label_13">
+                    <property name="text">
+                     <string>Intensity</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QLabel" name="label_269">
+                    <property name="text">
+                     <string>from</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="3">
+                   <widget class="QLineEdit" name="lneSliceIntensityStart"/>
+                  </item>
+                  <item row="2" column="4">
+                   <widget class="QLabel" name="label_266">
+                    <property name="text">
+                     <string>to</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="5" colspan="2">
+                   <widget class="QLineEdit" name="lneSliceIntensityEnd"/>
+                  </item>
+                  <item row="2" column="7" colspan="2">
+                   <widget class="QRadioButton" name="rdoSliceNormToOne">
+                    <property name="text">
+                     <string>Norm to 1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="2">
+                   <widget class="QLabel" name="label_14">
+                    <property name="text">
+                     <string>Smoothing</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="2" colspan="2">
+                   <widget class="QLineEdit" name="lneSliceSmoothing"/>
+                  </item>
+                  <item row="3" column="8">
+                   <widget class="QComboBox" name="cmbSliceColormap"/>
+                  </item>
+                  <item row="3" column="7">
+                   <widget class="QLabel" name="label_15">
+                    <property name="text">
+                     <string>Colormap</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="8">
+                   <widget class="QPushButton" name="btnSliceDisplay">
+                    <property name="text">
+                     <string>Display</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="1">
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::MinimumExpanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="CutTab_3">
+               <attribute name="title">
+                <string>Cut</string>
+               </attribute>
+               <layout class="QGridLayout" name="gridLayout_13">
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="gridLayout_12">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_251">
+                    <property name="text">
+                     <string>along</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="cmbCutAxis"/>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QLabel" name="label_4">
+                    <property name="text">
+                     <string>from</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QLineEdit" name="lneCutStart"/>
+                  </item>
+                  <item row="0" column="4">
+                   <widget class="QLabel" name="label_257">
+                    <property name="text">
+                     <string>to</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="5">
+                   <widget class="QLineEdit" name="lneCutEnd"/>
+                  </item>
+                  <item row="0" column="6">
+                   <widget class="QLabel" name="label_256">
+                    <property name="text">
+                     <string>step</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="7">
+                   <widget class="QLineEdit" name="lneCutStep">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_2">
+                    <property name="text">
+                     <string>Integrating</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QLabel" name="label_258">
+                    <property name="text">
+                     <string>from</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="3">
+                   <widget class="QLineEdit" name="lneCutIntegrationStart"/>
+                  </item>
+                  <item row="1" column="4">
+                   <widget class="QLabel" name="label_259">
+                    <property name="text">
+                     <string>to</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="5">
+                   <widget class="QLineEdit" name="lneCutIntegrationEnd"/>
+                  </item>
+                  <item row="1" column="6">
+                   <widget class="QLabel" name="label_253">
+                    <property name="text">
+                     <string>width</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="7">
+                   <widget class="QLineEdit" name="lneCutIntegrationWidth">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_3">
+                    <property name="text">
+                     <string>Intensity</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QLabel" name="label_264">
+                    <property name="text">
+                     <string>from</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="3">
+                   <widget class="QLineEdit" name="lneEditCutIntensityStart"/>
+                  </item>
+                  <item row="2" column="4">
+                   <widget class="QLabel" name="label_265">
+                    <property name="text">
+                     <string>to</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="5">
+                   <widget class="QLineEdit" name="lneCutIntensityEnd"/>
+                  </item>
+                  <item row="2" column="6" colspan="2">
+                   <widget class="QRadioButton" name="rdoCutNormToOne">
+                    <property name="text">
+                     <string>Norm to 1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLabel" name="label_5">
+                    <property name="text">
+                     <string>Smoothing</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="2" colspan="2">
+                   <widget class="QLineEdit" name="lneCutSmoothing"/>
+                  </item>
+                  <item row="3" column="6" colspan="2">
+                   <widget class="QPushButton" name="btnCutPlot">
+                    <property name="text">
+                     <string>Plot</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0" colspan="2">
+                   <widget class="QPushButton" name="btnCutSaveAscii">
+                    <property name="text">
+                     <string>Save Ascii</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="3" colspan="3">
+                   <widget class="QPushButton" name="btnCutSaveToWorkspace">
+                    <property name="text">
+                     <string>Save to Workspace</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="6" colspan="2">
+                   <widget class="QPushButton" name="btnCutPlotOver">
+                    <property name="text">
+                     <string>Plot Over</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="1">
+                 <spacer name="horizontalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Preferred</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>122</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="1" column="0">
+                 <spacer name="verticalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Expanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>38</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QScrollArea" name="scrollArea_2">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>276</width>
+          <height>804</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QTextEdit" name="iPythonPlaceHolder">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1194</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuDelete">
+     <property name="title">
+      <string>Delete</string>
+     </property>
+     <addaction name="actionDeleteSelected"/>
+     <addaction name="actionDeleteAll"/>
+    </widget>
+    <addaction name="actionLoad_Workspace_s"/>
+    <addaction name="actionCreateWorkspace"/>
+    <addaction name="menuDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuParameters">
+    <property name="title">
+     <string>Parameters</string>
+    </property>
+    <addaction name="actionLoad_Parameters"/>
+    <addaction name="actionSave_Parameters"/>
+   </widget>
+   <widget class="QMenu" name="menuBackground">
+    <property name="title">
+     <string>Background</string>
+    </property>
+    <addaction name="actionLoad_Empty_Can"/>
+    <addaction name="actionLoad_Detector_Background"/>
+    <addaction name="actionLoad_Time_Channel_Background"/>
+    <addaction name="actionLoad_Dark_Count"/>
+    <addaction name="actionSet_Overall_Background_Rate"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoad_Vanadium"/>
+   </widget>
+   <widget class="QMenu" name="menuMask">
+    <property name="title">
+     <string>Mask</string>
+    </property>
+    <widget class="QMenu" name="menuSet_Mask">
+     <property name="title">
+      <string>Set Mask</string>
+     </property>
+     <addaction name="actionBy_Detector_Number"/>
+     <addaction name="actionBy_Detector_Angle"/>
+    </widget>
+    <addaction name="menuSet_Mask"/>
+    <addaction name="actionRead_Mask_File"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <widget class="QMenu" name="menuInstrument_Geometry">
+     <property name="title">
+      <string>Instrument Geometry</string>
+     </property>
+     <addaction name="actionDirect"/>
+     <addaction name="actionInverse"/>
+    </widget>
+    <widget class="QMenu" name="menuVeiw_Intensity_As">
+     <property name="title">
+      <string>Veiw Intensity As:</string>
+     </property>
+     <addaction name="actionS_Q_Omega"/>
+     <addaction name="actionSymmertrized_S_Q_Omega"/>
+     <addaction name="actionD2_signal_d_Omega_d_Ef"/>
+     <addaction name="actionChi_Q_omega"/>
+     <addaction name="actionGDOS"/>
+     <addaction name="actionVDOS"/>
+     <addaction name="actionUnadjusted_by_ki_kf_factor"/>
+    </widget>
+    <addaction name="menuInstrument_Geometry"/>
+    <addaction name="menuVeiw_Intensity_As"/>
+    <addaction name="separator"/>
+    <addaction name="actionGoniometer_Properties"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuParameters"/>
+   <addaction name="menuBackground"/>
+   <addaction name="menuMask"/>
+   <addaction name="menuOptions"/>
+  </widget>
+  <action name="actionLoad_Parameters">
+   <property name="text">
+    <string>Load Parameters</string>
+   </property>
+  </action>
+  <action name="actionSave_Parameters">
+   <property name="text">
+    <string>Save Parameters</string>
+   </property>
+  </action>
+  <action name="actionLoad_Empty_Can">
+   <property name="text">
+    <string>Load Empty Can</string>
+   </property>
+  </action>
+  <action name="actionLoad_Detector_Background">
+   <property name="text">
+    <string>Load Detector Background</string>
+   </property>
+  </action>
+  <action name="actionLoad_Time_Channel_Background">
+   <property name="text">
+    <string>Load Time Channel Background</string>
+   </property>
+  </action>
+  <action name="actionLoad_Dark_Count">
+   <property name="text">
+    <string>Load Dark Count</string>
+   </property>
+  </action>
+  <action name="actionSet_Overall_Background_Rate">
+   <property name="text">
+    <string>Set Overall Background Rate</string>
+   </property>
+  </action>
+  <action name="actionLoad_Vanadium">
+   <property name="text">
+    <string>Load Vanadium</string>
+   </property>
+  </action>
+  <action name="actionBy_Detector_Number">
+   <property name="text">
+    <string>By Detector Number</string>
+   </property>
+  </action>
+  <action name="actionBy_Detector_Angle">
+   <property name="text">
+    <string>By Detector Angle</string>
+   </property>
+  </action>
+  <action name="actionCreateWorkspace">
+   <property name="text">
+    <string>Create Workspace from Files</string>
+   </property>
+  </action>
+  <action name="actionDeleteSelected">
+   <property name="text">
+    <string>Selected</string>
+   </property>
+  </action>
+  <action name="actionDeleteAll">
+   <property name="text">
+    <string>All</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionSummed_Files">
+   <property name="text">
+    <string>Summed Files</string>
+   </property>
+  </action>
+  <action name="actionProjection_Data">
+   <property name="text">
+    <string>Projection Data</string>
+   </property>
+  </action>
+  <action name="actionRead_Mask_File">
+   <property name="text">
+    <string>Read Mask File</string>
+   </property>
+  </action>
+  <action name="actionDirect">
+   <property name="text">
+    <string>Direct</string>
+   </property>
+  </action>
+  <action name="actionInverse">
+   <property name="text">
+    <string>Inverse</string>
+   </property>
+  </action>
+  <action name="actionS_Q_Omega">
+   <property name="text">
+    <string>S(Q,Omega)</string>
+   </property>
+  </action>
+  <action name="actionSymmertrized_S_Q_Omega">
+   <property name="text">
+    <string>Symmertrized S(Q,Omega)</string>
+   </property>
+  </action>
+  <action name="actionD2_signal_d_Omega_d_Ef">
+   <property name="text">
+    <string>d2(signal(/d(Omega)d(Ef)</string>
+   </property>
+  </action>
+  <action name="actionChi_Q_omega">
+   <property name="text">
+    <string>chi(Q,omega)</string>
+   </property>
+  </action>
+  <action name="actionGDOS">
+   <property name="text">
+    <string>GDOS</string>
+   </property>
+  </action>
+  <action name="actionVDOS">
+   <property name="text">
+    <string>VDOS</string>
+   </property>
+  </action>
+  <action name="actionUnadjusted_by_ki_kf_factor">
+   <property name="text">
+    <string>Unadjusted by ki/kf factor</string>
+   </property>
+  </action>
+  <action name="actionLoad_Workspace_s">
+   <property name="text">
+    <string>Load Workspace(s)</string>
+   </property>
+  </action>
+  <action name="actionGoniometer_Properties">
+   <property name="text">
+    <string>Goniometer Properties</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
