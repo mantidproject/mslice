@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\OMi32458\Workspace\MSlice3.0\QuickView\ui_mock_getter.ui'
+# Form implementation generated from reading ui file 'C:\Users\OMi32458\Workspace\MSlice3.0\quickview\getter_ui.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #

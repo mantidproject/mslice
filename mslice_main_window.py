@@ -1,7 +1,7 @@
 from PyQt4 import QtGui
 
 from MSliceMainView import MainView
-from WorkspaceManager.WorkspaceManagerPresenter import MainViewPresenter
+from workspacemanager.WorkspaceManagerPresenter import MainViewPresenter
 from command import Command
 from ui_Mslice import Ui_MainWindow
 

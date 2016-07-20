@@ -1,16 +1,16 @@
-from WorkspaceManager.WorkspaceManagerQuickView import WorkspaceManagerQuickView
-from PowderProjection.PowderProjectionQuickView import PowderProjectionQuickView
+from workspacemanager.WorkspaceManagerQuickView import WorkspaceManagerQuickView
+from powderprojection.PowderProjectionQuickView import PowderProjectionQuickView
 from MainPresenter import MainPresenter
-import WorkspaceManager,PowderProjection
+import workspacemanager,powderprojection
 
-#TODO Error in logging framework !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#TODO Error in logging framework, FIX/ASK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 class MainQuickView():
     def __init__(self):
 
         self._presenter = MainPresenter(self)
-        self.WorkspaceManagerView = WorkspaceManagerQuickView(WorkspaceManager.command.Command)
+        self.WorkspaceManagerView = WorkspaceManagerQuickView(workspacemanager.command.Command)
         self._workspaceManagerPresenter = self.WorkspaceManagerView.get_presenter()
-        self.PowderProjectionView = PowderProjectionQuickView(PowderProjection.command.Command)
+        self.PowderProjectionView = PowderProjectionQuickView(powderprojection.command.Command)
         # TODO add other subviews
 
 

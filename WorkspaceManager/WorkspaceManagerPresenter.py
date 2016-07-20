@@ -1,20 +1,17 @@
-from command import Command
+from workspacemanager.command import Command
 import os.path
 
 
+#TODO askOwen is passing mtd.getObjectNames() ideal? pass mtd? Answer: Will do for time being
+#TODO When moving to actual workspaces the tests should reflect that
+#TODO implement compose workspace
+#TODO tell user when file not found,file failed to load
 
 class WorkspaceManagerPresenter(object):
-
     def __init__(self,view,workspace_provider=None):
         self._groupCount = 1
         self._workspaceMangerView = view
         self._workSpaceprovider = workspace_provider
-
-    #TODO askOwen is passing mtd.getObjectNames() ideal? pass mtd? Answer: Will do for time being
-    #TODO When moving to actual workspaces the tests should reflect that
-
-    #TODO implement compose workspace
-    #TODO tell user when file not found,file failed to load
 
     def notify(self,command):
         if command == Command.LoadWorkspace:
@@ -71,10 +68,3 @@ class WorkspaceManagerPresenter(object):
             self._workspaceMangerView.display_loaded_workspaces(self._workSpaceprovider.getWorkspaceNames())
 
 
-
-
-
-
-if __name__=='__main__':
-    presenter = WorkspaceManagerPresenter()
-    presenter._workspaceMangerView.app.exec_()

@@ -3,59 +3,79 @@ import re
 from ui_mock import Getter,displayMessage
 from PyQt4 import QtGui
 
+
 class QuickView(QtGui.QWidget):
+    """QuickView is a base class for dynamically generated view for use while developing MVP applications.
+
+    The constructor takes a'command' class or object. The command class should contain only constants that will be sent to Presenter via
+    Presenter.notify(). Function are redirected upon call time to the handler
+    It is your responsibility to Create a QApplication before and call QApplication.exec_() after creating this view
+    self._presenter should be supplied in constructor in child class """
+
     def __init__(self,commands):
-        """"Your responsibilty to start a QApplication and call QApplication.exec_() after creating this view"""
-        print commands
         super(QtGui.QWidget,self).__init__()
-        self.handlers = {re.compile("get.*"):self.get,re.compile('populate.*'):lambda *args:('lorem','ipsum')}
-        self.default_handler = self.display
-        self.commands = commands
-        self.setupCommandCenter()
+        #Supply two default handlers
+        self._handlers = {re.compile("get.*"):self._get, re.compile('populate.*'):self._display}
+        self._default_handler = self._display
+        self._commands = commands
+        self._setupCommandCenter()
 
     def get_presenter(self):
         return self._presenter
 
     def __getattr__(self, item):
         print 'intercepted call of '+item
-        if item in ('__methods__','__members__') or item[:2] == '__' or item in dir(self):
-            return object.__getattribute__(self,item)
+        if item.startswith('_') or item in dir(self):
+            print 'released item',item
+            try:
+                return object.__getattribute__(self,item)
+            except AttributeError:
+                setattr(self,item,None)
+                return getattr(self,item)
         self.title = item
-        for regex,function in self.handlers.items():
+        for regex,function in self._handlers.items():
             if regex.match(item):
                 return function
-        return self.default_handler
+        return self._default_handler
 
     def add_handler(self,regex,handler_function):
-        """Add a function handler_function to handle all function calls that match the regex"""
-        self.handlers[re.compile(regex)] = handler_function
+        """Add a function handler_function to handle all function calls that match the regex string supplied"""
+        self._handlers[re.compile(regex)] = handler_function
+
     def set_default_handler(self,handler):
         """Set Function to handle calls that match none of the available regular expressions"""
-        self.default_handler = handler
-    def get(self):
-        getter = Getter(self.title)
-        return getter.data
+        self._default_handler = handler
 
-    def display(self,*args):
+    def _get(self):
+        getter = Getter(self.title)
+        return getter._data
+
+    def _supply_filler(self,length = 2):
+        filler = []
+        lorem_ipsum = ('lorem','ipsum')
+        for i in range(length):
+            filler.append(lorem_ipsum[i%2])
+
+    def _display(self, *args):
         displayMessage(self.title,*args)
 
-    def setupCommandCenter(self):
+    def _setupCommandCenter(self):
 
         self.window = QtGui.QWidget()
         self.layout = QtGui.QGridLayout()
         self.window.setWindowTitle('Send Notifications')
         self.buttons = {}
-        for i,command in enumerate(dir(self.commands)):
+        for i,command in enumerate(dir(self._commands)):
             if command[:2]=='__':
                 continue
-            self.buttons[command] = getattr(self.commands,command)
+            self.buttons[command] = getattr(self._commands, command)
             btn = QtGui.QPushButton(parent = self.window,text=command)
             self.layout.addWidget(btn,i%4,i//4)
-            btn.clicked.connect(self.notify_presenter)
+            btn.clicked.connect(self._notify_presenter)
         self.window.setLayout(self.layout)
         self.window.show()
 
-    def notify_presenter(self):
+    def _notify_presenter(self):
         sender = self.sender()
         self._presenter.notify(self.buttons[str(sender.text())])
 
