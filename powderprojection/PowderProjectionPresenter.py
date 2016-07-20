@@ -5,7 +5,9 @@ class PowderProjectionCalculatorPresenter(object):
 
     def __init__(self,powderView):
         self._powderProjectionView = powderView
-        self._powderProjectionView.pop
+        #Add reset of options
+        self._powderProjectionView.populate_powder_u1(['Energy'])
+        self._powderProjectionView.populate_powder_u2(['|Q|'])
 
     def notify(self,command):
         if command == Command.CalculatePowderProjection:
