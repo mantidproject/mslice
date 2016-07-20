@@ -67,4 +67,9 @@ class WorkspaceManagerPresenter(object):
             self._workSpaceprovider.RenameWorkspace(selected_workspace, newName)
             self._workspaceMangerView.display_loaded_workspaces(self._workSpaceprovider.getWorkspaceNames())
 
+    def get_selected_workspaces(self):
+        return self._workspaceMangerView.get_workspace_selected()
+
+    def refresh(self):
+        self._workspaceMangerView.display_loaded_workspaces(self._workSpaceprovider.getWorkspaceNames())
 

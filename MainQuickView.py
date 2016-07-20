@@ -10,7 +10,7 @@ class MainQuickView():
         self._presenter = MainPresenter(self)
         self.WorkspaceManagerView = WorkspaceManagerQuickView(workspacemanager.command.Command)
         self._workspaceManagerPresenter = self.WorkspaceManagerView.get_presenter()
-        self.PowderProjectionView = PowderProjectionQuickView(powderprojection.command.Command)
+        self.PowderProjectionView = PowderProjectionQuickView(self,powderprojection.command.Command)
         # TODO add other subviews
 
 
