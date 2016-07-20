@@ -6,10 +6,10 @@ class WorkspaceView(object):
     @abc.abstractmethod
     def get_workspace_to_load_path(self):
         pass
-    @abc.abcabstractmethod
+    @abc.abstractmethod
     def get_workspace_to_load_name(self):
         pass
-    @abc.abstractmethond
+    @abc.abstractmethod
     def get_workspace_to_save_filepath(self):
         pass
     @abc.abstractmethod
@@ -21,10 +21,10 @@ class WorkspaceView(object):
     @abc.abstractmethod
     def get_workspace_to_load_path(self):
         pass
-    @abc.abcabstractmethod
+    @abc.abstractmethod
     def get_workspace_to_load_name(self):
         pass
-    @abc.abstractmethond
+    @abc.abstractmethod
     def get_workspace_to_save_filepath(self):
         pass
     @abc.abstractmethod
