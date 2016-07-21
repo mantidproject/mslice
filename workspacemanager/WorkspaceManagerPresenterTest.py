@@ -58,7 +58,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_workspace_new_name.assert_called_once_with()
         self.workspace_provider.RenameWorkspace.assert_called_once_with(selected_workspace='file1',newName='new_name')
-        print self.view.display_loaded_workspaces.assert_called_once()
+        self.view.display_loaded_workspaces.assert_called_once()
 
 
     def test_rename_workspace_multiple_workspace_selected_prompt_user(self):
@@ -118,7 +118,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.GroupSelectedWorkSpaces)
         self.view.get_workspace_selected.assert_called_once_with()
         self.workspace_provider.GroupWorkspaces.assert_called_with(['file1','file2'],'group1')
-        print self.view.display_loaded_workspaces.assert_called_once()
+        self.view.display_loaded_workspaces.assert_called_once()
 
     def test_group_single_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -167,6 +167,12 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.error_select_one_or_more_workspaces.assert_called_once_with()
         self.workspace_provider.DeleteWorkspace.assert_not_called()
         self.view.display_loaded_workspaces.assert_not_called()
+
+    def test_call_presenter_with_unknown_command(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        unknown_commmand = 10
+        self.assertRaises(ValueError,self.presenter.notify, unknown_commmand)
+
 
 
 if __name__ == '__main__':

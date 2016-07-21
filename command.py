@@ -1,4 +1,3 @@
-#This file in its current state only exists for reference
 class Command:
     SaveSelectedWorkspaces = 1
     RemoveSelectedWorkspaces = 2
