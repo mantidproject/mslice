@@ -11,6 +11,8 @@ class MantidProjectionCalculator(ProjectionCalculator):
                                                                 QAxisBinning=qbinning,EMode='Direct')
 
     def CalculateSuggestedBinning(self,input_workspace):
+        return '0,.1,10'
+        #TODO AskInstrument scientist about calculating scattering angles
         input_workspace = mtd[input_workspace]
         ei = float(input_workspace.getRun().getLogData('Ei').value)
         ki = sqrt(ei/2.07)
