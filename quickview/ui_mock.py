@@ -3,7 +3,7 @@ from PyQt4 import QtGui
 
 
 class GetInputFromUser(Ui_Dialog, QtGui.QDialog):
-    """This is a generic window to get input from user.
+    """This is a generic _window to get input from user.
 
      Type input in the input box and click a button to return the contents of the input field explicitly typecasted to
      the type shown in the button. Alternatively hit enter to return the evaluation of the python expression

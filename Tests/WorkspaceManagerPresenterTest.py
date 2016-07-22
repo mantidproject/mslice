@@ -1,5 +1,3 @@
-from mock.mock import self
-
 from workspacemanager.WorkspaceManagerPresenter import WorkspaceManagerPresenter
 from workspacemanager.WorkspaceProvider import WorkspaceProvider
 from workspacemanager.WorkspaceView import WorkspaceView
@@ -9,7 +7,6 @@ import mock
 from mock import call
 
 
-#ToDo askOwen, view related tests, i.e view returns 'selected_workspace' that does not exist
 #TODO handle mantid load fail inquiry
 #TODO Test constructor and make this test specific
 

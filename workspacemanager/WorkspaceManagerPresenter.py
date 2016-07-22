@@ -1,3 +1,4 @@
+import workspacemanager
 from workspacemanager.command import Command
 import os.path
 
@@ -8,10 +9,13 @@ import os.path
 #TODO tell user when file not found,file failed to load
 
 class WorkspaceManagerPresenter(object):
-    def __init__(self,view,workspace_provider=None):
+    def __init__(self,workspace_view,workspace_provider):
+        print 'wsmp created',id(self),type (workspace_view)
+        #TODO add validation checks
         self._groupCount = 1
-        self._workspace_manger_view = view
+        self._workspace_manger_view = workspace_view
         self._work_spaceprovider = workspace_provider
+
 
     def notify(self,command):
         if command == Command.LoadWorkspace:
@@ -68,6 +72,8 @@ class WorkspaceManagerPresenter(object):
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
     def _rename_workspace(self):
+        print 'called from self', self._workspace_manger_view.get_selected_workspaces
+        print id(self)
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
         if not selected_workspaces:
             self._workspace_manger_view.error_select_one_workspace()
@@ -81,6 +87,8 @@ class WorkspaceManagerPresenter(object):
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
     def _get_selected_workspaces(self):
+        print 'called from main',self._workspace_manger_view.get_workspace_selected
+        print id(self)
         return self._workspace_manger_view.get_workspace_selected()
 
     def update_displayed_workspaces(self):
