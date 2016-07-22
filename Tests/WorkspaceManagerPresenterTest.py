@@ -1,9 +1,9 @@
 from mock.mock import self
 
-from WorkspaceManagerPresenter import WorkspaceManagerPresenter
-from WorkspaceProvider import WorkspaceProvider
-from WorkspaceView import WorkspaceView
-from command import Command
+from workspacemanager.WorkspaceManagerPresenter import WorkspaceManagerPresenter
+from workspacemanager.WorkspaceProvider import WorkspaceProvider
+from workspacemanager.WorkspaceView import WorkspaceView
+from workspacemanager.command import Command
 import unittest
 import mock
 from mock import call
