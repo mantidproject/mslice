@@ -1,6 +1,6 @@
 #TODO MOVE TO TOOLS
 import re
-from ui_mock import Getter,displayMessage
+from ui_mock import GetInputFromUser,display_message
 from PyQt4 import QtGui
 
 
@@ -47,7 +47,7 @@ class QuickView(QtGui.QWidget):
         self._default_handler = handler
 
     def _get(self):
-        getter = Getter(self.title)
+        getter = GetInputFromUser(self.title)
         return getter._data
 
     def _supply_filler(self,length = 2):
@@ -57,7 +57,7 @@ class QuickView(QtGui.QWidget):
             filler.append(lorem_ipsum[i%2])
 
     def _display(self, *args):
-        displayMessage(self.title,*args)
+        display_message(self.title, *args)
 
     def _setupCommandCenter(self):
 

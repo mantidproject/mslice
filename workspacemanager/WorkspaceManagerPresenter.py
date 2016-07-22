@@ -10,79 +10,84 @@ import os.path
 class WorkspaceManagerPresenter(object):
     def __init__(self,view,workspace_provider=None):
         self._groupCount = 1
-        self._workspaceMangerView = view
-        self._workSpaceprovider = workspace_provider
+        self._workspace_manger_view = view
+        self._work_spaceprovider = workspace_provider
 
     def notify(self,command):
         if command == Command.LoadWorkspace:
-            self.load_workspace()
+            self._load_workspace()
         elif command == Command.SaveSelectedWorkspace:
-            self.save_selected_workspace()
+            self._save_selected_workspace()
         elif command == Command.RemoveSelectedWorkspaces:
-            self.remove_selected_workspaces()
+            self._remove_selected_workspaces()
         elif command == Command.GroupSelectedWorkSpaces:
-            self.group_selected_workspaces()
+            self._group_selected_workspaces()
         elif command == Command.RenameWorkspace:
-            self.rename_workspace()
+            self._rename_workspace()
         else:
             raise ValueError("Command not found")
 
-    def load_workspace(self):
+    def _load_workspace(self):
         #TODO specify workspace name on load
         #TODO what to do on fail?
-        workspace_to_load = self._workspaceMangerView.get_workspace_to_load_path()
+        workspace_to_load = self._workspace_manger_view.get_workspace_to_load_path()
         base = os.path.basename(workspace_to_load)
         ws_name = os.path.splitext(base)[0]
-        self._workSpaceprovider.Load(Filename=workspace_to_load, OutputWorkspace=ws_name)
-        self._workspaceMangerView.display_loaded_workspaces(self._workSpaceprovider.getWorkspaceNames())
+        self._work_spaceprovider.Load(Filename=workspace_to_load, OutputWorkspace=ws_name)
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
-    def save_selected_workspace(self):
-        selected_workspaces = self._workspaceMangerView.get_workspace_selected()
+    def _save_selected_workspace(self):
+        selected_workspaces = self._workspace_manger_view.get_workspace_selected()
         if not selected_workspaces:
-            self._workspaceMangerView.error_select_one_workspace()
+            self._workspace_manger_view.error_select_one_workspace()
             return
         if len(selected_workspaces)>1:
-            self._workspaceMangerView.error_select_only_one_workspace()
+            self._workspace_manger_view.error_select_only_one_workspace()
             return
         selected_workspace = selected_workspaces[0]
-        path = self._workspaceMangerView.get_workspace_to_save_filepath()
-        self._workSpaceprovider.SaveNexus(selected_workspace, path)
+        path = self._workspace_manger_view.get_workspace_to_save_filepath()
+        self._work_spaceprovider.SaveNexus(selected_workspace, path)
 
-    def remove_selected_workspaces(self):
-        selected_workspaces = self._workspaceMangerView.get_workspace_selected()
+    def _remove_selected_workspaces(self):
+        selected_workspaces = self._workspace_manger_view.get_workspace_selected()
         if not selected_workspaces:
-            self._workspaceMangerView.error_select_one_or_more_workspaces()
+            self._workspace_manger_view.error_select_one_or_more_workspaces()
             return
         for workspace in selected_workspaces:
-            self._workSpaceprovider.DeleteWorkspace(workspace)
-        self._workspaceMangerView.display_loaded_workspaces(self._workSpaceprovider.getWorkspaceNames())
+            self._work_spaceprovider.DeleteWorkspace(workspace)
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
-    def group_selected_workspaces(self):
-        selected_workspaces = self._workspaceMangerView.get_workspace_selected()
+    def _group_selected_workspaces(self):
+        selected_workspaces = self._workspace_manger_view.get_workspace_selected()
         if not selected_workspaces:
-            self._workspaceMangerView.error_select_one_or_more_workspaces()
+            self._workspace_manger_view.error_select_one_or_more_workspaces()
             return
-        groupName = 'group' + str(self._groupCount)
-        self._groupCount+=1
-        self._workSpaceprovider.GroupWorkspaces(InputWorkspaces=selected_workspaces, OutputWorkspace=groupName)
-        self._workspaceMangerView.display_loaded_workspaces(self._workSpaceprovider.getWorkspaceNames())
+        group_name = 'group' + str(self._groupCount)
+        self._groupCount += 1
+        self._work_spaceprovider.GroupWorkspaces(InputWorkspaces=selected_workspaces, OutputWorkspace=group_name)
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
-    def rename_workspace(self):
-        selected_workspaces = self._workspaceMangerView.get_workspace_selected()
+    def _rename_workspace(self):
+        selected_workspaces = self._workspace_manger_view.get_workspace_selected()
         if not selected_workspaces:
-            self._workspaceMangerView.error_select_one_workspace()
+            self._workspace_manger_view.error_select_one_workspace()
             return
-        if len(selected_workspaces)>1:
-            self._workspaceMangerView.error_select_only_one_workspace()
+        if len(selected_workspaces) > 1:
+            self._workspace_manger_view.error_select_only_one_workspace()
             return
         selected_workspace = selected_workspaces[0]
-        new_name = self._workspaceMangerView.get_workspace_new_name()
-        self._workSpaceprovider.RenameWorkspace(selected_workspace, new_name)
-        self._workspaceMangerView.display_loaded_workspaces(self._workSpaceprovider.getWorkspaceNames())
+        new_name = self._workspace_manger_view.get_workspace_new_name()
+        self._work_spaceprovider.RenameWorkspace(selected_workspace, new_name)
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
-    def get_selected_workspaces(self):
-        return self._workspaceMangerView.get_workspace_selected()
+    def _get_selected_workspaces(self):
+        return self._workspace_manger_view.get_workspace_selected()
 
-    def refresh(self):
-        self._workspaceMangerView.display_loaded_workspaces(self._workSpaceprovider.getWorkspaceNames())
+    def update_displayed_workspaces(self):
+        """Update the workspaces shown to user.
+
+        This function must be called the main presenter if any other
+        presenter does any operation that changes the name or type of any existing workspace or creates or removes a
+        workspace"""
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 

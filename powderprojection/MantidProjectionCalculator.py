@@ -4,13 +4,13 @@ from math import sqrt,cos
 
 
 class MantidProjectionCalculator(ProjectionCalculator):
-    def CalculateProjections(self,input_workspace,output_workspace,qbinning,axis1,axis2):
+    def calculate_projections(self, input_workspace, output_workspace, qbinning, axis1, axis2):
         if axis1 == 'Energy' and axis2 == '|Q|':
             #TODO is EMode always direct ?
             SofQWNormalisedPolygon(InputWorkspace=input_workspace, OutputWorkspace=output_workspace,
                                                                 QAxisBinning=qbinning,EMode='Direct')
 
-    def CalculateSuggestedBinning(self,input_workspace):
+    def calculate_suggested_binning(self, input_workspace):
         return '0,.1,10'
         #TODO AskInstrument scientist about calculating scattering angles
         input_workspace = mtd[input_workspace]

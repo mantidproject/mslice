@@ -4,7 +4,7 @@ class MainPresenter():
         self._workspace_presenter = workspace_presenter
 
     def get_selected_workspaces(self):
-        return self._workspace_presenter.get_selected_workspaces()
+        return self._workspace_presenter._get_selected_workspaces()
 
     def refresh(self):
-        self._workspace_presenter.refresh()
+        self._workspace_presenter.update_displayed_workspaces()
