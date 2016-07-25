@@ -23,19 +23,24 @@ class PowderProjectionPresenter(object):
 
     def notify(self, command):
         if command == Command.CalculatePowderProjection:
-            selected_workspaces = self._main_presenter.get_selected_workspaces()
-            axis1 = self._powder_view.get_powder_u1()
-            axis2 = self._powder_view.get_powder_u2()
-            if not selected_workspaces:
-                pass
-                # TODO notify user? Status bar maybe?
-
-            for workspace in selected_workspaces:
-                # TODO if spec decides on suffix naming system then this will be calculated by the presenter!
-                output_workspace = self._powder_view.get_output_workspace_name()
-                binning = self._projection_calculator.calculate_suggested_binning(workspace)
-                # TODO should user be able to suggest own binning?
-                self._projection_calculator.calculate_projection(workspace, output_workspace, binning, axis1, axis2)
-            self._main_presenter.update_displayed_workspaces()
+            self._calculate_powder_projection()
         else:
             raise ValueError("Powder Projection Presenter received an unrecognised command")
+
+    def _calculate_powder_projection(self):
+        selected_workspaces = self._main_presenter.get_selected_workspaces()
+        axis1 = self._powder_view.get_powder_u1()
+        axis2 = self._powder_view.get_powder_u2()
+        if axis1 == axis2:
+            pass # TODO ask what to do
+        if not selected_workspaces:
+            pass
+            # TODO notify user? Status bar maybe?
+
+        for workspace in selected_workspaces:
+            # TODO if spec decides on suffix naming system then this will be calculated by the presenter!
+            output_workspace = self._powder_view.get_output_workspace_name()
+            binning = self._projection_calculator.calculate_suggested_binning(workspace)
+            # TODO should user be able to suggest own binning?
+            self._projection_calculator.calculate_projection(workspace, output_workspace, binning, axis1, axis2)
+        self._main_presenter.update_displayed_workspaces()
