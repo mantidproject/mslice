@@ -4,8 +4,6 @@ __pycache__/
 *$py.class
 *.pyc
 
-#To Deal with current pull request
-sliceplotter/
 
 #IDE cache
 .idea/
