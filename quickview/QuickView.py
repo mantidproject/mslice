@@ -23,15 +23,13 @@ class QuickView(QtGui.QWidget):
 
 
     def __getattr__(self, item):
-        #print 'intercepted call of '+item
         class_methods = ['get_presenter','_default_handler']
         if item.startswith('_') or item in dir(QuickView) or item in class_methods:
-        #   print 'released call of ', item
             try:
                 return object.__getattribute__(self,item)
             except AttributeError:
                 print item, 'Call handle failed'
-                raise Exception('No Idea what is going on')
+                raise AttributeError('Attribute %s not found'%item)
 
         self._title = item
         for regex,function in self._handlers.items():

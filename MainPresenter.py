@@ -4,8 +4,12 @@ class MainPresenter():
         self._workspace_presenter = workspace_presenter
 
     def get_selected_workspaces(self):
-        print 'I am going to call :', self._workspace_presenter._get_selected_workspaces
-        return self._workspace_presenter._get_selected_workspaces()
+        return self._workspace_presenter.get_selected_workspaces()
 
-    def refresh(self):
+    def update_displayed_workspaces(self):
+        """Update the workspaces shown to user.
+
+        This function must be called by any presenter that
+        does any operation that changes the name or type of any existing workspace or creates or removes a
+        workspace"""
         self._workspace_presenter.update_displayed_workspaces()

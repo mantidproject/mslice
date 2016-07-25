@@ -5,7 +5,11 @@ from powderprojection.PowderProjectionView import PowderView
 
 
 class PowderProjectionQuickView(QuickView,PowderView):
-    def __init__(self,mainView,commands):
+    def __init__(self,main_view,commands):
         super(PowderProjectionQuickView,self).__init__(commands)
         proj_calculator = MantidProjectionCalculator()
-        self._presenter = PowderProjectionPresenter(self,mainView,proj_calculator)
+        self._presenter = PowderProjectionPresenter(self, main_view,proj_calculator)
+
+    def __getattribute__(self, item):
+        # This is needed to handle calls to GUI functions generated on the fly correctly
+        object.__getattr__(self, item)

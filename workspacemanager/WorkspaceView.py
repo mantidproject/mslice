@@ -6,7 +6,7 @@ class WorkspaceView(object):
     def __init__(self):
         workspace_provider = WorkspaceProvider()
         self._presenter = WorkspaceManagerPresenter(self,workspace_provider)
-        print 'wsmViewAbstract created',id(self)
+
     def display_loaded_workspaces(self, workspaces):
         pass
 

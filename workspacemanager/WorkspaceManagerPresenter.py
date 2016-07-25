@@ -10,7 +10,6 @@ import os.path
 
 class WorkspaceManagerPresenter(object):
     def __init__(self,workspace_view,workspace_provider):
-        print 'wsmp created',id(self),type (workspace_view)
         #TODO add validation checks
         self._groupCount = 1
         self._workspace_manger_view = workspace_view
@@ -72,8 +71,6 @@ class WorkspaceManagerPresenter(object):
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
     def _rename_workspace(self):
-        print 'called from self', self._workspace_manger_view.get_selected_workspaces
-        print id(self)
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
         if not selected_workspaces:
             self._workspace_manger_view.error_select_one_workspace()
@@ -86,15 +83,14 @@ class WorkspaceManagerPresenter(object):
         self._work_spaceprovider.RenameWorkspace(selected_workspace, new_name)
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
-    def _get_selected_workspaces(self):
-        print 'called from main',self._workspace_manger_view.get_workspace_selected
-        print id(self)
+    def get_selected_workspaces(self):
+        """Get the currently selected workspaces from the user"""
         return self._workspace_manger_view.get_workspace_selected()
 
     def update_displayed_workspaces(self):
         """Update the workspaces shown to user.
 
-        This function must be called the main presenter if any other
+        This function must be called by the main presenter if any other
         presenter does any operation that changes the name or type of any existing workspace or creates or removes a
         workspace"""
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())

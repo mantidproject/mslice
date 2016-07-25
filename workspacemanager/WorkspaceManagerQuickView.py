@@ -10,15 +10,10 @@ class WorkspaceManagerQuickView(QuickView,WorkspaceView):
         super(WorkspaceManagerQuickView,self).__init__(commands)
         workspaceProvider = MantidWorkspaceProvider()
         self._presenter = WorkspaceManagerPresenter(self, workspaceProvider)
-        print 'wsmquick created'
 
     def __getattribute__(self, item):
-       # print 'wsmqv gettatr ', item
-        if item in ("get_presenter",):
-            print 'WSM PRESENTER'+WorkspaceView.__getattr__(self,item)
-            return WorkspaceView.__getattr__(self,item)
-        else:
-            object.__getattr__(self, item)
+        # This is needed to handle calls to GUI functions generated on the fly correctly
+        object.__getattr__(self, item)
 
 
 if __name__ == '__main__':

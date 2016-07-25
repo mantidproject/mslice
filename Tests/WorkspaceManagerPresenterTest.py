@@ -75,7 +75,6 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.RenameWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.error_select_only_one_workspace.assert_called_once_with()
-        print self.workspace_provider.RenameWorkspace.call_count
         self.workspace_provider.RenameWorkspace.assert_not_called()
 
     def test_rename_workspace_non_selected_prompt_user(self):

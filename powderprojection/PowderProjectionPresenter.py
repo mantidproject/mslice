@@ -17,11 +17,10 @@ class PowderProjectionPresenter(object):
             raise ValueError("main_view is not of type MainView")
 
         self._main_presenter = main_view.get_presenter()
-        print 'ppp main presenter ',main_view.get_presenter()
         #Add rest of options
         self._powder_view.populate_powder_u1(['Energy'])
         self._powder_view.populate_powder_u2(['|Q|'])
-        print self
+
     def notify(self,command):
         if command == Command.CalculatePowderProjection:
             selected_workspaces = self._main_presenter.get_selected_workspaces()
