@@ -28,7 +28,7 @@ class WorkspaceManagerPresenter(object):
         elif command == Command.RenameWorkspace:
             self._rename_workspace()
         else:
-            raise ValueError("Workspace Manager Presenter recived an unrecognised command")
+            raise ValueError("Workspace Manager Presenter received an unrecognised command")
 
     def _load_workspace(self):
         #TODO specify workspace name on load
