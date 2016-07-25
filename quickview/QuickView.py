@@ -23,7 +23,7 @@ class QuickView(QtGui.QWidget):
 
 
     def __getattr__(self, item):
-        class_methods = ['get_presenter','_default_handler']
+        class_methods = ['get_presenter']
         if item.startswith('_') or item in dir(QuickView) or item in class_methods:
             try:
                 return object.__getattribute__(self,item)

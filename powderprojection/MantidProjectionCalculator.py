@@ -4,7 +4,7 @@ from math import sqrt,cos
 
 
 class MantidProjectionCalculator(ProjectionCalculator):
-    def calculate_projections(self, input_workspace, output_workspace, qbinning, axis1, axis2):
+    def calculate_projection(self, input_workspace, output_workspace, qbinning, axis1, axis2):
         if axis1 == 'Energy' and axis2 == '|Q|':
             #TODO is EMode always direct ?
             SofQWNormalisedPolygon(InputWorkspace=input_workspace, OutputWorkspace=output_workspace,
