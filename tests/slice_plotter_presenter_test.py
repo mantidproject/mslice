@@ -1,9 +1,9 @@
-from sliceplotter.sliceplotterpresenter import SlicePlotterPresenter,Axis
-from sliceplotter.SlicePlotter import SlicePlotter
-from sliceplotter.SlicePlotterView import SlicePlotterView
-from sliceplotter.command import Command
+from widgets.slice.slice_plotter_presenter import SlicePlotterPresenter,Axis
+from widgets.slice.slice_plotter import SlicePlotter
+from widgets.slice.slice_plotter_view import SlicePlotterView
+from widgets.slice.command import Command
 from mainview import MainView
-from MainPresenter import MainPresenter
+from main_presenter import MainPresenter
 import unittest
 import mock
 

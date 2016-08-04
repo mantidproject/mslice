@@ -1,4 +1,4 @@
-from powderprojection.ProjectionCalculator import ProjectionCalculator
+from projection_calculator import ProjectionCalculator
 from mantid.simpleapi import SofQWNormalisedPolygon,mtd
 from math import sqrt,cos
 

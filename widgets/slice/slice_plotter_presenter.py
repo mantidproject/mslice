@@ -1,7 +1,7 @@
-from sliceplotter.command import Command
+from command import Command
 from mainview import MainView
-from sliceplotter.SlicePlotterView import SlicePlotterView
-from sliceplotter.SlicePlotter import SlicePlotter
+from slice_plotter_view import SlicePlotterView
+from slice_plotter import SlicePlotter
 from collections import namedtuple
 
 Axis = namedtuple('Axis', ['units', 'start', 'end', 'step'])

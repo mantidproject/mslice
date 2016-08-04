@@ -55,4 +55,3 @@ class SlicePlotterView:
 
     def error_invalid_y_units(self):
         pass
-    

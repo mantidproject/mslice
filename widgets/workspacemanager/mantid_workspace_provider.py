@@ -1,4 +1,4 @@
-from WorkspaceProvider import WorkspaceProvider
+from workspace_provider import WorkspaceProvider
 from mantid.simpleapi import mtd,Load,DeleteWorkspace,Load,GroupWorkspaces,RenameWorkspace,SaveNexus
 
 class MantidWorkspaceProvider(WorkspaceProvider):

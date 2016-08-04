@@ -1,6 +1,6 @@
 from command import Command
-from powderprojection.PowderProjectionView import PowderView
-from powderprojection.ProjectionCalculator import  ProjectionCalculator
+from powder_projection_view import PowderView
+from projection_calculator import ProjectionCalculator
 from mainview import MainView
 
 
@@ -16,7 +16,7 @@ class PowderProjectionPresenter(object):
         if not isinstance(main_view,MainView):
             raise TypeError("main_view is not of type MainView")
 
-        self._main_presenter = main_view.get_presenter()
+        self._main_view = main_view
         #Add rest of options
         self._powder_view.populate_powder_u1(['Energy'])
         self._powder_view.populate_powder_u2(['|Q|'])
@@ -28,7 +28,7 @@ class PowderProjectionPresenter(object):
             raise ValueError("Powder Projection Presenter received an unrecognised command")
 
     def _calculate_powder_projection(self):
-        selected_workspaces = self._main_presenter.get_selected_workspaces()
+        selected_workspaces = self._get_main_presenter().get_selected_workspaces()
         axis1 = self._powder_view.get_powder_u1()
         axis2 = self._powder_view.get_powder_u2()
         if axis1 == axis2:
@@ -43,4 +43,9 @@ class PowderProjectionPresenter(object):
             binning = self._projection_calculator.calculate_suggested_binning(workspace)
             # TODO should user be able to suggest own binning?
             self._projection_calculator.calculate_projection(workspace, output_workspace, binning, axis1, axis2)
-        self._main_presenter.update_displayed_workspaces()
+        self._get_main_presenter().update_displayed_workspaces()
+
+    def _get_main_presenter(self):
+        # not storing this variable at construction time gives freedom of creating this before creating the
+        # the main presenter
+        return self._main_view.get_presenter()

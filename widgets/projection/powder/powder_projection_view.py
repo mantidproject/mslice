@@ -13,7 +13,7 @@ class PowderView(object):
 
     def populate_powder_projection_axis(self, axis_options):
         self.populate_powder_u1(axis_options)
-        self.get_powder_u2(axis_options)
+        self.get_powder_u2()
 
     #@abc.abstractmethod
     def get_output_workspace_name(self):

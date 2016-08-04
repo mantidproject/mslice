@@ -1,7 +1,7 @@
-from workspacemanager.WorkspaceManagerPresenter import WorkspaceManagerPresenter
-from workspacemanager.WorkspaceProvider import WorkspaceProvider
-from workspacemanager.WorkspaceView import WorkspaceView
-from workspacemanager.command import Command
+from widgets.workspacemanager.workspace_manager_presenter import WorkspaceManagerPresenter
+from widgets.workspacemanager.workspace_provider import WorkspaceProvider
+from widgets.workspacemanager.workspace_view import WorkspaceView
+from widgets.workspacemanager.command import Command
 import unittest
 import mock
 from mock import call

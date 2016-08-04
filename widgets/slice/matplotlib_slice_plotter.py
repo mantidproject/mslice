@@ -1,4 +1,4 @@
-from sliceplotter.SlicePlotter import SlicePlotter
+from slice_plotter import SlicePlotter
 
 
 class MatplotlibSlicePlotter(SlicePlotter):

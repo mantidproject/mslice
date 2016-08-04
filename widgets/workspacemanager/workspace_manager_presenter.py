@@ -1,9 +1,7 @@
-import workspacemanager
-from workspacemanager.command import Command
+from command import Command
 import os.path
 
 
-#TODO askOwen is passing mtd.getObjectNames() ideal? pass mtd? Answer: Will do for time being
 #TODO When moving to actual workspaces the tests should reflect that
 #TODO implement compose workspace
 #TODO tell user when file not found,file failed to load
