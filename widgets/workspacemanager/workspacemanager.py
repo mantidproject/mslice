@@ -19,7 +19,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                                 self.btnWorkspaceRemove: Command.RemoveSelectedWorkspaces,
                                 self.btnWorkspaceSave: Command.SaveSelectedWorkspace,
                                 self.btnWorkspaceCompose: Command.ComposeWorkspace,
-                                self.btnLoad: Command.LoadWorkspace
+                                self.btnLoad: Command.LoadWorkspace#,
+                                #self.btnRename: Command.RenameWorkspace
                                 }
 
     def btn_clicked(self):
@@ -63,7 +64,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                 self.lstWorkspaces.takeItem(index)
                 return
 
-
     def get_workspace_selected(self):
         selected_workspaces = []
         for index in range(self.lstWorkspaces.count()):
@@ -81,4 +81,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         if not path:
             raise ValueError('Please Select a valid path to save to ')
         return str(path)
+
+    def get_workspace_new_name(self):
+        pass
 
