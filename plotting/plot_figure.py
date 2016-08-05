@@ -20,8 +20,8 @@ class MatplotlibCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
 
-
 class PlotFigure(QtGui.QMainWindow,Ui_MainWindow):
+    # TODO: Consider Subclassing figure
     def __init__(self,number,manager):
         self.number = number
         self._recieved_initial_focus = False

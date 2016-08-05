@@ -49,6 +49,8 @@ class FigureManager(object):
             return FigureManager.new_figure(fig_num)[0]
     @staticmethod
     def get_active_figure():
+        if FigureManager._active_figure in FigureManager.unclassified_figures:
+            return FigureManager.figures[FigureManager._active_figure]
         if FigureManager._active_category:
             if FigureManager._category_active_figures[FigureManager._active_category] == NO_FIGURE:
                 fig,num = FigureManager.new_figure()
@@ -101,7 +103,8 @@ class FigureManager(object):
                 figure_category = category
                 break
         else:
-            raise ValueError("Figure no. %i was not found"%figure_number)
+            raise ValueError("Figure no. %i was not found"%figure_number if figure_number else 0)
+            # in-line if to handle case figure_number is None
         return figure_category
 
     @staticmethod

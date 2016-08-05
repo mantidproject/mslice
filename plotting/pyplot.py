@@ -153,6 +153,23 @@ def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
     sci(ret)
     return ret
 
+@activate_category('2d')
+@draw_colorbar
+def tripcolor(*args, **kwargs):
+    ax = gca()
+    # allow callers to override the hold state by passing hold=True|False
+    washold = ax.ishold()
+    hold = kwargs.pop('hold', None)
+    if hold is not None:
+        ax.hold(hold)
+    try:
+        ret = ax.tripcolor(*args, **kwargs)
+        draw_if_interactive()
+    finally:
+        ax.hold(washold)
+    sci(ret)
+    return ret
+
 #*************************************************************************************************************************************
 def xlabel(s, *args, **kwargs):
     """
