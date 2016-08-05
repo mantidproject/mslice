@@ -45,20 +45,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         smoothing = 10
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
-        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
-        self.slice_view.get_slice_x_axis = mock.Mock(return_value=x.units)
-        self.slice_view.get_slice_x_start = mock.Mock(return_value=x.start)
-        self.slice_view.get_slice_x_end = mock.Mock(return_value=x.end)
-        self.slice_view.get_slice_x_step = mock.Mock(return_value=x.step)
-        self.slice_view.get_slice_y_axis = mock.Mock(return_value=y.units)
-        self.slice_view.get_slice_y_start = mock.Mock(return_value=y.start)
-        self.slice_view.get_slice_y_end= mock.Mock(return_value=y.end)
-        self.slice_view.get_slice_y_step = mock.Mock(return_value=y.step)
-        self.slice_view.get_slice_intensity_start = mock.Mock(return_value=intensity_start)
-        self.slice_view.get_slice_intensity_end = mock.Mock(return_value=intensity_end)
-        self.slice_view.get_slice_is_norm_to_one = mock.Mock(return_value=norm_to_one)
-        self.slice_view.get_slice_smoothing = mock.Mock(return_value=smoothing)
-        self.slice_view.get_slice_colourmap = mock.Mock(return_value=colourmap)
+        self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
+        self.slice_view.get_slice_x_axis.return_value=x.units
+        self.slice_view.get_slice_x_start.return_value=x.start
+        self.slice_view.get_slice_x_end.return_value=x.end
+        self.slice_view.get_slice_x_step.return_value=x.step
+        self.slice_view.get_slice_y_axis.return_value=y.units
+        self.slice_view.get_slice_y_start.return_value = y.start
+        self.slice_view.get_slice_y_end.return_value=y.end
+        self.slice_view.get_slice_y_step.return_value=y.step
+        self.slice_view.get_slice_intensity_start.return_value=intensity_start
+        self.slice_view.get_slice_intensity_end.return_value = intensity_end
+        self.slice_view.get_slice_is_norm_to_one.return_value=norm_to_one
+        self.slice_view.get_slice_smoothing.return_value=smoothing
+        self.slice_view.get_slice_colourmap.return_value=colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.main_presenter.get_selected_workspaces.assert_called_once_with()
@@ -76,7 +76,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_smoothing.assert_called_once_with()
         self.slice_view.get_slice_colourmap.assert_called_once_with()
 
-        self.slice_plotter.display_slice.assert_called_with(x_axis=x, y_axis=y, smoothing=smoothing,
+        self.slice_plotter.display_slice.assert_called_with(selected_workspace=selected_workspace, x_axis=x, y_axis=y, smoothing=smoothing,
                                                             intensity_start=intensity_start,intensity_end=intensity_end,
                                                             norm_to_one=norm_to_one,  colourmap=colourmap)
 

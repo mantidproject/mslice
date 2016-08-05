@@ -13,7 +13,6 @@ class WorkspaceManagerPresenter(object):
         self._workspace_manger_view = workspace_view
         self._work_spaceprovider = workspace_provider
 
-
     def notify(self,command):
         if command == Command.LoadWorkspace:
             self._load_workspace()
@@ -34,6 +33,12 @@ class WorkspaceManagerPresenter(object):
         workspace_to_load = self._workspace_manger_view.get_workspace_to_load_path()
         base = os.path.basename(workspace_to_load)
         ws_name = os.path.splitext(base)[0]
+        #confirm that user wants to overwrite an existing workspace
+        if ws_name in self._work_spaceprovider.getWorkspaceNames():
+            confirm_overwrite = self._workspace_manger_view.confirm_overwrite_workspace()
+            if not confirm_overwrite:
+                self._workspace_manger_view.no_workspace_has_been_loaded()
+                return
         self._work_spaceprovider.Load(Filename=workspace_to_load, OutputWorkspace=ws_name)
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.getWorkspaceNames())
 
@@ -42,7 +47,7 @@ class WorkspaceManagerPresenter(object):
         if not selected_workspaces:
             self._workspace_manger_view.error_select_one_workspace()
             return
-        if len(selected_workspaces)>1:
+        if len(selected_workspaces) > 1:
             self._workspace_manger_view.error_select_only_one_workspace()
             return
         selected_workspace = selected_workspaces[0]

@@ -23,10 +23,10 @@ class SlicePlotterView:
     def get_slice_y_step(self):
         pass
 
-    def get_intensity_start(self):
+    def get_slice_intensity_start(self):
         pass
 
-    def get_intensity_end(self):
+    def get_slice_intensity_end(self):
         pass
 
     def get_slice_is_norm_to_one(self):
@@ -54,4 +54,10 @@ class SlicePlotterView:
         pass
 
     def error_invalid_y_units(self):
+        pass
+
+    def error_select_one_workspace(self):
+        pass
+
+    def error_invalid_plot_parameters(self):
         pass

@@ -25,7 +25,7 @@ class SlicePlotterPresenter:
         if not isinstance(slice_plotter, SlicePlotter):
             raise TypeError("Parameter slice_plotter is not of type SlicePlotter")
         self._slice_view = slice_view
-        self._main_presenter = main_view.get_presenter()
+        self._main_view = main_view
         self._slice_plotter = slice_plotter
 
     def notify(self,command):
@@ -35,7 +35,7 @@ class SlicePlotterPresenter:
             raise ValueError("Slice Plotter Presenter received an unrecognised command")
 
     def _display_slice(self):
-        selected_workspaces = self._main_presenter.get_selected_workspaces()
+        selected_workspaces = self._get_main_presenter().get_selected_workspaces()
         if not selected_workspaces:
             self._slice_view.error_select_one_workspace()
             return
@@ -52,8 +52,8 @@ class SlicePlotterPresenter:
         norm_to_one = self._slice_view.get_slice_is_norm_to_one()
         smoothing = self._slice_view.get_slice_smoothing()
         colourmap = self._slice_view.get_slice_colourmap()
-        status = self._slice_plotter.display_slice(x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
-                                          colourmap)
+        status = self._slice_plotter.display_slice(selected_workspace,x_axis, y_axis, smoothing, intensity_start,
+                                                   intensity_end, norm_to_one, colourmap)
         if status == INVALID_PARAMS:
             self._slice_view.error_invalid_plot_parameters()
 
@@ -74,3 +74,8 @@ class SlicePlotterPresenter:
 
         elif status == INVALID_Y_UNITS:
             self._slice_view.error_invalid_y_units()
+
+    def _get_main_presenter(self):
+        # Get the presenter when needed as opposed to initializing it as a class variable in the constructor
+        # givs the flexibilty to instantiate this presenter before the main presenter
+        return self._main_view.get_presenter()
