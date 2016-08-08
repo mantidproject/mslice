@@ -1,4 +1,4 @@
-from command import Command
+from widgets.workspacemanager.command import Command
 import os.path
 
 
