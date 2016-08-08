@@ -1,9 +1,10 @@
-from workspacemanager_ui import Ui_Form
-from workspace_view import WorkspaceView
 from PyQt4.QtGui import QWidget,QListWidgetItem,QFileDialog, QInputDialog,QMessageBox
-from workspace_manager_presenter import WorkspaceManagerPresenter
-from mantid_workspace_provider import MantidWorkspaceProvider
+
 from command import Command
+from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
+from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from views.workspace_view import WorkspaceView
+from workspacemanager_ui import Ui_Form
 
 
 class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):

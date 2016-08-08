@@ -1,10 +1,12 @@
-from widgets.workspacemanager.workspace_manager_presenter import WorkspaceManagerPresenter
-from widgets.workspacemanager.workspace_provider import WorkspaceProvider
-from widgets.workspacemanager.workspace_view import WorkspaceView
-from widgets.workspacemanager.command import Command
 import unittest
+
 import mock
 from mock import call
+
+from models.workspacemanager.workspace_provider import WorkspaceProvider
+from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from views.workspace_view import WorkspaceView
+from widgets.workspacemanager.command import Command
 
 
 #TODO handle mantid load fail inquiry

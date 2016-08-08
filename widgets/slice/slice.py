@@ -1,9 +1,10 @@
-from slice_ui import Ui_Form
 from PyQt4.QtGui import QWidget, QMessageBox
-from slice_plotter_view import SlicePlotterView
-from slice_plotter_presenter import SlicePlotterPresenter
-from matplotlib_slice_plotter import MatplotlibSlicePlotter
+
 from command import Command
+from models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
+from presenters.slice_plotter_presenter import SlicePlotterPresenter
+from slice_ui import Ui_Form
+from views.slice_plotter_view import SlicePlotterView
 
 
 class SliceWidget(QWidget, Ui_Form, SlicePlotterView):

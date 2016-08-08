@@ -1,7 +1,7 @@
-from widgets.projection.powder.command import Command
 from mainview import MainView
-from widgets.projection.powder.projection_calculator import ProjectionCalculator
+from models.projection.powder.projection_calculator import ProjectionCalculator
 from views.powder_projection_view import PowderView
+from widgets.projection.powder.command import Command
 
 
 class PowderProjectionPresenter(object):

@@ -1,12 +1,11 @@
-from PyQt4.QtGui import QApplication
-from FigureManager import FigureManager
-import matplotlib
+from FigureManager import FigureManager,activate_category
+
 
 
 def draw_if_interactive():
-    if matplotlib.is_interactive():
-        for figure in FigureManager.figures.values():
-            figure.canvas.draw()
+    # We will always draw because mslice might be running without matplotlib interactive
+    for figure in FigureManager._figures.values():
+        figure.canvas.draw()
 
 
 def figure(num=None):
@@ -22,18 +21,6 @@ def hold(state=None):
     gca().hold(None)
 
 
-#This a decorator that accepts a parameter
-def activate_category(category):
-
-    def real_activate_function_decorator(function):
-
-        def wrapper(*args, **kwargs):
-            FigureManager.activate_category(category)
-            function(*args, **kwargs)
-            FigureManager.deactivate_category()
-        return wrapper
-
-    return real_activate_function_decorator
 
 def draw_colorbar(function):
     def wrapper(*args, **kwargs):
@@ -341,6 +328,7 @@ def yticks(*args, **kwargs):
 
 
 if __name__ == '__main__':
+    from PyQt4.QtGui import QApplication
     qapp = QApplication([])
     imshow([[1,2],[3,4]])
     plot([1,2,3,4])

@@ -1,5 +1,5 @@
-from widgets.workspacemanager.workspace_view import WorkspaceView
 from main_presenter import MainPresenter
+from views.workspace_view import WorkspaceView
 
 
 class MainView:

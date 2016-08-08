@@ -1,13 +1,13 @@
 import unittest
-import mock
-from mock import call
 
-from widgets.projection.powder.powder_projection_presenter import PowderProjectionPresenter
-from widgets.projection.powder.powder_projection_view import PowderView
-from widgets.projection.powder.projection_calculator import ProjectionCalculator
-from widgets.projection.powder.command import Command
-from mainview import MainView
+import mock
+
 from main_presenter import MainPresenter
+from mainview import MainView
+from models.projection.powder.projection_calculator import ProjectionCalculator
+from presenters.powder_projection_presenter import PowderProjectionPresenter
+from views.powder_projection_view import PowderView
+from widgets.projection.powder.command import Command
 
 
 class PowderProjectionPresenterTest(unittest.TestCase):

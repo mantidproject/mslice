@@ -1,8 +1,9 @@
-from widgets.slice.command import Command
-from mainview import MainView
-from widgets.slice.slice_plotter_view import SlicePlotterView
-from widgets.slice.slice_plotter import SlicePlotter
 from collections import namedtuple
+
+from mainview import MainView
+from models.slice.slice_plotter import SlicePlotter
+from views.slice_plotter_view import SlicePlotterView
+from widgets.slice.command import Command
 
 Axis = namedtuple('Axis', ['units', 'start', 'end', 'step'])
 
