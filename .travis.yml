@@ -4,4 +4,4 @@ python:
 # command to install dependencies
 install: "pip install mock"
 # command to run tests
-script: python -m unittest WorkspaceManager/WorkspaceManagerPresenterTest.py
+script: python -m unittest discover
