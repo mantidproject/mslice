@@ -41,16 +41,13 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         ws_name3 = 'file3'
         self.view.get_workspace_to_load_path = mock.Mock(
             side_effect=[path1, path2, path3])
-        self.workspace_provider.getWorkspaceNames = mock.Mock(side_effect=[[ws_name1], [ws_name1,ws_name2],
-                                                                           [ws_name1, ws_name2, ws_name3]])
+        self.workspace_provider.getWorkspaceNames = mock.Mock(return_value=[])
         for i in range(3):
             self.presenter.notify(Command.LoadWorkspace)
         load_calls = [call(Filename=path1, OutputWorkspace=ws_name1),
                       call(Filename=path2, OutputWorkspace=ws_name2),
                       call(Filename=path3, OutputWorkspace=ws_name3)]
         self.workspace_provider.Load.assert_has_calls(load_calls)
-        display_workspace_calls = [call([ws_name1]), call([ws_name1, ws_name2]), call([ws_name1, ws_name2, ws_name3])]
-        self.view.display_loaded_workspaces.assert_has_calls(display_workspace_calls)
 
     def test_rename_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
