@@ -13,7 +13,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def display_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                       colourmap):
         workspace = mtd[selected_workspace]
-        blocksize = workspace.blocksize()
         plot_method = 'imshow'
 
         if plot_method == 'imshow':
@@ -23,6 +22,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             plt.imshow(ydata)
 
         if plot_method == 'tripcolor':
+            blocksize = workspace.blocksize()
             xdata = workspace.readX(0)[1:]
             ydata = workspace.readY(0)
             workspace_indices = np.full((blocksize,),0)
@@ -35,6 +35,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
                           ydata)
 
         elif plot_method == 'tricontourf':
+            blocksize = workspace.blocksize()
             xdata = workspace.readX(0)[1:]
             ydata = workspace.readY(0)
             workspace_indices = np.full((blocksize,),0)

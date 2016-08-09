@@ -82,4 +82,3 @@ class SlicePlotterPresenterTest(unittest.TestCase):
                                                             intensity_start=intensity_start,intensity_end=intensity_end,
                                                             norm_to_one=norm_to_one,  colourmap=colourmap)
 
-    #TODO add more failure cases

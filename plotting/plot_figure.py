@@ -21,7 +21,7 @@ class MatplotlibCanvas(FigureCanvas):
 
 
 class PlotFigure(QtGui.QMainWindow,Ui_MainWindow):
-    # TODO: Consider Subclassing figure
+    #TODO make a base class of common functionality
     def __init__(self,number,manager):
         self.number = number
         self._recieved_initial_focus = False
@@ -30,28 +30,19 @@ class PlotFigure(QtGui.QMainWindow,Ui_MainWindow):
         self.setWindowTitle('Figure %i'%number)
         self.canvas = MatplotlibCanvas(self)
         self.setCentralWidget(self.canvas)
-        self._manager = manager # TODO askMartin. avoiding circular imports.is this OK
+        self._manager = manager
 
         self.menuKeep.aboutToShow.connect(self._report_as_kept_to_manager)
         self.menuMakeCurrent.aboutToShow.connect(self._report_as_current_to_manager)
 
-        self.show() #this isnt a good idea in non interactive mode
+        self._script_log = []
+        self._import_aliases = {'plotting.pyplot': 'plt'} # the aliases used in script generation
+
+        self.show() #this isn,t a good idea in non interactive mode #TODO FIX IT
 
     def closeEvent(self,event):
         self._manager.figure_closed(self.number)
         event.accept()
-
-    def windowActivationChange(self, *args, **kwargs):
-        #this event may happen before my PlotFigure.__init__ has finished, be careful
-        QtGui.QMainWindow.windowActivationChange(self, *args, **kwargs)
-        return
-        # This Feature is not ready for demo and is too risky
-        #We have to skip the first one because it happens before we have properly got things set up
-        if not self._recieved_initial_focus:
-            self._recieved_initial_focus = True
-            return
-        if self.isActiveWindow():
-            self._manager.set_figure_as_active(self.number)  # window has just recieved focus. make it the active plot
 
     def set_as_active(self):
         self.canvas.axes.hold(False)
@@ -84,14 +75,43 @@ class PlotFigure(QtGui.QMainWindow,Ui_MainWindow):
     def _report_as_current_to_manager(self):
         self._manager.set_figure_as_current(self.number)
 
-    def gca(self):
-        return self.canvas.figure.gca()
+    def get_figure(self):
+        return self.canvas.figure
 
-    def sca(self, *args, **kwargs):
-        return self.canvas.figure.sca(*args,**kwargs)
+    def script_log(self, source_module, function_name, call_args, call_kwargs):
+        self._script_log.append((source_module, function_name, call_args, call_kwargs))
+        print self._format_command(self._script_log[-1])
 
-    def _gci(self):
-        return self.gca()._gci()
+    def get_script(self):
+        script = ""
+        for library, alias in self._import_aliases.items():
+            script += "import " + library + " as " + alias + "\n"
+        for log in self._script_log:
+            script += self._format_command(log) + "\n"
+        return script
 
-    def colorbar(self,*args, **kwargs):
-        return self.canvas.figure.colorbar(*args,**kwargs)
+    def _format_command(self, command):
+        """Return a line of python code for a tuple in the log"""
+        output = ""
+        source_module, function_name, call_args, call_kwargs = command
+        if source_module in self._import_aliases.keys():
+            source_module = self._import_aliases[source_module]
+
+        if source_module:
+            output += source_module + "."
+
+        output += function_name + '('
+
+        formatted_call_args = ", ".join(call_args)
+        output += formatted_call_args
+
+        call_kwargs = map(lambda x:"=".join(x), call_kwargs.items())
+        formatted_call_kwargs = ", ".join(call_kwargs)
+
+        if formatted_call_kwargs:
+            if formatted_call_args:
+                output += ", "
+            output += formatted_call_kwargs
+        output += ")"
+
+        return output

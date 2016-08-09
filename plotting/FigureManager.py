@@ -11,7 +11,7 @@ class FigureManager(object):
     Do not instantiate this class"""
     # if there is a current figure it should be both current and active
     _active_category = None
-    _category_active_figures = {"1d": NO_FIGURE, "2d": NO_FIGURE}  #active _figures recieve commands
+    _category_active_figures = {"1d": NO_FIGURE, "2d": NO_FIGURE}  # active _figures recieve commands
     _category_current_figures = {"1d": NO_FIGURE, "2d": NO_FIGURE}  # Current _figures are overplotted
     _figures_by_category = {"1d": [], "2d": []}
     _unclassified_figures = []
@@ -63,7 +63,8 @@ class FigureManager(object):
             else:
                 FigureManager._active_figure = FigureManager._category_active_figures[FigureManager._active_category]
         if FigureManager._active_figure == NO_FIGURE:
-            FigureManager._new_figure()
+            fig, num = FigureManager._new_figure()
+            FigureManager._active_figure = num
         return FigureManager._figures[FigureManager._active_figure]
 
     @staticmethod
@@ -197,7 +198,7 @@ class FigureManager(object):
     @staticmethod
     def all_figures():
         """Return an iterator over all figures"""
-        return iter(FigureManager._figures.keys())
+        return FigureManager._figures.values()
 
     @staticmethod
     def number_of_figure(figure):
@@ -216,6 +217,7 @@ def activate_category(category):
             return_value = function(*args, **kwargs)
             FigureManager._deactivate_category()
             return return_value
+        wrapper.__name__ = function.__name__
         return wrapper
 
     return real_activate_function_decorator

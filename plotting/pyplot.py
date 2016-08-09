@@ -1,5 +1,5 @@
 from FigureManager import FigureManager,activate_category
-
+from script_generation import script_log
 
 
 def draw_if_interactive():
@@ -9,11 +9,11 @@ def draw_if_interactive():
 
 
 def figure(num=None):
-    return FigureManager.get_figure_number(num)
+    return FigureManager.get_figure_number(num).get_figure()
 
 
 def gcf():
-    return FigureManager.get_active_figure()
+    return FigureManager.get_active_figure().get_figure()
 
 
 def hold(state=None):
@@ -30,6 +30,7 @@ def draw_colorbar(function):
             cb.remove()
         cb = colorbar()
         gcf()._colorbar_axes = cb
+    wrapper.__name__ = function.__name__
     return wrapper
 
 # From here on just copy and paste from matplotlib.pyplot and decorate as appropriate
@@ -98,7 +99,7 @@ def gci():
     """
     return gcf()._gci()
 
-
+@script_log("plotting.pyplot")
 @activate_category("1d")
 def plot(*args, **kwargs):
     ax = gca()
@@ -158,6 +159,7 @@ def tripcolor(*args, **kwargs):
     return ret
 
 #*************************************************************************************************************************************
+@script_log("plotting.pyplot")
 def xlabel(s, *args, **kwargs):
     """
     Set the *x* axis label of the current axis.
