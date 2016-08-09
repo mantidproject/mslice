@@ -1,7 +1,11 @@
 from mock import call
 import mock
 import unittest
-from plotting.FigureManager import FigureManager, activate_category
+import plotting
+#TODO use method to specify figure class when that is decided
+plotting.get_figure_class = lambda :None
+from plotting.FigureManager import FigureManager
+from plotting.FigureManager import activate_category
 import plotting.FigureManager
 
 
