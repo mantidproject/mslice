@@ -7,7 +7,8 @@ from models.workspacemanager.workspace_provider import WorkspaceProvider
 from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from views.workspace_view import WorkspaceView
 from widgets.workspacemanager.command import Command
-
+from tempfile import gettempdir
+from os.path import join
 
 #TODO handle mantid load fail inquiry
 #TODO Test constructor and make this test specific
@@ -20,7 +21,8 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def test_load_one_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         # Create a view that will return a path on call to get_workspace_to_load_path
-        path_to_nexus = r'C:\a\b\cde.nxs'
+        tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
+        path_to_nexus = join(tempdir,'cde.nxs')
         workspace_name = 'cde'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=path_to_nexus)
         self.workspace_provider.getWorkspaceNames = mock.Mock(return_value=[workspace_name])
@@ -33,9 +35,10 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def test_load_multiple_workspaces(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         # Create a view that will return three filepaths on on 3 subsequent calls to get_workspace_to_load_path
-        path1 = r'C:\path\to\file1.nxs'
-        path2 = r'C:\path\to\any\file2.nxs'
-        path3 = r'C:\path\to\file3.nxs'
+        tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
+        path1 = join(tempdir,'file1.nxs')
+        path2 = join(tempdir,'file2.nxs')
+        path3 = join(tempdir,'file3.nxs')
         ws_name1 = 'file1'
         ws_name2 = 'file2'
         ws_name3 = 'file3'

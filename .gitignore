@@ -5,8 +5,8 @@ __pycache__/
 *.pyc
 
 #pylint
-pylint_check
-pylint-check
+pylint_check.py
+pylint-check.py
 
 #IDE cache
 .idea/
