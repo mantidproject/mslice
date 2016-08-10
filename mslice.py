@@ -16,7 +16,7 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
         self.wgtSlice.set_main_window(self)
 
 if __name__ == "__main__":
-    from build_all_ui import build_all_ui_files,script_folder
+    from build_all_ui_files import build_all_ui_files,script_folder
     build_all_ui_files(script_folder)
     qapp = QApplication([])
     mslice = MsliceGui()
