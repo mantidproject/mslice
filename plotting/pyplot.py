@@ -34,7 +34,7 @@ def draw_colorbar(function):
     return wrapper
 
 # From here on just copy and paste from matplotlib.pyplot and decorate as appropriate
-
+@script_log("plotting.pyplot")
 def colorbar(mappable=None, cax=None, ax=None, **kw):
     if mappable is None:
         mappable = gci()
@@ -119,6 +119,7 @@ def plot(*args, **kwargs):
 
 @activate_category("2d")
 @draw_colorbar
+@script_log("plotting.pyplot")
 def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
            vmin=None, vmax=None, origin=None, extent=None, shape=None,
            filternorm=1, filterrad=4.0, imlim=None, resample=None, url=None,
@@ -143,6 +144,7 @@ def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
 
 @activate_category('2d')
 @draw_colorbar
+@script_log("plotting.pyplot")
 def tripcolor(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -181,7 +183,7 @@ def xlabel(s, *args, **kwargs):
     draw_if_interactive()
     return l
 
-
+@script_log("plotting.pyplot")
 def ylabel(s, *args, **kwargs):
     """
     Set the *y* axis label of the current axis.
@@ -204,7 +206,7 @@ def ylabel(s, *args, **kwargs):
     draw_if_interactive()
     return l
 
-
+@script_log("plotting.pyplot")
 def xscale(*args, **kwargs):
     """
     Set the scaling of the *x*-axis.
@@ -223,7 +225,7 @@ def xscale(*args, **kwargs):
     ax.set_xscale(*args, **kwargs)
     draw_if_interactive()
 
-
+@script_log("plotting.pyplot")
 def yscale(*args, **kwargs):
     """
     Set the scaling of the *y*-axis.
@@ -242,7 +244,7 @@ def yscale(*args, **kwargs):
     ax.set_yscale(*args, **kwargs)
     draw_if_interactive()
 
-
+@script_log("plotting.pyplot")
 def xticks(*args, **kwargs):
     """
     Get or set the *x*-limits of the current tick locations and labels.
@@ -283,7 +285,7 @@ def xticks(*args, **kwargs):
     draw_if_interactive()
     return locs, silent_list('Text xticklabel', labels)
 
-
+@script_log("plotting.pyplot")
 def yticks(*args, **kwargs):
     """
     Get or set the *y*-limits of the current tick locations and labels.

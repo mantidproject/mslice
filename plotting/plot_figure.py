@@ -34,6 +34,7 @@ class PlotFigure(QtGui.QMainWindow,Ui_MainWindow):
 
         self.menuKeep.aboutToShow.connect(self._report_as_kept_to_manager)
         self.menuMakeCurrent.aboutToShow.connect(self._report_as_current_to_manager)
+        self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
 
         self._script_log = []
         self._import_aliases = {'plotting.pyplot': 'plt'} # the aliases used in script generation
@@ -115,3 +116,6 @@ class PlotFigure(QtGui.QMainWindow,Ui_MainWindow):
         output += ")"
 
         return output
+
+    def _dump_script_to_console(self):
+        print self.get_script()
