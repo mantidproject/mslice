@@ -7,7 +7,7 @@ install:
 
 # command to run tests
 script: 
-  nosetests -v --with-coverage --cover-package=presenters,plotting.FigureManager
+  nosetests -v --with-coverage --cover-package=presenters,plotting.figuremanager
 
 after_success:
   coveralls
