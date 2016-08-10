@@ -3,10 +3,9 @@ import mock
 import unittest
 import plotting
 #TODO use method to specify figure class when that is decided
-plotting.get_figure_class = lambda :None
+plotting.get_figure_class = lambda : None #This stops the Figure manager from importing the windows which import pyqt
 from plotting.figuremanager import FigureManager
 from plotting.figuremanager import activate_category
-import plotting.figuremanager
 
 
 class FigureManagerTest(unittest.TestCase):
@@ -20,7 +19,9 @@ class FigureManagerTest(unittest.TestCase):
         """The figure manager class is a singleton static class and any attempts to instantiate it should fail"""
         self.assertRaises(Exception, FigureManager)
 
-    @mock.patch('plotting.FigureManager.PlotFigure')
+    plot_window_class = 'plotting.figuremanager.PlotFigure'
+
+    @mock.patch(plot_window_class)
     def test_create_single_unclassified_plot_success(self, mock_figure_class):
         mock_figures = [mock.Mock()]
         mock_figure_class.side_effect = mock_figures
@@ -30,7 +31,7 @@ class FigureManagerTest(unittest.TestCase):
         self.assertRaises(KeyError,FigureManager.get_category, 1) #Check that figure has no category
         self.assert_(FigureManager.get_active_figure() ==mock_figures[0]) # Check that it is set as the active figure
 
-    @mock.patch('plotting.FigureManager.PlotFigure')
+    @mock.patch(plot_window_class)
     def test_create_multiple_unclassified_figures(self, mock_figure_class):
         """Test that n calls to figureManager create n unclassified _figures numbered 1 to n """
         n = 10  # number of unclassfied _figures to be created
@@ -43,7 +44,7 @@ class FigureManagerTest(unittest.TestCase):
             self.assert_(i in FigureManager.all_figure_numbers()) #Check that a new figure with number=i was created
             self.assertRaises(KeyError,FigureManager.get_category, i) #Check that figure has no category
 
-    @mock.patch('plotting.FigureManager.PlotFigure')
+    @mock.patch(plot_window_class)
     def test_create_single_categorised_figure(self,mock_figure_class):
         mock_figures = [mock.Mock()]
         mock_figure_class.side_effect = mock_figures
@@ -56,7 +57,7 @@ class FigureManagerTest(unittest.TestCase):
         self.assert_(FigureManager.get_category(1) == category)
         self.assert_(FigureManager.get_active_figure() == mock_figures[0]) # Check that it is set as the active figure
 
-    @mock.patch('plotting.FigureManager.PlotFigure')
+    @mock.patch(plot_window_class)
     def test_create_categorised_figure_then_uncategorised_figure(self,mock_figure_class):
         mock_figures = [mock.Mock(), mock.Mock()]
         mock_figure_class.side_effect = mock_figures
@@ -73,7 +74,7 @@ class FigureManagerTest(unittest.TestCase):
         self.assertRaises(KeyError,FigureManager.get_category,fig2_number)
         self.assert_( fig1_number ==1 and fig2_number == 2)
 
-    @mock.patch('plotting.FigureManager.PlotFigure')
+    @mock.patch(plot_window_class)
     def test_category_switching(self,mock_figure_class):
             mock_figures = [mock.Mock(),mock.Mock()]
             mock_figure_class.side_effect = mock_figures
