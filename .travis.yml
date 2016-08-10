@@ -3,7 +3,8 @@ python:
   - "2.7"
 # command to install dependencies
 install: 
- -pip install 'mock>=2.0.0' --force-reinstall && pip install coveralls
+  -pip install 'mock>=2.0.0' --force-reinstall 
+  -pip install coveralls
 
 # command to run tests
 script: 
