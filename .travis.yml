@@ -3,12 +3,12 @@ python:
   - "2.7"
 # command to install dependencies
 install: 
-  -pip install -r pip-requirements.txt
+  pip install -r pip-requirements.txt
 
 # command to run tests
 script: 
- - python -m unittest discover -s tests -p '*test.py'
- - nosetests --with-coverage 
+  python -m unittest discover -s tests -p '*test.py'
+  nosetests --with-coverage 
 
 after_success:
- - coveralls
+  coveralls
