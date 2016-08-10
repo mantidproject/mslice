@@ -12,7 +12,7 @@ class FigureManagerTest(unittest.TestCase):
     # In the case of more plot figures being created than expected then a StopIteration Exception will be raised
     # by the mock module. The number of expected plots is defined by the list at the beginning of each unit test
 
-    def setUp(self): 
+    def setUp(self):
         FigureManager.reset()
 
     def test_constructor_fails(self):
