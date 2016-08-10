@@ -25,7 +25,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         path_to_nexus = join(tempdir,'cde.nxs')
         workspace_name = 'cde'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=path_to_nexus)
-        self.workspace_provider.getWorkspaceNames = mock.Mock(return_value=[workspace_name])
+        self.workspace_provider.mtd_getObjectNames = mock.Mock(return_value=[workspace_name])
 
         self.presenter.notify(Command.LoadWorkspace)
         self.view.get_workspace_to_load_path.assert_called_once()
@@ -44,7 +44,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         ws_name3 = 'file3'
         self.view.get_workspace_to_load_path = mock.Mock(
             side_effect=[path1, path2, path3])
-        self.workspace_provider.getWorkspaceNames = mock.Mock(return_value=[])
+        self.workspace_provider.mtd_getObjectNames = mock.Mock(return_value=[])
         for i in range(3):
             self.presenter.notify(Command.LoadWorkspace)
         load_calls = [call(Filename=path1, OutputWorkspace=ws_name1),
@@ -60,7 +60,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         new_workspace_name = 'new_name'
         self.view.get_workspace_selected = mock.Mock(return_value=[old_workspace_name])
         self.view.get_workspace_new_name = mock.Mock(return_value=new_workspace_name)
-        self.workspace_provider.getWorkspaceNames = mock.Mock(return_value=['file1', 'file2', 'file3'])
+        self.workspace_provider.mtd_getObjectNames = mock.Mock(return_value=['file1', 'file2', 'file3'])
 
         self.presenter.notify(Command.RenameWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()

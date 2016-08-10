@@ -2,9 +2,9 @@ import unittest
 
 import mock
 
-from main_presenter import MainPresenter
 from mainview import MainView
 from models.slice.slice_plotter import SlicePlotter
+from presenters.main_presenter import MainPresenter
 from presenters.slice_plotter_presenter import SlicePlotterPresenter,Axis
 from views.slice_plotter_view import SlicePlotterView
 from widgets.slice.command import Command

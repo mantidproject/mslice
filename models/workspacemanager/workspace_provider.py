@@ -2,7 +2,7 @@ import abc
 
 class WorkspaceProvider:
     @abc.abstractmethod
-    def getWorkspaceNames(self):
+    def mtd_getObjectNames(self):
         pass
     @abc.abstractmethod
     def DeleteWorkspace(self,ToBeDeleted):

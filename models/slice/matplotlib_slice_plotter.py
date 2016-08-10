@@ -2,7 +2,6 @@ from slice_plotter import SlicePlotter
 from mantid.simpleapi import mtd
 from plotting import pyplot as plt
 import numpy as np
-import matplotlib
 
 
 def get_aspect_ratio(self, workspace):

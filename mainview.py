@@ -1,4 +1,4 @@
-from main_presenter import MainPresenter
+from presenters.main_presenter import MainPresenter
 from views.workspace_view import WorkspaceView
 
 

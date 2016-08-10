@@ -3,7 +3,7 @@ from mantid.simpleapi import mtd,Load,DeleteWorkspace,Load,GroupWorkspaces,Renam
 
 class MantidWorkspaceProvider(WorkspaceProvider):
 
-    def getWorkspaceNames(self):
+    def mtd_getObjectNames(self):
         return mtd.getObjectNames()
 
     def DeleteWorkspace(self,ToBeDeleted):

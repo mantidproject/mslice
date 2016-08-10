@@ -1,4 +1,4 @@
-from FigureManager import FigureManager,activate_category
+from figuremanager import FigureManager,activate_category
 from script_generation import script_log
 
 

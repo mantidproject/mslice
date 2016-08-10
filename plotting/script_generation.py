@@ -1,4 +1,4 @@
-from FigureManager import FigureManager
+from figuremanager import FigureManager
 
 def script_log(source_module):
     def script_log_deocator(function):

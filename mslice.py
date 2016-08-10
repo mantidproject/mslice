@@ -1,7 +1,8 @@
 from PyQt4.QtGui import QMainWindow,QApplication
-from mslice_ui import Ui_MainWindow
-from main_presenter import MainPresenter
+
 from mainview import MainView
+from mslice_ui import Ui_MainWindow
+from presenters.main_presenter import MainPresenter
 
 
 class MsliceGui(QMainWindow,Ui_MainWindow,MainView):

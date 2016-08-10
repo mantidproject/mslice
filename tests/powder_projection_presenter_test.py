@@ -2,9 +2,9 @@ import unittest
 
 import mock
 
-from main_presenter import MainPresenter
 from mainview import MainView
 from models.projection.powder.projection_calculator import ProjectionCalculator
+from presenters.main_presenter import MainPresenter
 from presenters.powder_projection_presenter import PowderProjectionPresenter
 from views.powder_projection_view import PowderView
 from widgets.projection.powder.command import Command
