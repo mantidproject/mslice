@@ -34,13 +34,13 @@ class WorkspaceManagerPresenter(object):
         base = os.path.basename(workspace_to_load)
         ws_name = os.path.splitext(base)[0]
         #confirm that user wants to overwrite an existing workspace
-        if ws_name in self._work_spaceprovider.mtd_getObjectNames():
+        if ws_name in self._work_spaceprovider.get_workspace_names():
             confirm_overwrite = self._workspace_manger_view.confirm_overwrite_workspace()
             if not confirm_overwrite:
                 self._workspace_manger_view.no_workspace_has_been_loaded()
                 return
-        self._work_spaceprovider.Load(Filename=workspace_to_load, OutputWorkspace=ws_name)
-        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.mtd_getObjectNames())
+        self._work_spaceprovider.load(Filename=workspace_to_load, OutputWorkspace=ws_name)
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
     def _save_selected_workspace(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
@@ -52,7 +52,7 @@ class WorkspaceManagerPresenter(object):
             return
         selected_workspace = selected_workspaces[0]
         path = self._workspace_manger_view.get_workspace_to_save_filepath()
-        self._work_spaceprovider.SaveNexus(selected_workspace, path)
+        self._work_spaceprovider.save_nexus(selected_workspace, path)
 
     def _remove_selected_workspaces(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
@@ -60,8 +60,8 @@ class WorkspaceManagerPresenter(object):
             self._workspace_manger_view.error_select_one_or_more_workspaces()
             return
         for workspace in selected_workspaces:
-            self._work_spaceprovider.DeleteWorkspace(workspace)
-        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.mtd_getObjectNames())
+            self._work_spaceprovider.delete_workspace(workspace)
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
     def _group_selected_workspaces(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
@@ -70,8 +70,8 @@ class WorkspaceManagerPresenter(object):
             return
         group_name = 'group' + str(self._groupCount)
         self._groupCount += 1
-        self._work_spaceprovider.GroupWorkspaces(InputWorkspaces=selected_workspaces, OutputWorkspace=group_name)
-        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.mtd_getObjectNames())
+        self._work_spaceprovider.group_workspaces(InputWorkspaces=selected_workspaces, OutputWorkspace=group_name)
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
     def _rename_workspace(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
@@ -83,8 +83,8 @@ class WorkspaceManagerPresenter(object):
             return
         selected_workspace = selected_workspaces[0]
         new_name = self._workspace_manger_view.get_workspace_new_name()
-        self._work_spaceprovider.RenameWorkspace(selected_workspace, new_name)
-        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.mtd_getObjectNames())
+        self._work_spaceprovider.rename_workspace(selected_workspace, new_name)
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
     def get_selected_workspaces(self):
         """Get the currently selected workspaces from the user"""
@@ -96,5 +96,5 @@ class WorkspaceManagerPresenter(object):
         This function must be called by the main presenter if any other
         presenter does any operation that changes the name or type of any existing workspace or creates or removes a
         workspace"""
-        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.mtd_getObjectNames())
+        self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 

@@ -2,20 +2,20 @@ import abc
 
 class WorkspaceProvider:
     @abc.abstractmethod
-    def mtd_getObjectNames(self):
+    def get_workspace_names(self):
         pass
     @abc.abstractmethod
-    def DeleteWorkspace(self,ToBeDeleted):
+    def delete_workspace(self, ToBeDeleted):
         pass
     @abc.abstractmethod
-    def Load(self,Filename,OutputWorkspace):
+    def load(self, Filename, OutputWorkspace):
         pass
     @abc.abstractmethod
-    def GroupWorkspaces(self,InputWorkspaces,OutputWorkspace):
+    def group_workspaces(self, InputWorkspaces, OutputWorkspace):
         pass
     @abc.abstractmethod
-    def RenameWorkspace(self,selected_workspace,newName):
+    def rename_workspace(self, selected_workspace, newName):
         pass
     @abc.abstractmethod
-    def SaveNexus(self,workspace,path):
+    def save_nexus(self, workspace, path):
         pass

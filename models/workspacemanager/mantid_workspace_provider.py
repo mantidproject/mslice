@@ -3,20 +3,20 @@ from mantid.simpleapi import mtd,Load,DeleteWorkspace,Load,GroupWorkspaces,Renam
 
 class MantidWorkspaceProvider(WorkspaceProvider):
 
-    def mtd_getObjectNames(self):
+    def get_workspace_names(self):
         return mtd.getObjectNames()
 
-    def DeleteWorkspace(self,ToBeDeleted):
+    def delete_workspace(self, ToBeDeleted):
         return DeleteWorkspace(ToBeDeleted)
 
-    def Load(self,Filename,OutputWorkspace):
+    def load(self, Filename, OutputWorkspace):
         return Load(Filename=Filename,OutputWorkspace=OutputWorkspace)
 
-    def GroupWorkspaces(self,InputWorkspaces,OutputWorkspace):
+    def group_workspaces(self, InputWorkspaces, OutputWorkspace):
         return GroupWorkspaces(InputWorkspaces,OutputWorkspace)
 
-    def RenameWorkspace(self,selected_workspace,newName):
+    def rename_workspace(self, selected_workspace, newName):
         return RenameWorkspace(selected_workspace,newName)
 
-    def SaveNexus(self,workspace,path):
+    def save_nexus(self, workspace, path):
         SaveNexus(workspace,path)
