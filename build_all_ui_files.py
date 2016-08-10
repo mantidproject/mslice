@@ -1,7 +1,7 @@
 BUILDER = r'C:\Users\OMi32458\Workspace\mantid\external\src\ThirdParty\lib\python2.7\pyuic4.bat'
 WORKING_DIR = r'C:\MantidInstall\bin'
 
-import os,subprocess
+import os, subprocess
 script_path = os.path.realpath(__file__)
 script_folder = os.path.dirname(script_path)
 os.chdir(WORKING_DIR)
@@ -9,8 +9,8 @@ os.chdir(WORKING_DIR)
 
 def remove_extension(filename):
     """Remove the file extension"""
-    dot_occurences = [n for n in xrange(len(filename)) if filename.find('.', n) == n]
-    return filename[:dot_occurences[-1]]
+    dot_occurrences = [n for n in xrange(len(filename)) if filename.find('.', n) == n]
+    return filename[:dot_occurrences[-1]]
 
 
 def is_ui_file(item):
@@ -29,7 +29,7 @@ def build_item(item,verbose=True):
     basename = os.path.basename(item)
     output_file_name = get_output_file_name_item(basename)
     output_file_path = os.path.join(dir,output_file_name)
-    subprocess.call([BUILDER,item,'-o',output_file_path])
+    subprocess.call([BUILDER, item, '-o', output_file_path])
     if verbose:
         print [BUILDER, item, '-o', output_file_path]
 
