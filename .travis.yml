@@ -7,7 +7,6 @@ install:
 
 # command to run tests
 script: 
-  python -m unittest discover -s tests -p '*test.py'
   nosetests --with-coverage 
 
 after_success:
