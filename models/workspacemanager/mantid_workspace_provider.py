@@ -1,10 +1,10 @@
 from workspace_provider import WorkspaceProvider
-from mantid.simpleapi import mtd,Load,DeleteWorkspace,Load,GroupWorkspaces,RenameWorkspace,SaveNexus
+from mantid.simpleapi import AnalysisDataService,Load,DeleteWorkspace,Load,GroupWorkspaces,RenameWorkspace,SaveNexus
 
 class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_workspace_names(self):
-        return mtd.getObjectNames()
+        return AnalysisDataService.getObjectNames()
 
     def delete_workspace(self, ToBeDeleted):
         return DeleteWorkspace(ToBeDeleted)

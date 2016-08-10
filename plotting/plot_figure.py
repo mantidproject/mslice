@@ -81,7 +81,6 @@ class PlotFigure(QtGui.QMainWindow,Ui_MainWindow):
 
     def script_log(self, source_module, function_name, call_args, call_kwargs):
         self._script_log.append((source_module, function_name, call_args, call_kwargs))
-        print self._format_command(self._script_log[-1])
 
     def get_script(self):
         script = ""

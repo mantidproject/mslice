@@ -119,7 +119,7 @@ def plot(*args, **kwargs):
 
 @activate_category("2d")
 @draw_colorbar
-@script_log("plotting.pyplot")
+#@script_log("plotting.pyplot")
 def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
            vmin=None, vmax=None, origin=None, extent=None, shape=None,
            filternorm=1, filterrad=4.0, imlim=None, resample=None, url=None,
