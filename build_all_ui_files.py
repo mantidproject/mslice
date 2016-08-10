@@ -24,13 +24,14 @@ def get_output_file_name_item(filename):
     return output_file_name
 
 
-def build_item(item):
+def build_item(item,verbose=True):
     dir = os.path.dirname(item)
     basename = os.path.basename(item)
     output_file_name = get_output_file_name_item(basename)
     output_file_path = os.path.join(dir,output_file_name)
     subprocess.call([BUILDER,item,'-o',output_file_path])
-    print [BUILDER,item,'-o',output_file_path]
+    if verbose:
+        print [BUILDER, item, '-o', output_file_path]
 
 
 def build_all_ui_files(basepath):
