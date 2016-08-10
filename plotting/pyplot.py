@@ -1,6 +1,6 @@
 from figuremanager import FigureManager,activate_category
 from script_generation import script_log
-
+from matplotlib.cbook import dedent, silent_list, is_string_like, is_numlike
 
 def draw_if_interactive():
     # We will always draw because mslice might be running without matplotlib interactive
@@ -16,10 +16,6 @@ def gcf():
     return FigureManager.get_active_figure().get_figure()
 
 
-def hold(state=None):
-    """set hold of current axes to 'state', if no state is provided then it will toggle the hold state"""
-    gca().hold(None)
-
 
 
 def draw_colorbar(function):
@@ -34,7 +30,16 @@ def draw_colorbar(function):
     return wrapper
 
 # From here on just copy and paste from matplotlib.pyplot and decorate as appropriate
-@script_log("plotting.pyplot")
+module_name = "plotting.pyplot"
+
+
+@script_log(module_name)
+def hold(state=None):
+    """set hold of current axes to 'state', if no state is provided then it will toggle the hold state"""
+    gca().hold(None)
+
+
+@script_log(module_name)
 def colorbar(mappable=None, cax=None, ax=None, **kw):
     if mappable is None:
         mappable = gci()
@@ -49,6 +54,7 @@ def colorbar(mappable=None, cax=None, ax=None, **kw):
     ret = gcf().colorbar(mappable, cax = cax, ax=ax, **kw)
     draw_if_interactive()
     return ret
+
 
 def gca(**kwargs):
     """
@@ -99,7 +105,7 @@ def gci():
     """
     return gcf()._gci()
 
-@script_log("plotting.pyplot")
+@script_log(module_name)
 @activate_category("1d")
 def plot(*args, **kwargs):
     ax = gca()
@@ -144,7 +150,7 @@ def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
 
 @activate_category('2d')
 @draw_colorbar
-@script_log("plotting.pyplot")
+@script_log(module_name)
 def tripcolor(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -161,7 +167,7 @@ def tripcolor(*args, **kwargs):
     return ret
 
 #*************************************************************************************************************************************
-@script_log("plotting.pyplot")
+@script_log(module_name)
 def xlabel(s, *args, **kwargs):
     """
     Set the *x* axis label of the current axis.
@@ -183,7 +189,7 @@ def xlabel(s, *args, **kwargs):
     draw_if_interactive()
     return l
 
-@script_log("plotting.pyplot")
+@script_log(module_name)
 def ylabel(s, *args, **kwargs):
     """
     Set the *y* axis label of the current axis.
@@ -206,7 +212,7 @@ def ylabel(s, *args, **kwargs):
     draw_if_interactive()
     return l
 
-@script_log("plotting.pyplot")
+@script_log(module_name)
 def xscale(*args, **kwargs):
     """
     Set the scaling of the *x*-axis.
@@ -225,7 +231,7 @@ def xscale(*args, **kwargs):
     ax.set_xscale(*args, **kwargs)
     draw_if_interactive()
 
-@script_log("plotting.pyplot")
+@script_log(module_name)
 def yscale(*args, **kwargs):
     """
     Set the scaling of the *y*-axis.
@@ -244,7 +250,7 @@ def yscale(*args, **kwargs):
     ax.set_yscale(*args, **kwargs)
     draw_if_interactive()
 
-@script_log("plotting.pyplot")
+@script_log(module_name)
 def xticks(*args, **kwargs):
     """
     Get or set the *x*-limits of the current tick locations and labels.
@@ -285,7 +291,7 @@ def xticks(*args, **kwargs):
     draw_if_interactive()
     return locs, silent_list('Text xticklabel', labels)
 
-@script_log("plotting.pyplot")
+@script_log(module_name)
 def yticks(*args, **kwargs):
     """
     Get or set the *y*-limits of the current tick locations and labels.
@@ -325,11 +331,67 @@ def yticks(*args, **kwargs):
 
     draw_if_interactive()
 
-    return ( locs,
+    return (locs,
              silent_list('Text yticklabel', labels)
              )
 
+@script_log(module_name)
+def xlim(*args, **kwargs):
+    """
+    Get or set the *x* limits of the current axes.
 
+    ::
+
+      xmin, xmax = xlim()   # return the current xlim
+      xlim( (xmin, xmax) )  # set the xlim to xmin, xmax
+      xlim( xmin, xmax )    # set the xlim to xmin, xmax
+
+    If you do not specify args, you can pass the xmin and xmax as
+    kwargs, e.g.::
+
+      xlim(xmax=3) # adjust the max leaving min unchanged
+      xlim(xmin=1) # adjust the min leaving max unchanged
+
+    Setting limits turns autoscaling off for the x-axis.
+
+    The new axis limits are returned as a length 2 tuple.
+
+    """
+    ax = gca()
+    if not args and not kwargs:
+        return ax.get_xlim()
+    ret = ax.set_xlim(*args, **kwargs)
+    draw_if_interactive()
+    return ret
+
+
+@script_log(module_name)
+def ylim(*args, **kwargs):
+    """
+    Get or set the *y*-limits of the current axes.
+
+    ::
+
+      ymin, ymax = ylim()   # return the current ylim
+      ylim( (ymin, ymax) )  # set the ylim to ymin, ymax
+      ylim( ymin, ymax )    # set the ylim to ymin, ymax
+
+    If you do not specify args, you can pass the *ymin* and *ymax* as
+    kwargs, e.g.::
+
+      ylim(ymax=3) # adjust the max leaving min unchanged
+      ylim(ymin=1) # adjust the min leaving max unchanged
+
+    Setting limits turns autoscaling off for the y-axis.
+
+    The new axis limits are returned as a length 2 tuple.
+    """
+    ax = gca()
+    if not args and not kwargs:
+        return ax.get_ylim()
+    ret = ax.set_ylim(*args, **kwargs)
+    draw_if_interactive()
+    return ret
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QApplication
