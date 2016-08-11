@@ -20,3 +20,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def save_nexus(self, workspace, path):
         SaveNexus(workspace,path)
+
+    @staticmethod
+    def get_workspace_handle(workspace_name):
+        """"Return handle to workspace given workspace_name_as_string"""
+        return AnalysisDataService[workspace_name]

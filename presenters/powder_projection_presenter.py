@@ -42,7 +42,7 @@ class PowderProjectionPresenter(object):
             output_workspace = self._powder_view.get_output_workspace_name()
             binning = self._projection_calculator.calculate_suggested_binning(workspace)
             # TODO should user be able to suggest own binning?
-            self._projection_calculator.calculate_projection(workspace, output_workspace, binning, axis1, axis2)
+            self._projection_calculator.calculate_projection(workspace, output_workspace, axis1, axis2)
         self._get_main_presenter().update_displayed_workspaces()
 
     def _get_main_presenter(self):

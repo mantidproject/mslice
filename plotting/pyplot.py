@@ -6,6 +6,7 @@ def draw_if_interactive():
     # We will always draw because mslice might be running without matplotlib interactive
     for figure in FigureManager._figures.values():
         figure.canvas.draw()
+        figure.canvas.draw()
 
 
 def figure(num=None):
