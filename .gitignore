@@ -4,13 +4,15 @@ __pycache__/
 *$py.class
 *.pyc
 
+#pylint
+pylint_check.py
+pylint-check.py
 
 #IDE cache
 .idea/
 
 #PyQt compiled files
-ui_MSlice.py
-quickview/getter_ui.py
+*_ui.py
 
 # C extensions
 *.so

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>402</width>
+    <height>150</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout_12">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_251">
+       <property name="text">
+        <string>along</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbCutAxis"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>from</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLineEdit" name="lneCutStart"/>
+     </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="label_257">
+       <property name="text">
+        <string>to</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QLineEdit" name="lneCutEnd"/>
+     </item>
+     <item row="0" column="6">
+      <widget class="QLabel" name="label_256">
+       <property name="text">
+        <string>step</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="7">
+      <widget class="QLineEdit" name="lneCutStep">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Integrating</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_258">
+       <property name="text">
+        <string>from</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLineEdit" name="lneCutIntegrationStart"/>
+     </item>
+     <item row="1" column="4">
+      <widget class="QLabel" name="label_259">
+       <property name="text">
+        <string>to</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QLineEdit" name="lneCutIntegrationEnd"/>
+     </item>
+     <item row="1" column="6">
+      <widget class="QLabel" name="label_253">
+       <property name="text">
+        <string>width</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="7">
+      <widget class="QLineEdit" name="lneCutIntegrationWidth">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Intensity</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLabel" name="label_264">
+       <property name="text">
+        <string>from</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QLineEdit" name="lneEditCutIntensityStart"/>
+     </item>
+     <item row="2" column="4">
+      <widget class="QLabel" name="label_265">
+       <property name="text">
+        <string>to</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="5">
+      <widget class="QLineEdit" name="lneCutIntensityEnd"/>
+     </item>
+     <item row="2" column="6" colspan="2">
+      <widget class="QRadioButton" name="rdoCutNormToOne">
+       <property name="text">
+        <string>Norm to 1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Smoothing</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2" colspan="2">
+      <widget class="QLineEdit" name="lneCutSmoothing"/>
+     </item>
+     <item row="3" column="6" colspan="2">
+      <widget class="QPushButton" name="btnCutPlot">
+       <property name="text">
+        <string>Plot</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="QPushButton" name="btnCutSaveAscii">
+       <property name="text">
+        <string>Save Ascii</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="3" colspan="3">
+      <widget class="QPushButton" name="btnCutSaveToWorkspace">
+       <property name="text">
+        <string>Save to Workspace</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="6" colspan="2">
+      <widget class="QPushButton" name="btnCutPlotOver">
+       <property name="text">
+        <string>Plot Over</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

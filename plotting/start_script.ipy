@@ -1,0 +1,2 @@
+%gui qt
+import embed_in_qt.pyplot as plt
