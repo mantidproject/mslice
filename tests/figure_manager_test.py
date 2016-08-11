@@ -69,25 +69,38 @@ class FigureManagerTest(unittest.TestCase):
         fig1_number = FigureManager.number_of_figure(fig1)
         fig2_number = FigureManager.number_of_figure(fig2)
         self.assert_(FigureManager.get_active_figure() == fig2)
-        self.assert_(FigureManager)
         self.assert_(FigureManager.get_category(fig1_number) == category)
         self.assertRaises(KeyError,FigureManager.get_category,fig2_number)
-        self.assert_( fig1_number ==1 and fig2_number == 2)
+        self.assert_( fig1_number == 1 and fig2_number == 2)
 
     @mock.patch(plot_window_class)
     def test_category_switching(self,mock_figure_class):
-            mock_figures = [mock.Mock(),mock.Mock()]
-            mock_figure_class.side_effect = mock_figures
-            cat1 = '1d'
-            cat2 = '2d'
-            cat1_get_active_figure = activate_category(cat1)(FigureManager.get_active_figure)
-            cat2_get_active_figure = activate_category(cat2)(FigureManager.get_active_figure)
-            # test is an arbitrary method just to make sure the correct figures are returned
-            cat1_get_active_figure().test(1)
-            cat2_get_active_figure().test(2)
-            cat1_get_active_figure().test(3)
+        mock_figures = [mock.Mock(),mock.Mock()]
+        mock_figure_class.side_effect = mock_figures
+        cat1 = '1d'
+        cat2 = '2d'
+        cat1_get_active_figure = activate_category(cat1)(FigureManager.get_active_figure)
+        cat2_get_active_figure = activate_category(cat2)(FigureManager.get_active_figure)
+        # test is an arbitrary method just to make sure the correct figures are returned
+        cat1_get_active_figure().test(1)
+        cat2_get_active_figure().test(2)
+        cat1_get_active_figure().test(3)
 
-            mock_figures[0].test.assert_has_calls([call(1), call(3)])
-            mock_figures[1].test.assert_has_calls([call(2)])
-            self.assert_(FigureManager._active_figure == 1)
+        mock_figures[0].test.assert_has_calls([call(1), call(3)])
+        mock_figures[1].test.assert_has_calls([call(2)])
+        self.assert_(FigureManager._active_figure == 1)
+
+    @mock.patch(plot_window_class)
+    def test_close_only_window(self,mock_figure_class):
+        mock_figures = [mock.Mock(), mock.Mock()]
+        mock_figure_class.side_effect = mock_figures
+        # Get a figure
+        fig1 = FigureManager.get_active_figure()
+        # check that getting the active window doesnt bring up a new one
+        self.assert_(FigureManager.get_active_figure() == fig1)
+        FigureManager.figure_closed(1)
+        fig2 = FigureManager.get_active_figure()
+
+        self.assert_(fig1 == mock_figures[0])
+        self.assert_(fig2 == mock_figures[1])
 
