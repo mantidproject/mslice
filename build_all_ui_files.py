@@ -1,14 +1,11 @@
-BUILDER = r'C:\Users\OMi32458\Workspace\mantid\external\src\ThirdParty\lib\python2.7\pyuic4.bat'
-WORKING_DIR = r'C:\MantidInstall\bin'
-
-import os, subprocess
+from PyQt4 import uic
+import os
 script_path = os.path.realpath(__file__)
 script_folder = os.path.dirname(script_path)
-os.chdir(WORKING_DIR)
 
 
 def remove_extension(filename):
-    """Remove the file extension"""
+    """return a the filename without the extension"""
     dot_occurrences = [n for n in xrange(len(filename)) if filename.find('.', n) == n]
     return filename[:dot_occurrences[-1]]
 
@@ -29,9 +26,11 @@ def build_item(item,verbose=True):
     basename = os.path.basename(item)
     output_file_name = get_output_file_name_item(basename)
     output_file_path = os.path.join(dir,output_file_name)
-    subprocess.call([BUILDER, item, '-o', output_file_path])
+    with open(output_file_path, 'w') as fout:
+        uic.compileUi(item, fout)
+
     if verbose:
-        print [BUILDER, item, '-o', output_file_path]
+        print item, "==>", output_file_path
 
 
 def build_all_ui_files(basepath):
