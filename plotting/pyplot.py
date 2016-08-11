@@ -2,10 +2,10 @@ from figuremanager import FigureManager,activate_category
 from script_generation import script_log
 from matplotlib.cbook import dedent, silent_list, is_string_like, is_numlike
 
+
 def draw_if_interactive():
     # We will always draw because mslice might be running without matplotlib interactive
     for figure in FigureManager._figures.values():
-        figure.canvas.draw()
         figure.canvas.draw()
 
 
