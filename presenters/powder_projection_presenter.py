@@ -18,8 +18,8 @@ class PowderProjectionPresenter(object):
 
         self._main_view = main_view
         #Add rest of options
-        self._powder_view.populate_powder_u1(['Energy'])
-        self._powder_view.populate_powder_u2(['|Q|'])
+        self._powder_view.populate_powder_u1(['|Q|'])
+        self._powder_view.populate_powder_u2(['Energy'])
 
     def notify(self, command):
         if command == Command.CalculatePowderProjection:
