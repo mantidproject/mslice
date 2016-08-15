@@ -36,3 +36,21 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
 
     def error_select_one_workspace(self):
         self._display_error('Please select a workspace to slice', 2000)
+
+    def get_slice_x_start(self):
+        return str(self.lneSliceXStart.text())
+
+    def get_slice_x_end(self):
+        return str(self.lneSliceXEnd.text())
+
+    def get_slice_x_step(self):
+        return str(self.lneSliceXStep.text())
+
+    def get_slice_y_start(self):
+        return str(self.lneSliceYStart.text())
+
+    def get_slice_y_end(self):
+        return str(self.lneSliceYEnd.text())
+
+    def get_slice_y_step(self):
+        return str(self.lneSliceYStep.text())
