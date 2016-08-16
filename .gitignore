@@ -98,6 +98,3 @@ ENV/
 
 # Rope project settings
 .ropeproject
-
-# Files I create just for debugging
-debugbug.py
