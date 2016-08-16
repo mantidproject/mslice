@@ -50,6 +50,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
             slice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
             plot_data = slice.getSignalArray() / slice.getNumEventsArray()
             plot_data = np.ma.masked_where(np.isnan(plot_data), plot_data)
+            # The flipud is because mantid plots first row of array at top of plot
+            # rot90 switches the x and y axis to to plot what user expected.
             plot_data = np.rot90(plot_data)
             plot_data = np.flipud(plot_data)
             x_step = x_dim.getX(1) - x_dim.getX(0)
@@ -58,7 +60,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
             y = np.arange(y_axis.start, y_axis.end + x_axis.step/2 , y_axis.step)
             #TODO check maths to see if x and y align properly with plot or are off by half bin/ off by one
             xx, yy = np.meshgrid(x, y, indexing='xy')
-            #
             plt.pcolormesh(xx, yy, plot_data)
             plt.xlabel(x_dim.getName())
             plt.ylabel(y_dim.getName())
