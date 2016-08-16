@@ -45,10 +45,16 @@ class MatplotlibCanvas(FigureCanvas):
 
 
     def _redraw_zoom_rect(self,mouse_event):
+        cache = [self._new_axes_limits[0][:],self._new_axes_limits[1][:]]
         self._new_axes_limits[0][1] = mouse_event.xdata
         self._new_axes_limits[1][1] = mouse_event.ydata
         rect = zip(*self._new_axes_limits)
-        rect = self.axes.transData.transform(rect)
+        try:
+            rect = self.axes.transData.transform(rect)
+        except ValueError:
+            # Mouse has gone out of bounds, undo changes and abort operation and supress errors
+            self._new_axes_limits = cache
+            return
         width, height = map(lambda c: c[1] - c[0], zip(*rect))
         x,y = rect[0]
         # We flip y and negate height because the coordinates of the axes and those of the canvas have opposite

@@ -1,4 +1,4 @@
-from plotting.plot_window_ui import Ui_MainWindow
+from plotting.plot_window.plot_window_ui import Ui_MainWindow
 from base_qt_plot_window import BaseQtPlotWindow
 
 
