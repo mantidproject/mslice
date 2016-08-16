@@ -20,10 +20,8 @@ class MatplotlibCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
         self._rect_cid = None
         self._motion_cid = None
-        self._new_axes_limits = [[None,None],[None,None]] # For zooming [[x_lower,x_upper],[y_lower,y_upper]]
-        # TODO implement zoom history stack
+        self._new_axes_limits = [[None, None], [None, None]] # For zooming [[x_lower,x_upper],[y_lower,y_upper]]
         self._zoom_history_stack = []
-        self._zoom_rect = None
 
     def zoom_out(self):
         if self._zoom_history_stack:
@@ -35,6 +33,7 @@ class MatplotlibCanvas(FigureCanvas):
     def zoom_in(self):
         self._zoom_history_stack.append([self.axes.get_xlim(), self.axes.get_ylim()])
         self._rect_cid = self.mpl_connect("button_press_event", self._start_draw_zoom_rect)
+        self._background = self.copy_from_bbox(self.axes.bbox)
         self.setCursor(QtCore.Qt.CrossCursor)
 
     def _start_draw_zoom_rect(self,mouse_event):
@@ -48,14 +47,16 @@ class MatplotlibCanvas(FigureCanvas):
     def _redraw_zoom_rect(self,mouse_event):
         self._new_axes_limits[0][1] = mouse_event.xdata
         self._new_axes_limits[1][1] = mouse_event.ydata
-        if self._zoom_rect:
-            self._zoom_rect.remove()
-        x,y = self._new_axes_limits[0][0], self._new_axes_limits[1][0]
-        width, height = map(lambda x: x[1]-x[0], self._new_axes_limits)
-        self._zoom_rect = Rectangle((x, y), width, height, fill=False)
-        self.axes.add_patch(self._zoom_rect)
-        self.draw()
-
+        rect = zip(*self._new_axes_limits)
+        rect = self.axes.transData.transform(rect)
+        width, height = map(lambda c: c[1] - c[0], zip(*rect))
+        x,y = rect[0]
+        # We flip y and negate height because the coordinates of the axes and those of the canvas have opposite
+        # vertical orientations
+        y = self.geometry().height() - y
+        height = -height
+        rect = (x, y, width, height)
+        self.drawRectangle(rect)
 
     def _end_draw_zoom_rect(self,mouse_event):
         self.mpl_disconnect(self._motion_cid)
@@ -64,12 +65,11 @@ class MatplotlibCanvas(FigureCanvas):
         self._new_axes_limits[1].sort()
         self.axes.set_xlim(*self._new_axes_limits[0])
         self.axes.set_ylim(*self._new_axes_limits[1])
-        self._new_axes_limits = [[None,None],[None,None]]
+        self._new_axes_limits = [[None, None], [None, None]]
         self.setCursor(QtCore.Qt.ArrowCursor)
-        if self._zoom_rect:
-            self._zoom_rect.remove()
-            self._zoom_rect = None
+        self.drawRectangle(None)
         self.draw()
+
 
 
 class BaseQtPlotWindow(BasePlotWindow, QtGui.QMainWindow):
@@ -85,7 +85,6 @@ class BaseQtPlotWindow(BasePlotWindow, QtGui.QMainWindow):
         self.setWindowTitle('Figure %i'%number)
 
         self.show() # this isn,t a good idea in non interactive mode #TODO FIX IT
-
 
     def closeEvent(self, event):
         self._manager.figure_closed(self.number)
