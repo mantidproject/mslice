@@ -45,8 +45,8 @@ class SlicePlotterPresenter:
             self._slice_view.error_select_one_workspace()
             return
         if len(selected_workspaces) > 1:
-            pass
-            #TODO is this okay? plot multiple? or error?
+            raise NotImplementedError('')
+
         selected_workspace = selected_workspaces[0]
         x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
                       self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())

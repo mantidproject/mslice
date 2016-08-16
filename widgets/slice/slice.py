@@ -8,7 +8,7 @@ from views.slice_plotter_view import SlicePlotterView
 
 
 class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
-    def __init__(self, main_window, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """This Widget provides basic control over displaying slices. This widget is NOT USABLE without a main window
 
         The main window must implement MainView"""
