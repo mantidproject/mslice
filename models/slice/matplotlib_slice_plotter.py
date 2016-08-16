@@ -80,3 +80,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
         """Deduct Values not supplied by user from workspace"""
         pass
 
+
+    def _validate_input(self,x_axis, y_axis, intensity_start, intensity_end):
+        return 0
