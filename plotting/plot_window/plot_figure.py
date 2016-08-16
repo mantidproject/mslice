@@ -1,5 +1,6 @@
 from plotting.plot_window.plot_window_ui import Ui_MainWindow
 from base_qt_plot_window import BaseQtPlotWindow
+from plotting.plot_window.plot_window_ui import Ui_MainWindow
 
 
 class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
