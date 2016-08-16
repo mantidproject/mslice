@@ -1,13 +1,17 @@
-from collections import namedtuple
-
 from mainview import MainView
 from models.slice.slice_plotter import SlicePlotter
 from views.slice_plotter_view import SlicePlotterView
 from widgets.slice.command import Command
 
-Axis = namedtuple('Axis', ['units', 'start', 'end', 'step'])
 
-#TODO askOwen ,these constants exist in both sliceplotter and the presenter, where should they be defined?
+class Axis:
+    def __init__(self, units, start, end, step):
+        self.units = units
+        self.start = start
+        self.end = end
+        self.step = step
+
+
 INVALID_PARAMS = 1
 INVALID_X_PARAMS = 2
 INVALID_Y_PARAMS = 3

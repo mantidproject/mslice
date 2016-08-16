@@ -6,6 +6,7 @@ from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
 from math import floor
 import numpy as np
+
 from plotting import pyplot as plt
 
 
@@ -48,7 +49,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
             xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
             ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
             slice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
-            plot_data = slice.getSignalArray() / slice.getNumEventsArray()
+            # perform number of events normalization then discard cells where no data was found
+            with np.errstate(invalid='ignore'):
+                plot_data = slice.getSignalArray() / slice.getNumEventsArray()
             plot_data = np.ma.masked_where(np.isnan(plot_data), plot_data)
             # The flipud is because mantid plots first row of array at top of plot
             # rot90 switches the x and y axis to to plot what user expected.
