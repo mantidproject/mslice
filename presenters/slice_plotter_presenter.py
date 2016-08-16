@@ -11,6 +11,11 @@ class Axis:
         self.end = end
         self.step = step
 
+    def __eq__(self, other):
+        # This is required for Unit testing
+        return self.units == other.units and self.start == other.start and self.end == other.end \
+                and self.step == other.step and isinstance(other, Axis)
+
 
 INVALID_PARAMS = 1
 INVALID_X_PARAMS = 2
