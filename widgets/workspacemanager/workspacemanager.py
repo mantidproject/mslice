@@ -32,6 +32,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         self._main_window = None
 
     def set_main_window(self,main_window):
+        # TODO refactor to emit errors as signals
         """Set a main window to display status bar messages to.
 
          If no main window is set any errors will be displayed to QDialogBoxes"""
