@@ -77,13 +77,13 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.projection_calculator.calculate_projection.assert_not_called()
 
     def test_calculate_projection_multiple_selection(self):
-        selected_workspaces = ['a', 'b']
+        selected_workspaces = []
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=selected_workspaces)
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
-        u2 = 'Energy'
+        u2 = '|Q|'
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
         self.assertRaises(NotImplementedError,self.powder_presenter.notify,Command.CalculatePowderProjection)
