@@ -61,3 +61,6 @@ class SlicePlotterView:
 
     def error_invalid_plot_parameters(self):
         pass
+
+    def populate_colormap_options(self,colormaps):
+        pass

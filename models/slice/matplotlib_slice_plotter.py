@@ -29,7 +29,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             y_axis.start = float(y_axis.start)
             y_axis.end = float(y_axis.end)
         except ValueError:
-            return  INVALID_Y_PARAMS
+            return INVALID_Y_PARAMS
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         if isinstance(workspace,IMDEventWorkspace):
             # TODO ask if this slice should live in ADS after plotting?
@@ -63,7 +63,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             y = np.arange(y_axis.start, y_axis.end + x_axis.step/2 , y_axis.step)
             #TODO check maths to see if x and y align properly with plot or are off by half bin/ off by one
             xx, yy = np.meshgrid(x, y, indexing='xy')
-            plt.pcolormesh(xx, yy, plot_data)
+            plt.pcolormesh(xx, yy, plot_data, cmap=colourmap)
             plt.xlabel(x_dim.getName())
             plt.ylabel(y_dim.getName())
         else:
@@ -74,7 +74,10 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_right = workspace.readX(0)[-1]
             y_top = workspace.getNumberHistograms() - 1
             y_bottom = 0
-            plt.imshow(ydata,extent=[x_left, x_right, y_bottom, y_top], aspect=get_aspect_ratio(workspace))
+            plt.imshow(ydata,extent=[x_left, x_right, y_bottom, y_top], aspect=get_aspect_ratio(workspace), cmap=colourmap)
+
+    def get_available_colormaps(self):
+        return ['viridis', 'jet', 'summer', 'winter']
 
     def _get_number_of_steps(self, axis):
         return int(max(1, floor(axis.end - axis.start)/axis.step))

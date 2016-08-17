@@ -54,3 +54,8 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
 
     def get_slice_y_step(self):
         return str(self.lneSliceYStep.text())
+
+    def populate_colormap_options(self,colormaps):
+        self.cmbSliceColormap.clear()
+        for colormap in colormaps:
+            self.cmbSliceColormap.addItem(colormap)

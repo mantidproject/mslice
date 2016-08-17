@@ -37,6 +37,8 @@ class SlicePlotterPresenter:
         self._slice_view = slice_view
         self._main_view = main_view
         self._slice_plotter = slice_plotter
+        colormaps = self._slice_plotter.get_available_colormaps()
+        self._slice_view.populate_colormap_options(colormaps)
 
     def notify(self,command):
         if command == Command.DisplaySlice:
