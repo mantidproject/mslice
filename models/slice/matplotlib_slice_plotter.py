@@ -6,6 +6,7 @@ from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
 from math import floor
 import numpy as np
+import matplotlib.cm as cm
 
 from plotting import pyplot as plt
 
@@ -13,21 +14,29 @@ from plotting import pyplot as plt
 def get_aspect_ratio(workspace):
     return 'auto'
 
+def to_float(x):
+    if x:
+        return float(x)
+    else:
+        return None
+
 class MatplotlibSlicePlotter(SlicePlotter):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
+        self._colormaps = ['viridis', 'jet', 'summer', 'winter']
+
     def display_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                       colourmap):
         try:
-            x_axis.step = float(x_axis.step)
-            x_axis.start = float(x_axis.start)
-            x_axis.end = float(x_axis.end)
+            x_axis.step = to_float(x_axis.step)
+            x_axis.start = to_float(x_axis.start)
+            x_axis.end = to_float(x_axis.end)
         except ValueError:
             return INVALID_X_PARAMS
         try:
-            y_axis.step = float(x_axis.step)
-            y_axis.start = float(y_axis.start)
-            y_axis.end = float(y_axis.end)
+            y_axis.step = to_float(x_axis.step)
+            y_axis.start = to_float(y_axis.start)
+            y_axis.end = to_float(y_axis.end)
         except ValueError:
             return INVALID_Y_PARAMS
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
@@ -74,10 +83,10 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_right = workspace.readX(0)[-1]
             y_top = workspace.getNumberHistograms() - 1
             y_bottom = 0
-            plt.imshow(ydata,extent=[x_left, x_right, y_bottom, y_top], aspect=get_aspect_ratio(workspace), cmap=colourmap)
+            plt.imshow(ydata, extent=[x_left, x_right, y_bottom, y_top], aspect=get_aspect_ratio(workspace), cmap=colourmap)
 
     def get_available_colormaps(self):
-        return ['viridis', 'jet', 'summer', 'winter']
+        return self._colormaps
 
     def _get_number_of_steps(self, axis):
         return int(max(1, floor(axis.end - axis.start)/axis.step))
