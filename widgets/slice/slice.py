@@ -59,3 +59,6 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.cmbSliceColormap.clear()
         for colormap in colormaps:
             self.cmbSliceColormap.addItem(colormap)
+
+    def get_slice_colourmap(self):
+        return str(self.cmbSliceColormap.currentText())
