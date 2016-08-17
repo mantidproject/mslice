@@ -17,8 +17,6 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
         self.wgtPowder.set_workspace_selector(self)
 
 if __name__ == "__main__":
-    from build_all_ui_files import build_all_ui_files,script_folder
-    build_all_ui_files(script_folder)
     qapp = QApplication([])
     mslice = MsliceGui()
     mslice.show()
