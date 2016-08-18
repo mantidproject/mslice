@@ -34,7 +34,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         except ValueError:
             return INVALID_X_PARAMS
         try:
-            y_axis.step = to_float(x_axis.step)
+            y_axis.step = to_float(y_axis.step)
             y_axis.start = to_float(y_axis.start)
             y_axis.end = to_float(y_axis.end)
         except ValueError:
@@ -66,13 +66,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
             # rot90 switches the x and y axis to to plot what user expected.
             plot_data = np.rot90(plot_data)
             plot_data = np.flipud(plot_data)
-            x_step = x_dim.getX(1) - x_dim.getX(0)
-            x = np.arange(x_axis.start, x_axis.end +x_axis.step/2, x_axis.step)
-            y_step = y_dim.getX(1) - y_dim.getX(0)
-            y = np.arange(y_axis.start, y_axis.end + x_axis.step/2 , y_axis.step)
-            #TODO check maths to see if x and y align properly with plot or are off by half bin/ off by one
-            xx, yy = np.meshgrid(x, y, indexing='xy')
-            plt.pcolormesh(xx, yy, plot_data, cmap=colourmap)
+            boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
+            plt.imshow(plot_data, extent=boundaries,interpolation='none', aspect=get_aspect_ratio(workspace),
+                       cmap=colourmap)
             plt.xlabel(x_dim.getName())
             plt.ylabel(y_dim.getName())
         else:
@@ -83,7 +79,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_right = workspace.readX(0)[-1]
             y_top = workspace.getNumberHistograms() - 1
             y_bottom = 0
-            plt.imshow(ydata, extent=[x_left, x_right, y_bottom, y_top], aspect=get_aspect_ratio(workspace), cmap=colourmap)
+            plt.imshow(ydata, interpolation='none', extent=[x_left, x_right, y_bottom, y_top],
+                       aspect=get_aspect_ratio(workspace), cmap=colourmap)
 
     def get_available_colormaps(self):
         return self._colormaps
