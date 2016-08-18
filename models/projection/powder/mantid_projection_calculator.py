@@ -1,15 +1,16 @@
-
-from mantid.simpleapi import AnalysisDataService,ConvertToMD
-
+from mantid.simpleapi import ConvertToMD
 from models.projection.powder.projection_calculator import ProjectionCalculator
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
+MD_SUFFIX = '_MD'
+
 
 class MantidProjectionCalculator(ProjectionCalculator):
-    def calculate_projection(self, input_workspace, output_workspace, axis1, axis2):
-        import random,string
-        letters = list(string.ascii_lowercase)
-        random.shuffle(letters)
-        input_workspace = MantidWorkspaceProvider.get_workspace_handle(input_workspace)
-        x = ConvertToMD(input_workspace,'|Q|','Direct')
-        raise NotImplementedError('Implement me')
+    def calculate_projection(self, input_workspace, axis1, axis2):
+        output_workspace = input_workspace + MD_SUFFIX
+        if axis1 == '|Q|' and axis2 == 'Energy':
+            ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions='|Q|',
+                        PreprocDetectorsWS='-')
+        else:
+            raise NotImplementedError('MSlice currently only supports projection to Energy vs |Q|')
+

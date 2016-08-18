@@ -18,8 +18,8 @@ class PowderProjectionPresenter(object):
 
         self._main_view = main_view
         #Add rest of options
-        self._powder_view.populate_powder_u1(['Energy'])
-        self._powder_view.populate_powder_u2(['|Q|'])
+        self._powder_view.populate_powder_u1(['|Q|'])
+        self._powder_view.populate_powder_u2(['Energy'])
 
     def notify(self, command):
         if command == Command.CalculatePowderProjection:
@@ -32,17 +32,13 @@ class PowderProjectionPresenter(object):
         axis1 = self._powder_view.get_powder_u1()
         axis2 = self._powder_view.get_powder_u2()
         if axis1 == axis2:
-            pass # TODO ask what to do
+            raise NotImplementedError('equal axis')
         if not selected_workspaces:
             pass
-            # TODO notify user? Status bar maybe?
+            raise NotImplementedError('Implement error message')
 
         for workspace in selected_workspaces:
-            # TODO if spec decides on suffix naming system then this will be calculated by the presenter!
-            output_workspace = self._powder_view.get_output_workspace_name()
-            binning = self._projection_calculator.calculate_suggested_binning(workspace)
-            # TODO should user be able to suggest own binning?
-            self._projection_calculator.calculate_projection(workspace, output_workspace, axis1, axis2)
+            self._projection_calculator.calculate_projection(workspace, axis1, axis2)
         self._get_main_presenter().update_displayed_workspaces()
 
     def _get_main_presenter(self):
