@@ -1,5 +1,8 @@
 from cut_ui import Ui_Form
 from views.cut_view import CutView
+from command import Command
+from presenters.cut_presenter import CutPresenter
+from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 from PyQt4.QtGui import QWidget
 
 
@@ -7,9 +10,22 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def __init__(self,*args, **kwargs):
         super(CutWidget,self).__init__(*args, **kwargs)
         self.setupUi(self)
+        self._command_lookup = {
+            self.btnCutPlot: Command.Plot,
+            self.btnCutPlotOver: Command.PlotOver,
+            self.btnCutSaveToWorkspace: Command.SaveToWorkspace,
+            self.btnCutSaveAscii: Command.SaveToAscii
+        }
+        for button in self._command_lookup.keys():
+            button.clicked.connect(self._btn_clicked)
+
+    def _btn_clicked(self):
+        sender = self.sender()
+        command = self._command_lookup[sender]
+        self._presenter.notify(Command)
 
     def set_workspace_selector(self, workspace_selector):
-        pass
+        self._presenter = CutPresenter(self, workspace_selector, MatplotlibCutPlotter())
 
     def get_cut_axis(self):
         return str(self.cmbCutAxis.currentText())
