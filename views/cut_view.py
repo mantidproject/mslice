@@ -13,10 +13,10 @@ class CutView:
     def get_cut_axis_step(self):
         pass
 
-    def get_integration_axis_start(self):
+    def get_integration_start(self):
         pass
 
-    def get_integration_axis_end(self):
+    def get_integration_end(self):
         pass
 
     def get_integration_width(self):

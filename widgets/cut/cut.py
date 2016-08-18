@@ -8,7 +8,6 @@ class CutWidget(QWidget, CutView, Ui_Form):
         super(CutWidget,self).__init__(*args, **kwargs)
         self.setupUi(self)
 
-
     def set_workspace_selector(self, workspace_selector):
         pass
 
@@ -24,10 +23,10 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def get_cut_axis_end(self):
         return str(self.lneCutEnd.text())
 
-    def get_integration_axis_start(self):
+    def get_integration_start(self):
         return str(self.lneCutIntegrationStart.text())
 
-    def get_integration_axis_end(self):
+    def get_integration_end(self):
         return str(self.lneCutIntegrationEnd.text())
 
     def get_integration_width(self):
@@ -44,3 +43,8 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
     def get_smoothing(self):
         return str(self.lneCutSmoothing.text())
+
+    def populate_cut_axis_options(self,options):
+        self.cmbCutAxis.clear()
+        for option in options:
+            self.cmbCutAxis.addItem(option)
