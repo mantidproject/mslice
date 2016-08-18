@@ -13,6 +13,7 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
         self._presenter = MainPresenter(self,workspace_presenter)
 
         self.wgtWorkspacemanager.set_main_window(self)
+
         self.wgtSlice.set_workspace_selector(self)
         self.wgtPowder.set_workspace_selector(self)
 

@@ -1,5 +1,5 @@
 from workspace_provider import WorkspaceProvider
-from mantid.simpleapi import AnalysisDataService,Load,DeleteWorkspace,Load,GroupWorkspaces,RenameWorkspace,SaveNexus
+from mantid.simpleapi import AnalysisDataService,DeleteWorkspace,GroupWorkspaces,Load,RenameWorkspace,SaveNexus
 
 class MantidWorkspaceProvider(WorkspaceProvider):
 
@@ -20,3 +20,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def save_nexus(self, workspace, path):
         SaveNexus(workspace,path)
+
+    def get_workspace_handle(workspace_name):
+        """"Return handle to workspace given workspace_name_as_string"""
+        return AnalysisDataService[workspace_name]

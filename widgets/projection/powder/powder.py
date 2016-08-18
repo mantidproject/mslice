@@ -1,6 +1,7 @@
 from powder_ui import Ui_Form
 from PyQt4.QtGui import QWidget
 from presenters.powder_projection_presenter import PowderProjectionPresenter
+
 from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from views.powder_projection_view import PowderView
 from command import Command
@@ -27,6 +28,7 @@ class PowderWidget(QWidget,Ui_Form,PowderView):
     def get_powder_u2(self):
         return str(self.cmbPowderU2.currentText())
 
+
     def populate_powder_u1(self, u1_options):
         self.cmbPowderU1.clear()
         for value in u1_options:
@@ -44,3 +46,4 @@ class PowderWidget(QWidget,Ui_Form,PowderView):
 
     def get_powder_units(self):
         return str(self.cmbPowderUnits.currentText())
+
