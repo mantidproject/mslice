@@ -10,8 +10,6 @@ class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
         self.menuMakeCurrent.aboutToShow.connect(self._report_as_current_to_manager)
         self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
 
-        self.actionZoom_In.triggered.connect(self.canvas.zoom_in)
-        self.actionZoom_Out.triggered.connect(self.canvas.zoom_out)
 
     def _display_status(self,status):
         if status == "kept":

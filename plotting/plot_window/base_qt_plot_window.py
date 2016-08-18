@@ -23,58 +23,6 @@ class MatplotlibCanvas(FigureCanvas):
         self._new_axes_limits = [[None, None], [None, None]] # For zooming [[x_lower,x_upper],[y_lower,y_upper]]
         self._zoom_history_stack = []
 
-    def zoom_out(self):
-        if self._zoom_history_stack:
-            old_dim = self._zoom_history_stack.pop()
-            self.axes.set_xlim(*old_dim[0])
-            self.axes.set_ylim(*old_dim[1])
-            self.draw()
-
-    def zoom_in(self):
-        self._zoom_history_stack.append([self.axes.get_xlim(), self.axes.get_ylim()])
-        self._rect_cid = self.mpl_connect("button_press_event", self._start_draw_zoom_rect)
-        self._background = self.copy_from_bbox(self.axes.bbox)
-        self.setCursor(QtCore.Qt.CrossCursor)
-
-    def _start_draw_zoom_rect(self,mouse_event):
-        self.mpl_disconnect(self._rect_cid)
-        self._motion_cid = self.mpl_connect("motion_notify_event",self._redraw_zoom_rect)
-        self._end_zoom_cid = self.mpl_connect("button_release_event", self._end_draw_zoom_rect)
-        self._new_axes_limits[0][0] = mouse_event.xdata
-        self._new_axes_limits[1][0] = mouse_event.ydata
-
-
-    def _redraw_zoom_rect(self,mouse_event):
-        cache = [self._new_axes_limits[0][:],self._new_axes_limits[1][:]]
-        self._new_axes_limits[0][1] = mouse_event.xdata
-        self._new_axes_limits[1][1] = mouse_event.ydata
-        rect = zip(*self._new_axes_limits)
-        try:
-            rect = self.axes.transData.transform(rect)
-        except ValueError:
-            # Mouse has gone out of bounds, undo changes and abort operation and supress errors
-            self._new_axes_limits = cache
-            return
-        width, height = map(lambda c: c[1] - c[0], zip(*rect))
-        x,y = rect[0]
-        # We flip y and negate height because the coordinates of the axes and those of the canvas have opposite
-        # vertical orientations
-        y = self.geometry().height() - y
-        height = -height
-        rect = (x, y, width, height)
-        self.drawRectangle(rect)
-
-    def _end_draw_zoom_rect(self,mouse_event):
-        self.mpl_disconnect(self._motion_cid)
-        self.mpl_disconnect(self._end_zoom_cid)
-        self._new_axes_limits[0].sort()
-        self._new_axes_limits[1].sort()
-        self.axes.set_xlim(*self._new_axes_limits[0])
-        self.axes.set_ylim(*self._new_axes_limits[1])
-        self._new_axes_limits = [[None, None], [None, None]]
-        self.setCursor(QtCore.Qt.ArrowCursor)
-        self.drawRectangle(None)
-        self.draw()
 
 
 
