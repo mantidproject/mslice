@@ -8,7 +8,7 @@ class CutPresenter(object):
     def __init__(self, cut_view, main_view, cut_plotter):
         self._cut_view = cut_view
         self._cut_plotter = cut_plotter
-        self._main_presenter = main_view.get_main_presenter()
+        self._main_presenter = main_view.get_presenter()
         # TODO wait for broadcast system to then call main_presenter.get_main_presenter().subscribe(self)
         if not isinstance(cut_view, CutView):
             raise TypeError("cut_view is not of type cut_view")
@@ -22,7 +22,7 @@ class CutPresenter(object):
             self._plot_cut(plot_over=True)
         elif command == Command.SaveToWorkspace:
             self._save_cut_to_workspace()
-        elif command in Command.SaveToAscii:
+        elif command == Command.SaveToAscii:
             raise NotImplementedError('Save to ascii Not implemented')
 
     def _plot_cut(self, plot_over=False):
@@ -33,7 +33,12 @@ class CutPresenter(object):
         intensity_start = self._cut_view.get_intensity_start()
         intensity_end = self._cut_view.get_intensity_end()
         norm_to_one = self._cut_view.get_intensity_is_norm_to_one()
-        selected_workspace = self._main_presenter.get_selected_workspaces()
+        selected_workspaces = self._main_presenter.get_selected_workspaces()
+        if not selected_workspaces:
+            raise NotImplementedError("Show an error message")
+        if len(selected_workspaces)>1:
+            raise NotImplementedError("Select only one workspace for now")
+        selected_workspace = selected_workspaces[0]
         error_code = self._cut_plotter.plot_cut(selected_workspace, cut_axis, integration_start, integration_end,
                                    intensity_start, intensity_end, norm_to_one, plot_over)
         self._main_presenter.update__displayed_workspaces()
@@ -47,8 +52,13 @@ class CutPresenter(object):
         intensity_start = self._cut_view.get_intensity_start()
         intensity_end = self._cut_view.get_intensity_end()
         norm_to_one = self._cut_view.get_intensity_is_norm_to_one()
-        selected_workspace = self._main_presenter.get_selected_workspaces()
+        selected_workspaces = self._main_presenter.get_selected_workspaces()
+        if not selected_workspaces:
+            raise NotImplementedError("Show an error message")
+        if len(selected_workspaces)>1:
+            raise NotImplementedError("Select only one workspace for now")
+        selected_workspace = selected_workspaces[0]
         error_code = self._cut_plotter.save_cut_to_workpsace(selected_workspace, cut_axis, integration_start,
-                                                integration_end,intensity_start, intensity_end, norm_to_one, plot_over)
+                                                integration_end, intensity_start, intensity_end, norm_to_one, plot_over)
         self._main_presenter.update__displayed_workspaces()
         # TODO handle error codes
