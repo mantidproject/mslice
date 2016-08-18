@@ -2,16 +2,15 @@ from widgets.workspacemanager.command import Command
 import os.path
 
 
-#TODO When moving to actual workspaces the tests should reflect that
-#TODO implement compose workspace
 #TODO tell user when file not found,file failed to load
 
 class WorkspaceManagerPresenter(object):
-    def __init__(self,workspace_view,workspace_provider):
+    def __init__(self, workspace_view, workspace_provider, main_view):
         #TODO add validation checks
         self._groupCount = 1
         self._workspace_manger_view = workspace_view
         self._work_spaceprovider = workspace_provider
+        self._main_view = main_view
 
     def notify(self,command):
         if command == Command.LoadWorkspace:
@@ -24,8 +23,16 @@ class WorkspaceManagerPresenter(object):
             self._group_selected_workspaces()
         elif command == Command.RenameWorkspace:
             self._rename_workspace()
+        elif command == Command.SelectionChanged:
+            self._broadcast_selected_workspaces()
         else:
             raise ValueError("Workspace Manager Presenter received an unrecognised command")
+
+    def _broadcast_selected_workspaces(self):
+        self._get_main_presenter().broadcast_selection_changed()
+
+    def _get_main_presenter(self):
+        return self._main_view.get_presenter()
 
     def _load_workspace(self):
         #TODO specify workspace name on load

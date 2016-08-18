@@ -28,6 +28,8 @@ class SlicePlotterPresenter:
         self._slice_view = slice_view
         self._main_view = main_view
         self._slice_plotter = slice_plotter
+        # calling the _get_main_presenter_method in the constructor renders it useless
+        self._get_main_presenter().subscribe_to_workspace_selection_monitor(self)
 
     def notify(self,command):
         if command == Command.DisplaySlice:
@@ -80,3 +82,8 @@ class SlicePlotterPresenter:
         # Get the presenter when needed as opposed to initializing it as a class variable in the constructor
         # givs the flexibilty to instantiate this presenter before the main presenter
         return self._main_view.get_presenter()
+
+    def workspace_selection_changed(self):
+        workspace_selection = self._get_main_presenter().get_selected_workspaces()
+        print ('workspace_selection changes to %s'%workspace_selection )
+        # Update drop down lists appropriately

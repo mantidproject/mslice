@@ -5,3 +5,4 @@ class Command:
     GroupSelectedWorkSpaces =4
     ComposeWorkspace = 5 #On hold for now
     RenameWorkspace = 1000
+    SelectionChanged = -1799
