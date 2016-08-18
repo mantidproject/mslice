@@ -7,6 +7,7 @@ from models.workspacemanager.workspace_provider import WorkspaceProvider
 from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from views.workspace_view import WorkspaceView
 from widgets.workspacemanager.command import Command
+from mainview import MainView
 from tempfile import gettempdir
 from os.path import join
 
@@ -17,9 +18,12 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def setUp(self):
         self.workspace_provider = mock.create_autospec(spec=WorkspaceProvider)
         self.view = mock.create_autospec(spec=WorkspaceView)
+        self.mainview = mock.create_autospec(MainView)
+        self.main_presenter= mock.Mock()
+        self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 
     def test_load_one_workspace(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that will return a path on call to get_workspace_to_load_path
         tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
         path_to_nexus = join(tempdir,'cde.nxs')
@@ -33,7 +37,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called_with([workspace_name])
 
     def test_load_multiple_workspaces(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that will return three filepaths on on 3 subsequent calls to get_workspace_to_load_path
         tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
         path1 = join(tempdir,'file1.nxs')
@@ -53,7 +57,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.load.assert_has_calls(load_calls)
 
     def test_rename_workspace(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that will return a single selected workspace on call to get_workspace_selected and supply a
         # name on call to get_workspace_new_name
         old_workspace_name = 'file1'
@@ -69,7 +73,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called_once()
 
     def test_rename_workspace_multiple_workspace_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that reports multiple selected workspaces on calls to get_workspace_selected
         selected_workspaces = ['ws1', 'ws2']
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
@@ -80,7 +84,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.rename_workspace.assert_not_called()
 
     def test_rename_workspace_non_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that reports that no workspaces are selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=[])
 
@@ -90,7 +94,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.rename_workspace.assert_not_called()
 
     def test_save_workspace(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
         # to save to on calls to get_workspace_to_save_filepath
         path_to_save_to = r'A:\file\path\save.nxs'
@@ -105,7 +109,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.save_nexus.assert_called_once_with(workspace_to_save, path_to_save_to)
 
     def test_save_workspace_multiple_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         #Create a view that reports multiple workspaces are selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=['file1','file2'])
 
@@ -116,7 +120,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.save_nexus.assert_not_called()
 
     def test_save_workspace_non_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         #Create a view that reports no workspaces arw selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=[])
 
@@ -127,7 +131,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.save_nexus.assert_not_called()
 
     def test_group_workspaces(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create view that reports two workspaces are selected on calls two get_workspace_selected
         workspaces_to_group = ['file1', 'file2']
         self.view.get_workspace_selected = mock.Mock(return_value=workspaces_to_group)
@@ -138,7 +142,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called_once()
 
     def test_group_single_workspace(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that reports a single selected workspace on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=['file1'])
 
@@ -148,7 +152,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called_once()
 
     def test_group_workspaces_non_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that reports no workspace selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=[])
 
@@ -159,7 +163,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_not_called()
 
     def test_remove_workspace(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a workspace that reports a single selected workspace on calls to get_workspace_selected
         workspace_to_be_removed = 'file1'
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_be_removed])
@@ -170,7 +174,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called_once()
 
     def test_remove_multiple_workspaces(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that reports 3 selected workspaces on calls to get_workspace_selected
         workspace1 = 'file1'
         workspace2 = 'file2'
@@ -184,7 +188,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called_once()
 
     def test_remove_workspace_non_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         # Create a view that reports no workspace selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=[])
 
@@ -194,11 +198,16 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.delete_workspace.assert_not_called()
         self.view.display_loaded_workspaces.assert_not_called()
 
+    def test_broadcast_success(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
+        self.presenter.notify(Command.SelectionChanged)
+        self.mainview.get_presenter.assert_called()
+        self.main_presenter.broadcast_selection_changed()
+
     def test_call_presenter_with_unknown_command(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider, self.mainview)
         unknown_command = 10
         self.assertRaises(ValueError,self.presenter.notify, unknown_command)
-
 
 if __name__ == '__main__':
     unittest.main()
