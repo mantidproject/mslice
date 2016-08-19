@@ -146,7 +146,11 @@
       </widget>
      </item>
      <item row="3" column="2" colspan="2">
-      <widget class="QLineEdit" name="lneSliceSmoothing"/>
+      <widget class="QLineEdit" name="lneSliceSmoothing">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item row="3" column="8">
       <widget class="QComboBox" name="cmbSliceColormap"/>
