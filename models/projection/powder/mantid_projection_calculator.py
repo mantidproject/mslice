@@ -1,22 +1,15 @@
-from math import sqrt,cos
-
-from mantid.simpleapi import SofQWNormalisedPolygon,mtd
-
+from mantid.simpleapi import ConvertToMD
 from models.projection.powder.projection_calculator import ProjectionCalculator
+
+MD_SUFFIX = '_MD'
 
 
 class MantidProjectionCalculator(ProjectionCalculator):
-    def calculate_projection(self, input_workspace, output_workspace, qbinning, axis1, axis2):
-        if axis1 == 'Energy' and axis2 == '|Q|':
-            #TODO is EMode always direct ?
-            SofQWNormalisedPolygon(InputWorkspace=input_workspace, OutputWorkspace=output_workspace,
-                                                                QAxisBinning=qbinning,EMode='Direct')
+    def calculate_projection(self, input_workspace, axis1, axis2):
+        output_workspace = input_workspace + MD_SUFFIX
+        if axis1 == '|Q|' and axis2 == 'Energy':
+            ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions='|Q|',
+                        PreprocDetectorsWS='-')
+        else:
+            raise NotImplementedError('MSlice currently only supports projection to Energy vs |Q|')
 
-    def calculate_suggested_binning(self, input_workspace):
-        return '0,.1,10'
-        #TODO AskInstrument scientist about calculating scattering angles
-        input_workspace = mtd[input_workspace]
-        ei = float(input_workspace.getRun().getLogData('Ei').value)
-        ki = sqrt(ei/2.07)
-        kf = sqrt((ei-0.0)/2.07)
-        Qx=ki*1-cos(minTheta)*kf

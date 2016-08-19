@@ -20,6 +20,7 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
     def show_error(self, error):
         self.statusbar.showMessage(error, 2000)
 
+
 if __name__ == "__main__":
     qapp = QApplication([])
     mslice = MsliceGui()

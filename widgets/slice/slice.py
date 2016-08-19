@@ -24,10 +24,13 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
     def _btn_clicked(self):
         self._presenter.notify(Command.DisplaySlice)
 
-    def set_main_window(self,main_window):
-        self._presenter = SlicePlotterPresenter(main_view=main_window, slice_view=self,
+    def set_workspace_selector(self, workspace_selector):
+        # Currently will raise an error if a workspace_selector does not implement mainView
+        # The code needs to be refactored and proper interface needs to be defined.
+        self._presenter = SlicePlotterPresenter(main_view=workspace_selector, slice_view=self,
                                                 slice_plotter=MatplotlibSlicePlotter())
-        self._main_window = main_window
+        # O
+        self._main_window = workspace_selector
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
@@ -63,6 +66,7 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.cmbSliceColormap.clear()
         for colormap in colormaps:
             self.cmbSliceColormap.addItem(colormap)
+
 
     def error_select_one_workspace(self):
         self._display_error('Please select a workspace to slice')
