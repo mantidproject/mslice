@@ -1,7 +1,6 @@
 class MainPresenter(object):
-    def __init__(self,main_view,workspace_presenter):
+    def __init__(self, main_view):
         self._mainView = main_view
-        self._workspace_presenter = workspace_presenter
         self._selected_workspace_listener = []
 
     def get_selected_workspaces(self):
@@ -19,6 +18,9 @@ class MainPresenter(object):
         for listener in self._selected_workspace_listener:
             listener.workspace_selection_changed()
 
+    def notify_selection_changed(self):
+        self.broadcast_selection_changed()
+
     def subscribe_to_workspace_selection_monitor(self, client):
         """Subcscribe a client to be notified when selected workspaces change
 
@@ -28,3 +30,5 @@ class MainPresenter(object):
         else:
             raise TypeError("The client trying to subscribe does not implement the method 'workspace_selection_changed'")
 
+    def register_workspace_selector(self, workspace_selector):
+        self._workspace_presenter = workspace_selector

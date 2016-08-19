@@ -20,7 +20,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 
     def test_constructor_success(self):
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
 
     def test_constructor_incorrect_powder_view_fail(self):
         self.assertRaises(TypeError, PowderProjectionPresenter, self.mainview, self.mainview, self.projection_calculator)
@@ -36,7 +36,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         output_workspace = 'b'
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
         u2 = '|Q|'
@@ -54,7 +54,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.main_presenter.update_displayed_workspaces.assert_called_once_with()
 
     def test_notify_presenter_with_unrecognised_command_raise_exception(self):
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         unrecognised_command = 1234567
         self.assertRaises(ValueError, self.powder_presenter.notify, unrecognised_command)
 
@@ -63,7 +63,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         output_workspace = 'b'
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
         u2 = 'Energy'
@@ -80,7 +80,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         selected_workspaces = []
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=selected_workspaces)
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
         u2 = '|Q|'

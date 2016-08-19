@@ -21,7 +21,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view = mock.create_autospec(SlicePlotterView)
 
     def test_constructor_success(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.main_view, self.slice_view, self.slice_plotter)
+        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
         self.main_presenter.subscribe_to_workspace_selection_monitor.assert_called_with(self.slice_plotter_presenter)
 
     def test_constructor_invalid_main_view_failure(self):
@@ -34,14 +34,14 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.assertRaises(TypeError, SlicePlotterPresenter, self.main_view, self.slice_view, self.slice_view)
 
     def test_notify_presenter_unknown_command_raise_exception_failure(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.main_view, self.slice_view, self.slice_plotter)
+        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
         unknown_command = -1
         self.assertRaises(ValueError, self.slice_plotter_presenter.notify, unknown_command)
 
     def test_plot_slice_successful(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.main_view, self.slice_view, self.slice_plotter)
-        x = Axis('x',0,10,1)
-        y = Axis('y',2,8,3)
+        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
+        x = Axis('x', 0, 10 ,1)
+        y = Axis('y', 2, 8, 3)
         intensity_start = 7
         intensity_end = 8
         norm_to_one = 9

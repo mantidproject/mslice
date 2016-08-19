@@ -30,14 +30,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                                 }
         self._main_window = None
         self.lstWorkspaces.itemChanged.connect(self.list_item_changed)
-
-    def set_client_handler(self, main_window):
-        # The client handler will broadcast changes in selected workspaces as appropriate
-        """Set a main window to display status bar messages to.
-
-         If no main window is set any errors will be displayed to QDialogBoxes"""
-        self._main_window = main_window
-        self._presenter = WorkspaceManagerPresenter(self,MantidWorkspaceProvider(), main_window)
+        self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
     def _display_error(self, error_string, timeout_ms):
         if self._main_window:
