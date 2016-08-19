@@ -1,4 +1,4 @@
-class MainPresenter:
+class MainPresenter(object):
     def __init__(self,main_view,workspace_presenter):
         self._mainView = main_view
         self._workspace_presenter = workspace_presenter
