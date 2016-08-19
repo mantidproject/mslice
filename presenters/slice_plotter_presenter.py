@@ -16,6 +16,10 @@ class Axis:
         return self.units == other.units and self.start == other.start and self.end == other.end \
                 and self.step == other.step and isinstance(other, Axis)
 
+    def __repr__(self):
+        info = (self.units, self.start, self.end, self.step)
+        return "Axis(" + " ,".join(map(str,info)) + ")"
+
 
 INVALID_PARAMS = 1
 INVALID_X_PARAMS = 2
@@ -59,6 +63,7 @@ class SlicePlotterPresenter:
         y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
                       self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
         status = self._process_axis(x_axis, y_axis)
+        print 'x_axis' , x_axis.start
         if status == INVALID_Y_PARAMS:
             self._slice_view.error_invalid_y_params()
             return
@@ -148,13 +153,11 @@ class SlicePlotterPresenter:
                 return INVALID_Y_PARAMS
 
     def _to_float(self, x):
-        if x:
-            return float(x)
-        else:
-            return None
+        if x is None:
+            return x
+        return float(x)
 
     def _to_int(self, x):
-        if x:
-            return int(x)
-        else:
-            return None
+        if x is None:
+            return x
+        return int(x)
