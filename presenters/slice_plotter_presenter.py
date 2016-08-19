@@ -59,13 +59,36 @@ class SlicePlotterPresenter:
                       self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
         y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
                       self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
+        status = self._process_axis(x_axis, y_axis)
+        if status == INVALID_Y_PARAMS:
+            self._slice_view.error_invalid_y_params()
+            return
+        elif status ==INVALID_X_PARAMS:
+            self._slice_view.error_invalid_y_params()
+            return
+        elif status ==INVALID_PARAMS:
+            self._slice_view.error_invalid_plot_parameters()
+            return
+
         intensity_start = self._slice_view.get_slice_intensity_start()
         intensity_end = self._slice_view.get_slice_intensity_end()
         norm_to_one = self._slice_view.get_slice_is_norm_to_one()
         smoothing = self._slice_view.get_slice_smoothing()
         colourmap = self._slice_view.get_slice_colourmap()
-        status = self._slice_plotter.display_slice(selected_workspace,x_axis, y_axis, smoothing, intensity_start,
+
+        if intensity_start > intensity_end:
+            self._slice_view.error_invalid_intensity_params()
+            return
+        try:
+            smoothing = self._to_int(smoothing)
+        except ValueError:
+            self._slice_view.error_invalid_smoothing_params()
+        try:
+            status = self._slice_plotter.display_slice(selected_workspace,x_axis, y_axis, smoothing, intensity_start,
                                                    intensity_end, norm_to_one, colourmap)
+        except NotImplementedError:
+            self._slice_view.error("workspace 2d slicing not supported")
+
         if status == INVALID_PARAMS:
             self._slice_view.error_invalid_plot_parameters()
 
@@ -91,3 +114,42 @@ class SlicePlotterPresenter:
         # Get the presenter when needed as opposed to initializing it as a class variable in the constructor
         # givs the flexibilty to instantiate this presenter before the main presenter
         return self._main_view.get_presenter()
+
+    def _process_axis(self,x, y):
+        if x.units == y.units:
+            #return INVALID_PARAMS
+            # TODO Waiting for unit lists to be populated
+            pass
+        try:
+            x.start = self._to_float(x.start)
+            x.step = self._to_float(x.step)
+            x.end = self._to_float(x.end)
+        except ValueError:
+            return INVALID_X_PARAMS
+
+        try:
+            y.start = self._to_float(y.start)
+            y.step = self._to_float(y.step)
+            y.end = self._to_float(y.end)
+        except ValueError:
+            return INVALID_Y_PARAMS
+
+        if x.start and x.end:
+            if x.start > x.end:
+                return INVALID_X_PARAMS
+
+        if y.start and y.end:
+            if y.start > y.end:
+                return INVALID_Y_PARAMS
+
+    def _to_float(self, x):
+        if x:
+            return float(x)
+        else:
+            return None
+
+    def _to_int(self, x):
+        if x:
+            return int(x)
+        else:
+            return None
