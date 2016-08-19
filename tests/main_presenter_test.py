@@ -44,3 +44,8 @@ class MainPresenterTests(unittest.TestCase):
             def __init__(self):
                 self.workspace_selection_changed = 1
         self.assertRaises(TypeError,main_presenter.subscribe_to_workspace_selection_monitor, x())
+
+    def test_update_displayed_workspaces(self):
+        main_presenter = MainPresenter(self.mainview, self.workspace_presenter)
+        main_presenter.update_displayed_workspaces()
+        self.workspace_presenter.update_displayed_workspaces.assert_called_with()
