@@ -17,11 +17,9 @@ class BasePlotWindow(object):
         self._import_aliases = {'plotting.pyplot': 'plt'} # the aliases used in script generation
 
     def set_as_kept(self):
-        self.canvas.axes.hold(False)
         self._display_status("kept")
 
     def set_as_current(self):
-        self.canvas.axes.hold(True)
         self._display_status("current")
 
     def display_status(self,status):
