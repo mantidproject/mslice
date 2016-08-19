@@ -25,7 +25,6 @@ INVALID_SMOOTHING = 5
 INVALID_X_UNITS = 6
 INVALID_Y_UNITS = 7
 
-
 class SlicePlotterPresenter:
     def __init__(self, main_view, slice_view,slice_plotter):
         if not isinstance(main_view, MainView):
@@ -75,6 +74,12 @@ class SlicePlotterPresenter:
         norm_to_one = self._slice_view.get_slice_is_norm_to_one()
         smoothing = self._slice_view.get_slice_smoothing()
         colourmap = self._slice_view.get_slice_colourmap()
+        try:
+            intensity_start = self._to_float(intensity_start)
+            intensity_end = self._to_float(intensity_end)
+        except ValueError:
+            self._slice_view.error_invalid_intensity_params()
+            return
 
         if intensity_start > intensity_end:
             self._slice_view.error_invalid_intensity_params()
