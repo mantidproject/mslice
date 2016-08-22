@@ -70,3 +70,9 @@ class SlicePlotterView:
     def populate_colormap_options(self,colormaps):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def populate_slice_x_options(self, options):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def populate_slice_y_options(self, options):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+

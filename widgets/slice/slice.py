@@ -76,6 +76,16 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         for colormap in colormaps:
             self.cmbSliceColormap.addItem(colormap)
 
+    def populate_slice_x_options(self, options):
+        self.cmbSliceXAxis.clear()
+        for option in options:
+            self.cmbSliceXAxis.addItem(option)
+
+    def populate_slice_y_options(self, options):
+        self.cmbSliceYAxis.clear()
+        for option in options:
+            self.cmbSliceYAxis.addItem(option)
+
     def error_select_one_workspace(self):
         self._display_error('Please select a workspace to slice')
 

@@ -21,8 +21,10 @@ class MantidSliceAlgorithm(SliceAlgorithm):
 
             n_x_bins = self._get_number_of_steps(x_axis)
             n_y_bins = self._get_number_of_steps(y_axis)
-            x_dim = workspace.getDimension(0)
-            y_dim = workspace.getDimension(1)
+            x_dim_id = workspace.getDimensionIndexByName(x_axis.units)
+            y_dim_id = workspace.getDimensionIndexByName(y_axis.units)
+            x_dim = workspace.getDimension(x_dim_id)
+            y_dim = workspace.getDimension(y_dim_id)
             xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
             ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
             slice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
@@ -48,14 +50,34 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         return plot_data
 
     def get_labels(self, workspace, x_axis, y_axis):
-        return 'X', 'Y'
+        return x_axis.units, y_axis.units
 
+    def get_available_axis(self, selected_workspace):
+        axis = []
+        workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
+        if isinstance(workspace, IMDEventWorkspace):
+            for i in range(workspace.getNumDims()):
+                dim_name = workspace.getDimension(i).getName()
+                axis.append(dim_name)
+        return axis
+
+    def norm_to_one(self, data):
+        data_range = data.max() - data.min()
+        return (data - data.min())/data_range
 
     def _get_number_of_steps(self, axis):
         return int(max(1, floor(axis.end - axis.start)/axis.step))
 
     def _fill_in_missing_input(self,axis,workspace):
-        if axis.end is None or axis.start is None or axis.step is None:
-            raise NotImplementedError("Autocompletion of slice params is not completed")
+        dim = workspace.getDimensionIndexByName(axis.units)
+        dim = workspace.getDimension(dim)
 
+        if axis.start is None:
+                axis.start = dim.getMinimum()
+
+        if axis.end is None:
+            axis.end = dim.getMaximum()
+
+        if axis.step is None:
+            axis.step = (axis.end - axis.start)/100
 

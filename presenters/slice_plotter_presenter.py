@@ -58,11 +58,9 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
 
     def _display_slice(self):
         selected_workspaces = self._get_main_presenter().get_selected_workspaces()
-        if not selected_workspaces:
+        if not selected_workspaces or len(selected_workspaces)>1:
             self._slice_view.error_select_one_workspace()
             return
-        if len(selected_workspaces) > 1:
-            raise NotImplementedError('')
 
         selected_workspace = selected_workspaces[0]
         x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
@@ -132,9 +130,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
 
     def _process_axis(self,x, y):
         if x.units == y.units:
-            #return INVALID_PARAMS
-            # TODO Waiting for unit lists to be populated
-            pass
+            return INVALID_PARAMS
         try:
             x.start = self._to_float(x.start)
             x.step = self._to_float(x.step)
@@ -169,5 +165,11 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
 
     def workspace_selection_changed(self):
         workspace_selection = self._get_main_presenter().get_selected_workspaces()
-        print ('workspace_selection changes to %s'%workspace_selection )
-        # Update drop down lists appropriately
+        if len(workspace_selection) != 1:
+            self._slice_view.populate_slice_x_options([])
+            self._slice_view.populate_slice_y_options([])
+            return
+        workspace_selection = workspace_selection[0]
+        axis = self._slice_plotter.get_available_axis(workspace_selection)
+        self._slice_view.populate_slice_x_options(axis)
+        self._slice_view.populate_slice_y_options(axis[::-1])
