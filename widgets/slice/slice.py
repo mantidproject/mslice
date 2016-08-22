@@ -1,7 +1,8 @@
-from PyQt4.QtGui import QWidget, QMessageBox
-from PyQt4.QtCore import pyqtSignal, QObject
+from PyQt4.QtGui import QWidget
+from PyQt4.QtCore import pyqtSignal
 from command import Command
 from models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
+from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
 from presenters.slice_plotter_presenter import SlicePlotterPresenter
 from slice_ui import Ui_Form
 from views.slice_plotter_view import SlicePlotterView
@@ -27,9 +28,10 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
     def set_workspace_selector(self, workspace_selector):
         # Currently will raise an error if a workspace_selector does not implement mainView
         # The code needs to be refactored and proper interface needs to be defined.
+        slice_plotter = MatplotlibSlicePlotter(MantidSliceAlgorithm())
         self._presenter = SlicePlotterPresenter(main_view=workspace_selector, slice_view=self,
-                                                slice_plotter=MatplotlibSlicePlotter())
-        # O
+                                                slice_plotter=slice_plotter)
+        #
         self._main_window = workspace_selector
 
     def _display_error(self, error_string):

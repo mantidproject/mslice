@@ -14,7 +14,7 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
         self._presenter = MainPresenter(self,workspace_presenter)
 
         self.wgtWorkspacemanager.set_main_window(self)
-        self.wgtSlice.set_main_window(self)
+        self.wgtSlice.set_workspace_selector(self)
         self.wgtSlice.error_occurred.connect(self.show_error)
 
     def show_error(self, error):

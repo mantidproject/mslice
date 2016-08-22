@@ -152,11 +152,11 @@ class SlicePlotterPresenter:
                 return INVALID_Y_PARAMS
 
     def _to_float(self, x):
-        if x is None:
-            return x
+        if x is None or x == "":
+            return None
         return float(x)
 
     def _to_int(self, x):
-        if x is None:
-            return x
+        if x is None or x == "":
+            return None
         return int(x)

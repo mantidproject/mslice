@@ -56,7 +56,6 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         return int(max(1, floor(axis.end - axis.start)/axis.step))
 
     def _fill_in_missing_input(self,axis,workspace):
-        """Deduct Values not supplied by user from workspace"""
-        pass
+        raise NotImplementedError()
 
 
