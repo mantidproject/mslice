@@ -1,25 +1,29 @@
-from mainview import MainView
 from models.projection.powder.projection_calculator import ProjectionCalculator
 from views.powder_projection_view import PowderView
 from widgets.projection.powder.command import Command
+from validation_decorators import require_main_presenter
+from presenters.interfaces.main_presenter import MainPresenterInterface
+from interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
 
 
-class PowderProjectionPresenter(object):
+class PowderProjectionPresenter(PowderProjectionPresenterInterface):
 
-    def __init__(self,powder_view,main_view,projection_calculator):
+    def __init__(self, powder_view, projection_calculator):
         self._powder_view = powder_view
         self._projection_calculator = projection_calculator
         if not isinstance(self._powder_view,PowderView):
             raise TypeError("powder_view is not of type PowderView")
         if not isinstance(self._projection_calculator,ProjectionCalculator):
             raise TypeError("projection_calculator is not of type ProjectionCalculator")
-        if not isinstance(main_view,MainView):
-            raise TypeError("main_view is not of type MainView")
 
-        self._main_view = main_view
         #Add rest of options
         self._powder_view.populate_powder_u1(['|Q|'])
         self._powder_view.populate_powder_u2(['Energy'])
+        self._main_presenter = None
+
+    def register_master(self, main_presenter):
+        assert (isinstance(main_presenter, MainPresenterInterface))
+        self._main_presenter = main_presenter
 
     def notify(self, command):
         if command == Command.CalculatePowderProjection:
@@ -34,14 +38,14 @@ class PowderProjectionPresenter(object):
         if axis1 == axis2:
             raise NotImplementedError('equal axis')
         if not selected_workspaces:
-            pass
             raise NotImplementedError('Implement error message')
 
         for workspace in selected_workspaces:
             self._projection_calculator.calculate_projection(workspace, axis1, axis2)
         self._get_main_presenter().update_displayed_workspaces()
 
+    @require_main_presenter
     def _get_main_presenter(self):
-        # not storing this variable at construction time gives freedom of creating this before creating the
-        # the main presenter
-        return self._main_view.get_presenter()
+        return self._main_presenter
+
+

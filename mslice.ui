@@ -15,6 +15,33 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="0">
+     <widget class="QTabWidget" name="tabWidget3">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Slice</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="SliceWidget" name="wgtSlice" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>Cut</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="0">
+         <widget class="CutWidget" name="widget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget2">
       <property name="currentIndex">
@@ -56,43 +83,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_4">
-       <attribute name="title">
-        <string>Single Crystal</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="SingleCrystalWidget" name="wgtSingleCrystal" native="true"/>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QTabWidget" name="tabWidget3">
-      <property name="currentIndex">
-       <number>1</number>
-      </property>
-      <widget class="QWidget" name="tab_5">
-       <attribute name="title">
-        <string>Slice</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="SliceWidget" name="wgtSlice" native="true"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_6">
-       <attribute name="title">
-        <string>Cut</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_7">
-        <item row="0" column="0">
-         <widget class="CutWidget" name="wgtCut" native="true"/>
-        </item>
-       </layout>
-      </widget>
      </widget>
     </item>
     <item row="0" column="0">
@@ -107,16 +97,6 @@
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="WorkspaceManagerWidget" name="wgtWorkspacemanager" native="true"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Status</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="StatusWidget" name="status_placeholder" native="true"/>
         </item>
        </layout>
       </widget>
@@ -137,18 +117,6 @@
    <class>WorkspaceManagerWidget</class>
    <extends>QWidget</extends>
    <header>widgets/workspacemanager/workspacemanager.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>StatusWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/status/status.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>SingleCrystalWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/projection/singlecrystal/singlecrystal.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -1,13 +1,14 @@
 from collections import namedtuple
 
-from mainview import MainView
 from models.slice.slice_plotter import SlicePlotter
 from views.slice_plotter_view import SlicePlotterView
 from widgets.slice.command import Command
+from validation_decorators import require_main_presenter
+from interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
+from interfaces.main_presenter import MainPresenterInterface
 
 Axis = namedtuple('Axis', ['units', 'start', 'end', 'step'])
 
-#TODO askOwen ,these constants exist in both sliceplotter and the presenter, where should they be defined?
 INVALID_PARAMS = 1
 INVALID_X_PARAMS = 2
 INVALID_Y_PARAMS = 3
@@ -17,17 +18,20 @@ INVALID_X_UNITS = 6
 INVALID_Y_UNITS = 7
 
 
-class SlicePlotterPresenter:
-    def __init__(self, main_view, slice_view,slice_plotter):
-        if not isinstance(main_view, MainView):
-            raise TypeError("Parameter main_view is not of type MainView")
+class SlicePlotterPresenter(SlicePlotterPresenterInterface):
+    def __init__(self, slice_view, slice_plotter):
         if not isinstance(slice_view, SlicePlotterView):
             raise TypeError("Parameter slice_view is not of type SlicePlotterView")
         if not isinstance(slice_plotter, SlicePlotter):
             raise TypeError("Parameter slice_plotter is not of type SlicePlotter")
         self._slice_view = slice_view
-        self._main_view = main_view
+        self._main_presenter = None
         self._slice_plotter = slice_plotter
+
+    def register_master(self, main_presenter):
+        assert (isinstance(main_presenter, MainPresenterInterface))
+        self._main_presenter = main_presenter
+        self._main_presenter.subscribe_to_workspace_selection_monitor(self)
 
     def notify(self,command):
         if command == Command.DisplaySlice:
@@ -76,7 +80,13 @@ class SlicePlotterPresenter:
         elif status == INVALID_Y_UNITS:
             self._slice_view.error_invalid_y_units()
 
+    @require_main_presenter
     def _get_main_presenter(self):
         # Get the presenter when needed as opposed to initializing it as a class variable in the constructor
         # givs the flexibilty to instantiate this presenter before the main presenter
-        return self._main_view.get_presenter()
+        return self._main_presenter
+
+    def workspace_selection_changed(self):
+        workspace_selection = self._get_main_presenter().get_selected_workspaces()
+        print ('workspace_selection changes to %s'%workspace_selection )
+        # Update drop down lists appropriately
