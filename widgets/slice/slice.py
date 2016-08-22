@@ -20,6 +20,7 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.setupUi(self)
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
+        self._presenter = SlicePlotterPresenter(self, MatplotlibSlicePlotter())
 
 
     def _btn_clicked(self):

@@ -1,19 +1,26 @@
 from widgets.workspacemanager.command import Command
 import os.path
+from mainview import MainView
+from validation_decorators import require_main_presenter
+from interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
+from interfaces.main_presenter import MainPresenterInterface
 
-
-#TODO When moving to actual workspaces the tests should reflect that
-#TODO implement compose workspace
 #TODO tell user when file not found,file failed to load
 
-class WorkspaceManagerPresenter(object):
-    def __init__(self,workspace_view,workspace_provider):
+class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
+    def __init__(self, workspace_view, workspace_provider):
         #TODO add validation checks
         self._groupCount = 1
         self._workspace_manger_view = workspace_view
         self._work_spaceprovider = workspace_provider
+        self._main_presenter = None
 
-    def notify(self,command):
+    def register_master(self, main_presenter):
+        assert (isinstance(main_presenter, MainPresenterInterface))
+        self._main_presenter = main_presenter
+        self._main_presenter.register_workspace_selector(self)
+
+    def notify(self, command):
         if command == Command.LoadWorkspace:
             self._load_workspace()
         elif command == Command.SaveSelectedWorkspace:
@@ -24,8 +31,17 @@ class WorkspaceManagerPresenter(object):
             self._group_selected_workspaces()
         elif command == Command.RenameWorkspace:
             self._rename_workspace()
+        elif command == Command.SelectionChanged:
+            self._broadcast_selected_workspaces()
         else:
             raise ValueError("Workspace Manager Presenter received an unrecognised command")
+
+    def _broadcast_selected_workspaces(self):
+        self._get_main_presenter().notify_workspace_selection_changed()
+
+    @require_main_presenter
+    def _get_main_presenter(self):
+        return self._main_presenter
 
     def _load_workspace(self):
         #TODO specify workspace name on load

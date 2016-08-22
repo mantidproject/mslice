@@ -4,7 +4,7 @@ import mock
 
 from mainview import MainView
 from models.projection.powder.projection_calculator import ProjectionCalculator
-from presenters.main_presenter import MainPresenter
+from presenters.interfaces.main_presenter import MainPresenterInterface
 from presenters.powder_projection_presenter import PowderProjectionPresenter
 from views.powder_projection_view import PowderView
 from widgets.projection.powder.command import Command
@@ -15,12 +15,12 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         # Set up a mock view, presenter, main view and main presenter
         self.powder_view = mock.create_autospec(PowderView)
         self.projection_calculator = mock.create_autospec(ProjectionCalculator)
-        self.main_presenter = mock.create_autospec(MainPresenter)
+        self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview = mock.create_autospec(MainView)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 
     def test_constructor_success(self):
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
 
     def test_constructor_incorrect_powder_view_fail(self):
         self.assertRaises(TypeError, PowderProjectionPresenter, self.mainview, self.mainview, self.projection_calculator)
@@ -31,12 +31,21 @@ class PowderProjectionPresenterTest(unittest.TestCase):
     def test_constructor_incorrect_projection_calculator_fail(self):
         self.assertRaises(TypeError, PowderProjectionPresenter, self.powder_view, self.mainview, None)
 
+    def test_register_master(self):
+        powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        powder_presenter.register_master(self.main_presenter)
+
+    def test_register_master_invalid_master_fail(self):
+        powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        self.assertRaises(AssertionError, powder_presenter.register_master, 3)
+
     def test_calculate_projection_success(self):
         selected_workspace = 'a'
         output_workspace = 'b'
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        self.powder_presenter.register_master(self.main_presenter)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
         u2 = '|Q|'
@@ -54,7 +63,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.main_presenter.update_displayed_workspaces.assert_called_once_with()
 
     def test_notify_presenter_with_unrecognised_command_raise_exception(self):
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         unrecognised_command = 1234567
         self.assertRaises(ValueError, self.powder_presenter.notify, unrecognised_command)
 
@@ -63,12 +72,13 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         output_workspace = 'b'
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
         u2 = 'Energy'
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
+        self.powder_presenter.register_master(self.main_presenter)
         self.assertRaises(NotImplementedError,self.powder_presenter.notify,Command.CalculatePowderProjection)
         self.main_presenter.get_selected_workspaces.assert_called_once_with()
         self.powder_view.get_powder_u1.assert_called_once_with()
@@ -80,7 +90,8 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         selected_workspaces = []
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=selected_workspaces)
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.mainview, self.projection_calculator)
+        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        self.powder_presenter.register_master(self.main_presenter)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
         u2 = '|Q|'
