@@ -11,7 +11,12 @@ class MainPresenterTests(unittest.TestCase):
         self.mainview = mock.create_autospec(MainView)
         self.workspace_presenter = mock.create_autospec(WorkspaceManagerPresenterInterface)
         self.workspace_presenter.get_selected_workspaces = mock.Mock(return_value=SELECTED_WORKSPACES)
-
+    def test_consturctor_sucess(self):
+        subpresenters = [mock.Mock() for i in range(10)]
+        main_presenter = MainPresenter(self.mainview, *subpresenters)
+        for presenter in subpresenters:
+            presenter.register_master.assert_called_once_with(main_presenter)
+            
     def test_get_selected_workspaces_success(self):
         main_presenter = MainPresenter(self.mainview)
         main_presenter.register_workspace_selector(self.workspace_presenter)
@@ -28,7 +33,7 @@ class MainPresenterTests(unittest.TestCase):
         for client in clients:
             client.workspace_selection_changed.assert_not_called()
 
-        main_presenter.broadcast_selection_changed()
+        main_presenter.notify_workspace_selection_changed()
         for client in clients:
             client.workspace_selection_changed.assert_called_once()
 
