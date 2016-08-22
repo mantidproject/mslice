@@ -63,12 +63,11 @@ class SlicePlotterPresenter:
         y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
                       self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
         status = self._process_axis(x_axis, y_axis)
-        print 'x_axis' , x_axis.start
         if status == INVALID_Y_PARAMS:
             self._slice_view.error_invalid_y_params()
             return
         elif status ==INVALID_X_PARAMS:
-            self._slice_view.error_invalid_y_params()
+            self._slice_view.error_invalid_x_params()
             return
         elif status ==INVALID_PARAMS:
             self._slice_view.error_invalid_plot_parameters()
