@@ -2,6 +2,7 @@ from models.projection.powder.projection_calculator import ProjectionCalculator
 from views.powder_projection_view import PowderView
 from widgets.projection.powder.command import Command
 from validation_decorators import require_main_presenter
+from mainview import MainView
 
 
 class PowderProjectionPresenter(object):
@@ -20,6 +21,7 @@ class PowderProjectionPresenter(object):
         self._main_presenter = None
 
     def register_master(self, main_view):
+        assert (isinstance(main_view, MainView))
         self._main_presenter = main_view.get_presenter()
 
     def notify(self, command):

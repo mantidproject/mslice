@@ -38,6 +38,15 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         unknown_command = -1
         self.assertRaises(ValueError, self.slice_plotter_presenter.notify, unknown_command)
 
+    def test_register_master_success(self):
+        slice_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
+        slice_presenter.register_master(self.main_view)
+        self.main_presenter.subscribe_to_workspace_selection_monitor.assert_called_once_with(slice_presenter)
+
+    def test_register_master_invalid_master_fail(self):
+        slice_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
+        self.assertRaises(AssertionError, slice_presenter.register_master, 3)
+
     def test_plot_slice_successful(self):
         self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
         self.slice_plotter_presenter.register_master(self.main_view)

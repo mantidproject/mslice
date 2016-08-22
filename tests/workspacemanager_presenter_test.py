@@ -22,6 +22,14 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.main_presenter= mock.Mock()
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 
+    def test_register_master_success(self):
+        workspace_presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        workspace_presenter.register_master(self.mainview)
+        self.main_presenter.register_workspace_selector.assert_called_once_with(workspace_presenter)
+
+    def test_register_master_invalid_master_fail(self):
+        workspace_presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.assertRaises(AssertionError ,workspace_presenter.register_master, 3)
     def test_load_one_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         # Create a view that will return a path on call to get_workspace_to_load_path

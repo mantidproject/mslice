@@ -1,5 +1,6 @@
 from widgets.workspacemanager.command import Command
 import os.path
+from mainview import MainView
 from validation_decorators import require_main_presenter
 
 #TODO tell user when file not found,file failed to load
@@ -13,6 +14,7 @@ class WorkspaceManagerPresenter(object):
         self._main_presenter = None
 
     def register_master(self, main_view):
+        assert (isinstance(main_view, MainView))
         self._main_presenter = main_view.get_presenter()
         self._main_presenter.register_workspace_selector(self)
 

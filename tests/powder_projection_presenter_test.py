@@ -31,6 +31,14 @@ class PowderProjectionPresenterTest(unittest.TestCase):
     def test_constructor_incorrect_projection_calculator_fail(self):
         self.assertRaises(TypeError, PowderProjectionPresenter, self.powder_view, self.mainview, None)
 
+    def test_register_master(self):
+        powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        powder_presenter.register_master(self.mainview)
+
+    def test_register_master_invalid_master_fail(self):
+        powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        self.assertRaises(AssertionError, powder_presenter.register_master, 3)
+
     def test_calculate_projection_success(self):
         selected_workspace = 'a'
         output_workspace = 'b'
