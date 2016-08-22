@@ -270,3 +270,16 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.slice_plotter.display_slice.assert_not_called()
         self.slice_view.error_invalid_intensity_params.assert_called_once_with()
+
+    def test_workspace_selection_changed_multiple_selected_empty_options_success(self):
+        slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
+        slice_plotter_presenter.register_master(self.main_presenter)
+        workspace = "a"
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace,workspace])
+        axis =["x","y"]
+        self.slice_plotter.get_available_axis = mock.Mock(return_value=axis)
+
+        slice_plotter_presenter.workspace_selection_changed()
+        self.slice_view.populate_slice_x_options.assert_called_with([])
+        self.slice_view.populate_slice_y_options.assert_called_with([])
+
