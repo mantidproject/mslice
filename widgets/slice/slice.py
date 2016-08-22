@@ -95,4 +95,5 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
     def error_invalid_x_units(self):
         self._display_error('Invalid selection of the x axis')
 
-
+    def error(self, str):
+        self._display_error(str)

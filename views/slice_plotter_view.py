@@ -65,7 +65,7 @@ class SlicePlotterView:
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def error_invalid_plot_parameters(self):
-        git raise NotImplementedError("This method must be implemented in a concrete view before being called")
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def populate_colormap_options(self,colormaps):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")

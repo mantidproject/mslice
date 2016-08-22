@@ -82,7 +82,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
 
         intensity_start = self._slice_view.get_slice_intensity_start()
         intensity_end = self._slice_view.get_slice_intensity_end()
-        norm_to_one = self._slice_view.get_slice_is_norm_to_one()
+        norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
         smoothing = self._slice_view.get_slice_smoothing()
         colourmap = self._slice_view.get_slice_colourmap()
         try:

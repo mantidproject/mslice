@@ -33,7 +33,6 @@ class MantidSliceAlgorithm(SliceAlgorithm):
             # The flipud is because mantid plots first row of array at top of plot
             # rot90 switches the x and y axis to to plot what user expected.
             plot_data = np.rot90(plot_data)
-            plot_data = np.flipud(plot_data)
             self._workspace_provider.delete_workspace(slice)
 
         else:
@@ -56,6 +55,7 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         return int(max(1, floor(axis.end - axis.start)/axis.step))
 
     def _fill_in_missing_input(self,axis,workspace):
-        raise NotImplementedError()
+        if axis.end is None or axis.start is None or axis.step is None:
+            raise NotImplementedError()
 
 
