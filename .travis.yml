@@ -7,7 +7,7 @@ install:
 
 # command to run tests
 script: 
-  nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager --exclude-dir=presenters/interfaces
+  nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager
 
 after_success:
   coveralls
