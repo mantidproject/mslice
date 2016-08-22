@@ -200,6 +200,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_broadcast_success(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter.register_master(self.mainview)
         self.presenter.notify(Command.SelectionChanged)
         self.mainview.get_presenter.assert_called()
         self.main_presenter.broadcast_selection_changed()
