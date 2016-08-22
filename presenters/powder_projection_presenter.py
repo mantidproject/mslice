@@ -2,7 +2,7 @@ from models.projection.powder.projection_calculator import ProjectionCalculator
 from views.powder_projection_view import PowderView
 from widgets.projection.powder.command import Command
 from validation_decorators import require_main_presenter
-from mainview import MainView
+from presenters.interfaces.main_presenter import MainPresenterInterface
 from interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
 
 
@@ -21,9 +21,9 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         self._powder_view.populate_powder_u2(['Energy'])
         self._main_presenter = None
 
-    def register_master(self, main_view):
-        assert (isinstance(main_view, MainView))
-        self._main_presenter = main_view.get_presenter()
+    def register_master(self, main_presenter):
+        assert (isinstance(main_presenter, MainPresenterInterface))
+        self._main_presenter = main_presenter
 
     def notify(self, command):
         if command == Command.CalculatePowderProjection:

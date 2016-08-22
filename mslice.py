@@ -9,11 +9,12 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
     def __init__(self):
         super(MsliceGui,self).__init__()
         self.setupUi(self)
-        self._presenter = MainPresenter(self)
 
-        self.wgtWorkspacemanager.get_presenter().register_master(self)
-        self.wgtSlice.get_presenter().register_master(self)
-        self.wgtPowder.get_presenter().register_master(self)
+        workspace_presenter = self.wgtWorkspacemanager.get_presenter()
+        slice_presenter = self.wgtSlice.get_presenter()
+        powder_presneter = self.wgtPowder.get_presenter()
+
+        self._presenter = MainPresenter(self, workspace_presenter, slice_presenter, powder_presneter)
 
     def get_presenter(self):
         return self._presenter

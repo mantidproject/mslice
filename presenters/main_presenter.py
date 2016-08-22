@@ -2,9 +2,11 @@ from interfaces.main_presenter import MainPresenterInterface
 
 
 class MainPresenter(MainPresenterInterface):
-    def __init__(self, main_view):
+    def __init__(self, main_view, *subpresenters):
         self._mainView = main_view
         self._selected_workspace_listener = []
+        for presenter in subpresenters:
+            presenter.register_master(self)
 
     def get_selected_workspaces(self):
         return self._workspace_presenter.get_selected_workspaces()

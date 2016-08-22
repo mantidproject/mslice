@@ -2,10 +2,10 @@ from collections import namedtuple
 
 from models.slice.slice_plotter import SlicePlotter
 from views.slice_plotter_view import SlicePlotterView
-from mainview import MainView
 from widgets.slice.command import Command
 from validation_decorators import require_main_presenter
 from interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
+from interfaces.main_presenter import MainPresenterInterface
 
 Axis = namedtuple('Axis', ['units', 'start', 'end', 'step'])
 
@@ -28,9 +28,9 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         self._main_presenter = None
         self._slice_plotter = slice_plotter
 
-    def register_master(self, main_view):
-        assert (isinstance(main_view, MainView))
-        self._main_presenter = main_view.get_presenter()
+    def register_master(self, main_presenter):
+        assert (isinstance(main_presenter, MainPresenterInterface))
+        self._main_presenter = main_presenter
         self._main_presenter.subscribe_to_workspace_selection_monitor(self)
 
     def notify(self,command):
