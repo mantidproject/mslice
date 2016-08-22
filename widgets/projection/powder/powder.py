@@ -12,11 +12,10 @@ class PowderWidget(QWidget,Ui_Form,PowderView):
         super(PowderWidget,self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.btnPowderCalculateProjection.clicked.connect(self._btn_clicked)
+        self._presenter = PowderProjectionPresenter(self, MantidProjectionCalculator())
 
-    def set_workspace_selector(self, workspace_selector):
-        # Currently will raise an error if a workspace_selector does not implement mainView
-        # The code needs to be refactored and proper interface needs to be defined.
-        self._presenter = PowderProjectionPresenter(self, workspace_selector, MantidProjectionCalculator())
+    def get_presenter(self):
+        return self._presenter
 
     def _btn_clicked(self):
         self._presenter.notify(Command.CalculatePowderProjection)

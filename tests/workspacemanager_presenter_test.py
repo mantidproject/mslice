@@ -5,8 +5,10 @@ from mock import call
 
 from models.workspacemanager.workspace_provider import WorkspaceProvider
 from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from presenters.interfaces.main_presenter import MainPresenterInterface
 from views.workspace_view import WorkspaceView
 from widgets.workspacemanager.command import Command
+from mainview import MainView
 from tempfile import gettempdir
 from os.path import join
 
@@ -17,6 +19,18 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def setUp(self):
         self.workspace_provider = mock.create_autospec(spec=WorkspaceProvider)
         self.view = mock.create_autospec(spec=WorkspaceView)
+        self.mainview = mock.create_autospec(MainView)
+        self.main_presenter= mock.create_autospec(MainPresenterInterface)
+        self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
+
+    def test_register_master_success(self):
+        workspace_presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        workspace_presenter.register_master(self.main_presenter)
+        self.main_presenter.register_workspace_selector.assert_called_once_with(workspace_presenter)
+
+    def test_register_master_invalid_master_fail(self):
+        workspace_presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.assertRaises(AssertionError ,workspace_presenter.register_master, 3)
 
     def test_load_one_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -194,11 +208,16 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.delete_workspace.assert_not_called()
         self.view.display_loaded_workspaces.assert_not_called()
 
+    def test_broadcast_success(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter.register_master(self.main_presenter)
+        self.presenter.notify(Command.SelectionChanged)
+        self.main_presenter.notify_workspace_selection_changed()
+
     def test_call_presenter_with_unknown_command(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         unknown_command = 10
         self.assertRaises(ValueError,self.presenter.notify, unknown_command)
-
 
 if __name__ == '__main__':
     unittest.main()
