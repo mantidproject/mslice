@@ -1,7 +1,7 @@
 import mock
 import unittest
 from presenters.main_presenter import MainPresenter
-from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from presenters.interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from mainview import MainView
 SELECTED_WORKSPACES = ['a', 'b', 'c']
 
@@ -9,7 +9,7 @@ SELECTED_WORKSPACES = ['a', 'b', 'c']
 class MainPresenterTests(unittest.TestCase):
     def setUp(self):
         self.mainview = mock.create_autospec(MainView)
-        self.workspace_presenter = mock.create_autospec(WorkspaceManagerPresenter)
+        self.workspace_presenter = mock.create_autospec(WorkspaceManagerPresenterInterface)
         self.workspace_presenter.get_selected_workspaces = mock.Mock(return_value=SELECTED_WORKSPACES)
 
     def test_get_selected_workspaces_success(self):

@@ -4,7 +4,7 @@ import mock
 
 from mainview import MainView
 from models.slice.slice_plotter import SlicePlotter
-from presenters.main_presenter import MainPresenter
+from presenters.interfaces.main_presenter import MainPresenterInterface
 from presenters.slice_plotter_presenter import SlicePlotterPresenter,Axis
 from views.slice_plotter_view import SlicePlotterView
 from widgets.slice.command import Command
@@ -14,7 +14,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def setUp(self):
         # Setting up main tool presenter and view
         self.main_view = mock.create_autospec(MainView)
-        self.main_presenter = mock.create_autospec(MainPresenter)
+        self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.main_view.get_presenter = mock.Mock(return_value=self.main_presenter)
         # Setting up view for slice plotter window
         self.slice_plotter = mock.create_autospec(SlicePlotter)

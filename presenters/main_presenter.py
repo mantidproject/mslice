@@ -1,4 +1,7 @@
-class MainPresenter(object):
+from interfaces.main_presenter import MainPresenterInterface
+
+
+class MainPresenter(MainPresenterInterface):
     def __init__(self, main_view):
         self._mainView = main_view
         self._selected_workspace_listener = []
@@ -18,7 +21,7 @@ class MainPresenter(object):
         for listener in self._selected_workspace_listener:
             listener.workspace_selection_changed()
 
-    def notify_selection_changed(self):
+    def notify_workspace_selection_changed(self):
         self.broadcast_selection_changed()
 
     def subscribe_to_workspace_selection_monitor(self, client):

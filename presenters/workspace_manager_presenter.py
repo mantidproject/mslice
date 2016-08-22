@@ -2,10 +2,11 @@ from widgets.workspacemanager.command import Command
 import os.path
 from mainview import MainView
 from validation_decorators import require_main_presenter
+from interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 
 #TODO tell user when file not found,file failed to load
 
-class WorkspaceManagerPresenter(object):
+class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def __init__(self, workspace_view, workspace_provider):
         #TODO add validation checks
         self._groupCount = 1
@@ -35,7 +36,7 @@ class WorkspaceManagerPresenter(object):
             raise ValueError("Workspace Manager Presenter received an unrecognised command")
 
     def _broadcast_selected_workspaces(self):
-        self._get_main_presenter().notify_selection_changed()
+        self._get_main_presenter().notify_workspace_selection_changed()
 
     @require_main_presenter
     def _get_main_presenter(self):

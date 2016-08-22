@@ -3,9 +3,10 @@ from views.powder_projection_view import PowderView
 from widgets.projection.powder.command import Command
 from validation_decorators import require_main_presenter
 from mainview import MainView
+from interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
 
 
-class PowderProjectionPresenter(object):
+class PowderProjectionPresenter(PowderProjectionPresenterInterface):
 
     def __init__(self, powder_view, projection_calculator):
         self._powder_view = powder_view

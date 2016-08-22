@@ -5,6 +5,7 @@ from mock import call
 
 from models.workspacemanager.workspace_provider import WorkspaceProvider
 from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from presenters.interfaces.main_presenter import MainPresenterInterface
 from views.workspace_view import WorkspaceView
 from widgets.workspacemanager.command import Command
 from mainview import MainView
@@ -19,7 +20,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider = mock.create_autospec(spec=WorkspaceProvider)
         self.view = mock.create_autospec(spec=WorkspaceView)
         self.mainview = mock.create_autospec(MainView)
-        self.main_presenter= mock.Mock()
+        self.main_presenter= mock.create_autospec(MainPresenterInterface)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 
     def test_register_master_success(self):
@@ -210,8 +211,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         self.presenter.register_master(self.mainview)
         self.presenter.notify(Command.SelectionChanged)
-        self.mainview.get_presenter.assert_called()
-        self.main_presenter.broadcast_selection_changed()
+        self.main_presenter.notify_workspace_selection_changed()
 
     def test_call_presenter_with_unknown_command(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)

@@ -4,7 +4,7 @@ import mock
 
 from mainview import MainView
 from models.projection.powder.projection_calculator import ProjectionCalculator
-from presenters.main_presenter import MainPresenter
+from presenters.interfaces.main_presenter import MainPresenterInterface
 from presenters.powder_projection_presenter import PowderProjectionPresenter
 from views.powder_projection_view import PowderView
 from widgets.projection.powder.command import Command
@@ -15,7 +15,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         # Set up a mock view, presenter, main view and main presenter
         self.powder_view = mock.create_autospec(PowderView)
         self.projection_calculator = mock.create_autospec(ProjectionCalculator)
-        self.main_presenter = mock.create_autospec(MainPresenter)
+        self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview = mock.create_autospec(MainView)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 

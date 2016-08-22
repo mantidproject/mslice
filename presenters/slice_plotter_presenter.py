@@ -5,6 +5,7 @@ from views.slice_plotter_view import SlicePlotterView
 from mainview import MainView
 from widgets.slice.command import Command
 from validation_decorators import require_main_presenter
+from interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 
 Axis = namedtuple('Axis', ['units', 'start', 'end', 'step'])
 
@@ -17,7 +18,7 @@ INVALID_X_UNITS = 6
 INVALID_Y_UNITS = 7
 
 
-class SlicePlotterPresenter:
+class SlicePlotterPresenter(SlicePlotterPresenterInterface):
     def __init__(self, slice_view, slice_plotter):
         if not isinstance(slice_view, SlicePlotterView):
             raise TypeError("Parameter slice_view is not of type SlicePlotterView")
