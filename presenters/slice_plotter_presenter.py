@@ -92,7 +92,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             self._slice_view.error_invalid_intensity_params()
             return
 
-        if intensity_start > intensity_end:
+        if intensity_start is not None and intensity_end is not None and intensity_start > intensity_end:
             self._slice_view.error_invalid_intensity_params()
             return
         try:
@@ -102,8 +102,8 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         try:
             status = self._slice_plotter.display_slice(selected_workspace,x_axis, y_axis, smoothing, intensity_start,
                                                    intensity_end, norm_to_one, colourmap)
-        except NotImplementedError:
-            self._slice_view.error("workspace 2d slicing not supported")
+        except NotImplementedError as e:
+            self._slice_view.error(e.message)
 
         if status == INVALID_PARAMS:
             self._slice_view.error_invalid_plot_parameters()
@@ -153,7 +153,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             if x.start > x.end:
                 return INVALID_X_PARAMS
 
-        if y.start and y.end:
+        if y.start is not None and y.end is not None:
             if y.start > y.end:
                 return INVALID_Y_PARAMS
 

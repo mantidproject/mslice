@@ -20,23 +20,29 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.setupUi(self)
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
-        self._presenter = SlicePlotterPresenter(self, MatplotlibSlicePlotter())
+        plotter = MatplotlibSlicePlotter(MantidSliceAlgorithm())
+        self._presenter = SlicePlotterPresenter(self, plotter)
 
+    def get_presenter(self):
+        return self._presenter
 
     def _btn_clicked(self):
         self._presenter.notify(Command.DisplaySlice)
 
-    def set_workspace_selector(self, workspace_selector):
-        # Currently will raise an error if a workspace_selector does not implement mainView
-        # The code needs to be refactored and proper interface needs to be defined.
-        slice_plotter = MatplotlibSlicePlotter(MantidSliceAlgorithm())
-        self._presenter = SlicePlotterPresenter(main_view=workspace_selector, slice_view=self,
-                                                slice_plotter=slice_plotter)
-        #
-        self._main_window = workspace_selector
-
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def get_slice_x_axis(self):
+        return str(self.cmbSliceXAxis.currentText())
+
+    def get_slice_y_axis(self):
+        return str(self.cmbSliceYAxis.currentText())
+
+    def get_slice_is_norm_to_one(self):
+        return self.rdoSliceNormToOne.isChecked()
+
+    def get_slice_smoothing(self):
+        return str(self.lneSliceSmoothing.text())
 
     def get_slice_x_start(self):
         return str(self.lneSliceXStart.text())
@@ -69,7 +75,6 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.cmbSliceColormap.clear()
         for colormap in colormaps:
             self.cmbSliceColormap.addItem(colormap)
-
 
     def error_select_one_workspace(self):
         self._display_error('Please select a workspace to slice')

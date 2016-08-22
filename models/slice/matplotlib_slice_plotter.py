@@ -14,7 +14,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             plot_data = self._slice_algorithm.compute_slice(selected_workspace, x_axis, y_axis, smoothing)
             boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
             if norm_to_one:
-                norm = Normalize(vmin=0, vmax=1)
+                raise NotImplementedError("Normalizing is not Implemented")
             else:
                 norm = Normalize(vmin=intensity_start, vmax=intensity_end)
             plt.imshow(plot_data, extent=boundaries, interpolation='none', aspect='auto', cmap=colourmap, norm=norm)

@@ -36,7 +36,7 @@ class MantidSliceAlgorithm(SliceAlgorithm):
             self._workspace_provider.delete_workspace(slice)
 
         else:
-            raise NotImplementedError('Implement Using Rebin2D')
+            raise NotImplementedError('Slicing workspace2d is not implemented')
             plot_data = []
             for i in range(workspace.getNumberHistograms()-1,-1,-1):
                 plot_data.append(workspace.readY(i))
@@ -56,6 +56,6 @@ class MantidSliceAlgorithm(SliceAlgorithm):
 
     def _fill_in_missing_input(self,axis,workspace):
         if axis.end is None or axis.start is None or axis.step is None:
-            raise NotImplementedError()
+            raise NotImplementedError("Autocompletion of slice params is not completed")
 
 
