@@ -33,7 +33,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
 
     def test_register_master(self):
         powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
-        powder_presenter.register_master(self.mainview)
+        powder_presenter.register_master(self.main_presenter)
 
     def test_register_master_invalid_master_fail(self):
         powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
@@ -45,7 +45,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
-        self.powder_presenter.register_master(self.mainview)
+        self.powder_presenter.register_master(self.main_presenter)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
         u2 = '|Q|'
@@ -78,7 +78,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         u2 = 'Energy'
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
-        self.powder_presenter.register_master(self.mainview)
+        self.powder_presenter.register_master(self.main_presenter)
         self.assertRaises(NotImplementedError,self.powder_presenter.notify,Command.CalculatePowderProjection)
         self.main_presenter.get_selected_workspaces.assert_called_once_with()
         self.powder_view.get_powder_u1.assert_called_once_with()
@@ -91,7 +91,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=selected_workspaces)
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
-        self.powder_presenter.register_master(self.mainview)
+        self.powder_presenter.register_master(self.main_presenter)
         # Setup view to report Energy and |Q| as selected axis to project two
         u1 = 'Energy'
         u2 = '|Q|'

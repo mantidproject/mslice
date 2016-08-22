@@ -40,7 +40,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
 
     def test_register_master_success(self):
         slice_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
-        slice_presenter.register_master(self.main_view)
+        slice_presenter.register_master(self.main_presenter)
         self.main_presenter.subscribe_to_workspace_selection_monitor.assert_called_once_with(slice_presenter)
 
     def test_register_master_invalid_master_fail(self):
@@ -49,7 +49,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
 
     def test_plot_slice_successful(self):
         self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
-        self.slice_plotter_presenter.register_master(self.main_view)
+        self.slice_plotter_presenter.register_master(self.main_presenter)
         x = Axis('x', 0, 10 ,1)
         y = Axis('y', 2, 8, 3)
         intensity_start = 7
