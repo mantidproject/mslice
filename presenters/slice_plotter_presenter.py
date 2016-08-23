@@ -113,7 +113,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
             # will break if matplotlib change exception eror message
-            if e.message == ("minvalue must be less than or equal to maxvalue"):
+            if e.message != ("minvalue must be less than or equal to maxvalue"):
                 raise e
             self._slice_view.error_invalid_intensity_params()
             return
