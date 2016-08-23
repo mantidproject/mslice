@@ -4,7 +4,7 @@ from widgets.slice.command import Command
 from validation_decorators import require_main_presenter
 from interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from interfaces.main_presenter import MainPresenterInterface
-import plotting.pyplot as plt
+
 
 class Axis(object):
     def __init__(self, units, start, end, step):
@@ -16,11 +16,11 @@ class Axis(object):
     def __eq__(self, other):
         # This is required for Unit testing
         return self.units == other.units and self.start == other.start and self.end == other.end \
-                and self.step == other.step and isinstance(other, Axis)
+               and self.step == other.step and isinstance(other, Axis)
 
     def __repr__(self):
         info = (self.units, self.start, self.end, self.step)
-        return "Axis(" + " ,".join(map(str,info)) + ")"
+        return "Axis(" + " ,".join(map(str, info)) + ")"
 
 
 INVALID_PARAMS = 1
@@ -33,7 +33,7 @@ INVALID_Y_UNITS = 7
 
 
 class SlicePlotterPresenter(SlicePlotterPresenterInterface):
-    def __init__(self, slice_view, slice_plotter):
+    def __init__(self, slice_view, slice_plotter, plot_module):
         if not isinstance(slice_view, SlicePlotterView):
             raise TypeError("Parameter slice_view is not of type SlicePlotterView")
         if not isinstance(slice_plotter, SlicePlotter):
@@ -43,13 +43,14 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         self._slice_plotter = slice_plotter
         colormaps = self._slice_plotter.get_available_colormaps()
         self._slice_view.populate_colormap_options(colormaps)
+        self._plot_module = plot_module
 
     def register_master(self, main_presenter):
         assert (isinstance(main_presenter, MainPresenterInterface))
         self._main_presenter = main_presenter
         self._main_presenter.subscribe_to_workspace_selection_monitor(self)
 
-    def notify(self,command):
+    def notify(self, command):
         if command == Command.DisplaySlice:
             self._display_slice()
         else:
@@ -57,7 +58,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
 
     def _display_slice(self):
         selected_workspaces = self._get_main_presenter().get_selected_workspaces()
-        if not selected_workspaces or len(selected_workspaces)>1:
+        if not selected_workspaces or len(selected_workspaces) > 1:
             self._slice_view.error_select_one_workspace()
             return
 
@@ -98,25 +99,29 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             self._slice_view.error_invalid_smoothing_params()
 
         try:
-            plot_data, boundaries, colormap, norm = self._slice_plotter.display_slice(selected_workspace,x_axis, y_axis,
-                                                    smoothing, intensity_start,intensity_end, norm_to_one, colourmap)
+            plot_data, boundaries, colormap, norm = self._slice_plotter.display_slice(selected_workspace, x_axis,
+                                                                                      y_axis,
+                                                                                      smoothing, intensity_start,
+                                                                                      intensity_end, norm_to_one,
+                                                                                      colourmap)
         except NotImplementedError as e:
             self._slice_view.error(e.message)
             return
         try:
-            plt.imshow(plot_data,extent=boundaries, cmap=colourmap, aspect='auto', norm=norm, interpolation='none')
+            self._plot_module.imshow(plot_data, extent=boundaries, cmap=colourmap, aspect='auto', norm=norm,
+                                interpolation='none')
         except ValueError:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
             self._slice_view.error_invalid_intensity_params()
             return
-        plt.xlabel(x_axis.units)
-        plt.ylabel(y_axis.units)
+        self._plot_module.xlabel(x_axis.units)
+        self._plot_module.ylabel(y_axis.units)
 
     @require_main_presenter
     def _get_main_presenter(self):
         return self._main_presenter
 
-    def _process_axis(self,x, y):
+    def _process_axis(self, x, y):
         if x.units == y.units:
             return INVALID_PARAMS
         try:
