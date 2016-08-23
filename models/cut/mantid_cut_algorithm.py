@@ -13,15 +13,16 @@ class MantidCutAlgorithm(CutAlgorithm):
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         n_steps = self._get_number_of_steps(cut_axis)
         self._infer_missing_parameters(cut_axis)
-        cut_binning = cut_axis.units + ',' + cut_axis.start + ',' + cut_axis.end + ',' + str(n_steps)
+        cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         print ('Warning : disregarding input and binning to 100 bins and integrating along Q')
-        integration_binning = "DeltaE," + integration_start + "," + integration_end +",1"
+        integration_binning = "DeltaE," + str(integration_start) + "," + str(integration_end) +",1"
         cut = BinMD(selected_workspace, AxisAligned="1", AlignedDim1=integration_binning, AlignedDim0=cut_binning)
         with np.errstate(invalid='ignore'):
             plot_data = cut.getSignalArray() / cut.getNumEventsArray()
         plot_data = plot_data.squeeze()
         plot_data = np.ma.masked_where(np.isnan(plot_data), plot_data)
-        x = np.linspace(float(cut_axis.start), float(cut_axis.end), 100)
+        plot_data = plot_data.squeeze()
+        x = np.linspace(float(cut_axis.start), float(cut_axis.end), plot_data.size)
         return x, plot_data
 
     def _infer_missing_parameters(self, cut_axis):

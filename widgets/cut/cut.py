@@ -1,13 +1,16 @@
+from PyQt4.QtGui import QWidget
+from PyQt4.QtCore import pyqtSignal
 from cut_ui import Ui_Form
 from views.cut_view import CutView
 from command import Command
 from presenters.cut_presenter import CutPresenter
 from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 from models.cut.mantid_cut_algorithm import MantidCutAlgorithm
-from PyQt4.QtGui import QWidget
 
 
 class CutWidget(QWidget, CutView, Ui_Form):
+    error_occurred = pyqtSignal('QString')
+
     def __init__(self,*args, **kwargs):
         super(CutWidget,self).__init__(*args, **kwargs)
         self.setupUi(self)
@@ -26,6 +29,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
         sender = self.sender()
         command = self._command_lookup[sender]
         self._presenter.notify(command)
+
+    def _display_error(self, error_string):
+        self.error_occurred.emit(error_string)
 
     def get_presenter(self):
         return self._presenter
@@ -67,3 +73,6 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.cmbCutAxis.clear()
         for option in options:
             self.cmbCutAxis.addItem(option)
+
+    def error_select_a_workspace(self):
+        self._display_error("Please select a workspace to cut")
