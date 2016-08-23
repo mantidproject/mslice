@@ -39,14 +39,6 @@ class MantidSliceAlgorithm(SliceAlgorithm):
 
         else:
             raise NotImplementedError('Slicing workspace2d is not implemented')
-            plot_data = []
-            for i in range(workspace.getNumberHistograms()-1,-1,-1):
-                plot_data.append(workspace.readY(i))
-                x_left = workspace.readX(0)[0]
-                x_right = workspace.readX(0)[-1]
-                y_top = workspace.getNumberHistograms() - 1
-                y_bottom = 0
-
         return plot_data
 
     def get_available_axis(self, selected_workspace):
