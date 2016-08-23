@@ -113,3 +113,23 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
 
     def error(self, str):
         self._display_error(str)
+
+    def populate_slice_x_params(self, x_start, x_end, x_step):
+        self.lneSliceXStart.setText(x_start)
+        self.lneSliceXEnd.setText(x_end)
+        self.lneSliceXStep.setText(x_step)
+
+    def populate_slice_y_params(self, y_start, y_end, y_step):
+        self.lneSliceYStart.setText(y_start)
+        self.lneSliceYEnd.setText(y_end)
+        self.lneSliceYStep.setText(y_step)
+
+    def clear_input_fields(self):
+        self.populate_slice_x_options([])
+        self.populate_slice_y_options([])
+        self.populate_slice_x_params("", "", "")
+        self.populate_slice_y_params("", "", "")
+        self.lneSliceIntensityStart.setText("")
+        self.lneSliceIntensityEnd.setText("")
+        self.lneSliceSmoothing.setText("")
+        self.rdoSliceNormToOne.setChecked(0)

@@ -113,7 +113,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
             # will break if matplotlib change exception eror message
-            if e.message != ("minvalue must be less than or equal to maxvalue"):
+            if e.message != "minvalue must be less than or equal to maxvalue":
                 raise e
             self._slice_view.error_invalid_intensity_params()
             return
@@ -128,16 +128,16 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         if x.units == y.units:
             return INVALID_PARAMS
         try:
-            x.start = self._to_float(x.start)
-            x.step = self._to_float(x.step)
-            x.end = self._to_float(x.end)
+            x.start = float(x.start)
+            x.step = float(x.step)
+            x.end = float(x.end)
         except ValueError:
             return INVALID_X_PARAMS
 
         try:
-            y.start = self._to_float(y.start)
-            y.step = self._to_float(y.step)
-            y.end = self._to_float(y.end)
+            y.start = float(y.start)
+            y.step = float(y.step)
+            y.end = float(y.end)
         except ValueError:
             return INVALID_Y_PARAMS
 
@@ -150,24 +150,32 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
                 return INVALID_Y_PARAMS
 
     def _to_float(self, x):
-        x = x.strip()
-        if x is None or x == "":
+        if x == "":
             return None
         return float(x)
 
     def _to_int(self, x):
-        x.strip()
-        if x is None or x == "":
+        if x == "":
             return None
         return int(x)
 
     def workspace_selection_changed(self):
         workspace_selection = self._get_main_presenter().get_selected_workspaces()
         if len(workspace_selection) != 1:
-            self._slice_view.populate_slice_x_options([])
-            self._slice_view.populate_slice_y_options([])
+            self._slice_view.clear_input_fields()
             return
         workspace_selection = workspace_selection[0]
+
         axis = self._slice_plotter.get_available_axis(workspace_selection)
         self._slice_view.populate_slice_x_options(axis)
         self._slice_view.populate_slice_y_options(axis[::-1])
+        x_min, x_max = self._slice_plotter.get_axis_range(workspace_selection,self._slice_view.get_slice_x_axis())
+        y_min, y_max = self._slice_plotter.get_axis_range(workspace_selection,self._slice_view.get_slice_y_axis())
+        try:
+            x_step = (x_max - x_min)/100
+            y_step = (y_max - y_min)/100
+        except TypeError:
+            self._slice_view.clear_input_fields()
+            return
+        self._slice_view.populate_slice_x_params(*map(lambda x: "%.5f" % x, (x_min, x_max, x_step)))
+        self._slice_view.populate_slice_y_params(*map(lambda x:"%.5f"%x, (y_min, y_max, y_step)))

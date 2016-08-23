@@ -1,5 +1,4 @@
-from plotting import pyplot as plt
-from matplotlib.colors import Normalize, NoNorm
+from matplotlib.colors import Normalize
 from slice_plotter import SlicePlotter
 
 
@@ -22,3 +21,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def get_available_axis(self, selected_workspace):
         return self._slice_algorithm.get_available_axis(selected_workspace)
+
+    def get_axis_range(self, workspace, dimension_name):
+        return self._slice_algorithm.get_axis_range(workspace, dimension_name)
+
+    def get_intensity_range(self, workspace):
+        return self._slice_algorithm.get_intensity_range(workspace)

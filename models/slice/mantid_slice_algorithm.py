@@ -13,9 +13,6 @@ class MantidSliceAlgorithm(SliceAlgorithm):
     def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         if isinstance(workspace,IMDEventWorkspace):
-            # TODO implement axis swapping
-            # TODO implement input validation and return appropriate error codes
-            # Deduct values not supplied by user from workspace
             self._fill_in_missing_input(x_axis, workspace)
             self._fill_in_missing_input(y_axis, workspace)
 
@@ -32,7 +29,6 @@ class MantidSliceAlgorithm(SliceAlgorithm):
             with np.errstate(invalid='ignore'):
                 plot_data = slice.getSignalArray() / slice.getNumEventsArray()
             plot_data = np.ma.masked_where(np.isnan(plot_data), plot_data)
-            # The flipud is because mantid plots first row of array at top of plot
             # rot90 switches the x and y axis to to plot what user expected.
             plot_data = np.rot90(plot_data)
             self._workspace_provider.delete_workspace(slice)
@@ -70,3 +66,16 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         if axis.step is None:
             axis.step = (axis.end - axis.start)/100
 
+    def get_intensity_range(self, workspace):
+        workspace = self._workspace_provider.get_workspace_handle(workspace)
+        if not isinstance(workspace, IMDEventWorkspace):
+            return "", ""
+        return "", ""
+
+    def get_axis_range(self, workspace, dimension_name):
+        workspace = self._workspace_provider.get_workspace_handle(workspace)
+        if not isinstance(workspace, IMDEventWorkspace):
+            return "", ""
+        dim = workspace.getDimensionIndexByName(dimension_name)
+        dim = workspace.getDimension(dim)
+        return dim.getMinimum(), dim.getMaximum()
