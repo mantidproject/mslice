@@ -13,7 +13,7 @@ class MantidCutAlgorithm(CutAlgorithm):
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         n_steps = self._get_number_of_steps(cut_axis)
         self._infer_missing_parameters(cut_axis)
-        cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
+        cut_binning = " ,".join(map(str, ('|Q|', cut_axis.start, cut_axis.end, n_steps)))
         print ('Warning : disregarding input and binning to 100 bins and integrating along Q')
         integration_binning = "DeltaE," + str(integration_start) + "," + str(integration_end) +",1"
         cut = BinMD(selected_workspace, AxisAligned="1", AlignedDim1=integration_binning, AlignedDim0=cut_binning)

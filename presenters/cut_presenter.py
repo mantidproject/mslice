@@ -10,15 +10,13 @@ class Axis(object):
         self.units =units
 
 class CutPresenter(object):
-    def __init__(self, cut_view, cut_plotter):
+    def __init__(self, cut_view, cut_algorithm, plotting_module):
         self._cut_view = cut_view
-        self._cut_plotter = cut_plotter
-        # TODO wait for broadcast system to then call main_presenter.get_main_presenter().subscribe(self)
+        self._cut_algorithm = cut_algorithm
         if not isinstance(cut_view, CutView):
             raise TypeError("cut_view is not of type cut_view")
-        # This should be populated according to the workspace
-        self._cut_view.populate_cut_axis_options(['|Q|','DeltaE'])
         self._main_presenter = None
+        self._plotting_module = plotting_module
 
     def register_master(self, main_presenter):
         self._main_presenter = main_presenter
@@ -43,8 +41,10 @@ class CutPresenter(object):
             params = self._parse_input()
         except ValueError:
             return
-        params += plot_over,
-        error_code = self._cut_plotter.plot_cut(*params)
+        cut_params = params[:4]
+        intensity_start ,intensity_end, is_norm = params[4:]
+        x,y = self._cut_algorithm.compute_cut(*params[:4])
+        self._plotting_module.plot(x,y)
         self._main_presenter.update_displayed_workspaces()
 
     def _save_cut_to_workspace(self, plot_over=False):
