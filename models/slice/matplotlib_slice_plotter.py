@@ -15,9 +15,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             if norm_to_one:
                 plot_data = self._slice_algorithm._norm_to_one(plot_data)
             norm = Normalize(vmin=intensity_start, vmax=intensity_end)
-            plt.imshow(plot_data, extent=boundaries, interpolation='none', aspect='auto', cmap=colourmap, norm=norm)
-            plt.xlabel(x_axis.units)
-            plt.ylabel(y_axis.units)
+            return plot_data, boundaries, colourmap, norm
 
     def get_available_colormaps(self):
         return self._colormaps

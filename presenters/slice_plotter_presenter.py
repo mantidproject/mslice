@@ -4,7 +4,7 @@ from widgets.slice.command import Command
 from validation_decorators import require_main_presenter
 from interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from interfaces.main_presenter import MainPresenterInterface
-
+import plotting.pyplot as plt
 
 class Axis(object):
     def __init__(self, units, start, end, step):
@@ -96,32 +96,21 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             smoothing = self._to_int(smoothing)
         except ValueError:
             self._slice_view.error_invalid_smoothing_params()
+
         try:
-            status = self._slice_plotter.display_slice(selected_workspace,x_axis, y_axis, smoothing, intensity_start,
-                                                   intensity_end, norm_to_one, colourmap)
+            plot_data, boundaries, colormap, norm = self._slice_plotter.display_slice(selected_workspace,x_axis, y_axis,
+                                                    smoothing, intensity_start,intensity_end, norm_to_one, colourmap)
         except NotImplementedError as e:
             self._slice_view.error(e.message)
-
-        if status == INVALID_PARAMS:
-            self._slice_view.error_invalid_plot_parameters()
-
-        elif status == INVALID_X_PARAMS:
-            self._slice_view.error_invalid_x_params()
-
-        elif status == INVALID_Y_PARAMS:
-            self._slice_view.error_invalid_y_params()
-
-        elif status == INVALID_INTENSITY:
+            return
+        try:
+            plt.imshow(plot_data,extent=boundaries, cmap=colourmap, aspect='auto', norm=norm, interpolation='none')
+        except ValueError:
+            # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
             self._slice_view.error_invalid_intensity_params()
-
-        elif status == INVALID_SMOOTHING:
-            self._slice_view.error_invalid_smoothing_params()
-
-        elif status == INVALID_X_UNITS:
-            self._slice_view.error_invalid_x_units()
-
-        elif status == INVALID_Y_UNITS:
-            self._slice_view.error_invalid_y_units()
+            return
+        plt.xlabel(x_axis.units)
+        plt.ylabel(y_axis.units)
 
     @require_main_presenter
     def _get_main_presenter(self):
