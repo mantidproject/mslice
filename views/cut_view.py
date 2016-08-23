@@ -36,3 +36,6 @@ class CutView:
 
     def populate_cut_axis_options(self,options):
         pass
+
+    def get_presenter(self):
+        pass

@@ -3,6 +3,7 @@ from views.cut_view import CutView
 from command import Command
 from presenters.cut_presenter import CutPresenter
 from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+from models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from PyQt4.QtGui import QWidget
 
 
@@ -18,7 +19,8 @@ class CutWidget(QWidget, CutView, Ui_Form):
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
-        self._presenter = CutPresenter(self, MatplotlibCutPlotter())
+        plotter = MatplotlibCutPlotter(MantidCutAlgorithm())
+        self._presenter = CutPresenter(self, plotter)
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -27,8 +29,6 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
     def get_presenter(self):
         return self._presenter
-
-
 
     def get_cut_axis(self):
         return str(self.cmbCutAxis.currentText())
