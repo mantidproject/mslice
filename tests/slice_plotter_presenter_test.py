@@ -1,7 +1,7 @@
 import unittest
 
 import mock
-
+from mock import call
 
 from models.slice.slice_plotter import SlicePlotter
 from presenters.interfaces.main_presenter import MainPresenterInterface
@@ -288,3 +288,16 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_plotter_presenter.workspace_selection_changed()
         self.slice_view.clear_input_fields.assert_called()
 
+    def test_workspace_selection_changed(self):
+        slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        slice_plotter_presenter.register_master(self.main_presenter)
+        workspace = 'workspace'
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
+        dims =['dim1', 'dim2']
+        self.slice_plotter.get_available_axis = mock.Mock(return_value=dims)
+        self.slice_plotter.get_axis_range = mock.Mock(return_value=(0,1))
+        slice_plotter_presenter.workspace_selection_changed()
+        self.slice_view.populate_slice_x_options.assert_called()
+        self.slice_view.populate_slice_y_options.assert_called()
+        self.slice_plotter.get_available_axis.assert_called()
+        self.slice_plotter.get_axis_range.assert_called()
