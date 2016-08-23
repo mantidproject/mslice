@@ -6,7 +6,7 @@ from interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from interfaces.main_presenter import MainPresenterInterface
 
 
-class Axis:
+class Axis(object):
     def __init__(self, units, start, end, step):
         self.units = units
         self.start = start
@@ -30,7 +30,6 @@ INVALID_INTENSITY = 4
 INVALID_SMOOTHING = 5
 INVALID_X_UNITS = 6
 INVALID_Y_UNITS = 7
-
 
 
 class SlicePlotterPresenter(SlicePlotterPresenterInterface):
@@ -71,10 +70,10 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         if status == INVALID_Y_PARAMS:
             self._slice_view.error_invalid_y_params()
             return
-        elif status ==INVALID_X_PARAMS:
+        elif status == INVALID_X_PARAMS:
             self._slice_view.error_invalid_x_params()
             return
-        elif status ==INVALID_PARAMS:
+        elif status == INVALID_PARAMS:
             self._slice_view.error_invalid_plot_parameters()
             return
 
