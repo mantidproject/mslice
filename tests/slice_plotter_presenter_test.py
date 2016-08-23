@@ -49,12 +49,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_plotter_presenter.register_master(self.main_presenter)
         self.slice_plotter_presenter.register_master(self.main_presenter)
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x', 0, 10 ,1)
-        y = Axis('y', 2, 8, 3)
-        intensity_start = 7
-        intensity_end = 8
+        x = Axis('x', '0', '10' ,'1')
+        y = Axis('y', '2', '8', '3')
+        intensity_start = '7'
+        intensity_end = '8'
         norm_to_one = False
-        smoothing = 10
+        smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
@@ -90,8 +90,9 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_smoothing.assert_called_once_with()
         self.slice_view.get_slice_colourmap.assert_called_once_with()
 
-        self.slice_plotter.display_slice.assert_called_with(selected_workspace, x, y, smoothing,
-                                                            intensity_start, intensity_end,
+        self.slice_plotter.display_slice.assert_called_with(selected_workspace, Axis('x', 0, 10 ,1),
+                                                            Axis('y', 2, 8, 3), int(smoothing),
+                                                            float(intensity_start), float(intensity_end),
                                                             norm_to_one, colourmap)
         self.plotting_module.imshow.assert_called_with("plot_data", extent="boundaries", cmap="colormap", aspect='auto',
                                                         norm="norm", interpolation='none')
@@ -99,12 +100,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_invalid__string_x_params_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x',0,"aa",1)
-        y = Axis('y',2,8,3)
-        intensity_start = 7
-        intensity_end = 8
-        norm_to_one = 9
-        smoothing = 10
+        x = Axis('x','0',"aa",'1')
+        y = Axis('y','2','8','3')
+        intensity_start = '7'
+        intensity_end = '8'
+        norm_to_one = '9'
+        smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
@@ -129,12 +130,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_x_start_bigger_than_x_stop_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x',2,1,.1)
-        y = Axis('y',2,8,3)
-        intensity_start = 7
-        intensity_end = 8
-        norm_to_one = 9
-        smoothing = 10
+        x = Axis('x','2','1','.1')
+        y = Axis('y','2','8','3')
+        intensity_start = '7'
+        intensity_end = '8'
+        norm_to_one = '9'
+        smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
@@ -159,12 +160,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_invalid_string_y_params_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x',0,7,1)
-        y = Axis('y',2,"8.-",3)
-        intensity_start = 7
-        intensity_end = 8
-        norm_to_one = 9
-        smoothing = 10
+        x = Axis('x','0','7','1')
+        y = Axis('y','2',"8.-",'3')
+        intensity_start = '7'
+        intensity_end = '8'
+        norm_to_one = '9'
+        smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
@@ -189,12 +190,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_invalid_y_params_y_end_less_than_y_start_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x',0,7,1)
-        y = Axis('y',20,8,3)
-        intensity_start = 7
-        intensity_end = 8
-        norm_to_one = 9
-        smoothing = 10
+        x = Axis('x','0','7','1')
+        y = Axis('y','20','8','3')
+        intensity_start = '7'
+        intensity_end = '8'
+        norm_to_one = '9'
+        smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
@@ -219,12 +220,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_invalid_intensity_params_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x',0,7,1)
-        y = Axis('y',2,8,3)
-        intensity_start = 7
+        x = Axis('x','0','7','1')
+        y = Axis('y','2','8','3')
+        intensity_start = '7'
         intensity_end = "j"
-        norm_to_one = 9
-        smoothing = 10
+        norm_to_one = '9'
+        smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
@@ -249,12 +250,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_intensity_end_less_than_intensity_start_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x',0,7,1)
-        y = Axis('y',2,8,3)
-        intensity_start = 7
-        intensity_end = 1
-        norm_to_one = 9
-        smoothing = 10
+        x = Axis('x','0','7','1')
+        y = Axis('y','2','8','3')
+        intensity_start = '7'
+        intensity_end = '1'
+        norm_to_one = '9'
+        smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
