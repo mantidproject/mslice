@@ -286,6 +286,5 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_plotter.get_available_axis = mock.Mock(return_value=axis)
 
         slice_plotter_presenter.workspace_selection_changed()
-        self.slice_view.populate_slice_x_options.assert_called_with([])
-        self.slice_view.populate_slice_y_options.assert_called_with([])
+        self.slice_view.clear_input_fields.assert_called()
 
