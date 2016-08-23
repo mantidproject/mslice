@@ -6,3 +6,6 @@ class SlicePlotter():
 
     def get_available_colormaps(self):
         pass
+
+    def get_available_axis(self, workspace):
+        pass

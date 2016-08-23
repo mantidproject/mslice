@@ -49,9 +49,6 @@ class MantidSliceAlgorithm(SliceAlgorithm):
 
         return plot_data
 
-    def get_labels(self, workspace, x_axis, y_axis):
-        return x_axis.units, y_axis.units
-
     def get_available_axis(self, selected_workspace):
         axis = []
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
@@ -61,7 +58,7 @@ class MantidSliceAlgorithm(SliceAlgorithm):
                 axis.append(dim_name)
         return axis
 
-    def norm_to_one(self, data):
+    def _norm_to_one(self, data):
         data_range = data.max() - data.min()
         return (data - data.min())/data_range
 
