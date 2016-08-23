@@ -5,15 +5,17 @@ from slice_plotter_presenter import Axis
 
 
 class CutPresenter(object):
-    def __init__(self, cut_view, main_view, cut_plotter):
+    def __init__(self, cut_view, cut_plotter):
         self._cut_view = cut_view
         self._cut_plotter = cut_plotter
-        self._main_presenter = main_view.get_presenter()
         # TODO wait for broadcast system to then call main_presenter.get_main_presenter().subscribe(self)
         if not isinstance(cut_view, CutView):
             raise TypeError("cut_view is not of type cut_view")
         # This should be populated according to the workspace
         self._cut_view.populate_cut_axis_options(['|Q|','DeltaE'])
+
+    def register_master(self, main_presenter):
+        self._main_presenter = main_presenter
 
     def notify(self, command):
         if command == Command.Plot:
@@ -27,7 +29,7 @@ class CutPresenter(object):
 
     def _plot_cut(self, plot_over=False):
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
-                        self._cut_view.get_cut_axis_step(), self._cut_view.get_cut_axis_end())
+                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
         integration_start = self._cut_view.get_integration_start()
         integration_end = self._cut_view.get_integration_end()
         intensity_start = self._cut_view.get_intensity_start()

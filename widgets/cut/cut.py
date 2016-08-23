@@ -18,14 +18,17 @@ class CutWidget(QWidget, CutView, Ui_Form):
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
+        self._presenter = CutPresenter(self, MatplotlibCutPlotter())
 
     def _btn_clicked(self):
         sender = self.sender()
         command = self._command_lookup[sender]
-        self._presenter.notify(Command)
+        self._presenter.notify(command)
 
-    def set_workspace_selector(self, workspace_selector):
-        self._presenter = CutPresenter(self, workspace_selector, MatplotlibCutPlotter())
+    def get_presenter(self):
+        return self._presenter
+
+
 
     def get_cut_axis(self):
         return str(self.cmbCutAxis.currentText())
