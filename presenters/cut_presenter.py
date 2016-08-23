@@ -54,7 +54,7 @@ class CutPresenter(object):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         if len(selected_workspaces) != 1:
-            self._cut_view.error_select_workspace()
+            self._cut_view.error_select_a_workspace()
             raise ValueError("Invalid workspace selection")
         selected_workspace = selected_workspaces[0]
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),

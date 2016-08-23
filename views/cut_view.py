@@ -39,3 +39,14 @@ class CutView:
 
     def get_presenter(self):
         pass
+
+    def error_select_a_workspace(self):
+        pass
+
+    def error_invalid_cut_axis_parameters(self):
+        pass
+    def error_invalid_integration_parameters(self):
+        pass
+
+    def error_invalid_intensity_parameters(self):
+        pass

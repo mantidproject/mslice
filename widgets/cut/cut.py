@@ -75,3 +75,12 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
     def error_select_a_workspace(self):
         self._display_error("Please select a workspace to cut")
+
+    def error_invalid_cut_axis_parameters(self):
+        self._display_error("Invalid cut axis parameters")
+
+    def error_invalid_integration_parameters(self):
+        self._display_error("Invalid parameters for integration")
+
+    def error_invalid_intensity_parameters(self):
+        self._display_error("Invalid intensity range")
