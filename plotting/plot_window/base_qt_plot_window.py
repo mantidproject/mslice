@@ -38,7 +38,6 @@ class BaseQtPlotWindow(BasePlotWindow, QtGui.QMainWindow):
         self.setCentralWidget(self.canvas)
         self.setWindowTitle('Figure %i'%number)
 
-        self.show() # this isn,t a good idea in non interactive mode #TODO FIX IT
 
     def closeEvent(self, event):
         self._manager.figure_closed(self.number)

@@ -15,7 +15,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     def __init__(self,parent):
         super(WorkspaceManagerWidget,self).__init__(parent)
         self.setupUi(self)
-        self._presenter = WorkspaceManagerPresenter(self,MantidWorkspaceProvider())
         self.btnWorkspaceSave.clicked.connect(self._btn_clicked)
         self.btnLoad.clicked.connect(self._btn_clicked)
         self.btnWorkspaceCompose.clicked.connect(self._btn_clicked)
@@ -30,13 +29,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                                 self.btnRename: Command.RenameWorkspace
                                 }
         self._main_window = None
-
-    def set_main_window(self,main_window):
-        # TODO refactor to emit errors as signals
-        """Set a main window to display status bar messages to.
-
-         If no main window is set any errors will be displayed to QDialogBoxes"""
-        self._main_window = main_window
+        self.lstWorkspaces.itemChanged.connect(self.list_item_changed)
+        self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
     def _display_error(self, error_string, timeout_ms):
         if self._main_window:
@@ -135,3 +129,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
 
     def get_presenter(self):
         return self._presenter
+
+    def list_item_changed(self, *args):
+        self._presenter.notify(Command.SelectionChanged)

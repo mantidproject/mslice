@@ -131,13 +131,6 @@
      <item row="2" column="5" colspan="2">
       <widget class="QLineEdit" name="lneSliceIntensityEnd"/>
      </item>
-     <item row="2" column="7" colspan="2">
-      <widget class="QRadioButton" name="rdoSliceNormToOne">
-       <property name="text">
-        <string>Norm to 1</string>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="0" colspan="2">
       <widget class="QLabel" name="label_14">
        <property name="text">
@@ -146,7 +139,11 @@
       </widget>
      </item>
      <item row="3" column="2" colspan="2">
-      <widget class="QLineEdit" name="lneSliceSmoothing"/>
+      <widget class="QLineEdit" name="lneSliceSmoothing">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item row="3" column="8">
       <widget class="QComboBox" name="cmbSliceColormap"/>
@@ -162,6 +159,13 @@
       <widget class="QPushButton" name="btnSliceDisplay">
        <property name="text">
         <string>Display</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="7" colspan="2">
+      <widget class="QCheckBox" name="rdoSliceNormToOne">
+       <property name="text">
+        <string>Norm to 1</string>
        </property>
       </widget>
      </item>

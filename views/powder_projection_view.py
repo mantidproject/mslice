@@ -1,39 +1,34 @@
-#import abc
+
 
 
 class PowderView(object):
+    def __init__(self):
+        raise Exception("This abstract class should not be instantiated")
 
-    #@abc.abstractmethod
     def populate_powder_u1(self, u1_options):
-        pass
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    #@abc.abstractmethod
     def populate_powder_u2(self, u2_options):
-        pass
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def populate_powder_projection_axis(self, axis_options):
         self.populate_powder_u1(axis_options)
         self.get_powder_u2()
 
-    #@abc.abstractmethod
     def get_output_workspace_name(self):
-        pass
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    #@abc.abstractmethod
     def populate_powder_projection_units(self, powder_projection_units):
-        pass
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    #@abc.abstractmethod
     def get_powder_u1(self):
-        pass
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    #@abc.abstractmethod
     def get_powder_u2(self):
-        pass
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    #@abc.abstractmethod
     def get_powder_units(self):
-        pass
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
 
 

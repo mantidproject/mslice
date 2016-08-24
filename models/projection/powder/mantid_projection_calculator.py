@@ -2,7 +2,7 @@ from mantid.simpleapi import ConvertToMD
 from models.projection.powder.projection_calculator import ProjectionCalculator
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
-MD_SUFFIX = '_MD'
+MD_SUFFIX = '_QE'
 
 
 class MantidProjectionCalculator(ProjectionCalculator):
