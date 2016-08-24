@@ -393,6 +393,24 @@ def ylim(*args, **kwargs):
     draw_if_interactive()
     return ret
 
+@script_log(module_name)
+@activate_category("2d")
+@draw_colorbar
+def pcolormesh(*args, **kwargs):
+    ax = gca()
+    # allow callers to override the hold state by passing hold=True|False
+    washold = ax.ishold()
+    hold = kwargs.pop('hold', None)
+    if hold is not None:
+        ax.hold(hold)
+    try:
+        ret = ax.pcolormesh(*args, **kwargs)
+    finally:
+        ax.hold(washold)
+    sci(ret)
+    return ret
+
+
 if __name__ == '__main__':
     from PyQt4.QtGui import QApplication
     qapp = QApplication([])
