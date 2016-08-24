@@ -1,6 +1,6 @@
 from cut_algorithm import CutAlgorithm
 from mantid.simpleapi import BinMD
-from mantid.api import IMDEventWorkspace
+from mantid.api import IMDEventWorkspace, Workspace
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from math import floor
 import numpy as np
@@ -14,9 +14,14 @@ class MantidCutAlgorithm(CutAlgorithm):
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         self._infer_missing_parameters(cut_axis)
         n_steps = self._get_number_of_steps(cut_axis)
-        cut_binning = " ,".join(map(str, ('|Q|', cut_axis.start, cut_axis.end, n_steps)))
+
+        axis = self.get_available_axis(selected_workspace)
+        axis.remove(cut_axis.units)
+        integration_axis = axis[0]
+
+        cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         print ('Warning : disregarding input and binning to 100 bins and integrating along Q')
-        integration_binning = "DeltaE," + str(integration_start) + "," + str(integration_end) +",1"
+        integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
         from random import choice; from string import ascii_lowercase
         output = 'cut_'
         for i in range(4):
@@ -40,7 +45,8 @@ class MantidCutAlgorithm(CutAlgorithm):
         return (x - x.min())/range_
 
     def get_available_axis(self, workspace):
-        workspace = self._workspace_provider.get_workspace_handle(workspace)
+        if isinstance(workspace, str):
+            workspace = self._workspace_provider.get_workspace_handle(workspace)
         if not isinstance(workspace, IMDEventWorkspace):
             return []
         dim_names = []

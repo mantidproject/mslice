@@ -69,6 +69,9 @@ class CutPresenter(object):
         selected_workspace = selected_workspaces[0]
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
                         self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
+        if cut_axis.units == "":
+            self._cut_view.error_current_selection_invalid()
+            raise ValueError("Not supported")
         try:
             cut_axis.start = float(cut_axis.start)
             cut_axis.end = float(cut_axis.end)

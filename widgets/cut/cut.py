@@ -95,6 +95,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
 
+    def error_current_selection_invalid(self):
+        self._display_error("Cutting for the current workspace selection is not supported")
+
     def error_select_a_workspace(self):
         self._display_error("Please select a workspace to cut")
 
