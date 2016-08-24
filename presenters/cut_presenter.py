@@ -22,9 +22,6 @@ class CutPresenter(object):
         self._main_presenter = main_presenter
         self._main_presenter.subscribe_to_workspace_selection_monitor(self)
 
-    def workspace_selection_changed(self):
-        pass
-
     @require_main_presenter
     def notify(self, command):
         if command == Command.Plot:
@@ -73,9 +70,9 @@ class CutPresenter(object):
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
                         self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
         try:
-            cut_axis.start = self._to_float(cut_axis.start)
-            cut_axis.end = self._to_float(cut_axis.end)
-            cut_axis.step = self._to_float(cut_axis.step)
+            cut_axis.start = float(cut_axis.start)
+            cut_axis.end = float(cut_axis.end)
+            cut_axis.step = float(cut_axis.step)
         except ValueError:
             self._cut_view.error_invalid_cut_axis_parameters()
             raise ValueError("Invalid Cut axis parameters")
@@ -87,15 +84,15 @@ class CutPresenter(object):
         integration_start = self._cut_view.get_integration_start()
         integration_end = self._cut_view.get_integration_end()
         try:
-            integration_start = self._to_float(integration_start)
-            integration_end = self._to_float(integration_end)
+            integration_start = float(integration_start)
+            integration_end = float(integration_end)
         except ValueError:
             self._cut_view.error_invalid_integration_parameters()
             raise ValueError("Invalid integration parameters")
 
-        if None not in (integration_start, integration_end) and integration_start > integration_end:
+        if None not in (integration_start, integration_end) and integration_start >= integration_end:
             self._cut_view.error_invalid_integration_parameters()
-            raise ValueError("Integration start > Integration End")
+            raise ValueError("Integration start >= Integration End")
 
         intensity_start = self._cut_view.get_intensity_start()
         intensity_end = self._cut_view.get_intensity_end()
@@ -113,3 +110,18 @@ class CutPresenter(object):
         if x == "":
             return None
         return float(x)
+
+
+    def workspace_selection_changed(self):
+        workspace_selection = self._main_presenter.get_selected_workspaces()
+        if len(workspace_selection) != 1:
+            self._cut_view.clear_input_fields()
+            return
+        workspace_selection = workspace_selection[0]
+
+        axis = self._cut_algorithm.get_available_axis(workspace_selection)
+        if len(axis) != 2:
+            self._cut_view.clear_input_fields()
+            return
+        self._cut_view.populate_cut_axis_options(axis)
+

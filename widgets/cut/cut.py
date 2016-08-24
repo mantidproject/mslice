@@ -73,6 +73,28 @@ class CutWidget(QWidget, CutView, Ui_Form):
         for option in options:
             self.cmbCutAxis.addItem(option)
 
+    def populate_cut_params(self, cut_start=None, cut_end=None, cut_step=None):
+        if cut_start is not None:
+            self.lneCutStart.setText(cut_start)
+        if cut_end is not None:
+            self.lneCutEnd.setText(cut_end)
+        if cut_step is not None:
+            self.lneCutStep.setText(cut_step)
+
+    def populate_integration_params(self, integration_start=None, integration_end=None):
+        if integration_start is not None:
+            self.lneCutIntegrationStart.setText(integration_start)
+        if integration_end is not None:
+            self.lneCutIntegrationEnd.setText(integration_end)
+
+    def clear_input_fields(self):
+        self.populate_cut_axis_options([])
+        self.populate_cut_params("", "", "")
+        self.populate_integration_params("", "")
+        self.lneCutIntegrationWidth.setText("")
+        self.lneCutSmoothing.setText("")
+        self.rdoCutNormToOne.setChecked(0)
+
     def error_select_a_workspace(self):
         self._display_error("Please select a workspace to cut")
 

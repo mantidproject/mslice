@@ -1,5 +1,6 @@
 from cut_algorithm import CutAlgorithm
 from mantid.simpleapi import BinMD
+from mantid.api import IMDEventWorkspace
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from math import floor
 import numpy as np
@@ -20,7 +21,8 @@ class MantidCutAlgorithm(CutAlgorithm):
         output = 'cut_'
         for i in range(4):
             output += choice(ascii_lowercase)
-        cut = BinMD(selected_workspace, OutputWorkspace=output, AxisAligned="1", AlignedDim1=integration_binning, AlignedDim0=cut_binning)
+        cut = BinMD(selected_workspace, OutputWorkspace=output, AxisAligned="1", AlignedDim1=integration_binning,
+                    AlignedDim0=cut_binning)
         with np.errstate(invalid='ignore'):
             plot_data = cut.getSignalArray() / cut.getNumEventsArray()
         plot_data = plot_data.squeeze()
@@ -36,6 +38,15 @@ class MantidCutAlgorithm(CutAlgorithm):
         # TODO do something when dividing by zero !!!!!!!
         range_ = x.max() - x.min()
         return (x - x.min())/range_
+
+    def get_available_axis(self, workspace):
+        workspace = self._workspace_provider.get_workspace_handle(workspace)
+        if not isinstance(workspace, IMDEventWorkspace):
+            return []
+        dim_names = []
+        for i in range(workspace.getNumDims()):
+            dim_names.append(workspace.getDimension(i).getName())
+        return dim_names
 
     def _infer_missing_parameters(self, cut_axis):
         if cut_axis.start is None or cut_axis.end is None:
