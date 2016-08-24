@@ -28,19 +28,6 @@
      <string>File</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuKeep">
-    <property name="title">
-     <string>Keep</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuMakeCurrent">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="title">
-     <string>Make Current</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuInformation">
     <property name="title">
      <string>Information</string>
@@ -64,8 +51,6 @@
     </property>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuKeep"/>
-   <addaction name="menuMakeCurrent"/>
    <addaction name="menuInformation"/>
    <addaction name="menuIntensity"/>
    <addaction name="menuMake_Script"/>
@@ -85,10 +70,11 @@
    <addaction name="action_save_image"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
-   <addaction name="actionData_Cursor"/>
+   <addaction name="actionDataCursor"/>
    <addaction name="actionEdit_Labels"/>
    <addaction name="actionToggle_Legends"/>
-   <addaction name="action_What_Else"/>
+   <addaction name="actionKeep"/>
+   <addaction name="actionMakeCurrent"/>
   </widget>
   <action name="action_save_image">
    <property name="text">
@@ -121,7 +107,10 @@
     <string>Zoom Out</string>
    </property>
   </action>
-  <action name="actionData_Cursor">
+  <action name="actionDataCursor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Data Cursor</string>
    </property>
@@ -136,9 +125,23 @@
     <string>Toggle Legends</string>
    </property>
   </action>
-  <action name="action_What_Else">
+  <action name="actionKeep">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>!!!What Else!!!</string>
+    <string>keep</string>
+   </property>
+  </action>
+  <action name="actionMakeCurrent">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Make Current</string>
    </property>
   </action>
  </widget>
