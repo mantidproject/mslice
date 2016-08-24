@@ -13,7 +13,7 @@ class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
 
         self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
         self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
-        self.actionSave_To_File.triggered.connect(self.stock_toolbar.save_figure)
+        self.action_save_image.triggered.connect(self.stock_toolbar.save_figure)
         self.show() #is not a good idea in non interactive mode
 
 
