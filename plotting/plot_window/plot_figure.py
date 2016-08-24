@@ -10,6 +10,10 @@ class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
         self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
         self.stock_toolbar = NavigationToolbar2QT(self.canvas, self)
         self.stock_toolbar.hide()
+
+        self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
+        self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
+        self.actionSave_To_File.triggered.connect(self.stock_toolbar.save_figure)
         self.show() #is not a good idea in non interactive mode
 
 
