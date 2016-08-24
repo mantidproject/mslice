@@ -6,6 +6,7 @@ from presenters.main_presenter import MainPresenter
 
 
 class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
+
     def __init__(self):
         super(MsliceGui,self).__init__()
         self.setupUi(self)
@@ -17,12 +18,14 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
         self._presenter = MainPresenter(self, workspace_presenter, slice_presenter , powder_presenter, cut_presenter)
 
         self.wgtCut.error_occurred.connect(self.show_error)
+        self.wgtSlice.error_occurred.connect(self.show_error)
+
+    def show_error(self, msg):
+        self.statusbar.showMessage(msg, 2000)
 
     def get_presenter(self):
         return self._presenter
 
-    def show_error(self, msg):
-        self.statusbar.showMessage(msg, 2000)
 
 if __name__ == "__main__":
     qapp = QApplication([])

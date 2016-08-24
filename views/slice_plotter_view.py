@@ -66,3 +66,24 @@ class SlicePlotterView:
 
     def error_invalid_plot_parameters(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def populate_colormap_options(self,colormaps):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def populate_slice_x_options(self, options):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def populate_slice_y_options(self, options):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def populate_slice_x_params(self, x_start, x_end, x_step):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def populate_slice_y_params(self, y_start, y_end, y_step):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def clear_input_fields(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+
+
