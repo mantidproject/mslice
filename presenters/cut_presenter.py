@@ -42,13 +42,26 @@ class CutPresenter(object):
         except ValueError:
             return
         cut_params = params[:4]
-        intensity_start ,intensity_end, is_norm = params[4:]
+        intensity_start, intensity_end, is_norm = params[4:]
         x,y = self._cut_algorithm.compute_cut(*params[:4])
-        self._plotting_module.plot(x,y)
-        self._main_presenter.update_displayed_workspaces()
+        if is_norm:
+            y = self._cut_algorithm.norm(y)
+        self._plotting_module.plot(x, y, hold=plot_over)
+        if intensity_start is None and intensity_end is None:
+            self._plotting_module.autoscale()
+        else:
+            self._plotting_module.ylim(intensity_start, intensity_end)
 
-    def _save_cut_to_workspace(self, plot_over=False):
-        raise NotImplementedError('Not implemented')
+
+    def _save_cut_to_workspace(self):
+        try:
+            params = self._parse_input()
+        except ValueError:
+            return
+        cut_params = params[:4]
+        x,y = self._cut_algorithm.compute_cut(*params[:4], keepworkspace=True)
+        print ("workspaces will not be normalized , regardless of checkbox")
+        self._main_presenter.update_displayed_workspaces()
 
     def _parse_input(self):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
