@@ -71,8 +71,7 @@
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
    <addaction name="actionDataCursor"/>
-   <addaction name="actionEdit_Labels"/>
-   <addaction name="actionToggle_Legends"/>
+   <addaction name="actionPlotOptions"/>
    <addaction name="actionKeep"/>
    <addaction name="actionMakeCurrent"/>
   </widget>
@@ -115,22 +114,15 @@
     <string>Data Cursor</string>
    </property>
   </action>
-  <action name="actionEdit_Labels">
-   <property name="text">
-    <string>Edit Labels</string>
-   </property>
-  </action>
-  <action name="actionToggle_Legends">
-   <property name="text">
-    <string>Toggle Legends</string>
-   </property>
-  </action>
   <action name="actionKeep">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>keep</string>
+    <string>Keep</string>
+   </property>
+   <property name="toolTip">
+    <string>Keep</string>
    </property>
   </action>
   <action name="actionMakeCurrent">
@@ -142,6 +134,11 @@
    </property>
    <property name="text">
     <string>Make Current</string>
+   </property>
+  </action>
+  <action name="actionPlotOptions">
+   <property name="text">
+    <string>Plot Options</string>
    </property>
   </action>
  </widget>

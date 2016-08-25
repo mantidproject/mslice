@@ -2,6 +2,8 @@ from base_qt_plot_window import BaseQtPlotWindow
 from plotting.plot_window.plot_window_ui import Ui_MainWindow
 from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 from PyQt4.QtCore import Qt
+import PyQt4.QtGui as QtGui
+from  plot_options_ui import Ui_Form
 
 class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
     def __init__(self,number,manager):
@@ -19,6 +21,7 @@ class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
         self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
         self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
         self.action_save_image.triggered.connect(self.stock_toolbar.save_figure)
+        self.actionPlotOptions.triggered.connect(self._plot_options)
 
         self.show() #is not a good idea in non interactive mode
 
@@ -38,3 +41,12 @@ class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
         elif status == "current":
             self.actionMakeCurrent.setChecked(True)
             self.actionKeep.setChecked(False)
+
+    def _plot_options(self):
+        x = PlotOptionsDialog()
+        
+
+class PlotOptionsDialog(QtGui.QDialog, Ui_Form):
+    def __init__(self):
+        super(PlotOptionsDialog, self).__init__()
+        self.setupUi(self)
