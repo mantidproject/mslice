@@ -38,27 +38,34 @@ class CutPresenter(object):
             params = self._parse_input()
         except ValueError:
             return
-        cut_params = params[:4]
-        intensity_start, intensity_end, is_norm = params[4:]
-        x,y = self._cut_algorithm.compute_cut(*params[:4])
-        if is_norm:
-            y = self._cut_algorithm.norm(y)
-        self._plotting_module.plot(x, y, hold=plot_over)
+        cut_params = params[:5]
+        intensity_start, intensity_end, integration_axis = params[5:]
+        x,y = self._cut_algorithm.compute_cut_xy(*cut_params)
+
+        legend =self._get_legend(params[0], integration_axis, params[2:4])
+        self._plotting_module.plot(x, y, label=legend, hold=plot_over)
+        raise Exception()
+        self._plotting_module.legend()
+
         if intensity_start is None and intensity_end is None:
             self._plotting_module.autoscale()
         else:
             self._plotting_module.ylim(intensity_start, intensity_end)
-
 
     def _save_cut_to_workspace(self):
         try:
             params = self._parse_input()
         except ValueError:
             return
-        cut_params = params[:4]
-        x,y = self._cut_algorithm.compute_cut(*params[:4], keepworkspace=True)
-        print ("workspaces will not be normalized , regardless of checkbox")
+        cut_params = params[:5]
+        self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
+
+    def _get_legend(self, workspace_name, integrated_dim, integration_range):
+        if integrated_dim == 'DeltaE':
+            integrated_dim ='e'
+        return workspace_name + "    " + "%.2f"%integration_range[0] + "<"+integrated_dim+"<"+\
+            "%.2f"%integration_range[1]
 
     def _parse_input(self):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
@@ -107,7 +114,11 @@ class CutPresenter(object):
             raise ValueError("Invalid intensity params")
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
-        return selected_workspace, cut_axis, integration_start, integration_end, intensity_start, intensity_end, norm_to_one
+        axis = self._cut_algorithm.get_available_axis(selected_workspace)
+        axis.remove(cut_axis.units)
+        integration_axis = axis[0]
+        return selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
+               intensity_end, integration_axis
 
     def _to_float(self, x):
         if x == "":

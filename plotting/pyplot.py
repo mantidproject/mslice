@@ -1,6 +1,7 @@
 from figuremanager import FigureManager,activate_category
 from script_generation import script_log
 from matplotlib.cbook import dedent, silent_list, is_string_like, is_numlike
+from matplotlib.pyplot import legend as _legend
 
 def draw_if_interactive():
     # We will always draw because mslice might be running without matplotlib interactive
@@ -188,6 +189,12 @@ def xlabel(s, *args, **kwargs):
     l =  gca().set_xlabel(s, *args, **kwargs)
     draw_if_interactive()
     return l
+
+@script_log(module_name)
+def legend(*args, **kwargs):
+    ret = gca().legend(*args, **kwargs)
+    draw_if_interactive()
+    return ret
 
 @script_log(module_name)
 def ylabel(s, *args, **kwargs):
