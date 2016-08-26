@@ -68,9 +68,6 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def get_smoothing(self):
         return str(self.lneCutSmoothing.text())
 
-    def get_integration_width(self):
-        return str(self.lneCutIntegrationWidth.text())
-
     def populate_cut_axis_options(self,options):
         self.cmbCutAxis.clear()
         for option in options:

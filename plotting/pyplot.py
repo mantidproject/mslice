@@ -146,6 +146,10 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None,
 
     return ret
 
+def autoscale(enable=True, axis='both', tight=None):
+    ret = gca().autoscale(enable=enable, axis=axis, tight=tight)
+    return ret
+
 @activate_category("2d")
 @draw_colorbar
 #@script_log("plotting.pyplot")

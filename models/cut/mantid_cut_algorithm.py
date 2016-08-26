@@ -1,5 +1,6 @@
 from cut_algorithm import CutAlgorithm
 from mantid.simpleapi import BinMD
+from mantid.api import MDNormalization
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from presenters.slice_plotter_presenter import Axis
@@ -12,11 +13,13 @@ class MantidCutAlgorithm(CutAlgorithm):
         self._workspace_provider = MantidWorkspaceProvider()
 
     def compute_cut_xye(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
-        cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm)
-
+        # TODO Note To reviewer
+        # if the is_norm flag is True then _num_events_normalized_array will be called twice, is this OK?
+        # Will it cause a significant slowdown of on large data? would it be worth caching this?
+        if not self.is_cut(selected_workspace):
+            cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm)
         plot_data = self._num_events_normalized_array(cut)
         plot_data = plot_data.squeeze()
-        assert isinstance(cut, IMDHistoWorkspace)
         errors = np.sqrt(cut.getErrorSquaredArray())/cut.getNumEventsArray()
         errors = errors.squeeze()
 
@@ -26,9 +29,7 @@ class MantidCutAlgorithm(CutAlgorithm):
         return x, plot_data, errors
 
     def compute_cut(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
-        # TODO Note To reviewer
-        # if the is_norm flag is True then _num_events_normalized_array will be called twice, is this OK?
-        # Will it cause a significant slowdown of on large data? would it be worth caching this?
+
         input_workspace_name = selected_workspace
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         self._infer_missing_parameters(selected_workspace, cut_axis)
@@ -49,23 +50,6 @@ class MantidCutAlgorithm(CutAlgorithm):
         if is_norm:
             self._normalize_workspace(cut)
         return cut
-
-    def _normalize_workspace(self, workspace):
-        assert isinstance(workspace, IMDHistoWorkspace)
-        num_events = workspace.getNumEventsArray()
-        average_event_intensity = self._num_events_normalized_array(workspace)
-        average_event_range = average_event_intensity.max() - average_event_intensity.min()
-
-        normed_average_event_intensity = (average_event_intensity - average_event_intensity.min())/average_event_range
-        new_data = normed_average_event_intensity * num_events
-        new_data = np.array(new_data)
-
-        new_data = np.nan_to_num(new_data)
-        workspace.setSignalArray(new_data)
-
-        errors = workspace.getErrorSquaredArray() /(average_event_range**2)
-        workspace.setErrorSquaredArray(errors)
-        workspace.setComment("Normalized By MSlice")
 
     def get_available_axis(self, workspace):
         if isinstance(workspace, str):
@@ -94,7 +78,10 @@ class MantidCutAlgorithm(CutAlgorithm):
         # If these were not set then this is not a cut
         used_params = ('AxisAligned', 'AlignedDim0', 'AlignedDim1')
         for i in range(history.size()-1, -1, -1):
-            algorithm = history.getAlgorithm(i)
+            try:
+                algorithm = history.getAlgorithm(i)
+            except RuntimeError:
+                return False
             if algorithm.name() == 'BinMD':
                 if all(map(lambda x: not algorithm.getPropertyValue(x), empty_params))\
                         and all(map(lambda x: algorithm.getPropertyValue(x), used_params)):
@@ -109,9 +96,9 @@ class MantidCutAlgorithm(CutAlgorithm):
     def get_cut_params(self, cut_workspace):
         cut_workspace = self._workspace_provider.get_workspace_handle(cut_workspace)
         assert isinstance(cut_workspace, IMDHistoWorkspace)
-        history = cut_workspace.getHistory()
         is_norm = cut_workspace.getComment() == "Normalized By MSlice"
         bin_md = None
+        history = cut_workspace.getHistory()
         for i in range(history.size()-1,-1,-1):
             algorithm = history.getAlgorithm(i)
             if algorithm.name() == 'BinMD':
@@ -143,6 +130,24 @@ class MantidCutAlgorithm(CutAlgorithm):
             cut_axis.end = dim.getMaximum()
         if cut_axis.step is None:
             cut_axis.step = (cut_axis.end - cut_axis.start)/100
+
+    def _normalize_workspace(self, workspace):
+        assert isinstance(workspace, IMDHistoWorkspace)
+        assert workspace.displayNormalization() == MDNormalization.NumEventsNormalization
+        num_events = workspace.getNumEventsArray()
+        average_event_intensity = self._num_events_normalized_array(workspace)
+        average_event_range = average_event_intensity.max() - average_event_intensity.min()
+
+        normed_average_event_intensity = (average_event_intensity - average_event_intensity.min())/average_event_range
+        new_data = normed_average_event_intensity * num_events
+        new_data = np.array(new_data)
+
+        new_data = np.nan_to_num(new_data)
+        workspace.setSignalArray(new_data)
+
+        errors = workspace.getErrorSquaredArray() /(average_event_range**2)
+        workspace.setErrorSquaredArray(errors)
+        workspace.setComment("Normalized By MSlice")
 
     def _get_number_of_steps(self, axis):
         return int(max(1, floor((axis.end - axis.start)/axis.step)))

@@ -19,3 +19,5 @@ class CutAlgorithm(object):
     def get_available_axis(self, workspace):
         pass
 
+    def get_other_axis(self, workspace, axis):
+        pass

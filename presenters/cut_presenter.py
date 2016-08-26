@@ -14,6 +14,7 @@ class CutPresenter(object):
         self._main_presenter = None
         self._plotting_module = plotting_module
         self._acting_on = None
+        self._cut_view.disable()
 
     def register_master(self, main_presenter):
         self._main_presenter = main_presenter
@@ -26,13 +27,17 @@ class CutPresenter(object):
         elif command == Command.PlotOver:
             self._process_cuts(plot_over=True)
         elif command == Command.SaveToWorkspace:
-            self._save_cut_to_workspace()
+            self._process_cuts(save_to_workspace=True)
         elif command == Command.SaveToAscii:
             raise NotImplementedError('Save to ascii Not implemented')
 
-    def _process_cuts(self, plot_over):
+    def _process_cuts(self, plot_over=False, save_to_workspace=False):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
         integration_start to integration_end """
+        if save_to_workspace:
+            handler = lambda params, plot_over: self._save_cut_to_workspace(params)
+        else:
+            handler = lambda params, plot_over: self._plot_cut(params, plot_over)
         try:
             params = self._parse_input()
         except ValueError:
@@ -47,7 +52,7 @@ class CutPresenter(object):
         cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
         while cut_start != cut_end:
             params = params[:2] + (cut_start, cut_end) + params[4:]
-            self._plot_cut(params, plot_over)
+            handler(params, plot_over)
             cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
@@ -62,17 +67,10 @@ class CutPresenter(object):
         self._plotting_module.legend()
         self._plotting_module.xlabel(cut_params[1].units)
         self._plotting_module.ylabel(INTENSITY)
+        self._plotting_module.autoscale()
+        self._plotting_module.ylim(intensity_start, intensity_end)
 
-        if intensity_start is None and intensity_end is None:
-            self._plotting_module.autoscale()
-        else:
-            self._plotting_module.ylim(intensity_start, intensity_end)
-
-    def _save_cut_to_workspace(self):
-        try:
-            params = self._parse_input()
-        except ValueError:
-            return
+    def _save_cut_to_workspace(self, params):
         cut_params = params[:5]
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
