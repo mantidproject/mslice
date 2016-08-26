@@ -1,7 +1,7 @@
 from figuremanager import FigureManager,activate_category
 from script_generation import script_log
 from matplotlib.cbook import dedent, silent_list, is_string_like, is_numlike
-from matplotlib.pyplot import legend as _legend
+
 
 def draw_if_interactive():
     # We will always draw because mslice might be running without matplotlib interactive
@@ -123,6 +123,28 @@ def plot(*args, **kwargs):
 
     return ret
 
+@activate_category("1d")
+def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None,
+             capsize=None, barsabove=False, lolims=False, uplims=False,
+             xlolims=False, xuplims=False, errorevery=1, capthick=None,
+             hold=None, data=None, **kwargs):
+    ax = gca()
+    # allow callers to override the hold state by passing hold=True|False
+    washold = ax.ishold()
+
+    if hold is not None:
+        ax.hold(hold)
+    try:
+        ret = ax.errorbar(x, y, yerr=yerr, xerr=xerr, fmt=fmt, ecolor=ecolor,
+                          elinewidth=elinewidth, capsize=capsize,
+                          barsabove=barsabove, lolims=lolims, uplims=uplims,
+                          xlolims=xlolims, xuplims=xuplims,
+                          errorevery=errorevery, capthick=capthick, data=data,
+                          **kwargs)
+    finally:
+        ax.hold(washold)
+
+    return ret
 
 @activate_category("2d")
 @draw_colorbar

@@ -10,21 +10,24 @@ class MantidCutAlgorithm(CutAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
-    def compute_cut_xy(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
+    def compute_cut_xye(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
         cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm)
 
         plot_data = self._num_events_normalized_array(cut)
         plot_data = plot_data.squeeze()
+        assert isinstance(cut, IMDHistoWorkspace)
+        errors = np.sqrt(cut.getErrorSquaredArray().squeeze())
 
         x = np.linspace(cut_axis.start, cut_axis.end, plot_data.size)
         self._workspace_provider.delete_workspace(cut)
 
-        return x, plot_data
+        return x, plot_data, errors
 
     def compute_cut(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
         # TODO Note To reviewer
         # if the is_norm flag is True then _num_events_normalized_array will be called twice, is this OK?
         # Will it cause a significant slowdown of on large data? would it be worth caching this?
+        input_workspace_name = selected_workspace
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         self._infer_missing_parameters(selected_workspace, cut_axis)
         n_steps = self._get_number_of_steps(cut_axis)
@@ -35,11 +38,14 @@ class MantidCutAlgorithm(CutAlgorithm):
 
         cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
-        from random import choice; from string import ascii_lowercase
-        output = 'cut_'
-        for i in range(4):
-            output += choice(ascii_lowercase)
-        cut = BinMD(selected_workspace, OutputWorkspace=output, AxisAligned="1", AlignedDim1=integration_binning,
+
+        output_workspace_name = input_workspace_name + "_cut"
+        index = 1
+        existing_workspaces = self._workspace_provider.get_workspace_names()
+        while output_workspace_name + str(index) in existing_workspaces:
+            index += 1
+        output_workspace_name += str(index)
+        cut = BinMD(selected_workspace, OutputWorkspace=output_workspace_name, AxisAligned="1", AlignedDim1=integration_binning,
                     AlignedDim0=cut_binning)
         if is_norm:
             self._normalize_workspace(cut)

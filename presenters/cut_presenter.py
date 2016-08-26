@@ -13,6 +13,7 @@ class CutPresenter(object):
             raise TypeError("cut_view is not of type CutView")
         self._main_presenter = None
         self._plotting_module = plotting_module
+        self._acting_on = None
 
     def register_master(self, main_presenter):
         self._main_presenter = main_presenter
@@ -36,10 +37,10 @@ class CutPresenter(object):
             return
         cut_params = params[:5]
         intensity_start, intensity_end, integration_axis = params[5:]
-        x,y = self._cut_algorithm.compute_cut_xy(*cut_params)
+        x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
 
         legend = self._get_legend(params[0], integration_axis, params[2:4])
-        self._plotting_module.plot(x, y, label=legend, hold=plot_over)
+        self._plotting_module.errorbar(x, y, yerr=e, label=legend, hold=plot_over)
         self._plotting_module.legend()
         self._plotting_module.xlabel(cut_params[1].units)
         self._plotting_module.ylabel(integration_axis)
@@ -60,7 +61,7 @@ class CutPresenter(object):
 
     def _get_legend(self, workspace_name, integrated_dim, integration_range):
         if integrated_dim == 'DeltaE':
-            integrated_dim ='e'
+            integrated_dim = 'e'
         return workspace_name + "    " + "%.2f"%integration_range[0] + "<"+integrated_dim+"<"+\
             "%.2f"%integration_range[1]
 
@@ -84,7 +85,7 @@ class CutPresenter(object):
             self._cut_view.error_invalid_cut_axis_parameters()
             raise ValueError("Invalid Cut axis parameters")
 
-        if None not in (cut_axis.start,cut_axis.end) and cut_axis.start > cut_axis.end:
+        if None not in (cut_axis.start,cut_axis.end) and cut_axis.start >= cut_axis.end:
             self._cut_view.error_invalid_cut_axis_parameters()
             raise ValueError("Invalid cut axis parameters")
 
@@ -122,17 +123,32 @@ class CutPresenter(object):
             return None
         return float(x)
 
-
     def workspace_selection_changed(self):
+        self._cut_view.clear_input_fields()
+        self._acting_on = None
         workspace_selection = self._main_presenter.get_selected_workspaces()
+
         if len(workspace_selection) != 1:
-            self._cut_view.clear_input_fields()
             return
-        workspace_selection = workspace_selection[0]
 
-        axis = self._cut_algorithm.get_available_axis(workspace_selection)
-        if len(axis) != 2:
+        workspace = workspace_selection[0]
+        if self._cut_algorithm.is_slice(workspace):
+            self._acting_on = "slice"
+            axis = self._cut_algorithm.get_available_axis(workspace)
+            self._cut_view.populate_cut_axis_options(axis)
+            self._cut_view.enable()
+
+        elif self._cut_algorithm.is_cut(workspace):
+            self._acting_on = "cut"
+            self._cut_view.disable_cut_params()
+            cut_axis, integration_limits, is_normed = self._cut_algorithm.get_cut_params(workspace)
+            if is_normed:
+                self._cut_view._force_normalization()
+            self._cut_view.populate_cut_axis_options([cut_axis])
+            self._cut_view.populate_cut_params(cut_axis.start, cut_axis.end, cut_axis.step)
+            self._cut_view.populate_integration_params(*integration_limits)
+
+        else:
             self._cut_view.clear_input_fields()
+            self._cut_view.disable()
             return
-        self._cut_view.populate_cut_axis_options(axis)
-
