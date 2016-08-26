@@ -62,9 +62,10 @@ class MantidCutAlgorithm(CutAlgorithm):
 
         new_data = np.nan_to_num(new_data)
         workspace.setSignalArray(new_data)
-        # TODO propagate the errors !!!!!!!!!!
-        workspace.setComment("Normalized By MSlice")
 
+        errors = workspace.getErrorSquaredArray() /(average_event_range**2)
+        workspace.setErrorSquaredArray(errors)
+        workspace.setComment("Normalized By MSlice")
 
     def get_available_axis(self, workspace):
         if isinstance(workspace, str):
