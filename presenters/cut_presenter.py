@@ -1,4 +1,5 @@
 from views.cut_view import CutView
+from models.cut.cut_algorithm import CutAlgorithm
 from widgets.cut.command import Command
 from validation_decorators import require_main_presenter
 from presenters.slice_plotter_presenter import Axis
@@ -9,8 +10,8 @@ class CutPresenter(object):
     def __init__(self, cut_view, cut_algorithm, plotting_module):
         self._cut_view = cut_view
         self._cut_algorithm = cut_algorithm
-        if not isinstance(cut_view, CutView):
-            raise TypeError("cut_view is not of type CutView")
+        assert isinstance(cut_view, CutView)
+        assert isinstance(cut_algorithm, CutAlgorithm)
         self._main_presenter = None
         self._plotting_module = plotting_module
         self._acting_on = None
