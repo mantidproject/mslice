@@ -1,20 +1,16 @@
 from views.cut_view import CutView
 from widgets.cut.command import Command
 from validation_decorators import require_main_presenter
+from presenters.slice_plotter_presenter import Axis
 
-class Axis(object):
-    def __init__(self, units,start, end, step):
-        self.start = start
-        self.end = end
-        self.step = step
-        self.units =units
+
 
 class CutPresenter(object):
     def __init__(self, cut_view, cut_algorithm, plotting_module):
         self._cut_view = cut_view
         self._cut_algorithm = cut_algorithm
         if not isinstance(cut_view, CutView):
-            raise TypeError("cut_view is not of type cut_view")
+            raise TypeError("cut_view is not of type CutView")
         self._main_presenter = None
         self._plotting_module = plotting_module
 
@@ -42,10 +38,11 @@ class CutPresenter(object):
         intensity_start, intensity_end, integration_axis = params[5:]
         x,y = self._cut_algorithm.compute_cut_xy(*cut_params)
 
-        legend =self._get_legend(params[0], integration_axis, params[2:4])
+        legend = self._get_legend(params[0], integration_axis, params[2:4])
         self._plotting_module.plot(x, y, label=legend, hold=plot_over)
-        raise Exception()
         self._plotting_module.legend()
+        self._plotting_module.xlabel(cut_params[1].units)
+        self._plotting_module.ylabel(integration_axis)
 
         if intensity_start is None and intensity_end is None:
             self._plotting_module.autoscale()
