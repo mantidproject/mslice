@@ -2,7 +2,7 @@ from views.cut_view import CutView
 from widgets.cut.command import Command
 from validation_decorators import require_main_presenter
 from presenters.slice_plotter_presenter import Axis
-
+INTENSITY = 'Signal/#Events'
 
 
 class CutPresenter(object):
@@ -22,19 +22,37 @@ class CutPresenter(object):
     @require_main_presenter
     def notify(self, command):
         if command == Command.Plot:
-            self._plot_cut(plot_over=False)
+            self._process_cuts(plot_over=False)
         elif command == Command.PlotOver:
-            self._plot_cut(plot_over=True)
+            self._process_cuts(plot_over=True)
         elif command == Command.SaveToWorkspace:
             self._save_cut_to_workspace()
         elif command == Command.SaveToAscii:
             raise NotImplementedError('Save to ascii Not implemented')
 
-    def _plot_cut(self, plot_over=False):
+    def _process_cuts(self, plot_over):
+        """This function handles the width parameter. If it is not specified a single cut is plotted from
+        integration_start to integration_end """
         try:
             params = self._parse_input()
         except ValueError:
             return
+        width = params[-1]
+        params = params[:-1]
+        if width is None:
+            # No width specified, just plot a single cut
+            self._plot_cut(params, plot_over)
+            return
+        integration_start, integration_end = params[2:4]
+        cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
+        while cut_start != cut_end:
+            params = params[:2] + (cut_start, cut_end) + params[4:]
+            self._plot_cut(params, plot_over)
+            cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
+            # The first plot will respect which button the user pressed. The rest will over plot
+            plot_over = True
+
+    def _plot_cut(self,params, plot_over):
         cut_params = params[:5]
         intensity_start, intensity_end, integration_axis = params[5:]
         x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
@@ -43,7 +61,7 @@ class CutPresenter(object):
         self._plotting_module.errorbar(x, y, yerr=e, label=legend, hold=plot_over)
         self._plotting_module.legend()
         self._plotting_module.xlabel(cut_params[1].units)
-        self._plotting_module.ylabel(integration_axis)
+        self._plotting_module.ylabel(INTENSITY)
 
         if intensity_start is None and intensity_end is None:
             self._plotting_module.autoscale()
@@ -112,11 +130,18 @@ class CutPresenter(object):
             raise ValueError("Invalid intensity params")
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
-        axis = self._cut_algorithm.get_available_axis(selected_workspace)
-        axis.remove(cut_axis.units)
-        integration_axis = axis[0]
+        width = self._cut_view.get_integration_width()
+        if width.strip():
+            try:
+                width = float(width)
+            except ValueError:
+                self._cut_view.error_invalid_width()
+                raise ValueError("Invalid width")
+        else:
+            width = None
+        integration_axis = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
         return selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
-               intensity_end, integration_axis
+               intensity_end, integration_axis, width
 
     def _to_float(self, x):
         if x == "":
@@ -140,7 +165,7 @@ class CutPresenter(object):
             self._cut_view.enable()
 
         elif self._cut_algorithm.is_cut(workspace):
-            self._acting_on = "cut"
+            self._acting_on = "existing_cut"
             self._cut_view.plotting_params_only()
             cut_axis, integration_limits, is_normed = self._cut_algorithm.get_cut_params(workspace)
             if is_normed:

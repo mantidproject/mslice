@@ -68,6 +68,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def get_smoothing(self):
         return str(self.lneCutSmoothing.text())
 
+    def get_integration_width(self):
+        return str(self.lneCutIntegrationWidth.text())
+
     def populate_cut_axis_options(self,options):
         self.cmbCutAxis.clear()
         for option in options:
@@ -95,6 +98,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
 
+
     def enable(self):
         self.lneCutStart.setEnabled(True)
         self.lneCutEnd.setEnabled(True)
@@ -103,6 +107,8 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
         self.lneCutIntegrationStart.setEnabled(True)
         self.lneCutIntegrationEnd.setEnabled(True)
+        self.lneCutIntegrationWidth.setEnabled(True)
+
         self.lneEditCutIntensityStart.setEnabled(True)
         self.lneCutIntensityEnd.setEnabled(True)
         self.rdoCutNormToOne.setEnabled(True)
@@ -124,6 +130,8 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
         self.lneCutIntegrationStart.setEnabled(False)
         self.lneCutIntegrationEnd.setEnabled(False)
+        self.lneCutIntegrationWidth.setEnabled(False)
+
         self.lneEditCutIntensityStart.setEnabled(False)
         self.lneCutIntensityEnd.setEnabled(False)
         self.rdoCutNormToOne.setEnabled(False)
@@ -144,6 +152,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def force_normalization(self):
         self.rdoCutNormToOne.setEnabled(False)
         self.rdoCutNormToOne.setChecked(True)
+
+    def error_invalid_width(self):
+        self._display_error("Invalid value for cut width")
 
     def error_current_selection_invalid(self):
         self._display_error("Cutting for the current workspace selection is not supported")

@@ -17,7 +17,8 @@ class MantidCutAlgorithm(CutAlgorithm):
         plot_data = self._num_events_normalized_array(cut)
         plot_data = plot_data.squeeze()
         assert isinstance(cut, IMDHistoWorkspace)
-        errors = np.sqrt(cut.getErrorSquaredArray().squeeze())
+        errors = np.sqrt(cut.getErrorSquaredArray())/cut.getNumEventsArray()
+        errors = errors.squeeze()
 
         x = np.linspace(cut_axis.start, cut_axis.end, plot_data.size)
         self._workspace_provider.delete_workspace(cut)
@@ -32,10 +33,7 @@ class MantidCutAlgorithm(CutAlgorithm):
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         self._infer_missing_parameters(selected_workspace, cut_axis)
         n_steps = self._get_number_of_steps(cut_axis)
-
-        axis = self.get_available_axis(selected_workspace)
-        axis.remove(cut_axis.units)
-        integration_axis = axis[0]
+        integration_axis = self.get_other_axis(selected_workspace, cut_axis)
 
         cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
@@ -64,6 +62,7 @@ class MantidCutAlgorithm(CutAlgorithm):
 
         new_data = np.nan_to_num(new_data)
         workspace.setSignalArray(new_data)
+        # TODO propagate the errors !!!!!!!!!!
         workspace.setComment("Normalized By MSlice")
 
 
@@ -76,6 +75,11 @@ class MantidCutAlgorithm(CutAlgorithm):
         for i in range(workspace.getNumDims()):
             dim_names.append(workspace.getDimension(i).getName())
         return dim_names
+
+    def get_other_axis(self, workspace, axis):
+        all_axis = self.get_available_axis(workspace)
+        all_axis.remove(axis.units)
+        return all_axis[0]
 
     def is_cut(self, workspace):
         workspace = self._workspace_provider.get_workspace_handle(workspace)
@@ -99,7 +103,7 @@ class MantidCutAlgorithm(CutAlgorithm):
 
     def is_cuttable(self, workspace):
         workspace = self._workspace_provider.get_workspace_handle(workspace)
-        return isinstance(workspace, IMDEventWorkspace) and workspace.getNumDims()== 2
+        return isinstance(workspace, IMDEventWorkspace) and workspace.getNumDims() == 2
 
     def get_cut_params(self, cut_workspace):
         cut_workspace = self._workspace_provider.get_workspace_handle(cut_workspace)
@@ -128,6 +132,7 @@ class MantidCutAlgorithm(CutAlgorithm):
         return data
 
     def _infer_missing_parameters(self, workspace, cut_axis):
+        """Infer Missing parameters. This will come in handy at the CLI"""
         assert isinstance(workspace, IMDEventWorkspace)
         dim = workspace.getDimensionIndexByName(cut_axis.units)
         dim = workspace.getDimension(dim)
