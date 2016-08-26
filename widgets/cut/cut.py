@@ -95,6 +95,56 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
 
+    def enable(self):
+        self.lneCutStart.setEnabled(True)
+        self.lneCutEnd.setEnabled(True)
+        self.lneCutStep.setEnabled(True)
+        self.cmbCutAxis.setEnabled(True)
+
+        self.lneCutIntegrationStart.setEnabled(True)
+        self.lneCutIntegrationEnd.setEnabled(True)
+        self.lneEditCutIntensityStart.setEnabled(True)
+        self.lneCutIntensityEnd.setEnabled(True)
+        self.rdoCutNormToOne.setEnabled(True)
+
+        self.btnCutSaveToWorkspace.setEnabled(False)
+        self.btnCutPlot.setEnabled(False)
+        self.btnCutPlotOver.setEnabled(False)
+
+        self.btnCutSaveToWorkspace.setEnabled(True)
+        self.btnCutPlot.setEnabled(True)
+        self.btnCutPlotOver.setEnabled(True)
+
+
+    def disable(self):
+        self.lneCutStart.setEnabled(False)
+        self.lneCutEnd.setEnabled(False)
+        self.lneCutStep.setEnabled(False)
+        self.cmbCutAxis.setEnabled(False)
+
+        self.lneCutIntegrationStart.setEnabled(False)
+        self.lneCutIntegrationEnd.setEnabled(False)
+        self.lneEditCutIntensityStart.setEnabled(False)
+        self.lneCutIntensityEnd.setEnabled(False)
+        self.rdoCutNormToOne.setEnabled(False)
+
+        self.btnCutSaveToWorkspace.setEnabled(False)
+        self.btnCutPlot.setEnabled(False)
+        self.btnCutPlotOver.setEnabled(False)
+
+    def plotting_params_only(self):
+        self.disable()
+        self.lneEditCutIntensityStart.setEnabled(True)
+        self.lneCutIntensityEnd.setEnabled(True)
+        self.rdoCutNormToOne.setEnabled(True)
+
+        self.btnCutPlot.setEnabled(True)
+        self.btnCutPlotOver.setEnabled(True)
+
+    def force_normalization(self):
+        self.rdoCutNormToOne.setEnabled(False)
+        self.rdoCutNormToOne.setChecked(True)
+
     def error_current_selection_invalid(self):
         self._display_error("Cutting for the current workspace selection is not supported")
 

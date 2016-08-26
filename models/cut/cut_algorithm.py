@@ -7,7 +7,7 @@ class CutAlgorithm(object):
     def compute_cut_xye(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
         pass
 
-    def is_slice(self, workspace):
+    def is_cuttable(self, workspace):
         pass
 
     def is_cut(self, workspace):
@@ -17,3 +17,5 @@ class CutAlgorithm(object):
         pass
 
     def get_available_axis(self, workspace):
+        pass
+

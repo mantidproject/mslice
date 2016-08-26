@@ -2,6 +2,7 @@ from cut_algorithm import CutAlgorithm
 from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
+from presenters.slice_plotter_presenter import Axis
 from math import floor
 import numpy as np
 
@@ -63,6 +64,7 @@ class MantidCutAlgorithm(CutAlgorithm):
 
         new_data = np.nan_to_num(new_data)
         workspace.setSignalArray(new_data)
+        workspace.setComment("Normalized By MSlice")
 
 
     def get_available_axis(self, workspace):
@@ -74,6 +76,49 @@ class MantidCutAlgorithm(CutAlgorithm):
         for i in range(workspace.getNumDims()):
             dim_names.append(workspace.getDimension(i).getName())
         return dim_names
+
+    def is_cut(self, workspace):
+        workspace = self._workspace_provider.get_workspace_handle(workspace)
+        if not isinstance(workspace, IMDHistoWorkspace):
+            return False
+        if workspace.getNumDims() != 2 or len(workspace.getNonIntegratedDimensions()) != 1:
+            return False
+        history = workspace.getHistory()
+        # If any of these were set in the last BinMD call then this is not a cut
+        empty_params = ('AlignedDim2','AlignedDim3', 'AlignedDim4', 'AlignedDim5')
+        # If these were not set then this is not a cut
+        used_params = ('AxisAligned', 'AlignedDim0', 'AlignedDim1')
+        for i in range(history.size()-1, -1, -1):
+            algorithm = history.getAlgorithm(i)
+            if algorithm.name() == 'BinMD':
+                if all(map(lambda x: not algorithm.getPropertyValue(x), empty_params))\
+                        and all(map(lambda x: algorithm.getPropertyValue(x), used_params)):
+                    return True
+                break
+        return False
+
+    def is_cuttable(self, workspace):
+        workspace = self._workspace_provider.get_workspace_handle(workspace)
+        return isinstance(workspace, IMDEventWorkspace) and workspace.getNumDims()== 2
+
+    def get_cut_params(self, cut_workspace):
+        cut_workspace = self._workspace_provider.get_workspace_handle(cut_workspace)
+        assert isinstance(cut_workspace, IMDHistoWorkspace)
+        history = cut_workspace.getHistory()
+        is_norm = cut_workspace.getComment() == "Normalized By MSlice"
+        bin_md = None
+        for i in range(history.size()-1,-1,-1):
+            algorithm = history.getAlgorithm(i)
+            if algorithm.name() == 'BinMD':
+                bin_md = algorithm
+                break
+        integration_binning = bin_md.getPropertyValue("AlignedDim1").split(",")
+        integration_range = float(integration_binning[1]), float(integration_binning[2])
+
+        cut_binning = bin_md.getPropertyValue("AlignedDim0").split(",")
+        cut_axis = Axis(cut_binning[0], *map(float,cut_binning[1:]))
+        cut_axis.step = (cut_axis.end - cut_axis.start)/float(cut_binning[-1])
+        return cut_axis, integration_range, is_norm
 
     def _num_events_normalized_array(self, workspace):
         assert isinstance(workspace, IMDHistoWorkspace)

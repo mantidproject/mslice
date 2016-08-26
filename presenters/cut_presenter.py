@@ -129,26 +129,26 @@ class CutPresenter(object):
         workspace_selection = self._main_presenter.get_selected_workspaces()
 
         if len(workspace_selection) != 1:
+            self._cut_view.disable()
             return
 
         workspace = workspace_selection[0]
-        if self._cut_algorithm.is_slice(workspace):
-            self._acting_on = "slice"
+        if self._cut_algorithm.is_cuttable(workspace):
+            self._acting_on = "cuttable"
             axis = self._cut_algorithm.get_available_axis(workspace)
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
 
         elif self._cut_algorithm.is_cut(workspace):
             self._acting_on = "cut"
-            self._cut_view.disable_cut_params()
+            self._cut_view.plotting_params_only()
             cut_axis, integration_limits, is_normed = self._cut_algorithm.get_cut_params(workspace)
             if is_normed:
-                self._cut_view._force_normalization()
-            self._cut_view.populate_cut_axis_options([cut_axis])
-            self._cut_view.populate_cut_params(cut_axis.start, cut_axis.end, cut_axis.step)
-            self._cut_view.populate_integration_params(*integration_limits)
+                self._cut_view.force_normalization()
+            self._cut_view.populate_cut_axis_options([cut_axis.units])
+            format_ = lambda *args: map(lambda x:"%.5f" % x, args)
+            self._cut_view.populate_cut_params(*format_(cut_axis.start, cut_axis.end, cut_axis.step))
+            self._cut_view.populate_integration_params(*format_(*integration_limits))
 
         else:
-            self._cut_view.clear_input_fields()
             self._cut_view.disable()
-            return
