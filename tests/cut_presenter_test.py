@@ -53,18 +53,24 @@ class CutPresenterTest(unittest.TestCase):
         self.view.populate_cut_axis_options.assert_called_with(available_dimensions)
         self.view.enable.assert_called_with()
 
-    # def test_workspace_selection_changed_single_cut_workspace(self):
-    #     cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
-    #     cut_presenter.register_master(self.main_presenter)
-    #     workspace = 'workspace'
-    #     self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
-    #     self.cut_algorithm.is_cuttable = mock.Mock(return_value=False)
-    #     self.cut_algorithm.is_cut = mock.Mock(return_value=True)
-    #     available_dimensions = ["dim1", "dim2"]
-    #     self.cut_algorithm.get_cut_params
-    #     cut_presenter.workspace_selection_changed()
-    #     self.view.populate_cut_axis_options.assert_called_with(available_dimensions)
-    #     self.view.enable.assert_called_with()
+    def test_workspace_selection_changed_single_cut_workspace(self):
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter.register_master(self.main_presenter)
+        workspace = 'workspace'
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
+        self.cut_algorithm.is_cuttable = mock.Mock(return_value=False)
+        self.cut_algorithm.is_cut = mock.Mock(return_value=True)
+        cut_axis = Axis( "units", 0, 10, .1)
+        integration_limits = (11, 12)
+        formatted_integration_limits = ("11.00000", "12.00000")
+        is_normed = False
+        self.cut_algorithm.get_cut_params = mock.Mock(return_value=[cut_axis, integration_limits, is_normed])
+        cut_presenter.workspace_selection_changed()
+        self.view.populate_cut_axis_options.assert_called_with([cut_axis.units])
+        self.view.populate_integration_params.assert_called_with(*formatted_integration_limits)
+        self.view.plotting_params_only.assert_called_once()
+
+        self.view.enable.assert_not_called()
 
     def test_plot_single_cut_success(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
@@ -93,6 +99,5 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.compute_cut_xye = mock.Mock(return_value=('x', 'y', 'e'))
         self.cut_algorithm.get_other_axis = mock.Mock(return_value=integrated_axis)
         cut_presenter.notify(Command.Plot)
-        assert isinstance(self.cut_algorithm, CutAlgorithm)
         self.cut_algorithm.compute_cut_xye.assert_called_with(workspace, processed_axis, integration_start,
                                                               integration_end, is_norm)
