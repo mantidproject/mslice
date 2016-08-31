@@ -11,11 +11,10 @@ class FigureManager(object):
     Do not instantiate this class"""
     # if there is a current figure it should be both current and active
     _active_category = None
-    _category_active_figures = {"1d": NO_FIGURE, "2d": NO_FIGURE}  # active _figures recieve commands
-    _category_current_figures = {"1d": NO_FIGURE, "2d": NO_FIGURE}  # Current _figures are overplotted
+    _category_current_figures = {"1d": NO_FIGURE, "2d": NO_FIGURE}  # Current _figures recieve decorated commands
     _figures_by_category = {"1d": [], "2d": []}
     _unclassified_figures = []
-    _active_figure = NO_FIGURE
+    _active_figure = NO_FIGURE  # Will receive all commands that have a matching decorator or are undecorated
     _figures = {}
 
     def __init__(self, *args, **kwargs):
@@ -34,13 +33,14 @@ class FigureManager(object):
         return FigureManager._figures[fig_num], fig_num
 
     @staticmethod
-    def get_figure_number(fig_num=None,create_if_not_found=True):
+    def get_figure_number(fig_num=None, create_if_not_found=True):
         FigureManager._active_figure = fig_num
         try:
+            # make the figure the current figure of its category
             category = FigureManager.get_category(fig_num)
-            FigureManager._category_active_figures[category] = fig_num
+            FigureManager._category_current_figures[category] = fig_num
         except KeyError:
-            # the figure is still uncategorised
+            # the figure is still uncategorised, Do nothing
             pass
 
         figure = FigureManager._figures.get(fig_num, None)
@@ -52,16 +52,17 @@ class FigureManager(object):
 
     @staticmethod
     def get_active_figure():
+        #TODO classify it if unclassified
         if FigureManager._active_figure in FigureManager._unclassified_figures:
             return FigureManager._figures[FigureManager._active_figure]
         if FigureManager._active_category:
-            if FigureManager._category_active_figures[FigureManager._active_category] == NO_FIGURE:
+            if FigureManager._category_current_figures[FigureManager._active_category] == NO_FIGURE:
                 fig,num = FigureManager._new_figure()
-                FigureManager.assign_figure_to_category(num,FigureManager._active_category)
-                FigureManager._category_active_figures[FigureManager._active_category] = num
+                FigureManager.assign_figure_to_category(num, FigureManager._active_category)
+                FigureManager._category_current_figures[FigureManager._active_category] = num
                 FigureManager._active_figure = num
             else:
-                FigureManager._active_figure = FigureManager._category_active_figures[FigureManager._active_category]
+                FigureManager._active_figure = FigureManager._category_current_figures[FigureManager._active_category]
         if FigureManager._active_figure == NO_FIGURE:
             fig, num = FigureManager._new_figure()
             FigureManager._active_figure = num
@@ -90,7 +91,7 @@ class FigureManager(object):
                 FigureManager._figures_by_category[a_category].remove(fig_num)
         FigureManager._figures_by_category[category].append(fig_num)
         if make_current:
-            FigureManager._category_active_figures[category] = fig_num
+            FigureManager._category_current_figures[category] = fig_num
 
     @staticmethod
     def figure_closed(figure_number):
@@ -99,14 +100,13 @@ class FigureManager(object):
         for a_category in FigureManager._figures_by_category.keys():
             if figure_number in FigureManager._figures_by_category[a_category]:
                 FigureManager._figures_by_category[a_category].remove(figure_number)
-            if FigureManager._category_active_figures[a_category] == figure_number:
-                FigureManager._category_active_figures[a_category] = NO_FIGURE
+
             if FigureManager._category_current_figures[a_category] == figure_number:
-                FigureManager._category_active_figures[a_category] = NO_FIGURE
+                FigureManager._category_current_figures[a_category] = NO_FIGURE
         try:
             del FigureManager._figures[figure_number]
         except KeyError:
-            raise KeyError('The key "%s" does not exist. The figure cannot be closed')
+            raise KeyError('The key "%s" does not exist. The figure cannot be closed' % figure_number)
 
     @staticmethod
     def get_category(figure_number):
@@ -121,11 +121,8 @@ class FigureManager(object):
 
     @staticmethod
     def set_figure_as_kept(figure_number):
-        # kept _figures are just lying around, not really managed much, until they report in as current/active again
+        # kept _figures are just lying around, not really managed much, until they report in as current again
         figure_category = FigureManager.get_category(figure_number)
-
-        if FigureManager._category_active_figures[figure_category] == figure_number:
-            FigureManager._category_active_figures[figure_category] = NO_FIGURE
 
         if FigureManager._category_current_figures[figure_category] == figure_number:
             FigureManager._category_current_figures[figure_category] = NO_FIGURE
@@ -136,18 +133,9 @@ class FigureManager(object):
     def set_figure_as_current(figure_number):
         figure_category = FigureManager.get_category(figure_number)
         FigureManager._category_current_figures[figure_category] = figure_number
-        FigureManager._category_active_figures[figure_category] = figure_number
         FigureManager._active_figure = figure_number
         FigureManager.broadcast()
 
-    @staticmethod
-    def set_figure_as_active(figure_number):
-        figure_category = FigureManager.get_category(figure_number)
-        if figure_number == FigureManager._category_current_figures[figure_category]:
-            # Don't turn a current figure into an active figure.. doesnt make sense
-            return
-        FigureManager._category_active_figures[figure_category] = figure_number
-        FigureManager._active_figure = figure_number
 
     @staticmethod
     def broadcast(category=None):
@@ -161,9 +149,6 @@ class FigureManager(object):
 
                 if figure_number == FigureManager._category_current_figures[category]:
                     FigureManager._figures[figure_number].set_as_current()
-
-                elif figure_number == FigureManager._category_active_figures[category]:
-                    FigureManager._figures[figure_number].set_as_active()
 
                 else:
                     FigureManager._figures[figure_number].set_as_kept()
@@ -188,7 +173,6 @@ class FigureManager(object):
         """Reset all class variables to initial state. This Function exists for testing purposes """
 
         FigureManager._active_category = None
-        FigureManager._category_active_figures = {"1d": NO_FIGURE, "2d": NO_FIGURE}  #active _figures recieve commands
         FigureManager._category_current_figures = {"1d": NO_FIGURE, "2d": NO_FIGURE}  # Current _figures are overplotted
         FigureManager._figures_by_category = {"1d": [], "2d": []}
         FigureManager._unclassified_figures = []
@@ -207,9 +191,7 @@ class FigureManager(object):
                 return key
         raise ValueError('Figure %s was not recognised'%figure)
 
-#This a decorator that accepts a parameter
 def activate_category(category):
-
     def real_activate_function_decorator(function):
 
         def wrapper(*args, **kwargs):
