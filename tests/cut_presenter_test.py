@@ -36,3 +36,31 @@ class CutPresenterTest(unittest.TestCase):
                 else:
                     getattr(self.view, attribute).assert_not_called()
 
+
+    def test_workspace_selection_changed_single_cuttable_workspace(self):
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter.register_master(self.main_presenter)
+        workspace = 'workspace'
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
+        self.cut_algorithm.is_cuttable = mock.Mock(return_value=True)
+        self.cut_algorithm.is_cut = mock.Mock(return_value=False)
+        available_dimensions = ["dim1", "dim2"]
+        self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
+
+        cut_presenter.workspace_selection_changed()
+        self.view.populate_cut_axis_options.assert_called_with(available_dimensions)
+        self.view.enable.assert_called_with()
+
+    def test_workspace_selection_changed_single_cut_workspace(self):
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter.register_master(self.main_presenter)
+        workspace = 'workspace'
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
+        self.cut_algorithm.is_cuttable = mock.Mock(return_value=False)
+        self.cut_algorithm.is_cut = mock.Mock(return_value=True)
+        available_dimensions = ["dim1", "dim2"]
+        self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
+
+        cut_presenter.workspace_selection_changed()
+        self.view.populate_cut_axis_options.assert_called_with(available_dimensions)
+        self.view.enable.assert_called_with()
