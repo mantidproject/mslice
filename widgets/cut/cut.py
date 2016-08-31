@@ -54,7 +54,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
         return str(self.lneCutIntegrationEnd.text())
 
     def get_integration_width(self):
-        return str(self.lneCutIntegrationEnd.text())
+        return str(self.lneCutIntegrationWidth.text())
 
     def get_intensity_start(self):
         return str(self.lneEditCutIntensityStart.text())
