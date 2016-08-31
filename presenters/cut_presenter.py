@@ -3,6 +3,7 @@ from models.cut.cut_algorithm import CutAlgorithm
 from widgets.cut.command import Command
 from validation_decorators import require_main_presenter
 from presenters.slice_plotter_presenter import Axis
+
 INTENSITY = 'Signal/#Events'
 
 
@@ -35,19 +36,19 @@ class CutPresenter(object):
     def _process_cuts(self, plot_over=False, save_to_workspace=False):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
         integration_start to integration_end """
-        if save_to_workspace:
-            handler = lambda params, plot_over: self._save_cut_to_workspace(params)
-        else:
-            handler = lambda params, plot_over: self._plot_cut(params, plot_over)
         try:
             params = self._parse_input()
         except ValueError:
             return
+        if save_to_workspace:
+            handler = lambda params, plot_over: self._save_cut_to_workspace(params)
+        else:
+            handler = lambda params, plot_over: self._plot_cut(params, plot_over)
         width = params[-1]
         params = params[:-1]
         if width is None:
             # No width specified, just plot a single cut
-            self._plot_cut(params, plot_over)
+            handler(params, plot_over)
             return
         integration_start, integration_end = params[2:4]
         cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
@@ -58,7 +59,7 @@ class CutPresenter(object):
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
 
-    def _plot_cut(self,params, plot_over):
+    def _plot_cut(self, params, plot_over):
         cut_params = params[:5]
         intensity_start, intensity_end, integration_axis = params[5:]
         x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
@@ -79,8 +80,8 @@ class CutPresenter(object):
     def _get_legend(self, workspace_name, integrated_dim, integration_range):
         if integrated_dim == 'DeltaE':
             integrated_dim = 'e'
-        return workspace_name + "    " + "%.2f"%integration_range[0] + "<"+integrated_dim+"<"+\
-            "%.2f"%integration_range[1]
+        return workspace_name + "    " + "%.2f" % integration_range[0] + "<" + integrated_dim + "<" + \
+               "%.2f" % integration_range[1]
 
     def _parse_input(self):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
@@ -102,7 +103,7 @@ class CutPresenter(object):
             self._cut_view.error_invalid_cut_axis_parameters()
             raise ValueError("Invalid Cut axis parameters")
 
-        if None not in (cut_axis.start,cut_axis.end) and cut_axis.start >= cut_axis.end:
+        if None not in (cut_axis.start, cut_axis.end) and cut_axis.start >= cut_axis.end:
             self._cut_view.error_invalid_cut_axis_parameters()
             raise ValueError("Invalid cut axis parameters")
 
@@ -149,7 +150,6 @@ class CutPresenter(object):
 
     def workspace_selection_changed(self):
         self._cut_view.clear_input_fields()
-        self._acting_on = None
         workspace_selection = self._main_presenter.get_selected_workspaces()
 
         if len(workspace_selection) != 1:
@@ -158,19 +158,17 @@ class CutPresenter(object):
 
         workspace = workspace_selection[0]
         if self._cut_algorithm.is_cuttable(workspace):
-            self._acting_on = "cuttable"
             axis = self._cut_algorithm.get_available_axis(workspace)
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
 
         elif self._cut_algorithm.is_cut(workspace):
-            self._acting_on = "existing_cut"
             self._cut_view.plotting_params_only()
             cut_axis, integration_limits, is_normed = self._cut_algorithm.get_cut_params(workspace)
             if is_normed:
                 self._cut_view.force_normalization()
             self._cut_view.populate_cut_axis_options([cut_axis.units])
-            format_ = lambda *args: map(lambda x:"%.5f" % x, args)
+            format_ = lambda *args: map(lambda x: "%.5f" % x, args)
             self._cut_view.populate_cut_params(*format_(cut_axis.start, cut_axis.end, cut_axis.step))
             self._cut_view.populate_integration_params(*format_(*integration_limits))
 

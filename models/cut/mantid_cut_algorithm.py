@@ -15,24 +15,39 @@ class MantidCutAlgorithm(CutAlgorithm):
     def compute_cut_xye(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
         # TODO Note To reviewer
         # if the is_norm flag is True then _num_events_normalized_array will be called twice, is this OK?
-        # Will it cause a significant slowdown of on large data? would it be worth caching this?
+        # Will it cause a significant slowdown on large data? would it be worth caching this?
+        cut_computed = False
+        copy_created = False
+        copy_name = '_to_be_normalized_xyx_123'
         if not self.is_cut(selected_workspace):
-            cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm)
+            cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm=False)
+            cut_computed = True
+        else:
+            cut = self._workspace_provider.get_workspace_handle(selected_workspace)
+        if is_norm:
+            # If the cut previously existed in the ADS we will not modify it
+            if not cut_computed:
+                copy_created = True
+                cut = cut.clone(OutputWorkspace=copy_name)
+            self._normalize_workspace(cut)
+
         plot_data = self._num_events_normalized_array(cut)
         plot_data = plot_data.squeeze()
         errors = np.sqrt(cut.getErrorSquaredArray())/cut.getNumEventsArray()
         errors = errors.squeeze()
 
         x = np.linspace(cut_axis.start, cut_axis.end, plot_data.size)
-        self._workspace_provider.delete_workspace(cut)
-
+        # If the cut already existed in the ADS before this function was called then do not delete it
+        if cut_computed:
+            self._workspace_provider.delete_workspace(cut)
+        if copy_created:
+            self._workspace_provider.delete_workspace(copy_name)
         return x, plot_data, errors
 
     def compute_cut(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
 
         input_workspace_name = selected_workspace
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
-        self._infer_missing_parameters(selected_workspace, cut_axis)
         n_steps = self._get_number_of_steps(cut_axis)
         integration_axis = self.get_other_axis(selected_workspace, cut_axis)
 
@@ -54,8 +69,6 @@ class MantidCutAlgorithm(CutAlgorithm):
     def get_available_axis(self, workspace):
         if isinstance(workspace, str):
             workspace = self._workspace_provider.get_workspace_handle(workspace)
-        if not isinstance(workspace, IMDEventWorkspace):
-            return []
         dim_names = []
         for i in range(workspace.getNumDims()):
             dim_names.append(workspace.getDimension(i).getName())
@@ -96,7 +109,7 @@ class MantidCutAlgorithm(CutAlgorithm):
     def get_cut_params(self, cut_workspace):
         cut_workspace = self._workspace_provider.get_workspace_handle(cut_workspace)
         assert isinstance(cut_workspace, IMDHistoWorkspace)
-        is_norm = cut_workspace.getComment() == "Normalized By MSlice"
+        is_norm = self._was_previously_normalized(cut_workspace)
         bin_md = None
         history = cut_workspace.getHistory()
         for i in range(history.size()-1,-1,-1):
@@ -108,7 +121,10 @@ class MantidCutAlgorithm(CutAlgorithm):
         integration_range = float(integration_binning[1]), float(integration_binning[2])
 
         cut_binning = bin_md.getPropertyValue("AlignedDim0").split(",")
-        cut_axis = Axis(cut_binning[0], *map(float,cut_binning[1:]))
+        # The axis name is retreived from the workspace directly and not the binning string to avoid
+        # adding/removing trailing spaces
+        dim_name = cut_workspace.getDimension(0).getName()
+        cut_axis = Axis(dim_name, *map(float,cut_binning[1:]))
         cut_axis.step = (cut_axis.end - cut_axis.start)/float(cut_binning[-1])
         return cut_axis, integration_range, is_norm
 
@@ -151,3 +167,6 @@ class MantidCutAlgorithm(CutAlgorithm):
 
     def _get_number_of_steps(self, axis):
         return int(max(1, floor((axis.end - axis.start)/axis.step)))
+
+    def _was_previously_normalized(self, workspace):
+        return workspace.getComment() == "Normalized By MSlice"
