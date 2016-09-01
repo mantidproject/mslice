@@ -1,9 +1,9 @@
 from base_qt_plot_window import BaseQtPlotWindow
 from plotting.plot_window.plot_window_ui import Ui_MainWindow
-from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
+from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from PyQt4.QtCore import Qt
 import PyQt4.QtGui as QtGui
-from  plot_options_ui import Ui_Dialog
+from plot_options_ui import Ui_Dialog
 
 
 class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
