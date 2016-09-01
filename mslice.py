@@ -17,6 +17,7 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
         self._presenter = MainPresenter(self, workspace_presenter, slice_presenter, powder_presenter)
 
         self.wgtSlice.error_occurred.connect(self.show_error)
+        self.wgtWorkspacemanager.error_occurred.connect(self.show_error)
 
     def show_error(self, error):
         self.statusbar.showMessage(error, 2000)
