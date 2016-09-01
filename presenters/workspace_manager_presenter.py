@@ -79,7 +79,10 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         if not path.endswith('.nxs'):
             path += '.nxs'
-        self._work_spaceprovider.save_nexus(selected_workspace, path)
+        try:
+            self._work_spaceprovider.save_nexus(selected_workspace, path)
+        except:
+            self._workspace_manger_view.error_unable_to_save()
 
     def _remove_selected_workspaces(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()

@@ -132,3 +132,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
 
     def list_item_changed(self, *args):
         self._presenter.notify(Command.SelectionChanged)
+
+    def error_unable_to_save(self):
+        self._display_error("Something went wrong while trying to save")
