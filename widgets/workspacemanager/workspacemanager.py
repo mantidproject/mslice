@@ -1,5 +1,5 @@
 from PyQt4.QtGui import QWidget,QListWidgetItem,QFileDialog, QInputDialog,QMessageBox
-
+from PyQt4.QtCore import pyqtSignal
 from command import Command
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
@@ -8,10 +8,10 @@ from workspacemanager_ui import Ui_Form
 
 
 class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
-    """A Widget that allows user to perform basic workspace save/load/rename/group/delete operations on workspaces
+    """A Widget that allows user to perform basic workspace save/load/rename/group/delete operations on workspaces"""
 
-    Please set a main window via the method set_main_window(main_window) to direct error messages to the status bar
-    and avoid annoying the user with QDialogBoxes"""
+    error_occurred = pyqtSignal('QString')
+
     def __init__(self,parent):
         super(WorkspaceManagerWidget,self).__init__(parent)
         self.setupUi(self)
@@ -32,14 +32,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         self.lstWorkspaces.itemChanged.connect(self.list_item_changed)
         self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
-    def _display_error(self, error_string, timeout_ms):
-        if self._main_window:
-            self._main_window.statusBar().showMessage(error_string,timeout_ms)
-        else:
-            m = QMessageBox()
-            m.setWindowTitle('MSlice Error Message')
-            m.setText(error_string)
-            m.exec_()
+    def _display_error(self, error_string):
+        self.error_occurred.emit(error_string)
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -90,7 +84,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         return selected_workspaces
 
     def get_workspace_to_load_path(self):
-        path = QFileDialog.getOpenFileName( )
+        path = QFileDialog.getOpenFileName()
         return str( path )
 
     def get_workspace_to_save_filepath(self):
@@ -102,18 +96,17 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         name,success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
         # The message above was padded with spaces to allow the whole title to show up
         if not success:
-            raise ValueError('No Valid Name suplied')
+            raise ValueError('No Valid Name supplied')
         return str(name)
 
     def error_select_only_one_workspace(self):
-        self._display_error('Please select only one workspace and then try again', 2000)
+        self._display_error('Please select only one workspace and then try again')
 
     def error_select_one_or_more_workspaces(self):
-        self._display_error('Please select one or more workspaces the try again', 2000)
-
+        self._display_error('Please select one or more workspaces the try again')
 
     def error_select_one_workspace(self):
-        self._display_error('Please select a workspace then try again', 2000)
+        self._display_error('Please select a workspace then try again')
 
     def error_unable_to_open_file(self):
         self._display_error('MSlice was not able to load the selected file')
@@ -132,7 +125,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         self._display_error('No files were saved')
         
     def no_workspace_has_been_loaded(self):
-        self._display_error('No new workspaces have been loaded', 2000)
+        self._display_error('No new workspaces have been loaded')
 
     def get_presenter(self):
         return self._presenter
