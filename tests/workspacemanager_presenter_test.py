@@ -88,7 +88,6 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
         self.presenter.notify(Command.LoadWorkspace)
         self.view.get_workspace_to_load_path.assert_called_once()
-        self.workspace_provider.load.assert_not_called()
         self.view.error_unable_to_open_file.assert_called_once()
 
 
