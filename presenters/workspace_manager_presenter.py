@@ -47,6 +47,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         #TODO specify workspace name on load
         #TODO what to do on fail?
         workspace_to_load = self._workspace_manger_view.get_workspace_to_load_path()
+        if not workspace_to_load:
+            return
         base = os.path.basename(workspace_to_load)
         ws_name = os.path.splitext(base)[0]
         #confirm that user wants to overwrite an existing workspace
@@ -55,7 +57,11 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             if not confirm_overwrite:
                 self._workspace_manger_view.no_workspace_has_been_loaded()
                 return
-        self._work_spaceprovider.load(Filename=workspace_to_load, OutputWorkspace=ws_name)
+        try:
+            self._work_spaceprovider.load(Filename=workspace_to_load, OutputWorkspace=ws_name)
+        except RuntimeError:
+            self._workspace_manger_view.error_unable_to_open_file()
+            return
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
     def _save_selected_workspace(self):
@@ -68,7 +74,15 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         selected_workspace = selected_workspaces[0]
         path = self._workspace_manger_view.get_workspace_to_save_filepath()
-        self._work_spaceprovider.save_nexus(selected_workspace, path)
+        if not path:
+            self._workspace_manger_view.error_invalid_save_path()
+            return
+        if not path.endswith('.nxs'):
+            path += '.nxs'
+        try:
+            self._work_spaceprovider.save_nexus(selected_workspace, path)
+        except RuntimeError:
+            self._workspace_manger_view.error_unable_to_save()
 
     def _remove_selected_workspaces(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
