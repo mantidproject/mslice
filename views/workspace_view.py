@@ -3,7 +3,7 @@
 class WorkspaceView(object):
     def __init__(self):
         raise Exception("This abstact base class must not be instantiated")
-    
+
     def display_loaded_workspaces(self, workspaces):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
@@ -36,3 +36,13 @@ class WorkspaceView(object):
 
     def no_workspace_has_been_loaded(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def error_unable_to_open_file(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def error_invalid_save_path(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def error_unable_to_save(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+

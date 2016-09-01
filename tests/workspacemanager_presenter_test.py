@@ -66,6 +66,31 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
                       call(Filename=path3, OutputWorkspace=ws_name3)]
         self.workspace_provider.load.assert_has_calls(load_calls)
 
+    def test_load_workspace_cancelled(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        # Create a view that will return a path on call to get_workspace_to_load_path
+        # This assumes the view will return an empty string if the operation was cancelled
+        self.view.get_workspace_to_load_path = mock.Mock(return_value='')
+
+        self.presenter.notify(Command.LoadWorkspace)
+        self.view.get_workspace_to_load_path.assert_called_once()
+        self.workspace_provider.load.assert_not_called()
+
+    def test_load_workspace_fail(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        # Create a view that will return a path on call to get_workspace_to_load_path
+        tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
+        path_to_nexus = join(tempdir,'cde.nxs')
+        workspace_name = 'cde'
+        self.view.get_workspace_to_load_path = mock.Mock(return_value=path_to_nexus)
+        self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_name])
+        self.workspace_provider.load = mock.Mock(side_effect=RuntimeError)
+
+        self.presenter.notify(Command.LoadWorkspace)
+        self.view.get_workspace_to_load_path.assert_called_once()
+        self.view.error_unable_to_open_file.assert_called_once()
+
+
     def test_rename_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         # Create a view that will return a single selected workspace on call to get_workspace_selected and supply a
@@ -138,6 +163,22 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.error_select_one_workspace.assert_called_once_with()
         self.view.get_workspace_to_save_filepath.assert_not_called()
+        self.workspace_provider.save_nexus.assert_not_called()
+
+    def test_save_workspace_cancelled(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
+        # to save to on calls to get_workspace_to_save_filepath
+        path_to_save_to = "" # view returns empty string to indicate operation cancelled
+        workspace_to_save = 'file1'
+        self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
+        self.view.get_workspace_to_save_filepath = mock.Mock(return_value=path_to_save_to)
+
+        self.presenter.notify(Command.SaveSelectedWorkspace)
+        self.view.get_workspace_selected.assert_called_once_with()
+        self.view.get_workspace_selected.assert_called_once_with()
+        self.view.get_workspace_to_save_filepath.assert_called_once_with()
+        self.view.error_invalid_save_path.assert_called_once()
         self.workspace_provider.save_nexus.assert_not_called()
 
     def test_group_workspaces(self):

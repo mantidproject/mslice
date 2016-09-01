@@ -1,6 +1,6 @@
 from functools import wraps
 from plotting import get_figure_class
-PlotFigure = get_figure_class()
+PlotFigureManager = get_figure_class( )
 NO_FIGURE = -1723
 
 
@@ -25,7 +25,7 @@ class FigureManager(object):
             fig_num = 1
             while any([fig_num == existing_fig_num for existing_fig_num in FigureManager._figures.keys()]):
                 fig_num += 1
-        new_fig = PlotFigure(fig_num, FigureManager)
+        new_fig = PlotFigureManager( fig_num, FigureManager )
         FigureManager._figures[fig_num] = new_fig
         FigureManager._active_figure = fig_num
         FigureManager._unclassified_figures.append(fig_num)

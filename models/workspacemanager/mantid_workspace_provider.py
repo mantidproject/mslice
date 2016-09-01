@@ -1,5 +1,7 @@
 from workspace_provider import WorkspaceProvider
-from mantid.simpleapi import AnalysisDataService,Load,DeleteWorkspace,Load,GroupWorkspaces,RenameWorkspace,SaveNexus
+from mantid.simpleapi import AnalysisDataService,Load,DeleteWorkspace,Load,GroupWorkspaces,RenameWorkspace,SaveNexus, SaveMD
+from mantid.api import IMDWorkspace
+
 
 class MantidWorkspaceProvider(WorkspaceProvider):
 
@@ -10,7 +12,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return DeleteWorkspace(ToBeDeleted)
 
     def load(self, Filename, OutputWorkspace):
-        return Load(Filename=Filename,OutputWorkspace=OutputWorkspace)
+        return Load(Filename=Filename, OutputWorkspace=OutputWorkspace)
 
     def group_workspaces(self, InputWorkspaces, OutputWorkspace):
         return GroupWorkspaces(InputWorkspaces,OutputWorkspace)
@@ -19,7 +21,11 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return RenameWorkspace(selected_workspace,newName)
 
     def save_nexus(self, workspace, path):
-        SaveNexus(workspace,path)
+        workspace_handle = self.get_workspace_handle(workspace)
+        if isinstance(workspace_handle, IMDWorkspace):
+            SaveMD(workspace, path)
+        else:
+            SaveNexus(workspace,path)
 
     def get_workspace_handle(self, workspace_name):
         """"Return handle to workspace given workspace_name_as_string"""
