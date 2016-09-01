@@ -90,13 +90,12 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         return selected_workspaces
 
     def get_workspace_to_load_path(self):
-        return str(QFileDialog.getOpenFileName())
+        path = QFileDialog.getOpenFileName( )
+        return str( path )
 
     def get_workspace_to_save_filepath(self):
         extension = 'Nexus file (*.nxs)'
         path = QFileDialog.getSaveFileName(filter=extension)
-        if not path:
-            raise ValueError('Please Select a valid path to save to ')
         return str(path)
 
     def get_workspace_new_name(self):
@@ -112,6 +111,13 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     def error_select_one_or_more_workspaces(self):
         self._display_error('Please select one or more workspaces the try again', 2000)
 
+
+    def error_select_one_workspace(self):
+        self._display_error('Please select a workspace then try again', 2000)
+
+    def error_unable_to_open_file(self):
+        self._display_error('MSlice was not able to load the selected file')
+
     def confirm_overwrite_workspace(self):
         reply = QMessageBox.question(self,'Confirm Overwrite','The workspace you want to load has the same name as'
                                                               'an existing workspace, Are you sure you want to '
@@ -122,11 +128,11 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         else:
             return False
 
+    def error_invalid_save_path(self):
+        self._display_error('No files were saved')
+        
     def no_workspace_has_been_loaded(self):
         self._display_error('No new workspaces have been loaded', 2000)
-
-    def error_select_one_workspace(self):
-        self._display_error('Please select a workspace then try again', 2000)
 
     def get_presenter(self):
         return self._presenter
