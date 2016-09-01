@@ -2,6 +2,7 @@ from figuremanager import FigureManager,activate_category
 from script_generation import script_log
 from matplotlib.cbook import dedent, silent_list, is_string_like, is_numlike
 
+
 def draw_if_interactive():
     # We will always draw because mslice might be running without matplotlib interactive
     for figure in FigureManager._figures.values():
@@ -14,8 +15,6 @@ def figure(num=None):
 
 def gcf():
     return FigureManager.get_active_figure().get_figure()
-
-
 
 
 def draw_colorbar(function):
@@ -170,6 +169,7 @@ def tripcolor(*args, **kwargs):
 @script_log(module_name)
 def xlabel(s, *args, **kwargs):
     """
+    Set the *x* axis label of the current axis.
     Set the *x* axis label of the current axis.
 
     Default override is::
