@@ -81,7 +81,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             path += '.nxs'
         try:
             self._work_spaceprovider.save_nexus(selected_workspace, path)
-        except:
+        except RuntimeError:
             self._workspace_manger_view.error_unable_to_save()
 
     def _remove_selected_workspaces(self):
