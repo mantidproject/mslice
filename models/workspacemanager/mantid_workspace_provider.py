@@ -2,6 +2,7 @@ from workspace_provider import WorkspaceProvider
 from mantid.simpleapi import AnalysisDataService,Load,DeleteWorkspace,Load,GroupWorkspaces,RenameWorkspace,SaveNexus, SaveMD
 from mantid.api import IMDWorkspace
 
+
 class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_workspace_names(self):
