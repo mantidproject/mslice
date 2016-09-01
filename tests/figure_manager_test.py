@@ -104,3 +104,16 @@ class FigureManagerTest(unittest.TestCase):
         self.assert_(fig1 == mock_figures[0])
         self.assert_(fig2 == mock_figures[1])
 
+    @mock.patch(plot_window_class)
+    def test_close_non_existant_window_fail(self,mock_figure_class):
+        mock_figures = [mock.Mock()]
+        mock_figure_class.side_effect = mock_figures
+        # Get a figure
+        fig1 = FigureManager.get_active_figure()
+        # check that getting the active window doesnt bring up a new one
+        self.assert_(FigureManager.get_active_figure() == fig1)
+        self.assertRaises(KeyError, FigureManager.figure_closed, 2)
+        fig2 = FigureManager.get_active_figure()
+
+        self.assert_(fig1 == mock_figures[0])
+        self.assert_(fig2 == mock_figures[0])
