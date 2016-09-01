@@ -123,6 +123,32 @@ def plot(*args, **kwargs):
 
     return ret
 
+@activate_category("1d")
+def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None,
+             capsize=None, barsabove=False, lolims=False, uplims=False,
+             xlolims=False, xuplims=False, errorevery=1, capthick=None,
+             hold=None, data=None, **kwargs):
+    ax = gca()
+    # allow callers to override the hold state by passing hold=True|False
+    washold = ax.ishold()
+
+    if hold is not None:
+        ax.hold(hold)
+    try:
+        ret = ax.errorbar(x, y, yerr=yerr, xerr=xerr, fmt=fmt, ecolor=ecolor,
+                          elinewidth=elinewidth, capsize=capsize,
+                          barsabove=barsabove, lolims=lolims, uplims=uplims,
+                          xlolims=xlolims, xuplims=xuplims,
+                          errorevery=errorevery, capthick=capthick, data=data,
+                          **kwargs)
+    finally:
+        ax.hold(washold)
+
+    return ret
+
+def autoscale(enable=True, axis='both', tight=None):
+    ret = gca().autoscale(enable=enable, axis=axis, tight=tight)
+    return ret
 
 @activate_category("2d")
 @draw_colorbar
@@ -189,6 +215,12 @@ def xlabel(s, *args, **kwargs):
     l =  gca().set_xlabel(s, *args, **kwargs)
     draw_if_interactive()
     return l
+
+@script_log(module_name)
+def legend(*args, **kwargs):
+    ret = gca().legend(*args, **kwargs)
+    draw_if_interactive()
+    return ret
 
 @script_log(module_name)
 def ylabel(s, *args, **kwargs):

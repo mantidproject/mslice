@@ -129,7 +129,8 @@ class FigureManager(object):
 
         if FigureManager._category_current_figures[figure_category] == figure_number:
             FigureManager._category_current_figures[figure_category] = NO_FIGURE
-
+        if FigureManager._active_figure == figure_number:
+            FigureManager._active_figure = NO_FIGURE
         FigureManager.broadcast(figure_category)
 
     @staticmethod
