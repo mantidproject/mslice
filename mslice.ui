@@ -36,7 +36,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_7">
         <item row="0" column="0">
-         <widget class="CutWidget" name="widget" native="true"/>
+         <widget class="CutWidget" name="wgtCut" native="true"/>
         </item>
        </layout>
       </widget>
