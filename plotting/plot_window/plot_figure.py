@@ -3,11 +3,12 @@ from plotting.plot_window.plot_window_ui import Ui_MainWindow
 from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 from PyQt4.QtCore import Qt
 import PyQt4.QtGui as QtGui
-from  plot_options_ui import Ui_Form
+from  plot_options_ui import Ui_Dialog
 
-class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
-    def __init__(self,number,manager):
-        super(PlotFigure,self).__init__(number, manager)
+
+class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
+    def __init__(self, number, manager):
+        super(PlotFigureManager, self).__init__(number, manager)
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -23,7 +24,7 @@ class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
         self.action_save_image.triggered.connect(self.stock_toolbar.save_figure)
         self.actionPlotOptions.triggered.connect(self._plot_options)
 
-        self.show() #is not a good idea in non interactive mode
+        self.show() # is not a good idea in non interactive mode
 
 
     def toggle_data_cursor(self):
@@ -43,10 +44,10 @@ class PlotFigure(BaseQtPlotWindow, Ui_MainWindow):
             self.actionKeep.setChecked(False)
 
     def _plot_options(self):
-        x = PlotOptionsDialog()
-        
+        return
 
-class PlotOptionsDialog(QtGui.QDialog, Ui_Form):
+
+class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)

@@ -9,8 +9,6 @@ class MatplotlibCanvas(FigureCanvas):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         self.figure = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = self.figure.add_subplot(111)
-        self.axes.hold(False)
         FigureCanvas.__init__(self, self.figure)
         self.setParent(parent)
 
@@ -18,10 +16,7 @@ class MatplotlibCanvas(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-        self._rect_cid = None
-        self._motion_cid = None
-        self._new_axes_limits = [[None, None], [None, None]] # For zooming [[x_lower,x_upper],[y_lower,y_upper]]
-        self._zoom_history_stack = []
+
 
 
 

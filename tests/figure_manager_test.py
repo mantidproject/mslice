@@ -19,7 +19,7 @@ class FigureManagerTest(unittest.TestCase):
         """The figure manager class is a singleton static class and any attempts to instantiate it should fail"""
         self.assertRaises(Exception, FigureManager)
 
-    plot_window_class = 'plotting.figuremanager.PlotFigure'
+    plot_window_class = 'plotting.figuremanager.PlotFigureManager'
 
     @mock.patch(plot_window_class)
     def test_create_single_unclassified_plot_success(self, mock_figure_class):
