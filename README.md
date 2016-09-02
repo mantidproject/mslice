@@ -16,7 +16,7 @@ It should look like
 C:\MantidInstall\bin\mantidpython.bat --matplotlib=qt -i start_script.ipy
 ```
 Replace the `C:\MantidInstall\` with the root directory of your Mantid installation. After saving the file running again 
-###Linux & Mac
+###Linux 
 It assumes you have a nightly build of Mantid at `/opt/mantidnightly/` . If you have a nightly build installed somewhere else on your computer then open the `start_mslice.sh` in a text editor. 
 It should look like
 ```
@@ -35,7 +35,7 @@ with
 ```
 <path_to_mantidpython.bat> --matplotlib -i start_script.ipy
 ```
-###Windows
+###Linux
 To find your `mantidpython` executable file open your build directory in and search for `mantidpython`. After locating the `mantidpython` open the `start_mslice.sh` in a text editor and replace 
 ```
 /opt/mantidnightly/bin/mantidpython --matplotlib -i start_script.ipy
