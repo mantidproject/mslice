@@ -22,5 +22,5 @@ If the version that appears in the interpreter is less that  `1.5.1` then you mu
  
 #### Warning
  
- Executing  `%run -m easy_install -- --user "matplotlib>=1.5.1"` on windows will not and may crash your PC!
+ Executing  `%run -m easy_install -- --user "matplotlib>=1.5.1"` on windows will not work and may crash your PC!
  
