@@ -40,7 +40,7 @@ def build_all_ui_files(basepath, verbose=True):
     """Build all ui files found in folder basepath"""
     for item in os.listdir(basepath):
         if os.path.isdir(os.path.join(basepath,item)):
-            build_all_ui_files(os.path.join(basepath,item))
+            build_all_ui_files(os.path.join(basepath,item), verbose=verbose)
         else:
             if is_ui_file(item):
                 build_item(os.path.join(basepath,item), verbose=verbose)
