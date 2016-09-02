@@ -19,6 +19,7 @@ In [2]:
 ```
 If the version that appears in the interpreter is less that  `1.5.1` then you must upgrade it by executing the following command in the MantidPlot script interpreter
  `%run -m easy_install -- --user "matplotlib>=1.5.1"`
- #####Warning
+ 
+ ####Warning
  Executing  `%run -m easy_install -- --user "matplotlib>=1.5.1"` on windows will not and may crash your PC!
  
