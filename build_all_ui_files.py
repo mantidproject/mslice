@@ -36,14 +36,14 @@ def build_item(item, verbose=True):
         print item, "==>", output_file_path
 
 
-def build_all_ui_files(basepath):
+def build_all_ui_files(basepath, verbose=True):
     """Build all ui files found in folder basepath"""
     for item in os.listdir(basepath):
         if os.path.isdir(os.path.join(basepath,item)):
             build_all_ui_files(os.path.join(basepath,item))
         else:
             if is_ui_file(item):
-                build_item(os.path.join(basepath,item))
+                build_item(os.path.join(basepath,item), verbose=verbose)
 
 if __name__ == '__main__':
     # assumes script is in project root directory
