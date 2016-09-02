@@ -1,7 +1,7 @@
 %gui qt
+from build_all_ui_files import build_all_ui_files, script_folder
 build_all_ui_files(script_folder, verbose=False)
 import plotting.pyplot as plt
-from build_all_ui_files import build_all_ui_files, script_folder
 from mslice import MsliceGui
 x = MsliceGui()
 x.show()
