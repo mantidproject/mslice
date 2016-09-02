@@ -5,9 +5,9 @@ MSlice is a tool for visualizing cuts and slices from powder diffraction samples
 
 ## Installing MSlice
 ###Requirements
--A recent build of `Mantid` (nightly or recent build of master) 
+- A recent build of `Mantid` (nightly or recent build of master) 
 To get the latest version of Mantid follow [this link](http://download.mantidproject.org/) and click on the download button the header *Nightly Build*
--Matplotlib >=`1.5.1`
+- Matplotlib >=`1.5.1`
 Recent versions of Mantid (including the current stable release and beyond) for windows currently ship with a recent version of `matplotlib`. However Mantid for linux comes with a slighlty older version.
 To check the version of Matplotlib on your system open the `MantidPlot` application and in the script interpreter at the bottom of the window execute ` import matplotlib; print matplotlib.__version__`
 The output should look like
