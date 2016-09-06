@@ -1,4 +1,4 @@
-from mantid.simpleapi import ConvertToMD
+from mantid.simpleapi import ConvertToMD, mtd
 from models.projection.powder.projection_calculator import ProjectionCalculator
 
 
@@ -10,7 +10,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
         output_workspace = input_workspace + MD_SUFFIX
         if axis1 == '|Q|' and axis2 == 'Energy':
             ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions='|Q|',
-                        PreprocDetectorsWS='-')
+                        PreprocDetectorsWS='-', dEAnalysisMode=mtd[input_workspace].getEMode().name)
         else:
             raise NotImplementedError('MSlice currently only supports projection to Energy vs |Q|')
 
