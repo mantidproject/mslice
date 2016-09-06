@@ -24,10 +24,10 @@ class MantidProjectionCalculator(ProjectionCalculator):
             dim0 = output_workspace_handle.getDimension(1)
             dim1 = output_workspace_handle.getDimension(0)
             # format into dimension string as expected
-            dim0 = dim0.getName() + ',' + str(dim0.getMinimum()-1) + ',' +\
-                   str(dim0.getMaximum() + 1) + ',' + str(dim0.getNBins())
-            dim1 = dim1.getName() + ',' + str(dim1.getMinimum()-1) + ',' +\
-                   str(dim1.getMaximum() + 1) + ',' + str(dim1.getNBins())
+            dim0 = dim0.getName() + ',' + str(dim0.getMinimum()) + ',' +\
+                   str(dim0.getMaximum()) + ',' + str(dim0.getNBins())
+            dim1 = dim1.getName() + ',' + str(dim1.getMinimum()) + ',' +\
+                   str(dim1.getMaximum()) + ',' + str(dim1.getNBins())
             SliceMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, AlignedDim0=dim0, AlignedDim1=dim1)
 
         else:
