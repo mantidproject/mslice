@@ -13,7 +13,7 @@ class PowderView(object):
 
     def populate_powder_projection_axis(self, axis_options):
         self.populate_powder_u1(axis_options)
-        self.get_powder_u2()
+        self.populate_powder_u2(axis_options[::-1])
 
     def get_output_workspace_name(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
