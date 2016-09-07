@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import threading
 from time import sleep
-matplotlib
+
 
 class Spinner:
     def __init__(self, axes):
