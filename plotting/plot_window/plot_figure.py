@@ -53,41 +53,90 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         current_axis.set_title(plot_config.title)
         current_axis.set_xlabel(plot_config.xlabel)
         current_axis.set_ylabel(plot_config.ylabel)
+        if plot_config.legend.visible:
+            current_axis.legend(plot_config.legend.handles, plot_config.legend.labels)
+        else:
+            current_axis.legend_ = None
         self.canvas.draw()
 
     def _get_plot_description(self):
-        title = self.canvas.figure.gca().get_title()
-        xlabel = self.canvas.figure.gca().get_xlabel()
-        ylabel = self.canvas.figure.gca().get_ylabel()
-        return PlotConfig(title=title, x_axis_label=xlabel, y_axis_label=ylabel)
+        current_axis = self.canvas.figure.gca()
+        title = current_axis.get_title()
+        xlabel = current_axis.get_xlabel()
+        ylabel = current_axis.get_ylabel()
+        handles, labels = current_axis.get_legend_handles_labels()
+        if not handles:
+            legend = LegendDescriptor(applicable=False)
+        else:
+            visible = hasattr(current_axis, 'legend_')
+            legend = LegendDescriptor(visible=visible, handles=handles, labels=labels)
+
+        return PlotConfig(title=title, x_axis_label=xlabel, y_axis_label=ylabel, legends=legend)
+
+
+class LegendSetter(QtGui.QWidget):
+    """This is a widget that consists of a checkbox and a lineEdit that will control exactly one legend entry"""
+    def __init__(self, parent, text, is_enabled):
+        super(LegendSetter, self).__init__(parent)
+        self.isEnabled = QtGui.QCheckBox(self)
+        self.isEnabled.setChecked(is_enabled)
+        self.legendText = QtGui.QLineEdit(self)
+        self.legendText.setText(text)
+
+        layout = QtGui.QHBoxLayout(self)
+        layout.addWidget(self.isEnabled)
+        layout.addWidget(self.legendText)
+
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self, current_config):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
-        self.groupBox.hide()
         self.chkShowErrorBars.hide()
         self.lneFigureTitle.setText(current_config.title)
         self.lneXAxisLabel.setText(current_config.xlabel)
         self.lneYAxisLabel.setText(current_config.ylabel)
-
+        if not current_config.legend.applicable:
+            self.groupBox.hide()
+        else:
+            self.chkShowLegends.setChecked(current_config.legend.visible)
+            for legend in current_config.legend.all_legends():
+                self.verticalLayout.addWidget(LegendSetter(self, legend['text'], legend['enabled']))
 
     @staticmethod
     def get_new_config(current_config):
         dialog = PlotOptionsDialog(current_config)
         dialog.exec_()
+        legends = LegendDescriptor(visible=dialog.chkShowLegends.isChecked())
         return PlotConfig(title=dialog.lneFigureTitle.text(),
                           x_axis_label=dialog.lneXAxisLabel.text(),
-                          y_axis_label=dialog.lneYAxisLabel.text())
+                          y_axis_label=dialog.lneYAxisLabel.text(),
+                          legends=legends)
 
+
+class LegendDescriptor(object):
+    def __init__(self, visible=False, applicable=True, handles=None, labels=None):
+        self.visible = visible
+        self.applicable = applicable
+        self.handles = handles
+        self.labels = labels
+
+    def all_legends(self):
+        #TODO THIS IS JUST PLAIN WRONG
+        for label in self.labels:
+            x = {'text': label, 'enabled': True}
+            yield x
 
 class PlotConfig(object):
     def __init__(self, title=None, x_axis_label=None, y_axis_label=None, legends=None, errorbars_enabled=None):
         self.title = title
         self.xlabel = x_axis_label
         self.ylabel = y_axis_label
-        self._legends = legends
-        self._errorbar = errorbars_enabled   # Has 3 values (True : shown, False: Not Shown, None: Not applicable)
+        if legends is None:
+            self.legend = LegendDescriptor()
+        else:
+            self.legend = legends
+        self.errorbar = errorbars_enabled   # Has 3 values (True : shown, False: Not Shown, None: Not applicable)
 
     @property
     def title(self):
