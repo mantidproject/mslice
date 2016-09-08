@@ -28,7 +28,7 @@
 #
 # Currently there are only two categories ('1d' and '2d') Hard-coded into the manager however it would be simple to add
 #  more by simply adding more entries into the _figures_by_category and _category_current_figures
-# dictionaries (Or maybe adding an add_category function to facilitate this)
+#  dictionaries (Or maybe adding an add_category function to facilitate this)
 #
 #
 
@@ -37,9 +37,16 @@ from functools import wraps
 from plotting import get_figure_class
 
 
-PlotFigureManager = get_figure_class()
-NO_FIGURE = -1723
+class NoFigure(object):
+    def __init__(self):
+        pass
 
+    def __eq__(self, other):
+        return isinstance(other, NoFigure)
+
+
+PlotFigureManager = get_figure_class()
+NO_FIGURE = NoFigure()
 
 class FigureManager(object):
     """This is singleton static class to manage the current _figures
