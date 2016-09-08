@@ -2,8 +2,9 @@ from mock import call
 import mock
 import unittest
 import plotting
-#TODO use method to specify figure class when that is decided
-plotting.get_figure_class = lambda : None #This stops the Figure manager from importing the windows which import pyqt
+import os
+os.putenv = lambda *args, **kwargs: None # This prevents python from actually changing the environment variable
+os.environ ['MSLICE_PLOT_WINDOWS'] = 'TEST'
 from plotting.figuremanager import FigureManager
 from plotting.figuremanager import activate_category
 

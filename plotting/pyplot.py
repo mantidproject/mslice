@@ -3139,7 +3139,7 @@ def autoscale(enable=True, axis='both', tight=None):
     return ret
 
 @activate_category("2d")
-@draw_colorbar
+@draw_colorbar(gcf, colorbar)
 #@script_log("plotting.pyplot")
 def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
            vmin=None, vmax=None, origin=None, extent=None, shape=None,
@@ -3164,7 +3164,7 @@ def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
     return ret
 
 @activate_category('2d')
-@draw_colorbar
+@draw_colorbar(gcf, colorbar)
 @script_log(module_name)
 def tripcolor(*args, **kwargs):
     ax = gca()
@@ -3416,7 +3416,7 @@ def ylim(*args, **kwargs):
 
 @script_log(module_name)
 @activate_category("2d")
-@draw_colorbar
+@draw_colorbar(gcf, colorbar)
 def pcolormesh(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
