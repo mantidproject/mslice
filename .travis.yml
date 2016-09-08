@@ -1,10 +1,11 @@
 language: python
 python:
   - "2.7"
+before_install:
+  export MSLICE_PLOT_WINDOWS="TEST"
 # command to install dependencies
-install: 
-  -pip install -r pip-requirements.txt
-  -export MSLICE_PLOT_WINDOWS="TEST"
+install:
+  pip install -r pip-requirements.txt
 # command to run tests
 script: 
   nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager
