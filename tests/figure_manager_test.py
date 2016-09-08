@@ -29,7 +29,7 @@ class FigureManagerTest(unittest.TestCase):
         FigureManager.get_figure_number()
         self.assert_(1 in FigureManager.all_figure_numbers()) #Check that a new figure with number=1 was created
         self.assertRaises(KeyError,FigureManager.get_category, 1) #Check that figure has no category
-        self.assert_(FigureManager.get_active_figure() ==mock_figures[0]) # Check that it is set as the active figure
+        self.assert_(FigureManager.get_active_figure() == mock_figures[0]) # Check that it is set as the active figure
 
     @mock.patch(plot_window_class)
     def test_create_multiple_unclassified_figures(self, mock_figure_class):
@@ -117,3 +117,33 @@ class FigureManagerTest(unittest.TestCase):
 
         self.assert_(fig1 == mock_figures[0])
         self.assert_(fig2 == mock_figures[0])
+
+    @mock.patch(plot_window_class)
+    def test_categorizing_of_uncategorized_plot(self, mock_figure_class):
+        mock_figures = [mock.Mock(), mock.Mock(), mock.Mock()]
+        fig1_mock_manger = mock.Mock()
+        # This manager is used to compare the relative order of calls of two differebc functions
+        fig1_mock_manger.attach_mock(mock_figures[0].set_as_kept, 'fig1_kept')
+        fig1_mock_manger.attach_mock(mock_figures[0].set_as_current, 'fig1_current')
+        mock_figure_class.side_effect = mock_figures
+        cat1 = '1d'
+        cat2 = '2d'
+        cat1_get_active_figure = activate_category(cat1)(FigureManager.get_active_figure)
+        cat2_get_active_figure = activate_category(cat2)(FigureManager.get_active_figure)
+
+        # test is an arbitrary method just to make sure the correct figures are returned
+
+        cat1_get_active_figure().test(1)  # create a figure of category 1
+        cat2_get_active_figure().test(2)  # create a figure of category 2
+        FigureManager.set_figure_as_kept(2) # now there is no active figure
+
+        FigureManager.get_active_figure().test(3) # create an uncategorized figure
+        cat1_get_active_figure().test(4) # the previously uncategorized figure should now be categorized as cat1
+
+        mock_figures[0].test.assert_has_calls([call(1)])
+        mock_figures[1].test.assert_has_calls([call(2)])
+        mock_figures[2].test.assert_has_calls([call(3), call(4)])
+
+        self.assert_(fig1_mock_manger.mock_calls[-1] == call.fig1_kept())  # assert final status of fig1 is kept
+        self.assert_(FigureManager._active_figure == 3)
+

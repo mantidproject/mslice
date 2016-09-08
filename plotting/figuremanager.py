@@ -147,9 +147,13 @@ class FigureManager(object):
         FigureManager._figures_by_category[category].append(fig_num)
         if make_current:
             FigureManager._category_current_figures[category] = fig_num
+        FigureManager.broadcast()
 
     @staticmethod
     def figure_closed(figure_number):
+        """Figure is closed, remove all references to it from all internal list
+
+        If it was the category current or global active figure then set that to NO_FIGURE"""
         if FigureManager._active_figure == figure_number:
             FigureManager._active_figure = NO_FIGURE
         for a_category in FigureManager._figures_by_category.keys():
@@ -165,6 +169,7 @@ class FigureManager(object):
 
     @staticmethod
     def get_category(figure_number):
+        """Return the category of the figure"""
         for category,fig_list in FigureManager._figures_by_category.items():
             if figure_number in fig_list:
                 figure_category = category
@@ -199,11 +204,12 @@ class FigureManager(object):
         if figure_category:
             FigureManager._category_current_figures[figure_category] = figure_number
         FigureManager._active_figure = figure_number
-        FigureManager.broadcast()
+        FigureManager.broadcast(figure_number)
 
 
     @staticmethod
     def broadcast(category=None):
+        """This method will broadcast to all figures in 'category' to update the displayed kept/current status"""
         if category is None:
             broadcast_list = FigureManager._figures_by_category.keys()
         else:
@@ -217,6 +223,12 @@ class FigureManager(object):
 
                 else:
                     FigureManager._figures[figure_number].set_as_kept()
+
+        for figure in FigureManager._unclassified_figures:
+            if figure == FigureManager._active_figure:
+                FigureManager._figures[figure].set_as_current()
+            else:
+                FigureManager._figures[figure].set_as_kept()
 
     @staticmethod
     def all_figure_numbers():
