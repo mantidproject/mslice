@@ -49,7 +49,7 @@ def draw_if_interactive():
 # defined before  this comment.
 
 # The following tuple is a list of all the functions in matplotlib.pyplot that have NOT been included in this interface
-___unincluded_fucntions = ('_backend_selection',
+___unincluded_functions = ('_backend_selection',
                            'install_repl_displayhook',
                            'uninstall_repl_displayhook',
                            'switch_backend',
@@ -77,13 +77,14 @@ ___unincluded_fucntions = ('_backend_selection',
 
 
 def get_unincluded_functions():
-    return ___unincluded_fucntions
+    return ___unincluded_functions
 
 
 __redefined_functions = ('figure',
                          'gcf',
                          'draw_if_interactive'
 )
+
 
 def get_redefined_functions():
     return __redefined_functions
