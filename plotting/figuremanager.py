@@ -44,9 +44,15 @@ class NoFigure(object):
     def __eq__(self, other):
         return isinstance(other, NoFigure)
 
+    def __getattribute__(self, item):
+        if item in ('__init__', '__eq__'):
+            return super(NoFigure, self).__getattribute__(item)
+        raise RuntimeError('Attempt to manipulate non-existent figure')
+
 
 PlotFigureManager = get_figure_class()
 NO_FIGURE = NoFigure()
+
 
 class FigureManager(object):
     """This is singleton static class to manage the current _figures
@@ -204,7 +210,7 @@ class FigureManager(object):
         if figure_category:
             FigureManager._category_current_figures[figure_category] = figure_number
         FigureManager._active_figure = figure_number
-        FigureManager.broadcast(figure_number)
+        FigureManager.broadcast(figure_category)
 
 
     @staticmethod
