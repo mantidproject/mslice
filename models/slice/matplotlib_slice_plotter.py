@@ -5,7 +5,7 @@ from slice_plotter import SlicePlotter
 class MatplotlibSlicePlotter(SlicePlotter):
     def __init__(self, slice_algorithm):
         self._slice_algorithm = slice_algorithm
-        self._colormaps = ['viridis', 'jet', 'summer', 'winter']
+        self._colormaps = ['viridis', 'jet', 'summer', 'winter', 'coolwarm']
 
     def display_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                       colourmap):
