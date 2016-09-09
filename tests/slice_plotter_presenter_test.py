@@ -72,7 +72,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_smoothing.return_value=smoothing
         self.slice_view.get_slice_colourmap.return_value=colourmap
         plot_info = ("plot_data", "boundaries", "colormap", "norm")
-        self.slice_plotter.display_slice = mock.Mock(return_value=plot_info)
+        self.slice_plotter.get_slice_plot_data = mock.Mock( return_value=plot_info )
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.main_presenter.get_selected_workspaces.assert_called_once_with()
@@ -90,10 +90,10 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_smoothing.assert_called_once_with()
         self.slice_view.get_slice_colourmap.assert_called_once_with()
 
-        self.slice_plotter.display_slice.assert_called_with(selected_workspace, Axis('x', 0, 10 ,1),
-                                                            Axis('y', 2, 8, 3), int(smoothing),
-                                                            float(intensity_start), float(intensity_end),
-                                                            norm_to_one, colourmap)
+        self.slice_plotter.get_slice_plot_data.assert_called_with( selected_workspace, Axis( 'x', 0, 10, 1 ),
+                                                                   Axis('y', 2, 8, 3), int(smoothing),
+                                                                   float(intensity_start), float(intensity_end),
+                                                                   norm_to_one, colourmap )
         self.plotting_module.imshow.assert_called_with("plot_data", extent="boundaries", cmap="colormap", aspect='auto',
                                                         norm="norm", interpolation='none')
 
@@ -124,7 +124,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value=colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.get_slice_plot_data.assert_not_called( )
         self.slice_view.error_invalid_x_params.assert_called_once_with()
 
     def test_plot_slice_x_start_bigger_than_x_stop_fail(self):
@@ -154,7 +154,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value=colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.get_slice_plot_data.assert_not_called( )
         self.slice_view.error_invalid_x_params.assert_called_once_with()
 
     def test_plot_slice_invalid_string_y_params_fail(self):
@@ -184,7 +184,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value=colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.get_slice_plot_data.assert_not_called( )
         self.slice_view.error_invalid_y_params.assert_called_once_with()
 
     def test_plot_slice_invalid_y_params_y_end_less_than_y_start_fail(self):
@@ -214,7 +214,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value=colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.get_slice_plot_data.assert_not_called( )
         self.slice_view.error_invalid_y_params.assert_called_once_with()
 
     def test_plot_slice_invalid_intensity_params_fail(self):
@@ -244,7 +244,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value=colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.get_slice_plot_data.assert_not_called( )
         self.slice_view.error_invalid_intensity_params.assert_called_once_with()
 
     def test_plot_slice_intensity_end_less_than_intensity_start_fail(self):
@@ -274,7 +274,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value=colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.get_slice_plot_data.assert_not_called( )
         self.slice_view.error_invalid_intensity_params.assert_called_once_with()
 
     def test_workspace_selection_changed_multiple_selected_empty_options_success(self):

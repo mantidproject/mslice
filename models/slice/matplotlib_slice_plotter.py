@@ -7,8 +7,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self._slice_algorithm = slice_algorithm
         self._colormaps = ['viridis', 'jet', 'summer', 'winter', 'coolwarm']
 
-    def display_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
-                      colourmap):
+    def get_slice_plot_data(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
+                            colourmap):
             plot_data = self._slice_algorithm.compute_slice(selected_workspace, x_axis, y_axis, smoothing)
             boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
             if norm_to_one:

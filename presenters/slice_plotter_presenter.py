@@ -99,11 +99,11 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             self._slice_view.error_invalid_smoothing_params()
 
         try:
-            plot_data, boundaries, colormap, norm = self._slice_plotter.display_slice(selected_workspace, x_axis,
-                                                                                      y_axis,
-                                                                                      smoothing, intensity_start,
-                                                                                      intensity_end, norm_to_one,
-                                                                                      colourmap)
+            plot_data, boundaries, colormap, norm = self._slice_plotter.get_slice_plot_data( selected_workspace, x_axis,
+                                                                                             y_axis,
+                                                                                             smoothing, intensity_start,
+                                                                                             intensity_end, norm_to_one,
+                                                                                             colourmap )
         except NotImplementedError as e:
             self._slice_view.error(e.message)
             return
