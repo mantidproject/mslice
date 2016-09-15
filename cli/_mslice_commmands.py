@@ -117,4 +117,3 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalized=False)
         return slice_array, extents
     else:
         raise ValueError("ret_val should be 'slice', 'extents' or 'both' and not %s " % ret_val)
-
