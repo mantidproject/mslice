@@ -18,7 +18,7 @@ class MantidCutAlgorithm(CutAlgorithm):
         # Will it cause a significant slowdown on large data? would it be worth caching this?
         cut_computed = False
         copy_created = False
-        copy_name = '_to_be_normalized_xyx_123'
+        copy_name = '_to_be_normalized_xyx_123_qme78hj'  # This is just a valid name
         if not self.is_cut(selected_workspace):
             cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm=False)
             cut_computed = True
