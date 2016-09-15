@@ -1,9 +1,30 @@
 # Helper tools
-from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
-from presenters.slice_plotter_presenter import Axis
-from mantid.kernel.funcinspect import lhs_info
+from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider as _MantidWorkspaceProvider
+from presenters.slice_plotter_presenter import Axis as _Axis
+from mantid.kernel.funcinspect import lhs_info as _lhs_info
 
-_workspace_provider = MantidWorkspaceProvider()
+_workspace_provider = _MantidWorkspaceProvider()
+
+def process_axis(x, y, input_workspace):
+    if x is None:
+        x = _slice_algorithm.get_available_axis(input_workspace)[0]
+
+    if y is None:
+        y = _slice_algorithm.get_available_axis(input_workspace)[1]
+
+    # check to see if x is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
+    if ',' in x:
+        x_axis = _string_to_axis(x)
+    else:
+        x_axis = _Axis(units=x, start=None, end=None, step=None) # The model will fill in the rest
+
+    # check to see if y is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
+    if ',' in y:
+        y_axis = _string_to_axis(y)
+    else:
+        y_axis = _Axis(y, start=None, end=None, step=None) # The model will take care of the missing parameters
+
+    return x_axis, y_axis
 
 def _string_to_axis(string):
     axis = string.split(',')
@@ -24,24 +45,24 @@ def _string_to_axis(string):
         step = float(axis[3])
     except:
         raise ValueError("step '%s' is not a valid float"%axis[3])
-    return Axis(name, start, end, step)
+    return _Axis(name, start, end, step)
 
 # Mantid Tools
 from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace
 
 # Projections
-from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
-from mantid.api import Workspace
-_powder_projection_model = MantidProjectionCalculator()
+from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
+from mantid.api import Workspace as _Workspace
+_powder_projection_model = _MantidProjectionCalculator()
 
 
 def get_projection(input_workspace, axis1, axis2):
-    if isinstance(input_workspace, Workspace):
+    if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     output_workspace = _powder_projection_model.calculate_projection(input_workspace=input_workspace, axis1=axis1,
                                                                      axis2=axis2)
     try:
-        names = lhs_info('names')
+        names = _lhs_info('names')
     except:
         names = [output_workspace.getName()]
     if len(names) > 1:
@@ -81,28 +102,8 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalized=False)
 
     input_workspace = _workspace_provider.get_workspace_handle(input_workspace)
     assert isinstance(input_workspace, _IMDWorkspace)
+    x_axis, y_axis = process_axis(x,y, input_workspace)
 
-    if x is None:
-        x = _slice_algorithm.get_available_axis(input_workspace)[0]
-
-    if y is None:
-        y = _slice_algorithm.get_available_axis(input_workspace)[1]
-
-    # check to see if x is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
-    if ',' in x:
-        x_axis = _string_to_axis(x)
-    else:
-        x_axis = Axis(units=x, start=None, end=None, step=None) # The model will fill in the rest
-
-    # check to see if y is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
-    if ',' in y:
-        y_axis = _string_to_axis(y)
-    else:
-        y_axis = Axis(y, start=None, end=None, step=None) # The model will take care of the missing parameters
-
-    # By this point both x_axis and y_axis should be 'Axis' objects
-
-    # intensity values are set to None since we are not using them. These values are used for plotting/colorbars
     slice_array, extents = _slice_algorithm.compute_slice(selected_workspace=input_workspace,x_axis=x_axis,
                                                            smoothing=None, y_axis=y_axis, norm_to_one=normalized)
     if ret_val == 'slice':
@@ -140,28 +141,12 @@ def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_mi
     input_workspace = _workspace_provider.get_workspace_handle(input_workspace)
     assert isinstance(input_workspace, _IMDWorkspace)
 
-    if x is None:
-        x = _slice_algorithm.get_available_axis(input_workspace)[0]
-
-    if y is None:
-        y = _slice_algorithm.get_available_axis(input_workspace)[1]
-
-    # check to see if x is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
-    if ',' in x:
-        x_axis = _string_to_axis(x)
-    else:
-        x_axis = Axis(units=x, start=None, end=None, step=None) # The model will fill in the rest
-
-    # check to see if y is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
-    if ',' in y:
-        y_axis = _string_to_axis(y)
-    else:
-        y_axis = Axis(y, start=None, end=None, step=None) # The model will take care of the missing parameters
-
-    # By this point both x_axis and y_axis should be 'Axis' objects
+    x_axis, y_axis = process_axis(x,y, input_workspace)
 
     # intensity values are set to None since we are not using them. These values are used for plotting/colorbars
-    _slice_model.plot_slice(selected_workspace=input_workspace,x_axis=x_axis, y_axis=y_axis,
-                                                   colourmap=colormap, intensity_start=intensity_min,
-                                                   intensity_end=intensity_max, smoothing=None, norm_to_one=normalized)
+    _slice_model.plot_slice(selected_workspace=input_workspace,x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
+                            intensity_start=intensity_min,intensity_end=intensity_max,
+                            smoothing=None, norm_to_one=normalized)
+
+
 
