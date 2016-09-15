@@ -59,11 +59,7 @@ class CutPresenter(object):
             plot_over = True
 
     def _plot_cut(self, params, plot_over):
-        integration_axis = params[-1]
-        integration_range = params[2:4]
-        workspace_name = params[0]
-        legend = self._get_legend(workspace_name, integration_axis, integration_range)
-        self._cut_plotter.plot_cut(*params, legend=legend, plot_over=plot_over)
+        self._cut_plotter.plot_cut(*params, plot_over=plot_over)
 
 
     def _save_cut_to_workspace(self, params):
@@ -71,11 +67,6 @@ class CutPresenter(object):
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
 
-    def _get_legend(self, workspace_name, integrated_dim, integration_range):
-        if integrated_dim == 'DeltaE':
-            integrated_dim = 'e'
-        return workspace_name + "    " + "%.2f" % integration_range[0] + "<" + integrated_dim + "<" + \
-               "%.2f" % integration_range[1]
 
     def _parse_input(self):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
@@ -133,9 +124,8 @@ class CutPresenter(object):
                 raise ValueError("Invalid width")
         else:
             width = None
-        integration_axis = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
         return selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
-               intensity_end, integration_axis, width
+               intensity_end, width
 
     def _to_float(self, x):
         if x == "":

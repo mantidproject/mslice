@@ -5,26 +5,18 @@ from mantid.kernel.funcinspect import lhs_info as _lhs_info
 
 _workspace_provider = _MantidWorkspaceProvider()
 
-def process_axis(x, y, input_workspace):
-    if x is None:
-        x = _slice_algorithm.get_available_axis(input_workspace)[0]
+def _process_axis(axis, fallback_index, input_workspace):
+    if axis is None:
+        axis = _slice_algorithm.get_available_axis(input_workspace)[fallback_index]
 
-    if y is None:
-        y = _slice_algorithm.get_available_axis(input_workspace)[1]
-
-    # check to see if x is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
-    if ',' in x:
-        x_axis = _string_to_axis(x)
+    # check to see if axis is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
+    if ',' in axis:
+        axis = _string_to_axis(axis)
     else:
-        x_axis = _Axis(units=x, start=None, end=None, step=None) # The model will fill in the rest
+        axis = _Axis(units=axis, start=None, end=None, step=None) # The model will fill in the rest
 
-    # check to see if y is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
-    if ',' in y:
-        y_axis = _string_to_axis(y)
-    else:
-        y_axis = _Axis(y, start=None, end=None, step=None) # The model will take care of the missing parameters
 
-    return x_axis, y_axis
+    return axis
 
 def _string_to_axis(string):
     axis = string.split(',')
@@ -79,7 +71,7 @@ _slice_algorithm = _MantidSliceAlgorithm()
 _slice_model = _MatplotlibSlicePlotter(_slice_algorithm)
 
 
-def get_slice(input_workspace, x=None, y=None, ret_val='both', normalized=False):
+def get_slice(input_workspace, x=None, y=None, ret_val='both', normalize=False):
     """ Get Slice from workspace as numpy array.
 
     Keyword Arguments:
@@ -96,16 +88,17 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalized=False)
     array containing the slice data. if ret_value == 'extents' it will return a list containing the range of the slice
     taken [xmin, xmax, ymin, ymax]. if ret_val == 'both' then it will return a tuple (<slice>, <extents>)
 
-    normalized -- if set to True the slice will be normalized to one.
+    normalize -- if set to True the slice will be normalize to one.
 
     """
 
     input_workspace = _workspace_provider.get_workspace_handle(input_workspace)
     assert isinstance(input_workspace, _IMDWorkspace)
-    x_axis, y_axis = process_axis(x,y, input_workspace)
+    x_axis = _process_axis(x, 0, input_workspace)
+    y_axis = _process_axis(y, 1, input_workspace)
 
     slice_array, extents = _slice_algorithm.compute_slice(selected_workspace=input_workspace,x_axis=x_axis,
-                                                           smoothing=None, y_axis=y_axis, norm_to_one=normalized)
+                                                           smoothing=None, y_axis=y_axis, norm_to_one=normalize)
     if ret_val == 'slice':
         return slice_array
     elif ret_val == 'extents':
@@ -117,7 +110,7 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalized=False)
 
 
 def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_min=None, intensity_max=None,
-               normalized=False):
+               normalize=False):
     """ Plot slice from workspace
 
     Keyword Arguments:
@@ -134,19 +127,41 @@ def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_mi
     intensity_min -- minimum value for intensity
     intensity_max -- maximum value for intensity
 
-    normalized -- if set to True the slice will be normalized to one.
+    normalize -- if set to True the slice will be normalize to one.
 
     """
 
     input_workspace = _workspace_provider.get_workspace_handle(input_workspace)
     assert isinstance(input_workspace, _IMDWorkspace)
 
-    x_axis, y_axis = process_axis(x,y, input_workspace)
+    x_axis = _process_axis(x, 0, input_workspace)
+    y_axis = _process_axis(y, 1, input_workspace)
 
-    # intensity values are set to None since we are not using them. These values are used for plotting/colorbars
     _slice_model.plot_slice(selected_workspace=input_workspace,x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
                             intensity_start=intensity_min,intensity_end=intensity_max,
-                            smoothing=None, norm_to_one=normalized)
+                            smoothing=None, norm_to_one=normalize)
 
 
 
+# Cutting
+from models.cut.mantid_cut_algorithm import MantidCutAlgorithm as _MantidCutAlgorithm
+from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+_cut_algorithm = _MantidCutAlgorithm()
+_cut_plotter = MatplotlibCutPlotter(_cut_algorithm)
+
+def get_cut_xye(input_workspace, cut_axis, integration_start, integration_end, normalize=False):
+    if isinstance(input_workspace, _Workspace):
+        input_workspace = input_workspace.getName()
+    cut_axis = _process_axis(cut_axis, None, input_workspace)
+    x, y, e = _cut_algorithm.compute_cut_xye(input_workspace, cut_axis, integration_start, integration_end, 
+                                             is_norm=normalize)
+    return x, y, e
+
+
+def plot_cut(input_workspace, cut_axis, integration_start, integration_end, intensity_start=None,
+             intensity_end=None, normalize=False, hold=False):
+    if isinstance(input_workspace, _Workspace):
+        input_workspace = input_workspace.getName()
+    cut_axis = _process_axis(cut_axis, None, input_workspace)
+    _cut_plotter.plot_cut(input_workspace, cut_axis, integration_start, integration_end, normalize, intensity_start,
+                          intensity_end, plot_over=hold)

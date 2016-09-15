@@ -48,6 +48,7 @@ class MantidCutAlgorithm(CutAlgorithm):
 
         input_workspace_name = selected_workspace
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
+        self._fill_in_missing_input(cut_axis, selected_workspace)
         n_steps = self._get_number_of_steps(cut_axis)
         integration_axis = self.get_other_axis(selected_workspace, cut_axis)
 
@@ -170,3 +171,16 @@ class MantidCutAlgorithm(CutAlgorithm):
 
     def _was_previously_normalized(self, workspace):
         return workspace.getComment() == "Normalized By MSlice"
+
+    def _fill_in_missing_input(self,axis,workspace):
+        dim = workspace.getDimensionIndexByName(axis.units)
+        dim = workspace.getDimension(dim)
+
+        if axis.start is None:
+                axis.start = dim.getMinimum()
+
+        if axis.end is None:
+            axis.end = dim.getMaximum()
+
+        if axis.step is None:
+            axis.step = (axis.end - axis.start)/100
