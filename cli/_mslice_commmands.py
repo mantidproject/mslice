@@ -103,12 +103,8 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalized=False)
     # By this point both x_axis and y_axis should be 'Axis' objects
 
     # intensity values are set to None since we are not using them. These values are used for plotting/colorbars
-    slice_array, extents, colormap, norm = _slice_model.get_slice_plot_data(selected_workspace=input_workspace,
-                                                                            x_axis=x_axis, y_axis=y_axis, smoothing=None,
-                                                                            intensity_start=None,
-                                                                            intensity_end=None,
-                                                                            norm_to_one=normalized,
-                                                                            colourmap=None)
+    slice_array, extents = _slice_algorithm.compute_slice(selected_workspace=input_workspace,x_axis=x_axis,
+                                                           smoothing=None, y_axis=y_axis, norm_to_one=normalized)
     if ret_val == 'slice':
         return slice_array
     elif ret_val == 'extents':
@@ -117,3 +113,55 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalized=False)
         return slice_array, extents
     else:
         raise ValueError("ret_val should be 'slice', 'extents' or 'both' and not %s " % ret_val)
+
+
+def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_min=None, intensity_max=None,
+               normalized=False):
+    """ Plot slice from workspace
+
+    Keyword Arguments:
+    input_workspace -- The workspace to slice. Must be an MDWorkspace with 2 Dimensions. The parameter can be either a
+    python handle to the workspace to slice OR the workspaces name in the ADS (string)
+
+    x -- The x axis of the slice. If not specified will default to Dimension 0 of the workspace
+    y -- The y axis of the slice. If not specified will default to Dimension 1 of the workspace
+    Axis Format:-
+        Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5'
+        or just the name e.g. 'DeltaE'. That case the start and en will default to the range in the data.
+
+    colormap -- a matplotlib colormap.
+    intensity_min -- minimum value for intensity
+    intensity_max -- maximum value for intensity
+
+    normalized -- if set to True the slice will be normalized to one.
+
+    """
+
+    input_workspace = _workspace_provider.get_workspace_handle(input_workspace)
+    assert isinstance(input_workspace, _IMDWorkspace)
+
+    if x is None:
+        x = _slice_algorithm.get_available_axis(input_workspace)[0]
+
+    if y is None:
+        y = _slice_algorithm.get_available_axis(input_workspace)[1]
+
+    # check to see if x is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
+    if ',' in x:
+        x_axis = _string_to_axis(x)
+    else:
+        x_axis = Axis(units=x, start=None, end=None, step=None) # The model will fill in the rest
+
+    # check to see if y is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
+    if ',' in y:
+        y_axis = _string_to_axis(y)
+    else:
+        y_axis = Axis(y, start=None, end=None, step=None) # The model will take care of the missing parameters
+
+    # By this point both x_axis and y_axis should be 'Axis' objects
+
+    # intensity values are set to None since we are not using them. These values are used for plotting/colorbars
+    _slice_model.plot_slice(selected_workspace=input_workspace,x_axis=x_axis, y_axis=y_axis,
+                                                   colourmap=colormap, intensity_start=intensity_min,
+                                                   intensity_end=intensity_max, smoothing=None, norm_to_one=normalized)
+
