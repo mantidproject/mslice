@@ -20,6 +20,7 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.ylabel(INTENSITY_LABEL)
         plt.autoscale()
         plt.ylim(intensity_start, intensity_end)
+        plt.draw_all()
 
     def _generate_legend(self, workspace_name, integrated_dim, integration_start, integration_end):
         if integrated_dim == 'DeltaE':

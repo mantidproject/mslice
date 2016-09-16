@@ -17,6 +17,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
                    interpolation='none', hold=False)
         plt.xlabel(x_axis.units)
         plt.ylabel(y_axis.units)
+        plt.draw_all()
 
     def get_available_colormaps(self):
         return self._colormaps
