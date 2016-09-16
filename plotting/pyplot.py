@@ -21,14 +21,15 @@ from matplotlib.image import imread as _imread
 from matplotlib.image import imsave as _imsave
 from matplotlib.externals import six
 import six
+import sys
 
 import warnings
 import numpy as np
 
-module_name = "plotting.pyplot"  # This is passed to who ever is managing the script logging
+module_name = "cli"  # This is passed to who ever is managing the script logging
+                     # This will be the name of the module in the script
 
-def rc(*args, **kwargs):
-    raise Exception('aaaa')
+
 
 # These are functions that exist is in matplotlib.pyplot but have been redefined.
 def figure(num=None):
@@ -41,9 +42,13 @@ def gcf():
 
 def draw_if_interactive():
     # We will always draw because mslice might be running without matplotlib interactive
-    for figure in FigureManager._figures.values():
-        figure.canvas.draw()
+    for fig in FigureManager.all_figures():
+        fig.canvas.draw()
 
+
+def draw_all():
+    for fig in FigureManager.all_figures():
+        fig.canvas.draw_idle()
 
 # All functions in this file have been copied over from matplotlib.pyplot  exactly as defined except the functions
 # defined before  this comment.
@@ -56,9 +61,6 @@ ___unincluded_functions = ('_backend_selection',
                            'show',
                            'ioff',
                            'pause',
-                           'rc',
-                           'rc_context',
-                           'rc_defaults',
                            'xkcd',
                            '_auto_draw_if_interactive',
                            'fignum_exists',
@@ -82,7 +84,8 @@ def get_unincluded_functions():
 
 __redefined_functions = ('figure',
                          'gcf',
-                         'draw_if_interactive'
+                         'draw_if_interactive',
+                         'draw_all'
 )
 
 
@@ -91,6 +94,53 @@ def get_redefined_functions():
 # These are functions that have been copied over from matplotlib.pyplot exactly as defined, decorators are added as
 # appropriate
 
+_IP_REGISTERED = None
+_INSTALL_FIG_OBSERVER = False
+def install_repl_displayhook():
+    """
+    Install a repl display hook so that any stale figure are automatically
+    redrawn when control is returned to the repl.
+
+    This works with both IPython terminals and vanilla python shells.
+    """
+    global _IP_REGISTERED
+    global _INSTALL_FIG_OBSERVER
+
+    class _NotIPython(Exception):
+        pass
+
+    # see if we have IPython hooks around, if use them
+
+    try:
+        if 'IPython' in sys.modules:
+            from IPython import get_ipython
+            ip = get_ipython()
+            if ip is None:
+                raise _NotIPython()
+
+            if _IP_REGISTERED:
+                return
+
+            def post_execute():
+                if matplotlib.is_interactive():
+                    draw_all()
+
+            # IPython >= 2
+            try:
+                ip.events.register('post_execute', post_execute)
+            except AttributeError:
+                # IPython 1.x
+                ip.register_post_execute(post_execute)
+
+            _IP_REGISTERED = post_execute
+            _INSTALL_FIG_OBSERVER = False
+        else:
+            _INSTALL_FIG_OBSERVER = True
+
+    # import failed or ipython is not running
+    except (ImportError, _NotIPython):
+        _INSTALL_FIG_OBSERVER = True
+install_repl_displayhook()
 
 def findobj(o=None, match=None, include_self=True):
     if o is None:
@@ -104,6 +154,22 @@ def isinteractive():
     """
     return matplotlib.is_interactive()
 
+
+@docstring.copy_dedent(matplotlib.rc)
+def rc(*args, **kwargs):
+    matplotlib.rc(*args, **kwargs)
+
+
+@docstring.copy_dedent(matplotlib.rc_context)
+def rc_context(rc=None, fname=None):
+    return matplotlib.rc_context(rc, fname)
+
+
+@docstring.copy_dedent(matplotlib.rcdefaults)
+def rcdefaults():
+    matplotlib.rcdefaults()
+    if matplotlib.is_interactive():
+        draw_all()
 
 def gci():
     """
@@ -198,7 +264,7 @@ def figimage(*args, **kwargs):
     #sci(ret)  # JDH figimage should not set current image -- it is not mappable, etc
     return gcf().figimage(*args, **kwargs)
 
-
+@script_log(module_name)
 def figlegend(handles, labels, loc, **kwargs):
     """
     Place a legend in the figure.
@@ -230,6 +296,7 @@ def figlegend(handles, labels, loc, **kwargs):
     return gcf().legend(handles, labels, loc, **kwargs)
 
 
+@script_log(module_name)
 def hold(b=None):
     """
     Set the hold state.  If *b* is None (default), toggle the
@@ -257,7 +324,7 @@ def hold(b=None):
 
     rc('axes', hold=b)
 
-# dont sciptlog me
+
 def ishold():
     """
     Return the hold status of the current axes.
@@ -265,7 +332,7 @@ def ishold():
     return gca().ishold()
 
 
-# I am a decorator. Keep this in mind
+
 def over(func, *args, **kwargs):
     """
     Call a function with hold(True).
@@ -282,6 +349,7 @@ def over(func, *args, **kwargs):
     hold(h)
 
 
+@script_log(module_name)
 def axes(*args, **kwargs):
     """
     Add an axes to the figure.
@@ -336,6 +404,7 @@ def axes(*args, **kwargs):
     return a
 
 
+@script_log(module_name)
 def delaxes(*args):
     """
     Remove an axes from the current figure.  If *ax*
@@ -350,7 +419,7 @@ def delaxes(*args):
     ret = gcf().delaxes(ax)
     return ret
 
-# dont log me
+
 def gca(**kwargs):
     """
     Get the current :class:`~matplotlib.axes.Axes` instance on the
@@ -473,6 +542,7 @@ def subplot(*args, **kwargs):
     return a
 
 
+@script_log(module_name)
 def subplots(nrows=1, ncols=1, sharex=False, sharey=False, squeeze=True,
                 subplot_kw=None, gridspec_kw=None, **fig_kw):
     """
@@ -796,6 +866,7 @@ def tight_layout(pad=1.08, h_pad=None, w_pad=None, rect=None):
     fig.tight_layout(pad=pad, h_pad=h_pad, w_pad=w_pad, rect=rect)
 
 
+@script_log(module_name)
 def box(on=None):
     """
     Turn the axes box on or off.  *on* may be a boolean or a string,
@@ -810,6 +881,7 @@ def box(on=None):
     ax.set_frame_on(on)
 
 
+@script_log(module_name)
 def title(s, *args, **kwargs):
     """
     Set a title of the current axes.
@@ -855,6 +927,7 @@ def title(s, *args, **kwargs):
     return gca().set_title(s, *args, **kwargs)
 
 
+@script_log(module_name)
 def axis(*v, **kwargs):
     """
     Convenience method to get or set axis properties.
@@ -924,6 +997,7 @@ def axis(*v, **kwargs):
     return gca().axis(*v, **kwargs)
 
 
+@script_log(module_name)
 def xlabel(s, *args, **kwargs):
     """
     Set the *x* axis label of the current axis.
@@ -944,6 +1018,7 @@ def xlabel(s, *args, **kwargs):
     return gca().set_xlabel(s, *args, **kwargs)
 
 
+@script_log(module_name)
 def ylabel(s, *args, **kwargs):
     """
     Set the *y* axis label of the current axis.
@@ -965,6 +1040,7 @@ def ylabel(s, *args, **kwargs):
     return gca().set_ylabel(s, *args, **kwargs)
 
 
+@script_log(module_name)
 def xlim(*args, **kwargs):
     """
     Get or set the *x* limits of the current axes.
@@ -993,6 +1069,7 @@ def xlim(*args, **kwargs):
     return ret
 
 
+@script_log(module_name)
 def ylim(*args, **kwargs):
     """
     Get or set the *y*-limits of the current axes.
@@ -1020,6 +1097,7 @@ def ylim(*args, **kwargs):
     return ret
 
 
+@script_log(module_name)
 @docstring.dedent_interpd
 def xscale(*args, **kwargs):
     """
@@ -1038,6 +1116,7 @@ def xscale(*args, **kwargs):
     gca().set_xscale(*args, **kwargs)
 
 
+@script_log(module_name)
 @docstring.dedent_interpd
 def yscale(*args, **kwargs):
     """
@@ -1056,6 +1135,7 @@ def yscale(*args, **kwargs):
     gca().set_yscale(*args, **kwargs)
 
 
+@script_log(module_name)
 def xticks(*args, **kwargs):
     """
     Get or set the *x*-limits of the current tick locations and labels.
@@ -1096,6 +1176,7 @@ def xticks(*args, **kwargs):
     return locs, silent_list('Text xticklabel', labels)
 
 
+@script_log(module_name)
 def yticks(*args, **kwargs):
     """
     Get or set the *y*-limits of the current tick locations and labels.
@@ -1139,6 +1220,8 @@ def yticks(*args, **kwargs):
              )
 
 
+
+@script_log(module_name)
 def minorticks_on():
     """
     Display minor ticks on the current plot.
@@ -1149,6 +1232,7 @@ def minorticks_on():
     gca().minorticks_on()
 
 
+@script_log(module_name)
 def minorticks_off():
     """
     Remove minor ticks from the current plot.
@@ -1156,6 +1240,7 @@ def minorticks_off():
     gca().minorticks_off()
 
 
+@script_log(module_name)
 def rgrids(*args, **kwargs):
     """
     Get or set the radial gridlines on a polar plot.
@@ -1200,6 +1285,7 @@ def rgrids(*args, **kwargs):
              silent_list('Text rgridlabel', labels) )
 
 
+@script_log(module_name)
 def thetagrids(*args, **kwargs):
     """
     Get or set the theta locations of the gridlines in a polar plot.
@@ -1262,7 +1348,7 @@ def thetagrids(*args, **kwargs):
 
 
 # This function was copied as is from matplotlib.pyplot
-#This function does n
+#This function does not do anything.
 def plotting():
     pass
 
@@ -1294,7 +1380,7 @@ def get_plot_commands():
     commands.sort()
     return commands
 
-#dont log me
+
 def colors():
     """
     This is a do-nothing function to provide you with help on how
@@ -1343,7 +1429,7 @@ def colors():
     """
     pass
 
-# DONT LOG ME
+
 def colormaps():
     """
     Matplotlib provides a number of colormaps, and others can be added using
@@ -1636,6 +1722,7 @@ def _setup_pyplot_info_docstrings():
     plotting.__doc__ = '\n'.join(lines)
 
 
+@script_log(module_name)
 def colorbar(mappable=None, cax=None, ax=None, **kw):
     if mappable is None:
         mappable = gci()
@@ -1652,6 +1739,7 @@ def colorbar(mappable=None, cax=None, ax=None, **kw):
 colorbar.__doc__ = matplotlib.colorbar.colorbar_doc
 
 
+@script_log(module_name)
 def clim(vmin=None, vmax=None):
     """
     Set the color limits of the current image.
@@ -1677,6 +1765,7 @@ def clim(vmin=None, vmax=None):
     im.set_clim(vmin, vmax)
 
 
+@script_log(module_name)
 def set_cmap(cmap):
     """
     Set the default colormap.  Applies to the current image if any.
@@ -1708,6 +1797,9 @@ def imsave(*args, **kwargs):
     return _imsave(*args, **kwargs)
 
 
+
+@script_log(module_name)
+@activate_category('2d')
 def matshow(A, fignum=None, **kw):
     """
     Display an array as a matrix in a new figure window.
@@ -1749,6 +1841,7 @@ def matshow(A, fignum=None, **kw):
     return im
 
 
+@script_log(module_name)
 def polar(*args, **kwargs):
     """
     Make a polar plot.
@@ -1766,6 +1859,7 @@ def polar(*args, **kwargs):
     return ret
 
 
+@script_log(module_name)
 def plotfile(fname, cols=(0,), plotfuncs=None,
              comments='#', skiprows=0, checkrows=5, delimiter=',',
              names=None, subplots=True, newfig=True, **kwargs):
@@ -1895,6 +1989,7 @@ def _autogen_docstring(base):
 # This function cannot be generated by boilerplate.py because it may
 # return an image or a line.
 @_autogen_docstring(Axes.spy)
+@script_log(module_name)
 def spy(Z, precision=0, marker=None, markersize=None, aspect='equal', hold=None, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -1915,6 +2010,8 @@ def spy(Z, precision=0, marker=None, markersize=None, aspect='equal', hold=None,
 ################# REMAINING CONTENT GENERATED BY boilerplate.py ##############
 
 
+
+@script_log(module_name)
 @_autogen_docstring(Axes.acorr)
 def acorr(x, hold=None, data=None, **kwargs):
     ax = gca()
@@ -1933,6 +2030,7 @@ def acorr(x, hold=None, data=None, **kwargs):
 
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
+@script_log(module_name)
 @_autogen_docstring(Axes.angle_spectrum)
 def angle_spectrum(x, Fs=None, Fc=None, window=None, pad_to=None, sides=None,
                    hold=None, data=None, **kwargs):
@@ -1952,6 +2050,8 @@ def angle_spectrum(x, Fs=None, Fc=None, window=None, pad_to=None, sides=None,
 
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
+
+@script_log(module_name)
 @_autogen_docstring(Axes.arrow)
 def arrow(x, y, dx, dy, hold=None, **kwargs):
     ax = gca()
@@ -1969,6 +2069,7 @@ def arrow(x, y, dx, dy, hold=None, **kwargs):
 
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
+@script_log(module_name)
 @_autogen_docstring(Axes.axhline)
 def axhline(y=0, xmin=0, xmax=1, hold=None, **kwargs):
     ax = gca()
@@ -1987,6 +2088,7 @@ def axhline(y=0, xmin=0, xmax=1, hold=None, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.axhspan)
+@script_log(module_name)
 def axhspan(ymin, ymax, xmin=0, xmax=1, hold=None, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2004,6 +2106,7 @@ def axhspan(ymin, ymax, xmin=0, xmax=1, hold=None, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.axvline)
+@script_log(module_name)
 def axvline(x=0, ymin=0, ymax=1, hold=None, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2021,6 +2124,7 @@ def axvline(x=0, ymin=0, ymax=1, hold=None, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.axvspan)
+@script_log(module_name)
 def axvspan(xmin, xmax, ymin=0, ymax=1, hold=None, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2038,6 +2142,7 @@ def axvspan(xmin, xmax, ymin=0, ymax=1, hold=None, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.bar)
+@script_log(module_name)
 def bar(left, height, width=0.8, bottom=None, hold=None, data=None, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2056,6 +2161,7 @@ def bar(left, height, width=0.8, bottom=None, hold=None, data=None, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.barh)
+@script_log(module_name)
 def barh(bottom, width, height=0.8, left=None, hold=None, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2073,6 +2179,7 @@ def barh(bottom, width, height=0.8, left=None, hold=None, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.broken_barh)
+@script_log(module_name)
 def broken_barh(xranges, yrange, hold=None, data=None, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2089,6 +2196,7 @@ def broken_barh(xranges, yrange, hold=None, data=None, **kwargs):
 
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
+@script_log(module_name)
 @_autogen_docstring(Axes.boxplot)
 def boxplot(x, notch=None, sym=None, vert=None, whis=None, positions=None,
             widths=None, patch_artist=None, bootstrap=None, usermedians=None,
@@ -2123,6 +2231,7 @@ def boxplot(x, notch=None, sym=None, vert=None, whis=None, positions=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.cohere)
+@script_log(module_name)
 def cohere(x, y, NFFT=256, Fs=2, Fc=0, detrend=mlab.detrend_none,
            window=mlab.window_hanning, noverlap=0, pad_to=None, sides='default',
            scale_by_freq=None, hold=None, data=None, **kwargs):
@@ -2145,6 +2254,7 @@ def cohere(x, y, NFFT=256, Fs=2, Fc=0, detrend=mlab.detrend_none,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.clabel)
+@script_log(module_name)
 def clabel(CS, *args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2162,6 +2272,7 @@ def clabel(CS, *args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.contour)
+@script_log(module_name)
 def contour(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2179,6 +2290,7 @@ def contour(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.contourf)
+@script_log(module_name)
 def contourf(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2196,6 +2308,7 @@ def contourf(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.csd)
+@script_log(module_name)
 def csd(x, y, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
         noverlap=None, pad_to=None, sides=None, scale_by_freq=None,
         return_line=None, hold=None, data=None, **kwargs):
@@ -2218,6 +2331,8 @@ def csd(x, y, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.errorbar)
+@activate_category('1d')
+@script_log(module_name)
 def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None,
              capsize=None, barsabove=False, lolims=False, uplims=False,
              xlolims=False, xuplims=False, errorevery=1, capthick=None,
@@ -2243,6 +2358,7 @@ def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.eventplot)
+@script_log(module_name)
 def eventplot(positions, orientation='horizontal', lineoffsets=1, linelengths=1,
               linewidths=None, colors=None, linestyles='solid', hold=None,
               data=None, **kwargs):
@@ -2265,6 +2381,7 @@ def eventplot(positions, orientation='horizontal', lineoffsets=1, linelengths=1,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.fill)
+@script_log(module_name)
 def fill(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2282,6 +2399,7 @@ def fill(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.fill_between)
+@script_log(module_name)
 def fill_between(x, y1, y2=0, where=None, interpolate=False, step=None,
                  hold=None, data=None, **kwargs):
     ax = gca()
@@ -2302,6 +2420,7 @@ def fill_between(x, y1, y2=0, where=None, interpolate=False, step=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.fill_betweenx)
+@script_log(module_name)
 def fill_betweenx(y, x1, x2=0, where=None, step=None, hold=None, data=None,
                   **kwargs):
     ax = gca()
@@ -2321,6 +2440,7 @@ def fill_betweenx(y, x1, x2=0, where=None, step=None, hold=None, data=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.hexbin)
+@script_log(module_name)
 def hexbin(x, y, C=None, gridsize=100, bins=None, xscale='linear',
            yscale='linear', extent=None, cmap=None, norm=None, vmin=None,
            vmax=None, alpha=None, linewidths=None, edgecolors='none',
@@ -2347,6 +2467,7 @@ def hexbin(x, y, C=None, gridsize=100, bins=None, xscale='linear',
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.hist)
+@script_log(module_name)
 def hist(x, bins=10, range=None, normed=False, weights=None, cumulative=False,
          bottom=None, histtype='bar', align='mid', orientation='vertical',
          rwidth=None, log=False, color=None, label=None, stacked=False,
@@ -2371,6 +2492,7 @@ def hist(x, bins=10, range=None, normed=False, weights=None, cumulative=False,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.hist2d)
+@script_log(module_name)
 def hist2d(x, y, bins=10, range=None, normed=False, weights=None, cmin=None,
            cmax=None, hold=None, data=None, **kwargs):
     ax = gca()
@@ -2391,6 +2513,7 @@ def hist2d(x, y, bins=10, range=None, normed=False, weights=None, cmin=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.hlines)
+@script_log(module_name)
 def hlines(y, xmin, xmax, colors='k', linestyles='solid', label='', hold=None,
            data=None, **kwargs):
     ax = gca()
@@ -2410,6 +2533,9 @@ def hlines(y, xmin, xmax, colors='k', linestyles='solid', label='', hold=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.imshow)
+@draw_colorbar(gcf,colorbar)
+@script_log(module_name)
+@activate_category('2d')
 def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
            vmin=None, vmax=None, origin=None, extent=None, shape=None,
            filternorm=1, filterrad=4.0, imlim=None, resample=None, url=None,
@@ -2435,6 +2561,7 @@ def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.loglog)
+@script_log(module_name)
 def loglog(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2452,6 +2579,7 @@ def loglog(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.magnitude_spectrum)
+@script_log(module_name)
 def magnitude_spectrum(x, Fs=None, Fc=None, window=None, pad_to=None,
                        sides=None, scale=None, hold=None, data=None, **kwargs):
     ax = gca()
@@ -2472,6 +2600,8 @@ def magnitude_spectrum(x, Fs=None, Fc=None, window=None, pad_to=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.pcolor)
+@script_log(module_name)
+@draw_colorbar(gcf, colorbar)
 def pcolor(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2489,6 +2619,8 @@ def pcolor(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.pcolormesh)
+@script_log(module_name)
+@draw_colorbar(gcf,colorbar)
 def pcolormesh(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2506,6 +2638,7 @@ def pcolormesh(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.phase_spectrum)
+@script_log(module_name)
 def phase_spectrum(x, Fs=None, Fc=None, window=None, pad_to=None, sides=None,
                    hold=None, data=None, **kwargs):
     ax = gca()
@@ -2525,6 +2658,7 @@ def phase_spectrum(x, Fs=None, Fc=None, window=None, pad_to=None, sides=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.pie)
+@script_log(module_name)
 def pie(x, explode=None, labels=None, colors=None, autopct=None,
         pctdistance=0.6, shadow=False, labeldistance=1.1, startangle=None,
         radius=None, counterclock=True, wedgeprops=None, textprops=None,
@@ -2550,6 +2684,8 @@ def pie(x, explode=None, labels=None, colors=None, autopct=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.plot)
+@script_log(module_name)
+@activate_category('1d')
 def plot(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2567,6 +2703,7 @@ def plot(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.plot_date)
+@script_log(module_name)
 def plot_date(x, y, fmt='o', tz=None, xdate=True, ydate=False, hold=None,
               data=None, **kwargs):
     ax = gca()
@@ -2586,6 +2723,7 @@ def plot_date(x, y, fmt='o', tz=None, xdate=True, ydate=False, hold=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.psd)
+@script_log(module_name)
 def psd(x, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
         noverlap=None, pad_to=None, sides=None, scale_by_freq=None,
         return_line=None, hold=None, data=None, **kwargs):
@@ -2608,6 +2746,7 @@ def psd(x, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.quiver)
+@script_log(module_name)
 def quiver(*args, **kw):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2625,6 +2764,7 @@ def quiver(*args, **kw):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.quiverkey)
+@script_log(module_name)
 def quiverkey(*args, **kw):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2642,6 +2782,7 @@ def quiverkey(*args, **kw):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.scatter)
+@script_log(module_name)
 def scatter(x, y, s=20, c=None, marker='o', cmap=None, norm=None, vmin=None,
             vmax=None, alpha=None, linewidths=None, verts=None, edgecolors=None,
             hold=None, data=None, **kwargs):
@@ -2664,6 +2805,7 @@ def scatter(x, y, s=20, c=None, marker='o', cmap=None, norm=None, vmin=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.semilogx)
+@script_log(module_name)
 def semilogx(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2681,6 +2823,7 @@ def semilogx(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.semilogy)
+@script_log(module_name)
 def semilogy(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2698,6 +2841,7 @@ def semilogy(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.specgram)
+@script_log(module_name)
 def specgram(x, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
              noverlap=None, cmap=None, xextent=None, pad_to=None, sides=None,
              scale_by_freq=None, mode=None, scale=None, vmin=None, vmax=None,
@@ -2722,6 +2866,7 @@ def specgram(x, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.stackplot)
+@script_log(module_name)
 def stackplot(x, *args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2739,6 +2884,7 @@ def stackplot(x, *args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.stem)
+@script_log(module_name)
 def stem(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2756,6 +2902,7 @@ def stem(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.step)
+@script_log(module_name)
 def step(x, y, *args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2773,6 +2920,7 @@ def step(x, y, *args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.streamplot)
+@script_log(module_name)
 def streamplot(x, y, u, v, density=1, linewidth=None, color=None, cmap=None,
                norm=None, arrowsize=1, arrowstyle='-|>', minlength=0.1,
                transform=None, zorder=1, start_points=None, hold=None, data=None):
@@ -2796,6 +2944,8 @@ def streamplot(x, y, u, v, density=1, linewidth=None, color=None, cmap=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.tricontour)
+@script_log(module_name)
+@draw_colorbar(gcf,colorbar)
 def tricontour(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2813,6 +2963,7 @@ def tricontour(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.tricontourf)
+@script_log(module_name)
 def tricontourf(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2830,6 +2981,7 @@ def tricontourf(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.tripcolor)
+@script_log(module_name)
 def tripcolor(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2847,6 +2999,7 @@ def tripcolor(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.triplot)
+@script_log(module_name)
 def triplot(*args, **kwargs):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2864,6 +3017,7 @@ def triplot(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.violinplot)
+@script_log(module_name)
 def violinplot(dataset, positions=None, vert=True, widths=0.5, showmeans=False,
                showextrema=True, showmedians=False, points=100, bw_method=None,
                hold=None, data=None):
@@ -2886,6 +3040,7 @@ def violinplot(dataset, positions=None, vert=True, widths=0.5, showmeans=False,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.vlines)
+@script_log(module_name)
 def vlines(x, ymin, ymax, colors='k', linestyles='solid', label='', hold=None,
            data=None, **kwargs):
     ax = gca()
@@ -2905,6 +3060,7 @@ def vlines(x, ymin, ymax, colors='k', linestyles='solid', label='', hold=None,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.xcorr)
+@script_log(module_name)
 def xcorr(x, y, normed=True, detrend=mlab.detrend_none, usevlines=True,
           maxlags=10, hold=None, data=None, **kwargs):
     ax = gca()
@@ -2925,6 +3081,7 @@ def xcorr(x, y, normed=True, detrend=mlab.detrend_none, usevlines=True,
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @_autogen_docstring(Axes.barbs)
+@script_log(module_name)
 def barbs(*args, **kw):
     ax = gca()
     # allow callers to override the hold state by passing hold=True|False
@@ -2942,6 +3099,7 @@ def barbs(*args, **kw):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.cla)
+@script_log(module_name)
 def cla():
     ret = gca().cla()
     return ret
@@ -2949,6 +3107,7 @@ def cla():
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.grid)
+@script_log(module_name)
 def grid(b=None, which='major', axis='both', **kwargs):
     ret = gca().grid(b=b, which=which, axis=axis, **kwargs)
     return ret
@@ -2956,6 +3115,7 @@ def grid(b=None, which='major', axis='both', **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.legend)
+@script_log(module_name)
 def legend(*args, **kwargs):
     ret = gca().legend(*args, **kwargs)
     return ret
@@ -2963,6 +3123,7 @@ def legend(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.table)
+@script_log(module_name)
 def table(**kwargs):
     ret = gca().table(**kwargs)
     return ret
@@ -2970,6 +3131,7 @@ def table(**kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.text)
+@script_log(module_name)
 def text(x, y, s, fontdict=None, withdash=False, **kwargs):
     ret = gca().text(x, y, s, fontdict=fontdict, withdash=withdash, **kwargs)
     return ret
@@ -2977,6 +3139,7 @@ def text(x, y, s, fontdict=None, withdash=False, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.annotate)
+@script_log(module_name)
 def annotate(*args, **kwargs):
     ret = gca().annotate(*args, **kwargs)
     return ret
@@ -2984,6 +3147,7 @@ def annotate(*args, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.ticklabel_format)
+@script_log(module_name)
 def ticklabel_format(**kwargs):
     ret = gca().ticklabel_format(**kwargs)
     return ret
@@ -2991,6 +3155,7 @@ def ticklabel_format(**kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.locator_params)
+@script_log(module_name)
 def locator_params(axis='both', tight=None, **kwargs):
     ret = gca().locator_params(axis=axis, tight=tight, **kwargs)
     return ret
@@ -2998,6 +3163,7 @@ def locator_params(axis='both', tight=None, **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.tick_params)
+@script_log(module_name)
 def tick_params(axis='both', **kwargs):
     ret = gca().tick_params(axis=axis, **kwargs)
     return ret
@@ -3005,6 +3171,7 @@ def tick_params(axis='both', **kwargs):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.margins)
+@script_log(module_name)
 def margins(*args, **kw):
     ret = gca().margins(*args, **kw)
     return ret
@@ -3012,431 +3179,9 @@ def margins(*args, **kw):
 # This function was autogenerated by boilerplate.py.  Do not edit as
 # changes will be lost
 @docstring.copy_dedent(Axes.autoscale)
+@script_log(module_name)
 def autoscale(enable=True, axis='both', tight=None):
     ret = gca().autoscale(enable=enable, axis=axis, tight=tight)
     return ret
 
 _setup_pyplot_info_docstrings()
-# The following comment was copied as is matplotlib.pyplot and is not true for this file
-################# REMAINING CONTENT GENERATED BY boilerplate.py ##############
-
-###******************************************************************************************* old functions ****************************************************************************************************************************************************
-
-@script_log(module_name)
-def hold(state=None):
-    """set hold of current axes to 'state', if no state is provided then it will toggle the hold state"""
-    gca().hold(None)
-
-
-@script_log(module_name)
-def colorbar(mappable=None, cax=None, ax=None, **kw):
-    if mappable is None:
-        mappable = gci()
-        if mappable is None:
-            raise RuntimeError('No mappable was found to use for colorbar '
-                               'creation. First define a mappable such as '
-                               'an image (with imshow) or a contour set ('
-                               'with contourf).')
-    if ax is None:
-        ax = gca()
-
-    ret = gcf().colorbar(mappable, cax = cax, ax=ax, **kw)
-    draw_if_interactive()
-    return ret
-
-
-def gca(**kwargs):
-    """
-    Get the current :class:`~matplotlib.axes.Axes` instance on the
-    current figure matching the given keyword args, or create one.
-
-    Examples
-    ---------
-    To get the current polar axes on the current figure::
-
-        plt.gca(projection='polar')
-
-    If the current axes doesn't exist, or isn't a polar one, the appropriate
-    axes will be created and then returned.
-
-    See Also
-    --------
-    matplotlib.figure.Figure.gca : The figure's gca method.
-    """
-    ax =  gcf().gca(**kwargs)
-    return ax
-
-
-def sci(im):
-    """
-    Set the current image.  This image will be the target of colormap
-    commands like :func:`~matplotlib.pyplot.jet`,
-    :func:`~matplotlib.pyplot.hot` or
-    :func:`~matplotlib.pyplot.clim`).  The current image is an
-    attribute of the current axes.
-    """
-    gca()._sci(im)
-
-
-def gci():
-    """
-    Get the current colorable artist.  Specifically, returns the
-    current :class:`~matplotlib.cm.ScalarMappable` instance (image or
-    patch collection), or *None* if no images or patch collections
-    have been defined.  The commands :func:`~matplotlib.pyplot.imshow`
-    and :func:`~matplotlib.pyplot.figimage` create
-    :class:`~matplotlib.image.Image` instances, and the commands
-    :func:`~matplotlib.pyplot.pcolor` and
-    :func:`~matplotlib.pyplot.scatter` create
-    :class:`~matplotlib.collections.Collection` instances.  The
-    current image is an attribute of the current axes, or the nearest
-    earlier axes in the current figure that contains an image.
-    """
-    return gcf()._gci()
-
-@script_log(module_name)
-@activate_category("1d")
-def plot(*args, **kwargs):
-    ax = gca()
-    # allow callers to override the hold state by passing hold=True|False
-    washold = ax.ishold()
-    hold = kwargs.pop('hold', None)
-    if hold is not None:
-        ax.hold(hold)
-    try:
-        ret = ax.plot(*args, **kwargs)
-        draw_if_interactive()
-    finally:
-        ax.hold(washold)
-
-    return ret
-
-@activate_category("1d")
-def errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None, elinewidth=None,
-             capsize=None, barsabove=False, lolims=False, uplims=False,
-             xlolims=False, xuplims=False, errorevery=1, capthick=None,
-             hold=None, data=None, **kwargs):
-    ax = gca()
-    # allow callers to override the hold state by passing hold=True|False
-    washold = ax.ishold()
-
-    if hold is not None:
-        ax.hold(hold)
-    try:
-        ret = ax.errorbar(x, y, yerr=yerr, xerr=xerr, fmt=fmt, ecolor=ecolor,
-                          elinewidth=elinewidth, capsize=capsize,
-                          barsabove=barsabove, lolims=lolims, uplims=uplims,
-                          xlolims=xlolims, xuplims=xuplims,
-                          errorevery=errorevery, capthick=capthick, data=data,
-                          **kwargs)
-    finally:
-        ax.hold(washold)
-
-    return ret
-
-def autoscale(enable=True, axis='both', tight=None):
-    ret = gca().autoscale(enable=enable, axis=axis, tight=tight)
-    return ret
-
-@activate_category("2d")
-@draw_colorbar(gcf, colorbar)
-#@script_log("plotting.pyplot")
-def imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, alpha=None,
-           vmin=None, vmax=None, origin=None, extent=None, shape=None,
-           filternorm=1, filterrad=4.0, imlim=None, resample=None, url=None,
-           hold=None, **kwargs):
-    ax = gca()
-    # allow callers to override the hold state by passing hold=True|False
-    washold = ax.ishold()
-
-    if hold is not None:
-        ax.hold(hold)
-    try:
-        ret = ax.imshow(X, cmap=cmap, norm=norm, aspect=aspect,
-                        interpolation=interpolation, alpha=alpha, vmin=vmin,
-                        vmax=vmax, origin=origin, extent=extent, shape=shape,
-                        filternorm=filternorm, filterrad=filterrad,
-                        imlim=imlim, resample=resample, url=url, **kwargs)
-        draw_if_interactive()
-    finally:
-        ax.hold(washold)
-    sci(ret)
-    return ret
-
-@activate_category('2d')
-@draw_colorbar(gcf, colorbar)
-@script_log(module_name)
-def tripcolor(*args, **kwargs):
-    ax = gca()
-    # allow callers to override the hold state by passing hold=True|False
-    washold = ax.ishold()
-    hold = kwargs.pop('hold', None)
-    if hold is not None:
-        ax.hold(hold)
-    try:
-        ret = ax.tripcolor(*args, **kwargs)
-        draw_if_interactive()
-    finally:
-        ax.hold(washold)
-    sci(ret)
-    return ret
-
-#*************************************************************************************************************************************
-@script_log(module_name)
-def xlabel(s, *args, **kwargs):
-    """
-    Set the *x* axis label of the current axis.
-
-    Default override is::
-
-      override = {
-          'fontsize'            : 'small',
-          'verticalalignment'   : 'top',
-          'horizontalalignment' : 'center'
-          }
-
-    .. seealso::
-
-        :func:`~matplotlib.pyplot.text`
-            For information on how override and the optional args work
-    """
-    l =  gca().set_xlabel(s, *args, **kwargs)
-    draw_if_interactive()
-    return l
-
-@script_log(module_name)
-def legend(*args, **kwargs):
-    ret = gca().legend(*args, **kwargs)
-    draw_if_interactive()
-    return ret
-
-@script_log(module_name)
-def ylabel(s, *args, **kwargs):
-    """
-    Set the *y* axis label of the current axis.
-
-    Defaults override is::
-
-        override = {
-           'fontsize'            : 'small',
-           'verticalalignment'   : 'center',
-           'horizontalalignment' : 'right',
-           'rotation'='vertical' : }
-
-    .. seealso::
-
-        :func:`~matplotlib.pyplot.text`
-            For information on how override and the optional args
-            work.
-    """
-    l = gca().set_ylabel(s, *args, **kwargs)
-    draw_if_interactive()
-    return l
-
-@script_log(module_name)
-def xscale(*args, **kwargs):
-    """
-    Set the scaling of the *x*-axis.
-
-    call signature::
-
-      xscale(scale, **kwargs)
-
-    The available scales are: %(scale)s
-
-    Different keywords may be accepted, depending on the scale:
-
-    %(scale_docs)s
-    """
-    ax = gca()
-    ax.set_xscale(*args, **kwargs)
-    draw_if_interactive()
-
-@script_log(module_name)
-def yscale(*args, **kwargs):
-    """
-    Set the scaling of the *y*-axis.
-
-    call signature::
-
-      yscale(scale, **kwargs)
-
-    The available scales are: %(scale)s
-
-    Different keywords may be accepted, depending on the scale:
-
-    %(scale_docs)s
-    """
-    ax = gca()
-    ax.set_yscale(*args, **kwargs)
-    draw_if_interactive()
-
-@script_log(module_name)
-def xticks(*args, **kwargs):
-    """
-    Get or set the *x*-limits of the current tick locations and labels.
-
-    ::
-
-      # return locs, labels where locs is an array of tick locations and
-      # labels is an array of tick labels.
-      locs, labels = xticks()
-
-      # set the locations of the xticks
-      xticks( arange(6) )
-
-      # set the locations and labels of the xticks
-      xticks( arange(5), ('Tom', 'Dick', 'Harry', 'Sally', 'Sue') )
-
-    The keyword args, if any, are :class:`~matplotlib.text.Text`
-    properties. For example, to rotate long labels::
-
-      xticks( arange(12), calendar.month_name[1:13], rotation=17 )
-    """
-    ax = gca()
-
-    if len(args)==0:
-        locs = ax.get_xticks()
-        labels = ax.get_xticklabels()
-    elif len(args)==1:
-        locs = ax.set_xticks(args[0])
-        labels = ax.get_xticklabels()
-    elif len(args)==2:
-        locs = ax.set_xticks(args[0])
-        labels = ax.set_xticklabels(args[1], **kwargs)
-    else: raise TypeError('Illegal number of arguments to xticks')
-    if len(kwargs):
-        for l in labels:
-            l.update(kwargs)
-
-    draw_if_interactive()
-    return locs, silent_list('Text xticklabel', labels)
-
-@script_log(module_name)
-def yticks(*args, **kwargs):
-    """
-    Get or set the *y*-limits of the current tick locations and labels.
-
-    ::
-
-      # return locs, labels where locs is an array of tick locations and
-      # labels is an array of tick labels.
-      locs, labels = yticks()
-
-      # set the locations of the yticks
-      yticks( arange(6) )
-
-      # set the locations and labels of the yticks
-      yticks( arange(5), ('Tom', 'Dick', 'Harry', 'Sally', 'Sue') )
-
-    The keyword args, if any, are :class:`~matplotlib.text.Text`
-    properties. For example, to rotate long labels::
-
-      yticks( arange(12), calendar.month_name[1:13], rotation=45 )
-    """
-    ax = gca()
-
-    if len(args)==0:
-        locs = ax.get_yticks()
-        labels = ax.get_yticklabels()
-    elif len(args)==1:
-        locs = ax.set_yticks(args[0])
-        labels = ax.get_yticklabels()
-    elif len(args)==2:
-        locs = ax.set_yticks(args[0])
-        labels = ax.set_yticklabels(args[1], **kwargs)
-    else: raise TypeError('Illegal number of arguments to yticks')
-    if len(kwargs):
-        for l in labels:
-            l.update(kwargs)
-
-    draw_if_interactive()
-
-    return (locs,
-             silent_list('Text yticklabel', labels)
-             )
-
-@script_log(module_name)
-def xlim(*args, **kwargs):
-    """
-    Get or set the *x* limits of the current axes.
-
-    ::
-
-      xmin, xmax = xlim()   # return the current xlim
-      xlim( (xmin, xmax) )  # set the xlim to xmin, xmax
-      xlim( xmin, xmax )    # set the xlim to xmin, xmax
-
-    If you do not specify args, you can pass the xmin and xmax as
-    kwargs, e.g.::
-
-      xlim(xmax=3) # adjust the max leaving min unchanged
-      xlim(xmin=1) # adjust the min leaving max unchanged
-
-    Setting limits turns autoscaling off for the x-axis.
-
-    The new axis limits are returned as a length 2 tuple.
-
-    """
-    ax = gca()
-    if not args and not kwargs:
-        return ax.get_xlim()
-    ret = ax.set_xlim(*args, **kwargs)
-    draw_if_interactive()
-    return ret
-
-
-@script_log(module_name)
-def ylim(*args, **kwargs):
-    """
-    Get or set the *y*-limits of the current axes.
-
-    ::
-
-      ymin, ymax = ylim()   # return the current ylim
-      ylim( (ymin, ymax) )  # set the ylim to ymin, ymax
-      ylim( ymin, ymax )    # set the ylim to ymin, ymax
-
-    If you do not specify args, you can pass the *ymin* and *ymax* as
-    kwargs, e.g.::
-
-      ylim(ymax=3) # adjust the max leaving min unchanged
-      ylim(ymin=1) # adjust the min leaving max unchanged
-
-    Setting limits turns autoscaling off for the y-axis.
-
-    The new axis limits are returned as a length 2 tuple.
-    """
-    ax = gca()
-    if not args and not kwargs:
-        return ax.get_ylim()
-    ret = ax.set_ylim(*args, **kwargs)
-    draw_if_interactive()
-    return ret
-
-@script_log(module_name)
-@activate_category("2d")
-@draw_colorbar(gcf, colorbar)
-def pcolormesh(*args, **kwargs):
-    ax = gca()
-    # allow callers to override the hold state by passing hold=True|False
-    washold = ax.ishold()
-    hold = kwargs.pop('hold', None)
-    if hold is not None:
-        ax.hold(hold)
-    try:
-        ret = ax.pcolormesh(*args, **kwargs)
-    finally:
-        ax.hold(washold)
-    sci(ret)
-    return ret
-
-
-if __name__ == '__main__':
-    from PyQt4.QtGui import QApplication
-    qapp = QApplication([])
-    imshow([[1,2],[3,4]])
-    plot([1,2,3,4])
-    figure(1)
-    xlabel('hi')
-    qapp.exec_()
