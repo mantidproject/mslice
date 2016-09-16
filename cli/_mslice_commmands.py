@@ -49,6 +49,15 @@ _powder_projection_model = _MantidProjectionCalculator()
 
 
 def get_projection(input_workspace, axis1, axis2):
+    """ Calculate projections of workspace.
+
+    Keyword Arguments:
+        input_workspace -- Workspace to project, can be either python handle to workspace or a string containing the
+        workspace name.
+        axis1 -- The first axis of projection (string)
+        axis2 -- The second axis of the projection (string)
+
+    """
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     output_workspace = _powder_projection_model.calculate_projection(input_workspace=input_workspace, axis1=axis1,
@@ -97,7 +106,7 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalize=False):
     x_axis = _process_axis(x, 0, input_workspace)
     y_axis = _process_axis(y, 1, input_workspace)
 
-    slice_array, extents = _slice_algorithm.compute_slice(selected_workspace=input_workspace,x_axis=x_axis,
+    slice_array, extents = _slice_algorithm.compute_slice(selected_workspace=input_workspace, x_axis=x_axis,
                                                            smoothing=None, y_axis=y_axis, norm_to_one=normalize)
     if ret_val == 'slice':
         return slice_array
@@ -106,7 +115,7 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalize=False):
     elif ret_val == 'both':
         return slice_array, extents
     else:
-        raise ValueError("ret_val should be 'slice', 'extents' or 'both' and not %s " % ret_val)
+        raise ValueError("ret_val should be 'slice', 'extents' or 'both' and not '%s' " % ret_val)
 
 
 def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_min=None, intensity_max=None,
@@ -149,17 +158,45 @@ from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 _cut_algorithm = _MantidCutAlgorithm()
 _cut_plotter = MatplotlibCutPlotter(_cut_algorithm)
 
+
 def get_cut_xye(input_workspace, cut_axis, integration_start, integration_end, normalize=False):
+    """Return x, y and e of a cut of a workspace. The function will return a tuple of 3 single dimensional numpy arrays.
+
+    Keyword Arguments
+    input_workspace -- The workspace to cut. Must be an MDWorkspace with 2 Dimensions. The parameter can be either a
+    python handle to the workspace to slice OR the workspaces name in the ADS (string)
+    cut_axis -- The axis to cut along.
+    Axis Format:-
+        Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5'
+        or just the name e.g. 'DeltaE'. That case the start and en will default to the range in the data.
+    integration_start -- value to start integrating from
+    integration_end -- The value to end the integration at
+    normalize -- will normalize the cut data to one if set to true
+    """
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
     x, y, e = _cut_algorithm.compute_cut_xye(input_workspace, cut_axis, integration_start, integration_end, 
                                              is_norm=normalize)
+    x, y, e = x.squeeze(), y.squeeze(), e.squeeze()
     return x, y, e
 
 
 def plot_cut(input_workspace, cut_axis, integration_start, integration_end, intensity_start=None,
              intensity_end=None, normalize=False, hold=False):
+    """Take a cut of the workspace and plot it.
+
+    Keyword Arguments
+    input_workspace -- The workspace to cut. Must be an MDWorkspace with 2 Dimensions. The parameter can be either a
+    python handle to the workspace to slice OR the workspaces name in the ADS (string)
+    cut_axis -- The axis to cut along.
+    Axis Format:-
+        Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5'
+        or just the name e.g. 'DeltaE'. That case the start and en will default to the range in the data.
+    integration_start -- value to start integrating from
+    integration_end -- The value to end the integration at
+    normalize -- will normalize the cut data to one if set to true
+    """
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
