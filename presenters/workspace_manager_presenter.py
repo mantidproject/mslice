@@ -19,6 +19,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         assert (isinstance(main_presenter, MainPresenterInterface))
         self._main_presenter = main_presenter
         self._main_presenter.register_workspace_selector(self)
+        self.update_displayed_workspaces()
 
     def notify(self, command):
         if command == Command.LoadWorkspace:
