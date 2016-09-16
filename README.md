@@ -8,7 +8,7 @@ Run the `start_mslice.bat` in the root directory of the project and the MSlice G
 ###Linux & Mac 
 Run the `start_mslice.sh` in the root directory of the project and the MSlice GUI and the accompanying console should open
 
-##If it does not work.
+##If you have installed Mantid to a custom directory
 ###Windows
 It assumes you have a nightly build of Mantid at `C:\MantidInstall\` . If you have a nightly build installed somewhere else on your computer then open the `start_mslice.bat` in a text editor. 
 It should look like
