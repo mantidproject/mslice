@@ -54,6 +54,10 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         current_axis.set_title(plot_config.title)
         current_axis.set_xlabel(plot_config.xlabel)
         current_axis.set_ylabel(plot_config.ylabel)
+
+        current_axis.set_xlim(*plot_config.x_range)
+        current_axis.set_ylim(*plot_config.y_range)
+
         legend_config = plot_config.legend
         for handle in legend_config.handles:
             handle.set_label(legend_config.get_legend_text(handle))
@@ -141,6 +145,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         title = current_axis.get_title()
         xlabel = current_axis.get_xlabel()
         ylabel = current_axis.get_ylabel()
+        x_range = current_axis.get_xlim()
+        y_range = current_axis.get_ylim()
         # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
         # axes.get_legend_handles_labels()
         # That is the reason for the use of the private function axes._get_legend_handles
@@ -155,5 +161,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             legend = LegendDescriptor(visible=visible, handles=handles)
         has_errorbars  = self._has_errorbars()
         return PlotConfig(title=title, x_axis_label=xlabel, y_axis_label=ylabel, legends=legend,
-                          errorbars_enabled=has_errorbars)
+                          errorbars_enabled=has_errorbars,
+                          x_range=x_range,
+                          y_range=y_range)
 

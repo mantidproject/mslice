@@ -26,15 +26,31 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
                 legend_widget = LegendSetter(self, legend['text'], legend['handle'], legend['visible'])
                 self.verticalLayout.addWidget(legend_widget)
                 self._legend_widgets.append(legend_widget)
-
-    def process_legends(self):
-        for widget in self._legend_widgets:
-            widget.apply_to_handle()
+        if None not in current_config.x_range:
+            self.lneXMin.setText(str(current_config.x_range[0]))
+            self.lneXMax.setText(str(current_config.x_range[1]))
+        if None not in current_config.y_range:
+            self.lneYMin.setText(str(current_config.y_range[0]))
+            self.lneYMax.setText(str(current_config.y_range[1]))
 
     @staticmethod
     def get_new_config(current_config):
         dialog = PlotOptionsDialog(current_config)
         dialog.exec_()
+        try:
+            xmin = float(str(dialog.lneXMin.text()))
+            xmax = float(str(dialog.lneXMax.text()))
+            x_range = (xmin, xmax)
+        except ValueError:
+            x_range = (None, None)
+
+        try:
+            ymin = float(str(dialog.lneYMin.text()))
+            ymax = float(str(dialog.lneYMax.text()))
+            y_range = (ymin, ymax)
+        except ValueError:
+            y_range = (None, None)
+
         legends = LegendDescriptor(visible=dialog.chkShowLegends.isChecked(),
                                    applicable=dialog.groupBox.isHidden())
         for legend_widget in dialog._legend_widgets:
@@ -46,7 +62,9 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
                           x_axis_label=dialog.lneXAxisLabel.text(),
                           y_axis_label=dialog.lneYAxisLabel.text(),
                           legends=legends,
-                          errorbars_enabled=dialog.chkShowErrorBars.isChecked())
+                          errorbars_enabled=dialog.chkShowErrorBars.isChecked(),
+                          x_range=x_range,
+                          y_range=y_range)
 
 
 class LegendSetter(QtGui.QWidget):
@@ -112,7 +130,8 @@ class LegendDescriptor(object):
 
 
 class PlotConfig(object):
-    def __init__(self, title=None, x_axis_label=None, y_axis_label=None, legends=None, errorbars_enabled=None):
+    def __init__(self, title=None, x_axis_label=None, y_axis_label=None, legends=None, errorbars_enabled=None,
+                 x_range=(None, None), y_range=(None, None)):
         self.title = title
         self.xlabel = x_axis_label
         self.ylabel = y_axis_label
@@ -121,6 +140,8 @@ class PlotConfig(object):
         else:
             self.legend = legends
         self.errorbar = errorbars_enabled   # Has 3 values (True : shown, False: Not Shown, None: Not applicable)
+        self.x_range = x_range
+        self.y_range = y_range
 
     @property
     def title(self):
