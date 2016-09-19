@@ -25,6 +25,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
         self.action_save_image.triggered.connect(self.stock_toolbar.save_figure)
         self.actionPlotOptions.triggered.connect(self._plot_options)
+        self.actionToggleLegends.triggered.connect(self._toggle_legend)
 
         self.show()  # is not a good idea in non interactive mode
 
@@ -60,17 +61,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         # To show/hide errorbars we will just set the alpha to 0
         if plot_config.errorbar is not None:
-            if plot_config.errorbar:
-                alpha = 1
-            else:
-                alpha = 0
-            for container in current_axis.containers:
-                if isinstance(container, ErrorbarContainer):
-                    elements = container.get_children()
-                    for i in range(len(elements)):
-                        # The first component is the actual line so we will not touch it
-                        if i != 0:
-                            elements[i].set_alpha(alpha)
+            self._set_errorbars_shown_state(plot_config.errorbar)
 
         # The legend must be set after hiding/showing the error bars so the errorbars on the legend are in sync with
         # the plot (in terms of having/not having errorbars)
@@ -83,6 +74,68 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             current_axis.legend_ = None
 
         self.canvas.draw()
+
+    def _set_legend_state(self, visible=True):
+        """Show legends if true, hide legends is visible is false"""
+        current_axes = self.canvas.figure.gca()
+        if visible:
+            current_axes.legend()
+        else:
+            if current_axes.legend_:
+                current_axes.legend_.remove()
+                current_axes.legend_ = None
+
+    def _toggle_legend(self):
+        current_axes = self.canvas.figure.gca()
+        if not list(current_axes._get_legend_handles()):
+            return  # Legends are not appplicable to this plot
+        current_state = getattr(current_axes, 'legend_') is not None
+        self._set_legend_state(not current_state)
+        self.canvas.draw()
+
+    def _has_errorbars(self):
+        """True current axes has visible errorbars,
+         False if current axes has hidden errorbars
+         None if errorbars are not applicable"""
+        current_axis = self.canvas.figure.gca()
+        if not any(map(lambda x: isinstance(x, ErrorbarContainer),current_axis.containers)):
+            has_errorbars = None  # Error bars are not applicable to this plot and will not show up in the config
+        else:
+            # If all the error bars have alpha= 0 they are all transparent (hidden)
+            containers = filter(lambda x: isinstance(x, ErrorbarContainer), current_axis.containers)
+            line_components = map(lambda x:x.get_children(), containers)
+            # drop the first element of each container because it is the the actual line
+            errorbars = map(lambda x: x[1:] , line_components)
+            errorbars =chain(*errorbars)
+            alpha = map(lambda x: x.get_alpha(), errorbars)
+            # replace None with 1(None indicates default which is 1)
+            alpha = map(lambda x: x if x is not None else 1, alpha)
+            if sum(alpha) == 0:
+                has_errorbars = False
+            else:
+                has_errorbars = True
+        return has_errorbars
+
+    def _set_errorbars_shown_state(self,state):
+        """Show errrorbar if state = 1, hide if state = 0"""
+        current_axis = self.canvas.figure.gca()
+        if state:
+            alpha = 1
+        else:
+            alpha = 0
+        for container in current_axis.containers:
+            if isinstance(container, ErrorbarContainer):
+                elements = container.get_children()
+                for i in range(len(elements)):
+                    # The first component is the actual line so we will not touch it
+                    if i != 0:
+                        elements[i].set_alpha(alpha)
+
+    def _toggle_errorbars(self):
+        state = self._has_errorbars()
+        if state is None: # No errorbars in this plot
+            return
+        self._set_errorbars_shown_state(not state)
 
     def _get_plot_description(self):
         current_axis = self.canvas.figure.gca()
@@ -101,22 +154,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         else:
             visible = getattr(current_axis, 'legend_') is not None
             legend = LegendDescriptor(visible=visible, handles=handles)
-        if not any(map(lambda x: isinstance(x, ErrorbarContainer),current_axis.containers)):
-            has_errorbars = None  # Error bars are not applicable to this plot and will not show up in the config
-        else:
-            # If all the error bars have alpha= 0 they are all transparent (hidden)
-            containers = filter(lambda x: isinstance(x, ErrorbarContainer), current_axis.containers)
-            line_components = map(lambda x:x.get_children(), containers)
-            # drop the first element of each container because it is the the actual line
-            errorbars = map(lambda x: x[1:] , line_components)
-            errorbars =chain(*errorbars)
-            alpha = map(lambda x: x.get_alpha(), errorbars)
-            # replace None with 1(None indicates default which is 1)
-            alpha = map(lambda x: x if x is not None else 1, alpha)
-            if sum(alpha) == 0:
-                has_errorbars = False
-            else:
-                has_errorbars = True
+        has_errorbars  = self._has_errorbars()
         return PlotConfig(title=title, x_axis_label=xlabel, y_axis_label=ylabel, legends=legend,
                           errorbars_enabled=has_errorbars)
 
