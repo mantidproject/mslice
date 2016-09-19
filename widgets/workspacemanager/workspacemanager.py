@@ -135,3 +135,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
 
     def error_unable_to_save(self):
         self._display_error("Something went wrong while trying to save")
+
+    def clear_displayed_error(self):
+        self._display_error("")

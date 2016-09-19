@@ -26,6 +26,7 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         self._main_presenter = main_presenter
 
     def notify(self, command):
+        self._clear_displayed_error()
         if command == Command.CalculatePowderProjection:
             self._calculate_powder_projection()
         else:
@@ -48,4 +49,5 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
     def _get_main_presenter(self):
         return self._main_presenter
 
-
+    def _clear_displayed_error(self):
+        self._powder_view.clear_displayed_error()

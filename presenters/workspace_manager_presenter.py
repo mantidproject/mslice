@@ -21,6 +21,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._main_presenter.register_workspace_selector(self)
 
     def notify(self, command):
+        self._clear_displayed_error()
         if command == Command.LoadWorkspace:
             self._load_workspace()
         elif command == Command.SaveSelectedWorkspace:
@@ -128,3 +129,5 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         workspace"""
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
+    def _clear_displayed_error(self):
+        self._workspace_manger_view.clear_displayed_error()

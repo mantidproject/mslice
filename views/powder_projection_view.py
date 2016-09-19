@@ -30,6 +30,10 @@ class PowderView(object):
     def get_powder_units(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def clear_displayed_error(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+
 
 
 

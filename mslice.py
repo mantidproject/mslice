@@ -20,9 +20,11 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)
         self.wgtWorkspacemanager.error_occurred.connect(self.show_error)
+        self.wgtPowder.error_occurred.connect(self._show_error)
 
     def show_error(self, msg):
-        self.statusbar.showMessage(msg, 2000)
+        """Show an error message on status bar. If msg ==""  the function will clear the displayed message """
+        self.statusbar.showMessage(msg)
 
     def get_presenter(self):
         return self._presenter
