@@ -10,15 +10,16 @@ class MantidProjectionCalculator(ProjectionCalculator):
         self._workspace_provider = MantidWorkspaceProvider()
 
     def calculate_projection(self, input_workspace, axis1, axis2):
+        emode = self._workspace_provider.get_workspace_handle(input_workspace).getEMode().name
         if axis1 == '|Q|' and axis2 == 'Energy':
             output_workspace = input_workspace + '_QE'
             ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions='|Q|',
-                        PreprocDetectorsWS='-')
+                        PreprocDetectorsWS='-', dEAnalysisMode=emode)
 
         elif axis1 == 'Energy' and axis2 == '|Q|':
             output_workspace = input_workspace + '_EQ'
             ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions='|Q|',
-                        PreprocDetectorsWS='-')
+                        PreprocDetectorsWS='-', dEAnalysisMode=emode)
             output_workspace_handle = self._workspace_provider.get_workspace_handle(output_workspace)
             # Now swapping dim0 and dim1
             dim0 = output_workspace_handle.getDimension(1)
@@ -28,7 +29,8 @@ class MantidProjectionCalculator(ProjectionCalculator):
                    str(dim0.getMaximum()) + ',' + str(dim0.getNBins())
             dim1 = dim1.getName() + ',' + str(dim1.getMinimum()) + ',' +\
                    str(dim1.getMaximum()) + ',' + str(dim1.getNBins())
-            SliceMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, AlignedDim0=dim0, AlignedDim1=dim1)
+            SliceMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, AlignedDim0=dim0,
+                    AlignedDim1=dim1)
 
         else:
             raise NotImplementedError("Not implemented axis1 = %s and axis2 = %s" % (axis1, axis2))
