@@ -103,3 +103,34 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.powder_view.get_powder_u2.assert_called_once_with()
 
         self.projection_calculator.calculate_projection.assert_not_called()
+
+    def test_axis_switching_1(self):
+        powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        dropbox_contents = self.powder_view.populate_powder_u1.call_args[0][0]
+        call_args = self.powder_view.populate_powder_u1.call_args
+
+        # This changes the selection by making view return second element instead of first
+        self.powder_view.populate_powder_u1.reset_mock()
+        self.powder_view.populate_powder_u2.reset_mock()
+        self.powder_view.get_powder_u1 = mock.Mock(return_value=dropbox_contents[1])
+        self.powder_view.get_powder_u2 = mock.Mock(return_value=dropbox_contents[1])
+        powder_presenter.notify(Command.U1Changed)
+
+        self.powder_view.populate_powder_u1.assert_not_called()
+        self.assertEquals(self.powder_view.populate_powder_u2.call_args, call_args)
+
+    def test_axis_switching_2(self):
+        powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        dropbox_contents = self.powder_view.populate_powder_u1.call_args[0][0]
+        call_args=self.powder_view.populate_powder_u1.call_args
+
+        # This changes the selection by making view return second element instead of first
+        self.powder_view.populate_powder_u1.reset_mock()
+        self.powder_view.populate_powder_u2.reset_mock()
+        self.powder_view.get_powder_u1 = mock.Mock(return_value=dropbox_contents[0])
+        self.powder_view.get_powder_u2 = mock.Mock(return_value=dropbox_contents[0])
+        powder_presenter.notify(Command.U2Changed)
+
+
+        self.powder_view.populate_powder_u2.assert_not_called()
+        self.assertEquals(self.powder_view.populate_powder_u1.call_args, mock.call(list(reversed(call_args[0][0]))))

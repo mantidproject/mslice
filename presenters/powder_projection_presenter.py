@@ -7,7 +7,6 @@ from interfaces.powder_projection_presenter import PowderProjectionPresenterInte
 
 
 class PowderProjectionPresenter(PowderProjectionPresenterInterface):
-
     def __init__(self, powder_view, projection_calculator):
         self._powder_view = powder_view
         self._projection_calculator = projection_calculator
