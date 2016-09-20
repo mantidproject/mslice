@@ -18,7 +18,8 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
 
         #Add rest of options
         self._available_units = ['|Q|', 'Energy']
-        self._powder_view.populate_powder_projection_axis(self._available_units)
+        self._powder_view.populate_powder_u1(self._available_units)
+        self._powder_view.populate_powder_u2(self._available_units[::-1])
         self._main_presenter = None
 
     def register_master(self, main_presenter):
