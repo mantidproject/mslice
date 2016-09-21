@@ -196,7 +196,6 @@ def tripcolor(*args, **kwargs):
 def xlabel(s, *args, **kwargs):
     """
     Set the *x* axis label of the current axis.
-    Set the *x* axis label of the current axis.
 
     Default override is::
 
