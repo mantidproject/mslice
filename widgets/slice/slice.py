@@ -133,3 +133,7 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.lneSliceIntensityEnd.setText("")
         self.lneSliceSmoothing.setText("")
         self.rdoSliceNormToOne.setChecked(0)
+
+
+    def clear_displayed_error(self):
+        self._display_error("")
