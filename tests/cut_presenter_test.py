@@ -101,7 +101,7 @@ class CutPresenterTest(unittest.TestCase):
 
         cut_presenter.notify(Command.Plot)
         self.cut_algorithm.compute_cut.assert_not_called()
-        self.cut_plotter.plot_cut.assert_called_with(selected_workspace="workpsace", cut_axis=processed_axis,
+        self.cut_plotter.plot_cut.assert_called_with(selected_workspace=workspace, cut_axis=processed_axis,
                                                      integration_start=integration_start, integration_end=integration_end,
                                                      norm_to_one=is_norm, intensity_start=intensity_start,
                                                      intensity_end=intensity_end, plot_over=False)
@@ -161,15 +161,19 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_intensity_end = mock.Mock(return_value=intensity_end)
         self.view.get_intensity_is_norm_to_one = mock.Mock(return_value=is_norm)
         self.view.get_integration_width = mock.Mock(return_value=width)
-        cuts = [('x1', 'y1', 'e1'), ('x2', 'y2', 'e2'), ('x3', 'y3', 'e3')]
-        self.cut_algorithm.compute_cut_xye = mock.Mock(side_effect=cuts)
         self.cut_algorithm.get_other_axis = mock.Mock(return_value=integrated_axis)
+
         cut_presenter.notify(Command.Plot)
-        call_list = [call(workspace, processed_axis, 3, 5, is_norm), call(workspace, processed_axis, 5, 7, is_norm),
-                     call(workspace, processed_axis, 7, 8, is_norm)]
-        self.cut_algorithm.compute_cut_xye.assert_has_calls(call_list)
-        errorbar_calls = [call('x1', 'y1', yerr='e1', label=ANY, hold=False),
-                          call('x2', 'y2', yerr='e2', label=ANY, hold=True),
-                          call('x3', 'y3', yerr='e3', label=ANY, hold=True)]
-        self.cut_plotter.errorbar.assert_has_calls(errorbar_calls)
-        self.cut_plotter.ylim.assert_called_with(intensity_start, intensity_end)
+        call_list = \
+            [call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=3,
+                 integration_end=5,norm_to_one=is_norm,intensity_start=intensity_start,
+                 intensity_end=intensity_end, plot_over=False),
+            call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=5,
+                 integration_end=7,norm_to_one=is_norm,intensity_start=intensity_start,
+                 intensity_end=intensity_end, plot_over=True),
+            call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=7,
+                 integration_end=8,norm_to_one=is_norm,intensity_start=intensity_start,
+                 intensity_end=intensity_end, plot_over=True),
+         ]
+        self.cut_algorithm.compute_cut.assert_not_called()
+        self.cut_plotter.plot_cut.assert_has_calls(call_list)
