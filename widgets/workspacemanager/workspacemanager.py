@@ -29,7 +29,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                                 self.btnRename: Command.RenameWorkspace
                                 }
         self._main_window = None
-        self.lstWorkspaces.itemChanged.connect(self.list_item_changed)
+        self.lstWorkspaces.itemSelectionChanged.connect(self.list_item_changed)
         self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
     def _display_error(self, error_string):
@@ -53,7 +53,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                 onscreen_workspaces.remove(workspace)
                 continue
             item = QListWidgetItem(workspace)
-            item.setCheckState(0)
             self.lstWorkspaces.addItem(item)
 
         # remove any onscreen workspaces that are no longer here
@@ -76,12 +75,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                 return
 
     def get_workspace_selected(self):
-        selected_workspaces = []
-        for index in range(self.lstWorkspaces.count()):
-            item = self.lstWorkspaces.item(index)
-            if item.checkState():
-                selected_workspaces.append(str(item.text()))
-        return selected_workspaces
+        selected_workspaces = map(lambda x: str(x.text()), self.lstWorkspaces.selectedItems())
+        return list(selected_workspaces)
 
     def get_workspace_to_load_path(self):
         path = QFileDialog.getOpenFileName()
