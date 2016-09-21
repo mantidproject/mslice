@@ -7,7 +7,6 @@ from interfaces.powder_projection_presenter import PowderProjectionPresenterInte
 
 
 class PowderProjectionPresenter(PowderProjectionPresenterInterface):
-
     def __init__(self, powder_view, projection_calculator):
         self._powder_view = powder_view
         self._projection_calculator = projection_calculator
@@ -17,8 +16,9 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
             raise TypeError("projection_calculator is not of type ProjectionCalculator")
 
         #Add rest of options
-        self._powder_view.populate_powder_u1(['|Q|'])
-        self._powder_view.populate_powder_u2(['Energy'])
+        self._available_units = ['|Q|', 'Energy']
+        self._powder_view.populate_powder_u1(self._available_units)
+        self._powder_view.populate_powder_u2(self._available_units[::-1])
         self._main_presenter = None
 
     def register_master(self, main_presenter):
@@ -28,6 +28,10 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
     def notify(self, command):
         if command == Command.CalculatePowderProjection:
             self._calculate_powder_projection()
+        elif command == Command.U1Changed:
+            self._axis_changed(1)
+        elif command == Command.U2Changed:
+            self._axis_changed(2)
         else:
             raise ValueError("Powder Projection Presenter received an unrecognised command")
 
@@ -48,4 +52,15 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
     def _get_main_presenter(self):
         return self._main_presenter
 
-
+    def _axis_changed(self, axis):
+        """This a private method which stops U1 from being the same as u2 on the gui at any point"""
+        if axis == 1:
+            all_axis = self._available_units[:]
+            if all_axis[0] == self._powder_view.get_powder_u1():
+                all_axis = all_axis[::-1] # reverse list pushing what selected in u1 to the bottom
+            self._powder_view.populate_powder_u2(all_axis)
+        if axis == 2:
+            all_axis = self._available_units[:]
+            if all_axis[0] == self._powder_view.get_powder_u2():
+                all_axis = all_axis[::-1] # reverse list pushing what selected in u1 to the bottom
+            self._powder_view.populate_powder_u1(all_axis)
