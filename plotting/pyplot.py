@@ -17,8 +17,6 @@ def gcf():
     return FigureManager.get_active_figure().get_figure()
 
 
-
-
 def draw_colorbar(function):
     def wrapper(*args, **kwargs):
         function(*args, **kwargs)
