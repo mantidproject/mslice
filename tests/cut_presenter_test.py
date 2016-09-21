@@ -4,28 +4,30 @@ from mock import ANY, call
 from presenters.cut_presenter import CutPresenter
 from views.cut_view import CutView
 from models.cut.cut_algorithm import CutAlgorithm
+from models.cut.cut_plotter import CutPlotter
 from presenters.interfaces.main_presenter import MainPresenterInterface
 from presenters.slice_plotter_presenter import Axis
 from widgets.cut.command import Command
 
+
 class CutPresenterTest(unittest.TestCase):
     def setUp(self):
         self.view = mock.create_autospec(CutView)
-        self.cut_algorithm = mock.Mock(CutAlgorithm)
-        self.plotting_module = mock.Mock(spec=['errorbar', 'legend', 'xlabel', 'ylabel', 'autoscale', 'ylim'])
+        self.cut_algorithm = mock.create_autospec(CutAlgorithm)
+        self.cut_plotter = mock.create_autospec(CutPlotter)
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
 
     def test_constructor_success(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         self.view.disable.assert_called()
 
     def test_register_master_success(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self.main_presenter.subscribe_to_workspace_selection_monitor.assert_called_with(cut_presenter)
 
     def test_workspace_selection_changed_multiple_workspaces(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self.main_presenter.get_selected_workspace = mock.Mock(return_value=['a', 'b'])
 
@@ -38,9 +40,8 @@ class CutPresenterTest(unittest.TestCase):
                 else:
                     getattr(self.view, attribute).assert_not_called()
 
-
     def test_workspace_selection_changed_single_cuttable_workspace(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
@@ -54,7 +55,7 @@ class CutPresenterTest(unittest.TestCase):
         self.view.enable.assert_called_with()
 
     def test_workspace_selection_changed_single_cut_workspace(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
@@ -73,7 +74,7 @@ class CutPresenterTest(unittest.TestCase):
         self.view.enable.assert_not_called()
 
     def test_plot_single_cut_success(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
         processed_axis = Axis("units", 0, 100, 1)
@@ -96,16 +97,17 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_intensity_end = mock.Mock(return_value=intensity_end)
         self.view.get_intensity_is_norm_to_one = mock.Mock(return_value=is_norm)
         self.view.get_integration_width = mock.Mock(return_value=width)
-        self.cut_algorithm.compute_cut_xye = mock.Mock(return_value=('x', 'y', 'e'))
         self.cut_algorithm.get_other_axis = mock.Mock(return_value=integrated_axis)
-        cut_presenter.notify(Command.Plot)
-        self.cut_algorithm.compute_cut_xye.assert_called_with(workspace, processed_axis, integration_start,
-                                                              integration_end, is_norm)
-        self.plotting_module.errorbar.assert_called_with('x', 'y', yerr='e', hold=False, label=ANY)
-        self.plotting_module.ylim.assert_called_with(intensity_start, intensity_end)
 
-    def test_cut_single_worksapce(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter.notify(Command.Plot)
+        self.cut_algorithm.compute_cut.assert_not_called()
+        self.cut_plotter.plot_cut.assert_called_with(selected_workspace="workpsace", cut_axis=processed_axis,
+                                                     integration_start=integration_start, integration_end=integration_end,
+                                                     norm_to_one=is_norm, intensity_start=intensity_start,
+                                                     intensity_end=intensity_end, plot_over=False)
+        
+    def test_cut_single_save_to_worksapce(self):
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
         processed_axis = Axis("units", 0, 100, 1)
@@ -133,11 +135,10 @@ class CutPresenterTest(unittest.TestCase):
         cut_presenter.notify(Command.SaveToWorkspace)
         self.cut_algorithm.compute_cut.assert_called_with(workspace, processed_axis, integration_start,
                                                               integration_end, is_norm)
-        self.plotting_module.errorbar.assert_not_called()
-        self.plotting_module.ylim.assert_not_called()
+        self.cut_plotter.plot_cut.assert_not_called()
 
     def test_plot_multiple_cuts_with_width(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
         processed_axis = Axis("units", 0, 100, 1)
@@ -170,5 +171,5 @@ class CutPresenterTest(unittest.TestCase):
         errorbar_calls = [call('x1', 'y1', yerr='e1', label=ANY, hold=False),
                           call('x2', 'y2', yerr='e2', label=ANY, hold=True),
                           call('x3', 'y3', yerr='e3', label=ANY, hold=True)]
-        self.plotting_module.errorbar.assert_has_calls(errorbar_calls)
-        self.plotting_module.ylim.assert_called_with(intensity_start, intensity_end)
+        self.cut_plotter.errorbar.assert_has_calls(errorbar_calls)
+        self.cut_plotter.ylim.assert_called_with(intensity_start, intensity_end)

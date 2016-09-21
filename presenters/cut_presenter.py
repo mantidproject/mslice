@@ -1,5 +1,6 @@
 from views.cut_view import CutView
 from models.cut.cut_algorithm import CutAlgorithm
+from models.cut.cut_plotter import CutPlotter
 from widgets.cut.command import Command
 from validation_decorators import require_main_presenter
 from presenters.slice_plotter_presenter import Axis
@@ -11,6 +12,7 @@ class CutPresenter(object):
         self._cut_algorithm = cut_algorithm
         assert isinstance(cut_view, CutView)
         assert isinstance(cut_algorithm, CutAlgorithm)
+        assert isinstance(cut_plotter, CutPlotter)
         self._main_presenter = None
         self._cut_plotter = cut_plotter
         self._acting_on = None
