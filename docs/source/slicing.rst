@@ -16,6 +16,6 @@ From The GUI
 
 
 From the  Command Line
----------------------
+----------------------
 
  *<Docstrings from cli.get_slice and cli.plot_slice should go here>
