@@ -45,5 +45,7 @@ The cut tab will by default be diabled. When you click on a cuttable workspace i
 
 .. images:: image/cutting/width_cuts
 
+**To plot multiple cuts manually to the same plot**
+
 
 
