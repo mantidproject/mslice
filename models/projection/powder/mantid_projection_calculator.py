@@ -11,12 +11,12 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def calculate_projection(self, input_workspace, axis1, axis2):
         emode = self._workspace_provider.get_workspace_handle(input_workspace).getEMode().name
-        if axis1 == '|Q|' and axis2 == 'Energy':
+        if axis1 == '|Q|' and axis2 == 'DeltaE':
             output_workspace = input_workspace + '_QE'
             ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions='|Q|',
                         PreprocDetectorsWS='-', dEAnalysisMode=emode)
 
-        elif axis1 == 'Energy' and axis2 == '|Q|':
+        elif axis1 == 'DeltaE' and axis2 == '|Q|':
             output_workspace = input_workspace + '_EQ'
             ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions='|Q|',
                         PreprocDetectorsWS='-', dEAnalysisMode=emode)
