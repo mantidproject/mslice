@@ -1,5 +1,5 @@
-Slicing
-=======
+Taking Slices
+=============
 
 This page provides a more in depth explanation of slicing in MSlice.
 
