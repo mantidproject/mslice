@@ -170,3 +170,6 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
     def error_invalid_intensity_parameters(self):
         self._display_error("Invalid intensity range")
+
+    def clear_displayed_error(self):
+        self._display_error("")

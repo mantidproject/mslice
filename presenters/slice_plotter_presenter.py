@@ -51,6 +51,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         self._main_presenter.subscribe_to_workspace_selection_monitor(self)
 
     def notify(self, command):
+        self._clear_displayed_error()
         if command == Command.DisplaySlice:
             self._display_slice()
         else:
@@ -171,3 +172,6 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             return
         self._slice_view.populate_slice_x_params(*map(lambda x: "%.5f" % x, (x_min, x_max, x_step)))
         self._slice_view.populate_slice_y_params(*map(lambda x: "%.5f" % x, (y_min, y_max, y_step)))
+
+    def _clear_displayed_error(self):
+        self._slice_view.clear_displayed_error()

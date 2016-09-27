@@ -104,6 +104,19 @@ class PowderProjectionPresenterTest(unittest.TestCase):
 
         self.projection_calculator.calculate_projection.assert_not_called()
 
+    def test_notify_presenter_clears_error(self):
+        presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
+        presenter.register_master(self.main_presenter)
+        # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
+        # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
+        for command in filter(lambda x: x[0] != "_", dir(Command)):
+            try:
+                presenter.notify(command)
+            except:
+                pass
+            self.powder_view.clear_displayed_error.assert_called()
+            self.powder_view.reset_mock()
+
     def test_axis_switching_1(self):
         powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         dropbox_contents = self.powder_view.populate_powder_u1.call_args[0][0]

@@ -26,6 +26,7 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         self._main_presenter = main_presenter
 
     def notify(self, command):
+        self._clear_displayed_error()
         if command == Command.CalculatePowderProjection:
             self._calculate_powder_projection()
         elif command == Command.U1Changed:
@@ -51,6 +52,9 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
     @require_main_presenter
     def _get_main_presenter(self):
         return self._main_presenter
+
+    def _clear_displayed_error(self):
+        self._powder_view.clear_displayed_error()
 
     def _axis_changed(self, axis):
         """This a private method which stops U1 from being the same as u2 on the gui at any point"""

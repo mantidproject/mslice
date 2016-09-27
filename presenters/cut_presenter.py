@@ -24,6 +24,7 @@ class CutPresenter(object):
 
     @require_main_presenter
     def notify(self, command):
+        self._clear_displayed_error()
         if command == Command.Plot:
             self._process_cuts(plot_over=False)
         elif command == Command.PlotOver:
@@ -160,3 +161,6 @@ class CutPresenter(object):
 
         else:
             self._cut_view.disable()
+
+    def _clear_displayed_error(self):
+        self._cut_view.clear_displayed_error()

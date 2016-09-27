@@ -71,10 +71,10 @@ ___unincluded_functions = ('_backend_selection',
                            'connect',
                            'disconnect',
                            'close',
-						   'draw',
-						   'subplot_tool',
-						   'get_plot_commands',
-						   '<all_colormap_setting_functions>'
+                           'draw',
+                           'subplot_tool',
+                           'get_plot_commands',
+                           '<all_colormap_setting_functions>'
                            )
 
 
@@ -141,6 +141,31 @@ def install_repl_displayhook():
     except (ImportError, _NotIPython):
         _INSTALL_FIG_OBSERVER = True
 install_repl_displayhook()
+
+# From here on just copy and paste from matplotlib.pyplot and decorate as appropriate
+module_name = "plotting.pyplot"
+
+@script_log(module_name)
+def hold(state=None):
+    """set hold of current axes to 'state', if no state is provided then it will toggle the hold state"""
+    gca().hold(None)
+
+
+@script_log(module_name)
+def colorbar(mappable=None, cax=None, ax=None, **kw):
+    if mappable is None:
+        mappable = gci()
+        if mappable is None:
+            raise RuntimeError('No mappable was found to use for colorbar '
+                               'creation. First define a mappable such as '
+                               'an image (with imshow) or a contour set ('
+                               'with contourf).')
+    if ax is None:
+        ax = gca()
+
+    ret = gcf().colorbar(mappable, cax = cax, ax=ax, **kw)
+    draw_if_interactive()
+    return ret
 
 def findobj(o=None, match=None, include_self=True):
     if o is None:
@@ -3185,3 +3210,12 @@ def autoscale(enable=True, axis='both', tight=None):
     return ret
 
 _setup_pyplot_info_docstrings()
+
+if __name__ == '__main__':
+    from PyQt4.QtGui import QApplication
+    qapp = QApplication([])
+    imshow([[1,2],[3,4]])
+    plot([1,2,3,4])
+    figure(1)
+    xlabel('hi')
+    qapp.exec_()

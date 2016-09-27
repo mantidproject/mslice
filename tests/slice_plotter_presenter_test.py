@@ -297,3 +297,16 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.populate_slice_y_options.assert_called()
         self.slice_plotter.get_available_axis.assert_called()
         self.slice_plotter.get_axis_range.assert_called()
+
+    def test_notify_presenter_clears_error(self):
+        presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        presenter.register_master(self.main_presenter)
+        # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
+        # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
+        for command in filter(lambda x: x[0] != "_", dir(Command)):
+            try:
+                presenter.notify(command)
+            except:
+                pass
+            self.slice_view.clear_displayed_error.assert_called()
+            self.slice_view.reset_mock()

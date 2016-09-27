@@ -1,5 +1,6 @@
 from powder_ui import Ui_Form
 from PyQt4.QtGui import QWidget
+from PyQt4.QtCore import pyqtSignal
 from presenters.powder_projection_presenter import PowderProjectionPresenter
 
 from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
@@ -9,6 +10,9 @@ from command import Command
 
 class PowderWidget(QWidget,Ui_Form,PowderView):
     """This widget is not usable without a main window which implements mainview"""
+
+    error_occurred = pyqtSignal('QString')
+
     def __init__(self,*args, **kwargs):
         super(PowderWidget,self).__init__(*args, **kwargs)
         self.setupUi(self)
@@ -35,7 +39,6 @@ class PowderWidget(QWidget,Ui_Form,PowderView):
     def get_powder_u2(self):
         return str(self.cmbPowderU2.currentText())
 
-
     def populate_powder_u1(self, u1_options):
         # Signals are blocked to prevent self._u1_changed being called here (it would be false alarm)
         self.cmbPowderU1.blockSignals(True)
@@ -61,3 +64,8 @@ class PowderWidget(QWidget,Ui_Form,PowderView):
     def get_powder_units(self):
         return str(self.cmbPowderUnits.currentText())
 
+    def clear_displayed_error(self):
+        self._display_error("")
+
+    def _display_error(self, error_string):
+        self.error_occurred.emit(error_string)
