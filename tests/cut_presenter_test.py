@@ -41,7 +41,7 @@ class CutPresenterTest(unittest.TestCase):
                     getattr(self.view, attribute).assert_not_called()
 
     def test_notify_presenter_clears_error(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks

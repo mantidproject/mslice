@@ -17,9 +17,9 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         # Setting up view for slice plotter window
         self.slice_plotter = mock.create_autospec(SlicePlotter)
         self.slice_view = mock.create_autospec(SlicePlotterView)
+
     def test_constructor_success(self):
         self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
-
 
     def test_constructor_invalid_slice_view_failure(self):
         self.assertRaises(TypeError, SlicePlotterPresenter, self.slice_plotter, self.slice_plotter)
@@ -299,7 +299,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_plotter.get_axis_range.assert_called()
 
     def test_notify_presenter_clears_error(self):
-        presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
         presenter.register_master(self.main_presenter)
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks

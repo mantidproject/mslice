@@ -11,9 +11,9 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def calculate_projection(self, input_workspace, axis1, axis2):
         """Calculate the projection workspace AND return a python handle to it"""
-        output_workspace = input_workspace + MD_SUFFIX
         emode = self._workspace_provider.get_workspace_handle(input_workspace).getEMode().name
         if axis1 == '|Q|' and axis2 == 'Energy':
+            output_workspace = input_workspace + '_QE'
             return ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions='|Q|',
                         PreprocDetectorsWS='-', dEAnalysisMode=emode)
 
