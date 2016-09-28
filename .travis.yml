@@ -1,14 +1,24 @@
 language: python
+
+sudo: required
+dist: trusty
+
 python:
   - "2.7"
+
 before_install:
-  export MSLICE_PLOT_WINDOWS="TEST"
-# command to install dependencies
+  - sudo apt-add-repository ppa:mantid/mantid -y
+  - sudo apt-add-repository "deb [arch=amd64] http://apt.isis.rl.ac.uk trusty-testing main" -y
+  - sudo apt-get update -q
+  - sudo apt-get install mantidnightly -y --force-yes
+
 install:
-  pip install -r pip-requirements.txt
-# command to run tests
-script: 
-  nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager
+  - pip install -r pip-requirements.txt
+
+env:
+  - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
+script:
+  - nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager
 
 after_success:
-  coveralls
+  - coveralls
