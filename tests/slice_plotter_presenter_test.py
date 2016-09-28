@@ -15,11 +15,9 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         # Setting up view for slice plotter window
         self.slice_plotter = mock.create_autospec(SlicePlotter)
         self.slice_view = mock.create_autospec(SlicePlotterView)
-        self.plotting_module = mock.Mock(spec=["imshow","xlabel","ylabel"])
 
     def test_constructor_success(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter,self.plotting_module)
-
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
 
     def test_constructor_invalid_slice_view_failure(self):
         self.assertRaises(TypeError, SlicePlotterPresenter, self.slice_plotter, self.slice_plotter)
@@ -28,22 +26,22 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.assertRaises(TypeError, SlicePlotterPresenter, self.slice_view, self.slice_view)
 
     def test_notify_presenter_unknown_command_raise_exception_failure(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
         unknown_command = -1
         self.assertRaises(ValueError, self.slice_plotter_presenter.notify, unknown_command)
 
     def test_register_master_success(self):
-        slice_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        slice_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         slice_presenter.register_master(self.main_presenter)
         self.main_presenter.subscribe_to_workspace_selection_monitor.assert_called_once_with(slice_presenter)
 
     def test_register_master_invalid_master_fail(self):
-        slice_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        slice_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.assertRaises(AssertionError, slice_presenter.register_master, 3)
 
     def test_plot_slice_successful(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
         self.slice_plotter_presenter.register_master(self.main_presenter)
         self.slice_plotter_presenter.register_master(self.main_presenter)
@@ -70,7 +68,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_smoothing.return_value = smoothing
         self.slice_view.get_slice_colourmap.return_value = colourmap
         plot_info = ("plot_data", "boundaries", "colormap", "norm")
-        self.slice_plotter.display_slice = mock.Mock(return_value=plot_info)
+        self.slice_plotter.plot_slice = mock.Mock( return_value=plot_info )
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.main_presenter.get_selected_workspaces.assert_called_once_with()
@@ -88,15 +86,13 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_smoothing.assert_called_once_with()
         self.slice_view.get_slice_colourmap.assert_called_once_with()
 
-        self.slice_plotter.display_slice.assert_called_with(selected_workspace, Axis('x', 0, 10 ,1),
-                                                            Axis('y', 2, 8, 3), int(smoothing),
-                                                            float(intensity_start), float(intensity_end),
-                                                            norm_to_one, colourmap)
-        self.plotting_module.imshow.assert_called_with("plot_data", extent="boundaries", cmap="colormap", aspect='auto',
-                                                        norm="norm", interpolation='none')
+        self.slice_plotter.plot_slice.assert_called_with( selected_workspace, Axis( 'x', 0, 10, 1 ),
+                                                          Axis('y', 2, 8, 3), int(smoothing),
+                                                          float(intensity_start), float(intensity_end),
+                                                          norm_to_one, colourmap )
 
     def test_plot_slice_invalid__string_x_params_fail(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
         x = Axis('x','0',"aa",'1')
         y = Axis('y','2','8','3')
@@ -122,11 +118,11 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.plot_slice.assert_not_called( )
         self.slice_view.error_invalid_x_params.assert_called_once_with()
 
     def test_plot_slice_x_start_bigger_than_x_stop_fail(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
         x = Axis('x','2','1','.1')
         y = Axis('y','2','8','3')
@@ -152,11 +148,11 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.plot_slice.assert_not_called( )
         self.slice_view.error_invalid_x_params.assert_called_once_with()
 
     def test_plot_slice_invalid_string_y_params_fail(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
         x = Axis('x','0','7','1')
         y = Axis('y','2',"8.-",'3')
@@ -182,11 +178,11 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.plot_slice.assert_not_called( )
         self.slice_view.error_invalid_y_params.assert_called_once_with()
 
     def test_plot_slice_invalid_y_params_y_end_less_than_y_start_fail(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
         x = Axis('x','0','7','1')
         y = Axis('y','20','8','3')
@@ -212,11 +208,11 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.plot_slice.assert_not_called( )
         self.slice_view.error_invalid_y_params.assert_called_once_with()
 
     def test_plot_slice_invalid_intensity_params_fail(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
         x = Axis('x','0','7','1')
         y = Axis('y','2','8','3')
@@ -242,11 +238,11 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.plot_slice.assert_not_called( )
         self.slice_view.error_invalid_intensity_params.assert_called_once_with()
 
     def test_plot_slice_intensity_end_less_than_intensity_start_fail(self):
-        self.slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
         x = Axis('x','0','7','1')
         y = Axis('y','2','8','3')
@@ -272,11 +268,11 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.display_slice.assert_not_called()
+        self.slice_plotter.plot_slice.assert_not_called( )
         self.slice_view.error_invalid_intensity_params.assert_called_once_with()
 
     def test_workspace_selection_changed_multiple_selected_empty_options_success(self):
-        slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         slice_plotter_presenter.register_master(self.main_presenter)
         workspace = "a"
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace,workspace])
@@ -287,7 +283,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.clear_input_fields.assert_called()
 
     def test_workspace_selection_changed(self):
-        slice_plotter_presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         slice_plotter_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
@@ -301,7 +297,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_plotter.get_axis_range.assert_called()
 
     def test_notify_presenter_clears_error(self):
-        presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter, self.plotting_module)
+        presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
         presenter.register_master(self.main_presenter)
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks

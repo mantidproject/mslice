@@ -30,4 +30,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_workspace_handle(self, workspace_name):
         """"Return handle to workspace given workspace_name_as_string"""
+
+        # if passed a workspace handle return the handle
+        if isinstance(workspace_name, Workspace):
+            return workspace_name
         return AnalysisDataService[workspace_name]

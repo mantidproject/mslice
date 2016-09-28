@@ -14,10 +14,11 @@ class MantidProjectionCalculator(ProjectionCalculator):
         return [MOD_Q_LABEL, DELTA_E_LABEL]
 
     def calculate_projection(self, input_workspace, axis1, axis2):
+        """Calculate the projection workspace AND return a python handle to it"""
         emode = self._workspace_provider.get_workspace_handle(input_workspace).getEMode().name
         if axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL:
             output_workspace = input_workspace + '_QE'
-            ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
+            return ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
                         PreprocDetectorsWS='-', dEAnalysisMode=emode)
         elif axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL:
             output_workspace = input_workspace + '_EQ'
@@ -32,7 +33,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
                    str(dim0.getMaximum()) + ',' + str(dim0.getNBins())
             dim1 = dim1.getName() + ',' + str(dim1.getMinimum()) + ',' +\
                    str(dim1.getMaximum()) + ',' + str(dim1.getNBins())
-            SliceMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, AlignedDim0=dim0,
+            return SliceMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, AlignedDim0=dim0,
                     AlignedDim1=dim1)
         else:
             raise NotImplementedError("Not implemented axis1 = %s and axis2 = %s" % (axis1, axis2))
