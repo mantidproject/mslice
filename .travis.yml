@@ -1,13 +1,25 @@
 language: python
+
+sudo: required
+dist: trusty
+
 python:
   - "2.7"
-# command to install dependencies
-install: 
-  pip install -r pip-requirements.txt
 
-# command to run tests
-script: 
-  nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager
+before_install:
+  - sudo apt-add-repository ppa:mantid/mantid -y
+  - sudo apt-add-repository "deb [arch=amd64] http://apt.isis.rl.ac.uk trusty main" -y
+  - sudo apt-get update -q
+  - sudo apt-get install mantidnightly -y
+
+install:
+  - pip install -r pip-requirements.txt
+
+env:
+  - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
+
+script:
+  - nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager
 
 after_success:
-  coveralls
+  - coveralls
