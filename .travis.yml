@@ -18,7 +18,7 @@ install:
 env:
   - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
 script:
-  - nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager
+  - nosetests -v --with-coverage --cover-min-percentage=90 --cover-package=presenters,plotting.figuremanager
 
 after_success:
   - coveralls
