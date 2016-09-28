@@ -1,7 +1,7 @@
 from workspace_provider import WorkspaceProvider
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load ,GroupWorkspaces,
                               RenameWorkspace, SaveNexus, SaveMD)
-from mantid.api import IMDWorkspace
+from mantid.api import IMDWorkspace, Workspace
 
 
 class MantidWorkspaceProvider(WorkspaceProvider):
