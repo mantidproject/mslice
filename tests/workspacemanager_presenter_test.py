@@ -20,7 +20,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider = mock.create_autospec(spec=WorkspaceProvider)
         self.view = mock.create_autospec(spec=WorkspaceView)
         self.mainview = mock.create_autospec(MainView)
-        self.main_presenter= mock.create_autospec(MainPresenterInterface)
+        self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 
     def test_register_master_success(self):

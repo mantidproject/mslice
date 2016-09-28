@@ -305,13 +305,13 @@ def xticks(*args, **kwargs):
     """
     ax = gca()
 
-    if len(args)==0:
+    if len(args) == 0:
         locs = ax.get_xticks()
         labels = ax.get_xticklabels()
-    elif len(args)==1:
+    elif len(args) == 1:
         locs = ax.set_xticks(args[0])
         labels = ax.get_xticklabels()
-    elif len(args)==2:
+    elif len(args) == 2:
         locs = ax.set_xticks(args[0])
         labels = ax.set_xticklabels(args[1], **kwargs)
     else: raise TypeError('Illegal number of arguments to xticks')
@@ -346,13 +346,13 @@ def yticks(*args, **kwargs):
     """
     ax = gca()
 
-    if len(args)==0:
+    if len(args) == 0:
         locs = ax.get_yticks()
         labels = ax.get_yticklabels()
-    elif len(args)==1:
+    elif len(args) == 1:
         locs = ax.set_yticks(args[0])
         labels = ax.get_yticklabels()
-    elif len(args)==2:
+    elif len(args) == 2:
         locs = ax.set_yticks(args[0])
         labels = ax.set_yticklabels(args[1], **kwargs)
     else: raise TypeError('Illegal number of arguments to yticks')

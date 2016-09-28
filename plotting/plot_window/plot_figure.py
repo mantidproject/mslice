@@ -109,7 +109,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             line_components = map(lambda x:x.get_children(), containers)
             # drop the first element of each container because it is the the actual line
             errorbars = map(lambda x: x[1:] , line_components)
-            errorbars =chain(*errorbars)
+            errorbars = chain(*errorbars)
             alpha = map(lambda x: x.get_alpha(), errorbars)
             # replace None with 1(None indicates default which is 1)
             alpha = map(lambda x: x if x is not None else 1, alpha)
