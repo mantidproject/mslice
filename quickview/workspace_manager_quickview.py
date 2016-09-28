@@ -2,7 +2,6 @@ from quickview.QuickView import QuickView
 from WorkspaceManagerPresenter import WorkspaceManagerPresenter
 from workspacemanager.WorkspaceView import WorkspaceView
 from MantidWorkspaceProvider import MantidWorkspaceProvider
-import time
 
 
 class WorkspaceManagerQuickView(QuickView,WorkspaceView):

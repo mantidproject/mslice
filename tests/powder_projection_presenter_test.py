@@ -1,6 +1,5 @@
-import unittest
-
 import mock
+import unittest
 
 from mainview import MainView
 from models.projection.powder.projection_calculator import ProjectionCalculator
@@ -42,7 +41,6 @@ class PowderProjectionPresenterTest(unittest.TestCase):
 
     def test_calculate_projection_success(self):
         selected_workspace = 'a'
-        output_workspace = 'b'
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
@@ -70,7 +68,6 @@ class PowderProjectionPresenterTest(unittest.TestCase):
 
     def test_calculate_projection_equal_axis_error(self):
         selected_workspace = 'a'
-        output_workspace = 'b'
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)

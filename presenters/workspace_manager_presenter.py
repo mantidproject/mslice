@@ -1,6 +1,5 @@
 from widgets.workspacemanager.command import Command
 import os.path
-from mainview import MainView
 from validation_decorators import require_main_presenter
 from interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from interfaces.main_presenter import MainPresenterInterface

@@ -16,7 +16,7 @@ class CutPresenterTest(unittest.TestCase):
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
 
     def test_constructor_success(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
+        CutPresenter(self.view, self.cut_algorithm, self.plotting_module)
         self.view.disable.assert_called()
 
     def test_register_master_success(self):

@@ -1,6 +1,6 @@
-from figuremanager import FigureManager,activate_category
+from figuremanager import FigureManager, activate_category
 from script_generation import script_log
-from matplotlib.cbook import dedent, silent_list, is_string_like, is_numlike
+from matplotlib.cbook import silent_list
 
 
 def draw_if_interactive():

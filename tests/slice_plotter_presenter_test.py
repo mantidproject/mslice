@@ -1,7 +1,5 @@
-import unittest
-
 import mock
-from mock import call
+import unittest
 
 from models.slice.slice_plotter import SlicePlotter
 from presenters.interfaces.main_presenter import MainPresenterInterface
