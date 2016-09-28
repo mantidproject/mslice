@@ -16,7 +16,7 @@ class MainPresenterTests(unittest.TestCase):
         main_presenter = MainPresenter(self.mainview, *subpresenters)
         for presenter in subpresenters:
             presenter.register_master.assert_called_once_with(main_presenter)
-            
+
     def test_get_selected_workspaces_success(self):
         main_presenter = MainPresenter(self.mainview)
         main_presenter.register_workspace_selector(self.workspace_presenter)

@@ -6,8 +6,6 @@ from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
 from presenters.slice_plotter_presenter import SlicePlotterPresenter
 from slice_ui import Ui_Form
 from views.slice_plotter_view import SlicePlotterView
-import plotting.pyplot
-
 
 class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
 

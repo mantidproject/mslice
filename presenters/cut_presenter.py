@@ -43,9 +43,13 @@ class CutPresenter(object):
             return
 
         if save_to_workspace:
-            handler = lambda params, plot_over: self._save_cut_to_workspace(params)
+            def save_cut(params, _):
+                self._save_cut_to_workspace(params)
+            handler = save_cut
         else:
-            handler = lambda params, plot_over: self._plot_cut(params, plot_over)
+            def plot_cut(params, plot_over):
+                self._plot_cut(params, plot_over)
+            handler = plot_cut
         width = params[-1]
         params = params[:-1]
         if width is None:
@@ -128,7 +132,7 @@ class CutPresenter(object):
         else:
             width = None
         return selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
-               intensity_end, width
+            intensity_end, width
 
     def _to_float(self, x):
         if x == "":
@@ -155,7 +159,8 @@ class CutPresenter(object):
             if is_normed:
                 self._cut_view.force_normalization()
             self._cut_view.populate_cut_axis_options([cut_axis.units])
-            format_ = lambda *args: map(lambda x: "%.5f" % x, args)
+            def format_(*args):
+                return map(lambda x: "%.5f" % x, args)
             self._cut_view.populate_cut_params(*format_(cut_axis.start, cut_axis.end, cut_axis.step))
             self._cut_view.populate_integration_params(*format_(*integration_limits))
 

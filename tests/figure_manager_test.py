@@ -1,7 +1,6 @@
 from mock import call
 import mock
 import unittest
-import plotting
 from plotting.figuremanager import FigureManager
 from plotting.figuremanager import activate_category
 
@@ -178,4 +177,3 @@ class FigureManagerTest(unittest.TestCase):
         mock_figures[1].test.assert_has_calls([call(2)])
 
         self.assert_(FigureManager._active_figure == 1)
-

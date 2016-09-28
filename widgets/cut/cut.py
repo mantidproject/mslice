@@ -6,7 +6,6 @@ from command import Command
 from presenters.cut_presenter import CutPresenter
 from models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
-import plotting.pyplot
 
 
 class CutWidget(QWidget, CutView, Ui_Form):

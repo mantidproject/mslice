@@ -2,7 +2,6 @@ from matplotlib.colors import Normalize
 from slice_plotter import SlicePlotter
 import plotting.pyplot as plt
 
-
 class MatplotlibSlicePlotter(SlicePlotter):
     def __init__(self, slice_algorithm):
         self._slice_algorithm = slice_algorithm

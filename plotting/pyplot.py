@@ -1,11 +1,11 @@
 # This file was created from matplotlib.pyplot
 # matplotlib version 1.5.2
-from figuremanager import FigureManager,activate_category
+# flake8 warnings are disabled for this file
+from figuremanager import FigureManager, activate_category
 from script_generation import script_log
 from _pyplot_decorators import draw_colorbar
 
-#imports from matplotlit.pyplot
-from matplotlib.cbook import dedent, silent_list, is_string_like, is_numlike
+# imports from matplotlit.pyplot
 import matplotlib
 from matplotlib import docstring
 from matplotlib.axes import Axes, Subplot
@@ -26,10 +26,9 @@ import sys
 import warnings
 import numpy as np
 
-module_name = "cli"  # This is passed to who ever is managing the script logging
-                     # This will be the name of the module in the script
-
-
+# This is passed to who ever is managing the script logging
+# This will be the name of the module in the script
+module_name = "cli"
 
 # These are functions that exist is in matplotlib.pyplot but have been redefined.
 def figure(num=None):
@@ -54,43 +53,45 @@ def draw_all():
 # defined before  this comment.
 
 # The following tuple is a list of all the functions in matplotlib.pyplot that have NOT been included in this interface
-___unincluded_functions = ('_backend_selection',
-                           'install_repl_displayhook',
-                           'uninstall_repl_displayhook',
-                           'switch_backend',
-                           'show',
-                           'ioff',
-                           'pause',
-                           'xkcd',
-                           '_auto_draw_if_interactive',
-                           'fignum_exists',
-                           'get_fignums',
-                           'get_fignums',
-                           'get_figlabels',
-                           'get_current_fig_manager',
-                           'connect',
-                           'disconnect',
-                           'close',
-                           'draw',
-                           'subplot_tool',
-                           'get_plot_commands',
-                           '<all_colormap_setting_functions>'
-                           )
+_UNINCLUDED_FUNCTIONS = (
+    '_backend_selection',
+    'install_repl_displayhook',
+    'uninstall_repl_displayhook',
+    'switch_backend',
+    'show',
+    'ioff',
+    'pause',
+    'xkcd',
+    '_auto_draw_if_interactive',
+    'fignum_exists',
+    'get_fignums',
+    'get_fignums',
+    'get_figlabels',
+    'get_current_fig_manager',
+    'connect',
+    'disconnect',
+    'close',
+    'draw',
+    'subplot_tool',
+    'get_plot_commands',
+    '<all_colormap_setting_functions>'
+)
 
 
 def get_unincluded_functions():
-    return ___unincluded_functions
+    return _UNINCLUDED_FUNCTIONS
 
-
-__redefined_functions = ('figure',
-                         'gcf',
-                         'draw_if_interactive',
-                         'draw_all'
+_REDEFINED_FUNCTIONS = (
+    'figure',
+    'gcf',
+    'draw_if_interactive',
+    'draw_all'
 )
 
 
 def get_redefined_functions():
-    return __redefined_functions
+    return _REDEFINED_FUNCTIONS
+
 # These are functions that have been copied over from matplotlib.pyplot exactly as defined, decorators are added as
 # appropriate
 
@@ -1184,13 +1185,13 @@ def xticks(*args, **kwargs):
     """
     ax = gca()
 
-    if len(args)==0:
+    if len(args) == 0:
         locs = ax.get_xticks()
         labels = ax.get_xticklabels()
-    elif len(args)==1:
+    elif len(args) == 1:
         locs = ax.set_xticks(args[0])
         labels = ax.get_xticklabels()
-    elif len(args)==2:
+    elif len(args) == 2:
         locs = ax.set_xticks(args[0])
         labels = ax.set_xticklabels(args[1], **kwargs)
     else: raise TypeError('Illegal number of arguments to xticks')
@@ -1225,13 +1226,13 @@ def yticks(*args, **kwargs):
     """
     ax = gca()
 
-    if len(args)==0:
+    if len(args) == 0:
         locs = ax.get_yticks()
         labels = ax.get_yticklabels()
-    elif len(args)==1:
+    elif len(args) == 1:
         locs = ax.set_yticks(args[0])
         labels = ax.get_yticklabels()
-    elif len(args)==2:
+    elif len(args) == 2:
         locs = ax.set_yticks(args[0])
         labels = ax.set_yticklabels(args[1], **kwargs)
     else: raise TypeError('Illegal number of arguments to yticks')

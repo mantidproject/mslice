@@ -16,7 +16,7 @@ class Axis(object):
     def __eq__(self, other):
         # This is required for Unit testing
         return self.units == other.units and self.start == other.start and self.end == other.end \
-               and self.step == other.step and isinstance(other, Axis)
+            and self.step == other.step and isinstance(other, Axis)
 
     def __repr__(self):
         info = (self.units, self.start, self.end, self.step)
@@ -101,7 +101,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
 
         try:
             self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
-                                        norm_to_one, colourmap)
+                                           norm_to_one, colourmap)
 
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa

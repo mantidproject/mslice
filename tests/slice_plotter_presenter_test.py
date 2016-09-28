@@ -1,7 +1,5 @@
-import unittest
-
 import mock
-from mock import call
+import unittest
 
 from models.slice.slice_plotter import SlicePlotter
 from presenters.interfaces.main_presenter import MainPresenterInterface
@@ -55,20 +53,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
-        self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value=x.units
-        self.slice_view.get_slice_x_start.return_value=x.start
-        self.slice_view.get_slice_x_end.return_value=x.end
-        self.slice_view.get_slice_x_step.return_value=x.step
-        self.slice_view.get_slice_y_axis.return_value=y.units
+        self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
+        self.slice_view.get_slice_x_axis.return_value = x.units
+        self.slice_view.get_slice_x_start.return_value = x.start
+        self.slice_view.get_slice_x_end.return_value = x.end
+        self.slice_view.get_slice_x_step.return_value = x.step
+        self.slice_view.get_slice_y_axis.return_value = y.units
         self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value=y.end
-        self.slice_view.get_slice_y_step.return_value=y.step
-        self.slice_view.get_slice_intensity_start.return_value=intensity_start
+        self.slice_view.get_slice_y_end.return_value = y.end
+        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
-        self.slice_view.get_slice_is_norm_to_one.return_value=norm_to_one
-        self.slice_view.get_slice_smoothing.return_value=smoothing
-        self.slice_view.get_slice_colourmap.return_value=colourmap
+        self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
+        self.slice_view.get_slice_smoothing.return_value = smoothing
+        self.slice_view.get_slice_colourmap.return_value = colourmap
         plot_info = ("plot_data", "boundaries", "colormap", "norm")
         self.slice_plotter.plot_slice = mock.Mock( return_value=plot_info )
 
@@ -104,20 +102,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
-        self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value=x.units
-        self.slice_view.get_slice_x_start.return_value=x.start
-        self.slice_view.get_slice_x_end.return_value=x.end
-        self.slice_view.get_slice_x_step.return_value=x.step
-        self.slice_view.get_slice_y_axis.return_value=y.units
+        self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
+        self.slice_view.get_slice_x_axis.return_value = x.units
+        self.slice_view.get_slice_x_start.return_value = x.start
+        self.slice_view.get_slice_x_end.return_value = x.end
+        self.slice_view.get_slice_x_step.return_value = x.step
+        self.slice_view.get_slice_y_axis.return_value = y.units
         self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value=y.end
-        self.slice_view.get_slice_y_step.return_value=y.step
-        self.slice_view.get_slice_intensity_start.return_value=intensity_start
+        self.slice_view.get_slice_y_end.return_value = y.end
+        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
-        self.slice_view.get_slice_is_norm_to_one.return_value=norm_to_one
-        self.slice_view.get_slice_smoothing.return_value=smoothing
-        self.slice_view.get_slice_colourmap.return_value=colourmap
+        self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
+        self.slice_view.get_slice_smoothing.return_value = smoothing
+        self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.slice_plotter.plot_slice.assert_not_called( )
@@ -134,20 +132,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
-        self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value=x.units
-        self.slice_view.get_slice_x_start.return_value=x.start
-        self.slice_view.get_slice_x_end.return_value=x.end
-        self.slice_view.get_slice_x_step.return_value=x.step
-        self.slice_view.get_slice_y_axis.return_value=y.units
+        self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
+        self.slice_view.get_slice_x_axis.return_value = x.units
+        self.slice_view.get_slice_x_start.return_value = x.start
+        self.slice_view.get_slice_x_end.return_value = x.end
+        self.slice_view.get_slice_x_step.return_value = x.step
+        self.slice_view.get_slice_y_axis.return_value = y.units
         self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value=y.end
-        self.slice_view.get_slice_y_step.return_value=y.step
-        self.slice_view.get_slice_intensity_start.return_value=intensity_start
+        self.slice_view.get_slice_y_end.return_value = y.end
+        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
-        self.slice_view.get_slice_is_norm_to_one.return_value=norm_to_one
-        self.slice_view.get_slice_smoothing.return_value=smoothing
-        self.slice_view.get_slice_colourmap.return_value=colourmap
+        self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
+        self.slice_view.get_slice_smoothing.return_value = smoothing
+        self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.slice_plotter.plot_slice.assert_not_called( )
@@ -164,20 +162,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
-        self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value=x.units
-        self.slice_view.get_slice_x_start.return_value=x.start
-        self.slice_view.get_slice_x_end.return_value=x.end
-        self.slice_view.get_slice_x_step.return_value=x.step
-        self.slice_view.get_slice_y_axis.return_value=y.units
+        self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
+        self.slice_view.get_slice_x_axis.return_value = x.units
+        self.slice_view.get_slice_x_start.return_value = x.start
+        self.slice_view.get_slice_x_end.return_value = x.end
+        self.slice_view.get_slice_x_step.return_value = x.step
+        self.slice_view.get_slice_y_axis.return_value = y.units
         self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value=y.end
-        self.slice_view.get_slice_y_step.return_value=y.step
-        self.slice_view.get_slice_intensity_start.return_value=intensity_start
+        self.slice_view.get_slice_y_end.return_value = y.end
+        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
-        self.slice_view.get_slice_is_norm_to_one.return_value=norm_to_one
-        self.slice_view.get_slice_smoothing.return_value=smoothing
-        self.slice_view.get_slice_colourmap.return_value=colourmap
+        self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
+        self.slice_view.get_slice_smoothing.return_value = smoothing
+        self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.slice_plotter.plot_slice.assert_not_called( )
@@ -194,20 +192,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
-        self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value=x.units
-        self.slice_view.get_slice_x_start.return_value=x.start
-        self.slice_view.get_slice_x_end.return_value=x.end
-        self.slice_view.get_slice_x_step.return_value=x.step
-        self.slice_view.get_slice_y_axis.return_value=y.units
+        self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
+        self.slice_view.get_slice_x_axis.return_value = x.units
+        self.slice_view.get_slice_x_start.return_value = x.start
+        self.slice_view.get_slice_x_end.return_value = x.end
+        self.slice_view.get_slice_x_step.return_value = x.step
+        self.slice_view.get_slice_y_axis.return_value = y.units
         self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value=y.end
-        self.slice_view.get_slice_y_step.return_value=y.step
-        self.slice_view.get_slice_intensity_start.return_value=intensity_start
+        self.slice_view.get_slice_y_end.return_value = y.end
+        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
-        self.slice_view.get_slice_is_norm_to_one.return_value=norm_to_one
-        self.slice_view.get_slice_smoothing.return_value=smoothing
-        self.slice_view.get_slice_colourmap.return_value=colourmap
+        self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
+        self.slice_view.get_slice_smoothing.return_value = smoothing
+        self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.slice_plotter.plot_slice.assert_not_called( )
@@ -224,20 +222,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
-        self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value=x.units
-        self.slice_view.get_slice_x_start.return_value=x.start
-        self.slice_view.get_slice_x_end.return_value=x.end
-        self.slice_view.get_slice_x_step.return_value=x.step
-        self.slice_view.get_slice_y_axis.return_value=y.units
+        self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
+        self.slice_view.get_slice_x_axis.return_value = x.units
+        self.slice_view.get_slice_x_start.return_value = x.start
+        self.slice_view.get_slice_x_end.return_value = x.end
+        self.slice_view.get_slice_x_step.return_value = x.step
+        self.slice_view.get_slice_y_axis.return_value = y.units
         self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value=y.end
-        self.slice_view.get_slice_y_step.return_value=y.step
-        self.slice_view.get_slice_intensity_start.return_value=intensity_start
+        self.slice_view.get_slice_y_end.return_value = y.end
+        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
-        self.slice_view.get_slice_is_norm_to_one.return_value=norm_to_one
-        self.slice_view.get_slice_smoothing.return_value=smoothing
-        self.slice_view.get_slice_colourmap.return_value=colourmap
+        self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
+        self.slice_view.get_slice_smoothing.return_value = smoothing
+        self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.slice_plotter.plot_slice.assert_not_called( )
@@ -254,20 +252,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
-        self.main_presenter.get_selected_workspaces.return_value=[selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value=x.units
-        self.slice_view.get_slice_x_start.return_value=x.start
-        self.slice_view.get_slice_x_end.return_value=x.end
-        self.slice_view.get_slice_x_step.return_value=x.step
-        self.slice_view.get_slice_y_axis.return_value=y.units
+        self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
+        self.slice_view.get_slice_x_axis.return_value = x.units
+        self.slice_view.get_slice_x_start.return_value = x.start
+        self.slice_view.get_slice_x_end.return_value = x.end
+        self.slice_view.get_slice_x_step.return_value = x.step
+        self.slice_view.get_slice_y_axis.return_value = y.units
         self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value=y.end
-        self.slice_view.get_slice_y_step.return_value=y.step
-        self.slice_view.get_slice_intensity_start.return_value=intensity_start
+        self.slice_view.get_slice_y_end.return_value = y.end
+        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
-        self.slice_view.get_slice_is_norm_to_one.return_value=norm_to_one
-        self.slice_view.get_slice_smoothing.return_value=smoothing
-        self.slice_view.get_slice_colourmap.return_value=colourmap
+        self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
+        self.slice_view.get_slice_smoothing.return_value = smoothing
+        self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
         self.slice_plotter.plot_slice.assert_not_called( )
@@ -278,7 +276,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_plotter_presenter.register_master(self.main_presenter)
         workspace = "a"
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace,workspace])
-        axis =["x","y"]
+        axis = ["x","y"]
         self.slice_plotter.get_available_axis = mock.Mock(return_value=axis)
 
         slice_plotter_presenter.workspace_selection_changed()
@@ -289,7 +287,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_plotter_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
-        dims =['dim1', 'dim2']
+        dims = ['dim1', 'dim2']
         self.slice_plotter.get_available_axis = mock.Mock(return_value=dims)
         self.slice_plotter.get_axis_range = mock.Mock(return_value=(0,1))
         slice_plotter_presenter.workspace_selection_changed()

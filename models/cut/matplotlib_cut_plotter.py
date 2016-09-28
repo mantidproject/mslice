@@ -26,4 +26,4 @@ class MatplotlibCutPlotter(CutPlotter):
         if integrated_dim == 'DeltaE':
             integrated_dim = 'e'
         return workspace_name + "    " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
-               "%.2f" % integration_end
+            "%.2f" % integration_end

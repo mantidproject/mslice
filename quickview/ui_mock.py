@@ -54,7 +54,7 @@ class GetInputFromUser(Ui_Dialog, QtGui.QDialog):
 def display_message(title, *args):
     args_and_types = [(str(arg) + ' ' + str(type(arg))) for arg in args]
     if not args_and_types:
-        args_and_types=['']
+        args_and_types = ['']
     #Pad message box so whole title is visible
     padding = len(title) * '   '
     args_and_types[0] += padding
