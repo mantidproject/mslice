@@ -10,6 +10,7 @@ python:
 before_install:
   - sudo apt-add-repository ppa:mantid/mantid -y
   - sudo apt-add-repository "deb [arch=amd64] http://apt.isis.rl.ac.uk trusty-testing main" -y
+  - sudo apt-get update -q
   - sudo apt-get install mantidnightly -y --force-yes
 
 install:
