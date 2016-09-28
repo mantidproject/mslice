@@ -36,4 +36,3 @@ class MantidProjectionCalculator(ProjectionCalculator):
                     AlignedDim1=dim1)
         else:
             raise NotImplementedError("Not implemented axis1 = %s and axis2 = %s" % (axis1, axis2))
-

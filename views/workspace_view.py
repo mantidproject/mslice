@@ -48,4 +48,3 @@ class WorkspaceView(object):
 
     def clear_displayed_error(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
-

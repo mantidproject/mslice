@@ -190,4 +190,3 @@ class PlotConfig(object):
                 self._ylabel = str(value)
             except ValueError:
                 raise ValueError("Plot ylabel must be a string or castable to string")
-

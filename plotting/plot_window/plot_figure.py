@@ -164,4 +164,3 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                           errorbars_enabled=has_errorbars,
                           x_range=x_range,
                           y_range=y_range)
-

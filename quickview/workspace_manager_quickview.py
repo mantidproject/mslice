@@ -20,5 +20,3 @@ if __name__ == '__main__':
     from command import Command as c
     m = WorkspaceManagerQuickView(c)
     m.app.exec_()
-
-

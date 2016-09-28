@@ -84,4 +84,3 @@ if __name__ == '__main__':
     m = QuickView()
     m.get_data_from_user()
     m.say_hi('A',1,(1,1,1,1,1,1,1,1))
-
