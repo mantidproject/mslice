@@ -3,19 +3,40 @@ from models.workspacemanager.mantid_workspace_provider import MantidWorkspacePro
 from presenters.slice_plotter_presenter import Axis as _Axis
 from mantid.kernel.funcinspect import lhs_info as _lhs_info
 
-_workspace_provider = _MantidWorkspaceProvider()
+# Mantid Tools imported for convenience
+from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F401
 
+# Projections
+from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
+from mantid.api import Workspace as _Workspace
+
+# Slicing
+from models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
+from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm as _MantidSliceAlgorithm
+from mantid.api import IMDWorkspace as _IMDWorkspace
+
+# Cutting
+from models.cut.mantid_cut_algorithm import MantidCutAlgorithm as _MantidCutAlgorithm
+from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+
+# Module constants
+_WORKSPACE_PROVIDER = _MantidWorkspaceProvider()
+_POWDER_PROJECTION_MODEL = _MantidProjectionCalculator()
+_SLICE_ALGORITHM = _MantidSliceAlgorithm()
+_SLICE_MODEL = _MatplotlibSlicePlotter(_SLICE_ALGORITHM)
+_CUT_ALGORITHM = _MantidCutAlgorithm()
+_CUT_PLOTTER = MatplotlibCutPlotter(_CUT_ALGORITHM)
+
+# Convenience methods
 def _process_axis(axis, fallback_index, input_workspace):
     if axis is None:
-        axis = _slice_algorithm.get_available_axis(input_workspace)[fallback_index]
+        axis = _SLICE_ALGORITHM.get_available_axis(input_workspace)[fallback_index]
 
     # check to see if axis is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
     if ',' in axis:
         axis = _string_to_axis(axis)
     else:
         axis = _Axis(units=axis, start=None, end=None, step=None) # The model will fill in the rest
-
-
     return axis
 
 def _string_to_axis(string):
@@ -27,7 +48,6 @@ def _string_to_axis(string):
         start = float(axis[1])
     except:
         raise ValueError("start '%s' is not a valid float"%axis[1])
-
     try:
         end = float(axis[2])
     except:
@@ -39,13 +59,6 @@ def _string_to_axis(string):
         raise ValueError("step '%s' is not a valid float"%axis[3])
     return _Axis(name, start, end, step)
 
-# Mantid Tools
-from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace
-
-# Projections
-from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
-from mantid.api import Workspace as _Workspace
-_powder_projection_model = _MantidProjectionCalculator()
 
 
 def get_projection(input_workspace, axis1, axis2):
@@ -60,7 +73,7 @@ def get_projection(input_workspace, axis1, axis2):
     """
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
-    output_workspace = _powder_projection_model.calculate_projection(input_workspace=input_workspace, axis1=axis1,
+    output_workspace = _POWDER_PROJECTION_MODEL.calculate_projection(input_workspace=input_workspace, axis1=axis1,
                                                                      axis2=axis2)
     try:
         names = _lhs_info('names')
@@ -70,15 +83,6 @@ def get_projection(input_workspace, axis1, axis2):
         raise Exception('Too many left hand side arguments, %s' % str(names))
     RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=names[0])
     return output_workspace
-
-#Slicing
-from models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
-from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm as _MantidSliceAlgorithm
-from mantid.api import IMDWorkspace as _IMDWorkspace
-
-_slice_algorithm = _MantidSliceAlgorithm()
-_slice_model = _MatplotlibSlicePlotter(_slice_algorithm)
-
 
 def get_slice(input_workspace, x=None, y=None, ret_val='both', normalize=False):
     """ Get Slice from workspace as numpy array.
@@ -100,14 +104,13 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalize=False):
     normalize -- if set to True the slice will be normalize to one.
 
     """
-
-    input_workspace = _workspace_provider.get_workspace_handle(input_workspace)
+    input_workspace = _WORKSPACE_PROVIDER.get_workspace_handle(input_workspace)
     assert isinstance(input_workspace, _IMDWorkspace)
     x_axis = _process_axis(x, 0, input_workspace)
     y_axis = _process_axis(y, 1, input_workspace)
 
-    slice_array, extents = _slice_algorithm.compute_slice(selected_workspace=input_workspace, x_axis=x_axis,
-                                                           smoothing=None, y_axis=y_axis, norm_to_one=normalize)
+    slice_array, extents = _SLICE_ALGORITHM.compute_slice(selected_workspace=input_workspace, x_axis=x_axis,
+                                                          smoothing=None, y_axis=y_axis, norm_to_one=normalize)
     if ret_val == 'slice':
         return slice_array
     elif ret_val == 'extents':
@@ -140,23 +143,15 @@ def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_mi
 
     """
 
-    input_workspace = _workspace_provider.get_workspace_handle(input_workspace)
+    input_workspace = _WORKSPACE_PROVIDER.get_workspace_handle(input_workspace)
     assert isinstance(input_workspace, _IMDWorkspace)
 
     x_axis = _process_axis(x, 0, input_workspace)
     y_axis = _process_axis(y, 1, input_workspace)
 
-    _slice_model.plot_slice(selected_workspace=input_workspace,x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
+    _SLICE_MODEL.plot_slice(selected_workspace=input_workspace,x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
                             intensity_start=intensity_min,intensity_end=intensity_max,
                             smoothing=None, norm_to_one=normalize)
-
-
-
-# Cutting
-from models.cut.mantid_cut_algorithm import MantidCutAlgorithm as _MantidCutAlgorithm
-from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
-_cut_algorithm = _MantidCutAlgorithm()
-_cut_plotter = MatplotlibCutPlotter(_cut_algorithm)
 
 
 def get_cut_xye(input_workspace, cut_axis, integration_start, integration_end, normalize=False):
@@ -176,7 +171,7 @@ def get_cut_xye(input_workspace, cut_axis, integration_start, integration_end, n
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
-    x, y, e = _cut_algorithm.compute_cut_xye(input_workspace, cut_axis, integration_start, integration_end, 
+    x, y, e = _CUT_ALGORITHM.compute_cut_xye(input_workspace, cut_axis, integration_start, integration_end,
                                              is_norm=normalize)
     x, y, e = x.squeeze(), y.squeeze(), e.squeeze()
     return x, y, e
@@ -200,5 +195,5 @@ def plot_cut(input_workspace, cut_axis, integration_start, integration_end, inte
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
-    _cut_plotter.plot_cut(input_workspace, cut_axis, integration_start, integration_end, normalize, intensity_start,
+    _CUT_PLOTTER.plot_cut(input_workspace, cut_axis, integration_start, integration_end, normalize, intensity_start,
                           intensity_end, plot_over=hold)
