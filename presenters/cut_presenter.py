@@ -1,20 +1,20 @@
 from views.cut_view import CutView
 from models.cut.cut_algorithm import CutAlgorithm
+from models.cut.cut_plotter import CutPlotter
 from widgets.cut.command import Command
 from validation_decorators import require_main_presenter
 from presenters.slice_plotter_presenter import Axis
 
-INTENSITY = 'Signal/#Events'
-
 
 class CutPresenter(object):
-    def __init__(self, cut_view, cut_algorithm, plotting_module):
+    def __init__(self, cut_view, cut_algorithm, cut_plotter):
         self._cut_view = cut_view
         self._cut_algorithm = cut_algorithm
         assert isinstance(cut_view, CutView)
         assert isinstance(cut_algorithm, CutAlgorithm)
+        assert isinstance(cut_plotter, CutPlotter)
         self._main_presenter = None
-        self._plotting_module = plotting_module
+        self._cut_plotter = cut_plotter
         self._acting_on = None
         self._cut_view.disable()
 
@@ -41,6 +41,7 @@ class CutPresenter(object):
             params = self._parse_input()
         except ValueError:
             return
+
         if save_to_workspace:
             handler = lambda params, plot_over: self._save_cut_to_workspace(params)
         else:
@@ -61,28 +62,14 @@ class CutPresenter(object):
             plot_over = True
 
     def _plot_cut(self, params, plot_over):
-        cut_params = params[:5]
-        intensity_start, intensity_end, integration_axis = params[5:]
-        x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
+        self._cut_plotter.plot_cut(*params, plot_over=plot_over)
 
-        legend = self._get_legend(params[0], integration_axis, params[2:4])
-        self._plotting_module.errorbar(x, y, yerr=e, label=legend, hold=plot_over)
-        self._plotting_module.legend()
-        self._plotting_module.xlabel(cut_params[1].units)
-        self._plotting_module.ylabel(INTENSITY)
-        self._plotting_module.autoscale()
-        self._plotting_module.ylim(intensity_start, intensity_end)
 
     def _save_cut_to_workspace(self, params):
         cut_params = params[:5]
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
 
-    def _get_legend(self, workspace_name, integrated_dim, integration_range):
-        if integrated_dim == 'DeltaE':
-            integrated_dim = 'e'
-        return workspace_name + "    " + "%.2f" % integration_range[0] + "<" + integrated_dim + "<" + \
-               "%.2f" % integration_range[1]
 
     def _parse_input(self):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
@@ -140,9 +127,8 @@ class CutPresenter(object):
                 raise ValueError("Invalid width")
         else:
             width = None
-        integration_axis = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
         return selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
-               intensity_end, integration_axis, width
+               intensity_end, width
 
     def _to_float(self, x):
         if x == "":

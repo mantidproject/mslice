@@ -4,7 +4,8 @@ sudo: required
 dist: trusty
 
 python:
-  - "2.7"
+  # See https://github.com/travis-ci/travis-ci/issues/2219#issuecomment-41804942
+  - "2.7_with_system_site_packages" # for pyqt4
 
 before_install:
   - sudo apt-add-repository ppa:mantid/mantid -y
@@ -19,7 +20,9 @@ env:
   - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
 
 script:
-  - nosetests -v --with-coverage --cover-min-percentage=80 --cover-package=presenters,plotting.figuremanager
+  - mkdir $HOME/.mantid && echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > $HOME/.mantid/Mantid.user.properties &&
+    python build_all_ui_files.py &&
+    nosetests -v --with-coverage --cover-min-percentage=85 --cover-package=presenters,plotting.figuremanager
 
 after_success:
   - coveralls
