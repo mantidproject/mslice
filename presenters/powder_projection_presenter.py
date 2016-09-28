@@ -16,7 +16,7 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
             raise TypeError("projection_calculator is not of type ProjectionCalculator")
 
         #Add rest of options
-        self._available_units = ['|Q|', 'Energy']
+        self._available_units = projection_calculator.available_units()
         self._powder_view.populate_powder_u1(self._available_units)
         self._powder_view.populate_powder_u2(self._available_units[::-1])
         self._main_presenter = None

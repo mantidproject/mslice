@@ -15,6 +15,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         # Set up a mock view, presenter, main view and main presenter
         self.powder_view = mock.create_autospec(PowderView)
         self.projection_calculator = mock.create_autospec(ProjectionCalculator)
+        self.projection_calculator.configure_mock(**{'available_units.return_value': ['|Q|', 'DeltaE']})
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview = mock.create_autospec(MainView)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
@@ -46,8 +47,8 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         self.powder_presenter.register_master(self.main_presenter)
-        # Setup view to report Energy and |Q| as selected axis to project two
-        u1 = 'Energy'
+        # Setup view to report DeltaE and |Q| as selected axis to project two
+        u1 = 'DeltaE'
         u2 = '|Q|'
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
@@ -73,9 +74,9 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         # Setting up main presenter to report that the current selected workspace is selected_workspace
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[selected_workspace])
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
-        # Setup view to report Energy and |Q| as selected axis to project two
-        u1 = 'Energy'
-        u2 = 'Energy'
+        # Setup view to report DeltaE and |Q| as selected axis to project two
+        u1 = 'DeltaE'
+        u2 = 'DeltaE'
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
         self.powder_presenter.register_master(self.main_presenter)
@@ -92,8 +93,8 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=selected_workspaces)
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         self.powder_presenter.register_master(self.main_presenter)
-        # Setup view to report Energy and |Q| as selected axis to project two
-        u1 = 'Energy'
+        # Setup view to report DeltaE and |Q| as selected axis to project two
+        u1 = 'DeltaE'
         u2 = '|Q|'
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
