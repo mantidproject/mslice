@@ -72,6 +72,7 @@
    <addaction name="actionZoom_Out"/>
    <addaction name="actionDataCursor"/>
    <addaction name="actionPlotOptions"/>
+   <addaction name="actionToggleLegends"/>
    <addaction name="actionKeep"/>
    <addaction name="actionMakeCurrent"/>
   </widget>
@@ -139,6 +140,11 @@
   <action name="actionPlotOptions">
    <property name="text">
     <string>Plot Options</string>
+   </property>
+  </action>
+  <action name="actionToggleLegends">
+   <property name="text">
+    <string>Toggle Legends</string>
    </property>
   </action>
  </widget>
