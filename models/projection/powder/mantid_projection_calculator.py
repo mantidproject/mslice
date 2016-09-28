@@ -19,7 +19,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
         if axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL:
             output_workspace = input_workspace + '_QE'
             return ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
-                        PreprocDetectorsWS='-', dEAnalysisMode=emode)
+                               PreprocDetectorsWS='-', dEAnalysisMode=emode)
         elif axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL:
             output_workspace = input_workspace + '_EQ'
             ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
@@ -30,10 +30,10 @@ class MantidProjectionCalculator(ProjectionCalculator):
             dim1 = output_workspace_handle.getDimension(0)
             # format into dimension string as expected
             dim0 = dim0.getName() + ',' + str(dim0.getMinimum()) + ',' +\
-                   str(dim0.getMaximum()) + ',' + str(dim0.getNBins())
+                str(dim0.getMaximum()) + ',' + str(dim0.getNBins())
             dim1 = dim1.getName() + ',' + str(dim1.getMinimum()) + ',' +\
-                   str(dim1.getMaximum()) + ',' + str(dim1.getNBins())
+                str(dim1.getMaximum()) + ',' + str(dim1.getNBins())
             return SliceMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, AlignedDim0=dim0,
-                    AlignedDim1=dim1)
+                           AlignedDim1=dim1)
         else:
             raise NotImplementedError("Not implemented axis1 = %s and axis2 = %s" % (axis1, axis2))
