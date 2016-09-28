@@ -4,12 +4,12 @@ sudo: required
 dist: trusty
 
 python:
-  - "2.7"
+  # See https://github.com/travis-ci/travis-ci/issues/2219#issuecomment-41804942
+  - "2.7_with_system_site_packages" # for pyqt4
 
 before_install:
   - sudo apt-add-repository ppa:mantid/mantid -y
   - sudo apt-add-repository "deb [arch=amd64] http://apt.isis.rl.ac.uk trusty-testing main" -y
-  - sudo apt-get update -q
   - sudo apt-get install mantidnightly -y --force-yes
 
 install:
@@ -17,6 +17,7 @@ install:
 
 env:
   - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
+
 script:
   - nosetests -v --with-coverage --cover-min-percentage=90 --cover-package=presenters,plotting.figuremanager
 
