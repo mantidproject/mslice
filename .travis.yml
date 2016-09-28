@@ -20,9 +20,9 @@ env:
   - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
 
 script:
-  - echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > $HOME/.mantid/Mantid.user.properties
-  - python build_all_ui_files.py
-  - nosetests -v --with-coverage --cover-min-percentage=85 --cover-package=presenters,plotting.figuremanager
+  - mkdir $HOME/.mantid && echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > $HOME/.mantid/Mantid.user.properties &&
+    python build_all_ui_files.py &&
+    nosetests -v --with-coverage --cover-min-percentage=85 --cover-package=presenters,plotting.figuremanager
 
 after_success:
   - coveralls
