@@ -1,7 +1,6 @@
 from mock import call
 import mock
 import unittest
-import plotting
 from plotting.figuremanager import FigureManager
 from plotting.figuremanager import activate_category
 

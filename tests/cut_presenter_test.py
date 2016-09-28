@@ -1,6 +1,6 @@
 import unittest
 import mock
-from mock import ANY, call
+from mock import call
 from presenters.cut_presenter import CutPresenter
 from views.cut_view import CutView
 from models.cut.cut_algorithm import CutAlgorithm
@@ -118,7 +118,7 @@ class CutPresenterTest(unittest.TestCase):
                                                      integration_start=integration_start, integration_end=integration_end,
                                                      norm_to_one=is_norm, intensity_start=intensity_start,
                                                      intensity_end=intensity_end, plot_over=False)
-        
+
     def test_cut_single_save_to_worksapce(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
@@ -147,7 +147,7 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.get_other_axis = mock.Mock(return_value=integrated_axis)
         cut_presenter.notify(Command.SaveToWorkspace)
         self.cut_algorithm.compute_cut.assert_called_with(workspace, processed_axis, integration_start,
-                                                              integration_end, is_norm)
+                                                          integration_end, is_norm)
         self.cut_plotter.plot_cut.assert_not_called()
 
     def test_plot_multiple_cuts_with_width(self):
@@ -177,8 +177,8 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.get_other_axis = mock.Mock(return_value=integrated_axis)
 
         cut_presenter.notify(Command.Plot)
-        call_list = \
-            [call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=3,
+        call_list = [
+            call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=3,
                  integration_end=5,norm_to_one=is_norm,intensity_start=intensity_start,
                  intensity_end=intensity_end, plot_over=False),
             call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=5,
@@ -186,7 +186,7 @@ class CutPresenterTest(unittest.TestCase):
                  intensity_end=intensity_end, plot_over=True),
             call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=7,
                  integration_end=8,norm_to_one=is_norm,intensity_start=intensity_start,
-                 intensity_end=intensity_end, plot_over=True),
-         ]
+                 intensity_end=intensity_end, plot_over=True)
+        ]
         self.cut_algorithm.compute_cut.assert_not_called()
         self.cut_plotter.plot_cut.assert_has_calls(call_list)
