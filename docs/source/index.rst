@@ -12,9 +12,12 @@ Mslice is a tool for visualizing cuts and slices from neutron powder diffraction
 .. toctree::
    :maxdepth: 2
    :numbered:
-   quickstart
-   cli
 
+   quickstart
+   plotwindows
+   cutting
+   slicing
+   cli
 
 
 Indices and tables

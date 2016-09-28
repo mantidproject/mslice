@@ -44,7 +44,7 @@ The cut tab will by default be diabled. When you click on a cuttable workspace i
 5. Click on the **Plot** button to plot the cut.
 
 
-.. images:: image/cutting/width_cuts.png
+.. image:: images/cutting/width_cuts.png
 
 **To add cuts to an existing plot**
 1. Click on a projection workspace in the *Workspace Manager* to select it.
