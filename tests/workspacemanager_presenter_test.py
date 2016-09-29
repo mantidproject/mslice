@@ -20,7 +20,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider = mock.create_autospec(spec=WorkspaceProvider)
         self.view = mock.create_autospec(spec=WorkspaceView)
         self.mainview = mock.create_autospec(MainView)
-        self.main_presenter= mock.create_autospec(MainPresenterInterface)
+        self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 
     def test_register_master_success(self):
@@ -259,6 +259,20 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         unknown_command = 10
         self.assertRaises(ValueError,self.presenter.notify, unknown_command)
+
+    def test_notify_presenter_clears_error(self):
+        presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        presenter.register_master(self.main_presenter)
+        # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
+        # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
+        for command in filter(lambda x: x[0] != "_", dir(Command)):
+            try:
+                presenter.notify(command)
+            except:
+                pass
+            self.view.clear_displayed_error.assert_called()
+            self.view.reset_mock()
+
 
 if __name__ == '__main__':
     unittest.main()

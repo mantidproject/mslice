@@ -1,6 +1,5 @@
 from widgets.workspacemanager.command import Command
 import os.path
-from mainview import MainView
 from validation_decorators import require_main_presenter
 from interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from interfaces.main_presenter import MainPresenterInterface
@@ -19,8 +18,10 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         assert (isinstance(main_presenter, MainPresenterInterface))
         self._main_presenter = main_presenter
         self._main_presenter.register_workspace_selector(self)
+        self.update_displayed_workspaces()
 
     def notify(self, command):
+        self._clear_displayed_error()
         if command == Command.LoadWorkspace:
             self._load_workspace()
         elif command == Command.SaveSelectedWorkspace:
@@ -128,3 +129,5 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         workspace"""
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
+    def _clear_displayed_error(self):
+        self._workspace_manger_view.clear_displayed_error()

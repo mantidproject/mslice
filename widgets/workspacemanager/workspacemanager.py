@@ -107,10 +107,10 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         self._display_error('MSlice was not able to load the selected file')
 
     def confirm_overwrite_workspace(self):
-        reply = QMessageBox.question(self,'Confirm Overwrite','The workspace you want to load has the same name as'
-                                                              'an existing workspace, Are you sure you want to '
-                                                              'overwrite it? ',QMessageBox.Yes |
-                                                                              QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(self,'Confirm Overwrite', 'The workspace you want to load has the same name as'
+                                                               'an existing workspace, Are you sure you want to '
+                                                               'overwrite it? ',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             return True
         else:
@@ -118,7 +118,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
 
     def error_invalid_save_path(self):
         self._display_error('No files were saved')
-        
+
     def no_workspace_has_been_loaded(self):
         self._display_error('No new workspaces have been loaded')
 
@@ -130,3 +130,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
 
     def error_unable_to_save(self):
         self._display_error("Something went wrong while trying to save")
+
+    def clear_displayed_error(self):
+        self._display_error("")

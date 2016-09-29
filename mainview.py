@@ -6,4 +6,3 @@ class MainView(object):
 
     def get_presenter(self):
         pass
-
