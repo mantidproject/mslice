@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2. Taking Cuts &mdash; MSlice 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="MSlice 0.2 documentation" href="index.html" />
+    <link rel="next" title="3. Taking Slices" href="slicing.html" />
+    <link rel="prev" title="1. Quick Start" href="quickstart.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="slicing.html" title="3. Taking Slices"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="1. Quick Start"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MSlice 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. Taking Cuts</a><ul>
+<li><a class="reference internal" href="#from-the-gui">2.1. From the GUI</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">1. Quick Start</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="slicing.html"
+                        title="next chapter">3. Taking Slices</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cutting.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="taking-cuts">
+<h1>2. Taking Cuts<a class="headerlink" href="#taking-cuts" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div>This page provides a more detailed explanation on taking cuts in MSlice</div></blockquote>
+<div class="section" id="from-the-gui">
+<h2>2.1. From the GUI<a class="headerlink" href="#from-the-gui" title="Permalink to this headline">¶</a></h2>
+<p>The cut tab will by default be diabled. When you click on a cuttable workspace it will be enabled.</p>
+<p><strong>To plot a Single Cut</strong></p>
+<ol class="arabic simple">
+<li>Click on a projection workspace in the <em>Workspace Manager</em> to select it.</li>
+<li>Switch to Cut tab</li>
+<li>Fill in the mandatory values for the integration axis and the integration range</li>
+</ol>
+<img alt="_images/mandatory_values.png" src="_images/mandatory_values.png" />
+<ol class="arabic simple" start="4">
+<li>Optionally Specify the range for the intensity to shown and tick the the <cite>Norm to 1</cite> checkbox to normalize the
+cuts to 1.</li>
+<li>Click on the <strong>Plot</strong> button to plot the cut.</li>
+</ol>
+<img alt="_images/single_cut.png" src="_images/single_cut.png" />
+<p><strong>To Plot Multiple Equal From one workspace</strong></p>
+<ol class="arabic">
+<li><p class="first">Click on a projection workspace in the <em>Workspace Manager</em> to select it.</p>
+</li>
+<li><p class="first">Switch to Cut tab</p>
+</li>
+<li><p class="first">Fill in the mandatory values for the integration axis and the integration range</p>
+</li>
+<li><dl class="first docutils">
+<dt>Specify the <cite>width</cite> parameter. When the the width parameter is set then cuts the values in <cite>integration from</cite> and</dt>
+<dd><p class="first last"><cite>Integration to ` will specify the range of the data to processed. The range specified will be divided into sections of
+`width</cite> and each section plotted individual. For instance setting the integration from <cite>0</cite> to <cite>40</cite> with width <cite>10</cite> will produce
+4 individual cuts, one with the ranges : from 0 to 10, from 10 to 20, from 20 to 30, from 30 to 40.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<img alt="_images/width_parameters_set.png" src="_images/width_parameters_set.png" />
+<ol class="arabic simple" start="4">
+<li>Optionally Specify the range for the intensity to shown and tick the the <cite>Norm to 1</cite> checkbox to normalize the
+cuts to 1.</li>
+<li>Click on the <strong>Plot</strong> button to plot the cut.</li>
+</ol>
+<img alt="_images/width_cuts.png" src="_images/width_cuts.png" />
+<p><strong>To add cuts to an existing plot</strong>
+1. Click on a projection workspace in the <em>Workspace Manager</em> to select it.</p>
+<ol class="arabic simple" start="2">
+<li>Switch to Cut tab</li>
+<li>Fill in cut parameters (You can specify width to add multiple cuts to a plot at once).</li>
+<li>Make sure the cut window you you want to plot is the current cut window (if it is not click on the make current button
+on it).</li>
+<li>Click on the <strong>Plot Over</strong> button to add the cut to the plot.</li>
+</ol>
+<img alt="_images/multiple_cuts_in_one_window.png" src="_images/multiple_cuts_in_one_window.png" />
+<p>N.B. If you plot multiple cuts to the same window (using <strong>plot over</strong> or <strong>width</strong>) and <tt class="docutils literal"><span class="pre">Norm</span> <span class="pre">to</span> <span class="pre">One</span></tt>  each cut will
+still be normalized independently (e.g. The ratio between corresponding points on  the different cuts will not be conserved).</p>
+<p><strong>Save cuts to workspaces</strong></p>
+<ol class="arabic simple">
+<li>Click on a projection workspace in the <em>Workspace Manager</em> to select it.</li>
+<li>Switch to Cut tab</li>
+<li>Fill in cut parameters (You can specify width to add multiple cuts to a plot at once).</li>
+<li>Click on the <strong>Save to workspaces</strong> button to add the cut to the plot.</li>
+<li>The new cuts should now appear in the <strong>Workspace Manager</strong></li>
+</ol>
+<img alt="_images/cuts_saved_to_workspace.png" src="_images/cuts_saved_to_workspace.png" />
+<p><strong>Interacting with saved cuts</strong></p>
+<blockquote>
+<div><p>Clicking on a saved cut will make the cut tab show the parameters the cut was taken with.</p>
+<img alt="_images/cut_tab_show_params.png" src="_images/cut_tab_show_params.png" />
+<p>You cannot edit these values, However, you still can set an intensity range for the plot. If the cut was not normalized
+to one then you can normalized it if you wish. You cannot revert a normalized cut to its previous state</p>
+<p>To plot the cut click on <strong>Plot</strong>/<strong>Plot Over</strong> or alternatively to save the cut to a workspace click on the <strong>Save</strong>
+button in the <strong>Workspace Manager</strong></p>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="slicing.html" title="3. Taking Slices"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="1. Quick Start"
+             >previous</a> |</li>
+        <li><a href="index.html">MSlice 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Mantid Project.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

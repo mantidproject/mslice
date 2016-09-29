@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. Taking Slices &mdash; MSlice 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="MSlice 0.2 documentation" href="index.html" />
+    <link rel="prev" title="2. Taking Cuts" href="cutting.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="cutting.html" title="2. Taking Cuts"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MSlice 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3. Taking Slices</a><ul>
+<li><a class="reference internal" href="#from-the-gui">3.1. From The GUI</a></li>
+<li><a class="reference internal" href="#from-the-command-line">3.2. From the  Command Line</a></li>
+<li><a class="reference internal" href="#example">3.3. Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cutting.html"
+                        title="previous chapter">2. Taking Cuts</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/slicing.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="taking-slices">
+<h1>3. Taking Slices<a class="headerlink" href="#taking-slices" title="Permalink to this headline">¶</a></h1>
+<p>This page provides a more in depth explanation of slicing in MSlice.</p>
+<div class="section" id="from-the-gui">
+<h2>3.1. From The GUI<a class="headerlink" href="#from-the-gui" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>Click on a projection workspace in the <strong>Workspace Manager</strong> to select it.When a sliceable <em>Workspace</em> is selected</dt>
+<dd><p class="first last">in the <strong>Workspace Manager</strong> tab the <strong>Slice</strong> tab is automatically populated with suggested values.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<img alt="_images/slice_parameters1.png" src="_images/slice_parameters1.png" />
+<ol class="arabic simple">
+<li>After changing the parameters as desired click on the display button.</li>
+</ol>
+</div>
+<div class="section" id="from-the-command-line">
+<h2>3.2. From the  Command Line<a class="headerlink" href="#from-the-command-line" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><em>&lt;Docstrings from cli.get_slice and cli.plot_slice should go here&gt;</em></div></blockquote>
+</div>
+<div class="section" id="example">
+<h2>3.3. Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>First lets load some data and get the projections ready.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">cli</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="n">cli</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s">&#39;MAR21335_Ei60.00meV.nxs&#39;</span><span class="p">)</span>
+<span class="n">projection</span> <span class="o">=</span> <span class="n">cli</span><span class="o">.</span><span class="n">get_projection</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s">&#39;DelatE&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Plotting a simple slice that spans all of the data</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Specifying the axis</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Specifying the axis with binning parameters,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|,0,10,.5&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE,-20,20,1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Specifiying the binning parameters for a single axis</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE,-20,20,100&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Specifying the intensity range</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|,0,10,.1&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE,-20,20,.5&#39;</span><span class="p">,</span> <span class="n">intensity_min</span><span class="o">=.</span><span class="mi">2</span><span class="p">,</span> <span class="n">intensity_max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Normalizing the intensity</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|,0,10,.1&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE,-20,20,.5&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Setting the colormap</dt>
+<dd>Any valid matplotib colormap object or colormap name maybe passed a a value of the <tt class="docutils literal"><span class="pre">colormap</span></tt> parameter in
+<tt class="docutils literal"><span class="pre">plot_slice</span></tt></dd>
+</dl>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s">&#39;coolwarm&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="cutting.html" title="2. Taking Cuts"
+             >previous</a> |</li>
+        <li><a href="index.html">MSlice 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Mantid Project.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

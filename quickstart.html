@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Quick Start &mdash; MSlice 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="MSlice 0.2 documentation" href="index.html" />
+    <link rel="next" title="2. Taking Cuts" href="cutting.html" />
+    <link rel="prev" title="Welcome to MSlice’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="cutting.html" title="2. Taking Cuts"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to MSlice’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MSlice 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to MSlice&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cutting.html"
+                        title="next chapter">2. Taking Cuts</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/quickstart.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quick-start">
+<h1>1. Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<p>This Quick start tutorial will walk you through the basics of loading a file, calculating the projections, plotting a slice
+and plotting a cut</p>
+<ol class="arabic simple">
+<li>To install MSlice download this <a class="reference external" href="https://github.com/mantidproject/mslice/archive/master.zip">zip</a> archive and
+extract(unzip) the archive to a folder on your computer.</li>
+<li>Open the folder you extracted the archive to. Inside it there should now be a folder named <tt class="docutils literal"><span class="pre">mslice-master</span></tt> open that
+folder.</li>
+<li>Run the start-up file by double clicking it. For windows users the start-up file is <tt class="docutils literal"><span class="pre">start-mslice.bat</span></tt> , for linux
+users the start-up file is <tt class="docutils literal"><span class="pre">start-mslice.sh</span></tt></li>
+</ol>
+<ol class="arabic simple" start="5">
+<li>Two windows will shortly appear on the screen. One should be a console window, the other one should be MSlice interface</li>
+</ol>
+<img alt="_images/started_mslice.png" src="_images/started_mslice.png" />
+<ol class="arabic simple" start="5">
+<li>Click on the <strong>Load</strong> button and select a file to load into <cite>MSlice</cite> . After the file loads a new entry should appear
+in the workspace manager.</li>
+</ol>
+<img alt="_images/workspace_loaded.png" src="_images/workspace_loaded.png" />
+<ol class="arabic simple" start="6">
+<li>If the loaded workspace is a <cite>Workspace2D</cite> then you must calculate the projections before being able to take slices or cuts
+If it is an <cite>MDWorkspace</cite> Then you can skip the next step.</li>
+<li>To calculate the projections for a workspace first select the workspace by clicking on it in the <cite>Workspace Manager</cite>.
+After selecting the workspace you can set the projections parameters in the <cite>Powder</cite> tab. After setting the paramenters
+click on the <strong>Calculate Projection</strong> button. A new workspace should appear in the <cite>Workspace Manager</cite>.</li>
+</ol>
+<blockquote>
+<div>N.B. Currently <cite>MSlice</cite> only supports projecting to <cite>|Q| vs Energy</cite> or <cite>Energy vs |Q|</cite></div></blockquote>
+<img alt="_images/projection_calculated.png" src="_images/projection_calculated.png" />
+<ol class="arabic simple" start="8">
+<li>Select the new projection workspace by clicking on it. The input boxes in the <strong>Slice</strong> tab should automatically be
+filled by suggested values calculated from the workspace. If you want to edit the <cite>Slice</cite> parameters before plotting
+then do so now.</li>
+</ol>
+<img alt="_images/slice_parameters.png" src="_images/slice_parameters.png" />
+<ol class="arabic simple" start="9">
+<li>To plot the slice click the <strong>Display</strong> button in the <cite>Slice</cite> tab. A new window containing the plot should appear.</li>
+</ol>
+<img alt="_images/slice_plotted.png" src="_images/slice_plotted.png" />
+<ol class="arabic simple" start="10">
+<li>You can close the slice plot window, minimize it or keep it open before continuing.</li>
+<li>If the projection created earlier is not selected (if it is selected it will be highlighted) then select it by
+Clicking on it.</li>
+</ol>
+<p>12. To plot a a cut open the cut tab. Fill in the desired cut parameters. Leave the width parameter empty for now. Click
+on the <strong>Plot</strong> button. A new window with the cut should now appear.</p>
+<img alt="_images/cut_plotted.png" src="_images/cut_plotted.png" />
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="cutting.html" title="2. Taking Cuts"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to MSlice’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">MSlice 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2016, Mantid Project.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
