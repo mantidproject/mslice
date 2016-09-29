@@ -36,7 +36,9 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     @staticmethod
     def get_new_config(current_config):
         dialog = PlotOptionsDialog(current_config)
-        dialog.exec_()
+        dialog_accepted= dialog.exec_()
+        if not dialog_accepted:
+            return None
         try:
             xmin = float(str(dialog.lneXMin.text()))
             xmax = float(str(dialog.lneXMax.text()))

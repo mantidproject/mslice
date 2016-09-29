@@ -47,7 +47,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def _plot_options(self):
         config = self._get_plot_description()
         new_config = PlotOptionsDialog.get_new_config(config)
-        self._apply_config(new_config)
+        if new_config:
+            self._apply_config(new_config)
 
     def _apply_config(self, plot_config):
         current_axis = self.canvas.figure.gca()
