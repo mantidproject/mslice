@@ -29,7 +29,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                                 self.btnRename: Command.RenameWorkspace
                                 }
         self._main_window = None
-        self.lstWorkspaces.itemChanged.connect(self.list_item_changed)
+        self.lstWorkspaces.itemSelectionChanged.connect(self.list_item_changed)
         self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
     def _display_error(self, error_string):
@@ -53,7 +53,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                 onscreen_workspaces.remove(workspace)
                 continue
             item = QListWidgetItem(workspace)
-            item.setCheckState(0)
             self.lstWorkspaces.addItem(item)
 
         # remove any onscreen workspaces that are no longer here
@@ -76,12 +75,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                 return
 
     def get_workspace_selected(self):
-        selected_workspaces = []
-        for index in range(self.lstWorkspaces.count()):
-            item = self.lstWorkspaces.item(index)
-            if item.checkState():
-                selected_workspaces.append(str(item.text()))
-        return selected_workspaces
+        selected_workspaces = map(lambda x: str(x.text()), self.lstWorkspaces.selectedItems())
+        return list(selected_workspaces)
 
     def get_workspace_to_load_path(self):
         path = QFileDialog.getOpenFileName()
@@ -112,10 +107,10 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         self._display_error('MSlice was not able to load the selected file')
 
     def confirm_overwrite_workspace(self):
-        reply = QMessageBox.question(self,'Confirm Overwrite','The workspace you want to load has the same name as'
-                                                              'an existing workspace, Are you sure you want to '
-                                                              'overwrite it? ',QMessageBox.Yes |
-                                                                              QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(self,'Confirm Overwrite', 'The workspace you want to load has the same name as'
+                                                               'an existing workspace, Are you sure you want to '
+                                                               'overwrite it? ',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             return True
         else:
@@ -123,7 +118,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
 
     def error_invalid_save_path(self):
         self._display_error('No files were saved')
-        
+
     def no_workspace_has_been_loaded(self):
         self._display_error('No new workspaces have been loaded')
 
@@ -135,3 +130,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
 
     def error_unable_to_save(self):
         self._display_error("Something went wrong while trying to save")
+
+    def clear_displayed_error(self):
+        self._display_error("")

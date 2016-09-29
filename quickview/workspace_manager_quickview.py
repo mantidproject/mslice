@@ -2,7 +2,6 @@ from quickview.QuickView import QuickView
 from WorkspaceManagerPresenter import WorkspaceManagerPresenter
 from workspacemanager.WorkspaceView import WorkspaceView
 from MantidWorkspaceProvider import MantidWorkspaceProvider
-import time
 
 
 class WorkspaceManagerQuickView(QuickView,WorkspaceView):
@@ -20,5 +19,3 @@ if __name__ == '__main__':
     from command import Command as c
     m = WorkspaceManagerQuickView(c)
     m.app.exec_()
-
-

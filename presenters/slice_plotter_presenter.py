@@ -16,7 +16,7 @@ class Axis(object):
     def __eq__(self, other):
         # This is required for Unit testing
         return self.units == other.units and self.start == other.start and self.end == other.end \
-               and self.step == other.step and isinstance(other, Axis)
+            and self.step == other.step and isinstance(other, Axis)
 
     def __repr__(self):
         info = (self.units, self.start, self.end, self.step)
@@ -33,7 +33,7 @@ INVALID_Y_UNITS = 7
 
 
 class SlicePlotterPresenter(SlicePlotterPresenterInterface):
-    def __init__(self, slice_view, slice_plotter, plot_module):
+    def __init__(self, slice_view, slice_plotter):
         if not isinstance(slice_view, SlicePlotterView):
             raise TypeError("Parameter slice_view is not of type SlicePlotterView")
         if not isinstance(slice_plotter, SlicePlotter):
@@ -43,7 +43,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         self._slice_plotter = slice_plotter
         colormaps = self._slice_plotter.get_available_colormaps()
         self._slice_view.populate_colormap_options(colormaps)
-        self._plot_module = plot_module
+
 
     def register_master(self, main_presenter):
         assert (isinstance(main_presenter, MainPresenterInterface))
@@ -51,6 +51,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         self._main_presenter.subscribe_to_workspace_selection_monitor(self)
 
     def notify(self, command):
+        self._clear_displayed_error()
         if command == Command.DisplaySlice:
             self._display_slice()
         else:
@@ -99,26 +100,18 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             self._slice_view.error_invalid_smoothing_params()
 
         try:
-            plot_data, boundaries, colormap, norm = self._slice_plotter.display_slice(selected_workspace, x_axis,
-                                                                                      y_axis,
-                                                                                      smoothing, intensity_start,
-                                                                                      intensity_end, norm_to_one,
-                                                                                      colourmap)
-        except NotImplementedError as e:
-            self._slice_view.error(e.message)
-            return
-        try:
-            self._plot_module.imshow(plot_data, extent=boundaries, cmap=colourmap, aspect='auto', norm=norm,
-                                interpolation='none')
+            self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
+                                           norm_to_one, colourmap)
+
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
             # will break if matplotlib change exception eror message
+
+            # If the mesage string is not equal to what is set below the exception will be re-raised
             if e.message != "minvalue must be less than or equal to maxvalue":
                 raise e
             self._slice_view.error_invalid_intensity_params()
-            return
-        self._plot_module.xlabel(x_axis.units)
-        self._plot_module.ylabel(y_axis.units)
+
 
     @require_main_presenter
     def _get_main_presenter(self):
@@ -178,4 +171,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             self._slice_view.clear_input_fields()
             return
         self._slice_view.populate_slice_x_params(*map(lambda x: "%.5f" % x, (x_min, x_max, x_step)))
-        self._slice_view.populate_slice_y_params(*map(lambda x:"%.5f"%x, (y_min, y_max, y_step)))
+        self._slice_view.populate_slice_y_params(*map(lambda x: "%.5f" % x, (y_min, y_max, y_step)))
+
+    def _clear_displayed_error(self):
+        self._slice_view.clear_displayed_error()

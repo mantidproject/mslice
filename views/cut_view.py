@@ -78,3 +78,6 @@ class CutView:
 
     def clear_input_fields(self):
         pass
+
+    def clear_displayed_error(self):
+        pass

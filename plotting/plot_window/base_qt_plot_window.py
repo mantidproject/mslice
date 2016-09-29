@@ -1,8 +1,7 @@
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 from base_plot_window import BasePlotWindow
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.patches import Rectangle
 
 class MatplotlibCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -16,9 +15,6 @@ class MatplotlibCanvas(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-
-
-
 
 
 class BaseQtPlotWindow(BasePlotWindow, QtGui.QMainWindow):

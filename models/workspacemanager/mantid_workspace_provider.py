@@ -1,6 +1,7 @@
 from workspace_provider import WorkspaceProvider
-from mantid.simpleapi import AnalysisDataService,Load,DeleteWorkspace,Load,GroupWorkspaces,RenameWorkspace,SaveNexus, SaveMD
-from mantid.api import IMDWorkspace
+from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load ,GroupWorkspaces,
+                              RenameWorkspace, SaveNexus, SaveMD)
+from mantid.api import IMDWorkspace, Workspace
 
 
 class MantidWorkspaceProvider(WorkspaceProvider):
@@ -29,4 +30,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_workspace_handle(self, workspace_name):
         """"Return handle to workspace given workspace_name_as_string"""
+
+        # if passed a workspace handle return the handle
+        if isinstance(workspace_name, Workspace):
+            return workspace_name
         return AnalysisDataService[workspace_name]

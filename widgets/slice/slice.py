@@ -6,8 +6,6 @@ from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
 from presenters.slice_plotter_presenter import SlicePlotterPresenter
 from slice_ui import Ui_Form
 from views.slice_plotter_view import SlicePlotterView
-import plotting.pyplot
-
 
 class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
 
@@ -22,7 +20,7 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
         plotter = MatplotlibSlicePlotter(MantidSliceAlgorithm())
-        self._presenter = SlicePlotterPresenter(self, plotter, plot_module=plotting.pyplot)
+        self._presenter = SlicePlotterPresenter( self, plotter )
 
     def get_presenter(self):
         return self._presenter
@@ -133,3 +131,7 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.lneSliceIntensityEnd.setText("")
         self.lneSliceSmoothing.setText("")
         self.rdoSliceNormToOne.setChecked(0)
+
+
+    def clear_displayed_error(self):
+        self._display_error("")
