@@ -105,8 +105,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         group_name = 'group' + str(self._groupCount)
         self._groupCount += 1
-        self._work_spaceprovider.group_workspaces(input_workspaces=selected_workspaces,
-                                                  output_workspace_name=group_name)
+        self._work_spaceprovider.group_workspaces(selected_workspaces, group_name)
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
     def _rename_workspace(self):
