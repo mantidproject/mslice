@@ -1,5 +1,9 @@
 [flake8]
 ignore = E2,E3,F403
-exclude = *_ui.py,misc/MDUtils.py,plotting/pyplot.py
+exclude =
+    docs/source/conf.py,
+    *_ui.py,
+    misc/MDUtils.py,
+    plotting/pyplot.py
 max-complexity = 14
 max-line-length = 140
