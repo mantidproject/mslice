@@ -16,9 +16,11 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
             raise TypeError("projection_calculator is not of type ProjectionCalculator")
 
         #Add rest of options
+        self._available_axes = projection_calculator.available_axes()
         self._available_units = projection_calculator.available_units()
-        self._powder_view.populate_powder_u1(self._available_units)
-        self._powder_view.populate_powder_u2(self._available_units[::-1])
+        self._powder_view.populate_powder_u1(self._available_axes)
+        self._powder_view.populate_powder_u2(self._available_axes[::-1])
+        self._powder_view.populate_powder_projection_units(self._available_units[::-1])
         self._main_presenter = None
 
     def register_master(self, main_presenter):
@@ -43,10 +45,11 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         if axis1 == axis2:
             raise NotImplementedError('equal axis')
         if not selected_workspaces:
-            raise NotImplementedError('Implement error message')
+            raise NotImplementedError('no workspaces selected')
+        units = self._powder_view.get_powder_units()
 
         for workspace in selected_workspaces:
-            self._projection_calculator.calculate_projection(workspace, axis1, axis2)
+            self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
         self._get_main_presenter().update_displayed_workspaces()
 
     @require_main_presenter
@@ -59,12 +62,12 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
     def _axis_changed(self, axis):
         """This a private method which stops U1 from being the same as u2 on the gui at any point"""
         if axis == 1:
-            all_axis = self._available_units[:]
+            all_axis = self._available_axes[:]
             if all_axis[0] == self._powder_view.get_powder_u1():
                 all_axis = all_axis[::-1] # reverse list pushing what selected in u1 to the bottom
             self._powder_view.populate_powder_u2(all_axis)
         if axis == 2:
-            all_axis = self._available_units[:]
+            all_axis = self._available_axes[:]
             if all_axis[0] == self._powder_view.get_powder_u2():
                 all_axis = all_axis[::-1] # reverse list pushing what selected in u1 to the bottom
             self._powder_view.populate_powder_u1(all_axis)

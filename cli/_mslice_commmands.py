@@ -61,7 +61,7 @@ def _string_to_axis(string):
 
 
 
-def get_projection(input_workspace, axis1, axis2):
+def get_projection(input_workspace, axis1, axis2, units='meV'):
     """ Calculate projections of workspace.
 
     Keyword Arguments:
@@ -69,12 +69,13 @@ def get_projection(input_workspace, axis1, axis2):
         workspace name.
         axis1 -- The first axis of projection (string)
         axis2 -- The second axis of the projection (string)
+        units -- The energy units (string) [default: 'meV']
 
     """
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     output_workspace = _POWDER_PROJECTION_MODEL.calculate_projection(input_workspace=input_workspace, axis1=axis1,
-                                                                     axis2=axis2)
+                                                                     axis2=axis2, units=units)
     try:
         names = _lhs_info('names')
     except:
