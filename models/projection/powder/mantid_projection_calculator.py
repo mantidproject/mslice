@@ -21,15 +21,14 @@ class MantidProjectionCalculator(ProjectionCalculator):
     def calculate_projection(self, input_workspace, axis1, axis2, units):
         """Calculate the projection workspace AND return a python handle to it"""
         emode = self._workspace_provider.get_workspace_handle(input_workspace).getEMode().name
-        if emode == 'Elastic': emode = 'Direct'
         if axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL:
             scale = [1, 8.06554]
-            output_workspace = input_workspace + '_QE'
+            output_workspace = input_workspace + '_QE' + ('_cm' if units == WAVENUMBER_LABEL else '')
             ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
                         PreprocDetectorsWS='-', dEAnalysisMode=emode)
         elif axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL:
             scale = [8.06554, 1]
-            output_workspace = input_workspace + '_EQ'
+            output_workspace = input_workspace + '_EQ' + ('_cm' if units == WAVENUMBER_LABEL else '')
             ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
                         PreprocDetectorsWS='-', dEAnalysisMode=emode)
             output_workspace_handle = self._workspace_provider.get_workspace_handle(output_workspace)
