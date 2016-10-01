@@ -14,7 +14,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         # Set up a mock view, presenter, main view and main presenter
         self.powder_view = mock.create_autospec(PowderView)
         self.projection_calculator = mock.create_autospec(ProjectionCalculator)
-        self.projection_calculator.configure_mock(**{'available_units.return_value': ['|Q|', 'DeltaE']})
+        self.projection_calculator.configure_mock(**{'available_units.return_value': ['|Q|', '2Theta', 'DeltaE']})
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview = mock.create_autospec(MainView)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
@@ -118,30 +118,27 @@ class PowderProjectionPresenterTest(unittest.TestCase):
     def test_axis_switching_1(self):
         powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
         dropbox_contents = self.powder_view.populate_powder_u1.call_args[0][0]
-        call_args = self.powder_view.populate_powder_u1.call_args
-
-        # This changes the selection by making view return second element instead of first
-        self.powder_view.populate_powder_u1.reset_mock()
-        self.powder_view.populate_powder_u2.reset_mock()
+        # Makes u2 == u1
+        self.powder_view.set_powder_u1.reset_mock()
+        self.powder_view.set_powder_u2.reset_mock()
         self.powder_view.get_powder_u1 = mock.Mock(return_value=dropbox_contents[1])
         self.powder_view.get_powder_u2 = mock.Mock(return_value=dropbox_contents[1])
+        # Now set u1 to change, and check that u1 is not subsequently affected, but u2 is called.
         powder_presenter.notify(Command.U1Changed)
-
-        self.powder_view.populate_powder_u1.assert_not_called()
-        self.assertEquals(self.powder_view.populate_powder_u2.call_args, call_args)
+        self.powder_view.set_powder_u1.assert_not_called()
+        # Since we set u1 to be a non-DeltaE axis, u2 must be DeltaE
+        self.powder_view.set_powder_u2.assert_called_with(dropbox_contents[-1])
 
     def test_axis_switching_2(self):
         powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
-        dropbox_contents = self.powder_view.populate_powder_u1.call_args[0][0]
-        call_args = self.powder_view.populate_powder_u1.call_args
-
-        # This changes the selection by making view return second element instead of first
-        self.powder_view.populate_powder_u1.reset_mock()
-        self.powder_view.populate_powder_u2.reset_mock()
-        self.powder_view.get_powder_u1 = mock.Mock(return_value=dropbox_contents[0])
-        self.powder_view.get_powder_u2 = mock.Mock(return_value=dropbox_contents[0])
+        dropbox_contents = self.powder_view.populate_powder_u2.call_args[0][0]
+        # Makes u2 == u1 == DeltaE
+        self.powder_view.set_powder_u1.reset_mock()
+        self.powder_view.set_powder_u2.reset_mock()
+        self.powder_view.get_powder_u1 = mock.Mock(return_value=dropbox_contents[2])
+        self.powder_view.get_powder_u2 = mock.Mock(return_value=dropbox_contents[2])
+        # Now set u2 to change, and check that u2 is not subsequently affected, but u1 is called.
         powder_presenter.notify(Command.U2Changed)
-
-
-        self.powder_view.populate_powder_u2.assert_not_called()
-        self.assertEquals(self.powder_view.populate_powder_u1.call_args, mock.call(list(reversed(call_args[0][0]))))
+        self.powder_view.set_powder_u2.assert_not_called()
+        # Since we set u1==u2==DeltaE, u1 must now be the first non-DeltaE unit
+        self.powder_view.set_powder_u1.assert_called_once_with(dropbox_contents[0])
