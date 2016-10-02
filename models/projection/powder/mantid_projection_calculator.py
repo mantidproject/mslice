@@ -1,4 +1,5 @@
-from mantid.simpleapi import ConvertToMD, SliceMD, ConvertSpectrumAxis
+import tempfile
+from mantid.simpleapi import ConvertToMD, SliceMD, ConvertSpectrumAxis, PreprocessDetectorsToMD, DeleteWorkspace
 from models.projection.powder.projection_calculator import ProjectionCalculator
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
@@ -27,6 +28,11 @@ class MantidProjectionCalculator(ProjectionCalculator):
         return SliceMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, AlignedDim0=dim0,
                        AlignedDim1=dim1)
 
+    def _getDetWS(self, input_workspace):
+        wsdet = next(tempfile._get_candidate_names())
+        PreprocessDetectorsToMD(InputWorkspace=input_workspace, OutputWorkspace=wsdet)
+        return wsdet
+
     def calculate_projection(self, input_workspace, axis1, axis2):
         """Calculate the projection workspace AND return a python handle to it"""
         emode = self._workspace_provider.get_workspace_handle(input_workspace).getEMode().name
@@ -42,8 +48,12 @@ class MantidProjectionCalculator(ProjectionCalculator):
         elif axis1 == THETA_LABEL and axis2 == DELTA_E_LABEL:
             output_workspace = input_workspace + '_ThE'
             ConvertSpectrumAxis(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, Target='Theta')
+            # Work-around for a bug in ConvertToMD.
+            wsdet = self._getDetWS(input_workspace) if emode == 'Indirect' else '-'
             ConvertToMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, QDimensions='CopyToMD',
-                        PreprocDetectorsWS='-', dEAnalysisMode=emode)
+                        PreprocDetectorsWS=wsdet, dEAnalysisMode=emode)
+            if emode == 'Indirect':
+                DeleteWorkspace(wsdet)
             return self._flip_axes(output_workspace)
         elif axis1 == DELTA_E_LABEL and axis2 == THETA_LABEL:
             output_workspace = input_workspace + '_ETh'
