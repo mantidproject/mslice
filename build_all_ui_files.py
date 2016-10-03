@@ -25,10 +25,10 @@ def get_output_file_name(filename):
 def build_item(item, verbose=True):
     """Build the ui file at the path in "item" to python file in the same directory.
      The output file name is specified by the get_output_file_name function"""
-    dir = os.path.dirname(item)
+    dirname = os.path.dirname(item)
     basename = os.path.basename(item)
     output_file_name = get_output_file_name(basename)
-    output_file_path = os.path.join(dir,output_file_name)
+    output_file_path = os.path.join(dirname,output_file_name)
     with open(output_file_path, 'w') as fout:
         uic.compileUi(item, fout)
 
