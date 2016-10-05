@@ -64,6 +64,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manger_view.error_unable_to_open_file()
             return
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
+        self._workspace_manger_view.set_workspace_selected(self._workspace_manger_view.get_workspace_index(ws_name))
 
     def _save_selected_workspace(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
@@ -120,6 +121,11 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def get_selected_workspaces(self):
         """Get the currently selected workspaces from the user"""
         return self._workspace_manger_view.get_workspace_selected()
+
+    def set_selected_workspaces(self, list):
+        get_index = self._workspace_manger_view.get_workspace_index
+        index_list = [(get_index(item) if isinstance(item, basestring) else item) for item in list]
+        self._workspace_manger_view.set_workspace_selected(index_list)
 
     def update_displayed_workspaces(self):
         """Update the workspaces shown to user.

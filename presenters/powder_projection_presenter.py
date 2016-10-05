@@ -45,9 +45,11 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         if not selected_workspaces:
             raise NotImplementedError('Implement error message')
 
+        outws = []
         for workspace in selected_workspaces:
-            self._projection_calculator.calculate_projection(workspace, axis1, axis2)
+            outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2))
         self._get_main_presenter().update_displayed_workspaces()
+        self._get_main_presenter().set_selected_workspaces(outws)
 
     @require_main_presenter
     def _get_main_presenter(self):
