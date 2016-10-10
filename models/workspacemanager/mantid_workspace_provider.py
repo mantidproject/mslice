@@ -16,7 +16,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return Load(Filename=Filename, OutputWorkspace=OutputWorkspace)
 
     def group_workspaces(self, InputWorkspaces, OutputWorkspace):
-        return GroupWorkspaces(InputWorkspaces,OutputWorkspace)
+        return GroupWorkspaces(InputWorkspaces, OutputWorkspace=OutputWorkspace)
 
     def rename_workspace(self, selected_workspace, newName):
         return RenameWorkspace(selected_workspace,newName)

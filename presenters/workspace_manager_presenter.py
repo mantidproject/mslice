@@ -91,7 +91,11 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manger_view.error_select_one_or_more_workspaces()
             return
         for workspace in selected_workspaces:
-            self._work_spaceprovider.delete_workspace(workspace)
+            # If the user attempts to delete a group and the child workspaces in one go if all the child workspaces
+            # Are deleted before the group then mantid will automatically remove the empty group. This will throw an
+            # exception when deleting the group. Hence the check
+            if workspace in self._work_spaceprovider.get_workspace_names():
+                self._work_spaceprovider.delete_workspace(workspace)
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
     def _group_selected_workspaces(self):
@@ -101,7 +105,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         group_name = 'group' + str(self._groupCount)
         self._groupCount += 1
-        self._work_spaceprovider.group_workspaces(InputWorkspaces=selected_workspaces, OutputWorkspace=group_name)
+        self._work_spaceprovider.group_workspaces(selected_workspaces, group_name)
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
 
     def _rename_workspace(self):

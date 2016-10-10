@@ -218,6 +218,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         # Create a workspace that reports a single selected workspace on calls to get_workspace_selected
         workspace_to_be_removed = 'file1'
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_be_removed])
+        self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_to_be_removed])
 
         self.presenter.notify(Command.RemoveSelectedWorkspaces)
         self.view.get_workspace_selected.assert_called_once_with()
@@ -231,6 +232,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         workspace2 = 'file2'
         workspace3 = 'file3'
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace1, workspace2, workspace3])
+        self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace1, workspace2, workspace3])
 
         self.presenter.notify(Command.RemoveSelectedWorkspaces)
         self.view.get_workspace_selected.assert_called_once_with()
