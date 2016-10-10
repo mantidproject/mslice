@@ -47,7 +47,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
         # Now scale the energy axis if required - ConvertToMD always gives DeltaE in meV
         if units == WAVENUMBER_LABEL:
             retval = TransformMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, Scaling=scale)
-            self._workspace_provider.get_workspace_handle(output_workspace).setComment('MSlice_in_wavenumber')
+            retval.setComment('MSlice_in_wavenumber')
         elif units != MEV_LABEL:
             raise NotImplementedError("Unit %s not recognised. Only 'meV' and 'cm-1' implemented." % (units))
         return retval
