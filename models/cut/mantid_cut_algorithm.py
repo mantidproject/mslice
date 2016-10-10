@@ -177,7 +177,7 @@ class MantidCutAlgorithm(CutAlgorithm):
         dim = workspace.getDimension(dim)
 
         if axis.start is None:
-                axis.start = dim.getMinimum()
+            axis.start = dim.getMinimum()
 
         if axis.end is None:
             axis.end = dim.getMaximum()
