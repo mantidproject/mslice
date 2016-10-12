@@ -8,7 +8,7 @@ from workspacemanager_ui import Ui_Form
 
 
 class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
-    """A Widget that allows user to perform basic workspace save/load/rename/group/delete operations on workspaces"""
+    """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
 
     error_occurred = pyqtSignal('QString')
 
@@ -19,10 +19,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         self.btnLoad.clicked.connect(self._btn_clicked)
         self.btnWorkspaceCompose.clicked.connect(self._btn_clicked)
         self.btnWorkspaceRemove.clicked.connect(self._btn_clicked)
-        self.btnWorkspaceGroup.clicked.connect(self._btn_clicked)
         self.btnRename.clicked.connect(self._btn_clicked)
-        self.button_mappings = {self.btnWorkspaceGroup: Command.GroupSelectedWorkSpaces,
-                                self.btnWorkspaceRemove: Command.RemoveSelectedWorkspaces,
+        self.button_mappings = {self.btnWorkspaceRemove: Command.RemoveSelectedWorkspaces,
                                 self.btnWorkspaceSave: Command.SaveSelectedWorkspace,
                                 self.btnWorkspaceCompose: Command.ComposeWorkspace,
                                 self.btnLoad: Command.LoadWorkspace,

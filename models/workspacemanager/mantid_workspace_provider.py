@@ -1,5 +1,5 @@
 from workspace_provider import WorkspaceProvider
-from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load ,GroupWorkspaces,
+from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
                               RenameWorkspace, SaveNexus, SaveMD)
 from mantid.api import IMDWorkspace, Workspace
 
@@ -14,9 +14,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def load(self, Filename, OutputWorkspace):
         return Load(Filename=Filename, OutputWorkspace=OutputWorkspace)
-
-    def group_workspaces(self, InputWorkspaces, OutputWorkspace):
-        return GroupWorkspaces(InputWorkspaces,OutputWorkspace)
 
     def rename_workspace(self, selected_workspace, newName):
         return RenameWorkspace(selected_workspace,newName)

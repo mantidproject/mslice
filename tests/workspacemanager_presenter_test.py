@@ -181,38 +181,6 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.error_invalid_save_path.assert_called_once()
         self.workspace_provider.save_nexus.assert_not_called()
 
-    def test_group_workspaces(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
-        # Create view that reports two workspaces are selected on calls two get_workspace_selected
-        workspaces_to_group = ['file1', 'file2']
-        self.view.get_workspace_selected = mock.Mock(return_value=workspaces_to_group)
-
-        self.presenter.notify(Command.GroupSelectedWorkSpaces)
-        self.view.get_workspace_selected.assert_called_once_with()
-        self.workspace_provider.group_workspaces.assert_called_with(workspaces_to_group, 'group1')
-        self.view.display_loaded_workspaces.assert_called_once()
-
-    def test_group_single_workspace(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
-        # Create a view that reports a single selected workspace on calls to get_workspace_selected
-        self.view.get_workspace_selected = mock.Mock(return_value=['file1'])
-
-        self.presenter.notify(Command.GroupSelectedWorkSpaces)
-        self.view.get_workspace_selected.assert_called_once_with()
-        self.workspace_provider.group_workspaces.assert_called_with(['file1'], 'group1')
-        self.view.display_loaded_workspaces.assert_called_once()
-
-    def test_group_workspaces_non_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
-        # Create a view that reports no workspace selected on calls to get_workspace_selected
-        self.view.get_workspace_selected = mock.Mock(return_value=[])
-
-        self.presenter.notify(Command.GroupSelectedWorkSpaces)
-        self.view.get_workspace_selected.assert_called_once_with()
-        self.view.error_select_one_or_more_workspaces.assert_called_once_with()
-        self.workspace_provider.group_workspaces.assert_not_called()
-        self.view.display_loaded_workspaces.assert_not_called()
-
     def test_remove_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         # Create a workspace that reports a single selected workspace on calls to get_workspace_selected
