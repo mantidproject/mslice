@@ -43,7 +43,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
         self.presenter.notify(Command.LoadWorkspace)
         self.view.get_workspace_to_load_path.assert_called_once()
-        self.workspace_provider.load.assert_called_with(Filename=path_to_nexus, OutputWorkspace=workspace_name)
+        self.workspace_provider.load.assert_called_with(filename=path_to_nexus, output_workspace=workspace_name)
         self.view.display_loaded_workspaces.assert_called_with([workspace_name])
 
     def test_load_multiple_workspaces(self):
@@ -61,9 +61,9 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[])
         for i in range(3):
             self.presenter.notify(Command.LoadWorkspace)
-        load_calls = [call(Filename=path1, OutputWorkspace=ws_name1),
-                      call(Filename=path2, OutputWorkspace=ws_name2),
-                      call(Filename=path3, OutputWorkspace=ws_name3)]
+        load_calls = [call(filename=path1, output_workspace=ws_name1),
+                      call(filename=path2, output_workspace=ws_name2),
+                      call(filename=path3, output_workspace=ws_name3)]
         self.workspace_provider.load.assert_has_calls(load_calls)
 
     def test_load_workspace_cancelled(self):
@@ -104,7 +104,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.RenameWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_workspace_new_name.assert_called_once_with()
-        self.workspace_provider.rename_workspace.assert_called_once_with(selected_workspace='file1', newName='new_name')
+        self.workspace_provider.rename_workspace.assert_called_once_with(selected_workspace='file1', new_name='new_name')
         self.view.display_loaded_workspaces.assert_called_once()
 
     def test_rename_workspace_multiple_workspace_selected_prompt_user(self):

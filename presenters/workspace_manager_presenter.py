@@ -56,7 +56,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._workspace_manger_view.no_workspace_has_been_loaded()
                 return
         try:
-            self._work_spaceprovider.load(Filename=workspace_to_load, OutputWorkspace=ws_name)
+            self._work_spaceprovider.load(filename=workspace_to_load, output_workspace=ws_name)
         except RuntimeError:
             self._workspace_manger_view.error_unable_to_open_file()
             return
