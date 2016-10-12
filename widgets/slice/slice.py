@@ -1,5 +1,11 @@
+"""A widget for defining slice calculations
+"""
+# -----------------------------------------------------------------------------
+# Imports
+# -----------------------------------------------------------------------------
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import pyqtSignal
+
 from command import Command
 from models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
 from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
@@ -7,8 +13,12 @@ from presenters.slice_plotter_presenter import SlicePlotterPresenter
 from slice_ui import Ui_Form
 from views.slice_plotter_view import SlicePlotterView
 
-class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
 
+# -----------------------------------------------------------------------------
+# Classes and functions
+# -----------------------------------------------------------------------------
+
+class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
     error_occurred = pyqtSignal('QString')
 
     def __init__(self, *args, **kwargs):
@@ -20,7 +30,7 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
         plotter = MatplotlibSlicePlotter(MantidSliceAlgorithm())
-        self._presenter = SlicePlotterPresenter( self, plotter )
+        self._presenter = SlicePlotterPresenter(self, plotter)
 
     def get_presenter(self):
         return self._presenter
@@ -70,7 +80,7 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
     def get_slice_intensity_end(self):
         return str(self.lneSliceIntensityEnd.text())
 
-    def populate_colormap_options(self,colormaps):
+    def populate_colormap_options(self, colormaps):
         self.cmbSliceColormap.clear()
         for colormap in colormaps:
             self.cmbSliceColormap.addItem(colormap)
@@ -131,7 +141,6 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.lneSliceIntensityEnd.setText("")
         self.lneSliceSmoothing.setText("")
         self.rdoSliceNormToOne.setChecked(0)
-
 
     def clear_displayed_error(self):
         self._display_error("")
