@@ -21,6 +21,7 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         self._powder_view.populate_powder_u1(self._available_axes)
         self._powder_view.populate_powder_u2(self._available_axes)
         self._powder_view.set_powder_u2(self._available_axes[-1])
+        self._powder_view.populate_powder_projection_units(self._available_units)
         self._main_presenter = None
 
     def register_master(self, main_presenter):
