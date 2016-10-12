@@ -16,10 +16,11 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
             raise TypeError("projection_calculator is not of type ProjectionCalculator")
 
         #Add rest of options
+        self._available_axes = projection_calculator.available_axes()
         self._available_units = projection_calculator.available_units()
-        self._powder_view.populate_powder_u1(self._available_units)
-        self._powder_view.populate_powder_u2(self._available_units)
-        self._powder_view.set_powder_u2(self._available_units[-1])
+        self._powder_view.populate_powder_u1(self._available_axes)
+        self._powder_view.populate_powder_u2(self._available_axes)
+        self._powder_view.set_powder_u2(self._available_axes[-1])
         self._main_presenter = None
 
     def register_master(self, main_presenter):
@@ -44,10 +45,11 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         if axis1 == axis2:
             raise NotImplementedError('equal axis')
         if not selected_workspaces:
-            raise NotImplementedError('Implement error message')
+            raise NotImplementedError('no workspaces selected')
+        units = self._powder_view.get_powder_units()
 
         for workspace in selected_workspaces:
-            self._projection_calculator.calculate_projection(workspace, axis1, axis2)
+            self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
         self._get_main_presenter().update_displayed_workspaces()
 
     @require_main_presenter
@@ -61,13 +63,13 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         """This is a private method which makes sure u1 and u2 are always different and one is always DeltaE"""
         curr_axis = axis - 1
         other_axis = axis % 2
-        num_items = len(self._available_units)
+        num_items = len(self._available_axes)
         axes = [self._powder_view.get_powder_u1(), self._powder_view.get_powder_u2()]
         axes_set = [self._powder_view.set_powder_u1, self._powder_view.set_powder_u2]
-        name_to_index = dict((val,id) for id, val in enumerate(self._available_units))
+        name_to_index = dict((val,id) for id, val in enumerate(self._available_axes))
         if axes[curr_axis] == axes[other_axis]:
             new_index = (name_to_index[axes[other_axis]] + 1) % num_items
-            axes_set[other_axis](self._available_units[new_index])
+            axes_set[other_axis](self._available_axes[new_index])
         # Assuming DeltaE is always the last axes option.
-        if axes[curr_axis] != self._available_units[-1] and axes[other_axis] != self._available_units[-1]:
-            axes_set[other_axis](self._available_units[-1])
+        if axes[curr_axis] != self._available_axes[-1] and axes[other_axis] != self._available_axes[-1]:
+            axes_set[other_axis](self._available_axes[-1])

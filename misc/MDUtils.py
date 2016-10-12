@@ -4,7 +4,7 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-
+from mantid.simpleapi import ConvertToMD, CutMD, Load, SetUB, mtd
 
 def dim2array(d):
     """

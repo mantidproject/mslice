@@ -12,7 +12,7 @@ from matplotlib.axes import Axes, Subplot
 from matplotlib.figure import Figure, figaspect
 from matplotlib.gridspec import GridSpec
 from matplotlib.artist import setp as _setp
-from matplotlib.cbook import _string_to_bool
+from matplotlib.cbook import _string_to_bool, is_string_like, is_numlike, silent_list
 from matplotlib.projections import PolarAxes
 
 from matplotlib import cm
@@ -1858,7 +1858,7 @@ def matshow(A, fignum=None, **kw):
         ax = gca()
     else:
         # Extract actual aspect ratio of array and make appropriately sized figure
-        fig = figure(fignum, figsize=figaspect(A))
+        fig = Figure(fignum, figsize=figaspect(A))
         ax  = fig.add_axes([0.15, 0.09, 0.775, 0.775])
 
     im = ax.matshow(A, **kw)

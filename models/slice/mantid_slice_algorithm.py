@@ -25,14 +25,14 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         y_dim = workspace.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
-        slice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
+        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
         # perform number of events normalization then mask cells where no data was found
         with np.errstate(invalid='ignore'):
-            plot_data = slice.getSignalArray() / slice.getNumEventsArray()
+            plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
         plot_data = np.ma.masked_where(np.isnan(plot_data), plot_data)
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)
-        self._workspace_provider.delete_workspace(slice)
+        self._workspace_provider.delete_workspace(thisslice)
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
         if norm_to_one:
             plot_data = self._norm_to_one(plot_data)
@@ -60,7 +60,7 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         dim = workspace.getDimension(dim)
 
         if axis.start is None:
-                axis.start = dim.getMinimum()
+            axis.start = dim.getMinimum()
 
         if axis.end is None:
             axis.end = dim.getMaximum()
