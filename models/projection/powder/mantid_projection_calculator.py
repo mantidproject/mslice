@@ -1,4 +1,4 @@
-import tempfile
+import uuid
 from mantid.simpleapi import ConvertToMD, SliceMD, TransformMD, ConvertSpectrumAxis, PreprocessDetectorsToMD
 from mantid.simpleapi import RenameWorkspace, DeleteWorkspace
 from models.projection.powder.projection_calculator import ProjectionCalculator
@@ -37,7 +37,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def _getDetWS(self, input_workspace):
         """ Precalculates the detector workspace for ConvertToMD - workaround for bug for indirect geometry """
-        wsdet = next(tempfile._get_candidate_names())
+        wsdet = str(uuid.uuid4().hex)
         PreprocessDetectorsToMD(InputWorkspace=input_workspace, OutputWorkspace=wsdet)
         return wsdet
 
@@ -67,7 +67,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
     def calculate_projection(self, input_workspace, axis1, axis2, units):
         """Calculate the projection workspace AND return a python handle to it"""
         emode = self._workspace_provider.get_workspace_handle(input_workspace).getEMode().name
-        # Calculates the projection - can have Q-E or 2theta-E or their transpose. 
+        # Calculates the projection - can have Q-E or 2theta-E or their transpose.
         if (axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL) or (axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL):
             retval, output_workspace = self._calcQEproj(input_workspace, emode, axis1, axis2)
         elif (axis1 == THETA_LABEL and axis2 == DELTA_E_LABEL) or (axis1 == DELTA_E_LABEL and axis2 == THETA_LABEL):
