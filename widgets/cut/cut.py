@@ -1,18 +1,27 @@
-from PyQt4.QtGui import QWidget
+"""A widget for cut calculations
+"""
+# -----------------------------------------------------------------------------
+# Imports
+# -----------------------------------------------------------------------------
 from PyQt4.QtCore import pyqtSignal
-from cut_ui import Ui_Form
-from views.cut_view import CutView
+from PyQt4.QtGui import QWidget
+
 from command import Command
-from presenters.cut_presenter import CutPresenter
+from cut_ui import Ui_Form
 from models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+from presenters.cut_presenter import CutPresenter
+from views.cut_view import CutView
 
+# -----------------------------------------------------------------------------
+# Classes and functions
+# -----------------------------------------------------------------------------
 
 class CutWidget(QWidget, CutView, Ui_Form):
     error_occurred = pyqtSignal('QString')
 
-    def __init__(self,*args, **kwargs):
-        super(CutWidget,self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(CutWidget, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self._command_lookup = {
             self.btnCutPlot: Command.Plot,
@@ -70,7 +79,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def get_smoothing(self):
         return str(self.lneCutSmoothing.text())
 
-    def populate_cut_axis_options(self,options):
+    def populate_cut_axis_options(self, options):
         self.cmbCutAxis.clear()
         for option in options:
             self.cmbCutAxis.addItem(option)
@@ -97,7 +106,6 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
 
-
     def enable(self):
         self.lneCutStart.setEnabled(True)
         self.lneCutEnd.setEnabled(True)
@@ -119,7 +127,6 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.btnCutSaveToWorkspace.setEnabled(True)
         self.btnCutPlot.setEnabled(True)
         self.btnCutPlotOver.setEnabled(True)
-
 
     def disable(self):
         self.lneCutStart.setEnabled(False)

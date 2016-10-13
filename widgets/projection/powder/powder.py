@@ -1,20 +1,28 @@
-from powder_ui import Ui_Form
+"""A widget for defining projections for powders
+"""
+# -----------------------------------------------------------------------------
+# Imports
+# -----------------------------------------------------------------------------
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import pyqtSignal
-from presenters.powder_projection_presenter import PowderProjectionPresenter
 
-from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
-from views.powder_projection_view import PowderView
 from command import Command
+from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
+from powder_ui import Ui_Form
+from presenters.powder_projection_presenter import PowderProjectionPresenter
+from views.powder_projection_view import PowderView
 
+# -----------------------------------------------------------------------------
+# Classes and functions
+# -----------------------------------------------------------------------------
 
-class PowderWidget(QWidget,Ui_Form,PowderView):
+class PowderWidget(QWidget, Ui_Form, PowderView):
     """This widget is not usable without a main window which implements mainview"""
 
     error_occurred = pyqtSignal('QString')
 
-    def __init__(self,*args, **kwargs):
-        super(PowderWidget,self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(PowderWidget, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.btnPowderCalculateProjection.clicked.connect(self._btn_clicked)
         self._presenter = PowderProjectionPresenter(self, MantidProjectionCalculator())
@@ -46,7 +54,6 @@ class PowderWidget(QWidget,Ui_Form,PowderView):
         for value in u1_options:
             self.cmbPowderU1.addItem(value)
         self.cmbPowderU1.blockSignals(False)
-
 
     def populate_powder_u2(self, u2_options):
         # Signals are blocked to prevent self._u2_changed being called here (it would be false alarm)
