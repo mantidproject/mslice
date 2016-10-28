@@ -47,12 +47,27 @@ class PowderWidget(QWidget, Ui_Form, PowderView):
     def get_powder_u2(self):
         return str(self.cmbPowderU2.currentText())
 
+    def set_powder_u1(self, name):
+        # Signals are blocked to prevent self._u1_changed being called here (it would be false alarm)
+        self.cmbPowderU1.blockSignals(True)
+        self.cmbPowderU1.setCurrentIndex(self._name_to_index[name])
+        self.cmbPowderU1.blockSignals(False)
+
+    def set_powder_u2(self, name):
+        # Signals are blocked to prevent self._u2_changed being called here (it would be false alarm)
+        self.cmbPowderU2.blockSignals(True)
+        self.cmbPowderU2.setCurrentIndex(self._name_to_index[name])
+        self.cmbPowderU2.blockSignals(False)
+
     def populate_powder_u1(self, u1_options):
         # Signals are blocked to prevent self._u1_changed being called here (it would be false alarm)
         self.cmbPowderU1.blockSignals(True)
         self.cmbPowderU1.clear()
-        for value in u1_options:
+        # Assuming that u1 and u2 both have the same possible units.
+        self._name_to_index = {}
+        for idx, value in enumerate(u1_options):
             self.cmbPowderU1.addItem(value)
+            self._name_to_index[value] = idx
         self.cmbPowderU1.blockSignals(False)
 
     def populate_powder_u2(self, u2_options):
