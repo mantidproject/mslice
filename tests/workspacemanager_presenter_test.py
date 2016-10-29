@@ -38,7 +38,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
         path_to_nexus = join(tempdir,'cde.nxs')
         workspace_name = 'cde'
-        self.view.get_workspace_to_load_path = mock.Mock(return_value=path_to_nexus)
+        self.view.get_workspace_to_load_path = mock.Mock(return_value=[path_to_nexus])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_name])
 
         self.presenter.notify(Command.LoadWorkspace)
@@ -57,10 +57,10 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         ws_name2 = 'file2'
         ws_name3 = 'file3'
         self.view.get_workspace_to_load_path = mock.Mock(
-            side_effect=[path1, path2, path3])
-        self.workspace_provider.get_workspace_names = mock.Mock(return_value=[])
-        for i in range(3):
-            self.presenter.notify(Command.LoadWorkspace)
+            return_value=[path1, path2, path3])
+        self.workspace_provider.get_workspace_names = mock.Mock(
+            return_value=[ws_name1, ws_name2, ws_name3])
+        self.presenter.notify(Command.LoadWorkspace)
         load_calls = [call(filename=path1, output_workspace=ws_name1),
                       call(filename=path2, output_workspace=ws_name2),
                       call(filename=path3, output_workspace=ws_name3)]
