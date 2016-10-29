@@ -76,6 +76,12 @@ class CutView:
     def force_normalization(self):
         pass
 
+    def get_input_fields(self):
+        pass
+
+    def populate_input_fields(self, saved_input):
+        pass
+
     def clear_input_fields(self):
         pass
 

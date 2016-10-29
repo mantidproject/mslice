@@ -19,6 +19,9 @@ class CutPresenter(object):
         self._cut_plotter = cut_plotter
         self._acting_on = None
         self._cut_view.disable()
+        self._saved_parameters = dict()
+        self._previous_cut = None
+        self._previous_axis = None
 
     def register_master(self, main_presenter):
         self._main_presenter = main_presenter
@@ -37,6 +40,8 @@ class CutPresenter(object):
             fname = str(QFileDialog.getSaveFileName(caption='Select File for Saving'))
             if fname:
                 self._process_cuts(save_to_file=fname)
+        elif command == Command.AxisChanged:
+            self._cut_axis_changed()
 
     def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
@@ -159,18 +164,31 @@ class CutPresenter(object):
         return float(x)
 
     def workspace_selection_changed(self):
+        if self._previous_cut is not None and self._previous_axis is not None:
+            if self._previous_cut not in self._saved_parameters.keys():
+                self._saved_parameters[self._previous_cut] = dict()
+            self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
+
         self._cut_view.clear_input_fields()
         workspace_selection = self._main_presenter.get_selected_workspaces()
 
         if len(workspace_selection) != 1:
             self._cut_view.disable()
+            self._previous_cut = None
+            self._previous_axis = None
             return
 
         workspace = workspace_selection[0]
+
         if self._cut_algorithm.is_cuttable(workspace):
             axis = self._cut_algorithm.get_available_axis(workspace)
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
+            if workspace in self._saved_parameters.keys():
+                if axis[0] in self._saved_parameters[workspace].keys():
+                    self._cut_view.populate_input_fields(self._saved_parameters[workspace][axis[0]])
+            self._previous_cut = workspace
+            self._previous_axis = axis[0]
 
         elif self._cut_algorithm.is_cut(workspace):
             self._cut_view.plotting_params_only()
@@ -185,6 +203,21 @@ class CutPresenter(object):
 
         else:
             self._cut_view.disable()
+            self._previous_cut = None
+            self._previous_axis = None
+
+    def _cut_axis_changed(self):
+        if self._previous_axis is not None:
+            if self._previous_cut not in self._saved_parameters.keys():
+                self._saved_parameters[self._previous_cut] = dict()
+            self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
+        self._cut_view.clear_input_fields(keep_axes=True)
+        if self._previous_cut is not None:
+            self._previous_axis = self._cut_view.get_cut_axis()
+            if self._previous_axis in self._saved_parameters[self._previous_cut].keys():
+                self._cut_view.populate_input_fields(self._saved_parameters[self._previous_cut][self._previous_axis])
+        else:
+            self._cut_view.clear_input_fields()
 
     def _clear_displayed_error(self):
         self._cut_view.clear_displayed_error()

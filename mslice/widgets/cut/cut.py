@@ -34,6 +34,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
         cut_alogrithm = MantidCutAlgorithm()
         cut_plotter = MatplotlibCutPlotter(cut_alogrithm)
         self._presenter = CutPresenter(self, cut_alogrithm, cut_plotter)
+        self.cmbCutAxis.currentIndexChanged.connect(self.axis_changed)
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -43,6 +44,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
 
+    def axis_changed(self, *args):
+        self._presenter.notify(Command.AxisChanged)
+        
     def get_presenter(self):
         return self._presenter
 
@@ -80,9 +84,11 @@ class CutWidget(QWidget, CutView, Ui_Form):
         return str(self.lneCutSmoothing.text())
 
     def populate_cut_axis_options(self, options):
+        self.cmbCutAxis.blockSignals(True)
         self.cmbCutAxis.clear()
         for option in options:
             self.cmbCutAxis.addItem(option)
+        self.cmbCutAxis.blockSignals(False)
 
     def populate_cut_params(self, cut_start=None, cut_end=None, cut_step=None):
         if cut_start is not None:
@@ -98,13 +104,33 @@ class CutWidget(QWidget, CutView, Ui_Form):
         if integration_end is not None:
             self.lneCutIntegrationEnd.setText(integration_end)
 
-    def clear_input_fields(self):
-        self.populate_cut_axis_options([])
+    def clear_input_fields(self, **kwargs):
+        if 'keep_axes' not in kwargs.keys() or not kwargs['keep_axes']:
+            self.populate_cut_axis_options([])
         self.populate_cut_params("", "", "")
         self.populate_integration_params("", "")
         self.lneCutIntegrationWidth.setText("")
         self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
+
+    def populate_input_fields(self, saved_input):
+        self.populate_cut_params(*saved_input['cut_parameters'])
+        self.populate_integration_params(*saved_input['integration_range'])
+        self.lneCutIntegrationWidth.setText(saved_input['integration_width'])
+        self.lneCutSmoothing.setText(saved_input['smoothing'])
+        self.rdoCutNormToOne.setChecked(saved_input['normtounity'])
+
+    def get_input_fields(self):
+        saved_input = dict()
+        saved_input['cut_parameters'] = [self.get_cut_axis_start(),
+                                         self.get_cut_axis_end(),
+                                         self.get_cut_axis_step()]
+        saved_input['integration_range'] = [self.get_integration_start(),
+                                            self.get_integration_end()]
+        saved_input['integration_width'] = self.get_integration_width()
+        saved_input['smoothing'] = self.get_smoothing()
+        saved_input['normtounity'] = self.get_intensity_is_norm_to_one()
+        return saved_input
 
     def enable(self):
         self.lneCutStart.setEnabled(True)
