@@ -61,7 +61,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         #                           output_workspace=output_workspace,qbinning=???,axis1=u1,axis2=u2)
         self.projection_calculator.calculate_projection.assert_called_once()
         self.main_presenter.update_displayed_workspaces.assert_called_once_with()
-        self.main_presenter.set_selected_workspaces.assert_called_once() 
+        self.main_presenter.set_selected_workspaces.assert_called_once()
 
     def test_notify_presenter_with_unrecognised_command_raise_exception(self):
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
