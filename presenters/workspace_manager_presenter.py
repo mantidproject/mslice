@@ -47,20 +47,27 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         workspace_to_load = self._workspace_manger_view.get_workspace_to_load_path()
         if not workspace_to_load:
             return
-        base = os.path.basename(workspace_to_load)
-        ws_name = os.path.splitext(base)[0]
+        ws_names = [os.path.splitext(os.path.basename(base))[0] for base in workspace_to_load]
+        loaded = []
         #confirm that user wants to overwrite an existing workspace
-        if ws_name in self._work_spaceprovider.get_workspace_names():
-            confirm_overwrite = self._workspace_manger_view.confirm_overwrite_workspace()
-            if not confirm_overwrite:
-                self._workspace_manger_view.no_workspace_has_been_loaded()
-                return
-        try:
-            self._work_spaceprovider.load(filename=workspace_to_load, output_workspace=ws_name)
-        except RuntimeError:
+        for ii, ws_name in enumerate(ws_names):
+            if ws_name in self._work_spaceprovider.get_workspace_names():
+                confirm_overwrite = self._workspace_manger_view.confirm_overwrite_workspace()
+                if not confirm_overwrite:
+                    self._workspace_manger_view.no_workspace_has_been_loaded()
+                    return
+            try:
+                self._work_spaceprovider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
+            except RuntimeError:
+                pass
+            else:
+                loaded.append(ws_name)
+        if len(loaded) == 0:
             self._workspace_manger_view.error_unable_to_open_file()
             return
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
+        #self._workspace_manger_view.set_workspace_selected(
+        #        [self._workspace_manger_view.get_workspace_index(ld_name) for ld_name in loaded])
 
     def _save_selected_workspace(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()
