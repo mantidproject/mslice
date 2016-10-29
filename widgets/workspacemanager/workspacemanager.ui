@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>495</width>
-    <height>227</height>
+    <width>529</width>
+    <height>225</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,7 +56,10 @@
       </size>
      </property>
      <property name="title">
-      <string>Workspace Options:</string>
+      <string>Workspace Options</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
@@ -67,13 +70,6 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QPushButton" name="btnWorkspaceGroup">
-        <property name="text">
-         <string>Group Selected</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
        <widget class="QPushButton" name="btnWorkspaceCompose">
         <property name="enabled">
          <bool>false</bool>
@@ -83,12 +79,25 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="2" column="0">
        <widget class="QPushButton" name="btnRename">
         <property name="text">
          <string>Rename</string>
         </property>
        </widget>
+      </item>
+      <item row="3" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

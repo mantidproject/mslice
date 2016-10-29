@@ -1,20 +1,28 @@
-from powder_ui import Ui_Form
+"""A widget for defining projections for powders
+"""
+# -----------------------------------------------------------------------------
+# Imports
+# -----------------------------------------------------------------------------
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import pyqtSignal
-from presenters.powder_projection_presenter import PowderProjectionPresenter
 
-from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
-from views.powder_projection_view import PowderView
 from command import Command
+from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
+from powder_ui import Ui_Form
+from presenters.powder_projection_presenter import PowderProjectionPresenter
+from views.powder_projection_view import PowderView
 
+# -----------------------------------------------------------------------------
+# Classes and functions
+# -----------------------------------------------------------------------------
 
-class PowderWidget(QWidget,Ui_Form,PowderView):
+class PowderWidget(QWidget, Ui_Form, PowderView):
     """This widget is not usable without a main window which implements mainview"""
 
     error_occurred = pyqtSignal('QString')
 
-    def __init__(self,*args, **kwargs):
-        super(PowderWidget,self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(PowderWidget, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.btnPowderCalculateProjection.clicked.connect(self._btn_clicked)
         self._presenter = PowderProjectionPresenter(self, MantidProjectionCalculator())
@@ -39,14 +47,28 @@ class PowderWidget(QWidget,Ui_Form,PowderView):
     def get_powder_u2(self):
         return str(self.cmbPowderU2.currentText())
 
+    def set_powder_u1(self, name):
+        # Signals are blocked to prevent self._u1_changed being called here (it would be false alarm)
+        self.cmbPowderU1.blockSignals(True)
+        self.cmbPowderU1.setCurrentIndex(self._name_to_index[name])
+        self.cmbPowderU1.blockSignals(False)
+
+    def set_powder_u2(self, name):
+        # Signals are blocked to prevent self._u2_changed being called here (it would be false alarm)
+        self.cmbPowderU2.blockSignals(True)
+        self.cmbPowderU2.setCurrentIndex(self._name_to_index[name])
+        self.cmbPowderU2.blockSignals(False)
+
     def populate_powder_u1(self, u1_options):
         # Signals are blocked to prevent self._u1_changed being called here (it would be false alarm)
         self.cmbPowderU1.blockSignals(True)
         self.cmbPowderU1.clear()
-        for value in u1_options:
+        # Assuming that u1 and u2 both have the same possible units.
+        self._name_to_index = {}
+        for idx, value in enumerate(u1_options):
             self.cmbPowderU1.addItem(value)
+            self._name_to_index[value] = idx
         self.cmbPowderU1.blockSignals(False)
-
 
     def populate_powder_u2(self, u2_options):
         # Signals are blocked to prevent self._u2_changed being called here (it would be false alarm)

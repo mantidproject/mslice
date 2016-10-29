@@ -115,15 +115,15 @@ class LegendDescriptor(object):
         self._labels[handle] = text
 
     def get_legend_descriptor(self, handle):
-            if handle in self._labels.keys():
-                label = self._labels[handle]  # If a new value has been set for a handle return that
-            else:
-                label = handle.get_label()   # Else get the value from the plot
-            if label.startswith('_'):
-                x = {'text': label[1:], 'visible': False, 'handle':handle}
-            else:
-                x = {'text': label, 'visible': True, 'handle':handle}
-            return x
+        if handle in self._labels.keys():
+            label = self._labels[handle]  # If a new value has been set for a handle return that
+        else:
+            label = handle.get_label()   # Else get the value from the plot
+        if label.startswith('_'):
+            x = {'text': label[1:], 'visible': False, 'handle':handle}
+        else:
+            x = {'text': label, 'visible': True, 'handle':handle}
+        return x
 
     def get_legend_text(self, handle):
         if handle in self._labels.keys():

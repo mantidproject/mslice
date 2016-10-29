@@ -1,25 +1,31 @@
+"""Defines the additional mslice commands on top of the standard matplotlib plotting commands
+"""
+# -----------------------------------------------------------------------------
+# Imports
+# -----------------------------------------------------------------------------
+
+# Mantid Tools imported for convenience
+from mantid.api import IMDWorkspace as _IMDWorkspace
+from mantid.api import Workspace as _Workspace
+from mantid.kernel.funcinspect import lhs_info as _lhs_info
+from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F401
+
 # Helper tools
 from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider as _MantidWorkspaceProvider
 from presenters.slice_plotter_presenter import Axis as _Axis
-from mantid.kernel.funcinspect import lhs_info as _lhs_info
-
-# Mantid Tools imported for convenience
-from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F401
-
 # Projections
 from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
-from mantid.api import Workspace as _Workspace
-
 # Slicing
 from models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
 from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm as _MantidSliceAlgorithm
-from mantid.api import IMDWorkspace as _IMDWorkspace
-
 # Cutting
 from models.cut.mantid_cut_algorithm import MantidCutAlgorithm as _MantidCutAlgorithm
 from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 
+# -----------------------------------------------------------------------------
 # Module constants
+# -----------------------------------------------------------------------------
+
 _WORKSPACE_PROVIDER = _MantidWorkspaceProvider()
 _POWDER_PROJECTION_MODEL = _MantidProjectionCalculator()
 _SLICE_ALGORITHM = _MantidSliceAlgorithm()
@@ -27,7 +33,10 @@ _SLICE_MODEL = _MatplotlibSlicePlotter(_SLICE_ALGORITHM)
 _CUT_ALGORITHM = _MantidCutAlgorithm()
 _CUT_PLOTTER = MatplotlibCutPlotter(_CUT_ALGORITHM)
 
-# Convenience methods
+# -----------------------------------------------------------------------------
+# Convenience functions
+# -----------------------------------------------------------------------------
+
 def _process_axis(axis, fallback_index, input_workspace):
     if axis is None:
         axis = _SLICE_ALGORITHM.get_available_axis(input_workspace)[fallback_index]
@@ -60,8 +69,11 @@ def _string_to_axis(string):
     return _Axis(name, start, end, step)
 
 
+# -----------------------------------------------------------------------------
+# Command functions
+# -----------------------------------------------------------------------------
 
-def get_projection(input_workspace, axis1, axis2):
+def get_projection(input_workspace, axis1, axis2, units='meV'):
     """ Calculate projections of workspace.
 
     Keyword Arguments:
@@ -69,12 +81,13 @@ def get_projection(input_workspace, axis1, axis2):
         workspace name.
         axis1 -- The first axis of projection (string)
         axis2 -- The second axis of the projection (string)
+        units -- The energy units (string) [default: 'meV']
 
     """
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     output_workspace = _POWDER_PROJECTION_MODEL.calculate_projection(input_workspace=input_workspace, axis1=axis1,
-                                                                     axis2=axis2)
+                                                                     axis2=axis2, units=units)
     try:
         names = _lhs_info('names')
     except:

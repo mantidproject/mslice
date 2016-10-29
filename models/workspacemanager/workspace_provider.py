@@ -1,21 +1,34 @@
+"""Defines the interface to an object responsible for performaing operations on
+workspaces
+"""
+# -----------------------------------------------------------------------------
+# Imports
+# -----------------------------------------------------------------------------
+
 import abc
 
-class WorkspaceProvider:
+# -----------------------------------------------------------------------------
+# Classes and functions
+# -----------------------------------------------------------------------------
+
+class WorkspaceProvider(object):
+
     @abc.abstractmethod
     def get_workspace_names(self):
         pass
+
     @abc.abstractmethod
-    def delete_workspace(self, ToBeDeleted):
+    def delete_workspace(self, workspace):
         pass
+
     @abc.abstractmethod
-    def load(self, Filename, OutputWorkspace):
+    def load(self, filename, output_workspace):
         pass
+
     @abc.abstractmethod
-    def group_workspaces(self, InputWorkspaces, OutputWorkspace):
+    def rename_workspace(self, selected_workspace, new_name):
         pass
-    @abc.abstractmethod
-    def rename_workspace(self, selected_workspace, newName):
-        pass
+
     @abc.abstractmethod
     def save_nexus(self, workspace, path):
         pass

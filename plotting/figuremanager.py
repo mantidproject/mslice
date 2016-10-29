@@ -109,7 +109,7 @@ class FigureManager(object):
 
 
             elif FigureManager._category_current_figures[FigureManager._active_category] == NO_FIGURE:
-                fig, num = FigureManager._new_figure()
+                _, num = FigureManager._new_figure()
                 FigureManager.assign_figure_to_category(num, FigureManager._active_category, make_current=True)
                 FigureManager._active_figure = num
 
