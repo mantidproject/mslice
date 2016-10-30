@@ -11,7 +11,11 @@ before_install:
   - sudo apt-add-repository ppa:mantid/mantid -y
   - sudo apt-add-repository "deb [arch=amd64] http://apt.isis.rl.ac.uk trusty-testing main" -y
   - sudo apt-get update -q
-  - sudo apt-get install mantidnightly -y
+  - sudo apt-get install gdebi -y
+  - wget https://sourceforge.net/projects/mantid/files/Nightly/ -O /tmp/index.html
+  - wget http://downloads.sourceforge.net/project/mantid/Nightly/$(grep mantidnightly /tmp/index.html |grep trusty1_amd64.deb | sed s/.*mantidnightly/mantidnightly/ | sed s/.deb.*/.deb/ | head -n1) -O /tmp/mtn.deb
+  - sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
+  #- sudo apt-get install mantidnightly -y --force-yes 
 
 install:
   - pip install -r pip-requirements.txt

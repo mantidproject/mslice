@@ -48,23 +48,35 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not workspace_to_load:
             return
         ws_names = [os.path.splitext(os.path.basename(base))[0] for base in workspace_to_load]
+        not_loaded = []
+        not_opened = []
         loaded = []
-        #confirm that user wants to overwrite an existing workspace
         for ii, ws_name in enumerate(ws_names):
+            # confirm that user wants to overwrite an existing workspace
             if ws_name in self._work_spaceprovider.get_workspace_names():
                 confirm_overwrite = self._workspace_manger_view.confirm_overwrite_workspace()
                 if not confirm_overwrite:
-                    self._workspace_manger_view.no_workspace_has_been_loaded()
-                    return
+                    not_loaded.append(ws_name)
+                    continue
             try:
                 self._work_spaceprovider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
             except RuntimeError:
+                not_opened.append(ws_name)
                 pass
             else:
                 loaded.append(ws_name)
-        if len(loaded) == 0:
+        if len(not_opened) == len(ws_names):
             self._workspace_manger_view.error_unable_to_open_file()
             return
+        elif len(not_opened) > 0:
+            errmsg = not_opened if len(not_opened)==1 else ",".join(not_opened)
+            self._workspace_manger_view.error_unable_to_open_file(errmsg)
+        if len(not_loaded) == len(ws_names):
+            self._workspace_manger_view.no_workspace_has_been_loaded()
+            return
+        elif len(not_loaded) > 0:
+            errmsg = not_loaded if len(not_loaded)==1 else ",".join(not_loaded)
+            self._workspace_manger_view.no_workspace_has_been_loaded(errmsg)
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
         #self._workspace_manger_view.set_workspace_selected(
         #        [self._workspace_manger_view.get_workspace_index(ld_name) for ld_name in loaded])
