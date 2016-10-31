@@ -32,3 +32,9 @@ class WorkspaceProvider(object):
     @abc.abstractmethod
     def save_nexus(self, workspace, path):
         pass
+
+    def get_workspace_handle(self, workspace_name):
+        pass
+
+    def get_workspace_name(self, workspace_handle):
+        pass

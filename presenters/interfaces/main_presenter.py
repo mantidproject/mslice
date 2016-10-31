@@ -5,6 +5,9 @@ class MainPresenterInterface(object):
     def get_selected_workspaces(self):
         raise NotImplementedError("This method must be overriden in implementation")
 
+    def set_selected_workspaces(self, list):
+        raise NotImplementedError("This method must be overriden in implementation")
+
     def update_displayed_workspaces(self):
         raise NotImplementedError("This method must be overriden in implementation")
 

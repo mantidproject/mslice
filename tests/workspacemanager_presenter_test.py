@@ -40,11 +40,13 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         workspace_name = 'cde'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=path_to_nexus)
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_name])
+        self.view.get_workspace_index = mock.Mock(return_value=[0])
 
         self.presenter.notify(Command.LoadWorkspace)
         self.view.get_workspace_to_load_path.assert_called_once()
         self.workspace_provider.load.assert_called_with(filename=path_to_nexus, output_workspace=workspace_name)
         self.view.display_loaded_workspaces.assert_called_with([workspace_name])
+        self.view.set_workspace_selected.assert_called_with([0])
 
     def test_load_multiple_workspaces(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -75,6 +77,18 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.LoadWorkspace)
         self.view.get_workspace_to_load_path.assert_called_once()
         self.workspace_provider.load.assert_not_called()
+
+    def test_load_workspace_dont_overwrite(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
+        path = join(tempdir,'file.nxs')
+        ws_name = 'file'
+        self.view.get_workspace_to_load_path = mock.Mock(return_value=path)
+        self.workspace_provider.get_workspace_names = mock.Mock(return_value=[ws_name])
+        self.view.confirm_overwrite_workspace = mock.Mock(return_value=False)
+
+        self.presenter.notify(Command.LoadWorkspace)
+        self.view.confirm_overwrite_workspace.assert_called_once()
 
     def test_load_workspace_fail(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -241,6 +255,29 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             self.view.clear_displayed_error.assert_called()
             self.view.reset_mock()
 
+    def test_set_selected_workspace_index(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.view.get_workspace_index = mock.Mock()
+        self.workspace_provider.get_workspace_name = mock.Mock()
+        self.presenter.set_selected_workspaces([1])
+        self.view.set_workspace_selected.assert_called_once_with([1])
+
+    def test_set_selected_workspace_name(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.view.get_workspace_index = mock.Mock(return_value=0)
+        self.workspace_provider.get_workspace_name = mock.Mock()
+        self.presenter.set_selected_workspaces(['ws'])
+        self.view.get_workspace_index.assert_called_once_with('ws')
+        self.view.set_workspace_selected.assert_called_once_with([0])
+
+    def test_set_selected_workspace_handle(self):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.view.get_workspace_index = mock.Mock(return_value=0)
+        self.workspace_provider.get_workspace_name = mock.Mock(return_value='ws')
+        self.presenter.set_selected_workspaces([mock.Mock()])
+        self.workspace_provider.get_workspace_name.called_once_with(mock.Mock())
+        self.view.get_workspace_index.assert_called_once_with('ws')
+        self.view.set_workspace_selected.assert_called_once_with([0])
 
 if __name__ == '__main__':
     unittest.main()

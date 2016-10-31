@@ -11,7 +11,14 @@ before_install:
   - sudo apt-add-repository ppa:mantid/mantid -y
   - sudo apt-add-repository "deb [arch=amd64] http://apt.isis.rl.ac.uk trusty-testing main" -y
   - sudo apt-get update -q
-  - sudo apt-get install mantidnightly -y --force-yes
+  # Removed due to slow speed of isis apt repository causing builds to fail due to time out.
+  # sudo apt-get install mantidnightly -y --force-yes
+  # Use a work-around by downloading deb from sourceforge instead.
+  - sudo apt-get install gdebi -y
+  - wget https://sourceforge.net/projects/mantid/files/Nightly/ -O /tmp/index.html
+  - export mantiddeb=$(grep mantidnightly /tmp/index.html |grep amd64.deb | sed s/.*man/man/ | sed s/.deb.*/.deb/ | head -n1)
+  - wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
+  - sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
 
 install:
   - pip install -r pip-requirements.txt
