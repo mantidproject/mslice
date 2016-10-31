@@ -44,14 +44,16 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         axis1 = self._powder_view.get_powder_u1()
         axis2 = self._powder_view.get_powder_u2()
         if axis1 == axis2:
-            raise NotImplementedError('equal axis')
+            raise ValueError('equal axis')
         if not selected_workspaces:
-            raise NotImplementedError('no workspaces selected')
+            raise NameError('no workspaces selected')
         units = self._powder_view.get_powder_units()
 
+        outws = []
         for workspace in selected_workspaces:
-            self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
+            outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2, units))
         self._get_main_presenter().update_displayed_workspaces()
+        self._get_main_presenter().set_selected_workspaces(outws)
 
     @require_main_presenter
     def _get_main_presenter(self):

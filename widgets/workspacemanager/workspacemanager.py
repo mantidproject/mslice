@@ -76,6 +76,18 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         selected_workspaces = map(lambda x: str(x.text()), self.lstWorkspaces.selectedItems())
         return list(selected_workspaces)
 
+    def set_workspace_selected(self, index):
+        for item_index in range(self.lstWorkspaces.count()):
+            self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(item_index), False)
+        for this_index in (index if hasattr(index, "__iter__") else [index]):
+            self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(this_index), True)
+
+    def get_workspace_index(self, ws_name):
+        for index in range(self.lstWorkspaces.count()):
+            if str(self.lstWorkspaces.item(index).text()) == ws_name:
+                return index
+        return -1
+
     def get_workspace_to_load_path(self):
         paths = QFileDialog.getOpenFileNames()
         return [str(filename) for filename in paths]

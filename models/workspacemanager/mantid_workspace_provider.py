@@ -42,3 +42,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         if isinstance(workspace_name, Workspace):
             return workspace_name
         return AnalysisDataService[workspace_name]
+
+    def get_workspace_name(self, workspace):
+        """Returns the name of a workspace given the workspace handle"""
+        if isinstance(workspace, basestring):
+            return workspace
+        return workspace.name()
