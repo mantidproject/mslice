@@ -68,17 +68,17 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manger_view.error_unable_to_open_file()
             return
         elif len(not_opened) > 0:
-            errmsg = not_opened if len(not_opened)==1 else ",".join(not_opened)
+            errmsg = not_opened[0] if len(not_opened)==1 else ",".join(not_opened)
             self._workspace_manger_view.error_unable_to_open_file(errmsg)
         if len(not_loaded) == len(ws_names):
             self._workspace_manger_view.no_workspace_has_been_loaded()
             return
         elif len(not_loaded) > 0:
-            errmsg = not_loaded if len(not_loaded)==1 else ",".join(not_loaded)
+            errmsg = not_loaded[0] if len(not_loaded)==1 else ",".join(not_loaded)
             self._workspace_manger_view.no_workspace_has_been_loaded(errmsg)
         self._workspace_manger_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
         self._workspace_manger_view.set_workspace_selected(
-                [self._workspace_manger_view.get_workspace_index(ld_name) for ld_name in loaded])
+            [self._workspace_manger_view.get_workspace_index(ld_name) for ld_name in loaded])
 
     def _save_selected_workspace(self):
         selected_workspaces = self._workspace_manger_view.get_workspace_selected()

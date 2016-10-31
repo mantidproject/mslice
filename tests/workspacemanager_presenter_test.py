@@ -62,11 +62,17 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             return_value=[path1, path2, path3])
         self.workspace_provider.get_workspace_names = mock.Mock(
             return_value=[ws_name1, ws_name2, ws_name3])
+        # Makes the first file not load because of a name collision
+        self.view.confirm_overwrite_workspace = mock.Mock(side_effect=[False, True, True])
+        # Makes the second file fail to load, to check if it raise the correct error
+        self.workspace_provider.load = mock.Mock(side_effect=[RuntimeError, 0])
         self.presenter.notify(Command.LoadWorkspace)
-        load_calls = [call(filename=path1, output_workspace=ws_name1),
-                      call(filename=path2, output_workspace=ws_name2),
+        # Because of the name collision, the first file name is not loaded.
+        load_calls = [call(filename=path2, output_workspace=ws_name2),
                       call(filename=path3, output_workspace=ws_name3)]
         self.workspace_provider.load.assert_has_calls(load_calls)
+        self.view.error_unable_to_open_file.assert_called_once_with(ws_name2)
+        self.view.no_workspace_has_been_loaded.assert_called_once_with(ws_name1)
 
     def test_load_workspace_cancelled(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -89,6 +95,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
         self.presenter.notify(Command.LoadWorkspace)
         self.view.confirm_overwrite_workspace.assert_called_once()
+        self.view.no_workspace_has_been_loaded.assert_called_once()
 
     def test_load_workspace_fail(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -103,7 +110,6 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.LoadWorkspace)
         self.view.get_workspace_to_load_path.assert_called_once()
         self.view.error_unable_to_open_file.assert_called_once()
-
 
     def test_rename_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
