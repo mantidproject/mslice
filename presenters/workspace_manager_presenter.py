@@ -62,7 +62,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._work_spaceprovider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
             except RuntimeError:
                 not_opened.append(ws_name)
-                pass
             else:
                 loaded.append(ws_name)
         if len(not_opened) == len(ws_names):

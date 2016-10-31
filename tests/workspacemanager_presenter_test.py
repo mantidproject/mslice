@@ -40,7 +40,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         workspace_name = 'cde'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=[path_to_nexus])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_name])
-        self.view.get_workspace_index = mock.Mock(return_value=[0])
+        self.view.get_workspace_index = mock.Mock(return_value=0)
 
         self.presenter.notify(Command.LoadWorkspace)
         self.view.get_workspace_to_load_path.assert_called_once()
@@ -83,7 +83,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
         path = join(tempdir,'file.nxs')
         ws_name = 'file'
-        self.view.get_workspace_to_load_path = mock.Mock(return_value=path)
+        self.view.get_workspace_to_load_path = mock.Mock(return_value=[path])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[ws_name])
         self.view.confirm_overwrite_workspace = mock.Mock(return_value=False)
 

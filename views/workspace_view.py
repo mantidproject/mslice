@@ -40,10 +40,10 @@ class WorkspaceView(object):
     def confirm_overwrite_workspace(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    def no_workspace_has_been_loaded(self):
+    def no_workspace_has_been_loaded(self, filename=None):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    def error_unable_to_open_file(self):
+    def error_unable_to_open_file(self, filename=None):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def error_invalid_save_path(self):

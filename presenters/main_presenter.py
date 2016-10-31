@@ -11,8 +11,8 @@ class MainPresenter(MainPresenterInterface):
     def get_selected_workspaces(self):
         return self._workspace_presenter.get_selected_workspaces()
 
-    def set_selected_workspaces(self, list):
-        self._workspace_presenter.set_selected_workspaces(list)
+    def set_selected_workspaces(self, workspace_list):
+        self._workspace_presenter.set_selected_workspaces(workspace_list)
 
     def update_displayed_workspaces(self):
         """Update the workspaces shown to user.
