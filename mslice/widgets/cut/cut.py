@@ -83,6 +83,13 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def get_smoothing(self):
         return str(self.lneCutSmoothing.text())
 
+    def set_cut_axis(self, axis_name):
+        index = [ind for ind in range(self.cmbCutAxis.count()) if str(self.cmbCutAxis.itemText(ind)) == axis_name]
+        if index:
+            self.cmbCutAxis.blockSignals(True)
+            self.cmbCutAxis.setCurrentIndex(index[0])
+            self.cmbCutAxis.blockSignals(False)
+
     def populate_cut_axis_options(self, options):
         self.cmbCutAxis.blockSignals(True)
         self.cmbCutAxis.clear()
@@ -122,6 +129,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
     def get_input_fields(self):
         saved_input = dict()
+        saved_input['axes'] = [str(self.cmbCutAxis.itemText(ind)) for ind in range(self.cmbCutAxis.count())]
         saved_input['cut_parameters'] = [self.get_cut_axis_start(),
                                          self.get_cut_axis_end(),
                                          self.get_cut_axis_step()]

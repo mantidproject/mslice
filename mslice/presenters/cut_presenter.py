@@ -169,10 +169,10 @@ class CutPresenter(object):
                 self._saved_parameters[self._previous_cut] = dict()
             self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
 
-        self._cut_view.clear_input_fields()
         workspace_selection = self._main_presenter.get_selected_workspaces()
 
         if len(workspace_selection) != 1:
+            self._cut_view.clear_input_fields()
             self._cut_view.disable()
             self._previous_cut = None
             self._previous_axis = None
@@ -182,13 +182,18 @@ class CutPresenter(object):
 
         if self._cut_algorithm.is_cuttable(workspace):
             axis = self._cut_algorithm.get_available_axis(workspace)
+            current_axis = axis[0]
+            if self._previous_cut is not None and self._previous_axis is not None:
+                if axis == self._saved_parameters[self._previous_cut][self._previous_axis]['axes']:
+                    current_axis = self._cut_view.get_cut_axis()
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
+            self._cut_view.set_cut_axis(current_axis)
             if workspace in self._saved_parameters.keys():
-                if axis[0] in self._saved_parameters[workspace].keys():
-                    self._cut_view.populate_input_fields(self._saved_parameters[workspace][axis[0]])
+                if current_axis in self._saved_parameters[workspace].keys():
+                    self._cut_view.populate_input_fields(self._saved_parameters[workspace][current_axis])
             self._previous_cut = workspace
-            self._previous_axis = axis[0]
+            self._previous_axis = current_axis
 
         elif self._cut_algorithm.is_cut(workspace):
             self._cut_view.plotting_params_only()
@@ -202,6 +207,7 @@ class CutPresenter(object):
             self._cut_view.populate_integration_params(*format_(*integration_limits))
 
         else:
+            self._cut_view.clear_input_fields()
             self._cut_view.disable()
             self._previous_cut = None
             self._previous_axis = None
