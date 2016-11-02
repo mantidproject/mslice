@@ -89,8 +89,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         return -1
 
     def get_workspace_to_load_path(self):
-        path = QFileDialog.getOpenFileName()
-        return str( path )
+        paths = QFileDialog.getOpenFileNames()
+        return [str(filename) for filename in paths]
 
     def get_workspace_to_save_filepath(self):
         extension = 'Nexus file (*.nxs)'
@@ -113,8 +113,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     def error_select_one_workspace(self):
         self._display_error('Please select a workspace then try again')
 
-    def error_unable_to_open_file(self):
-        self._display_error('MSlice was not able to load the selected file')
+    def error_unable_to_open_file(self, filename=None):
+        self._display_error('MSlice was not able to load %s' % ('the selected file' if filename is None else filename))
 
     def confirm_overwrite_workspace(self):
         reply = QMessageBox.question(self,'Confirm Overwrite', 'The workspace you want to load has the same name as'
@@ -129,8 +129,11 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     def error_invalid_save_path(self):
         self._display_error('No files were saved')
 
-    def no_workspace_has_been_loaded(self):
-        self._display_error('No new workspaces have been loaded')
+    def no_workspace_has_been_loaded(self, filename=None):
+        if filename is None:
+            self._display_error('No new workspaces have been loaded')
+        else:
+            self._display_error('File %s has not been loaded' % (filename))
 
     def get_presenter(self):
         return self._presenter
