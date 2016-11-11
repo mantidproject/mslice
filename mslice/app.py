@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from PyQt4.QtGui import QMainWindow,QApplication
 
 from mainview import MainView
@@ -29,9 +30,11 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
     def get_presenter(self):
         return self._presenter
 
-
-if __name__ == "__main__":
+def main():
     qapp = QApplication([])
     mslice = MsliceGui()
     mslice.show()
-    qapp.exec_()
+    return qapp.exec_()
+
+if __name__ == "__main__":
+    main()
