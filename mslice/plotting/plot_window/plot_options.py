@@ -1,9 +1,6 @@
 import PyQt4.QtGui as QtGui
-from plot_options_ui import Ui_Dialog
 
-
-
-
+from .plot_options_ui import Ui_Dialog
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self, current_config):

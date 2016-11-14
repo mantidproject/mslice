@@ -1,15 +1,21 @@
 #!/usr/bin/env python
-from PyQt4.QtGui import QMainWindow,QApplication
+from __future__ import (print_function)
 
-from mainview import MainView
-from mslice_ui import Ui_MainWindow
-from presenters.main_presenter import MainPresenter
+from PyQt4.QtGui import QMainWindow
+from IPython import start_ipython
 
+from .mainview import MainView
+from .mslice_ui import Ui_MainWindow
+from .presenters.main_presenter import MainPresenter
 
-class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
+# ==============================================================================
+# Classes
+# ==============================================================================
+
+class MSliceGui(QMainWindow, Ui_MainWindow, MainView):
 
     def __init__(self):
-        super(MsliceGui,self).__init__()
+        super(MSliceGui,self).__init__()
         self.setupUi(self)
 
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
@@ -30,11 +36,18 @@ class MsliceGui(QMainWindow,Ui_MainWindow,MainView):
     def get_presenter(self):
         return self._presenter
 
+
+# ==============================================================================
+# Application Entry Point
+# ==============================================================================
+
+IPY_STARTUP_CODE = '''from mslice.app import MSliceGui
+x = MSliceGui()
+x.show()'''
+
 def main():
-    qapp = QApplication([])
-    mslice = MsliceGui()
-    mslice.show()
-    return qapp.exec_()
+    ipython_args = ["--matplotlib", "-i", "-c", IPY_STARTUP_CODE]
+    start_ipython(ipython_args)
 
 if __name__ == "__main__":
     main()

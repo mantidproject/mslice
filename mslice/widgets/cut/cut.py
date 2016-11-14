@@ -6,12 +6,12 @@
 from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtGui import QWidget
 
-from command import Command
-from cut_ui import Ui_Form
-from models.cut.mantid_cut_algorithm import MantidCutAlgorithm
-from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
-from presenters.cut_presenter import CutPresenter
-from views.cut_view import CutView
+from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
+from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+from mslice.presenters.cut_presenter import CutPresenter
+from mslice.views.cut_view import CutView
+from .command import Command
+from .cut_ui import Ui_Form
 
 # -----------------------------------------------------------------------------
 # Classes and functions

@@ -6,12 +6,12 @@
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import pyqtSignal
 
-from command import Command
-from models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
-from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-from presenters.slice_plotter_presenter import SlicePlotterPresenter
-from slice_ui import Ui_Form
-from views.slice_plotter_view import SlicePlotterView
+from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
+from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
+from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
+from mslice.views.slice_plotter_view import SlicePlotterView
+from .command import Command
+from .slice_ui import Ui_Form
 
 
 # -----------------------------------------------------------------------------

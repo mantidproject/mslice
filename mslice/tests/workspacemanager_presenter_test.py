@@ -1,18 +1,18 @@
+from tempfile import gettempdir
+from os.path import join
 import unittest
 
 import mock
 from mock import call
 
-from models.workspacemanager.workspace_provider import WorkspaceProvider
-from presenters.workspace_manager_presenter import WorkspaceManagerPresenter
-from presenters.interfaces.main_presenter import MainPresenterInterface
-from views.workspace_view import WorkspaceView
-from widgets.workspacemanager.command import Command
-from mainview import MainView
-from tempfile import gettempdir
-from os.path import join
+from mslice.mainview import MainView
+from mslice.models.workspacemanager.workspace_provider import WorkspaceProvider
+from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
+from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from mslice.views.workspace_view import WorkspaceView
+from mslice.widgets.workspacemanager.command import Command
 
-#TODO handle mantid load fail inquiry
+
 #TODO Test constructor and make this test specific
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):

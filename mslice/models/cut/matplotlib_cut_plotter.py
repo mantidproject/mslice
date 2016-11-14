@@ -1,5 +1,5 @@
-from cut_plotter import CutPlotter
-import plotting.pyplot as plt
+import mslice.plotting.pyplot as plt
+from .cut_plotter import CutPlotter
 
 INTENSITY_LABEL = 'Signal/#Events'
 

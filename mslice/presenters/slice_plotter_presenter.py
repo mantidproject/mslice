@@ -1,9 +1,9 @@
-from models.slice.slice_plotter import SlicePlotter
-from views.slice_plotter_view import SlicePlotterView
-from widgets.slice.command import Command
-from validation_decorators import require_main_presenter
-from interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
-from interfaces.main_presenter import MainPresenterInterface
+from mslice.models.slice.slice_plotter import SlicePlotter
+from mslice.views.slice_plotter_view import SlicePlotterView
+from mslice.widgets.slice.command import Command
+from .interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
+from .interfaces.main_presenter import MainPresenterInterface
+from .validation_decorators import require_main_presenter
 
 
 class Axis(object):

@@ -11,16 +11,16 @@ from mantid.kernel.funcinspect import lhs_info as _lhs_info
 from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F401
 
 # Helper tools
-from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider as _MantidWorkspaceProvider
-from presenters.slice_plotter_presenter import Axis as _Axis
+from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider as _MantidWorkspaceProvider
+from mslice.presenters.slice_plotter_presenter import Axis as _Axis
 # Projections
-from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
+from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
 # Slicing
-from models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
-from models.slice.mantid_slice_algorithm import MantidSliceAlgorithm as _MantidSliceAlgorithm
+from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
+from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm as _MantidSliceAlgorithm
 # Cutting
-from models.cut.mantid_cut_algorithm import MantidCutAlgorithm as _MantidCutAlgorithm
-from models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm as _MantidCutAlgorithm
+from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 
 # -----------------------------------------------------------------------------
 # Module constants

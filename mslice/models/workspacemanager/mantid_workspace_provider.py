@@ -9,7 +9,7 @@ from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
                               RenameWorkspace, SaveNexus, SaveMD)
 from mantid.api import IMDWorkspace, Workspace
 
-from workspace_provider import WorkspaceProvider
+from .workspace_provider import WorkspaceProvider
 
 # -----------------------------------------------------------------------------
 # Classes and functions

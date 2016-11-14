@@ -1,8 +1,9 @@
-from mock import call
 import mock
+from mock import call
 import unittest
-from plotting.figuremanager import FigureManager
-from plotting.figuremanager import activate_category
+
+from mslice.plotting.figuremanager import FigureManager
+from mslice.plotting.figuremanager import activate_category
 
 
 class FigureManagerTest(unittest.TestCase):
@@ -10,7 +11,7 @@ class FigureManagerTest(unittest.TestCase):
     # by the mock module. The number of expected plots is defined by the list at the beginning of each unit test
 
     # Define the location of the plot figure class for mock
-    _plot_window_class = 'plotting.figuremanager.PlotFigureManager'
+    _plot_window_class = 'mslice.plotting.figuremanager.PlotFigureManager'
 
     def setUp(self):
         FigureManager.reset()

@@ -1,6 +1,7 @@
 from matplotlib.colors import Normalize
-from slice_plotter import SlicePlotter
-import plotting.pyplot as plt
+
+from .slice_plotter import SlicePlotter
+import mslice.plotting.pyplot as plt
 
 class MatplotlibSlicePlotter(SlicePlotter):
     def __init__(self, slice_algorithm):

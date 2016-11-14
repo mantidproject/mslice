@@ -1,9 +1,9 @@
-from models.projection.powder.projection_calculator import ProjectionCalculator
-from views.powder_projection_view import PowderView
-from widgets.projection.powder.command import Command
-from validation_decorators import require_main_presenter
-from presenters.interfaces.main_presenter import MainPresenterInterface
-from interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
+from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
+from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
+from mslice.views.powder_projection_view import PowderView
+from mslice.widgets.projection.powder.command import Command
+from .interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
+from .validation_decorators import require_main_presenter
 
 
 class PowderProjectionPresenter(PowderProjectionPresenterInterface):

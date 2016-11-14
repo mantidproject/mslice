@@ -6,11 +6,11 @@
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import pyqtSignal
 
-from command import Command
-from models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
-from powder_ui import Ui_Form
-from presenters.powder_projection_presenter import PowderProjectionPresenter
-from views.powder_projection_view import PowderView
+from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
+from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
+from mslice.views.powder_projection_view import PowderView
+from .command import Command
+from .powder_ui import Ui_Form
 
 # -----------------------------------------------------------------------------
 # Classes and functions

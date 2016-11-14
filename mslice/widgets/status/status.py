@@ -7,7 +7,7 @@ Displays information/errors to the user
 # -----------------------------------------------------------------------------
 from PyQt4.QtGui import QWidget
 
-from status_ui import Ui_Form
+from .status_ui import Ui_Form
 
 # -----------------------------------------------------------------------------
 # Classes and functions

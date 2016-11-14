@@ -1,4 +1,4 @@
-from interfaces.main_presenter import MainPresenterInterface
+from .interfaces.main_presenter import MainPresenterInterface
 
 
 class MainPresenter(MainPresenterInterface):

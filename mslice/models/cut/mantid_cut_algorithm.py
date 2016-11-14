@@ -1,11 +1,13 @@
-from cut_algorithm import CutAlgorithm
+from math import floor
+import numpy as np
+
 from mantid.simpleapi import BinMD
 from mantid.api import MDNormalization
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
-from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
-from presenters.slice_plotter_presenter import Axis
-from math import floor
-import numpy as np
+
+from .cut_algorithm import CutAlgorithm
+from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
+from mslice.presenters.slice_plotter_presenter import Axis
 
 
 class MantidCutAlgorithm(CutAlgorithm):

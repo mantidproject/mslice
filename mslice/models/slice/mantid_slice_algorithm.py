@@ -1,9 +1,11 @@
-from slice_algorithm import SliceAlgorithm
-from mantid.simpleapi import BinMD
-from mantid.api import IMDEventWorkspace
-from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from math import floor
 import numpy as np
+
+from mantid.simpleapi import BinMD
+from mantid.api import IMDEventWorkspace
+
+from .slice_algorithm import SliceAlgorithm
+from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 
 class MantidSliceAlgorithm(SliceAlgorithm):

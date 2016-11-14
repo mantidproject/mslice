@@ -3,8 +3,8 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
-import plotting.pyplot as _plt
-from plotting.pyplot import * # noqa: F401
+import mslice.plotting.pyplot as _plt
+from mslice.plotting.pyplot import * # noqa: F401
 import _mslice_commmands
 from _mslice_commmands import * # noqa: F401
 

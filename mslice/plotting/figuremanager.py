@@ -31,10 +31,9 @@
 #  dictionaries (Or maybe adding an add_category function to facilitate this)
 #
 #
-
-
 from functools import wraps
-from plotting import get_figure_class
+
+from mslice.plotting import get_figure_class
 
 
 class NoFigure(object):

@@ -1,7 +1,8 @@
-from PyQt4 import QtGui
-from base_plot_window import BasePlotWindow
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from PyQt4 import QtGui
+
+from .base_plot_window import BasePlotWindow
 
 class MatplotlibCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""

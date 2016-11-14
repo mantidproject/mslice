@@ -1,8 +1,9 @@
 import uuid
 from mantid.simpleapi import ConvertToMD, SliceMD, TransformMD, ConvertSpectrumAxis, PreprocessDetectorsToMD
 from mantid.simpleapi import RenameWorkspace, DeleteWorkspace
-from models.projection.powder.projection_calculator import ProjectionCalculator
-from models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
+
+from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
+from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 # unit labels
 MOD_Q_LABEL = '|Q|'

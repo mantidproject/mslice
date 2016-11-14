@@ -1,10 +1,12 @@
-from base_qt_plot_window import BaseQtPlotWindow
-from plotting.plot_window.plot_window_ui import Ui_MainWindow
-from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
-from PyQt4.QtCore import Qt
-from plot_options import PlotOptionsDialog, LegendDescriptor, PlotConfig
-from matplotlib.container import ErrorbarContainer
 from itertools import chain
+
+from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
+from matplotlib.container import ErrorbarContainer
+from PyQt4.QtCore import Qt
+
+from .plot_window_ui import Ui_MainWindow
+from .base_qt_plot_window import BaseQtPlotWindow
+from .plot_options import PlotOptionsDialog, LegendDescriptor, PlotConfig
 
 
 class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):

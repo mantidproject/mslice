@@ -1,13 +1,14 @@
-import unittest
 import mock
 from mock import call
-from presenters.cut_presenter import CutPresenter
-from views.cut_view import CutView
-from models.cut.cut_algorithm import CutAlgorithm
-from models.cut.cut_plotter import CutPlotter
-from presenters.interfaces.main_presenter import MainPresenterInterface
-from presenters.slice_plotter_presenter import Axis
-from widgets.cut.command import Command
+import unittest
+
+from mslice.models.cut.cut_algorithm import CutAlgorithm
+from mslice.models.cut.cut_plotter import CutPlotter
+from mslice.presenters.cut_presenter import CutPresenter
+from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
+from mslice.presenters.slice_plotter_presenter import Axis
+from mslice.widgets.cut.command import Command
+from mslice.views.cut_view import CutView
 
 
 class CutPresenterTest(unittest.TestCase):

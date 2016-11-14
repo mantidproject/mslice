@@ -1,9 +1,9 @@
-from views.cut_view import CutView
-from models.cut.cut_algorithm import CutAlgorithm
-from models.cut.cut_plotter import CutPlotter
-from widgets.cut.command import Command
-from validation_decorators import require_main_presenter
-from presenters.slice_plotter_presenter import Axis
+from mslice.models.cut.cut_algorithm import CutAlgorithm
+from mslice.models.cut.cut_plotter import CutPlotter
+from mslice.presenters.slice_plotter_presenter import Axis
+from mslice.views.cut_view import CutView
+from mslice.widgets.cut.command import Command
+from .validation_decorators import require_main_presenter
 
 
 class CutPresenter(object):

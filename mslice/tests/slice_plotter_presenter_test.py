@@ -1,11 +1,11 @@
 import mock
 import unittest
 
-from models.slice.slice_plotter import SlicePlotter
-from presenters.interfaces.main_presenter import MainPresenterInterface
-from presenters.slice_plotter_presenter import SlicePlotterPresenter,Axis
-from views.slice_plotter_view import SlicePlotterView
-from widgets.slice.command import Command
+from mslice.models.slice.slice_plotter import SlicePlotter
+from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
+from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter,Axis
+from mslice.views.slice_plotter_view import SlicePlotterView
+from mslice.widgets.slice.command import Command
 
 
 class SlicePlotterPresenterTest(unittest.TestCase):

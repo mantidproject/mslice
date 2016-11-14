@@ -1,8 +1,9 @@
-from widgets.workspacemanager.command import Command
 import os.path
-from validation_decorators import require_main_presenter
-from interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
-from interfaces.main_presenter import MainPresenterInterface
+
+from mslice.widgets.workspacemanager.command import Command
+from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
+from .interfaces.main_presenter import MainPresenterInterface
+from .validation_decorators import require_main_presenter
 
 #TODO tell user when file not found,file failed to load
 

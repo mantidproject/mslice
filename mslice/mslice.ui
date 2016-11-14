@@ -110,25 +110,25 @@
   <customwidget>
    <class>PowderWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/projection/powder/powder.h</header>
+   <header>mslice/widgets/projection/powder/powder.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>WorkspaceManagerWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/workspacemanager/workspacemanager.h</header>
+   <header>mslice/widgets/workspacemanager/workspacemanager.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SliceWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/slice/slice.h</header>
+   <header>mslice/widgets/slice/slice.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>CutWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/cut/cut.h</header>
+   <header>mslice/widgets/cut/cut.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

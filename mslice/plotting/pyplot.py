@@ -1,9 +1,9 @@
 # This file was created from matplotlib.pyplot
 # matplotlib version 1.5.2
 # flake8 warnings are disabled for this file
-from figuremanager import FigureManager, activate_category
-from script_generation import script_log
-from _pyplot_decorators import draw_colorbar
+from .figuremanager import FigureManager, activate_category
+from .script_generation import script_log
+from ._pyplot_decorators import draw_colorbar
 
 # imports from matplotlit.pyplot
 import matplotlib

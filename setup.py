@@ -10,12 +10,13 @@ from __future__ import print_function
 import os
 from distutils.command.build import build as _build
 from setuptools.command.build_py import build_py as _build_py
+from setuptools.command.install import install as _install
+from setuptools.command.install_lib import install_lib
 from setuptools import find_packages, setup
 from subprocess import check_call
 import sys
 
 from mslice import __project_url__, __version__
-
 
 # ==============================================================================
 # Constants
@@ -77,10 +78,42 @@ class build_qt(_build_py):
         return {'.qrc': '%s_rc', '.ui': '%s_ui'}.get(ext, '%s') % name
 
 
-class build(_build):
+class build_py(_build_py):
+
+    def run(self):
+        self.run_command('build_qt')
+        self.distribution.packages.append(NAME)
+        _build_py.run(self)
+
     # 'sub_commands': a list of commands this command might have to run to
     # get its work done.  See cmd.py for more info.
-    sub_commands = [('build_qt', lambda _: True)] + _build.sub_commands
+    sub_commands = [('build_qt', None)] + _build_py.sub_commands
+
+
+class install_qt(install_lib):
+    description = "install the qt interface resources"
+
+    def run(self):
+        if not self.skip_build:
+            self.run_command('build_qt')
+
+        self.distribution.packages.append(NAME)
+        install_lib.run(self)
+
+
+class install(_install):
+
+    def run(self):
+        if not self.skip_build:
+            self.run_command('build_qt')
+
+        self.distribution.packages.append(NAME)
+        _install.run(self)
+
+    # 'sub_commands': a list of commands this command might have to run to
+    # get its work done.  See cmd.py for more info.
+    sub_commands = [('install_qt', None)] + _install.sub_commands
+
 
 # ==============================================================================
 # Setup arguments
@@ -92,6 +125,8 @@ setup_args = dict(name=NAME,
                   url=__project_url__,
                   keywords='PyQt4,',
                   packages=find_packages(),
+                  # Fool setup.py to running the tests on a built copy (this feels like a hack)
+                  use_2to3=True,
                   classifiers=['Operating System :: MacOS',
                                'Operating System :: Microsoft :: Windows',
                                'Operating System :: POSIX :: Linux',
@@ -99,18 +134,22 @@ setup_args = dict(name=NAME,
                                'Development Status :: 4 - Beta',
                                'Topic :: Scientific/Engineering'],
                   cmdclass={'build_qt': build_qt,
-                            'build': build})
+                            'build_py': build_py,
+                            'install_qt': install_qt,
+                            'install': install})
 
 # ==============================================================================
 # Setuptools deps
 # ==============================================================================
 setup_args['setup_requires'] = ['flake8']
 
-setup_args['install_requires'] = ['numpy', 'matplotlib >= 1.5']
+tests_require = ['nose>=1.0']
+setup_args['tests_require'] = ['nose>=1.0']
+setup_args['install_requires'] = ['numpy', 'matplotlib>=1.5'] + tests_require
 
 setup_args['entry_points'] = {
     'gui_scripts': [
-        'mslice = mslice.app.main'
+        'mslice = mslice.app:main'
     ]
 }
 
