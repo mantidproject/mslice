@@ -142,24 +142,24 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_9">
+       <widget class="QLabel" name="lblCMin">
         <property name="text">
          <string>Min</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lneYMin_2"/>
+       <widget class="QLineEdit" name="lneCMin"/>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_8">
+       <widget class="QLabel" name="lblCMax">
         <property name="text">
          <string>Max</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="lneYMax_2"/>
+       <widget class="QLineEdit" name="lneCMax"/>
       </item>
      </layout>
     </widget>
