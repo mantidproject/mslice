@@ -14,11 +14,13 @@ from setuptools import find_packages, setup
 from subprocess import check_call
 import sys
 
+from mslice import __project_url__, __version__
+
+
 # ==============================================================================
 # Constants
 # ==============================================================================
 NAME = 'mslice'
-from mslice import __project_url__, __version__
 
 # ==============================================================================
 # Custom distutils commands
@@ -76,12 +78,9 @@ class build_qt(_build_py):
 
 
 class build(_build):
-
     # 'sub_commands': a list of commands this command might have to run to
     # get its work done.  See cmd.py for more info.
-    sub_commands = [
-        ('build_qt', lambda _: True),
-        ] + _build.sub_commands
+    sub_commands = [('build_qt', lambda _: True)] + _build.sub_commands
 
 # ==============================================================================
 # Setup arguments
@@ -100,13 +99,13 @@ setup_args = dict(name=NAME,
                                'Development Status :: 4 - Beta',
                                'Topic :: Scientific/Engineering'],
                   cmdclass={'build_qt': build_qt,
-                            'build': build,
-                            }
-)
+                            'build': build})
 
 # ==============================================================================
 # Setuptools deps
-#==============================================================================
+# ==============================================================================
+setup_args['setup_requires'] = ['flake8']
+
 setup_args['install_requires'] = ['numpy', 'matplotlib >= 1.5']
 
 setup_args['entry_points'] = {
