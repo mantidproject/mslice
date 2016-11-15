@@ -8,7 +8,6 @@ on Mantid (http://www.mantidproject.org).
 from __future__ import print_function
 
 import os
-from distutils.command.build import build as _build
 from setuptools.command.build_py import build_py as _build_py
 from setuptools.command.install import install as _install
 from setuptools.command.install_lib import install_lib
@@ -122,6 +121,7 @@ setup_args = dict(name=NAME,
                   version=__version__,
                   description='Visualise and slice data from Mantid',
                   author='The Mantid Project',
+                  author_email='mantid-help@mantidproject.org',
                   url=__project_url__,
                   keywords='PyQt4,',
                   packages=find_packages(),
@@ -141,12 +141,16 @@ setup_args = dict(name=NAME,
 # ==============================================================================
 # Setuptools deps
 # ==============================================================================
+# Running setup command requires the following dependencies
 setup_args['setup_requires'] = ['flake8']
 
-tests_require = ['nose>=1.0']
-setup_args['tests_require'] = ['nose>=1.0']
-setup_args['install_requires'] = ['numpy', 'matplotlib>=1.5'] + tests_require
+# User installation requires the following dependencies
+install_requires = setup_args['install_requires'] = ['numpy', 'matplotlib>=1.5',
+                                                     'PyQt4', 'six']
+# Testing requires
+setup_args['tests_require'] = ['nose>=1.0', 'mock>=2.0'] + install_requires
 
+# Script entry points for application
 setup_args['entry_points'] = {
     'gui_scripts': [
         'mslice = mslice.app:main'
