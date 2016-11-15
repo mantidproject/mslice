@@ -20,17 +20,13 @@ before_install:
   - wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
   - sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
 
-install:
-  - pip install -r pip-requirements.txt
-
 env:
   - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
 
 script:
-  - flake8 --version && flake8
+  - python setup.py flake8
   - mkdir $HOME/.mantid && echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > $HOME/.mantid/Mantid.user.properties &&
-    python build_all_ui_files.py &&
-    nosetests -v --with-coverage --cover-min-percentage=85 --cover-package=presenters,plotting.figuremanager
+    python setup.py nosetests
 
 after_success:
   - coveralls
