@@ -1,0 +1,5 @@
+"""Script desgined to be fed to IPython to start the MSlice GUI
+"""
+from mslice.app.mainwindow import MainWindow
+win = MainWindow()
+win.show()

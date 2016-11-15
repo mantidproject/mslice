@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Launch MSlice using the Mantid Python wrappers
+#
+# The build of Mantid can be controlled with arguments
+
+# Get the directory this script resides in. This will only work on bash-like shells
+SCRIPT=$(readlink -f "$0")
+SCRIPT_PATH=$(dirname "$SCRIPT")
+
+
+INSTALL_PREFIX=/opt
+PACKAGE=Mantid
+# It is assumed that by default this script starts an IPython shell
+MANTIDPYTHON=mantidpython
+MANTIDPYTHON_ARGS="--matplotlib -i"
+MAIN_SCRIPT=${SCRIPT_PATH}/main.ipy
+
+# Run
+${INSTALL_PREFIX}/${PACKAGE}/bin/${MANTIDPYTHON} ${MANTIDPYTHON_ARGS} ${MAIN_SCRIPT}

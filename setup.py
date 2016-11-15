@@ -168,12 +168,9 @@ install_requires = setup_args['install_requires'] = \
 setup_args['tests_require'] = read_requirements_from_file(os.path.join(THIS_DIR, 'test-requirements.txt')) \
     + install_requires
 
-# Script entry points for application
-setup_args['entry_points'] = {
-    'gui_scripts': [
-        'mslice = mslice.app:main'
-    ]
-}
+# Startup scripts - these use the mantidpython wrappers so we cannot
+# go through the entry_points mechanism
+setup_args['scripts'] = ['scripts/mslice', 'scripts/main.ipy']
 
 #==============================================================================
 # Main setup
