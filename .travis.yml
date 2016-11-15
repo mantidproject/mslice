@@ -15,10 +15,10 @@ before_install:
   - export mantiddeb=$(grep mantidnightly /tmp/index.html |grep amd64.deb | sed s/.*man/man/ | sed s/.deb.*/.deb/ | head -n1)
   - wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
   - sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
+  - mkdir $HOME/.mantid && echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > $HOME/.mantid/Mantid.user.properties
 
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
+  - pip install -r setup-requirements.txt -r install-requirements -r test-requirements.txt coveralls
 
 env:
   - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
@@ -26,8 +26,7 @@ env:
 script:
   - set -e
   - python setup.py flake8
-  - mkdir $HOME/.mantid && echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > $HOME/.mantid/Mantid.user.properties &&
-    python setup.py nosetests
+  - python setup.py nosetests
 
 after_success:
   - coveralls

@@ -21,10 +21,26 @@ from mslice import __project_url__, __version__
 # Constants
 # ==============================================================================
 NAME = 'mslice'
+THIS_DIR = os.path.dirname(__file__)
+
+# ==============================================================================
+# Package requirements helper
+# ==============================================================================
+
+def read_requirements_from_file(filepath):
+    '''Read a list of requirements from the given file and split into a
+    list of strings. It is assumed that the file is a flat
+    list with one requirement per line.
+    :param filepath: Path to the file to read
+    :return: A list of strings containing the requirements
+    '''
+    with open(filepath, 'rU') as req_file:
+        return req_file.readlines()
 
 # ==============================================================================
 # Custom distutils commands
 # ==============================================================================
+
 class build_qt(_build_py):
     description = "build every qt related resources (.uic and .qrc and .pyc)"
 
@@ -123,7 +139,7 @@ setup_args = dict(name=NAME,
                   author='The Mantid Project',
                   author_email='mantid-help@mantidproject.org',
                   url=__project_url__,
-                  keywords='PyQt4,',
+                  keywords=['PyQt4'],
                   packages=find_packages(),
                   # Fool setup.py to running the tests on a built copy (this feels like a hack)
                   use_2to3=True,
@@ -142,13 +158,15 @@ setup_args = dict(name=NAME,
 # Setuptools deps
 # ==============================================================================
 # Running setup command requires the following dependencies
-setup_args['setup_requires'] = ['flake8']
+setup_args['setup_requires'] = read_requirements_from_file(os.path.join(THIS_DIR, 'setup-requirements.txt'))
 
 # User installation requires the following dependencies
-install_requires = setup_args['install_requires'] = ['numpy', 'matplotlib>=1.5',
-                                                     'PyQt4', 'six']
+# PyQt4 cannot be installed from pip so they cannot be added here
+install_requires = setup_args['install_requires'] = \
+    read_requirements_from_file(os.path.join(THIS_DIR, 'install-requirements.txt'))
 # Testing requires
-setup_args['tests_require'] = ['nose>=1.0', 'mock>=2.0'] + install_requires
+setup_args['tests_require'] = read_requirements_from_file(os.path.join(THIS_DIR, 'test-requirements.txt')) \
+    + install_requires
 
 # Script entry points for application
 setup_args['entry_points'] = {
