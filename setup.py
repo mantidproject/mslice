@@ -37,6 +37,16 @@ def read_requirements_from_file(filepath):
     with open(filepath, 'rU') as req_file:
         return req_file.readlines()
 
+
+def get_data_files():
+    """Return data_files in a platform dependent manner"""
+    if sys.platform.startswith('linux'):
+        data_files = [('share/applications', ['scripts/mslice.desktop']),
+                      ('share/pixmaps', ['resources/images/mslice_logo.png'])]
+    else:
+        data_files = []
+    return data_files
+
 # ==============================================================================
 # Custom distutils commands
 # ==============================================================================
@@ -141,6 +151,7 @@ setup_args = dict(name=NAME,
                   url=__project_url__,
                   keywords=['PyQt4'],
                   packages=find_packages(),
+                  data_files=get_data_files(),
                   # Fool setup.py to running the tests on a built copy (this feels like a hack)
                   use_2to3=True,
                   classifiers=['Operating System :: MacOS',
