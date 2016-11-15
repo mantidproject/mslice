@@ -7,6 +7,8 @@ python:
   # See https://github.com/travis-ci/travis-ci/issues/2219#issuecomment-41804942
   - "2.7_with_system_site_packages" # for pyqt4
 
+cache: pip
+
 before_install:
   - sudo apt-add-repository ppa:mantid/mantid -y && sudo apt-get update -q
   # Download deb file from sourceforge as it's far quicker that the ISIS repo
