@@ -8,22 +8,23 @@ python:
   - "2.7_with_system_site_packages" # for pyqt4
 
 before_install:
-  - sudo apt-add-repository ppa:mantid/mantid -y
-  - sudo apt-add-repository "deb [arch=amd64] http://apt.isis.rl.ac.uk trusty-testing main" -y
-  - sudo apt-get update -q
-  # Removed due to slow speed of isis apt repository causing builds to fail due to time out.
-  # sudo apt-get install mantidnightly -y --force-yes
-  # Use a work-around by downloading deb from sourceforge instead.
+  - sudo apt-add-repository ppa:mantid/mantid -y && sudo apt-get update -q
+  # Download deb file from sourceforge as it's far quicker that the ISIS repo
   - sudo apt-get install gdebi -y
   - wget https://sourceforge.net/projects/mantid/files/Nightly/ -O /tmp/index.html
   - export mantiddeb=$(grep mantidnightly /tmp/index.html |grep amd64.deb | sed s/.*man/man/ | sed s/.deb.*/.deb/ | head -n1)
   - wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
   - sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
 
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+
 env:
   - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
 
 script:
+  - set -e
   - python setup.py flake8
   - mkdir $HOME/.mantid && echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > $HOME/.mantid/Mantid.user.properties &&
     python setup.py nosetests
