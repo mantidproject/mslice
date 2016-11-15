@@ -19,7 +19,6 @@ from matplotlib import cm
 from matplotlib import mlab
 from matplotlib.image import imread as _imread
 from matplotlib.image import imsave as _imsave
-from matplotlib.externals import six
 import six
 import sys
 
