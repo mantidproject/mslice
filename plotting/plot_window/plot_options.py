@@ -6,9 +6,22 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self, current_config):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
-        self.lneFigureTitle.setText(current_config.title)
-        self.lneXAxisLabel.setText(current_config.xlabel)
-        self.lneYAxisLabel.setText(current_config.ylabel)
+        if self.lneFigureTitle is not None:
+            self.lneFigureTitle.setText(current_config.title)
+        if self.lneXAxisLabel is not None:
+            self.lneXAxisLabel.setText(current_config.xlabel)
+        if self.lneYAxisLabel is not None:
+            self.lneYAxisLabel.setText(current_config.ylabel)
+        if None not in current_config.x_range:
+            self.lneXMin.setText(str(current_config.x_range[0]))
+            self.lneXMax.setText(str(current_config.x_range[1]))
+        if None not in current_config.y_range:
+            self.lneYMin.setText(str(current_config.y_range[0]))
+            self.lneYMax.setText(str(current_config.y_range[1]))
+        if None not in current_config.colorbar_range:
+            self.lneCMin.setText(str(current_config.colorbar_range[0]))
+            self.lneCMax.setText(str(current_config.colorbar_range[1]))
+
         self._legend_widgets = []
         self.chkShowLegends.setChecked(current_config.legend.visible)
         if current_config.errorbar is None:
@@ -23,15 +36,6 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
                 legend_widget = LegendSetter(self, legend['text'], legend['handle'], legend['visible'])
                 self.verticalLayout.addWidget(legend_widget)
                 self._legend_widgets.append(legend_widget)
-        if None not in current_config.x_range:
-            self.lneXMin.setText(str(current_config.x_range[0]))
-            self.lneXMax.setText(str(current_config.x_range[1]))
-        if None not in current_config.y_range:
-            self.lneYMin.setText(str(current_config.y_range[0]))
-            self.lneYMax.setText(str(current_config.y_range[1]))
-        if None not in current_config.colorbar_range:
-            self.lneCMin.setText(str(current_config.colorbar_range[0]))
-            self.lneCMax.setText(str(current_config.colorbar_range[1]))
 
     @staticmethod
     def get_new_config(current_config):
