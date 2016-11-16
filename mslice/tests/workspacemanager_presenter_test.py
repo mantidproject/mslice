@@ -5,10 +5,10 @@ import unittest
 import mock
 from mock import call
 
-from mslice.mainview import MainView
 from mslice.models.workspacemanager.workspace_provider import WorkspaceProvider
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from mslice.views.mainview import MainView
 from mslice.views.workspace_view import WorkspaceView
 from mslice.widgets.workspacemanager.command import Command
 

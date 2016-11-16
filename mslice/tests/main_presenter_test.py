@@ -1,9 +1,9 @@
 import mock
 import unittest
 
-from mslice.mainview import MainView
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.presenters.interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
+from mslice.views.mainview import MainView
 
 SELECTED_WORKSPACES = ['a', 'b', 'c']
 
