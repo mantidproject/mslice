@@ -82,6 +82,25 @@ class build_py(_build_py):
                     self.compile_src(src_file, module_file)
         _build_py.run(self)
 
+    def get_outputs(self, include_bytecode=1):
+        '''Return the list of outputs that would be generated
+           if this command were run
+        '''
+        outputs = _build_py.get_outputs(self, include_bytecode)
+        for dirpath, _, filenames in os.walk(self.get_package_dir(self.PACKAGE)):
+            package = dirpath.split(os.sep)
+            for filename in filenames:
+                module = self.get_module_name(filename)
+                module_file = self.get_module_outfile(self.build_lib, package, module)
+                outputs.append(module_file)
+            if include_bytecode:
+                if self.compile:
+                    outputs.append(module_file + "c")
+                if self.optimize > 0:
+                    outputs.append(module_file + "o")
+
+        return outputs
+
     @staticmethod
     def compile_ui(ui_file, py_file):
         from PyQt4 import uic
