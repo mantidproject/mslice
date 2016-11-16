@@ -10,7 +10,7 @@ SCRIPT_PATH=$(dirname "$SCRIPT")
 
 
 INSTALL_PREFIX=/opt
-PACKAGE=Mantid
+PACKAGE=mantidnightly
 # It is assumed that by default this script starts an IPython shell
 MANTIDPYTHON=mantidpython
 MANTIDPYTHON_ARGS="--matplotlib -i"
