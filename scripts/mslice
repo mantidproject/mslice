@@ -13,7 +13,7 @@ INSTALL_PREFIX=/opt
 PACKAGE=mantidnightly
 # It is assumed that by default this script starts an IPython shell
 MANTIDPYTHON=mantidpython
-MANTIDPYTHON_ARGS="--matplotlib -i"
+MANTIDPYTHON_ARGS="--matplotlib=qt4 -i"
 MAIN_SCRIPT=${SCRIPT_PATH}/main.ipy
 
 # Run
