@@ -59,6 +59,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         current_axis.set_xlim(*plot_config.x_range)
         current_axis.set_ylim(*plot_config.y_range)
 
+        for im in current_axis.get_images():
+            im.set_clim(*plot_config.colorbar_range)
+
         legend_config = plot_config.legend
         for handle in legend_config.handles:
             handle.set_label(legend_config.get_legend_text(handle))
@@ -148,6 +151,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         ylabel = current_axis.get_ylabel()
         x_range = current_axis.get_xlim()
         y_range = current_axis.get_ylim()
+
         # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
         # axes.get_legend_handles_labels()
         # That is the reason for the use of the private function axes._get_legend_handles
