@@ -17,11 +17,16 @@ http://mantidproject.github.io/mslice
 
 ## Running from source (development)
 
-First either clone the source code using Git or download a zipped version of the repository from GitHub.
+First install mantid onto your local machine (nightly version for Linux). Now clone the source code using Git or download a zipped version of the repository from GitHub.
 
 On Linux/OSX (from the root of the repository):
 
 ```sh
-pip install --user -r setup-requirements.txt -r install-requirements.txt -r test-requirements.txt
 ./mslicedevel.sh
+```
+
+On Windows (from the root of the repository):
+
+```sh
+mslicedevel.bat
 ```
