@@ -21,7 +21,7 @@ def startup(with_ipython):
     if with_ipython:
         import IPython
         IPython.start_ipython(["--matplotlib=qt4", "-i",
-                               "-c 'from mslice.app import show_gui; show_gui()'"])
+                               "-c from mslice.app import show_gui; show_gui()"])
     else:
         from PyQt4.QtGui import QApplication
         qapp = QApplication()
