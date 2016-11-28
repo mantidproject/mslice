@@ -5,6 +5,7 @@ from PyQt4.QtCore import Qt
 from plot_options import PlotOptionsDialog, LegendDescriptor, PlotConfig
 from matplotlib.container import ErrorbarContainer
 from itertools import chain
+import matplotlib.colors as colors
 
 
 class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
@@ -61,6 +62,15 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         for im in current_axis.get_images():
             im.set_clim(*plot_config.colorbar_range)
+
+        vmin, vmax = plot_config.colorbar_range
+        norm = colors.LogNorm(vmin, vmax)
+
+        mappable = current_axis.get_images()[0]
+        mappable.set_norm(norm)
+
+        f = self.canvas.figure
+        f.colorbar(mappable)
 
         legend_config = plot_config.legend
         for handle in legend_config.handles:

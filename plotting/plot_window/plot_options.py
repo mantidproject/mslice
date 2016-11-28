@@ -21,6 +21,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         if None not in current_config.colorbar_range:
             self.lneCMin.setText(str(current_config.colorbar_range[0]))
             self.lneCMax.setText(str(current_config.colorbar_range[1]))
+        if current_config.logarithmic is not None:
+            self.chkLogarithmic.setChecked(current_config.logarithmic)
 
         self._legend_widgets = []
         self.chkShowLegends.setChecked(current_config.legend.visible)
@@ -64,6 +66,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         except ValueError:
             colorbar_range = (None, None)
 
+        logarithmic = dialog.chkLogarithmic.isChecked()
+
         legends = LegendDescriptor(visible=dialog.chkShowLegends.isChecked(),
                                    applicable=dialog.groupBox.isHidden())
         for legend_widget in dialog._legend_widgets:
@@ -78,7 +82,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
                           errorbars_enabled=dialog.chkShowErrorBars.isChecked(),
                           x_range=x_range,
                           y_range=y_range,
-                          colorbar_range=colorbar_range)
+                          colorbar_range=colorbar_range,
+                          logarithmic=logarithmic)
 
 
 class LegendSetter(QtGui.QWidget):
@@ -145,7 +150,7 @@ class LegendDescriptor(object):
 
 class PlotConfig(object):
     def __init__(self, title=None, x_axis_label=None, y_axis_label=None, legends=None, errorbars_enabled=None,
-                 x_range=(None, None), y_range=(None, None), colorbar_range=(None, None)):
+                 x_range=(None, None), y_range=(None, None), colorbar_range=(None, None), logarithmic=None):
         self.title = title
         self.xlabel = x_axis_label
         self.ylabel = y_axis_label
@@ -157,6 +162,7 @@ class PlotConfig(object):
         self.x_range = x_range
         self.y_range = y_range
         self.colorbar_range = colorbar_range
+        self.logarithmic = logarithmic
 
     @property
     def title(self):
