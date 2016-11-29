@@ -4,6 +4,6 @@ exclude =
     docs/source/conf.py,
     *_ui.py,
     misc/MDUtils.py,
-    plotting/pyplot.py
+    mslice/plotting/pyplot.py
 max-complexity = 14
 max-line-length = 140
