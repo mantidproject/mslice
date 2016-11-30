@@ -60,17 +60,23 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         current_axis.set_xlim(*plot_config.x_range)
         current_axis.set_ylim(*plot_config.y_range)
 
-        for im in current_axis.get_images():
-            im.set_clim(*plot_config.colorbar_range)
-
-        vmin, vmax = plot_config.colorbar_range
-        norm = colors.LogNorm(vmin, vmax)
+        images = current_axis.get_images()
+        if len(images) != 1:
+            raise RuntimeError("Expected single image on axes, found " + str(len(images)))
 
         mappable = current_axis.get_images()[0]
-        mappable.set_norm(norm)
+        mappable.set_clim(*plot_config.colorbar_range)
 
-        f = self.canvas.figure
-        f.colorbar(mappable)
+        if plot_config.logarithmic:
+            mappable.colorbar.remove()
+
+            vmin, vmax = plot_config.colorbar_range
+            if vmin == 0:
+                vmin = 0.001
+            norm = colors.LogNorm(vmin, vmax)
+            mappable.set_norm(norm)
+
+            self.canvas.figure.colorbar(mappable)
 
         legend_config = plot_config.legend
         for handle in legend_config.handles:
@@ -162,8 +168,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         x_range = current_axis.get_xlim()
         y_range = current_axis.get_ylim()
 
-        for im in current_axis.get_images():
-            colorbar_range = im.get_clim()
+        mappable = current_axis.get_images()[0]
+        colorbar_range = mappable.get_clim()
+        norm = mappable.norm
 
         # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
         # axes.get_legend_handles_labels()
@@ -182,4 +189,5 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                           errorbars_enabled=has_errorbars,
                           x_range=x_range,
                           y_range=y_range,
-                          colorbar_range=colorbar_range)
+                          colorbar_range=colorbar_range,
+                          logarithmic=isinstance(norm, colors.LogNorm))
