@@ -64,12 +64,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if len(images) != 1:
             raise RuntimeError("Expected single image on axes, found " + str(len(images)))
 
-        mappable = current_axis.get_images()[0]
+        mappable = images[0]
         mappable.set_clim(*plot_config.colorbar_range)
 
         vmin, vmax = plot_config.colorbar_range
 
-        if plot_config.logarithmic and not isinstance(mappable.norm, colors.LogNorm):
+        if plot_config.logarithmic and type(mappable.norm) != colors.LogNorm:
             mappable.colorbar.remove()
 
             if vmin == 0:
@@ -79,7 +79,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
             mappable.set_norm(norm)
             self.canvas.figure.colorbar(mappable)
-        elif not plot_config.logarithmic and not isinstance(mappable.norm, colors.Normalize):
+        elif not plot_config.logarithmic and type(mappable.norm) != colors.Normalize:
             mappable.colorbar.remove()
 
             norm = colors.Normalize(vmin, vmax)
