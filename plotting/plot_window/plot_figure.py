@@ -72,7 +72,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if plot_config.logarithmic and type(mappable.norm) != colors.LogNorm:
             mappable.colorbar.remove()
 
-            if vmin == 0:
+            if vmin == float(0):
                 vmin = 0.001
 
             norm = colors.LogNorm(vmin, vmax)
