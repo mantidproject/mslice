@@ -67,15 +67,24 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         mappable = current_axis.get_images()[0]
         mappable.set_clim(*plot_config.colorbar_range)
 
-        if plot_config.logarithmic:
+        vmin, vmax = plot_config.colorbar_range
+
+        if plot_config.logarithmic and not isinstance(mappable.norm, colors.LogNorm):
             mappable.colorbar.remove()
 
-            vmin, vmax = plot_config.colorbar_range
             if vmin == 0:
                 vmin = 0.001
-            norm = colors.LogNorm(vmin, vmax)
-            mappable.set_norm(norm)
 
+            norm = colors.LogNorm(vmin, vmax)
+
+            mappable.set_norm(norm)
+            self.canvas.figure.colorbar(mappable)
+        elif not plot_config.logarithmic and not isinstance(mappable.norm, colors.Normalize):
+            mappable.colorbar.remove()
+
+            norm = colors.Normalize(vmin, vmax)
+
+            mappable.set_norm(norm)
             self.canvas.figure.colorbar(mappable)
 
         legend_config = plot_config.legend
