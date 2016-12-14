@@ -24,6 +24,6 @@ def startup(with_ipython):
                                "-c from mslice.app import show_gui; show_gui()"])
     else:
         from PyQt4.QtGui import QApplication
-        qapp = QApplication()
+        qapp = QApplication([])
         show_gui()
         qapp.exec_()
