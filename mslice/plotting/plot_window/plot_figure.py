@@ -179,9 +179,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         x_range = current_axis.get_xlim()
         y_range = current_axis.get_ylim()
 
-        mappable = current_axis.get_images()[0]
-        colorbar_range = mappable.get_clim()
-        norm = mappable.norm
+        if not current_axis.get_images():
+            colorbar_range = None, None
+            logarithmic = None
+        else:
+            mappable = current_axis.get_images()[0]
+            colorbar_range = mappable.get_clim()
+            norm = mappable.norm
+            logarithmic = isinstance(norm, colors.LogNorm)
 
         # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
         # axes.get_legend_handles_labels()
@@ -201,4 +206,4 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                           x_range=x_range,
                           y_range=y_range,
                           colorbar_range=colorbar_range,
-                          logarithmic=isinstance(norm, colors.LogNorm))
+                          logarithmic=logarithmic)

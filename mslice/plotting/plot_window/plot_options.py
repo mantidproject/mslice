@@ -22,6 +22,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         if None not in current_config.colorbar_range:
             self.lneCMin.setText(str(current_config.colorbar_range[0]))
             self.lneCMax.setText(str(current_config.colorbar_range[1]))
+        else:
+            self.groupBox_4.hide()
         if current_config.logarithmic is not None:
             self.chkLogarithmic.setChecked(current_config.logarithmic)
 
