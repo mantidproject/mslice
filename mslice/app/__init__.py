@@ -32,4 +32,3 @@ def startup(with_ipython):
         qapp = QApplication([])
         show_gui()
         qapp.exec_()
-
