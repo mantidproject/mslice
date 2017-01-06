@@ -2,13 +2,18 @@
 and entry points.
 """
 
+# Module-level reference to keep main window alive after show_gui has returned
+MAIN_WINDOW = None
+
 def show_gui():
     """Display the top-level main window. It assumes that the QApplication instance
     has already been started
     """
-    from mslice.app.mainwindow import MainWindow
-    win = MainWindow()
-    win.show()
+    global MAIN_WINDOW
+    if MAIN_WINDOW is None:
+        from mslice.app.mainwindow import MainWindow
+        MAIN_WINDOW = MainWindow()
+    MAIN_WINDOW.show()
 
 def startup(with_ipython):
     """Perform a full application startup, including the IPython
@@ -24,6 +29,6 @@ def startup(with_ipython):
                                "-c from mslice.app import show_gui; show_gui()"])
     else:
         from PyQt4.QtGui import QApplication
-        qapp = QApplication()
+        qapp = QApplication([])
         show_gui()
         qapp.exec_()
