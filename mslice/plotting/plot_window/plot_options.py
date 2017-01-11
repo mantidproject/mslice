@@ -45,7 +45,7 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     @staticmethod
     def get_new_config(current_config):
         dialog = PlotOptionsDialog(current_config)
-        dialog_accepted=dialog.exec_()
+        dialog_accepted = dialog.exec_()
         if not dialog_accepted:
             return None
         try:
@@ -70,7 +70,6 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
             colorbar_range = (None, None)
 
         logarithmic = dialog.chkLogarithmic.isChecked()
-
         legends = LegendDescriptor(visible=dialog.chkShowLegends.isChecked(),
                                    applicable=dialog.groupBox.isHidden())
         for legend_widget in dialog._legend_widgets:

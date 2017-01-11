@@ -66,27 +66,20 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             images = current_axis.get_images()
             if len(images) != 1:
                 raise RuntimeError("Expected single image on axes, found " + str(len(images)))
-
             mappable = images[0]
             mappable.set_clim(*plot_config.colorbar_range)
-
             vmin, vmax = plot_config.colorbar_range
 
             if plot_config.logarithmic and type(mappable.norm) != colors.LogNorm:
                 mappable.colorbar.remove()
-
                 if vmin == float(0):
                     vmin = 0.001
-
                 norm = colors.LogNorm(vmin, vmax)
-
                 mappable.set_norm(norm)
                 self.canvas.figure.colorbar(mappable)
             elif not plot_config.logarithmic and type(mappable.norm) != colors.Normalize:
                 mappable.colorbar.remove()
-
                 norm = colors.Normalize(vmin, vmax)
-
                 mappable.set_norm(norm)
                 self.canvas.figure.colorbar(mappable)
 
@@ -102,7 +95,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         # the plot (in terms of having/not having errorbars)
         if legend_config.visible:
             current_axis.legend()
-
         else:
             if current_axis.legend_:
                 current_axis.legend_.remove()
