@@ -62,32 +62,33 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         current_axis.set_xlim(*plot_config.x_range)
         current_axis.set_ylim(*plot_config.y_range)
 
-        images = current_axis.get_images()
-        if len(images) != 1:
-            raise RuntimeError("Expected single image on axes, found " + str(len(images)))
+        if current_axis.get_images():
+            images = current_axis.get_images()
+            if len(images) != 1:
+                raise RuntimeError("Expected single image on axes, found " + str(len(images)))
 
-        mappable = images[0]
-        mappable.set_clim(*plot_config.colorbar_range)
+            mappable = images[0]
+            mappable.set_clim(*plot_config.colorbar_range)
 
-        vmin, vmax = plot_config.colorbar_range
+            vmin, vmax = plot_config.colorbar_range
 
-        if plot_config.logarithmic and type(mappable.norm) != colors.LogNorm:
-            mappable.colorbar.remove()
+            if plot_config.logarithmic and type(mappable.norm) != colors.LogNorm:
+                mappable.colorbar.remove()
 
-            if vmin == float(0):
-                vmin = 0.001
+                if vmin == float(0):
+                    vmin = 0.001
 
-            norm = colors.LogNorm(vmin, vmax)
+                norm = colors.LogNorm(vmin, vmax)
 
-            mappable.set_norm(norm)
-            self.canvas.figure.colorbar(mappable)
-        elif not plot_config.logarithmic and type(mappable.norm) != colors.Normalize:
-            mappable.colorbar.remove()
+                mappable.set_norm(norm)
+                self.canvas.figure.colorbar(mappable)
+            elif not plot_config.logarithmic and type(mappable.norm) != colors.Normalize:
+                mappable.colorbar.remove()
 
-            norm = colors.Normalize(vmin, vmax)
+                norm = colors.Normalize(vmin, vmax)
 
-            mappable.set_norm(norm)
-            self.canvas.figure.colorbar(mappable)
+                mappable.set_norm(norm)
+                self.canvas.figure.colorbar(mappable)
 
         legend_config = plot_config.legend
         for handle in legend_config.handles:
