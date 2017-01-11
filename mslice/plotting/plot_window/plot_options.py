@@ -2,13 +2,31 @@ import PyQt4.QtGui as QtGui
 
 from .plot_options_ui import Ui_Dialog
 
+
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self, current_config):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
-        self.lneFigureTitle.setText(current_config.title)
-        self.lneXAxisLabel.setText(current_config.xlabel)
-        self.lneYAxisLabel.setText(current_config.ylabel)
+        if current_config.title is not None:
+            self.lneFigureTitle.setText(current_config.title)
+        if current_config.xlabel is not None:
+            self.lneXAxisLabel.setText(current_config.xlabel)
+        if current_config.ylabel is not None:
+            self.lneYAxisLabel.setText(current_config.ylabel)
+        if None not in current_config.x_range:
+            self.lneXMin.setText(str(current_config.x_range[0]))
+            self.lneXMax.setText(str(current_config.x_range[1]))
+        if None not in current_config.y_range:
+            self.lneYMin.setText(str(current_config.y_range[0]))
+            self.lneYMax.setText(str(current_config.y_range[1]))
+        if None not in current_config.colorbar_range:
+            self.lneCMin.setText(str(current_config.colorbar_range[0]))
+            self.lneCMax.setText(str(current_config.colorbar_range[1]))
+        else:
+            self.groupBox_4.hide()
+        if current_config.logarithmic is not None:
+            self.chkLogarithmic.setChecked(current_config.logarithmic)
+
         self._legend_widgets = []
         self.chkShowLegends.setChecked(current_config.legend.visible)
         if current_config.errorbar is None:
@@ -23,17 +41,11 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
                 legend_widget = LegendSetter(self, legend['text'], legend['handle'], legend['visible'])
                 self.verticalLayout.addWidget(legend_widget)
                 self._legend_widgets.append(legend_widget)
-        if None not in current_config.x_range:
-            self.lneXMin.setText(str(current_config.x_range[0]))
-            self.lneXMax.setText(str(current_config.x_range[1]))
-        if None not in current_config.y_range:
-            self.lneYMin.setText(str(current_config.y_range[0]))
-            self.lneYMax.setText(str(current_config.y_range[1]))
 
     @staticmethod
     def get_new_config(current_config):
         dialog = PlotOptionsDialog(current_config)
-        dialog_accepted= dialog.exec_()
+        dialog_accepted = dialog.exec_()
         if not dialog_accepted:
             return None
         try:
@@ -50,6 +62,14 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         except ValueError:
             y_range = (None, None)
 
+        try:
+            cmin = float(str(dialog.lneCMin.text()))
+            cmax = float(str(dialog.lneCMax.text()))
+            colorbar_range = (cmin, cmax)
+        except ValueError:
+            colorbar_range = (None, None)
+
+        logarithmic = dialog.chkLogarithmic.isChecked()
         legends = LegendDescriptor(visible=dialog.chkShowLegends.isChecked(),
                                    applicable=dialog.groupBox.isHidden())
         for legend_widget in dialog._legend_widgets:
@@ -63,7 +83,9 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
                           legends=legends,
                           errorbars_enabled=dialog.chkShowErrorBars.isChecked(),
                           x_range=x_range,
-                          y_range=y_range)
+                          y_range=y_range,
+                          colorbar_range=colorbar_range,
+                          logarithmic=logarithmic)
 
 
 class LegendSetter(QtGui.QWidget):
@@ -102,7 +124,7 @@ class LegendDescriptor(object):
     def all_legends(self):
         """An iterator which yields a dictionary description of legends containing the handle, text and if visible or not"""
         for handle in self.handles:
-            yield  self.get_legend_descriptor(handle)
+            yield self.get_legend_descriptor(handle)
 
     def set_legend_text(self, handle, text, visible=True):
         if handle not in self.handles:
@@ -117,9 +139,9 @@ class LegendDescriptor(object):
         else:
             label = handle.get_label()   # Else get the value from the plot
         if label.startswith('_'):
-            x = {'text': label[1:], 'visible': False, 'handle':handle}
+            x = {'text': label[1:], 'visible': False, 'handle': handle}
         else:
-            x = {'text': label, 'visible': True, 'handle':handle}
+            x = {'text': label, 'visible': True, 'handle': handle}
         return x
 
     def get_legend_text(self, handle):
@@ -130,7 +152,7 @@ class LegendDescriptor(object):
 
 class PlotConfig(object):
     def __init__(self, title=None, x_axis_label=None, y_axis_label=None, legends=None, errorbars_enabled=None,
-                 x_range=(None, None), y_range=(None, None)):
+                 x_range=(None, None), y_range=(None, None), colorbar_range=(None, None), logarithmic=None):
         self.title = title
         self.xlabel = x_axis_label
         self.ylabel = y_axis_label
@@ -141,6 +163,8 @@ class PlotConfig(object):
         self.errorbar = errorbars_enabled   # Has 3 values (True : shown, False: Not Shown, None: Not applicable)
         self.x_range = x_range
         self.y_range = y_range
+        self.colorbar_range = colorbar_range
+        self.logarithmic = logarithmic
 
     @property
     def title(self):

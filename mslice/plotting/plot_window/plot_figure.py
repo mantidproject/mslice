@@ -2,6 +2,7 @@ from itertools import chain
 
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
+import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
 
 from .plot_window_ui import Ui_MainWindow
@@ -61,6 +62,27 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         current_axis.set_xlim(*plot_config.x_range)
         current_axis.set_ylim(*plot_config.y_range)
 
+        if current_axis.get_images():
+            images = current_axis.get_images()
+            if len(images) != 1:
+                raise RuntimeError("Expected single image on axes, found " + str(len(images)))
+            mappable = images[0]
+            mappable.set_clim(*plot_config.colorbar_range)
+            vmin, vmax = plot_config.colorbar_range
+
+            if plot_config.logarithmic and type(mappable.norm) != colors.LogNorm:
+                mappable.colorbar.remove()
+                if vmin == float(0):
+                    vmin = 0.001
+                norm = colors.LogNorm(vmin, vmax)
+                mappable.set_norm(norm)
+                self.canvas.figure.colorbar(mappable)
+            elif not plot_config.logarithmic and type(mappable.norm) != colors.Normalize:
+                mappable.colorbar.remove()
+                norm = colors.Normalize(vmin, vmax)
+                mappable.set_norm(norm)
+                self.canvas.figure.colorbar(mappable)
+
         legend_config = plot_config.legend
         for handle in legend_config.handles:
             handle.set_label(legend_config.get_legend_text(handle))
@@ -73,7 +95,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         # the plot (in terms of having/not having errorbars)
         if legend_config.visible:
             current_axis.legend()
-
         else:
             if current_axis.legend_:
                 current_axis.legend_.remove()
@@ -150,6 +171,16 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         ylabel = current_axis.get_ylabel()
         x_range = current_axis.get_xlim()
         y_range = current_axis.get_ylim()
+
+        if not current_axis.get_images():
+            colorbar_range = None, None
+            logarithmic = None
+        else:
+            mappable = current_axis.get_images()[0]
+            colorbar_range = mappable.get_clim()
+            norm = mappable.norm
+            logarithmic = isinstance(norm, colors.LogNorm)
+
         # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
         # axes.get_legend_handles_labels()
         # That is the reason for the use of the private function axes._get_legend_handles
@@ -166,4 +197,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         return PlotConfig(title=title, x_axis_label=xlabel, y_axis_label=ylabel, legends=legend,
                           errorbars_enabled=has_errorbars,
                           x_range=x_range,
-                          y_range=y_range)
+                          y_range=y_range,
+                          colorbar_range=colorbar_range,
+                          logarithmic=logarithmic)
