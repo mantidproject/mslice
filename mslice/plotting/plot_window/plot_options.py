@@ -7,11 +7,11 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self, current_config):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
-        if self.lneFigureTitle is not None:
+        if current_config.title is not None:
             self.lneFigureTitle.setText(current_config.title)
-        if self.lneXAxisLabel is not None:
+        if current_config.xlabel is not None:
             self.lneXAxisLabel.setText(current_config.xlabel)
-        if self.lneYAxisLabel is not None:
+        if current_config.ylabel is not None:
             self.lneYAxisLabel.setText(current_config.ylabel)
         if None not in current_config.x_range:
             self.lneXMin.setText(str(current_config.x_range[0]))
