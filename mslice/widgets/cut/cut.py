@@ -124,6 +124,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.btnCutPlot.setEnabled(False)
         self.btnCutPlotOver.setEnabled(False)
 
+        self.btnCutSaveAscii.setEnabled(True)
         self.btnCutSaveToWorkspace.setEnabled(True)
         self.btnCutPlot.setEnabled(True)
         self.btnCutPlotOver.setEnabled(True)
@@ -142,6 +143,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.lneCutIntensityEnd.setEnabled(False)
         self.rdoCutNormToOne.setEnabled(False)
 
+        self.btnCutSaveAscii.setEnabled(False)
         self.btnCutSaveToWorkspace.setEnabled(False)
         self.btnCutPlot.setEnabled(False)
         self.btnCutPlotOver.setEnabled(False)

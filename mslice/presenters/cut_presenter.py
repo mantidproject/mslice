@@ -4,7 +4,9 @@ from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.views.cut_view import CutView
 from mslice.widgets.cut.command import Command
 from .validation_decorators import require_main_presenter
-
+from PyQt4.QtGui import QFileDialog
+from os.path import splitext
+import numpy as np
 
 class CutPresenter(object):
     def __init__(self, cut_view, cut_algorithm, cut_plotter):
@@ -32,9 +34,11 @@ class CutPresenter(object):
         elif command == Command.SaveToWorkspace:
             self._process_cuts(save_to_workspace=True)
         elif command == Command.SaveToAscii:
-            raise NotImplementedError('Save to ascii Not implemented')
+            #raise NotImplementedError('Save to ascii Not implemented')
+            fname = QFileDialog.getSaveFileName(caption='Select File for Saving')
+            self._process_cuts(save_to_file=fname)
 
-    def _process_cuts(self, plot_over=False, save_to_workspace=False):
+    def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
         integration_start to integration_end """
         try:
@@ -43,24 +47,35 @@ class CutPresenter(object):
             return
 
         if save_to_workspace:
-            def save_cut(params, _):
+            def save_cut(params, _, __):
                 self._save_cut_to_workspace(params)
             handler = save_cut
+        elif save_to_file is not None:
+            def save_file(params, _, save_to_file):
+                self._save_cut_to_file(params, save_to_file)
+            handler = save_file
         else:
-            def plot_cut(params, plot_over):
+            def plot_cut(params, plot_over, _):
                 self._plot_cut(params, plot_over)
             handler = plot_cut
         width = params[-1]
         params = params[:-1]
         if width is None:
             # No width specified, just plot a single cut
-            handler(params, plot_over)
+            handler(params, plot_over, save_to_file)
             return
         integration_start, integration_end = params[2:4]
         cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
+        index = 0
         while cut_start != cut_end:
             params = params[:2] + (cut_start, cut_end) + params[4:]
-            handler(params, plot_over)
+            if save_to_file is not None:
+                filename, file_extension = splitext(save_to_file)
+                output_file_part = filename+'_'+str(index)+file_extension
+            else:
+                output_file_part = None
+            index += 1
+            handler(params, plot_over, output_file_part)
             cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
@@ -68,10 +83,17 @@ class CutPresenter(object):
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
 
+    def _save_cut_to_file(self, params, output_file):
+        cut_params = params[:5]
+        x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
+        header = 'MSlice Cut of workspace "%s" along "%s" between %f and %f' % (params[:4])
+        header += ' %s normalising to unity' % ('with' if params[4] else 'without')
+        out_data = np.c_[x, y, e]
+        np.savetxt(str(output_file), out_data, fmt='%12.9e', header=header)
 
     def _save_cut_to_workspace(self, params):
         cut_params = params[:5]
-        self._cut_algorithm.compute_cut(*cut_params)
+        cut_ws = self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
 
 
