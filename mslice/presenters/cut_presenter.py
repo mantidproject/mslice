@@ -87,19 +87,19 @@ class CutPresenter(object):
         x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
         header = 'MSlice Cut of workspace "%s" along "%s" between %f and %f' % (params[:4])
         header += ' %s normalising to unity' % ('with' if params[4] else 'without')
-        self.save_data_to_txt(x, y, e, header)
+        self.save_data_to_txt(x, y, e, output_file, header)
 
     def get_filename_to_save(self):
         path = QFileDialog.getSaveFileName(caption='Select File for Saving')
         return str(path)
 
-    def save_data_to_txt(self, x, y, e, header=None):
+    def save_data_to_txt(self, x, y, e, output_file, header=None):
         out_data = np.c_[x, y, e]
         np.savetxt(str(output_file), out_data, fmt='%12.9e', header=header)
 
     def _save_cut_to_workspace(self, params):
         cut_params = params[:5]
-        cut_ws = self._cut_algorithm.compute_cut(*cut_params)
+        self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
 
 

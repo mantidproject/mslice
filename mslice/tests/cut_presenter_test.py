@@ -232,4 +232,3 @@ class CutPresenterTest(unittest.TestCase):
         ]
         self.cut_algorithm.compute_cut.assert_not_called()
         self.cut_plotter.plot_cut.assert_has_calls(call_list)
-

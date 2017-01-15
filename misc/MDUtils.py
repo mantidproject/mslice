@@ -10,13 +10,13 @@ def dim2array(d):
     """
     Create a numpy array containing bin centers along the dimension d
     input: d - IMDDimension
-    return: numpy array, from min+st/2 to max-st/2 with step st  
+    return: numpy array, from min+st/2 to max-st/2 with step st
     """
     dmin = d.getMinimum()
     dmax = d.getMaximum()
     dstep = d.getX(1)-d.getX(0)
     return np.arange(dmin+dstep/2,dmax,dstep)
-    
+
 
 def SaveMDToAscii(ws,filename,IgnoreIntegrated=True,NumEvNorm=False,Format='%.6e'):
     """
@@ -24,7 +24,7 @@ def SaveMDToAscii(ws,filename,IgnoreIntegrated=True,NumEvNorm=False,Format='%.6e
     input: ws - handle to the workspace
     input: filename - path to the output filename
     input: IgnoreIntegrated - if True, the integrated dimensions are ignored (smaller files), but that information is lost
-    input: NumEvNorm - must be set to true if data was converted to MD from a histo workspace (like NXSPE) and no MDNorm... algorithms were used
+    input: NumEvNorm - set to true if data was converted to MD from a histo workspace (like NXSPE) and no MDNorm... algorithms were used
     input: Format - value to pass to numpy.savetxt
     return: nothing
     """
@@ -52,7 +52,7 @@ def SaveMDToAscii(ws,filename,IgnoreIntegrated=True,NumEvNorm=False,Format='%.6e
     for d in newdimarrays:
         toPrint = np.c_[toPrint,d.flatten()]
     np.savetxt(filename,toPrint,fmt=Format,header=header)
-    
+
 
 def Plot1DMD(ax,ws,PlotErrors=True,NumEvNorm=False,**kwargs):
     """
@@ -60,7 +60,7 @@ def Plot1DMD(ax,ws,PlotErrors=True,NumEvNorm=False,**kwargs):
     input: ax - axis object
     input: ws - handle to the workspace
     input: PlotErrors - if True, will show error bars
-    input: NumEvNorm - must be set to true if data was converted to MD from a histo workspace (like NXSPE) and no MDNorm... algorithms were used
+    input: NumEvNorm - set to true if data was converted to MD from a histo workspace (like NXSPE) and no MDNorm... algorithms were used
     input: kwargs - arguments that are passed to plot, such as plotting symbol, color, label, etc.
     """
     dims = ws.getNonIntegratedDimensions()
@@ -90,7 +90,7 @@ def Plot2DMD(ax,ws,NumEvNorm=False,**kwargs):
     Plot a 2D slice from an MDHistoWorkspace (assume all other dimensions are 1)
     input: ax - axis object
     input: ws - handle to the workspace
-    input: NumEvNorm - must be set to true if data was converted to MD from a histo workspace (like NXSPE) and no MDNorm... algorithms were used
+    input: NumEvNorm - set to true if data was converted to MD from a histo workspace (like NXSPE) and no MDNorm... algorithms were used
     input: kwargs - arguments that are passed to plot, such as plotting symbol, color, label, etc.
     """
     dims = ws.getNonIntegratedDimensions()
@@ -120,26 +120,26 @@ def example_plots():
     #create slices and cuts
     w = Load(Filename='/SNS/HYS/IPTS-14189/shared/autoreduce/4pixel/HYS_102102_4pixel_spe.nxs')
     SetUB(w,4.53,4.53,11.2,90,90,90,"1,0,0","0,0,1")
-    mde = ConvertToMD(w, QDimensions='Q3D')       
+    mde = ConvertToMD(w, QDimensions='Q3D')
     sl1d = CutMD(InputWorkspace=mde, P1Bin='-5,5', P2Bin='-5,5', P3Bin='2,4', P4Bin='-10,0.5,15', NoPix=True)
     sl2d = CutMD(InputWorkspace=mde, P1Bin='-5,5', P2Bin='-5,5', P3Bin='-5,0.1,5', P4Bin='-10,1,15', NoPix=True)
-    
+
     #2 subplots per page
     fig,ax = plt.subplots(2,1)
     Plot1DMD(ax[0],sl1d,NumEvNorm=True,fmt='ro')
     ax[0].set_ylabel("Int(a.u.)")
     pcm = Plot2DMD(ax[1],sl2d,NumEvNorm=True)
     fig.colorbar(pcm,ax=ax[1])
-    
+
     #save to png
     plt.tight_layout(1.08)
     fig.savefig('/tmp/test.png')
 
-def example_pdf():    
+def example_pdf():
     #create slices and cuts
     w = Load(Filename='/SNS/HYS/IPTS-14189/shared/autoreduce/4pixel/HYS_102102_4pixel_spe.nxs')
     SetUB(w,4.53,4.53,11.2,90,90,90,"1,0,0","0,0,1")
-    mde = ConvertToMD(w, QDimensions='Q3D')       
+    mde = ConvertToMD(w, QDimensions='Q3D')
     with PdfPages('/tmp/multipage_pdf.pdf') as pdf:
         for i in range(4):
             llims = str(i-0.5)+','+str(i+0.5)
