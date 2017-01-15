@@ -34,8 +34,7 @@ class CutPresenter(object):
         elif command == Command.SaveToWorkspace:
             self._process_cuts(save_to_workspace=True)
         elif command == Command.SaveToAscii:
-            #raise NotImplementedError('Save to ascii Not implemented')
-            fname = QFileDialog.getSaveFileName(caption='Select File for Saving')
+            fname = self.get_filename_to_save()
             self._process_cuts(save_to_file=fname)
 
     def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None):
@@ -88,6 +87,13 @@ class CutPresenter(object):
         x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
         header = 'MSlice Cut of workspace "%s" along "%s" between %f and %f' % (params[:4])
         header += ' %s normalising to unity' % ('with' if params[4] else 'without')
+        self.save_data_to_txt(x, y, e, header)
+
+    def get_filename_to_save(self):
+        path = QFileDialog.getSaveFileName(caption='Select File for Saving')
+        return str(path)
+
+    def save_data_to_txt(self, x, y, e, header=None):
         out_data = np.c_[x, y, e]
         np.savetxt(str(output_file), out_data, fmt='%12.9e', header=header)
 
