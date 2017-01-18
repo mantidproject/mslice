@@ -35,7 +35,8 @@ class CutPresenter(object):
             self._process_cuts(save_to_workspace=True)
         elif command == Command.SaveToAscii:
             fname = self.get_filename_to_save()
-            self._process_cuts(save_to_file=fname)
+            if fname:
+                self._process_cuts(save_to_file=fname)
 
     def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
