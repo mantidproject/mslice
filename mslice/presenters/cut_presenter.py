@@ -47,17 +47,14 @@ class CutPresenter(object):
             return
 
         if save_to_workspace:
-            def save_cut(params, _, __):
-                self._save_cut_to_workspace(params)
-            handler = save_cut
+            def handler(*args):
+                self._save_cut_to_workspace(args[0])
         elif save_to_file is not None:
-            def save_file(params, _, save_to_file):
+            def handler(params, _, save_to_file):
                 self._save_cut_to_file(params, save_to_file)
-            handler = save_file
         else:
-            def plot_cut(params, plot_over, _):
+            def handler(params, plot_over, _):
                 self._plot_cut(params, plot_over)
-            handler = plot_cut
         width = params[-1]
         params = params[:-1]
         if width is None:
@@ -94,7 +91,8 @@ class CutPresenter(object):
         path = QFileDialog.getSaveFileName(caption='Select File for Saving')
         return str(path)
 
-    def save_data_to_txt(self, x, y, e, output_file, header=None):
+    def save_data_to_txt(self, *args):
+        x, y, e, output_file, header = tuple(args)
         out_data = np.c_[x, y, e]
         np.savetxt(str(output_file), out_data, fmt='%12.9e', header=header)
 
