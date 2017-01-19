@@ -110,6 +110,91 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_integration_width = mock.Mock(return_value=width)
         self.cut_algorithm.get_other_axis = mock.Mock(return_value=integrated_axis)
 
+    def test_cut_parse_input_errors(self):
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        # Invalid workspace
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        # Defines good values
+        axis = Axis("units", "0", "100", "1")
+        processed_axis = Axis("units", 0, 100, 1)
+        integration_start = 3
+        integration_end = 8
+        width = "2"
+        intensity_start = 11
+        intensity_end = 30
+        is_norm = True
+        workspace = "workspace"
+        integrated_axis = 'integrated axis'
+        # Wrong units
+        axis = Axis("", "0", "100", "1")
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        # Bad cut axis
+        axis = Axis("units", "a", "100", "1")
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        # Invalid axis range
+        axis = Axis("units", "100", "0", "1")
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        axis = Axis("units", "0", "100", "1")
+        # Bad integration
+        integration_start = "a"
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        # Invalid integration range 
+        integration_start = 30
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        integration_start = 3
+        # Bad intensity 
+        intensity_start = "a"
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        # Invalid intensity range 
+        intensity_start = 100
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        intensity_start = 11
+        # Wrong width
+        width = "a"
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        cut_presenter.notify(Command.Plot)
+        self.assertRaises(ValueError)
+        
     def test_plot_single_cut_success(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
