@@ -13,7 +13,7 @@ from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.widgets.cut.command import Command
 from mslice.views.cut_view import CutView
 
-from PyQt4.QtGui import QFileDialog 
+from PyQt4.QtGui import QFileDialog
 import numpy as np
 
 class CutPresenterTest(unittest.TestCase):
@@ -160,7 +160,7 @@ class CutPresenterTest(unittest.TestCase):
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
         cut_presenter.notify(Command.Plot)
         self.assertRaises(ValueError)
-        # Invalid integration range 
+        # Invalid integration range
         integration_start = 30
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
@@ -169,7 +169,7 @@ class CutPresenterTest(unittest.TestCase):
         cut_presenter.notify(Command.Plot)
         self.assertRaises(ValueError)
         integration_start = 3
-        # Bad intensity 
+        # Bad intensity
         intensity_start = "a"
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
@@ -177,7 +177,7 @@ class CutPresenterTest(unittest.TestCase):
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
         cut_presenter.notify(Command.Plot)
         self.assertRaises(ValueError)
-        # Invalid intensity range 
+        # Invalid intensity range
         intensity_start = 100
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
@@ -194,7 +194,7 @@ class CutPresenterTest(unittest.TestCase):
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
         cut_presenter.notify(Command.Plot)
         self.assertRaises(ValueError)
-        
+
     def test_plot_single_cut_success(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
