@@ -37,6 +37,9 @@ class CutView:
     def get_presenter(self):
         pass
 
+    def set_cut_axis(self, axis_name):
+        pass
+
     def error_select_a_workspace(self):
         pass
 
@@ -82,7 +85,7 @@ class CutView:
     def populate_input_fields(self, saved_input):
         pass
 
-    def clear_input_fields(self):
+    def clear_input_fields(self, **kwargs):
         pass
 
     def clear_displayed_error(self):

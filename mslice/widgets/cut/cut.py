@@ -46,7 +46,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
     def axis_changed(self, *args):
         self._presenter.notify(Command.AxisChanged)
-        
+
     def get_presenter(self):
         return self._presenter
 
