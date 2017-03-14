@@ -98,11 +98,19 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         return str(path)
 
     def get_workspace_new_name(self):
-        name,success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
+        name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
         # The message above was padded with spaces to allow the whole title to show up
         if not success:
             raise ValueError('No Valid Name supplied')
         return str(name)
+ 
+    def get_workspace_efixed(self, workspace):
+        Ef, success = QInputDialog.getDouble(None, 'Indirect Ef', 
+                                             'Input Fixed Final Energy in meV for %s:' % (workspace),
+                                             value=0., min=0.1, decimals=5)
+        if not success:
+            raise ValueError('Fixed final energy not given')
+        return Ef
 
     def error_select_only_one_workspace(self):
         self._display_error('Please select only one workspace and then try again')

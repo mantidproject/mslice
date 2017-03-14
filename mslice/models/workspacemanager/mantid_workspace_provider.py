@@ -16,14 +16,32 @@ from .workspace_provider import WorkspaceProvider
 # -----------------------------------------------------------------------------
 
 class MantidWorkspaceProvider(WorkspaceProvider):
+    def __init__(self):
+        # Stores various parameters of workspaces not stored by Mantid
+        self._EfDefined = {}
+    
     def get_workspace_names(self):
         return AnalysisDataService.getObjectNames()
 
     def delete_workspace(self, workspace):
         return DeleteWorkspace(Workspace=workspace)
 
+    def _processEfixed(self, workspace):
+        """Checks whether the fixed energy is defined for this workspace"""
+        ws_name = workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)
+        ws_h = self.get_workspace_handle(ws_name)
+        try:
+            ef = [ws_h.getEFixed(ws_h.getDetector(i).getID()) 
+                for i in range(ws_h.getNumberHistograms())]
+            self._EfDefined[ws_name] = True
+        except RuntimeError:
+            self._EfDefined[ws_name] = False
+
     def load(self, filename, output_workspace):
-        return Load(Filename=filename, OutputWorkspace=output_workspace)
+        ws = Load(Filename=filename, OutputWorkspace=output_workspace)
+        if self.get_emode(output_workspace) == 'Indirect':
+            self._processEfixed(output_workspace)
+        return ws
 
     def rename_workspace(self, selected_workspace, new_name):
         return RenameWorkspace(InputWorkspace=selected_workspace, OutputWorkspace=new_name)
@@ -48,3 +66,22 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         if isinstance(workspace, basestring):
             return workspace
         return workspace.name()
+
+    def get_emode(self, workspace):
+        """Returns the energy analysis mode (direct or indirect of a workspace)"""
+        if isinstance(workspace, basestring):
+            workspace_handle = self.get_workspace_handle(workspace)
+        else:
+            workspace_handle = workspace
+        return workspace_handle.getEMode().name
+
+    def has_efixed(self, workspace):
+        return self._EfDefined[workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)]
+
+    def set_efixed(self, workspace, Ef):
+        """Sets (overides) the fixed energy for all detectors (spectra) of this workspace"""
+        ws_name = workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)
+        ws_handle = self.get_workspace_handle(ws_name)
+        for idx in range(ws_handle.getNumberHistograms()):
+            ws_handle.setEFixed(ws_handle.getDetector(idx).getID(), Ef)
+
