@@ -1,10 +1,11 @@
-from PyQt4.QtGui import QWidget,QListWidgetItem,QFileDialog, QInputDialog,QMessageBox
+from PyQt4.QtGui import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
 from PyQt4.QtCore import pyqtSignal
 
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
+from .inputdialog import EfInputDialog
 from .workspacemanager_ui import Ui_Form
 
 class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
@@ -103,14 +104,12 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         if not success:
             raise ValueError('No Valid Name supplied')
         return str(name)
- 
-    def get_workspace_efixed(self, workspace):
-        Ef, success = QInputDialog.getDouble(None, 'Indirect Ef', 
-                                             'Input Fixed Final Energy in meV for %s:' % (workspace),
-                                             value=0., min=0.1, decimals=5)
+
+    def get_workspace_efixed(self, workspace, hasMultipleWS=False):
+        Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, None)
         if not success:
             raise ValueError('Fixed final energy not given')
-        return Ef
+        return Ef, applyToAll
 
     def error_select_only_one_workspace(self):
         self._display_error('Please select only one workspace and then try again')

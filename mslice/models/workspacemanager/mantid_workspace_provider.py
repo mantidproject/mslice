@@ -19,7 +19,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def __init__(self):
         # Stores various parameters of workspaces not stored by Mantid
         self._EfDefined = {}
-    
+
     def get_workspace_names(self):
         return AnalysisDataService.getObjectNames()
 
@@ -31,8 +31,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(ws_name)
         try:
-            ef = [ws_h.getEFixed(ws_h.getDetector(i).getID()) 
-                for i in range(ws_h.getNumberHistograms())]
+            [ws_h.getEFixed(ws_h.getDetector(i).getID()) for i in range(ws_h.getNumberHistograms())]
             self._EfDefined[ws_name] = True
         except RuntimeError:
             self._EfDefined[ws_name] = False
@@ -84,4 +83,3 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_handle = self.get_workspace_handle(ws_name)
         for idx in range(ws_handle.getNumberHistograms()):
             ws_handle.setEFixed(ws_handle.getDetector(idx).getID(), Ef)
-
