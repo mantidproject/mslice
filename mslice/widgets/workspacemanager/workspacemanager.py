@@ -1,10 +1,11 @@
-from PyQt4.QtGui import QWidget,QListWidgetItem,QFileDialog, QInputDialog,QMessageBox
+from PyQt4.QtGui import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
 from PyQt4.QtCore import pyqtSignal
 
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
+from .inputdialog import EfInputDialog
 from .workspacemanager_ui import Ui_Form
 
 class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
@@ -98,11 +99,17 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         return str(path)
 
     def get_workspace_new_name(self):
-        name,success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
+        name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
         # The message above was padded with spaces to allow the whole title to show up
         if not success:
             raise ValueError('No Valid Name supplied')
         return str(name)
+
+    def get_workspace_efixed(self, workspace, hasMultipleWS=False):
+        Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, None)
+        if not success:
+            raise ValueError('Fixed final energy not given')
+        return Ef, applyToAll
 
     def error_select_only_one_workspace(self):
         self._display_error('Please select only one workspace and then try again')

@@ -40,13 +40,19 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         workspace_name = 'cde'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=[path_to_nexus])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_name])
+        self.workspace_provider.get_emode = mock.Mock(return_value='Indirect')
+        self.workspace_provider.has_efixed = mock.Mock(return_value=False)
+        self.workspace_provider.set_efixed = mock.Mock()
         self.view.get_workspace_index = mock.Mock(return_value=0)
+        self.view.get_workspace_efixed = mock.Mock(return_value=(1.845, False))
 
         self.presenter.notify(Command.LoadWorkspace)
         self.view.get_workspace_to_load_path.assert_called_once()
         self.workspace_provider.load.assert_called_with(filename=path_to_nexus, output_workspace=workspace_name)
         self.view.display_loaded_workspaces.assert_called_with([workspace_name])
         self.view.set_workspace_selected.assert_called_with([0])
+        self.view.get_workspace_efixed.assert_called_with(workspace_name, False)
+        self.workspace_provider.set_efixed.assert_called_once()
 
     def test_load_multiple_workspaces(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -62,6 +68,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             return_value=[path1, path2, path3])
         self.workspace_provider.get_workspace_names = mock.Mock(
             return_value=[ws_name1, ws_name2, ws_name3])
+        self.workspace_provider.get_emode = mock.Mock(return_value='Direct')
         # Makes the first file not load because of a name collision
         self.view.confirm_overwrite_workspace = mock.Mock(side_effect=[False, True, True])
         # Makes the second file fail to load, to check if it raise the correct error
@@ -73,6 +80,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.load.assert_has_calls(load_calls)
         self.view.error_unable_to_open_file.assert_called_once_with(ws_name2)
         self.view.no_workspace_has_been_loaded.assert_called_once_with(ws_name1)
+        self.view.get_workspace_efixed.assert_not_called()
 
     def test_load_workspace_cancelled(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
