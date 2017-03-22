@@ -1,6 +1,6 @@
 import uuid
 from mantid.simpleapi import ConvertToMD, SliceMD, TransformMD, ConvertSpectrumAxis, PreprocessDetectorsToMD
-from mantid.simpleapi import RenameWorkspace, DeleteWorkspace
+from mantid.simpleapi import RenameWorkspace, DeleteWorkspace, SofQW3
 
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
@@ -45,10 +45,24 @@ class MantidProjectionCalculator(ProjectionCalculator):
     def _calcQEproj(self, input_workspace, emode, axis1, axis2):
         """ Carries out either the Q-E or E-Q projections """
         output_workspace = input_workspace + ('_QE' if axis1 == MOD_Q_LABEL else '_EQ')
-        retval = ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
-                             PreprocDetectorsWS='-', dEAnalysisMode=emode)
-        if axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL:
-            retval = self._flip_axes(output_workspace)
+        # For indirect geometry and large datafiles (likely to be using a 1-to-1 mapping use ConvertToMD('|Q|')
+        numSpectra = self._workspace_provider.get_workspace_handle(input_workspace).getNumberHistograms()
+        if emode == 'Indirect' or numSpectra > 1000:
+            retval = ConvertToMD(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
+                                 PreprocDetectorsWS='-', dEAnalysisMode=emode)
+            if axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL:
+                retval = self._flip_axes(output_workspace)
+        # Otherwise first run SofQW3 to rebin it in |Q| properly before calling ConvertToMD with CopyToMD
+        else:
+            limits = self._workspace_provider.get_limits(input_workspace, 'MomentumTransfer')
+            # Use a step size a bit smaller than angular spacing so user can rebin if they really want...
+            limits[2] = limits[2] / 3.
+            limits = ','.join([str(limits[i]) for i in [0, 2, 1]])
+            SofQW3(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QAxisBinning=limits, Emode=emode)
+            retval = ConvertToMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, QDimensions='CopyToMD',
+                                 PreprocDetectorsWS='-', dEAnalysisMode=emode)
+            if axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL:
+                retval = self._flip_axes(output_workspace)
         return retval, output_workspace
 
     def _calcThetaEproj(self, input_workspace, emode, axis1, axis2):
@@ -67,7 +81,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def calculate_projection(self, input_workspace, axis1, axis2, units):
         """Calculate the projection workspace AND return a python handle to it"""
-        emode = self._workspace_provider.get_workspace_handle(input_workspace).getEMode().name
+        emode = self._workspace_provider.get_emode(input_workspace)
         # Calculates the projection - can have Q-E or 2theta-E or their transpose.
         if (axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL) or (axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL):
             retval, output_workspace = self._calcQEproj(input_workspace, emode, axis1, axis2)
@@ -83,4 +97,8 @@ class MantidProjectionCalculator(ProjectionCalculator):
             retval.setComment('MSlice_in_wavenumber')
         elif units != MEV_LABEL:
             raise NotImplementedError("Unit %s not recognised. Only 'meV' and 'cm-1' implemented." % (units))
+        self._workspace_provider.propagate_properties(input_workspace, output_workspace)
         return retval
+
+    def set_workspace_provider(self, workspace_provider):
+        self._workspace_provider = workspace_provider

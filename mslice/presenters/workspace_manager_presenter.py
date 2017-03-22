@@ -147,6 +147,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 index_list.append(get_index(get_name(item)))
         self._workspace_manger_view.set_workspace_selected(index_list)
 
+    def get_workspace_provider(self):
+        return self._work_spaceprovider
+
     def update_displayed_workspaces(self):
         """Update the workspaces shown to user.
 

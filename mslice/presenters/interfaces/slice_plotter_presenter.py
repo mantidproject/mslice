@@ -10,3 +10,6 @@ class SlicePlotterPresenterInterface(object):
 
     def workspace_selection_changed(self):
         raise NotImplementedError("This method must be overriden in implementation")
+
+    def set_workspace_provider(self, workspace_provider):
+        raise NotImplementedError("This method must be overriden in implementation")

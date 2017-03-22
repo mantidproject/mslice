@@ -32,5 +32,8 @@ class PowderView(object):
     def set_powder_u2(self, name):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def set_workspace_provider(self, workspace_provider):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def clear_displayed_error(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")

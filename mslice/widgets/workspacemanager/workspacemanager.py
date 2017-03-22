@@ -145,6 +145,9 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     def get_presenter(self):
         return self._presenter
 
+    def get_workspace_provider(self):
+        return self._presenter.get_workspace_provider()
+
     def list_item_changed(self, *args):
         self._presenter.notify(Command.SelectionChanged)
 

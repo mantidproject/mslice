@@ -162,12 +162,10 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
         axis = self._slice_plotter.get_available_axis(workspace_selection)
         self._slice_view.populate_slice_x_options(axis)
         self._slice_view.populate_slice_y_options(axis[::-1])
-        x_min, x_max = self._slice_plotter.get_axis_range(workspace_selection,self._slice_view.get_slice_x_axis())
-        y_min, y_max = self._slice_plotter.get_axis_range(workspace_selection,self._slice_view.get_slice_y_axis())
         try:
-            x_step = (x_max - x_min)/100
-            y_step = (y_max - y_min)/100
-        except TypeError:
+            x_min, x_max, x_step = self._slice_plotter.get_axis_range(workspace_selection,self._slice_view.get_slice_x_axis())
+            y_min, y_max, y_step = self._slice_plotter.get_axis_range(workspace_selection,self._slice_view.get_slice_y_axis())
+        except (KeyError, RuntimeError):
             self._slice_view.clear_input_fields()
             return
         self._slice_view.populate_slice_x_params(*map(lambda x: "%.5f" % x, (x_min, x_max, x_step)))
@@ -175,3 +173,6 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
 
     def _clear_displayed_error(self):
         self._slice_view.clear_displayed_error()
+
+    def set_workspace_provider(self, workspace_provider):
+        self._slice_plotter.set_workspace_provider(workspace_provider)

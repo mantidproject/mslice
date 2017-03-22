@@ -43,6 +43,9 @@ class SlicePlotterView:
     def get_slice_colourmap(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def set_workspace_provider(self, workspace_provider):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def error_invalid_x_params(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 

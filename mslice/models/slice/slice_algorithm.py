@@ -8,3 +8,6 @@ class SliceAlgorithm(object):
 
     def get_available_axis(self, workspace):
         pass
+
+    def set_workspace_provider(self, workspace_provider):
+        pass

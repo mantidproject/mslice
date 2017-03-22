@@ -14,5 +14,8 @@ class WorkspaceManagerPresenterInterface(object):
     def set_selected_workspaces(self, workspace_list):
         raise NotImplementedError("This method must be overriden in implementation")
 
+    def get_workspace_provider(self, workspace_provider):
+        raise NotImplementedError("This method must be overriden in implementation")
+
     def update_displayed_workspaces(self):
         raise NotImplementedError("This method must be overriden in implementation")

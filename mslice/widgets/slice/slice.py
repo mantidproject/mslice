@@ -80,6 +80,9 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
     def get_slice_intensity_end(self):
         return str(self.lneSliceIntensityEnd.text())
 
+    def set_workspace_provider(self, workspace_provider):
+        self._presenter.set_workspace_provider(workspace_provider)
+
     def populate_colormap_options(self, colormaps):
         self.cmbSliceColormap.clear()
         for colormap in colormaps:

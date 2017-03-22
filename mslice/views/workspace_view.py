@@ -40,6 +40,9 @@ class WorkspaceView(object):
     def get_presenter(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def get_workspace_provider(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def confirm_overwrite_workspace(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 

@@ -289,7 +289,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
         dims = ['dim1', 'dim2']
         self.slice_plotter.get_available_axis = mock.Mock(return_value=dims)
-        self.slice_plotter.get_axis_range = mock.Mock(return_value=(0,1))
+        self.slice_plotter.get_axis_range = mock.Mock(return_value=(0,1,0.1))
         slice_plotter_presenter.workspace_selection_changed()
         self.slice_view.populate_slice_x_options.assert_called()
         self.slice_view.populate_slice_y_options.assert_called()

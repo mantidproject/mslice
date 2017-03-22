@@ -9,3 +9,6 @@ class PowderProjectionPresenterInterface(object):
 
     def notify(self, command):
         raise NotImplementedError("This method must be overriden in implementation")
+
+    def set_workspace_provider(self, workspace_provider):
+        raise NotImplementedError("This method must be overriden in implementation")
