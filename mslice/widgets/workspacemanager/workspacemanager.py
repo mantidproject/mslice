@@ -145,7 +145,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     def get_presenter(self):
         return self._presenter
 
-    def list_item_changed(self, *args):
+    def list_item_changed(self):
         self._presenter.notify(Command.SelectionChanged)
 
     def error_unable_to_save(self):

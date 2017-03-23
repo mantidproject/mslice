@@ -1,7 +1,7 @@
 
 class PowderProjectionPresenterInterface(object):
 
-    def __init__(self, powder_view, projection_calculator):
+    def __init__(self, _powder_view, _projection_calculator):
         raise Exception("This interface must not be instantiated")
 
     def register_master(self, main_view):

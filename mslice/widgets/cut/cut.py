@@ -44,7 +44,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
 
-    def axis_changed(self, *args):
+    def axis_changed(self, _changed_index):
         self._presenter.notify(Command.AxisChanged)
 
     def get_presenter(self):

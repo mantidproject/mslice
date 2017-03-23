@@ -59,7 +59,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         # Checks that loaded data is in energy transfer.
         enAxis = ws_h.getAxis(0)
         if 'DeltaE' not in enAxis.getUnit().unitID():
-            raise RuntimeWarning('Workspace has no energy transfer unit: %s' % (enAxis.getUnit().unitID()))
             self._limits[ws_name] = None
             return
         en = ws_h.getAxis(0).extractValues()
@@ -149,9 +148,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         else:
             ws_h = self.get_workspace_handle(workspace)
             dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
-            min = dim.getMinimum()
-            max = dim.getMaximum()
-            return min, max, (max-min)/100.
+            minimum = dim.getMinimum()
+            maximum = dim.getMaximum()
+            return minimum, maximum, (maximum - minimum)/100.
 
     def propagate_properties(self, old_workspace, new_workspace):
         """Propagates MSlice only properties of workspaces, e.g. limits"""

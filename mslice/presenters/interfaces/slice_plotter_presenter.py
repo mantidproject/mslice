@@ -1,5 +1,5 @@
 class SlicePlotterPresenterInterface(object):
-    def __init__(self, slice_view, slice_plotter):
+    def __init__(self, _slice_view, _slice_plotter):
         raise Exception("This interface class must not be instantiated")
 
     def register_master(self, main_view):
