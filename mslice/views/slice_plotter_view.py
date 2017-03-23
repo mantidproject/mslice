@@ -1,6 +1,8 @@
 
 
 class SlicePlotterView:
+    error_occurred = None
+
     def __init__(self):
         raise Exception("This abstract class must not be instantiated")
 
@@ -41,9 +43,6 @@ class SlicePlotterView:
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def get_slice_colourmap(self):
-        raise NotImplementedError("This method must be implemented in a concrete view before being called")
-
-    def set_workspace_provider(self, workspace_provider):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def error_invalid_x_params(self):
@@ -89,4 +88,7 @@ class SlicePlotterView:
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def clear_displayed_error(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def get_presenter(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")

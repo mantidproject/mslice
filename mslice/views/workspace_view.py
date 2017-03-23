@@ -1,6 +1,8 @@
 
 
 class WorkspaceView(object):
+    error_occurred = None
+
     def __init__(self):
         raise Exception("This abstact base class must not be instantiated")
 
@@ -38,9 +40,6 @@ class WorkspaceView(object):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def get_presenter(self):
-        raise NotImplementedError("This method must be implemented in a concrete view before being called")
-
-    def get_workspace_provider(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def confirm_overwrite_workspace(self):

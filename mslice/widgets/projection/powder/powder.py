@@ -86,9 +86,6 @@ class PowderWidget(QWidget, Ui_Form, PowderView):
     def get_powder_units(self):
         return str(self.cmbPowderUnits.currentText())
 
-    def set_workspace_provider(self, workspace_provider):
-        self._presenter.set_workspace_provider(workspace_provider)
-
     def clear_displayed_error(self):
         self._display_error("")
 

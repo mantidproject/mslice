@@ -28,6 +28,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def delete_workspace(self, workspace):
         ws = DeleteWorkspace(Workspace=workspace)
+        if workspace in self._EfDefined.keys():
+            del self._EfDefined[workspace]
         if workspace in self._limits.keys():
             del self._limits[workspace]
         return ws
@@ -49,7 +51,10 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
         try:
             efix = ws_h.getEFixed(ws_h.getDetector(0).getID())
-        except RuntimeError:
+        except RuntimeError:   # Efixed not defined
+            return
+        except AttributeError: # Wrong workspace type (e.g. cut)
+            self._limits[ws_name] = {}
             return
         # Checks that loaded data is in energy transfer.
         enAxis = ws_h.getAxis(0)
@@ -92,6 +97,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws = RenameWorkspace(InputWorkspace=selected_workspace, OutputWorkspace=new_name)
         if selected_workspace in self._limits.keys():
             self._limits[new_name] = self._limits.pop(selected_workspace)
+        if selected_workspace in self._EfDefined.keys():
+            self._EfDefined[new_name] = self._EfDefined.pop(selected_workspace)
         return ws
 
     def save_nexus(self, workspace, path):
@@ -148,4 +155,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def propagate_properties(self, old_workspace, new_workspace):
         """Propagates MSlice only properties of workspaces, e.g. limits"""
-        self._limits[new_workspace] = self._limits[old_workspace]
+        if old_workspace in self._EfDefined.keys():
+            self._EfDefined[new_workspace] = self._EfDefined[old_workspace]
+        if old_workspace in self._limits.keys():
+            self._limits[new_workspace] = self._limits[old_workspace]

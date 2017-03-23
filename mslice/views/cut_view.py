@@ -1,6 +1,8 @@
 
 
 class CutView:
+    error_occurred = None
+
     def get_cut_axis(self):
         pass
 
