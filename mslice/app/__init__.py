@@ -23,12 +23,20 @@ def startup(with_ipython):
     :param with_ipython: If true then the IPython shell is started and
     mslice is launched from here
     """
-    if with_ipython:
-        import IPython
-        IPython.start_ipython(["--matplotlib=qt4", "-i",
-                               "-c from mslice.app import show_gui; show_gui()"])
-    else:
-        from PyQt4.QtGui import QApplication
-        qapp = QApplication([])
+    # Checks if running within MantidPlot, if so, just run show_gui()
+    try:
+        import mantidplot # noqa
         show_gui()
-        qapp.exec_()
+    except:
+        if with_ipython:
+            import IPython
+            IPython.start_ipython(["--matplotlib=qt4", "-i",
+                                   "-c from mslice.app import show_gui; show_gui()"])
+        else:
+            from PyQt4.QtGui import QApplication
+            if QApplication.instance():
+                qapp = QApplication.instance()
+            else:
+                qapp = QApplication([])
+            show_gui()
+            qapp.exec_()
