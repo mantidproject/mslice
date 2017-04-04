@@ -33,25 +33,30 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self._presenter = SlicePlotterPresenter(self, plotter)
         # Each time the fields are populated, set a minimum step size
         self._minimumStep = {}
-        self.lneSliceXStep.textEdited.connect(lambda txt: self._step_edited('x', txt, self.lneSliceXStep))
-        self.lneSliceYStep.textEdited.connect(lambda txt: self._step_edited('y', txt, self.lneSliceYStep))
+        self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))
+        self.lneSliceYStep.editingFinished.connect(lambda: self._step_edited('y', self.lneSliceYStep))
 
     def get_presenter(self):
         return self._presenter
 
     def _btn_clicked(self):
-        self._presenter.notify(Command.DisplaySlice)
+        if self._step_edited('x', self.lneSliceXStep) and self._step_edited('y', self.lneSliceXStep):
+            self._presenter.notify(Command.DisplaySlice)
 
-    def _step_edited(self, idx, text, lineEdit):
+    def _step_edited(self, idx, lineEdit):
         """Checks that user inputted step size is not too small."""
         if self._minimumStep:
             try:
-                value = float(text)
+                value = float(lineEdit.text())
             except ValueError:
                 return
-            if value < (self._minimumStep[idx] / 100.):
+            if value == 0:
                 lineEdit.setText(str(self._minimumStep[idx]))
+                self._display_error('Setting step size to default.')
+            elif value < (self._minimumStep[idx] / 10000.):
                 self._display_error('Step size too small!')
+                return False
+        return True
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
