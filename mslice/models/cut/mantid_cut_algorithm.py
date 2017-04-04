@@ -186,3 +186,9 @@ class MantidCutAlgorithm(CutAlgorithm):
 
         if axis.step is None:
             axis.step = (axis.end - axis.start)/100
+
+    def get_axis_range(self, workspace, dimension_name):
+        return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
+
+    def set_workspace_provider(self, workspace_provider):
+        self._workspace_provider = workspace_provider

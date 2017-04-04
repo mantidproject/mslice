@@ -63,3 +63,4 @@ class AppTests(unittest.TestCase):
         MainWindow()
         self.projection_calculator.set_workspace_provider.assert_called_with(self.workspace_provider)
         self.slice_plotter.set_workspace_provider.assert_called_with(self.workspace_provider)
+        self.cut_algorithm.set_workspace_provider.assert_called_with(self.workspace_provider)

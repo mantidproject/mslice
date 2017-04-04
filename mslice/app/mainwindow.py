@@ -23,6 +23,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
         workspace_provider = workspace_presenter.get_workspace_provider()
         powder_presenter.set_workspace_provider(workspace_provider)
         slice_presenter.set_workspace_provider(workspace_provider)
+        cut_presenter.set_workspace_provider(workspace_provider)
 
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)

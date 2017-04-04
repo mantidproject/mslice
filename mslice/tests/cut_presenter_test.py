@@ -80,6 +80,11 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_input_fields = mock.Mock(return_value=fields)
         cut_presenter.workspace_selection_changed()
         self.view.get_cut_axis.assert_called_with()
+        # Change back to check that it repopulates the fields
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
+        self.view.get_cut_axis = mock.Mock(return_value=available_dimensions[0])
+        cut_presenter.workspace_selection_changed()
+        self.view.populate_input_fields.assert_called_with(fields)
 
     def test_workspace_selection_changed_single_cut_workspace(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
@@ -98,6 +103,10 @@ class CutPresenterTest(unittest.TestCase):
         self.view.populate_integration_params.assert_called_with(*formatted_integration_limits)
         self.view.plotting_params_only.assert_called_once()
         self.view.enable.assert_not_called()
+        is_normed = True
+        self.cut_algorithm.get_cut_params = mock.Mock(return_value=[cut_axis, integration_limits, is_normed])
+        cut_presenter.workspace_selection_changed()
+        self.view.force_normalization.assert_called_with()
 
     def test_workspace_selection_changed_single_noncut_workspace(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
@@ -109,8 +118,6 @@ class CutPresenterTest(unittest.TestCase):
         cut_presenter.workspace_selection_changed()
         self.view.clear_input_fields.assert_called_with()
         self.view.disable.assert_called_with()
-        cut_presenter.notify(Command.AxisChanged)
-        self.view.clear_input_fields.assert_called_with()
 
     def _create_cut(self, *args):
         axis, processed_axis = tuple(args[0:2])
@@ -415,3 +422,18 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_cut_axis = mock.Mock(return_value='dim1')
         cut_presenter.notify(Command.AxisChanged)
         self.view.populate_input_fields.assert_called_with(fields1)
+
+    def test_cut_step_size(self):
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        workspace = 'workspace'
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
+        self.cut_algorithm.is_cuttable = mock.Mock(return_value=True)
+        available_dimensions = ["dim1", "dim2"]
+        self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
+        cut_presenter.workspace_selection_changed()
+        self.cut_algorithm.get_axis_range.assert_any_call(workspace, available_dimensions[0])
+        self.cut_algorithm.get_axis_range.assert_any_call(workspace, available_dimensions[1])
+        self.cut_algorithm.get_axis_range = mock.Mock(side_effect=KeyError)
+        cut_presenter.workspace_selection_changed()
+        self.view.set_minimum_step.assert_called_with(None)

@@ -42,6 +42,9 @@ class CutView:
     def set_cut_axis(self, axis_name):
         pass
 
+    def set_minimum_step(self, value):
+        pass
+
     def error_select_a_workspace(self):
         pass
 
