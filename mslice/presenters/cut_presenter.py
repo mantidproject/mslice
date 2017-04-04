@@ -164,6 +164,15 @@ class CutPresenter(object):
             return None
         return float(x)
 
+    def _set_minimum_step(self, workspace, axis):
+        """Gets axes limits from workspace_provider and then sets the minimumStep dictionary with those values"""
+        for ax in axis:
+            try:
+                self._minimumStep[ax] = self._cut_algorithm.get_axis_range(workspace, ax)[2]
+            except (KeyError, RuntimeError):
+                self._minimumStep[ax] = None
+        self._cut_view.set_minimum_step(self._minimumStep[axis[0]])
+
     def workspace_selection_changed(self):
         if self._previous_cut is not None and self._previous_axis is not None:
             if self._previous_cut not in self._saved_parameters.keys():
@@ -195,12 +204,7 @@ class CutPresenter(object):
                     self._cut_view.populate_input_fields(self._saved_parameters[workspace][current_axis])
             self._previous_cut = workspace
             self._previous_axis = current_axis
-            for ax in axis:
-                try:
-                    self._minimumStep[ax] = self._cut_algorithm.get_axis_range(workspace, ax)[2]
-                except (KeyError, RuntimeError):
-                    self._minimumStep[ax] = None
-            self._cut_view.set_minimum_step(self._minimumStep[axis[0]])
+            self._set_minimum_step(workspace, axis)
 
         elif self._cut_algorithm.is_cut(workspace):
             self._cut_view.plotting_params_only()
