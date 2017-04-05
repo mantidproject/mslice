@@ -60,12 +60,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         running_min = []
         for values in data:
             try:
-                running_min.append(np.min(values[values > absolute_minimum]))
+                running_min.append(np.min(values[np.isfinite(values) * (values > absolute_minimum)]))
             except ValueError:  # If data is empty or not array of numbers
                 pass
         return np.min(running_min) if running_min else absolute_minimum
 
-    def _apply_config(self, plot_config):
+    def _apply_config(self, plot_config): # noqa: C901
         current_axis = self.canvas.figure.gca()
         current_axis.set_title(plot_config.title)
         current_axis.set_xlabel(plot_config.xlabel)
@@ -93,15 +93,19 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 self.canvas.figure.colorbar(mappable)
         else:
             if plot_config.xlog:
-                current_axis.set_xscale('log', nonposx='mask')
-                xmin = self._get_min([ll.get_xdata() for ll in current_axis.get_lines()], absolute_minimum=0.)
-                plot_config.x_range = (xmin, plot_config.x_range[1])
+                xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
+                xmin = self._get_min(xdata, absolute_minimum=0.)
+                current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
+                if self._get_min(xdata) > 0:
+                    plot_config.x_range = (xmin, plot_config.x_range[1])
             else:
                 current_axis.set_xscale('linear')
             if plot_config.ylog:
-                current_axis.set_yscale('log', nonposy='mask')
-                ymin = self._get_min([ll.get_ydata() for ll in current_axis.get_lines()], absolute_minimum=0.)
-                plot_config.y_range = (ymin, plot_config.y_range[1])
+                ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
+                ymin = self._get_min(ydata, absolute_minimum=0.)
+                current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
+                if self._get_min(ydata) > 0:
+                    plot_config.y_range = (ymin, plot_config.y_range[1])
             else:
                 current_axis.set_yscale('linear')
 
