@@ -52,7 +52,13 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         try:
             efix = ws_h.getEFixed(ws_h.getDetector(0).getID())
         except RuntimeError:   # Efixed not defined
-            return
+            # This could occur for malformed NXSPE without the instrument name set.
+            # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
+            if ws_h.run().hasProperty('Ei'):
+                efix = ws_h.run().getProperty('Ei').value
+            else:
+                self._limits[ws_name] = None
+                return
         except AttributeError: # Wrong workspace type (e.g. cut)
             self._limits[ws_name] = {}
             return
@@ -126,7 +132,13 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             workspace_handle = self.get_workspace_handle(workspace)
         else:
             workspace_handle = workspace
-        return workspace_handle.getEMode().name
+        emode = workspace_handle.getEMode().name
+        if emode == 'Elastic':
+            # Work-around for older versions of Mantid which does not set instrument name
+            # in NXSPE files, so LoadNXSPE does not know if it is direct or indirect data
+            ei_log = workspace_handle.run().getProperty('Ei').value
+            emode = 'Indirect' if np.isnan(ei_log) else 'Direct'
+        return emode
 
     def has_efixed(self, workspace):
         return self._EfDefined[workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)]
