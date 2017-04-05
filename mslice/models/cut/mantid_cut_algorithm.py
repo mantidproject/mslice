@@ -152,7 +152,8 @@ class MantidCutAlgorithm(CutAlgorithm):
 
     def _normalize_workspace(self, workspace):
         assert isinstance(workspace, IMDHistoWorkspace)
-        assert workspace.displayNormalization() == MDNormalization.NumEventsNormalization
+        if workspace.displayNormalization() != MDNormalization.NumEventsNormalization:
+            workspace.setDisplayNormalization(MDNormalization.NumEventsNormalization)
         num_events = workspace.getNumEventsArray()
         average_event_intensity = self._num_events_normalized_array(workspace)
         average_event_range = average_event_intensity.max() - average_event_intensity.min()
