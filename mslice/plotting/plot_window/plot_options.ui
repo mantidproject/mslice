@@ -103,6 +103,13 @@
       <item row="1" column="1">
        <widget class="QLineEdit" name="lneYMax"/>
       </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="chkYLog">
+        <property name="text">
+         <string>Logarithmic</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -131,6 +138,13 @@
       </item>
       <item row="1" column="1">
        <widget class="QLineEdit" name="lneXMax"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="chkXLog">
+        <property name="text">
+         <string>Logarithmic</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
