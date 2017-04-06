@@ -35,16 +35,33 @@ class CutWidget(QWidget, CutView, Ui_Form):
         cut_plotter = MatplotlibCutPlotter(cut_alogrithm)
         self._presenter = CutPresenter(self, cut_alogrithm, cut_plotter)
         self.cmbCutAxis.currentIndexChanged.connect(self.axis_changed)
+        self._minimumStep = None
+        self.lneCutStep.editingFinished.connect(self._step_edited)
 
     def _btn_clicked(self):
         sender = self.sender()
         command = self._command_lookup[sender]
         self._presenter.notify(command)
 
+    def _step_edited(self):
+        """Checks that user inputted step size is not too small."""
+        if self._minimumStep:
+            try:
+                value = float(self.lneCutStep.text())
+            except ValueError:
+                return
+            if value == 0:
+                self.lneCutStep.setText('%.5f' % (self._minimumStep))
+                self._display_error('Setting step size to default.')
+            elif value < (self._minimumStep / 10000.):
+                self._display_error('Step size too small!')
+                return False
+        return True
+
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
 
-    def axis_changed(self, *args):
+    def axis_changed(self, _changed_index):
         self._presenter.notify(Command.AxisChanged)
 
     def get_presenter(self):
@@ -89,6 +106,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
             self.cmbCutAxis.blockSignals(True)
             self.cmbCutAxis.setCurrentIndex(index[0])
             self.cmbCutAxis.blockSignals(False)
+
+    def set_minimum_step(self, value):
+        self._minimumStep = value
 
     def populate_cut_axis_options(self, options):
         self.cmbCutAxis.blockSignals(True)

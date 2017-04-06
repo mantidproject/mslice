@@ -71,9 +71,7 @@ class MantidSliceAlgorithm(SliceAlgorithm):
             axis.step = (axis.end - axis.start)/100
 
     def get_axis_range(self, workspace, dimension_name):
-        workspace = self._workspace_provider.get_workspace_handle(workspace)
-        if not isinstance(workspace, IMDEventWorkspace):
-            return "", ""
-        dim = workspace.getDimensionIndexByName(dimension_name)
-        dim = workspace.getDimension(dim)
-        return dim.getMinimum(), dim.getMaximum()
+        return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
+
+    def set_workspace_provider(self, workspace_provider):
+        self._workspace_provider = workspace_provider

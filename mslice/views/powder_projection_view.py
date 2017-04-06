@@ -2,6 +2,8 @@
 
 
 class PowderView(object):
+    error_occurred = None
+
     def __init__(self):
         raise Exception("This abstract class should not be instantiated")
 
@@ -33,4 +35,7 @@ class PowderView(object):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def clear_displayed_error(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def get_presenter(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")

@@ -27,3 +27,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def get_axis_range(self, workspace, dimension_name):
         return self._slice_algorithm.get_axis_range(workspace, dimension_name)
+
+    def set_workspace_provider(self, workspace_provider):
+        self._slice_algorithm.set_workspace_provider(workspace_provider)

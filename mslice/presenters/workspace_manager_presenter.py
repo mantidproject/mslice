@@ -134,11 +134,11 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         """Get the currently selected workspaces from the user"""
         return self._workspace_manger_view.get_workspace_selected()
 
-    def set_selected_workspaces(self, list):
+    def set_selected_workspaces(self, workspace_list):
         get_index = self._workspace_manger_view.get_workspace_index
         get_name = self._work_spaceprovider.get_workspace_name
         index_list = []
-        for item in list:
+        for item in workspace_list:
             if isinstance(item, basestring):
                 index_list.append(get_index(item))
             elif isinstance(item, int):
@@ -146,6 +146,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             else:
                 index_list.append(get_index(get_name(item)))
         self._workspace_manger_view.set_workspace_selected(index_list)
+
+    def get_workspace_provider(self):
+        return self._work_spaceprovider
 
     def update_displayed_workspaces(self):
         """Update the workspaces shown to user.

@@ -1,6 +1,8 @@
 
 
 class WorkspaceView(object):
+    error_occurred = None
+
     def __init__(self):
         raise Exception("This abstact base class must not be instantiated")
 
@@ -16,7 +18,7 @@ class WorkspaceView(object):
     def get_workspace_new_name(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    def get_workspace_efixed(self):
+    def get_workspace_efixed(self, workspace, hasMultipleWS=False):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def get_workspace_index(self, ws_name):
