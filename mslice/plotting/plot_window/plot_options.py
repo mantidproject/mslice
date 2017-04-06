@@ -4,12 +4,15 @@ from .plot_options_ui import Ui_Dialog
 
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
-    def __init__(self, current_config):
+    def __init__(self, current_config): # noqa: C901
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
-        if current_config.title is not None: self.lneFigureTitle.setText(current_config.title)
-        if current_config.xlabel is not None: self.lneXAxisLabel.setText(current_config.xlabel)
-        if current_config.ylabel is not None: self.lneYAxisLabel.setText(current_config.ylabel)
+        if current_config.title is not None:
+            self.lneFigureTitle.setText(current_config.title)
+        if current_config.xlabel is not None:
+            self.lneXAxisLabel.setText(current_config.xlabel)
+        if current_config.ylabel is not None:
+            self.lneYAxisLabel.setText(current_config.ylabel)
         if None not in current_config.x_range:
             self.lneXMin.setText(str(current_config.x_range[0]))
             self.lneXMax.setText(str(current_config.x_range[1]))
@@ -23,9 +26,12 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
             self.chkYLog.hide()
         else:
             self.groupBox_4.hide()
-        if current_config.logarithmic is not None: self.chkLogarithmic.setChecked(current_config.logarithmic)
-        if current_config.xlog is not None: self.chkXLog.setChecked(current_config.xlog)
-        if current_config.ylog is not None: self.chkYLog.setChecked(current_config.ylog)
+        if current_config.logarithmic is not None:
+            self.chkLogarithmic.setChecked(current_config.logarithmic)
+        if current_config.xlog is not None:
+            self.chkXLog.setChecked(current_config.xlog)
+        if current_config.ylog is not None:
+            self.chkYLog.setChecked(current_config.ylog)
 
         self._legend_widgets = []
         self.chkShowLegends.setChecked(current_config.legend.visible)
