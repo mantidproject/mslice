@@ -92,3 +92,9 @@ class SlicePlotterView:
 
     def get_presenter(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def disable(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def enable(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
