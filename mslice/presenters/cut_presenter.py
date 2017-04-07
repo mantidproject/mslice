@@ -207,6 +207,7 @@ class CutPresenter(object):
             self._set_minimum_step(workspace, axis)
 
         elif self._cut_algorithm.is_cut(workspace):
+            self._cut_view.clear_input_fields()
             self._cut_view.plotting_params_only()
             cut_axis, integration_limits, is_normed = self._cut_algorithm.get_cut_params(workspace)
             if is_normed:
@@ -217,6 +218,8 @@ class CutPresenter(object):
             self._cut_view.populate_cut_params(*format_(cut_axis.start, cut_axis.end, cut_axis.step))
             self._cut_view.populate_integration_params(*format_(*integration_limits))
             self._minimumStep[cut_axis.units] = None
+            self._previous_cut = None
+            self._previous_axis = None
 
         else:
             self._cut_view.clear_input_fields()
