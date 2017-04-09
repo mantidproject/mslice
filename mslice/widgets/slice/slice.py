@@ -167,5 +167,37 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.rdoSliceNormToOne.setChecked(0)
         self._minimumStep = {}
 
+    def disable(self):
+        self.cmbSliceXAxis.setEnabled(False)
+        self.cmbSliceYAxis.setEnabled(False)
+        self.lneSliceXStart.setEnabled(False)
+        self.lneSliceXEnd.setEnabled(False)
+        self.lneSliceXStep.setEnabled(False)
+        self.lneSliceYStart.setEnabled(False)
+        self.lneSliceYEnd.setEnabled(False)
+        self.lneSliceYStep.setEnabled(False)
+        self.lneSliceIntensityStart.setEnabled(False)
+        self.lneSliceIntensityEnd.setEnabled(False)
+        self.lneSliceSmoothing.setEnabled(False)
+        self.rdoSliceNormToOne.setEnabled(False)
+        self.btnSliceDisplay.setEnabled(False)
+        self.cmbSliceColormap.setEnabled(False)
+
+    def enable(self):
+        self.cmbSliceXAxis.setEnabled(True)
+        self.cmbSliceYAxis.setEnabled(True)
+        self.lneSliceXStart.setEnabled(True)
+        self.lneSliceXEnd.setEnabled(True)
+        self.lneSliceXStep.setEnabled(True)
+        self.lneSliceYStart.setEnabled(True)
+        self.lneSliceYEnd.setEnabled(True)
+        self.lneSliceYStep.setEnabled(True)
+        self.lneSliceIntensityStart.setEnabled(True)
+        self.lneSliceIntensityEnd.setEnabled(True)
+        self.lneSliceSmoothing.setEnabled(True)
+        self.rdoSliceNormToOne.setEnabled(True)
+        self.btnSliceDisplay.setEnabled(True)
+        self.cmbSliceColormap.setEnabled(True)
+
     def clear_displayed_error(self):
         self._display_error("")
