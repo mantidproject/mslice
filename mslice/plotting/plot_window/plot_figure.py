@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
+import numpy as np
 
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
@@ -53,14 +54,22 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if new_config:
             self._apply_config(new_config)
 
-    def _apply_config(self, plot_config):
+    def _get_min(self, data, absolute_minimum=-np.inf):
+        """Determines the minimum of a set of numpy arrays"""
+        data = data if isinstance(data, list) else [data]
+        running_min = []
+        for values in data:
+            try:
+                running_min.append(np.min(values[np.isfinite(values) * (values > absolute_minimum)]))
+            except ValueError:  # If data is empty or not array of numbers
+                pass
+        return np.min(running_min) if running_min else absolute_minimum
+
+    def _apply_config(self, plot_config): # noqa: C901
         current_axis = self.canvas.figure.gca()
         current_axis.set_title(plot_config.title)
         current_axis.set_xlabel(plot_config.xlabel)
         current_axis.set_ylabel(plot_config.ylabel)
-
-        current_axis.set_xlim(*plot_config.x_range)
-        current_axis.set_ylim(*plot_config.y_range)
 
         if current_axis.get_images():
             images = current_axis.get_images()
@@ -82,6 +91,26 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 norm = colors.Normalize(vmin, vmax)
                 mappable.set_norm(norm)
                 self.canvas.figure.colorbar(mappable)
+        else:
+            if plot_config.xlog:
+                xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
+                xmin = self._get_min(xdata, absolute_minimum=0.)
+                current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
+                if self._get_min(xdata) > 0:
+                    plot_config.x_range = (xmin, plot_config.x_range[1])
+            else:
+                current_axis.set_xscale('linear')
+            if plot_config.ylog:
+                ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
+                ymin = self._get_min(ydata, absolute_minimum=0.)
+                current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
+                if self._get_min(ydata) > 0:
+                    plot_config.y_range = (ymin, plot_config.y_range[1])
+            else:
+                current_axis.set_yscale('linear')
+
+        current_axis.set_xlim(*plot_config.x_range)
+        current_axis.set_ylim(*plot_config.y_range)
 
         legend_config = plot_config.legend
         for handle in legend_config.handles:
@@ -175,11 +204,15 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if not current_axis.get_images():
             colorbar_range = None, None
             logarithmic = None
+            xlog = 'log' in current_axis.get_xscale()
+            ylog = 'log' in current_axis.get_yscale()
         else:
             mappable = current_axis.get_images()[0]
             colorbar_range = mappable.get_clim()
             norm = mappable.norm
             logarithmic = isinstance(norm, colors.LogNorm)
+            xlog = None
+            ylog = None
 
         # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
         # axes.get_legend_handles_labels()
@@ -194,9 +227,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             visible = getattr(current_axis, 'legend_') is not None
             legend = LegendDescriptor(visible=visible, handles=handles)
         has_errorbars  = self._has_errorbars()
-        return PlotConfig(title=title, x_axis_label=xlabel, y_axis_label=ylabel, legends=legend,
-                          errorbars_enabled=has_errorbars,
-                          x_range=x_range,
-                          y_range=y_range,
+        return PlotConfig(title=title, xlabel=xlabel, ylabel=ylabel, legend=legend,
+                          errorbars=has_errorbars,
+                          x_range=x_range, xlog=xlog,
+                          y_range=y_range, ylog=ylog,
                           colorbar_range=colorbar_range,
                           logarithmic=logarithmic)

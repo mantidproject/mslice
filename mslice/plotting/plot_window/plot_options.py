@@ -4,7 +4,7 @@ from .plot_options_ui import Ui_Dialog
 
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
-    def __init__(self, current_config):
+    def __init__(self, current_config): # noqa: C901
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
         if current_config.title is not None:
@@ -22,10 +22,16 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         if None not in current_config.colorbar_range:
             self.lneCMin.setText(str(current_config.colorbar_range[0]))
             self.lneCMax.setText(str(current_config.colorbar_range[1]))
+            self.chkXLog.hide()
+            self.chkYLog.hide()
         else:
             self.groupBox_4.hide()
         if current_config.logarithmic is not None:
             self.chkLogarithmic.setChecked(current_config.logarithmic)
+        if current_config.xlog is not None:
+            self.chkXLog.setChecked(current_config.xlog)
+        if current_config.ylog is not None:
+            self.chkYLog.setChecked(current_config.ylog)
 
         self._legend_widgets = []
         self.chkShowLegends.setChecked(current_config.legend.visible)
@@ -78,12 +84,12 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
                                     visible=legend_widget.is_visible())
 
         return PlotConfig(title=dialog.lneFigureTitle.text(),
-                          x_axis_label=dialog.lneXAxisLabel.text(),
-                          y_axis_label=dialog.lneYAxisLabel.text(),
-                          legends=legends,
-                          errorbars_enabled=dialog.chkShowErrorBars.isChecked(),
-                          x_range=x_range,
-                          y_range=y_range,
+                          xlabel=dialog.lneXAxisLabel.text(),
+                          ylabel=dialog.lneYAxisLabel.text(),
+                          legend=legends,
+                          errorbar=dialog.chkShowErrorBars.isChecked(),
+                          x_range=x_range, xlog=dialog.chkXLog.isChecked(),
+                          y_range=y_range, ylog=dialog.chkYLog.isChecked(),
                           colorbar_range=colorbar_range,
                           logarithmic=logarithmic)
 
@@ -151,20 +157,23 @@ class LegendDescriptor(object):
 
 
 class PlotConfig(object):
-    def __init__(self, title=None, x_axis_label=None, y_axis_label=None, legends=None, errorbars_enabled=None,
-                 x_range=(None, None), y_range=(None, None), colorbar_range=(None, None), logarithmic=None):
-        self.title = title
-        self.xlabel = x_axis_label
-        self.ylabel = y_axis_label
-        if legends is None:
-            self.legend = LegendDescriptor()
-        else:
-            self.legend = legends
-        self.errorbar = errorbars_enabled   # Has 3 values (True : shown, False: Not Shown, None: Not applicable)
-        self.x_range = x_range
-        self.y_range = y_range
-        self.colorbar_range = colorbar_range
-        self.logarithmic = logarithmic
+    def __init__(self, **kwargs):
+        # Define default values for all options
+        self.title = None
+        self.xlabel = None
+        self.ylabel = None
+        self.xlog = None
+        self.ylog = None
+        self.legend = LegendDescriptor()
+        self.errorbar = None
+        self.x_range = None
+        self.y_range = None
+        self.colorbar_range = None
+        self.logarithmic = None
+        # Populates fields from keyword arguments
+        for (argname, value) in kwargs.items():
+            if value is not None:
+                setattr(self, argname, value)
 
     @property
     def title(self):
