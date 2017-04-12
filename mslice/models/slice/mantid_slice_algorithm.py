@@ -77,7 +77,4 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         self._workspace_provider = workspace_provider
 
     def getComment(self, workspace):
-        if hasattr(workspace, 'getComment'):
-            return workspace.getComment()
-        ws_handle = self._workspace_provider.get_workspace_handle(workspace)
-        return ws_handle.getComment()
+        return self._workspace_provider.getComment(workspace)

@@ -31,7 +31,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         elif 'MomentumTransfer' in axisUnits or '|Q|' in axisUnits:
             return '$|Q|$ ($\mathrm{\AA}^{-1}$)'
         elif 'Degrees' in axisUnits:
-            return 'Scattering Angle 2$\theta$ ($^{\circ}$)'
+            return r'Scattering Angle 2$\theta$ ($^{\circ}$)'
         else:
             return axisUnits
 

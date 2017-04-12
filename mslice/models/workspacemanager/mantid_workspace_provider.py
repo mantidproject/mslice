@@ -170,3 +170,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self._EfDefined[new_workspace] = self._EfDefined[old_workspace]
         if old_workspace in self._limits.keys():
             self._limits[new_workspace] = self._limits[old_workspace]
+
+    def getComment(self, workspace):
+        if hasattr(workspace, 'getComment'):
+            return workspace.getComment()
+        ws_handle = self.get_workspace_handle(workspace)
+        return ws_handle.getComment()

@@ -38,3 +38,6 @@ class WorkspaceProvider(object):
 
     def get_workspace_name(self, workspace_handle):
         pass
+
+    def getComment(self, workspace):
+        pass
