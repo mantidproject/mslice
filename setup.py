@@ -131,7 +131,7 @@ setup_args = dict(name=NAME,
                   author_email='mantid-help@mantidproject.org',
                   url=__project_url__,
                   keywords=['PyQt4'],
-                  packages=find_packages(),
+                  packages=find_packages(exclude=["misc"]),
                   data_files=get_data_files(),
                   # Fool setup.py to running the tests on a built copy (this feels like a hack)
                   use_2to3=True,
