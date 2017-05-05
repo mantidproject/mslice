@@ -8,8 +8,9 @@ def draw_colorbar(gcf, colorbar):
             function(*args, **kwargs)
             cb = getattr(gcf(),'_colorbar_axes',None)
             if cb:
-                cb.remove()
-            cb = colorbar()
-            gcf()._colorbar_axes = cb
+                colorbar(cax = gcf().get_axes()[1])
+            else:
+                cb = colorbar()
+                gcf()._colorbar_axes = cb
         return wrapper
     return draw_colorbar_wrapper

@@ -6,7 +6,11 @@ import mslice.plotting.pyplot as plt
 class MatplotlibSlicePlotter(SlicePlotter):
     def __init__(self, slice_algorithm):
         self._slice_algorithm = slice_algorithm
-        self._colormaps = ['viridis', 'jet', 'summer', 'winter', 'coolwarm']
+        import matplotlib
+        ver = float('.'.join(matplotlib.__version__.split('.')[:2]))
+        self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
+        if ver >= 1.5:
+            self._colormaps.insert(0, 'viridis')
 
     def plot_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
