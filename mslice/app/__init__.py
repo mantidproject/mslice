@@ -4,6 +4,19 @@ and entry points.
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
+MPL_COMPAT = False
+
+def check_mpl():
+    from distutils.version import LooseVersion
+    import matplotlib
+    if LooseVersion(matplotlib.__version__) < LooseVersion("1.5.0"):
+        import warnings
+        warnings.warn('')
+        warnings.warn('A version of Matplotlib older than 1.5.0 has been detected.', ImportWarning)
+        warnings.warn('Some features of MSlice may not work correctly.', ImportWarning)
+        warnings.warn('')
+        global MPL_COMPAT
+        MPL_COMPAT = True
 
 def show_gui():
     """Display the top-level main window. It assumes that the QApplication instance
@@ -23,6 +36,7 @@ def startup(with_ipython):
     :param with_ipython: If true then the IPython shell is started and
     mslice is launched from here
     """
+    check_mpl()
     if with_ipython:
         import IPython
         IPython.start_ipython(["--matplotlib=qt4", "-i",

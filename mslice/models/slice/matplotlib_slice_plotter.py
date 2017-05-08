@@ -2,14 +2,13 @@ from matplotlib.colors import Normalize
 
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
+from mslice.app import MPL_COMPAT
 
 class MatplotlibSlicePlotter(SlicePlotter):
     def __init__(self, slice_algorithm):
         self._slice_algorithm = slice_algorithm
-        import matplotlib
-        ver = float('.'.join(matplotlib.__version__.split('.')[:2]))
         self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
-        if ver >= 1.5:
+        if not MPL_COMPAT:
             self._colormaps.insert(0, 'viridis')
 
     def plot_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
@@ -27,11 +26,15 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def _getDisplayName(self, axisUnits, comment=None):
         if 'DeltaE' in axisUnits:
-            return 'Energy Transfer ' + ('(cm$^{-1}$)' if (comment and 'wavenumber' in comment) else '(meV)')
+            # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX
+            if MPL_COMPAT:
+                return 'Energy Transfer ' + ('(cm-1)' if (comment and 'wavenumber' in comment) else '(meV)')
+            else:
+                return 'Energy Transfer ' + ('(cm$^{-1}$)' if (comment and 'wavenumber' in comment) else '(meV)')
         elif 'MomentumTransfer' in axisUnits or '|Q|' in axisUnits:
-            return '$|Q|$ ($\mathrm{\AA}^{-1}$)'
+            return '|Q| (recip. Ang.)' if MPL_COMPAT else '$|Q|$ ($\mathrm{\AA}^{-1}$)'
         elif 'Degrees' in axisUnits:
-            return r'Scattering Angle 2$\theta$ ($^{\circ}$)'
+            return 'Scattering Angle (degrees)' if MPL_COMPAT else r'Scattering Angle 2$\theta$ ($^{\circ}$)'
         else:
             return axisUnits
 
