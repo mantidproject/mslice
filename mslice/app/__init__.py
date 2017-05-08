@@ -40,7 +40,7 @@ def show_gui():
             # loop but it still seems to run; however script code cannot start
             # a main event loop - you have to do that manually with %gui
             # BUT - if you raise an error just before the script finishes, then
-            # the GUI runs fine and control is returned to IPython (without 
+            # the GUI runs fine and control is returned to IPython (without
             # the blocking caused by the next exec_() call.)
             raise RuntimeWarning('Unable to start IPython GUI event loop.')
         qapp.exec_()
