@@ -1,78 +1,54 @@
 """Package defining top-level MSlice application
 and entry points.
 """
+from IPython import start_ipython
+from PyQt4.QtGui import QApplication
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
+QAPP_REF = None
+
+def main():
+    """Start the application. Detects the current environment and
+    runs accordingly:
+      - if an existing QApplication is detected then this is used and IPython
+      - is not started, otherwise  a application is created.
+      - if an existing IPython shell is detected this instance is used
+        and matplotlib support is enabled otherwise a new one is created
+    """
+    global QAPP_REF
+    if QApplication.instance():
+        # We must be embedded in some other application that has already started the event loop
+        # just show the UI...
+        show_gui()
+        return
+
+    # We're doing our own startup. Are we already running IPython?
+    try:
+        ip = get_ipython()
+        ip_running = True
+    except NameError:
+        ip_running = False
+
+    if ip_running:
+        # IPython handles the Qt event loop exec so we can return control to the ipython terminal
+        ip.enable_matplotlib('qt4') # selects the backend
+        if QApplication.instance() is None:
+            QAPP_REF = QApplication([])
+        show_gui()
+    else:
+        QAPP_REF = QApplication([])
+        start_ipython(["--matplotlib=qt4", "-i",
+                       "-c from mslice.app import show_gui; show_gui()"])
+        qapp.exec_()
 
 def show_gui():
-    """Display the top-level main window. If the Qt event loop has not been started, starts it.
+    """Display the top-level main window.
+    If this is the first call then an instance of the Windows is cached to ensure it
+    survives for the duration of the application
     """
-    from PyQt4.QtGui import QApplication
-    qapp = QApplication.instance()
-    runningIP = False
-    runExec = False
-    if not qapp:
-        # Check that if we're running in IPython, try to use IPython's event loop
-        try:
-            ip = get_ipython()
-            if qapp is None:
-                ip.enable_matplotlib('qt4')
-            runningIP = True
-        except NameError:
-            pass
-    # Also catch case where IPython event loop fails
-    qapp = QApplication.instance()
-    if not qapp:
-        qapp = QApplication([])
-        runExec = True
-
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow
         MAIN_WINDOW = MainWindow()
     MAIN_WINDOW.show()
-
-    if runExec:
-        if runningIP:
-            # Weird voodoo... In newer IPython (>3), it seems script code is run
-            # in a different thread. So the code above does not detect the main
-            # loop but it still seems to run; however script code cannot start
-            # a main event loop - you have to do that manually with %gui
-            # BUT - if you raise an error just before the script finishes, then
-            # the GUI runs fine and control is returned to IPython (without
-            # the blocking caused by the next exec_() call.)
-            raise RuntimeWarning('Unable to start IPython GUI event loop.')
-        qapp.exec_()
-
-
-def startup(with_ipython):
-    """Perform a full application startup, including the IPython
-    shell if requested. If IPython is requested then the matplotlib
-    backend is set to qt4. If IPython is not requested then the
-    QApplication event loop is started manually
-    :param with_ipython: If true then the IPython shell is started and
-    mslice is launched from here
-    """
-    # Checks if running within MantidPlot, if so, just run show_gui()
-    try:
-        import mantidplot # noqa
-        show_gui()
-    except ImportError:
-        if with_ipython:
-            # Check that we are not already running IPython!
-            try:
-                get_ipython()
-                show_gui()
-            except NameError:
-                import IPython
-                IPython.start_ipython(["--matplotlib=qt4", "-i",
-                                       "-c from mslice.app import show_gui; show_gui()"])
-        else:
-            from PyQt4.QtGui import QApplication
-            if QApplication.instance():
-                qapp = QApplication.instance()
-            else:
-                qapp = QApplication([])
-            show_gui()
-            qapp.exec_()
