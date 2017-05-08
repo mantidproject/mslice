@@ -35,8 +35,14 @@ def show_gui():
 
     if runExec:
         if runningIP:
-            import warnings
-            warnings.warn('Unable to start IPython GUI event loop. Scripting not available')
+            # Weird voodoo... In newer IPython (>3), it seems script code is run
+            # in a different thread. So the code above does not detect the main
+            # loop but it still seems to run; however script code cannot start
+            # a main event loop - you have to do that manually with %gui
+            # BUT - if you raise an error just before the script finishes, then
+            # the GUI runs fine and control is returned to IPython (without 
+            # the blocking caused by the next exec_() call.)
+            raise RuntimeWarning('Unable to start IPython GUI event loop.')
         qapp.exec_()
 
 
@@ -52,7 +58,7 @@ def startup(with_ipython):
     try:
         import mantidplot # noqa
         show_gui()
-    except:
+    except ImportError:
         if with_ipython:
             # Check that we are not already running IPython!
             try:
