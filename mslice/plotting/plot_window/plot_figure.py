@@ -230,7 +230,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             legend = LegendDescriptor(visible=visible, handles=handles)
         has_errorbars  = self._has_errorbars()
         return PlotConfig(title=title, xlabel=xlabel, ylabel=ylabel, legend=legend,
-                          errorbars=has_errorbars,
+                          errorbar=has_errorbars,
                           x_range=x_range, xlog=xlog,
                           y_range=y_range, ylog=ylog,
                           colorbar_range=colorbar_range,
