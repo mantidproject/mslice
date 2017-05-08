@@ -33,6 +33,7 @@ def main():
     if ip_running:
         # IPython handles the Qt event loop exec so we can return control to the ipython terminal
         ip.enable_matplotlib('qt4') # selects the backend
+        # Older IPython versions would start this automatically but the newer ones do not
         if QApplication.instance() is None:
             QAPP_REF = QApplication([])
         show_gui()
@@ -40,7 +41,7 @@ def main():
         QAPP_REF = QApplication([])
         start_ipython(["--matplotlib=qt4", "-i",
                        "-c from mslice.app import show_gui; show_gui()"])
-        qapp.exec_()
+        # IPython will call EventLoop.exec when required
 
 def show_gui():
     """Display the top-level main window.
