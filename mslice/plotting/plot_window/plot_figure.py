@@ -123,7 +123,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         # The legend must be set after hiding/showing the error bars so the errorbars on the legend are in sync with
         # the plot (in terms of having/not having errorbars)
         if legend_config.visible:
-            current_axis.legend()
+            leg = current_axis.legend()
+            leg.draggable()
         else:
             if current_axis.legend_:
                 current_axis.legend_.remove()
@@ -135,7 +136,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         """Show legends if true, hide legends is visible is false"""
         current_axes = self.canvas.figure.gca()
         if visible:
-            current_axes.legend()
+            leg = current_axes.legend()
+            leg.draggable()
         else:
             if current_axes.legend_:
                 current_axes.legend_.remove()
@@ -228,7 +230,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             legend = LegendDescriptor(visible=visible, handles=handles)
         has_errorbars  = self._has_errorbars()
         return PlotConfig(title=title, xlabel=xlabel, ylabel=ylabel, legend=legend,
-                          errorbars=has_errorbars,
+                          errorbar=has_errorbars,
                           x_range=x_range, xlog=xlog,
                           y_range=y_range, ylog=ylog,
                           colorbar_range=colorbar_range,
