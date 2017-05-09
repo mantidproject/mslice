@@ -1,4 +1,3 @@
-from math import floor
 import numpy as np
 
 from mantid.simpleapi import BinMD
@@ -55,7 +54,7 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         return (data - data.min())/data_range
 
     def _get_number_of_steps(self, axis):
-        return int(max(1, floor(axis.end - axis.start)/axis.step))
+        return int(max(1, (axis.end - axis.start)/axis.step))
 
     def _fill_in_missing_input(self,axis,workspace):
         dim = workspace.getDimensionIndexByName(axis.units)
@@ -71,9 +70,10 @@ class MantidSliceAlgorithm(SliceAlgorithm):
             axis.step = (axis.end - axis.start)/100
 
     def get_axis_range(self, workspace, dimension_name):
-        workspace = self._workspace_provider.get_workspace_handle(workspace)
-        if not isinstance(workspace, IMDEventWorkspace):
-            return "", ""
-        dim = workspace.getDimensionIndexByName(dimension_name)
-        dim = workspace.getDimension(dim)
-        return dim.getMinimum(), dim.getMaximum()
+        return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
+
+    def set_workspace_provider(self, workspace_provider):
+        self._workspace_provider = workspace_provider
+
+    def getComment(self, workspace):
+        return self._workspace_provider.getComment(workspace)

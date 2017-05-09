@@ -7,6 +7,17 @@ from PyQt4.QtGui import QApplication
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
 QAPP_REF = None
+MPL_COMPAT = False
+
+def check_mpl():
+    from distutils.version import LooseVersion
+    import matplotlib
+    if LooseVersion(matplotlib.__version__) < LooseVersion("1.5.0"):
+        import warnings
+        warnings.warn('A version of Matplotlib older than 1.5.0 has been detected.')
+        warnings.warn('Some features of MSlice may not work correctly.')
+        global MPL_COMPAT
+        MPL_COMPAT = True
 
 def main():
     """Start the application. Detects the current environment and
@@ -16,6 +27,7 @@ def main():
       - if an existing IPython shell is detected this instance is used
         and matplotlib support is enabled otherwise a new one is created
     """
+    check_mpl()
     global QAPP_REF
     if QApplication.instance():
         # We must be embedded in some other application that has already started the event loop

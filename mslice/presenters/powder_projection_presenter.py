@@ -76,3 +76,6 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         # Assuming DeltaE is always the last axes option.
         if axes[curr_axis] != self._available_axes[-1] and axes[other_axis] != self._available_axes[-1]:
             axes_set[other_axis](self._available_axes[-1])
+
+    def set_workspace_provider(self, workspace_provider):
+        self._projection_calculator.set_workspace_provider(workspace_provider)

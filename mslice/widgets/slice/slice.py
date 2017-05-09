@@ -31,12 +31,32 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.display_errors_to_statusbar = True
         plotter = MatplotlibSlicePlotter(MantidSliceAlgorithm())
         self._presenter = SlicePlotterPresenter(self, plotter)
+        # Each time the fields are populated, set a minimum step size
+        self._minimumStep = {}
+        self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))
+        self.lneSliceYStep.editingFinished.connect(lambda: self._step_edited('y', self.lneSliceYStep))
 
     def get_presenter(self):
         return self._presenter
 
     def _btn_clicked(self):
-        self._presenter.notify(Command.DisplaySlice)
+        if self._step_edited('x', self.lneSliceXStep) and self._step_edited('y', self.lneSliceXStep):
+            self._presenter.notify(Command.DisplaySlice)
+
+    def _step_edited(self, idx, lineEdit):
+        """Checks that user inputted step size is not too small."""
+        if self._minimumStep:
+            try:
+                value = float(lineEdit.text())
+            except ValueError:
+                return
+            if value == 0:
+                lineEdit.setText(str(self._minimumStep[idx]))
+                self._display_error('Setting step size to default.')
+            elif value < (self._minimumStep[idx] / 10000.):
+                self._display_error('Step size too small!')
+                return False
+        return True
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
@@ -126,11 +146,15 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.lneSliceXStart.setText(x_start)
         self.lneSliceXEnd.setText(x_end)
         self.lneSliceXStep.setText(x_step)
+        if x_step:
+            self._minimumStep['x'] = float(x_step)
 
     def populate_slice_y_params(self, y_start, y_end, y_step):
         self.lneSliceYStart.setText(y_start)
         self.lneSliceYEnd.setText(y_end)
         self.lneSliceYStep.setText(y_step)
+        if y_step:
+            self._minimumStep['y'] = float(y_step)
 
     def clear_input_fields(self):
         self.populate_slice_x_options([])
@@ -141,6 +165,39 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
         self.lneSliceIntensityEnd.setText("")
         self.lneSliceSmoothing.setText("")
         self.rdoSliceNormToOne.setChecked(0)
+        self._minimumStep = {}
+
+    def disable(self):
+        self.cmbSliceXAxis.setEnabled(False)
+        self.cmbSliceYAxis.setEnabled(False)
+        self.lneSliceXStart.setEnabled(False)
+        self.lneSliceXEnd.setEnabled(False)
+        self.lneSliceXStep.setEnabled(False)
+        self.lneSliceYStart.setEnabled(False)
+        self.lneSliceYEnd.setEnabled(False)
+        self.lneSliceYStep.setEnabled(False)
+        self.lneSliceIntensityStart.setEnabled(False)
+        self.lneSliceIntensityEnd.setEnabled(False)
+        self.lneSliceSmoothing.setEnabled(False)
+        self.rdoSliceNormToOne.setEnabled(False)
+        self.btnSliceDisplay.setEnabled(False)
+        self.cmbSliceColormap.setEnabled(False)
+
+    def enable(self):
+        self.cmbSliceXAxis.setEnabled(True)
+        self.cmbSliceYAxis.setEnabled(True)
+        self.lneSliceXStart.setEnabled(True)
+        self.lneSliceXEnd.setEnabled(True)
+        self.lneSliceXStep.setEnabled(True)
+        self.lneSliceYStart.setEnabled(True)
+        self.lneSliceYEnd.setEnabled(True)
+        self.lneSliceYStep.setEnabled(True)
+        self.lneSliceIntensityStart.setEnabled(True)
+        self.lneSliceIntensityEnd.setEnabled(True)
+        self.lneSliceSmoothing.setEnabled(True)
+        self.rdoSliceNormToOne.setEnabled(True)
+        self.btnSliceDisplay.setEnabled(True)
+        self.cmbSliceColormap.setEnabled(True)
 
     def clear_displayed_error(self):
         self._display_error("")

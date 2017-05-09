@@ -1,6 +1,8 @@
 
 
 class SlicePlotterView:
+    error_occurred = None
+
     def __init__(self):
         raise Exception("This abstract class must not be instantiated")
 
@@ -86,4 +88,13 @@ class SlicePlotterView:
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def clear_displayed_error(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def get_presenter(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def disable(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def enable(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
