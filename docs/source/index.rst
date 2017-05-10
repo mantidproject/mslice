@@ -1,5 +1,5 @@
-Welcome to MSlice's documentation!
-==================================
+Welcome to MSlice's documentation
+=================================
 
 Mslice is a tool for visualizing cuts and slices from neutron powder diffraction data. It uses
 `Mantid <http://mantidproject.org>`_ to process the data and plots it using
@@ -22,4 +22,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
