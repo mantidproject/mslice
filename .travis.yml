@@ -3,6 +3,11 @@ language: python
 sudo: required
 dist: trusty
 
+# safelist
+branches:
+  only:
+  - master
+
 python:
   # See https://github.com/travis-ci/travis-ci/issues/2219#issuecomment-41804942
   - "2.7_with_system_site_packages" # for pyqt4
