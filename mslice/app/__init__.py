@@ -1,6 +1,11 @@
 """Package defining top-level MSlice application
 and entry points.
 """
+# Ensure we use version 2 of the PyQt apis to be compatible with IPython.
+import sip
+sip.setapi('QString', 2)
+sip.setapi('QVariant', 2)
+
 from IPython import start_ipython
 from PyQt4.QtGui import QApplication
 
