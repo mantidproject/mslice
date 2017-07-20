@@ -21,6 +21,7 @@ from mslice import __project_url__, __version__
 NAME = 'mslice'
 THIS_DIR = os.path.dirname(__file__)
 
+
 # ==============================================================================
 # Package requirements helper
 # ==============================================================================
@@ -45,6 +46,7 @@ def get_data_files():
         data_files = []
     return data_files
 
+
 # ==============================================================================
 # Custom distutils build & install commands
 # ==============================================================================
@@ -52,7 +54,17 @@ def get_data_files():
 class build_py(_build_py):
     description = "build pure python + qt related resources (.uic and .qrc and .pyc)"
 
+    user_options = _build_py.user_options + [
+        ('inplace', 'i', "build inplace and not to build directory")
+    ]
+
+    boolean_options = _build_py.boolean_options + ['inplace']
+
     PACKAGE = NAME
+
+    def initialize_options(self):
+        _build_py.initialize_options(self)
+        self.inplace = False
 
     def finalize_options(self):
         _build_py.finalize_options(self)
@@ -75,9 +87,7 @@ class build_py(_build_py):
         for dirpath, _, filenames in os.walk(self.get_package_dir(self.PACKAGE)):
             package = dirpath.split(os.sep)
             for filename in filenames:
-                module = self.get_module_name(filename)
-                module_file = self.get_module_outfile(self.build_lib, package, module)
-                src_file = os.path.join(dirpath, filename)
+                src_file, module_file = self.get_inout(package, dirpath, filename)
                 if newer(src_file, module_file):
                     self.compile_src(src_file, module_file)
         _build_py.run(self)
@@ -90,8 +100,7 @@ class build_py(_build_py):
         for dirpath, _, filenames in os.walk(self.get_package_dir(self.PACKAGE)):
             package = dirpath.split(os.sep)
             for filename in filenames:
-                module = self.get_module_name(filename)
-                module_file = self.get_module_outfile(self.build_lib, package, module)
+                _, module_file = self.get_inout(package, dirpath, filename)
                 outputs.append(module_file)
             if include_bytecode:
                 if self.compile:
@@ -100,6 +109,23 @@ class build_py(_build_py):
                     outputs.append(module_file + "o")
 
         return outputs
+
+    def get_inout(self, package, dirpath, filename):
+        src_file = os.path.join(dirpath, filename)
+        module_name = self.get_module_name(filename)
+        if self.inplace:
+            if self.is_compilation_required(src_file):
+                module_file = os.path.join(dirpath, module_name) + '.py'
+            else:
+                module_file = src_file
+        else:
+            module_file = self.get_module_outfile(self.build_lib, package, module_name)
+
+        return src_file, module_file
+
+    def is_compilation_required(self, source_file):
+        '''Is something above a simply copy required'''
+        return self.get_compiler(source_file) is not None
 
     @staticmethod
     def compile_ui(ui_file, py_file):
@@ -120,6 +146,7 @@ class build_py(_build_py):
     def get_module_name(src_filename):
         name, ext = os.path.splitext(src_filename)
         return {'.qrc': '%s_rc', '.ui': '%s_ui'}.get(ext, '%s') % name
+
 
 # ==============================================================================
 # Setup arguments
@@ -161,14 +188,14 @@ setup_args['tests_require'] = read_requirements_from_file(os.path.join(THIS_DIR,
 
 # Startup scripts - these use the mantidpython wrappers so we cannot
 # go through the entry_points mechanism
-scripts =  ['scripts/start_mslice.py']
+scripts = ['scripts/start_mslice.py']
 if os.name == 'nt':
     scripts.append('scripts/mslice.bat')
 else:
     scripts.append('scripts/mslice')
 setup_args['scripts'] = scripts
 
-#==============================================================================
+# ==============================================================================
 # Main setup
-#==============================================================================
+# ==============================================================================
 setup(**setup_args)
