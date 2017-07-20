@@ -4,6 +4,8 @@ import unittest
 from tempfile import gettempdir
 from os.path import join
 
+import numpy as np
+from PyQt4.QtGui import QFileDialog
 
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
@@ -13,8 +15,6 @@ from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.widgets.cut.command import Command
 from mslice.views.cut_view import CutView
 
-from PyQt4.QtGui import QFileDialog
-import numpy as np
 
 class CutPresenterTest(unittest.TestCase):
     def setUp(self):

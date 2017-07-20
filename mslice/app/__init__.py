@@ -3,13 +3,9 @@ and entry points.
 """
 import os
 
-# Ensure we use version 2 of the PyQt apis to be compatible with IPython.
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+from PyQt4.QtGui import QApplication
+from IPython import start_ipython
 
-from IPython import start_ipython # noqa
-from PyQt4.QtGui import QApplication # noqa
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
