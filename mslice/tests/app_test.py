@@ -1,7 +1,7 @@
 import mock
 import unittest
 from mock import patch
-import PyQt4
+from PyQt4 import QtGui
 
 from mslice.app.mainwindow import MainWindow
 from mslice.app.mainwindow_ui import Ui_MainWindow
@@ -57,7 +57,7 @@ class AppTests(unittest.TestCase):
         mainview = mock_setup
 
     @patch.object(Ui_MainWindow, 'setupUi', mock_setupUi)
-    @patch.object(PyQt4.QtGui.QMainWindow, '__init__', lambda x: None)
+    @patch.object(QtGui.QMainWindow, '__init__', lambda x: None)
     def test_mainwindow(self):
         """Test the MainWindow initialises correctly"""
         MainWindow()

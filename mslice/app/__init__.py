@@ -1,13 +1,11 @@
 """Package defining top-level MSlice application
 and entry points.
 """
-# Ensure we use version 2 of the PyQt apis to be compatible with IPython.
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
+import os
 
-from IPython import start_ipython
 from PyQt4.QtGui import QApplication
+from IPython import start_ipython
+
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
@@ -37,10 +35,16 @@ def main():
     if QApplication.instance():
         # We must be embedded in some other application that has already started the event loop
         # just show the UI...
+        QAPP_REF = QApplication.instance()
         show_gui()
         return
 
-    # We're doing our own startup. Are we already running IPython?
+    # We're doing our own startup. There seems to be an issue with starting ipython from within
+    # PyCharm. The assumption is that the standard input/output redirection messes things up and
+    # IPython can't properly run the event loop.
+    # Currently if we detect we are inside PyCharm then we will not start IPython
+    # Are we already running IPython?
+    not_inside_pycharm = "PYCHARM_HOSTED" not in os.environ
     try:
         ip = get_ipython()
         ip_running = True
@@ -49,16 +53,20 @@ def main():
 
     if ip_running:
         # IPython handles the Qt event loop exec so we can return control to the ipython terminal
-        ip.enable_matplotlib('qt4') # selects the backend
+        ip.enable_matplotlib('qt4')  # selects the backend
         # Older IPython versions would start this automatically but the newer ones do not
         if QApplication.instance() is None:
             QAPP_REF = QApplication([])
         show_gui()
     else:
         QAPP_REF = QApplication([])
-        start_ipython(["--matplotlib=qt4", "-i",
-                       "-c from mslice.app import show_gui; show_gui()"])
-        # IPython will call EventLoop.exec when required
+        if not_inside_pycharm:
+            start_ipython(["--matplotlib=qt4", "-i",
+                           "-c from mslice.app import show_gui; show_gui();"])
+            # IPython will call EventLoop.exec when required
+        else:
+            show_gui()
+            return QAPP_REF.exec_()
 
 def show_gui():
     """Display the top-level main window.
