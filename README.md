@@ -31,6 +31,8 @@ To develop purely on the command line then simply use your favourite editor and 
 
 ### PyCharm
 
+Mantid must be installed prior to running this setup. The setup assumes that mantid is installed in its default location.
+
 To set up the [PyCharm IDE](https://www.jetbrains.com/pycharm/) first open PyCharm and select `File->Open Project`. Select the cloned `mslice` directory and select open.
 The project layout should be displayed. The first run may take some time to open while PyCharm parses the structure.
 
