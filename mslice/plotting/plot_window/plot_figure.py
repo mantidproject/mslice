@@ -51,7 +51,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def _plot_options(self):
         config = self._get_plot_description()
-        new_config = PlotOptionsPresenter(PlotOptionsDialog(config)).get_new_config()
+        view = PlotOptionsDialog(config) # tmp - remove config
+        new_config = PlotOptionsPresenter(config, view).get_new_config()
         if new_config:
             self._apply_config(new_config)
 
@@ -206,7 +207,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         if not current_axis.get_images():
             colorbar_range = None, None
-            logarithmic = None
+            logarithmic = False
             xlog = 'log' in current_axis.get_xscale()
             ylog = 'log' in current_axis.get_yscale()
         else:
@@ -214,8 +215,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             colorbar_range = mappable.get_clim()
             norm = mappable.norm
             logarithmic = isinstance(norm, colors.LogNorm)
-            xlog = None
-            ylog = None
+            xlog = False
+            ylog = False
 
         # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
         # axes.get_legend_handles_labels()

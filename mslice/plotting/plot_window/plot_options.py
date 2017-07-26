@@ -4,49 +4,16 @@ from .plot_options_ui import Ui_Dialog
 
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
-    def __init__(self, current_config): # noqa: C901
+    def __init__(self, current_config):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
-        if current_config.title is not None:
-            self.lneFigureTitle.setText(current_config.title)
-        if current_config.xlabel is not None:
-            self.lneXAxisLabel.setText(current_config.xlabel)
-        if current_config.ylabel is not None:
-            self.lneYAxisLabel.setText(current_config.ylabel)
-        if None not in current_config.x_range:
-            self.lneXMin.setText(str(current_config.x_range[0]))
-            self.lneXMax.setText(str(current_config.x_range[1]))
-        if None not in current_config.y_range:
-            self.lneYMin.setText(str(current_config.y_range[0]))
-            self.lneYMax.setText(str(current_config.y_range[1]))
-        if None not in current_config.colorbar_range:
-            self.lneCMin.setText(str(current_config.colorbar_range[0]))
-            self.lneCMax.setText(str(current_config.colorbar_range[1]))
-            self.chkXLog.hide()
-            self.chkYLog.hide()
-        else:
-            self.groupBox_4.hide()
-        if current_config.logarithmic is not None:
-            self.chkLogarithmic.setChecked(current_config.logarithmic)
-        if current_config.xlog is not None:
-            self.chkXLog.setChecked(current_config.xlog)
-        if current_config.ylog is not None:
-            self.chkYLog.setChecked(current_config.ylog)
-
         self._legend_widgets = []
-        self.chkShowLegends.setChecked(current_config.legend.visible)
-        if current_config.errorbar is None:
-            self.chkShowErrorBars.hide()
-        else:
-            self.chkShowErrorBars.setChecked(current_config.errorbar)
-        if not current_config.legend.applicable:
-            self.groupBox.hide()
-        else:
-            self.chkShowLegends.setChecked(current_config.legend.visible)
-            for legend in current_config.legend.all_legends():
-                legend_widget = LegendSetter(self, legend['text'], legend['handle'], legend['visible'])
-                self.verticalLayout.addWidget(legend_widget)
-                self._legend_widgets.append(legend_widget)
+
+
+    def add_legend(self, text, handle, visible):
+        legend_widget = LegendSetter(self, text, handle, visible)
+        self.verticalLayout.addWidget(legend_widget)
+        self._legend_widgets.append(legend_widget)
 
     @property
     def x_range(self):
@@ -57,6 +24,15 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
             return (None, None)
         return (xmin, xmax)
 
+    @x_range.setter
+    def x_range(self, xrange):
+        try:
+            xmin, xmax = xrange
+        except ValueError:
+            raise ValueError("pass an iterable with two items")
+        self.lneXMin.setText(str(xmin))
+        self.lneXMax.setText(str(xmax))
+
     @property
     def y_range(self):
         try:
@@ -66,6 +42,15 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
             return (None, None)
         return (ymin, ymax)
 
+    @y_range.setter
+    def y_range(self, yrange):
+        try:
+            ymin, ymax = yrange
+        except ValueError:
+            raise ValueError("pass an iterable with two items")
+        self.lneYMin.setText(str(ymin))
+        self.lneYMax.setText(str(ymax))
+
     @property
     def colorbar_range(self):
         try:
@@ -74,6 +59,40 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         except ValueError:
             return (None, None)
         return (cmin, cmax)
+
+    @colorbar_range.setter
+    def colorbar_range(self, c_range):
+        try:
+            cmin, cmax = c_range
+        except ValueError:
+            raise ValueError("pass an iterable with two items")
+        self.lneCMin.setText(str(cmin))
+        self.lneCMax.setText(str(cmax))
+
+    @property
+    def title(self):
+        return self.lneFigureTitle.text()
+
+    @title.setter
+    def title(self, value):
+        self.lneFigureTitle.setText(value)
+
+    @property
+    def x_label(self):
+        return self.lneXAxisLabel.text()
+
+    @x_label.setter
+    def x_label(self, value):
+        self.lneXAxisLabel.setText(value)
+
+    @property
+    def y_label(self):
+        return self.lneYAxisLabel.text()
+
+    @y_label.setter
+    def y_label(self, value):
+        self.lneYAxisLabel.setText(value)
+
 
 
 class LegendSetter(QtGui.QWidget):
