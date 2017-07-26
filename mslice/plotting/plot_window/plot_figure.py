@@ -52,7 +52,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def _plot_options(self):
         config = self._get_plot_description()
         view = PlotOptionsDialog(config) # tmp - remove config
-        new_config = PlotOptionsPresenter(config, view).get_new_config()
+        new_config = PlotOptionsPresenter(config, view, self).get_new_config()
         if new_config:
             self._apply_config(new_config)
 
@@ -148,7 +148,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def _toggle_legend(self):
         current_axes = self.canvas.figure.gca()
         if not list(current_axes._get_legend_handles()):
-            return  # Legends are not appplicable to this plot
+            return  # Legends are not applicable to this plot
         current_state = getattr(current_axes, 'legend_') is not None
         self._set_legend_state(not current_state)
         self.canvas.draw()
@@ -196,6 +196,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if state is None: # No errorbars in this plot
             return
         self._set_errorbars_shown_state(not state)
+
+    def get_title(self):
+        return self.canvas.figure.gca().get_title()
 
     def _get_plot_description(self):
         current_axis = self.canvas.figure.gca()

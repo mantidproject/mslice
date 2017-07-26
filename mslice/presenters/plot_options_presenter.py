@@ -1,57 +1,102 @@
 from mslice.plotting.plot_window.plot_options import PlotOptionsDialog
 
 class PlotOptionsPresenter(object):
-    def __init__(self, current_config, PlotOptionsDialog):
+    def __init__(self, current_config, PlotOptionsDialog, PlotFigureManager):
+
+        self._modified_values = []
+        self._model = PlotFigureManager
+        self._current_config = current_config
 
         # propagate dialog with existing data
-        self._plot_options_dialog = PlotOptionsDialog
-        self._plot_options_dialog.title = current_config.title
-        self._plot_options_dialog.x_label = current_config.xlabel
-        self._plot_options_dialog.y_label = current_config.ylabel
-        self._plot_options_dialog.x_range = (current_config.x_range[0], current_config.x_range[1])
-        self._plot_options_dialog.y_range = (current_config.y_range[0], current_config.y_range[1])
-        if None not in current_config.colorbar_range:
-            self._plot_options_dialog.colorbar_range = (current_config.colorbar_range[0], current_config.colorbar_range[1])
-            self._plot_options_dialog.chkLogarithmic.setChecked(current_config.logarithmic)
-            self._plot_options_dialog.chkXLog.hide()
-            self._plot_options_dialog.chkYLog.hide()
-        else:
-            self._plot_options_dialog.groupBox_4.hide()
-            self._plot_options_dialog.chkXLog.setChecked(current_config.xlog)
-            self._plot_options_dialog.chkYLog.setChecked(current_config.ylog)
+        self._view = PlotOptionsDialog
+        properties = ['title', 'x_label', 'y_label']
+        for p in properties:
+            setattr(self._view, p, getattr(self, p))
 
-        self._plot_options_dialog.chkShowLegends.setChecked(current_config.legend.visible)
+        self._view.x_range = (current_config.x_range[0], current_config.x_range[1])
+        self._view.y_range = (current_config.y_range[0], current_config.y_range[1])
+        if None not in current_config.colorbar_range:
+            self._view.colorbar_range = (current_config.colorbar_range[0], current_config.colorbar_range[1])
+            self._view.chkLogarithmic.setChecked(current_config.logarithmic)
+            self._view.chkXLog.hide()
+            self._view.chkYLog.hide()
+        else:
+            self._view.groupBox_4.hide()
+            self._view.chkXLog.setChecked(current_config.xlog)
+            self._view.chkYLog.setChecked(current_config.ylog)
+
+        self._view.chkShowLegends.setChecked(current_config.legend.visible)
         if current_config.errorbar is None:
-            self._plot_options_dialog.chkShowErrorBars.hide()
+            self._view.chkShowErrorBars.hide()
         else:
-            self._plot_options_dialog.chkShowErrorBars.setChecked(current_config.errorbar)
+            self._view.chkShowErrorBars.setChecked(current_config.errorbar)
         if not current_config.legend.applicable:
-            self._plot_options_dialog.groupBox.hide()
+            self._view.groupBox.hide()
         else:
-            self._plot_options_dialog.chkShowLegends.setChecked(current_config.legend.visible)
+            self._view.chkShowLegends.setChecked(current_config.legend.visible)
             for legend in current_config.legend.all_legends():
-                legend_widget = self._plot_options_dialog.add_legend(legend['text'], legend['handle'], legend['visible'])
+                legend_widget = self._view.add_legend(legend['text'], legend['handle'], legend['visible'])
+
+        self._view.titleChanged.connect(self._titleChanged)
+
+
+    def _titleChanged(self):
+        self._modified_values.append(("title", self._view.title))
 
     def get_new_config(self):
-        dialog_accepted = self._plot_options_dialog.exec_()
+        dialog_accepted = self._view.exec_()
         if not dialog_accepted:
             return None
-        legends = LegendDescriptor( visible=self._plot_options_dialog.chkShowLegends.isChecked(),
-                                    applicable=self._plot_options_dialog.groupBox.isHidden())
-        for legend_widget in self._plot_options_dialog._legend_widgets:
+        for arg, value in self._modified_values:
+            setattr(self, arg, value)
+        self._model.canvas.draw()
+
+    @property
+    def title(self):
+        return self._model.get_title()
+
+    @title.setter
+    def title(self, value):
+        current_axis = self._model.canvas.figure.gca()
+        current_axis.set_title(value)
+
+    @property
+    def x_label(self):
+        return self._current_config.xlabel
+
+    @x_label.setter
+    def x_label(self, value):
+        current_axis = self._model.canvas.figure.gca()
+        current_axis.set_xlabel(value)
+
+    @property
+    def y_label(self):
+        return self._current_config.ylabel
+
+    @y_label.setter
+    def y_label(self, value):
+        current_axis = self._model.canvas.figure.gca()
+        current_axis.set_ylabel(value)
+
+    def get_new_config_orig(self):
+        dialog_accepted = self._view.exec_()
+        if not dialog_accepted:
+            return None
+        legends = LegendDescriptor(visible=self._view.chkShowLegends.isChecked(),
+                                   applicable=self._view.groupBox.isHidden())
+        for legend_widget in self._view._legend_widgets:
             legends.set_legend_text(handle=legend_widget.handle,
                                     text=legend_widget.get_text(),
                                     visible=legend_widget.is_visible())
 
-        return PlotConfig(title=self._plot_options_dialog.title,
-                          xlabel=self._plot_options_dialog.x_label,
-                          ylabel=self._plot_options_dialog.y_label,
+        return PlotConfig(xlabel=self._view.x_label,
+                          ylabel=self._view.y_label,
                           legend=legends,
-                          errorbar=self._plot_options_dialog.chkShowErrorBars.isChecked(),
-                          x_range=self._plot_options_dialog.x_range, xlog=self._plot_options_dialog.chkXLog.isChecked(),
-                          y_range=self._plot_options_dialog.y_range, ylog=self._plot_options_dialog.chkYLog.isChecked(),
-                          colorbar_range=self._plot_options_dialog.colorbar_range,
-                          logarithmic=self._plot_options_dialog.chkLogarithmic.isChecked())
+                          errorbar=self._view.chkShowErrorBars.isChecked(),
+                          x_range=self._view.x_range, xlog=self._view.chkXLog.isChecked(),
+                          y_range=self._view.y_range, ylog=self._view.chkYLog.isChecked(),
+                          colorbar_range=self._view.colorbar_range,
+                          logarithmic=self._view.chkLogarithmic.isChecked())
 
 class LegendDescriptor(object):
     """This is a class that describes the legends on a plot"""
@@ -96,7 +141,6 @@ class LegendDescriptor(object):
 class PlotConfig(object):
     def __init__(self, **kwargs):
         # Define default values for all options
-        self.title = None
         self.xlabel = None
         self.ylabel = None
         self.xlog = False

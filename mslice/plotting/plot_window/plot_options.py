@@ -1,14 +1,21 @@
 import PyQt4.QtGui as QtGui
+from PyQt4.QtCore import pyqtSignal
 
 from .plot_options_ui import Ui_Dialog
 
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
+
+    titleChanged = pyqtSignal()
+
     def __init__(self, current_config):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
         self._legend_widgets = []
+        self.lneFigureTitle.textEdited.connect(self._title_changed)
 
+    def _title_changed(self):
+        self.titleChanged.emit()
 
     def add_legend(self, text, handle, visible):
         legend_widget = LegendSetter(self, text, handle, visible)
