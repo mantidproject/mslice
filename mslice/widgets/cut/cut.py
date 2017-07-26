@@ -31,9 +31,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
-        cut_alogrithm = MantidCutAlgorithm()
-        cut_plotter = MatplotlibCutPlotter(cut_alogrithm)
-        self._presenter = CutPresenter(self, cut_alogrithm, cut_plotter)
+        cut_algorithm = MantidCutAlgorithm()
+        cut_plotter = MatplotlibCutPlotter(cut_algorithm)
+        self._presenter = CutPresenter(self, cut_algorithm, cut_plotter)
         self.cmbCutAxis.currentIndexChanged.connect(self.axis_changed)
         self._minimumStep = None
         self.lneCutStep.editingFinished.connect(self._step_edited)

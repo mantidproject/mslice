@@ -48,50 +48,32 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
                 self.verticalLayout.addWidget(legend_widget)
                 self._legend_widgets.append(legend_widget)
 
-    @staticmethod
-    def get_new_config(current_config):
-        dialog = PlotOptionsDialog(current_config)
-        dialog_accepted = dialog.exec_()
-        if not dialog_accepted:
-            return None
+    @property
+    def x_range(self):
         try:
-            xmin = float(str(dialog.lneXMin.text()))
-            xmax = float(str(dialog.lneXMax.text()))
-            x_range = (xmin, xmax)
+            xmin = float(str(self.lneXMin.text()))
+            xmax = float(str(self.lneXMax.text()))
         except ValueError:
-            x_range = (None, None)
+            return (None, None)
+        return (xmin, xmax)
 
+    @property
+    def y_range(self):
         try:
-            ymin = float(str(dialog.lneYMin.text()))
-            ymax = float(str(dialog.lneYMax.text()))
-            y_range = (ymin, ymax)
+            ymin = float(str(self.lneYMin.text()))
+            ymax = float(str(self.lneYMax.text()))
         except ValueError:
-            y_range = (None, None)
+            return (None, None)
+        return (ymin, ymax)
 
+    @property
+    def colorbar_range(self):
         try:
-            cmin = float(str(dialog.lneCMin.text()))
-            cmax = float(str(dialog.lneCMax.text()))
-            colorbar_range = (cmin, cmax)
+            cmin = float(str(self.lneCMin.text()))
+            cmax = float(str(self.lneCMax.text()))
         except ValueError:
-            colorbar_range = (None, None)
-
-        logarithmic = dialog.chkLogarithmic.isChecked()
-        legends = LegendDescriptor(visible=dialog.chkShowLegends.isChecked(),
-                                   applicable=dialog.groupBox.isHidden())
-        for legend_widget in dialog._legend_widgets:
-            legends.set_legend_text(handle=legend_widget.handle,
-                                    text=legend_widget.get_text(),
-                                    visible=legend_widget.is_visible())
-
-        return PlotConfig(title=dialog.lneFigureTitle.text(),
-                          xlabel=dialog.lneXAxisLabel.text(),
-                          ylabel=dialog.lneYAxisLabel.text(),
-                          legend=legends,
-                          errorbar=dialog.chkShowErrorBars.isChecked(),
-                          x_range=x_range, xlog=dialog.chkXLog.isChecked(),
-                          y_range=y_range, ylog=dialog.chkYLog.isChecked(),
-                          colorbar_range=colorbar_range,
-                          logarithmic=logarithmic)
+            return (None, None)
+        return (cmin, cmax)
 
 
 class LegendSetter(QtGui.QWidget):
@@ -116,109 +98,3 @@ class LegendSetter(QtGui.QWidget):
         return str(self.legendText.text())
 
 
-class LegendDescriptor(object):
-    """This is a class that describes the legends on a plot"""
-    def __init__(self, visible=False, applicable=True, handles=None):
-        self.visible = visible
-        self.applicable = applicable
-        if handles:
-            self.handles = list(handles)
-        else:
-            self.handles = []
-        self._labels = {}
-
-    def all_legends(self):
-        """An iterator which yields a dictionary description of legends containing the handle, text and if visible or not"""
-        for handle in self.handles:
-            yield self.get_legend_descriptor(handle)
-
-    def set_legend_text(self, handle, text, visible=True):
-        if handle not in self.handles:
-            self.handles.append(handle)
-        if not visible:
-            text = '_' + text
-        self._labels[handle] = text
-
-    def get_legend_descriptor(self, handle):
-        if handle in self._labels.keys():
-            label = self._labels[handle]  # If a new value has been set for a handle return that
-        else:
-            label = handle.get_label()   # Else get the value from the plot
-        if label.startswith('_'):
-            x = {'text': label[1:], 'visible': False, 'handle': handle}
-        else:
-            x = {'text': label, 'visible': True, 'handle': handle}
-        return x
-
-    def get_legend_text(self, handle):
-        if handle in self._labels.keys():
-            return self._labels[handle]
-        return handle.get_label()
-
-
-class PlotConfig(object):
-    def __init__(self, **kwargs):
-        # Define default values for all options
-        self.title = None
-        self.xlabel = None
-        self.ylabel = None
-        self.xlog = None
-        self.ylog = None
-        self.legend = LegendDescriptor()
-        self.errorbar = None
-        self.x_range = None
-        self.y_range = None
-        self.colorbar_range = None
-        self.logarithmic = None
-        # Populates fields from keyword arguments
-        for (argname, value) in kwargs.items():
-            if value is not None:
-                setattr(self, argname, value)
-
-    @property
-    def title(self):
-        if self._title is not None:
-            return self._title
-        return ""
-
-    @title.setter
-    def title(self, value):
-        if value is None:
-            self._title = None
-        else:
-            try:
-                self._title = str(value)
-            except ValueError:
-                raise ValueError("Plot title must be a string or castable to string")
-
-    @property
-    def xlabel(self):
-        if self._xlabel is not None:
-            return self._xlabel
-        return ""
-
-    @xlabel.setter
-    def xlabel(self, value):
-        if value is None:
-            self._xlabel = None
-        else:
-            try:
-                self._xlabel = str(value)
-            except ValueError:
-                raise ValueError("Plot xlabel must be a string or castable to string")
-
-    @property
-    def ylabel(self):
-        if self._ylabel is not None:
-            return self._ylabel
-        return ""
-
-    @ylabel.setter
-    def ylabel(self, value):
-        if value is None:
-            self._ylabel = None
-        else:
-            try:
-                self._ylabel = str(value)
-            except ValueError:
-                raise ValueError("Plot ylabel must be a string or castable to string")

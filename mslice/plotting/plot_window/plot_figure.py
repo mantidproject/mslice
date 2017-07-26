@@ -6,9 +6,10 @@ import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
 import numpy as np
 
+from mslice.presenters.plot_options_presenter import PlotOptionsPresenter, PlotConfig, LegendDescriptor
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
-from .plot_options import PlotOptionsDialog, LegendDescriptor, PlotConfig
+from .plot_options import PlotOptionsDialog
 
 
 class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
@@ -50,7 +51,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def _plot_options(self):
         config = self._get_plot_description()
-        new_config = PlotOptionsDialog.get_new_config(config)
+        new_config = PlotOptionsPresenter(PlotOptionsDialog(config)).get_new_config()
         if new_config:
             self._apply_config(new_config)
 
