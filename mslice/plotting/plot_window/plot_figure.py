@@ -51,10 +51,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def _plot_options(self):
         config = self._get_plot_description()
-        view = PlotOptionsDialog(config) # tmp - remove config
-        new_config = PlotOptionsPresenter(config, view, self).get_new_config()
+        view = PlotOptionsDialog()
+        new_config = PlotOptionsPresenter(config, view, self.canvas.figure.gca()).get_new_config()
         if new_config:
             self._apply_config(new_config)
+            self.canvas.draw()
 
     def _get_min(self, data, absolute_minimum=-np.inf):
         """Determines the minimum of a set of numpy arrays"""
@@ -69,15 +70,16 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def _apply_config(self, plot_config): # noqa: C901
         current_axis = self.canvas.figure.gca()
-        current_axis.set_title(plot_config.title)
-        current_axis.set_xlabel(plot_config.xlabel)
-        current_axis.set_ylabel(plot_config.ylabel)
+        #current_axis.set_title(plot_config.title)
+        #current_axis.set_xlabel(plot_config.xlabel)
+        #current_axis.set_ylabel(plot_config.ylabel)
 
         if current_axis.get_images():
             images = current_axis.get_images()
             if len(images) != 1:
                 raise RuntimeError("Expected single image on axes, found " + str(len(images)))
-            mappable = images[0]
+            mappable = current_axis.get_images[0]
+            print current_axis.get_images
             mappable.set_clim(*plot_config.colorbar_range)
             vmin, vmax = plot_config.colorbar_range
 
@@ -111,8 +113,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             else:
                 current_axis.set_yscale('linear')
 
-        current_axis.set_xlim(*plot_config.x_range)
-        current_axis.set_ylim(*plot_config.y_range)
+        #current_axis.set_xlim(*plot_config.x_range)
+        #current_axis.set_ylim(*plot_config.y_range)
 
         legend_config = plot_config.legend
         for handle in legend_config.handles:
@@ -199,6 +201,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def get_title(self):
         return self.canvas.figure.gca().get_title()
+
+    def get_x_label(self):
+        return self.canvas.figure.gca().get_xlabel()
+
+    def get_y_label(self):
+        return self.canvas.figure.gca().get_ylabel()
 
     def _get_plot_description(self):
         current_axis = self.canvas.figure.gca()

@@ -8,7 +8,7 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
 
     titleChanged = pyqtSignal()
 
-    def __init__(self, current_config):
+    def __init__(self):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
         self._legend_widgets = []

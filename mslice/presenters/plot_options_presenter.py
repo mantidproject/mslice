@@ -1,20 +1,18 @@
 from mslice.plotting.plot_window.plot_options import PlotOptionsDialog
 
 class PlotOptionsPresenter(object):
-    def __init__(self, current_config, PlotOptionsDialog, PlotFigureManager):
+    def __init__(self, current_config, PlotOptionsDialog, current_axis):
 
         self._modified_values = []
-        self._model = PlotFigureManager
+        self._model = current_axis
         self._current_config = current_config
 
         # propagate dialog with existing data
         self._view = PlotOptionsDialog
-        properties = ['title', 'x_label', 'y_label']
+        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range']
         for p in properties:
             setattr(self._view, p, getattr(self, p))
 
-        self._view.x_range = (current_config.x_range[0], current_config.x_range[1])
-        self._view.y_range = (current_config.y_range[0], current_config.y_range[1])
         if None not in current_config.colorbar_range:
             self._view.colorbar_range = (current_config.colorbar_range[0], current_config.colorbar_range[1])
             self._view.chkLogarithmic.setChecked(current_config.logarithmic)
@@ -49,7 +47,7 @@ class PlotOptionsPresenter(object):
             return None
         for arg, value in self._modified_values:
             setattr(self, arg, value)
-        self._model.canvas.draw()
+        return True
 
     @property
     def title(self):
@@ -57,26 +55,39 @@ class PlotOptionsPresenter(object):
 
     @title.setter
     def title(self, value):
-        current_axis = self._model.canvas.figure.gca()
-        current_axis.set_title(value)
+        self._model.set_title(value)
 
     @property
     def x_label(self):
-        return self._current_config.xlabel
+        return self._model.get_xlabel()
 
     @x_label.setter
     def x_label(self, value):
-        current_axis = self._model.canvas.figure.gca()
-        current_axis.set_xlabel(value)
+        self._model.set_xlabel(value)
 
     @property
     def y_label(self):
-        return self._current_config.ylabel
+        return self._model.get_ylabel()
 
     @y_label.setter
     def y_label(self, value):
-        current_axis = self._model.canvas.figure.gca()
-        current_axis.set_ylabel(value)
+        self._model.set_ylabel(value)
+
+    @property
+    def x_range(self):
+        return self._model.get_xlim()
+
+    @x_range.setter
+    def x_range(self, value):
+        self._model.set_xlim(value)
+
+    @property
+    def y_range(self):
+        return self._model.get_ylim()
+
+    @y_range.setter
+    def y_range(self, value):
+        self._model.set_ylim(value)
 
     def get_new_config_orig(self):
         dialog_accepted = self._view.exec_()
