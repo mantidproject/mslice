@@ -1,45 +1,47 @@
 from mslice.plotting.plot_window.plot_options import PlotOptionsDialog
+import matplotlib.colors as colors
+from functools import partial
 
 class PlotOptionsPresenter(object):
-    def __init__(self, current_config, PlotOptionsDialog, current_axis):
+    def __init__(self, PlotOptionsDialog, plot_figure_manager):
+
+        self._model = plot_figure_manager
+        self._plot_window_canvas = plot_figure_manager.canvas.figure.gca()
+        self._view = PlotOptionsDialog
 
         self._modified_values = []
-        self._model = current_axis
-        self._current_config = current_config
+        self._xy_log = {'x_log': self.x_log, 'y_log': self.y_log, 'error_bars': self.error_bars, 'modified' : False}
+        self._color_log = {'c_range' : self.colorbar_range, 'log': self.logarithmic, 'modified' : False}
 
         # propagate dialog with existing data
-        self._view = PlotOptionsDialog
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range']
+
+        if None not in self.colorbar_range:
+            properties.append('colorbar_range')
+            self._view.set_log('c', self.logarithmic)
+        else:
+            self._view.set_log('x', self.x_log)
+            self._view.set_log('y', self.y_log)
+            self._view.set_show_error_bars(self.error_bars)
+
+            legends = self._model.get_legends()
+            self._view.set_legend_state(legends)
+
         for p in properties:
             setattr(self._view, p, getattr(self, p))
 
-        if None not in current_config.colorbar_range:
-            self._view.colorbar_range = (current_config.colorbar_range[0], current_config.colorbar_range[1])
-            self._view.chkLogarithmic.setChecked(current_config.logarithmic)
-            self._view.chkXLog.hide()
-            self._view.chkYLog.hide()
-        else:
-            self._view.groupBox_4.hide()
-            self._view.chkXLog.setChecked(current_config.xlog)
-            self._view.chkYLog.setChecked(current_config.ylog)
+        self._view.titleEdited.connect(partial(self._value_modified, 'title'))
+        self._view.xLabelEdited.connect(partial(self._value_modified, 'x_label'))
+        self._view.yLabelEdited.connect(partial(self._value_modified, 'y_label'))
+        self._view.xRangeEdited.connect(partial(self._value_modified, 'x_range'))
+        self._view.yRangeEdited.connect(partial(self._value_modified, 'y_range'))
+        self._view.cRangeEdited.connect(partial(self._value_modified, 'colorbar_range'))
+        self._view.xLogEdited.connect(partial(self._value_modified, 'x_log'))
+        self._view.yLogEdited.connect(partial(self._value_modified, 'y_log'))
+        self._view.errorBarsEdited.connect(partial(self._value_modified, 'error_bars'))
 
-        self._view.chkShowLegends.setChecked(current_config.legend.visible)
-        if current_config.errorbar is None:
-            self._view.chkShowErrorBars.hide()
-        else:
-            self._view.chkShowErrorBars.setChecked(current_config.errorbar)
-        if not current_config.legend.applicable:
-            self._view.groupBox.hide()
-        else:
-            self._view.chkShowLegends.setChecked(current_config.legend.visible)
-            for legend in current_config.legend.all_legends():
-                legend_widget = self._view.add_legend(legend['text'], legend['handle'], legend['visible'])
-
-        self._view.titleChanged.connect(self._titleChanged)
-
-
-    def _titleChanged(self):
-        self._modified_values.append(("title", self._view.title))
+    def _value_modified(self, value_name):
+        self._modified_values.append((value_name, getattr(self._view, value_name)))
 
     def get_new_config(self):
         dialog_accepted = self._view.exec_()
@@ -47,67 +49,114 @@ class PlotOptionsPresenter(object):
             return None
         for arg, value in self._modified_values:
             setattr(self, arg, value)
+        if self._xy_log['modified']:
+            self._plot_window_canvas.change_lineplot(self._xy_log['x_log'], self._xy_log['y_log'])
+            if self._xy_log['error_bars'] is not None:
+                self._model._set_errorbars_shown_state(self._xy_log['error_bars'])
+        if self._color_log['modified']:
+            self._plot_window_canvas.change_colorplot(self._color_log['c_range'], self._color_log['log'])
+        legends = self._view.get_legends()
+        self._model.set_legends(legends)
         return True
 
     @property
     def title(self):
-        return self._model.get_title()
+        return self._plot_window_canvas.get_title()
 
     @title.setter
     def title(self, value):
-        self._model.set_title(value)
+        self._plot_window_canvas.set_title(value)
 
     @property
     def x_label(self):
-        return self._model.get_xlabel()
+        return self._plot_window_canvas.get_xlabel()
 
     @x_label.setter
     def x_label(self, value):
-        self._model.set_xlabel(value)
+        self._plot_window_canvas.set_xlabel(value)
 
     @property
     def y_label(self):
-        return self._model.get_ylabel()
+        return self._plot_window_canvas.get_ylabel()
 
     @y_label.setter
     def y_label(self, value):
-        self._model.set_ylabel(value)
+        self._plot_window_canvas.set_ylabel(value)
 
     @property
     def x_range(self):
-        return self._model.get_xlim()
+        return self._plot_window_canvas.get_xlim()
 
     @x_range.setter
     def x_range(self, value):
-        self._model.set_xlim(value)
+        self._plot_window_canvas.set_xlim(value)
 
     @property
     def y_range(self):
-        return self._model.get_ylim()
+        return self._plot_window_canvas.get_ylim()
 
     @y_range.setter
     def y_range(self, value):
-        self._model.set_ylim(value)
+        self._plot_window_canvas.set_ylim(value)
 
-    def get_new_config_orig(self):
-        dialog_accepted = self._view.exec_()
-        if not dialog_accepted:
-            return None
-        legends = LegendDescriptor(visible=self._view.chkShowLegends.isChecked(),
-                                   applicable=self._view.groupBox.isHidden())
-        for legend_widget in self._view._legend_widgets:
-            legends.set_legend_text(handle=legend_widget.handle,
-                                    text=legend_widget.get_text(),
-                                    visible=legend_widget.is_visible())
+    @property
+    def colorbar_range(self):
+        if self._plot_window_canvas.get_images():
+            return self._plot_window_canvas.get_images()[0].get_clim()
+        else:
+            return None, None
 
-        return PlotConfig(xlabel=self._view.x_label,
-                          ylabel=self._view.y_label,
-                          legend=legends,
-                          errorbar=self._view.chkShowErrorBars.isChecked(),
-                          x_range=self._view.x_range, xlog=self._view.chkXLog.isChecked(),
-                          y_range=self._view.y_range, ylog=self._view.chkYLog.isChecked(),
-                          colorbar_range=self._view.colorbar_range,
-                          logarithmic=self._view.chkLogarithmic.isChecked())
+    @colorbar_range.setter
+    def colorbar_range(self, value):
+        self._color_log['c_range'] = value
+        self._color_log['modified'] = True
+
+    @property
+    def logarithmic(self):
+        if self._plot_window_canvas.get_images():
+            mappable = self._plot_window_canvas.get_images()[0]
+            norm = mappable.norm
+            return isinstance(norm, colors.LogNorm)
+        else:
+            return False
+
+    @logarithmic.setter
+    def logarithmic(self, value):
+        self._color_log['log'] = value
+        self._color_log['modified'] = True
+
+    @property
+    def x_log(self):
+        if self._plot_window_canvas.get_images():
+            return 'log' in self._plot_window_canvas.get_xscale()
+        else:
+            return False
+
+    @x_log.setter
+    def x_log(self, value):
+        self._xy_log['xlog'] = value
+        self._xy_log['modified'] = True
+
+    @property
+    def y_log(self):
+        if self._plot_window_canvas.get_images:
+            return 'log' in self._plot_window_canvas.get_yscale()
+        else:
+            return False
+
+    @y_log.setter
+    def y_log(self, value):
+        self._xy_log['ylog'] = value
+        self._xy_log['modified'] = True
+
+    @property
+    def error_bars(self):
+        return self._model._has_errorbars() #maybe some of these props should be in plot_figure
+
+    @error_bars.setter
+    def error_bars(self, value):
+        self._xy_log['error_bars'] = value
+        self._xy_log['modified'] = True
 
 class LegendDescriptor(object):
     """This is a class that describes the legends on a plot"""
@@ -147,70 +196,3 @@ class LegendDescriptor(object):
         if handle in self._labels.keys():
             return self._labels[handle]
         return handle.get_label()
-
-
-class PlotConfig(object):
-    def __init__(self, **kwargs):
-        # Define default values for all options
-        self.xlabel = None
-        self.ylabel = None
-        self.xlog = False
-        self.ylog = False
-        self.legend = LegendDescriptor()
-        self.errorbar = None
-        self.x_range = None
-        self.y_range = None
-        self.colorbar_range = None
-        self.logarithmic = False
-        # Populates fields from keyword arguments
-        for (argname, value) in kwargs.items():
-            if value is not None:
-                setattr(self, argname, value)
-
-    @property
-    def title(self):
-        if self._title is not None:
-            return self._title
-        return ""
-
-    @title.setter
-    def title(self, value):
-        if value is None:
-            self._title = None
-        else:
-            try:
-                self._title = str(value)
-            except ValueError:
-                raise ValueError("Plot title must be a string or castable to string")
-
-    @property
-    def xlabel(self):
-        if self._xlabel is not None:
-            return self._xlabel
-        return ""
-
-    @xlabel.setter
-    def xlabel(self, value):
-        if value is None:
-            self._xlabel = None
-        else:
-            try:
-                self._xlabel = str(value)
-            except ValueError:
-                raise ValueError("Plot xlabel must be a string or castable to string")
-
-    @property
-    def ylabel(self):
-        if self._ylabel is not None:
-            return self._ylabel
-        return ""
-
-    @ylabel.setter
-    def ylabel(self, value):
-        if value is None:
-            self._ylabel = None
-        else:
-            try:
-                self._ylabel = str(value)
-            except ValueError:
-                raise ValueError("Plot ylabel must be a string or castable to string")

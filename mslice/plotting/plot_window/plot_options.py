@@ -2,25 +2,108 @@ import PyQt4.QtGui as QtGui
 from PyQt4.QtCore import pyqtSignal
 
 from .plot_options_ui import Ui_Dialog
+from mslice.presenters.plot_options_presenter import LegendDescriptor
 
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
 
-    titleChanged = pyqtSignal()
+    titleEdited = pyqtSignal()
+    xLabelEdited = pyqtSignal()
+    yLabelEdited = pyqtSignal()
+    xRangeEdited = pyqtSignal()
+    yRangeEdited = pyqtSignal()
+    cRangeEdited = pyqtSignal()
+    xLogEdited = pyqtSignal()
+    yLogEdited = pyqtSignal()
+    errorBarsEdited = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, color_plot):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
         self._legend_widgets = []
-        self.lneFigureTitle.textEdited.connect(self._title_changed)
 
-    def _title_changed(self):
-        self.titleChanged.emit()
+        if(color_plot):
+            self.chkXLog.hide()
+            self.chkYLog.hide()
+            self.chkShowErrorBars.hide()
+            self.groupBox.hide()
+        else:
+            self.groupBox_4.hide()
+
+
+        self.lneFigureTitle.editingFinished.connect(self._title_edited)
+        self.lneXAxisLabel.editingFinished.connect(self._x_label_edited)
+        self.lneYAxisLabel.editingFinished.connect(self._y_label_edited)
+        self.lneXMin.editingFinished.connect(self._x_range_edited)
+        self.lneXMax.editingFinished.connect(self._x_range_edited)
+        self.lneYMin.editingFinished.connect(self._y_range_edited)
+        self.lneYMax.editingFinished.connect(self._y_range_edited)
+        self.lneCMin.editingFinished.connect(self._c_range_edited)
+        self.lneCMax.editingFinished.connect(self._c_range_edited)
+        self.chkXLog.stateChanged.connect(self._x_log_edited)
+        self.chkYLog.stateChanged.connect(self._y_log_edited)
+        self.chkShowErrorBars.stateChanged.connect(self._error_bars_edited)
+
+
+    def set_legends(self, legends):
+        if not legends.applicable:
+            self.groupBox.hide()
+        else:
+            self.chkShowLegends.setChecked(legends.visible)
+            for legend in legends.all_legends():
+                legend_widget = self.add_legend(legend['text'], legend['handle'], legend['visible'])
+
+    def get_legends(self):
+        legends = LegendDescriptor(visible=self.chkShowLegends.isChecked(),
+                                   applicable = self.groupBox.isHidden())
+        for legend_widget in self._legend_widgets:
+            legends.set_legend_text(handle=legend_widget.handle,
+                                    text = legend_widget.get_text(),
+                                    visible = legend_widget.is_visible())
+
+    def _title_edited(self):
+        self.titleEdited.emit()
+
+    def _x_label_edited(self):
+        self.xLabelEdited.emit()
+
+    def _y_label_edited(self):
+        self.yLabelEdited.emit()
+
+    def _x_range_edited(self):
+        self.xRangeEdited.emit()
+
+    def _y_range_edited(self):
+        self.yRangeEdited.emit()
+
+    def _c_range_edited(self):
+        self.cRangeEdited.emit()
+
+    def _x_log_edited(self):
+        self.xLogEdited.emit()
+
+    def _y_log_edited(self):
+        self.yLogEdited.emit()
+
+    def _error_bars_edited(self):
+        self.errorBarsEdited.emit()
 
     def add_legend(self, text, handle, visible):
         legend_widget = LegendSetter(self, text, handle, visible)
         self.verticalLayout.addWidget(legend_widget)
         self._legend_widgets.append(legend_widget)
+
+    def set_log(self, type, value):
+        if type == 'c':
+            self.chkLogarithmic.setChecked(value)
+        elif type == 'x':
+            self.chkXLog.setChecked(value)
+        elif type == 'y':
+            self.chkYLog.setChecked(value)
+
+    def set_show_error_bars(self, value):
+        if value is not None:
+            self.chkShowErrorBars.setChecked(value)
 
     @property
     def x_range(self):
@@ -99,6 +182,18 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     @y_label.setter
     def y_label(self, value):
         self.lneYAxisLabel.setText(value)
+
+    @property
+    def x_log(self):
+        return self.chkXLog.isChecked()
+
+    @property
+    def y_log(self):
+        return self.chkYLog.isChecked()
+
+    @property
+    def error_bars(self):
+        return self.chkShowErrorBars.isChecked()
 
 
 

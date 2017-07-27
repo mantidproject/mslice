@@ -50,11 +50,13 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.actionKeep.setChecked(False)
 
     def _plot_options(self):
-        config = self._get_plot_description()
-        view = PlotOptionsDialog()
-        new_config = PlotOptionsPresenter(config, view, self.canvas.figure.gca()).get_new_config()
+        if self.canvas.figure.gca().get_images():
+            color_plot = True
+        else:
+            color_plot = False
+        view = PlotOptionsDialog(color_plot)
+        new_config = PlotOptionsPresenter(view, self).get_new_config()
         if new_config:
-            self._apply_config(new_config)
             self.canvas.draw()
 
     def _get_min(self, data, absolute_minimum=-np.inf):
@@ -68,75 +70,51 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 pass
         return np.min(running_min) if running_min else absolute_minimum
 
-    def _apply_config(self, plot_config): # noqa: C901
+    def set_legends(self, legends):
         current_axis = self.canvas.figure.gca()
-        #current_axis.set_title(plot_config.title)
-        #current_axis.set_xlabel(plot_config.xlabel)
-        #current_axis.set_ylabel(plot_config.ylabel)
+        for handle in legends.handles:
+            handle.set_label(legends.get_legend_text(handle))
 
-        if current_axis.get_images():
-            images = current_axis.get_images()
-            if len(images) != 1:
-                raise RuntimeError("Expected single image on axes, found " + str(len(images)))
-            mappable = current_axis.get_images[0]
-            print current_axis.get_images
-            mappable.set_clim(*plot_config.colorbar_range)
-            vmin, vmax = plot_config.colorbar_range
+        self.set_legend_state(legends.visible)
 
-            if plot_config.logarithmic and type(mappable.norm) != colors.LogNorm:
-                mappable.colorbar.remove()
-                if vmin == float(0):
-                    vmin = 0.001
-                norm = colors.LogNorm(vmin, vmax)
-                mappable.set_norm(norm)
-                self.canvas.figure.colorbar(mappable)
-            elif not plot_config.logarithmic and type(mappable.norm) != colors.Normalize:
-                mappable.colorbar.remove()
-                norm = colors.Normalize(vmin, vmax)
-                mappable.set_norm(norm)
-                self.canvas.figure.colorbar(mappable)
+    def change_lineplot(self, xlog, ylog):
+        current_axis = self.canvas.figure.gca()
+        if xlog:
+            xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
+            xmin = self._get_min(xdata, absolute_minimum=0.)
+            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
         else:
-            if plot_config.xlog:
-                xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-                xmin = self._get_min(xdata, absolute_minimum=0.)
-                current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
-                if self._get_min(xdata) > 0:
-                    plot_config.x_range = (xmin, plot_config.x_range[1])
-            else:
-                current_axis.set_xscale('linear')
-            if plot_config.ylog:
-                ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-                ymin = self._get_min(ydata, absolute_minimum=0.)
-                current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
-                if self._get_min(ydata) > 0:
-                    plot_config.y_range = (ymin, plot_config.y_range[1])
-            else:
-                current_axis.set_yscale('linear')
-
-        #current_axis.set_xlim(*plot_config.x_range)
-        #current_axis.set_ylim(*plot_config.y_range)
-
-        legend_config = plot_config.legend
-        for handle in legend_config.handles:
-            handle.set_label(legend_config.get_legend_text(handle))
-
-        # To show/hide errorbars we will just set the alpha to 0
-        if plot_config.errorbar is not None:
-            self._set_errorbars_shown_state(plot_config.errorbar)
-
-        # The legend must be set after hiding/showing the error bars so the errorbars on the legend are in sync with
-        # the plot (in terms of having/not having errorbars)
-        if legend_config.visible:
-            leg = current_axis.legend()
-            leg.draggable()
+            current_axis.set_xscale('linear')
+        if ylog:
+            ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
+            ymin = self._get_min(ydata, absolute_minimum=0.)
+            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
         else:
-            if current_axis.legend_:
-                current_axis.legend_.remove()
-            current_axis.legend_ = None
+            current_axis.set_yscale('linear')
 
-        self.canvas.draw()
+    def change_colorplot(self, colorbar_range, logarithmic):
+        current_axis = self.canvas.figure.gca()
+        images = current_axis.get_images()
+        if len(images) != 1:
+            raise RuntimeError("Expected single image on axes, found " + str(len(images)))
+        mappable = images[0]
+        print current_axis.get_images
+        mappable.set_clim(*colorbar_range)  # * unnecessary?
+        vmin, vmax = colorbar_range
+        if logarithmic and type(mappable.norm) != colors.LogNorm:
+            mappable.colorbar.remove()
+            if vmin == float(0):
+                vmin = 0.001
+            norm = colors.LogNorm(vmin, vmax)
+            mappable.set_norm(norm)
+            self.canvas.figure.colorbar(mappable)
+        elif not logarithmic and type(mappable.norm) != colors.Normalize:
+            mappable.colorbar.remove()
+            norm = colors.Normalize(vmin, vmax)
+            mappable.set_norm(norm)
+            self.canvas.figure.colorbar(mappable)
 
-    def _set_legend_state(self, visible=True):
+    def set_legend_state(self, visible=True):
         """Show legends if true, hide legends is visible is false"""
         current_axes = self.canvas.figure.gca()
         if visible:
@@ -152,7 +130,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if not list(current_axes._get_legend_handles()):
             return  # Legends are not applicable to this plot
         current_state = getattr(current_axes, 'legend_') is not None
-        self._set_legend_state(not current_state)
+        self.set_legend_state(not current_state)
         self.canvas.draw()
 
     def _has_errorbars(self):
@@ -208,43 +186,17 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def get_y_label(self):
         return self.canvas.figure.gca().get_ylabel()
 
-    def _get_plot_description(self):
+    # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
+    # axes.get_legend_handles()
+    # That is the reason for the use of the private function axes._get_legend_handles
+    # This code was written against the 1.5.1 version of matplotlib.
+    def get_legends(self):
         current_axis = self.canvas.figure.gca()
-        title = current_axis.get_title()
-        xlabel = current_axis.get_xlabel()
-        ylabel = current_axis.get_ylabel()
-        x_range = current_axis.get_xlim()
-        y_range = current_axis.get_ylim()
-
-        if not current_axis.get_images():
-            colorbar_range = None, None
-            logarithmic = False
-            xlog = 'log' in current_axis.get_xscale()
-            ylog = 'log' in current_axis.get_yscale()
-        else:
-            mappable = current_axis.get_images()[0]
-            colorbar_range = mappable.get_clim()
-            norm = mappable.norm
-            logarithmic = isinstance(norm, colors.LogNorm)
-            xlog = False
-            ylog = False
-
-        # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
-        # axes.get_legend_handles_labels()
-        # That is the reason for the use of the private function axes._get_legend_handles
-        # This code was written against the 1.5.1 version of matplotlib.
         handles = list(current_axis._get_legend_handles())
-        labels = map(lambda x: x.get_label(), handles)
-        labels = list(labels)
         if not handles:
             legend = LegendDescriptor(applicable=False)
         else:
             visible = getattr(current_axis, 'legend_') is not None
             legend = LegendDescriptor(visible=visible, handles=handles)
-        has_errorbars  = self._has_errorbars()
-        return PlotConfig(title=title, xlabel=xlabel, ylabel=ylabel, legend=legend,
-                          errorbar=has_errorbars,
-                          x_range=x_range, xlog=xlog,
-                          y_range=y_range, ylog=ylog,
-                          colorbar_range=colorbar_range,
-                          logarithmic=logarithmic)
+        return legend
+
