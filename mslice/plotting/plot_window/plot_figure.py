@@ -6,7 +6,7 @@ import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
 import numpy as np
 
-from mslice.presenters.plot_options_presenter import PlotOptionsPresenter, PlotConfig, LegendDescriptor
+from mslice.presenters.plot_options_presenter import PlotOptionsPresenter, LegendDescriptor
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
 from .plot_options import PlotOptionsDialog
@@ -41,7 +41,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.stock_toolbar.message.disconnect()
             self.canvas.setCursor(Qt.ArrowCursor)
 
-    def _display_status(self,status):
+    def _display_status(self, status):
         if status == "kept":
             self.actionKeep.setChecked(True)
             self.actionMakeCurrent.setChecked(False)
@@ -59,7 +59,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if new_config:
             self.canvas.draw()
 
-    def _get_min(self, data, absolute_minimum=-np.inf):
+    @staticmethod
+    def get_min(data, absolute_minimum=-np.inf):
         """Determines the minimum of a set of numpy arrays"""
         data = data if isinstance(data, list) else [data]
         running_min = []
@@ -71,26 +72,31 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         return np.min(running_min) if running_min else absolute_minimum
 
     def set_legends(self, legends):
-        current_axis = self.canvas.figure.gca()
         for handle in legends.handles:
             handle.set_label(legends.get_legend_text(handle))
 
         self.set_legend_state(legends.visible)
 
-    def change_lineplot(self, xlog, ylog):
+    def change_lineplot(self, xy_config):
         current_axis = self.canvas.figure.gca()
-        if xlog:
+        if xy_config['x_log']:
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-            xmin = self._get_min(xdata, absolute_minimum=0.)
+            xmin = self.get_min(xdata, absolute_minimum=0.)
             current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
+            if self.get_min(xdata) > 0:
+                xy_config['x_range'] = (xmin, xy_config['x_range'][1])
         else:
             current_axis.set_xscale('linear')
-        if ylog:
+        if xy_config['y_log']:
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-            ymin = self._get_min(ydata, absolute_minimum=0.)
+            ymin = self.get_min(ydata, absolute_minimum=0.)
             current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
+            if self.get_min(ydata) > 0:
+                xy_config['y_range'] = (ymin, xy_config['y_range'][1])
         else:
             current_axis.set_yscale('linear')
+        self.set_x_range(xy_config['x_range'])
+        self.set_y_range(xy_config['y_range'])
 
     def change_colorplot(self, colorbar_range, logarithmic):
         current_axis = self.canvas.figure.gca()
@@ -113,6 +119,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             norm = colors.Normalize(vmin, vmax)
             mappable.set_norm(norm)
             self.canvas.figure.colorbar(mappable)
+
+    def set_x_range(self, value):
+        self.canvas.figure.gca().set_xlim(value)
+
+    def set_y_range(self, value):
+        self.canvas.figure.gca().set_ylim(value)
 
     def set_legend_state(self, visible=True):
         """Show legends if true, hide legends is visible is false"""
@@ -138,14 +150,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
          False if current axes has hidden errorbars
          None if errorbars are not applicable"""
         current_axis = self.canvas.figure.gca()
-        if not any(map(lambda x: isinstance(x, ErrorbarContainer),current_axis.containers)):
+        if not any(map(lambda x: isinstance(x, ErrorbarContainer), current_axis.containers)):
             has_errorbars = None  # Error bars are not applicable to this plot and will not show up in the config
         else:
             # If all the error bars have alpha= 0 they are all transparent (hidden)
             containers = filter(lambda x: isinstance(x, ErrorbarContainer), current_axis.containers)
-            line_components = map(lambda x:x.get_children(), containers)
+            line_components = map(lambda x: x.get_children(), containers)
             # drop the first element of each container because it is the the actual line
-            errorbars = map(lambda x: x[1:] , line_components)
+            errorbars = map(lambda x: x[1:], line_components)
             errorbars = chain(*errorbars)
             alpha = map(lambda x: x.get_alpha(), errorbars)
             # replace None with 1(None indicates default which is 1)
@@ -156,7 +168,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 has_errorbars = True
         return has_errorbars
 
-    def _set_errorbars_shown_state(self,state):
+    def _set_errorbars_shown_state(self, state):
         """Show errrorbar if state = 1, hide if state = 0"""
         current_axis = self.canvas.figure.gca()
         if state:
@@ -173,7 +185,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def _toggle_errorbars(self):
         state = self._has_errorbars()
-        if state is None: # No errorbars in this plot
+        if state is None:  # No errorbars in this plot
             return
         self._set_errorbars_shown_state(not state)
 
@@ -199,4 +211,3 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             visible = getattr(current_axis, 'legend_') is not None
             legend = LegendDescriptor(visible=visible, handles=handles)
         return legend
-

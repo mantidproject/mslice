@@ -15,21 +15,22 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     cRangeEdited = pyqtSignal()
     xLogEdited = pyqtSignal()
     yLogEdited = pyqtSignal()
+    cLogEdited = pyqtSignal()
     errorBarsEdited = pyqtSignal()
 
     def __init__(self, color_plot):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
         self._legend_widgets = []
+        self.color_plot = color_plot
 
-        if(color_plot):
+        if self.color_plot:
             self.chkXLog.hide()
             self.chkYLog.hide()
             self.chkShowErrorBars.hide()
             self.groupBox.hide()
         else:
             self.groupBox_4.hide()
-
 
         self.lneFigureTitle.editingFinished.connect(self._title_edited)
         self.lneXAxisLabel.editingFinished.connect(self._x_label_edited)
@@ -42,8 +43,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         self.lneCMax.editingFinished.connect(self._c_range_edited)
         self.chkXLog.stateChanged.connect(self._x_log_edited)
         self.chkYLog.stateChanged.connect(self._y_log_edited)
+        self.chkLogarithmic.stateChanged.connect(self._c_log_edited)
         self.chkShowErrorBars.stateChanged.connect(self._error_bars_edited)
-
 
     def set_legends(self, legends):
         if not legends.applicable:
@@ -51,15 +52,16 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         else:
             self.chkShowLegends.setChecked(legends.visible)
             for legend in legends.all_legends():
-                legend_widget = self.add_legend(legend['text'], legend['handle'], legend['visible'])
+                self.add_legend(legend['text'], legend['handle'], legend['visible'])
 
     def get_legends(self):
         legends = LegendDescriptor(visible=self.chkShowLegends.isChecked(),
-                                   applicable = self.groupBox.isHidden())
+                                   applicable=self.groupBox.isHidden())
         for legend_widget in self._legend_widgets:
             legends.set_legend_text(handle=legend_widget.handle,
-                                    text = legend_widget.get_text(),
-                                    visible = legend_widget.is_visible())
+                                    text=legend_widget.get_text(),
+                                    visible=legend_widget.is_visible())
+        return legends
 
     def _title_edited(self):
         self.titleEdited.emit()
@@ -85,6 +87,9 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     def _y_log_edited(self):
         self.yLogEdited.emit()
 
+    def _c_log_edited(self):
+        self.cLogEdited.emit()
+
     def _error_bars_edited(self):
         self.errorBarsEdited.emit()
 
@@ -93,12 +98,12 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         self.verticalLayout.addWidget(legend_widget)
         self._legend_widgets.append(legend_widget)
 
-    def set_log(self, type, value):
-        if type == 'c':
+    def set_log(self, to_set, value):
+        if to_set == 'c':
             self.chkLogarithmic.setChecked(value)
-        elif type == 'x':
+        elif to_set == 'x':
             self.chkXLog.setChecked(value)
-        elif type == 'y':
+        elif to_set == 'y':
             self.chkYLog.setChecked(value)
 
     def set_show_error_bars(self, value):
@@ -111,13 +116,13 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
             xmin = float(str(self.lneXMin.text()))
             xmax = float(str(self.lneXMax.text()))
         except ValueError:
-            return (None, None)
-        return (xmin, xmax)
+            return None, None
+        return xmin, xmax
 
     @x_range.setter
-    def x_range(self, xrange):
+    def x_range(self, x_range):
         try:
-            xmin, xmax = xrange
+            xmin, xmax = x_range
         except ValueError:
             raise ValueError("pass an iterable with two items")
         self.lneXMin.setText(str(xmin))
@@ -129,8 +134,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
             ymin = float(str(self.lneYMin.text()))
             ymax = float(str(self.lneYMax.text()))
         except ValueError:
-            return (None, None)
-        return (ymin, ymax)
+            return None, None
+        return ymin, ymax
 
     @y_range.setter
     def y_range(self, yrange):
@@ -147,8 +152,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
             cmin = float(str(self.lneCMin.text()))
             cmax = float(str(self.lneCMax.text()))
         except ValueError:
-            return (None, None)
-        return (cmin, cmax)
+            return None, None
+        return cmin, cmax
 
     @colorbar_range.setter
     def colorbar_range(self, c_range):
@@ -192,9 +197,12 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         return self.chkYLog.isChecked()
 
     @property
+    def c_log(self):
+        return self.chkLogarithmic.isChecked()
+
+    @property
     def error_bars(self):
         return self.chkShowErrorBars.isChecked()
-
 
 
 class LegendSetter(QtGui.QWidget):
@@ -217,5 +225,3 @@ class LegendSetter(QtGui.QWidget):
 
     def get_text(self):
         return str(self.legendText.text())
-
-

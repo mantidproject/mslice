@@ -1,17 +1,19 @@
-from mslice.plotting.plot_window.plot_options import PlotOptionsDialog
 import matplotlib.colors as colors
 from functools import partial
 
+
 class PlotOptionsPresenter(object):
-    def __init__(self, PlotOptionsDialog, plot_figure_manager):
+    def __init__(self, plot_options_dialog, plot_figure_manager):
 
         self._model = plot_figure_manager
         self._plot_window_canvas = plot_figure_manager.canvas.figure.gca()
-        self._view = PlotOptionsDialog
+        self._view = plot_options_dialog
 
-        self._modified_values = []
-        self._xy_log = {'x_log': self.x_log, 'y_log': self.y_log, 'error_bars': self.error_bars, 'modified' : False}
-        self._color_log = {'c_range' : self.colorbar_range, 'log': self.logarithmic, 'modified' : False}
+        self._modified_values = {}
+        self._xy_log = {'x_log': self.x_log,           'y_log': self.y_log,
+                        'x_range': self.x_range,       'y_range': self.y_range,
+                        'error_bars': self.error_bars, 'modified': False }
+        self._color_log = {'c_range': self.colorbar_range, 'log': self.logarithmic, 'modified': False}
 
         # propagate dialog with existing data
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range']
@@ -25,7 +27,7 @@ class PlotOptionsPresenter(object):
             self._view.set_show_error_bars(self.error_bars)
 
             legends = self._model.get_legends()
-            self._view.set_legend_state(legends)
+            self._view.set_legends(legends)
 
         for p in properties:
             setattr(self._view, p, getattr(self, p))
@@ -33,30 +35,63 @@ class PlotOptionsPresenter(object):
         self._view.titleEdited.connect(partial(self._value_modified, 'title'))
         self._view.xLabelEdited.connect(partial(self._value_modified, 'x_label'))
         self._view.yLabelEdited.connect(partial(self._value_modified, 'y_label'))
-        self._view.xRangeEdited.connect(partial(self._value_modified, 'x_range'))
-        self._view.yRangeEdited.connect(partial(self._value_modified, 'y_range'))
-        self._view.cRangeEdited.connect(partial(self._value_modified, 'colorbar_range'))
-        self._view.xLogEdited.connect(partial(self._value_modified, 'x_log'))
-        self._view.yLogEdited.connect(partial(self._value_modified, 'y_log'))
         self._view.errorBarsEdited.connect(partial(self._value_modified, 'error_bars'))
+        self._view.xLogEdited.connect(self._set_x_log)
+        self._view.yLogEdited.connect(self._set_y_log)
+        self._view.cLogEdited.connect(self._set_c_log)
+        self._view.xRangeEdited.connect(self._set_x_range)
+        self._view.yRangeEdited.connect(self._set_y_range)
+        self._view.cRangeEdited.connect(self._set_c_range)
+
 
     def _value_modified(self, value_name):
-        self._modified_values.append((value_name, getattr(self._view, value_name)))
+        self._modified_values[value_name] = getattr(self._view, value_name)
+
+    def _set_x_log(self): #probs conciser way of writing these 4
+        self._xy_log['x_log'] = self._view.x_log
+        self._xy_log['modified'] = True
+
+    def _set_y_log(self):
+        self._xy_log['y_log'] = self._view.y_log
+        self._xy_log['modified'] = True
+
+    def _set_x_range(self):
+        self._xy_log['x_range'] = self._view.x_range
+        self._xy_log['modified'] = True
+
+    def _set_y_range(self):
+        self._xy_log['y_range'] = self._view.y_range
+        self._xy_log['modified'] = True
+
+    def _set_c_range(self):
+        self._color_log['c_range'] = self._view.colorbar_range
+        self._color_log['modified'] = True
+
+    def _set_c_log(self):
+        self._color_log['log'] = self._view.c_log
+        self._color_log['modified'] = True
 
     def get_new_config(self):
         dialog_accepted = self._view.exec_()
         if not dialog_accepted:
             return None
-        for arg, value in self._modified_values:
-            setattr(self, arg, value)
-        if self._xy_log['modified']:
-            self._plot_window_canvas.change_lineplot(self._xy_log['x_log'], self._xy_log['y_log'])
+        if self._view.color_plot:
+            if self._color_log['modified']:
+                self._model.change_colorplot(self._color_log['c_range'], self._color_log['log'])
+                for key, value in self._modified_values.items():
+                    setattr(self, key, value)
+            self._model.set_x_range(self._xy_log['x_range'])
+            self._model.set_y_range(self._xy_log['y_range'])
+
+        else:
+            if self._xy_log['modified']:
+                self._model.change_lineplot(self._xy_log)
             if self._xy_log['error_bars'] is not None:
                 self._model._set_errorbars_shown_state(self._xy_log['error_bars'])
-        if self._color_log['modified']:
-            self._plot_window_canvas.change_colorplot(self._color_log['c_range'], self._color_log['log'])
-        legends = self._view.get_legends()
-        self._model.set_legends(legends)
+            for key, value in self._modified_values.items():
+                setattr(self, key, value)
+            legends = self._view.get_legends()
+            self._model.set_legends(legends)
         return True
 
     @property
@@ -87,17 +122,9 @@ class PlotOptionsPresenter(object):
     def x_range(self):
         return self._plot_window_canvas.get_xlim()
 
-    @x_range.setter
-    def x_range(self, value):
-        self._plot_window_canvas.set_xlim(value)
-
     @property
     def y_range(self):
         return self._plot_window_canvas.get_ylim()
-
-    @y_range.setter
-    def y_range(self, value):
-        self._plot_window_canvas.set_ylim(value)
 
     @property
     def colorbar_range(self):
@@ -127,36 +154,27 @@ class PlotOptionsPresenter(object):
 
     @property
     def x_log(self):
-        if self._plot_window_canvas.get_images():
+        if not self._plot_window_canvas.get_images():
             return 'log' in self._plot_window_canvas.get_xscale()
         else:
             return False
 
-    @x_log.setter
-    def x_log(self, value):
-        self._xy_log['xlog'] = value
-        self._xy_log['modified'] = True
-
     @property
     def y_log(self):
-        if self._plot_window_canvas.get_images:
+        if not self._plot_window_canvas.get_images():
             return 'log' in self._plot_window_canvas.get_yscale()
         else:
             return False
 
-    @y_log.setter
-    def y_log(self, value):
-        self._xy_log['ylog'] = value
-        self._xy_log['modified'] = True
-
     @property
     def error_bars(self):
-        return self._model._has_errorbars() #maybe some of these props should be in plot_figure
+        return self._model._has_errorbars()  # maybe some of these props should be in plot_figure
 
     @error_bars.setter
     def error_bars(self, value):
         self._xy_log['error_bars'] = value
         self._xy_log['modified'] = True
+
 
 class LegendDescriptor(object):
     """This is a class that describes the legends on a plot"""
@@ -170,7 +188,8 @@ class LegendDescriptor(object):
         self._labels = {}
 
     def all_legends(self):
-        """An iterator which yields a dictionary description of legends containing the handle, text and if visible or not"""
+        """An iterator which yields a dictionary description of legends containing the handle,
+        text and if visible or not"""
         for handle in self.handles:
             yield self.get_legend_descriptor(handle)
 
