@@ -1,5 +1,4 @@
 import PyQt4.QtGui as QtGui
-from abc import ABCMeta
 from PyQt4.QtCore import pyqtSignal
 
 from .plot_options_ui import Ui_Dialog
