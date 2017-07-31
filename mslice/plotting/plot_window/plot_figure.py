@@ -6,10 +6,11 @@ import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
 import numpy as np
 
-from mslice.presenters.plot_options_presenter import PlotOptionsPresenter, LegendDescriptor
+from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter, \
+                                                     LegendDescriptor
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
-from .plot_options import PlotOptionsDialog
+from .plot_options import SlicePlotOptions, CutPlotOptions
 
 
 class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
@@ -51,11 +52,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def _plot_options(self):
         if self.canvas.figure.gca().get_images():
-            color_plot = True
+            view = SlicePlotOptions()
+            new_config = SlicePlotOptionsPresenter(view, self).get_new_config()
         else:
-            color_plot = False
-        view = PlotOptionsDialog(color_plot)
-        new_config = PlotOptionsPresenter(view, self).get_new_config()
+            view = CutPlotOptions()
+            new_config = CutPlotOptionsPresenter(view, self).get_new_config()
         if new_config:
             self.canvas.draw()
 
@@ -77,7 +78,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         self.set_legend_state(legends.visible)
 
-    def change_lineplot(self, xy_config):
+    def change_cut_plot(self, xy_config):
         current_axis = self.canvas.figure.gca()
         if xy_config['x_log']:
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
@@ -98,7 +99,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.set_x_range(xy_config['x_range'])
         self.set_y_range(xy_config['y_range'])
 
-    def change_colorplot(self, colorbar_range, logarithmic):
+    def change_slice_plot(self, colorbar_range, logarithmic):
         current_axis = self.canvas.figure.gca()
         images = current_axis.get_images()
         if len(images) != 1:
