@@ -7,7 +7,8 @@ from PyQt4.QtCore import Qt
 import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter, \
-                                                     LegendDescriptor
+    LegendDescriptor
+
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
 from .plot_options import SlicePlotOptions, CutPlotOptions

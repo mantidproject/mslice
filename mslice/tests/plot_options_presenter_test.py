@@ -1,7 +1,8 @@
 from mock import MagicMock, PropertyMock, Mock
 import unittest
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter, \
-                                                     LegendDescriptor
+    LegendDescriptor
+
 
 
 class PlotOptionsPresenterTest(unittest.TestCase):
