@@ -123,9 +123,6 @@ class SlicePlotOptions(PlotOptionsDialog):
     def _c_log_edited(self):
         self.cLogEdited.emit()
 
-    def set_log(self, value):
-            self.chkLogarithmic.setChecked(value)
-
     @property
     def colorbar_range(self):
         try:
@@ -145,8 +142,12 @@ class SlicePlotOptions(PlotOptionsDialog):
         self.lneCMax.setText(str(cmax))
 
     @property
-    def c_log(self):
+    def colorbar_log(self):
         return self.chkLogarithmic.isChecked()
+
+    @colorbar_log.setter
+    def colorbar_log(self, value):
+        self.chkLogarithmic.setChecked(value)
 
 
 class CutPlotOptions(PlotOptionsDialog):
@@ -195,29 +196,29 @@ class CutPlotOptions(PlotOptionsDialog):
     def _error_bars_edited(self):
         self.errorBarsEdited.emit()
 
-    def set_show_error_bars(self, value):
-        if value is not None:
-            self.chkShowErrorBars.setChecked(value)
-
-    def set_log(self, to_set, value):
-        if to_set == 'x':
-            self.chkXLog.setChecked(value)
-        elif to_set == 'y':
-            self.chkYLog.setChecked(value)
-        else:
-            raise ValueError("must specify whether to set x or y")
-
     @property
     def x_log(self):
         return self.chkXLog.isChecked()
+
+    @x_log.setter
+    def x_log(self, value):
+        self.chkXLog.setChecked(value)
 
     @property
     def y_log(self):
         return self.chkYLog.isChecked()
 
+    @y_log.setter
+    def y_log(self, value):
+        self.chkYLog.setChecked(value)
+
     @property
     def error_bars(self):
         return self.chkShowErrorBars.isChecked()
+
+    @error_bars.setter
+    def error_bars(self, value):
+        self.chkShowErrorBars.setChecked(value)
 
 
 class LegendSetter(QtGui.QWidget):
