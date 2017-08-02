@@ -4,8 +4,8 @@ and entry points.
 import os
 
 from PyQt4.QtGui import QApplication
-from IPython import start_ipython
 
+from mslice.external.ipython import start_ipython
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
