@@ -35,6 +35,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         self.show()  # is not a good idea in non interactive mode
 
+    def is_slice_figure(self):
+        return bool(self.canvas.figure.gca().get_images())
+
+    def is_cut_figure(self):
+        return not bool(self.canvas.figure.gca().get_images())
+
     def toggle_data_cursor(self):
         if self.actionDataCursor.isChecked():
             self.stock_toolbar.message.connect(self.statusbar.showMessage)
@@ -52,12 +58,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.actionKeep.setChecked(False)
 
     def _plot_options(self):
-        if self.canvas.figure.gca().get_images():
-            view = SlicePlotOptions()
-            new_config = SlicePlotOptionsPresenter(view, self).get_new_config()
+        if self.is_slice_figure():
+            view_class, presenter_class = SlicePlotOptions, SlicePlotOptionsPresenter
         else:
-            view = CutPlotOptions()
-            new_config = CutPlotOptionsPresenter(view, self).get_new_config()
+            view_class, presenter_class = CutPlotOptions, CutPlotOptionsPresenter
+        new_config = presenter_class(view_class(), self).get_new_config()
         if new_config:
             self.canvas.draw()
 
@@ -79,7 +84,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
             xmin = self.get_min(xdata, absolute_minimum=0.)
             current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
-            if self.get_min(xdata) > 0:
+            if xmin > 0:
                 xy_config['x_range'] = (xmin, xy_config['x_range'][1])
         else:
             current_axis.set_xscale('linear')
@@ -87,7 +92,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
             ymin = self.get_min(ydata, absolute_minimum=0.)
             current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
-            if self.get_min(ydata) > 0:
+            if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
         else:
             current_axis.set_yscale('linear')
@@ -100,7 +105,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if len(images) != 1:
             raise RuntimeError("Expected single image on axes, found " + str(len(images)))
         mappable = images[0]
-        print current_axis.get_images
         mappable.set_clim(*colorbar_range)  # * unnecessary?
         vmin, vmax = colorbar_range
         if logarithmic and type(mappable.norm) != colors.LogNorm:

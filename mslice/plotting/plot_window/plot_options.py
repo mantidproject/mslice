@@ -17,28 +17,13 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
 
-        self.lneFigureTitle.editingFinished.connect(self._title_edited)
-        self.lneXAxisLabel.editingFinished.connect(self._x_label_edited)
-        self.lneYAxisLabel.editingFinished.connect(self._y_label_edited)
-        self.lneXMin.editingFinished.connect(self._x_range_edited)
-        self.lneXMax.editingFinished.connect(self._x_range_edited)
-        self.lneYMin.editingFinished.connect(self._y_range_edited)
-        self.lneYMax.editingFinished.connect(self._y_range_edited)
-
-    def _title_edited(self):
-        self.titleEdited.emit()
-
-    def _x_label_edited(self):
-        self.xLabelEdited.emit()
-
-    def _y_label_edited(self):
-        self.yLabelEdited.emit()
-
-    def _x_range_edited(self):
-        self.xRangeEdited.emit()
-
-    def _y_range_edited(self):
-        self.yRangeEdited.emit()
+        self.lneFigureTitle.editingFinished.connect(self.titleEdited)
+        self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
+        self.lneYAxisLabel.editingFinished.connect(self.yLabelEdited)
+        self.lneXMin.editingFinished.connect(self.xRangeEdited)
+        self.lneXMax.editingFinished.connect(self.xRangeEdited)
+        self.lneYMin.editingFinished.connect(self.yRangeEdited)
+        self.lneYMax.editingFinished.connect(self.yRangeEdited)
 
     @property
     def x_range(self):
