@@ -1,97 +1,209 @@
 import PyQt4.QtGui as QtGui
+from PyQt4.QtCore import pyqtSignal
 
 from .plot_options_ui import Ui_Dialog
+from mslice.presenters.plot_options_presenter import LegendDescriptor
 
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
-    def __init__(self, current_config): # noqa: C901
+
+    titleEdited = pyqtSignal()
+    xLabelEdited = pyqtSignal()
+    yLabelEdited = pyqtSignal()
+    xRangeEdited = pyqtSignal()
+    yRangeEdited = pyqtSignal()
+
+    def __init__(self):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
-        if current_config.title is not None:
-            self.lneFigureTitle.setText(current_config.title)
-        if current_config.xlabel is not None:
-            self.lneXAxisLabel.setText(current_config.xlabel)
-        if current_config.ylabel is not None:
-            self.lneYAxisLabel.setText(current_config.ylabel)
-        if None not in current_config.x_range:
-            self.lneXMin.setText(str(current_config.x_range[0]))
-            self.lneXMax.setText(str(current_config.x_range[1]))
-        if None not in current_config.y_range:
-            self.lneYMin.setText(str(current_config.y_range[0]))
-            self.lneYMax.setText(str(current_config.y_range[1]))
-        if None not in current_config.colorbar_range:
-            self.lneCMin.setText(str(current_config.colorbar_range[0]))
-            self.lneCMax.setText(str(current_config.colorbar_range[1]))
-            self.chkXLog.hide()
-            self.chkYLog.hide()
-        else:
-            self.groupBox_4.hide()
-        if current_config.logarithmic is not None:
-            self.chkLogarithmic.setChecked(current_config.logarithmic)
-        if current_config.xlog is not None:
-            self.chkXLog.setChecked(current_config.xlog)
-        if current_config.ylog is not None:
-            self.chkYLog.setChecked(current_config.ylog)
 
+        self.lneFigureTitle.editingFinished.connect(self.titleEdited)
+        self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
+        self.lneYAxisLabel.editingFinished.connect(self.yLabelEdited)
+        self.lneXMin.editingFinished.connect(self.xRangeEdited)
+        self.lneXMax.editingFinished.connect(self.xRangeEdited)
+        self.lneYMin.editingFinished.connect(self.yRangeEdited)
+        self.lneYMax.editingFinished.connect(self.yRangeEdited)
+
+    @property
+    def x_range(self):
+        try:
+            xmin = float(str(self.lneXMin.text()))
+            xmax = float(str(self.lneXMax.text()))
+        except ValueError:
+            return None, None
+        return xmin, xmax
+
+    @x_range.setter
+    def x_range(self, x_range):
+        try:
+            xmin, xmax = x_range
+        except ValueError:
+            raise ValueError("pass an iterable with two items")
+        self.lneXMin.setText(str(xmin))
+        self.lneXMax.setText(str(xmax))
+
+    @property
+    def y_range(self):
+        try:
+            ymin = float(str(self.lneYMin.text()))
+            ymax = float(str(self.lneYMax.text()))
+        except ValueError:
+            return None, None
+        return ymin, ymax
+
+    @y_range.setter
+    def y_range(self, yrange):
+        try:
+            ymin, ymax = yrange
+        except ValueError:
+            raise ValueError("pass an iterable with two items")
+        self.lneYMin.setText(str(ymin))
+        self.lneYMax.setText(str(ymax))
+
+    @property
+    def title(self):
+        return self.lneFigureTitle.text()
+
+    @title.setter
+    def title(self, value):
+        self.lneFigureTitle.setText(value)
+
+    @property
+    def x_label(self):
+        return self.lneXAxisLabel.text()
+
+    @x_label.setter
+    def x_label(self, value):
+        self.lneXAxisLabel.setText(value)
+
+    @property
+    def y_label(self):
+        return self.lneYAxisLabel.text()
+
+    @y_label.setter
+    def y_label(self, value):
+        self.lneYAxisLabel.setText(value)
+
+
+class SlicePlotOptions(PlotOptionsDialog):
+
+    cRangeEdited = pyqtSignal()
+    cLogEdited = pyqtSignal()
+
+    def __init__(self):
+        super(SlicePlotOptions, self).__init__()
+        self.chkXLog.hide()
+        self.chkYLog.hide()
+        self.chkShowErrorBars.hide()
+        self.groupBox.hide()
+
+        self.lneCMin.editingFinished.connect(self._c_range_edited)
+        self.lneCMax.editingFinished.connect(self._c_range_edited)
+        self.chkLogarithmic.stateChanged.connect(self._c_log_edited)
+
+    def _c_range_edited(self):
+        self.cRangeEdited.emit()
+
+    def _c_log_edited(self):
+        self.cLogEdited.emit()
+
+    @property
+    def colorbar_range(self):
+        try:
+            cmin = float(str(self.lneCMin.text()))
+            cmax = float(str(self.lneCMax.text()))
+        except ValueError:
+            return None, None
+        return cmin, cmax
+
+    @colorbar_range.setter
+    def colorbar_range(self, c_range):
+        try:
+            cmin, cmax = c_range
+        except ValueError:
+            raise ValueError("pass an iterable with two items")
+        self.lneCMin.setText(str(cmin))
+        self.lneCMax.setText(str(cmax))
+
+    @property
+    def colorbar_log(self):
+        return self.chkLogarithmic.isChecked()
+
+    @colorbar_log.setter
+    def colorbar_log(self, value):
+        self.chkLogarithmic.setChecked(value)
+
+
+class CutPlotOptions(PlotOptionsDialog):
+
+    xLogEdited = pyqtSignal()
+    yLogEdited = pyqtSignal()
+    errorBarsEdited = pyqtSignal()
+
+    def __init__(self):
+        super(CutPlotOptions, self).__init__()
         self._legend_widgets = []
-        self.chkShowLegends.setChecked(current_config.legend.visible)
-        if current_config.errorbar is None:
-            self.chkShowErrorBars.hide()
-        else:
-            self.chkShowErrorBars.setChecked(current_config.errorbar)
-        if not current_config.legend.applicable:
+        self.groupBox_4.hide()
+
+        self.chkXLog.stateChanged.connect(self._x_log_edited)
+        self.chkYLog.stateChanged.connect(self._y_log_edited)
+        self.chkShowErrorBars.stateChanged.connect(self._error_bars_edited)
+
+    def set_legends(self, legends):
+        if not legends.applicable:
             self.groupBox.hide()
         else:
-            self.chkShowLegends.setChecked(current_config.legend.visible)
-            for legend in current_config.legend.all_legends():
-                legend_widget = LegendSetter(self, legend['text'], legend['handle'], legend['visible'])
-                self.verticalLayout.addWidget(legend_widget)
-                self._legend_widgets.append(legend_widget)
+            self.chkShowLegends.setChecked(legends.visible)
+            for legend in legends.all_legends():
+                self.add_legend(legend['text'], legend['handle'], legend['visible'])
 
-    @staticmethod
-    def get_new_config(current_config):
-        dialog = PlotOptionsDialog(current_config)
-        dialog_accepted = dialog.exec_()
-        if not dialog_accepted:
-            return None
-        try:
-            xmin = float(str(dialog.lneXMin.text()))
-            xmax = float(str(dialog.lneXMax.text()))
-            x_range = (xmin, xmax)
-        except ValueError:
-            x_range = (None, None)
-
-        try:
-            ymin = float(str(dialog.lneYMin.text()))
-            ymax = float(str(dialog.lneYMax.text()))
-            y_range = (ymin, ymax)
-        except ValueError:
-            y_range = (None, None)
-
-        try:
-            cmin = float(str(dialog.lneCMin.text()))
-            cmax = float(str(dialog.lneCMax.text()))
-            colorbar_range = (cmin, cmax)
-        except ValueError:
-            colorbar_range = (None, None)
-
-        logarithmic = dialog.chkLogarithmic.isChecked()
-        legends = LegendDescriptor(visible=dialog.chkShowLegends.isChecked(),
-                                   applicable=dialog.groupBox.isHidden())
-        for legend_widget in dialog._legend_widgets:
+    def get_legends(self):
+        legends = LegendDescriptor(visible=self.chkShowLegends.isChecked(),
+                                   applicable=self.groupBox.isHidden())
+        for legend_widget in self._legend_widgets:
             legends.set_legend_text(handle=legend_widget.handle,
                                     text=legend_widget.get_text(),
                                     visible=legend_widget.is_visible())
+        return legends
 
-        return PlotConfig(title=dialog.lneFigureTitle.text(),
-                          xlabel=dialog.lneXAxisLabel.text(),
-                          ylabel=dialog.lneYAxisLabel.text(),
-                          legend=legends,
-                          errorbar=dialog.chkShowErrorBars.isChecked(),
-                          x_range=x_range, xlog=dialog.chkXLog.isChecked(),
-                          y_range=y_range, ylog=dialog.chkYLog.isChecked(),
-                          colorbar_range=colorbar_range,
-                          logarithmic=logarithmic)
+    def add_legend(self, text, handle, visible):
+        legend_widget = LegendSetter(self, text, handle, visible)
+        self.verticalLayout.addWidget(legend_widget)
+        self._legend_widgets.append(legend_widget)
+
+    def _x_log_edited(self):
+        self.xLogEdited.emit()
+
+    def _y_log_edited(self):
+        self.yLogEdited.emit()
+
+    def _error_bars_edited(self):
+        self.errorBarsEdited.emit()
+
+    @property
+    def x_log(self):
+        return self.chkXLog.isChecked()
+
+    @x_log.setter
+    def x_log(self, value):
+        self.chkXLog.setChecked(value)
+
+    @property
+    def y_log(self):
+        return self.chkYLog.isChecked()
+
+    @y_log.setter
+    def y_log(self, value):
+        self.chkYLog.setChecked(value)
+
+    @property
+    def error_bars(self):
+        return self.chkShowErrorBars.isChecked()
+
+    @error_bars.setter
+    def error_bars(self, value):
+        self.chkShowErrorBars.setChecked(value)
 
 
 class LegendSetter(QtGui.QWidget):
@@ -114,111 +226,3 @@ class LegendSetter(QtGui.QWidget):
 
     def get_text(self):
         return str(self.legendText.text())
-
-
-class LegendDescriptor(object):
-    """This is a class that describes the legends on a plot"""
-    def __init__(self, visible=False, applicable=True, handles=None):
-        self.visible = visible
-        self.applicable = applicable
-        if handles:
-            self.handles = list(handles)
-        else:
-            self.handles = []
-        self._labels = {}
-
-    def all_legends(self):
-        """An iterator which yields a dictionary description of legends containing the handle, text and if visible or not"""
-        for handle in self.handles:
-            yield self.get_legend_descriptor(handle)
-
-    def set_legend_text(self, handle, text, visible=True):
-        if handle not in self.handles:
-            self.handles.append(handle)
-        if not visible:
-            text = '_' + text
-        self._labels[handle] = text
-
-    def get_legend_descriptor(self, handle):
-        if handle in self._labels.keys():
-            label = self._labels[handle]  # If a new value has been set for a handle return that
-        else:
-            label = handle.get_label()   # Else get the value from the plot
-        if label.startswith('_'):
-            x = {'text': label[1:], 'visible': False, 'handle': handle}
-        else:
-            x = {'text': label, 'visible': True, 'handle': handle}
-        return x
-
-    def get_legend_text(self, handle):
-        if handle in self._labels.keys():
-            return self._labels[handle]
-        return handle.get_label()
-
-
-class PlotConfig(object):
-    def __init__(self, **kwargs):
-        # Define default values for all options
-        self.title = None
-        self.xlabel = None
-        self.ylabel = None
-        self.xlog = None
-        self.ylog = None
-        self.legend = LegendDescriptor()
-        self.errorbar = None
-        self.x_range = None
-        self.y_range = None
-        self.colorbar_range = None
-        self.logarithmic = None
-        # Populates fields from keyword arguments
-        for (argname, value) in kwargs.items():
-            if value is not None:
-                setattr(self, argname, value)
-
-    @property
-    def title(self):
-        if self._title is not None:
-            return self._title
-        return ""
-
-    @title.setter
-    def title(self, value):
-        if value is None:
-            self._title = None
-        else:
-            try:
-                self._title = str(value)
-            except ValueError:
-                raise ValueError("Plot title must be a string or castable to string")
-
-    @property
-    def xlabel(self):
-        if self._xlabel is not None:
-            return self._xlabel
-        return ""
-
-    @xlabel.setter
-    def xlabel(self, value):
-        if value is None:
-            self._xlabel = None
-        else:
-            try:
-                self._xlabel = str(value)
-            except ValueError:
-                raise ValueError("Plot xlabel must be a string or castable to string")
-
-    @property
-    def ylabel(self):
-        if self._ylabel is not None:
-            return self._ylabel
-        return ""
-
-    @ylabel.setter
-    def ylabel(self, value):
-        if value is None:
-            self._ylabel = None
-        else:
-            try:
-                self._ylabel = str(value)
-            except ValueError:
-                raise ValueError("Plot ylabel must be a string or castable to string")
