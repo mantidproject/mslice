@@ -192,7 +192,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     @title.setter
     def title(self, value):
         self.canvas.figure.gca().set_title(value)
-        self.setWindowTitle(self.title)
+        self.setWindowTitle(value)
 
     @property
     def x_label(self):
