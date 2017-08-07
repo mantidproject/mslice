@@ -137,7 +137,7 @@ class CutPlotOptions(PlotOptionsDialog):
 
     def __init__(self):
         super(CutPlotOptions, self).__init__()
-        self._legend_widgets = []
+        self._line_widgets = []
         self.groupBox_4.hide()
 
         self.chkXLog.stateChanged.connect(self.xLogEdited)
@@ -145,17 +145,28 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkShowErrorBars.stateChanged.connect(self.errorBarsEdited)
         self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
 
-    def set_legends(self, legends):
-        for legend in legends:
-            legend_widget = LegendSetter(self, legend['label'], legend['visible'])
-            self.verticalLayout.addWidget(legend_widget)
-            self._legend_widgets.append(legend_widget)
+    def set_line_data(self, line_data):
+        for line in line_data:
+            legend, line_options = line
+            line_widget = LegendAndLineOptionsSetter(self, legend['label'], legend['visible'], line_options)
+            self.verticalLayout.addWidget(line_widget)
+            self._line_widgets.append(line_widget)
 
     def get_legends(self):
         legends = []
-        for legend_widget in self._legend_widgets:
-            legends.append({'label': legend_widget.get_text(), 'visible': legend_widget.is_visible()})
+        for line_widget in self._line_widgets:
+            legends.append({'label': line_widget.get_text(), 'visible': line_widget.is_visible()})
         return legends
+
+    def get_line_data(self):
+        legends = self.get_legends()
+        all_line_options = []
+        for line_widget in self._line_widgets:
+            line_options = {}
+            for option in ['color', 'style', 'width', 'marker']:
+                line_options[option] = getattr(line_widget, option)
+            all_line_options.append(line_options)
+        return zip(legends, all_line_options)
 
     @property
     def x_log(self):
@@ -190,22 +201,78 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkShowLegends.setChecked(value)
 
 
-class LegendSetter(QtGui.QWidget):
-    """This is a widget that consists of a checkbox and a lineEdit that will control exactly one legend entry
-
+class LegendAndLineOptionsSetter(QtGui.QWidget):
+    """This is a widget that has various legend and line controls for each line of a plot
     This widget has a concrete reference to the artist and modifies it"""
-    def __init__(self, parent, text, is_enabled):
-        super(LegendSetter, self).__init__(parent)
+    def __init__(self, parent, text, is_enabled, line_options):
+        super(LegendAndLineOptionsSetter, self).__init__(parent)
         self.isEnabled = QtGui.QCheckBox(self)
         self.isEnabled.setChecked(is_enabled)
         self.legendText = QtGui.QLineEdit(self)
         self.legendText.setText(text)
-        layout = QtGui.QHBoxLayout(self)
-        layout.addWidget(self.isEnabled)
-        layout.addWidget(self.legendText)
+
+        self.color_label = QtGui.QLabel(self)
+        self.color_label.setText("Color:")
+        self.line_color = QtGui.QComboBox(self)
+        self.line_color.addItems(['b', 'g', 'r', 'c', 'm', 'y', 'b', 'w'])
+        self.line_color.setCurrentIndex(self.line_color.findText(line_options['color']))
+
+        self.style_label = QtGui.QLabel(self)
+        self.style_label.setText("Style:")
+        self.line_style = QtGui.QComboBox(self)
+        self.line_style.addItems(['-', '--', '-.', ':'])
+        self.line_style.setCurrentIndex(self.line_style.findText(line_options['style']))
+
+        self.width_label = QtGui.QLabel(self)
+        self.width_label.setText("Width:")
+        self.line_width = QtGui.QComboBox(self)
+        self.line_width.addItems(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+        self.line_width.setCurrentIndex(self.line_width.findText(line_options['width']))
+
+        self.marker_label = QtGui.QLabel(self)
+        self.marker_label.setText("Marker:")
+        self.line_marker = QtGui.QComboBox(self)
+        self.line_marker.addItems(['o', ',', '.', 'v', '^', '<', '>', '1', '2', '3', '4', '8', 's', 'p' 'P',
+                                   '*', 'h', 'H', '+', 'x', 'X', 'D', 'd', '|', '_', 'None'])
+        self.line_marker.setCurrentIndex(self.line_marker.findText(line_options['marker']))
+
+        layout = QtGui.QVBoxLayout(self)
+        row1 = QtGui.QHBoxLayout()
+        layout.addLayout(row1)
+        row2 = QtGui.QHBoxLayout()
+        layout.addLayout(row2)
+        row3 = QtGui.QHBoxLayout()
+        layout.addLayout(row3)
+
+        row1.addWidget(self.isEnabled)
+        row1.addWidget(self.legendText)
+        row2.addWidget(self.color_label)
+        row2.addWidget(self.line_color)
+        row2.addWidget(self.style_label)
+        row2.addWidget(self.line_style)
+        row3.addWidget(self.width_label)
+        row3.addWidget(self.line_width)
+        row3.addWidget(self.marker_label)
+        row3.addWidget(self.line_marker)
 
     def is_visible(self):
         return self.isEnabled.checkState()
 
     def get_text(self):
         return str(self.legendText.text())
+
+    @property
+    def color(self):
+        return self.line_color.currentText()
+
+    @property
+    def style(self):
+        return self.line_style.currentText()
+
+    @property
+    def width(self):
+        return self.line_width.currentText()
+
+    @property
+    def marker(self):
+        return self.line_marker.currentText()

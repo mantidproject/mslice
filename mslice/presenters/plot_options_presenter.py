@@ -76,8 +76,8 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._view.xLogEdited.connect(partial(self._xy_config_modified, 'x_log'))
         self._view.yLogEdited.connect(partial(self._xy_config_modified, 'y_log'))
 
-        legends = self._model.get_legends()
-        self._view.set_legends(legends)
+        line_data = self._model.get_line_data()
+        self._view.set_line_data(line_data)
 
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log', 'error_bars',
@@ -93,6 +93,6 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
             self._model.change_cut_plot(self._xy_config)
         for key, value in self._modified_values.items():
             setattr(self._model, key, value)
-        legends = self._view.get_legends()
-        self._model.set_legends(legends)
+        line_data = self._view.get_line_data()
+        self._model.set_line_data(line_data)
         return True

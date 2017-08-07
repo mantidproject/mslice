@@ -198,22 +198,34 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.set_legends(self.get_legends())
         self.canvas.draw()
 
-    def set_line_color(self, line_index, color):
-        # sets color of both line and error bars - child[0] = line, child[1] = error bars
-        for child in self.canvas.figure.gca().containers[line_index].get_children():
-            child.set_color(color)
+    def get_line_data(self):
+        legends = self.get_legends()
+        all_line_options = []
+        for line_group in self.canvas.figure.gca().containers:
+            line_options = {}
+            line = line_group.get_children()[0]
+            line_options['color'] = line.get_color()
+            line_options['style'] = line.get_linestyle()
+            line_options['width'] = str(int(line.get_linewidth()))
+            line_options['marker'] = line.get_marker()
+            all_line_options.append(line_options)
+        return zip(legends, all_line_options)
 
-    def set_line_style(self, line_index, style):
-        line = self.canvas.figure.gca().containers[line_index].get_children()[0]
-        line.set_linestyle(style) #  may need error checking
-
-    def set_line_width(self, line_index, width):
-        for child in self.canvas.figure.gca().containers[line_index].get_children():
-            child.set_linewidth(width)
-
-    def set_line_marker(self, line_index, marker):
-        line = self.canvas.figure.gca().containers[line_index].get_children()[0]
-        line.set_marker(marker)  # may need error checking
+    def set_line_data(self, line_data):
+        legends = []
+        i = 0
+        for line in line_data:
+            legend, line_options = line
+            legends.append(legend)
+            line_model = self.canvas.figure.gca().containers[i]
+            for child in line_model.get_children():
+                child.set_color(str(line_options['color'])[0])
+                child.set_linewidth(line_options['width'])
+            main_line = line_model.get_children()[0]
+            main_line.set_linestyle(str(line_options['style']))
+            main_line.set_marker(str(line_options['marker']))
+            i += 1
+        self.set_legends(legends)
 
     def set_line_visible(self, line_index, visible):
         for child in self.canvas.figure.gca().containers[line_index].get_children():
