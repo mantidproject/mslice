@@ -198,6 +198,27 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.set_legends(self.get_legends())
         self.canvas.draw()
 
+    def set_line_color(self, line_index, color):
+        # sets color of both line and error bars - child[0] = line, child[1] = error bars
+        for child in self.canvas.figure.gca().containers[line_index].get_children():
+            child.set_color(color)
+
+    def set_line_style(self, line_index, style):
+        line = self.canvas.figure.gca().containers[line_index].get_children()[0]
+        line.set_linestyle(style) #  may need error checking
+
+    def set_line_width(self, line_index, width):
+        for child in self.canvas.figure.gca().containers[line_index].get_children():
+            child.set_linewidth(width)
+
+    def set_line_marker(self, line_index, marker):
+        line = self.canvas.figure.gca().containers[line_index].get_children()[0]
+        line.set_marker(marker)  # may need error checking
+
+    def set_line_visible(self, line_index, visible):
+        for child in self.canvas.figure.gca().containers[line_index].get_children():
+            child.set_alpha(visible)
+
     @property
     def title(self):
         return self.canvas.figure.gca().get_title()
