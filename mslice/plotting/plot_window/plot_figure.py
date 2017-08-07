@@ -6,8 +6,7 @@ import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
 import numpy as np
 
-from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter, \
-    LegendDescriptor
+from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
 
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
@@ -18,6 +17,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def __init__(self, number, manager):
         super(PlotFigureManager, self).__init__(number, manager)
 
+        self.show_legends = True
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
 
@@ -123,21 +123,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def set_legend_state(self, visible=True):
         """Show legends if true, hide legends is visible is false"""
         current_axes = self.canvas.figure.gca()
-        if visible:
-            leg = current_axes.legend()
-            leg.draggable()
-        else:
-            if current_axes.legend_:
-                current_axes.legend_.remove()
-                current_axes.legend_ = None
+        for container in current_axes.containers:
+            container.get_children()[1].set_visible(visible)
 
     def _toggle_legend(self):
-        current_axes = self.canvas.figure.gca()
-        if not list(current_axes._get_legend_handles()):
-            return  # Legends are not applicable to this plot
-        current_state = getattr(current_axes, 'legend_') is not None
-        self.set_legend_state(not current_state)
-        self.canvas.draw()
+        self.show_legends = not self.show_legends
 
     def _has_errorbars(self):
         """True current axes has visible errorbars,
@@ -180,10 +170,22 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self._set_errorbars_shown_state(not state)
 
     def set_legends(self, legends):
-        for handle in legends.handles:
-            handle.set_label(legends.get_legend_text(handle))
-
-        self.set_legend_state(legends.visible)
+        if legends is None:
+            return
+        current_axes = self.canvas.figure.gca()
+        labels = []
+        handles_to_show = []
+        handles = current_axes.get_legend_handles_labels()[0]
+        for i in range(len(legends)):
+            container = current_axes.containers[i]
+            container.set_label(legends[i]['label'])
+            if legends[i]['visible']:
+                handles_to_show.append(handles[i])
+                labels.append(legends[i]['label'])
+        current_axes.legend_.remove()  # remove all legends
+        current_axes.legend_ = None
+        x = current_axes.legend(handles_to_show, labels) # add new legends
+        x.draggable()
 
     @property
     def title(self):
@@ -251,16 +253,20 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def error_bars(self, value):
         self._set_errorbars_shown_state(value)
 
-    # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
-    # axes.get_legend_handles()
-    # That is the reason for the use of the private function axes._get_legend_handles
-    # This code was written against the 1.5.1 version of matplotlib.
+    @property
+    def show_legends(self):
+        return True
+
+    @show_legends.setter
+    def show_legends(self, value):
+        self.set_legend_state(value)
+
     def get_legends(self):
         current_axis = self.canvas.figure.gca()
-        handles = list(current_axis._get_legend_handles())
-        if not handles:
-            legend = LegendDescriptor(applicable=False)
-        else:
-            visible = getattr(current_axis, 'legend_') is not None
-            legend = LegendDescriptor(visible=visible, handles=handles)
-        return legend
+        legends = []
+        h, l = current_axis.get_legend_handles_labels()
+        legend_data = zip(h, l)
+        for handle, label in legend_data:
+            v = current_axis.legend(handle).get_visible()
+            legends.append({'label': label, 'visible': v})
+        return legends

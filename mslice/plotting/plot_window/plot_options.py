@@ -2,8 +2,6 @@ import PyQt4.QtGui as QtGui
 from PyQt4.QtCore import pyqtSignal
 
 from .plot_options_ui import Ui_Dialog
-from mslice.presenters.plot_options_presenter import LegendDescriptor
-
 
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
 
@@ -151,26 +149,16 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkShowErrorBars.stateChanged.connect(self._error_bars_edited)
 
     def set_legends(self, legends):
-        if not legends.applicable:
-            self.groupBox.hide()
-        else:
-            self.chkShowLegends.setChecked(legends.visible)
-            for legend in legends.all_legends():
-                self.add_legend(legend['text'], legend['handle'], legend['visible'])
+        for legend in legends:
+            legend_widget = LegendSetter(self, legend['label'], legend['visible'])
+            self.verticalLayout.addWidget(legend_widget)
+            self._legend_widgets.append(legend_widget)
 
     def get_legends(self):
-        legends = LegendDescriptor(visible=self.chkShowLegends.isChecked(),
-                                   applicable=self.groupBox.isHidden())
+        legends = []
         for legend_widget in self._legend_widgets:
-            legends.set_legend_text(handle=legend_widget.handle,
-                                    text=legend_widget.get_text(),
-                                    visible=legend_widget.is_visible())
+            legends.append({'label': legend_widget.get_text(), 'visible': legend_widget.is_visible()})
         return legends
-
-    def add_legend(self, text, handle, visible):
-        legend_widget = LegendSetter(self, text, handle, visible)
-        self.verticalLayout.addWidget(legend_widget)
-        self._legend_widgets.append(legend_widget)
 
     def _x_log_edited(self):
         self.xLogEdited.emit()
@@ -205,18 +193,25 @@ class CutPlotOptions(PlotOptionsDialog):
     def error_bars(self, value):
         self.chkShowErrorBars.setChecked(value)
 
+    @property
+    def show_legends(self):
+        return self.chkShowLegends.isChecked()
+
+    @show_legends.setter
+    def show_legends(self, value):
+        self.chkShowLegends.setChecked(value)
+
 
 class LegendSetter(QtGui.QWidget):
     """This is a widget that consists of a checkbox and a lineEdit that will control exactly one legend entry
 
     This widget has a concrete reference to the artist and modifies it"""
-    def __init__(self, parent, text, handle, is_enabled):
+    def __init__(self, parent, text, is_enabled):
         super(LegendSetter, self).__init__(parent)
         self.isEnabled = QtGui.QCheckBox(self)
         self.isEnabled.setChecked(is_enabled)
         self.legendText = QtGui.QLineEdit(self)
         self.legendText.setText(text)
-        self.handle = handle
         layout = QtGui.QHBoxLayout(self)
         layout.addWidget(self.isEnabled)
         layout.addWidget(self.legendText)

@@ -40,7 +40,8 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
         self._view.cRangeEdited.connect(self._set_c_range)
 
     def set_properties(self):
-        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'colorbar_range', 'colorbar_log']
+        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'colorbar_range', 'colorbar_log',
+                      'show_legends']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 
@@ -94,44 +95,3 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         legends = self._view.get_legends()
         self._model.set_legends(legends)
         return True
-
-
-class LegendDescriptor(object):
-    """This is a class that describes the legends on a plot"""
-    def __init__(self, visible=False, applicable=True, handles=None):
-        self.visible = visible
-        self.applicable = applicable
-        if handles:
-            self.handles = list(handles)
-        else:
-            self.handles = []
-        self._labels = {}
-
-    def all_legends(self):
-        """An iterator which yields a dictionary description of legends containing the handle,
-        text and if visible or not"""
-        for handle in self.handles:
-            yield self.get_legend_descriptor(handle)
-
-    def set_legend_text(self, handle, text, visible=True):
-        if handle not in self.handles:
-            self.handles.append(handle)
-        if not visible:
-            text = '_' + text
-        self._labels[handle] = text
-
-    def get_legend_descriptor(self, handle):
-        if handle in self._labels.keys():
-            label = self._labels[handle]  # If a new value has been set for a handle return that
-        else:
-            label = handle.get_label()   # Else get the value from the plot
-        if label.startswith('_'):
-            x = {'text': label[1:], 'visible': False, 'handle': handle}
-        else:
-            x = {'text': label, 'visible': True, 'handle': handle}
-        return x
-
-    def get_legend_text(self, handle):
-        if handle in self._labels.keys():
-            return self._labels[handle]
-        return handle.get_label()
