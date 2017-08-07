@@ -17,7 +17,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def __init__(self, number, manager):
         super(PlotFigureManager, self).__init__(number, manager)
 
-        self.show_legends = True
+        self.legends_shown = True
+        self.legends_visible = []
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
 
@@ -105,7 +106,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if len(images) != 1:
             raise RuntimeError("Expected single image on axes, found " + str(len(images)))
         mappable = images[0]
-        mappable.set_clim(*colorbar_range)  # * unnecessary?
+        mappable.set_clim(colorbar_range)
         vmin, vmax = colorbar_range
         if logarithmic and type(mappable.norm) != colors.LogNorm:
             mappable.colorbar.remove()
@@ -119,15 +120,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             norm = colors.Normalize(vmin, vmax)
             mappable.set_norm(norm)
             self.canvas.figure.colorbar(mappable)
-
-    def set_legend_state(self, visible=True):
-        """Show legends if true, hide legends is visible is false"""
-        current_axes = self.canvas.figure.gca()
-        for container in current_axes.containers:
-            container.get_children()[1].set_visible(visible)
-
-    def _toggle_legend(self):
-        self.show_legends = not self.show_legends
 
     def _has_errorbars(self):
         """True current axes has visible errorbars,
@@ -169,10 +161,25 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             return
         self._set_errorbars_shown_state(not state)
 
+    def get_legends(self):
+        current_axis = self.canvas.figure.gca()
+        legends = []
+        labels = current_axis.get_legend_handles_labels()[1]
+        for i in range(len(labels)):
+            try:
+                v = self.legends_visible[i]
+            except IndexError:
+                v = True
+                self.legends_visible.append(True)
+            legends.append({'label': labels[i], 'visible': v})
+        return legends
+
     def set_legends(self, legends):
-        if legends is None:
-            return
         current_axes = self.canvas.figure.gca()
+        if current_axes.legend_:
+            current_axes.legend_.remove()  # remove old legends
+        if legends is None or not self.legends_shown:
+            return
         labels = []
         handles_to_show = []
         handles = current_axes.get_legend_handles_labels()[0]
@@ -182,10 +189,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             if legends[i]['visible']:
                 handles_to_show.append(handles[i])
                 labels.append(legends[i]['label'])
-        current_axes.legend_.remove()  # remove all legends
-        current_axes.legend_ = None
-        x = current_axes.legend(handles_to_show, labels) # add new legends
+            self.legends_visible[i] = legends[i]['visible']
+        x = current_axes.legend(handles_to_show, labels)  # add new legends
         x.draggable()
+
+    def _toggle_legend(self):
+        self.legends_shown = not self.legends_shown
+        self.set_legends(self.get_legends())
+        self.canvas.draw()
 
     @property
     def title(self):
@@ -255,18 +266,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     @property
     def show_legends(self):
-        return True
+        return self.legends_shown
 
     @show_legends.setter
     def show_legends(self, value):
-        self.set_legend_state(value)
-
-    def get_legends(self):
-        current_axis = self.canvas.figure.gca()
-        legends = []
-        h, l = current_axis.get_legend_handles_labels()
-        legend_data = zip(h, l)
-        for handle, label in legend_data:
-            v = current_axis.legend(handle).get_visible()
-            legends.append({'label': label, 'visible': v})
-        return legends
+        self.legends_shown = value

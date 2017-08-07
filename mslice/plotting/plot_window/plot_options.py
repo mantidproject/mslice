@@ -3,6 +3,7 @@ from PyQt4.QtCore import pyqtSignal
 
 from .plot_options_ui import Ui_Dialog
 
+
 class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
 
     titleEdited = pyqtSignal()
@@ -96,15 +97,9 @@ class SlicePlotOptions(PlotOptionsDialog):
         self.chkShowErrorBars.hide()
         self.groupBox.hide()
 
-        self.lneCMin.editingFinished.connect(self._c_range_edited)
-        self.lneCMax.editingFinished.connect(self._c_range_edited)
-        self.chkLogarithmic.stateChanged.connect(self._c_log_edited)
-
-    def _c_range_edited(self):
-        self.cRangeEdited.emit()
-
-    def _c_log_edited(self):
-        self.cLogEdited.emit()
+        self.lneCMin.editingFinished.connect(self.cRangeEdited)
+        self.lneCMax.editingFinished.connect(self.cRangeEdited)
+        self.chkLogarithmic.stateChanged.connect(self.cLogEdited)
 
     @property
     def colorbar_range(self):
@@ -138,15 +133,17 @@ class CutPlotOptions(PlotOptionsDialog):
     xLogEdited = pyqtSignal()
     yLogEdited = pyqtSignal()
     errorBarsEdited = pyqtSignal()
+    showLegendsEdited = pyqtSignal()
 
     def __init__(self):
         super(CutPlotOptions, self).__init__()
         self._legend_widgets = []
         self.groupBox_4.hide()
 
-        self.chkXLog.stateChanged.connect(self._x_log_edited)
-        self.chkYLog.stateChanged.connect(self._y_log_edited)
-        self.chkShowErrorBars.stateChanged.connect(self._error_bars_edited)
+        self.chkXLog.stateChanged.connect(self.xLogEdited)
+        self.chkYLog.stateChanged.connect(self.yLogEdited)
+        self.chkShowErrorBars.stateChanged.connect(self.errorBarsEdited)
+        self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
 
     def set_legends(self, legends):
         for legend in legends:
@@ -159,15 +156,6 @@ class CutPlotOptions(PlotOptionsDialog):
         for legend_widget in self._legend_widgets:
             legends.append({'label': legend_widget.get_text(), 'visible': legend_widget.is_visible()})
         return legends
-
-    def _x_log_edited(self):
-        self.xLogEdited.emit()
-
-    def _y_log_edited(self):
-        self.yLogEdited.emit()
-
-    def _error_bars_edited(self):
-        self.errorBarsEdited.emit()
 
     @property
     def x_log(self):

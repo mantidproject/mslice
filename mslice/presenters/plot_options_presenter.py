@@ -40,8 +40,7 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
         self._view.cRangeEdited.connect(self._set_c_range)
 
     def set_properties(self):
-        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'colorbar_range', 'colorbar_log',
-                      'show_legends']
+        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'colorbar_range', 'colorbar_log']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 
@@ -73,6 +72,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._xy_config.update({'x_log': self._model.x_log, 'y_log': self._model.y_log})
 
         self._view.errorBarsEdited.connect(partial(self._value_modified, 'error_bars'))
+        self._view.showLegendsEdited.connect(partial(self._value_modified, 'show_legends'))
         self._view.xLogEdited.connect(partial(self._xy_config_modified, 'x_log'))
         self._view.yLogEdited.connect(partial(self._xy_config_modified, 'y_log'))
 
@@ -80,7 +80,8 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._view.set_legends(legends)
 
     def set_properties(self):
-        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log', 'error_bars']
+        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log', 'error_bars',
+                      'show_legends']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 
