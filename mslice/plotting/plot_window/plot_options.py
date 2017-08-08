@@ -204,6 +204,23 @@ class CutPlotOptions(PlotOptionsDialog):
 class LegendAndLineOptionsSetter(QtGui.QWidget):
     """This is a widget that has various legend and line controls for each line of a plot
     This widget has a concrete reference to the artist and modifies it"""
+
+    # dictionaries used to convert from matplotlib arguments to UI selection and vice versa
+    colors = {'B': 'Blue', 'G': 'Green', 'R': 'Red', 'C': 'Cyan', 'M': 'Magenta', 'Y': 'Yellow',
+                   'K': 'Black', 'W': 'White'}
+
+    styles = {'-': 'Solid', '--': 'Dashed', '-.': 'Dashdot', ':': 'Dotted'}
+
+    markers = {'o': 'Circle', ',': 'Pixel', '.': 'Point', 'v': 'Triangle down', '^': 'Triangle up',
+                    '<': 'Triangle_left', '>': 'Triangle right', '1': 'Arrow down', '2': 'Arrow up',
+                    '3': 'Arrow left', '4': 'Arrow right', '8': 'Octagon', 's': 'Square', 'p': 'Pentagon',
+                    '*': 'Star', 'h': 'Hexagon 1', 'H': 'Hexagon 2', '+': 'Plus', 'x': 'X', 'D': 'Diamond',
+                    'd': 'Diamond (thin)', '|': 'Vertical line', '_': 'Horizontal line', 'None': 'None'}
+
+    inverse_colors = {v: k for k, v in colors.iteritems()}
+    inverse_styles = {v: k for k, v in styles.iteritems()}
+    inverse_markers = {v: k for k, v in markers.iteritems()}
+
     def __init__(self, parent, text, is_enabled, line_options):
         super(LegendAndLineOptionsSetter, self).__init__(parent)
         self.isEnabled = QtGui.QCheckBox(self)
@@ -213,15 +230,18 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
 
         self.color_label = QtGui.QLabel(self)
         self.color_label.setText("Color:")
+
         self.line_color = QtGui.QComboBox(self)
-        self.line_color.addItems(['b', 'g', 'r', 'c', 'm', 'y', 'b', 'w'])
-        self.line_color.setCurrentIndex(self.line_color.findText(line_options['color']))
+        self.line_color.addItems(self.colors.values())
+        chosen_color_as_string = self.colors[line_options['color'].upper()]
+        self.line_color.setCurrentIndex(self.line_color.findText(chosen_color_as_string))
 
         self.style_label = QtGui.QLabel(self)
         self.style_label.setText("Style:")
         self.line_style = QtGui.QComboBox(self)
-        self.line_style.addItems(['-', '--', '-.', ':'])
-        self.line_style.setCurrentIndex(self.line_style.findText(line_options['style']))
+        self.line_style.addItems(self.styles.values())
+        chosen_style_as_string = self.styles[line_options['style']]
+        self.line_style.setCurrentIndex(self.line_style.findText(chosen_style_as_string))
 
         self.width_label = QtGui.QLabel(self)
         self.width_label.setText("Width:")
@@ -232,9 +252,11 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.marker_label = QtGui.QLabel(self)
         self.marker_label.setText("Marker:")
         self.line_marker = QtGui.QComboBox(self)
-        self.line_marker.addItems(['o', ',', '.', 'v', '^', '<', '>', '1', '2', '3', '4', '8', 's', 'p' 'P',
-                                   '*', 'h', 'H', '+', 'x', 'X', 'D', 'd', '|', '_', 'None'])
-        self.line_marker.setCurrentIndex(self.line_marker.findText(line_options['marker']))
+        markers = self.markers.values()
+        markers.sort()
+        self.line_marker.addItems(markers)
+        chosen_marker_as_string = self.markers[line_options['marker']]
+        self.line_marker.setCurrentIndex(self.line_marker.findText(chosen_marker_as_string))
 
         layout = QtGui.QVBoxLayout(self)
         row1 = QtGui.QHBoxLayout()
@@ -263,11 +285,11 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
 
     @property
     def color(self):
-        return self.line_color.currentText()
+        return self.inverse_colors[str(self.line_color.currentText())]
 
     @property
     def style(self):
-        return self.line_style.currentText()
+        return self.inverse_styles[str(self.line_style.currentText())]
 
     @property
     def width(self):
@@ -275,4 +297,4 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
 
     @property
     def marker(self):
-        return self.line_marker.currentText()
+        return self.inverse_markers[str(self.line_marker.currentText())]

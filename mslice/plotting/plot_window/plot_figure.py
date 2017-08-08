@@ -219,11 +219,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             legends.append(legend)
             line_model = self.canvas.figure.gca().containers[i]
             for child in line_model.get_children():
-                child.set_color(str(line_options['color'])[0])
+                child.set_color(line_options['color'])
                 child.set_linewidth(line_options['width'])
             main_line = line_model.get_children()[0]
-            main_line.set_linestyle(str(line_options['style']))
-            main_line.set_marker(str(line_options['marker']))
+            main_line.set_linestyle(line_options['style'])
+            main_line.set_marker(line_options['marker'])
             i += 1
         self.set_legends(legends)
 
