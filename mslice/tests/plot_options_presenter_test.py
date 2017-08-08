@@ -1,4 +1,4 @@
-from mock import MagicMock, PropertyMock, Mock
+from mock import MagicMock, PropertyMock
 import unittest
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
 
@@ -169,7 +169,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
 
         model_error_bars_mock.assert_called_once_with(False)
 
-    '''TODO: add/update tests 
+    '''TODO: add/update tests
     def test_legends(self):
         #  model -> view
         legends = LegendDescriptor(handles=['legend0', 'legend1'])
