@@ -10,6 +10,7 @@ from mslice.app import MPL_COMPAT
 import matplotlib
 from matplotlib import docstring
 from matplotlib.axes import Axes, Subplot
+from matplotlib.backends import pylab_setup
 from matplotlib.figure import Figure, figaspect
 from matplotlib.gridspec import GridSpec
 from matplotlib.artist import setp as _setp
@@ -25,6 +26,8 @@ import sys
 
 import warnings
 import numpy as np
+
+_backend_mod, new_figure_manager, draw_if_interactive, _show = pylab_setup()
 
 # Handles older matplotlib than 1.5
 if MPL_COMPAT:
@@ -68,7 +71,6 @@ _UNINCLUDED_FUNCTIONS = (
     'install_repl_displayhook',
     'uninstall_repl_displayhook',
     'switch_backend',
-    'show',
     'ioff',
     'pause',
     'xkcd',
@@ -155,6 +157,26 @@ install_repl_displayhook()
 
 # From here on just copy and paste from matplotlib.pyplot and decorate as appropriate
 module_name = "plotting.pyplot"
+
+@script_log(module_name)
+def show(*args, **kw):
+    """
+    Display a figure.
+    When running in ipython with its pylab mode, display all
+    figures and return to the ipython prompt.
+
+    In non-interactive mode, display all figures and block until
+    the figures have been closed; in interactive mode it has no
+    effect unless figures were created prior to a change from
+    non-interactive to interactive mode (not recommended).  In
+    that case it displays the figures but does not block.
+
+    A single experimental keyword argument, *block*, may be
+    set to True or False to override the blocking behavior
+    described above.
+    """
+    global _show
+    return _show(*args, **kw)
 
 @script_log(module_name)
 def hold(state=None):

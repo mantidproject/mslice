@@ -22,6 +22,11 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.xlabel(self._getDisplayName(x_axis.units, comment))
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
         plt.title(selected_workspace)
+
+        fig = plt.figure()
+        fig.canvas.set_window_title('new title')
+        plt.show()
+
         plt.draw_all()
 
     def _getDisplayName(self, axisUnits, comment=None):
