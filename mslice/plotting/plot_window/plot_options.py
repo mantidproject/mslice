@@ -149,7 +149,7 @@ class CutPlotOptions(PlotOptionsDialog):
         for line in line_data:
             legend, line_options = line
             line_widget = LegendAndLineOptionsSetter(self, legend['label'], legend['visible'], line_options)
-            self.verticalLayout.addWidget(line_widget)
+            self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
 
     def get_legends(self):
@@ -167,6 +167,20 @@ class CutPlotOptions(PlotOptionsDialog):
                 line_options[option] = getattr(line_widget, option)
             all_line_options.append(line_options)
         return zip(legends, all_line_options)
+
+    def color_validator(self, selected):
+        count = 0
+        for line_widget in self._line_widgets:
+            if line_widget.get_color_index() == selected:
+                count += 1
+        if count <= 1:
+            return True
+        msg_box = QtGui.QMessageBox(self)
+        msg_box.setWindowTitle("Selection Invalid")
+        msg_box.setIcon(QtGui.QMessageBox.Warning)
+        msg_box.setText("Cannot have two lines the same colour.")
+        msg_box.exec_()
+        return False
 
     @property
     def x_log(self):
@@ -223,6 +237,7 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
 
     def __init__(self, parent, text, is_enabled, line_options):
         super(LegendAndLineOptionsSetter, self).__init__(parent)
+        self.parent = parent
         self.isEnabled = QtGui.QCheckBox(self)
         self.isEnabled.setChecked(is_enabled)
         self.legendText = QtGui.QLineEdit(self)
@@ -235,6 +250,7 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.line_color.addItems(self.colors.values())
         chosen_color_as_string = self.colors[line_options['color'].upper()]
         self.line_color.setCurrentIndex(self.line_color.findText(chosen_color_as_string))
+        self.previous_color = self.line_color.currentIndex()
 
         self.style_label = QtGui.QLabel(self)
         self.style_label.setText("Style:")
@@ -246,7 +262,7 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.width_label = QtGui.QLabel(self)
         self.width_label.setText("Width:")
         self.line_width = QtGui.QComboBox(self)
-        self.line_width.addItems(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+        self.line_width.addItems([str(x+1) for x in range(10)])
         self.line_width.setCurrentIndex(self.line_width.findText(line_options['width']))
 
         self.marker_label = QtGui.QLabel(self)
@@ -277,11 +293,23 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         row3.addWidget(self.marker_label)
         row3.addWidget(self.line_marker)
 
+        # noinspection PyUnresolvedReferences
+        self.line_color.currentIndexChanged.connect(lambda selected: self.color_validator(selected))
+
+    def color_validator(self, index):
+        if self.parent.color_validator(index):
+            self.previous_color = self.line_color.currentIndex()
+        else:
+            self.line_color.setCurrentIndex(self.previous_color)
+
     def is_visible(self):
         return self.isEnabled.checkState()
 
     def get_text(self):
         return str(self.legendText.text())
+
+    def get_color_index(self):
+        return self.line_color.currentIndex()
 
     @property
     def color(self):
