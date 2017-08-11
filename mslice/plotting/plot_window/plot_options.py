@@ -165,7 +165,7 @@ class CutPlotOptions(PlotOptionsDialog):
     def get_legends(self):
         legends = []
         for line_widget in self._line_widgets:
-            legends.append({'label': line_widget.get_text(), 'visible': line_widget.is_visible()})
+            legends.append({'label': line_widget.get_text(), 'visible': line_widget.legend_visible()})
         return legends
 
     def get_line_data(self):
@@ -173,7 +173,7 @@ class CutPlotOptions(PlotOptionsDialog):
         all_line_options = []
         for line_widget in self._line_widgets:
             line_options = {}
-            for option in ['color', 'style', 'width', 'marker']:
+            for option in ['show', 'color', 'style', 'width', 'marker']:
                 line_options[option] = getattr(line_widget, option)
             all_line_options.append(line_options)
         return zip(legends, all_line_options)
@@ -226,8 +226,7 @@ class CutPlotOptions(PlotOptionsDialog):
 
 
 class LegendAndLineOptionsSetter(QtGui.QWidget):
-    """This is a widget that has various legend and line controls for each line of a plot
-    This widget has a concrete reference to the artist and modifies it"""
+    """This is a widget that has various legend and line controls for each line of a plot"""
 
     # dictionaries used to convert from matplotlib arguments to UI selection and vice versa
     colors = {'B': 'Blue', 'G': 'Green', 'R': 'Red', 'C': 'Cyan', 'M': 'Magenta', 'Y': 'Yellow',
@@ -245,17 +244,14 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
     inverse_styles = {v: k for k, v in styles.iteritems()}
     inverse_markers = {v: k for k, v in markers.iteritems()}
 
-    def __init__(self, parent, text, is_enabled, line_options):
+    def __init__(self, parent, text, show_legend, line_options):
         super(LegendAndLineOptionsSetter, self).__init__(parent)
         self.parent = parent
-        self.isEnabled = QtGui.QCheckBox(self)
-        self.isEnabled.setChecked(is_enabled)
         self.legendText = QtGui.QLineEdit(self)
         self.legendText.setText(text)
 
         self.color_label = QtGui.QLabel(self)
         self.color_label.setText("Color:")
-
         self.line_color = QtGui.QComboBox(self)
         self.line_color.addItems(self.colors.values())
         chosen_color_as_string = self.colors[line_options['color'].upper()]
@@ -284,6 +280,16 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         chosen_marker_as_string = self.markers[line_options['marker']]
         self.line_marker.setCurrentIndex(self.line_marker.findText(chosen_marker_as_string))
 
+        self.show_line_label = QtGui.QLabel(self)
+        self.show_line_label.setText("Show: ")
+        self.show_line = QtGui.QCheckBox(self)
+        self.show_line.setChecked(line_options['show'])
+
+        self.show_legend_label = QtGui.QLabel(self)
+        self.show_legend_label.setText("Show legend: ")
+        self.show_legend = QtGui.QCheckBox(self)
+        self.show_legend.setChecked(show_legend)
+
         layout = QtGui.QVBoxLayout(self)
         row1 = QtGui.QHBoxLayout()
         layout.addLayout(row1)
@@ -291,9 +297,11 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         layout.addLayout(row2)
         row3 = QtGui.QHBoxLayout()
         layout.addLayout(row3)
+        row4 = QtGui.QHBoxLayout()
+        layout.addLayout(row4)
         layout.addStretch()
 
-        row1.addWidget(self.isEnabled)
+        row1.addWidget(self.show_legend)
         row1.addWidget(self.legendText)
         row2.addWidget(self.color_label)
         row2.addWidget(self.line_color)
@@ -303,9 +311,14 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         row3.addWidget(self.line_width)
         row3.addWidget(self.marker_label)
         row3.addWidget(self.line_marker)
+        row4.addWidget(self.show_line_label)
+        row4.addWidget(self.show_line)
+        row4.addWidget(self.show_legend_label)
+        row4.addWidget(self.show_legend)
 
         # noinspection PyUnresolvedReferences
         self.line_color.currentIndexChanged.connect(lambda selected: self.color_validator(selected))
+        self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))
 
     def color_validator(self, index):
         if self.parent.color_validator(index):
@@ -313,14 +326,23 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         else:
             self.line_color.setCurrentIndex(self.previous_color)
 
-    def is_visible(self):
-        return self.isEnabled.checkState()
+    def show_line_changed(self, state):
+        #  automatically shows/hides legend if line is shown/hidden
+        self.show_legend.setEnabled(state)
+        self.show_legend.setChecked(state)
+
+    def legend_visible(self):
+        return self.show_legend.checkState()
 
     def get_text(self):
         return str(self.legendText.text())
 
     def get_color_index(self):
         return self.line_color.currentIndex()
+
+    @property
+    def show(self):
+        return bool(self.show_line.checkState())
 
     @property
     def color(self):

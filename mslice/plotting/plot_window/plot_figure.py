@@ -19,6 +19,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         self.legends_shown = True
         self.legends_visible = []
+        self.lines_visible = {}
+
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
 
@@ -201,14 +203,17 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def get_line_data(self):
         legends = self.get_legends()
         all_line_options = []
+        i = 0
         for line_group in self.canvas.figure.gca().containers:
             line_options = {}
             line = line_group.get_children()[0]
+            line_options['show'] = self.get_line_visible(i)
             line_options['color'] = line.get_color()
             line_options['style'] = line.get_linestyle()
             line_options['width'] = str(int(line.get_linewidth()))
             line_options['marker'] = line.get_marker()
             all_line_options.append(line_options)
+            i += 1
         return zip(legends, all_line_options)
 
     def set_line_data(self, line_data):
@@ -218,6 +223,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             legend, line_options = line
             legends.append(legend)
             line_model = self.canvas.figure.gca().containers[i]
+            self.set_line_visible(i, line_options['show'])
             for child in line_model.get_children():
                 child.set_color(line_options['color'])
                 child.set_linewidth(line_options['width'])
@@ -228,8 +234,17 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.set_legends(legends)
 
     def set_line_visible(self, line_index, visible):
+        self.lines_visible[line_index] = visible
         for child in self.canvas.figure.gca().containers[line_index].get_children():
             child.set_alpha(visible)
+
+    def get_line_visible(self, line_index):
+        try:
+            ret = self.lines_visible[line_index]
+            return ret
+        except KeyError:
+            self.lines_visible[line_index] = True
+            return True
 
     @property
     def title(self):
