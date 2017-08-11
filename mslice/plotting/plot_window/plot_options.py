@@ -16,6 +16,12 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
 
+        #  get reference to all child widgets
+        field = ['lneFigureTitle', 'lneXAxisLabel', 'lneYAxisLabel', 'lneXMin', 'lneXMax', 'chkXLog', 'lneYMax',
+                 'lneYMin', 'chkYLog']
+        for f in field:
+            setattr(self, f, self.axis_options.findChild((QtGui.QLineEdit, QtGui.QCheckBox), f))
+
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
         self.lneYAxisLabel.editingFinished.connect(self.yLabelEdited)
@@ -23,6 +29,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         self.lneXMax.editingFinished.connect(self.xRangeEdited)
         self.lneYMin.editingFinished.connect(self.yRangeEdited)
         self.lneYMax.editingFinished.connect(self.yRangeEdited)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
     @property
     def x_range(self):
@@ -94,8 +102,9 @@ class SlicePlotOptions(PlotOptionsDialog):
         super(SlicePlotOptions, self).__init__()
         self.chkXLog.hide()
         self.chkYLog.hide()
-        self.chkShowErrorBars.hide()
-        self.groupBox.hide()
+        self.cut_options.hide()
+        self.setMaximumWidth(300)
+        self.buttonBox.setMaximumWidth(275)
 
         self.lneCMin.editingFinished.connect(self.cRangeEdited)
         self.lneCMax.editingFinished.connect(self.cRangeEdited)
@@ -151,6 +160,7 @@ class CutPlotOptions(PlotOptionsDialog):
             line_widget = LegendAndLineOptionsSetter(self, legend['label'], legend['visible'], line_options)
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
+        self.verticalLayout_legend.addStretch()
 
     def get_legends(self):
         legends = []
@@ -192,7 +202,7 @@ class CutPlotOptions(PlotOptionsDialog):
 
     @property
     def y_log(self):
-        return self.chkYLog.isChecked()
+        return self.isChecked()
 
     @y_log.setter
     def y_log(self, value):
@@ -281,6 +291,7 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         layout.addLayout(row2)
         row3 = QtGui.QHBoxLayout()
         layout.addLayout(row3)
+        layout.addStretch()
 
         row1.addWidget(self.isEnabled)
         row1.addWidget(self.legendText)

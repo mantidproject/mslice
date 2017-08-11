@@ -146,7 +146,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if state:
             alpha = 1
         else:
-            alpha = 0
+            alpha = 0.
         for container in current_axis.containers:
             if isinstance(container, ErrorbarContainer):
                 elements = container.get_children()
