@@ -162,6 +162,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         # to save to on calls to get_workspace_to_save_filepath
         path_to_save_to = r'A:\file\path'
         workspace_to_save = 'file1'
+        result_path = join(path_to_save_to, workspace_to_save + '.nxs')
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
         self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
 
@@ -169,18 +170,20 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_directory_to_save_workspaces.assert_called_once_with()
-        self.workspace_provider.save_nexus.assert_called_once_with(workspace_to_save, r'A:\file\path\file1.nxs')
+        self.workspace_provider.save_nexus.assert_called_once_with(workspace_to_save, result_path)
 
     def test_save_workspace_multiple_selected(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         #Create a view that reports multiple workspaces are selected on calls to get_workspace_selected
         path_to_save_to = r'A:\file\path'
         self.view.get_workspace_selected = mock.Mock(return_value=['file1','file2'])
+        result_paths = [join(path_to_save_to, 'file1.nxs'), join(path_to_save_to, 'file2.nxs')]
         self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
+
         self.presenter.notify(Command.SaveSelectedWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_directory_to_save_workspaces.assert_called_once_with()
-        calls = [call('file1', r'A:\file\path\file1.nxs'), call('file2', r'A:\file\path\file2.nxs')]
+        calls = [call('file1', result_paths[0]), call('file2', result_paths[1])]
         self.workspace_provider.save_nexus.assert_has_calls(calls)
 
     def test_save_workspace_non_selected_prompt_user(self):
