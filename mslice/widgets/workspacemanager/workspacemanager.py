@@ -98,6 +98,9 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         path = QFileDialog.getSaveFileName(filter=extension)
         return str(path)
 
+    def get_directory_to_save_workspaces(self):
+        return QFileDialog.getExistingDirectory()
+
     def get_workspace_new_name(self):
         name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
         # The message above was padded with spaces to allow the whole title to show up
