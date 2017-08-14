@@ -93,14 +93,15 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not selected_workspaces:
             self._workspace_manger_view.error_select_one_workspace()
             return
-        dir = self._workspace_manger_view.get_directory_to_save_workspaces()
-        if not dir:
+        save_directory = self._workspace_manger_view.get_directory_to_save_workspaces()
+        if not save_directory:
             self._workspace_manger_view.error_invalid_save_path()
+            return
         for workspace in selected_workspaces:
             filename = workspace
             if not filename.endswith('.nxs'):
                 filename += '.nxs'
-            path = os.path.join(str(dir), filename)
+            path = os.path.join(str(save_directory), filename)
             try:
                 self._work_spaceprovider.save_nexus(workspace, path)
             except RuntimeError:

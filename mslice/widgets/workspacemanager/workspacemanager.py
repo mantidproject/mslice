@@ -93,11 +93,6 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         paths = QFileDialog.getOpenFileNames()
         return [str(filename) for filename in paths]
 
-    def get_workspace_to_save_filepath(self):
-        extension = 'Nexus file (*.nxs)'
-        path = QFileDialog.getSaveFileName(filter=extension)
-        return str(path)
-
     def get_directory_to_save_workspaces(self):
         return QFileDialog.getExistingDirectory()
 
