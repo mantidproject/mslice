@@ -47,7 +47,7 @@ class CutPresenter(object):
     def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None, workspace_index=0):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
         integration_start to integration_end """
-        number_workspaces_selected = self._workspaces_selected()
+        selected_workspaces = self._main_presenter.get_selected_workspaces()
         try:
             params = self._parse_input(workspace_index)
         except ValueError:
@@ -64,7 +64,6 @@ class CutPresenter(object):
 
         width = params[-1]
         params = params[:-1]
-
         if width is not None:
             integration_start, integration_end = params[2:4]
             cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
@@ -85,9 +84,11 @@ class CutPresenter(object):
             # No width specified, just plot a single cut
             handler(params, plot_over, save_to_file)
 
-        if workspace_index < number_workspaces_selected - 1:
+        if workspace_index < len(selected_workspaces) - 1:
+            workspace_index += 1
+            self._populate_fields_using_workspace(selected_workspaces[workspace_index], plotting=True)
             self._process_cuts(plot_over=True, save_to_workspace=save_to_workspace, save_to_file=save_to_file,
-                               workspace_index=workspace_index + 1)
+                               workspace_index=workspace_index)
 
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
@@ -186,16 +187,15 @@ class CutPresenter(object):
             self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
 
         workspace_selection = self._main_presenter.get_selected_workspaces()
-
         if len(workspace_selection) < 1:
             self._cut_view.clear_input_fields()
             self._cut_view.disable()
             self._previous_cut = None
             self._previous_axis = None
             return
+        self._populate_fields_using_workspace(workspace_selection[0])
 
-        workspace = workspace_selection[0]
-
+    def _populate_fields_using_workspace(self, workspace, plotting=False):
         if self._cut_algorithm.is_cuttable(workspace):
             axis = self._cut_algorithm.get_available_axis(workspace)
             current_axis = axis[0]
@@ -205,7 +205,7 @@ class CutPresenter(object):
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
             self._cut_view.set_cut_axis(current_axis)
-            if workspace in self._saved_parameters.keys():
+            if not plotting and workspace in self._saved_parameters.keys():
                 if current_axis in self._saved_parameters[workspace].keys():
                     self._cut_view.populate_input_fields(self._saved_parameters[workspace][current_axis])
             self._previous_cut = workspace
