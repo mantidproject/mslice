@@ -8,6 +8,7 @@ from PyQt4.QtGui import QFileDialog
 from os.path import splitext
 import numpy as np
 
+
 class CutPresenter(object):
     def __init__(self, cut_view, cut_algorithm, cut_plotter):
         self._cut_view = cut_view
@@ -219,6 +220,7 @@ class CutPresenter(object):
             if is_normed:
                 self._cut_view.force_normalization()
             self._cut_view.populate_cut_axis_options([cut_axis.units])
+
             def format_(*args):
                 return map(lambda x: "%.5f" % x, args)
             self._cut_view.populate_cut_params(*format_(cut_axis.start, cut_axis.end, cut_axis.step))
@@ -243,8 +245,8 @@ class CutPresenter(object):
             self._previous_axis = self._cut_view.get_cut_axis()
             if self._previous_axis in self._saved_parameters[self._previous_cut].keys():
                 self._cut_view.populate_input_fields(self._saved_parameters[self._previous_cut][self._previous_axis])
-        minStep = self._minimumStep[self._cut_view.get_cut_axis()]
-        self._cut_view.set_minimum_step(minStep)
+        min_step = self._minimumStep[self._cut_view.get_cut_axis()]
+        self._cut_view.set_minimum_step(min_step)
 
     def _clear_displayed_error(self):
         self._cut_view.clear_displayed_error()
