@@ -44,14 +44,14 @@ class CutPresenter(object):
         elif command == Command.AxisChanged:
             self._cut_axis_changed()
 
-    def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None):
+    def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None, workspace_index=0):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
         integration_start to integration_end """
+        number_workspaces_selected = self._workspaces_selected()
         try:
-            params = self._parse_input()
+            params = self._parse_input(workspace_index)
         except ValueError:
             return
-
         if save_to_workspace:
             def handler(*args):
                 self._save_cut_to_workspace(args[0])
@@ -61,27 +61,33 @@ class CutPresenter(object):
         else:
             def handler(params, plot_over, _):
                 self._plot_cut(params, plot_over)
+
         width = params[-1]
         params = params[:-1]
-        if width is None:
+
+        if width is not None:
+            integration_start, integration_end = params[2:4]
+            cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
+            index = 0
+            while cut_start != cut_end:
+                params = params[:2] + (cut_start, cut_end) + params[4:]
+                if save_to_file is not None:
+                    filename, file_extension = splitext(save_to_file)
+                    output_file_part = filename+'_'+str(index)+file_extension
+                else:
+                    output_file_part = None
+                index += 1
+                handler(params, plot_over, output_file_part)
+                cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
+                # The first plot will respect which button the user pressed. The rest will over plot
+                plot_over = True
+        else:
             # No width specified, just plot a single cut
             handler(params, plot_over, save_to_file)
-            return
-        integration_start, integration_end = params[2:4]
-        cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
-        index = 0
-        while cut_start != cut_end:
-            params = params[:2] + (cut_start, cut_end) + params[4:]
-            if save_to_file is not None:
-                filename, file_extension = splitext(save_to_file)
-                output_file_part = filename+'_'+str(index)+file_extension
-            else:
-                output_file_part = None
-            index += 1
-            handler(params, plot_over, output_file_part)
-            cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
-            # The first plot will respect which button the user pressed. The rest will over plot
-            plot_over = True
+
+        if workspace_index < number_workspaces_selected - 1:
+            self._process_cuts(plot_over=True, save_to_workspace=save_to_workspace, save_to_file=save_to_file,
+                               workspace_index=workspace_index + 1)
 
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
@@ -99,14 +105,14 @@ class CutPresenter(object):
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
 
+    def _workspaces_selected(self):
+        selected_workspaces = self._main_presenter.get_selected_workspaces()
+        return len(selected_workspaces)
 
-    def _parse_input(self):
+    def _parse_input(self, workspace_index=0):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
         selected_workspaces = self._main_presenter.get_selected_workspaces()
-        if len(selected_workspaces) != 1:
-            self._cut_view.error_select_a_workspace()
-            raise ValueError("Invalid workspace selection")
-        selected_workspace = selected_workspaces[0]
+        selected_workspace = selected_workspaces[workspace_index]
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
                         self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
         if cut_axis.units == "":
@@ -181,7 +187,7 @@ class CutPresenter(object):
 
         workspace_selection = self._main_presenter.get_selected_workspaces()
 
-        if len(workspace_selection) != 1:
+        if len(workspace_selection) < 1:
             self._cut_view.clear_input_fields()
             self._cut_view.disable()
             self._previous_cut = None
