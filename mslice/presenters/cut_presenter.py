@@ -31,6 +31,7 @@ class CutPresenter(object):
     @require_main_presenter
     def notify(self, command):
         self._clear_displayed_error()
+        self._cut_view.busy.emit(True)
         if command == Command.Plot:
             self._process_cuts(plot_over=False)
         elif command == Command.PlotOver:
@@ -43,6 +44,7 @@ class CutPresenter(object):
                 self._process_cuts(save_to_file=fname)
         elif command == Command.AxisChanged:
             self._cut_axis_changed()
+        self._cut_view.busy.emit(False)
 
     def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
