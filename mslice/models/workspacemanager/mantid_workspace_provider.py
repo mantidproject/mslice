@@ -132,7 +132,10 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             workspace_handle = self.get_workspace_handle(workspace)
         else:
             workspace_handle = workspace
-        emode = workspace_handle.getEMode().name
+        try:
+            emode = workspace_handle.getEMode().name
+        except AttributeError:
+            return None
         if emode == 'Elastic':
             # Work-around for older versions of Mantid which does not set instrument name
             # in NXSPE files, so LoadNXSPE does not know if it is direct or indirect data
