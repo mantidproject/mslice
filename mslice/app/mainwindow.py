@@ -1,4 +1,4 @@
-from PyQt4.QtGui import QMainWindow, QLabel
+from PyQt4.QtGui import QApplication, QMainWindow, QLabel
 
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.views.mainview import MainView
@@ -30,12 +30,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
         self.wgtWorkspacemanager.error_occurred.connect(self.show_error)
         self.wgtPowder.error_occurred.connect(self.show_error)
         self.wgtCut.busy.connect(self.show_busy)
-        self.wgtWorkspacemanager.error_occurred.connect(self.show_busy)
+        self.wgtSlice.busy.connect(self.show_busy)
+        self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
 
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
-        self.show_busy(False)
+        self.busy_text.setText("  Idle  ")
+        self.busy = False
+
 
     def show_error(self, msg):
         """Show an error message on status bar. If msg ==""  the function will clear the displayed message """
@@ -45,11 +48,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
         return self._presenter
 
     def show_busy(self, busy):
-        if busy:
-            print "busy"
+        if busy and not self.busy:
+            self.busy = True
             self.busy_text.setStyleSheet("QLabel { color: red }")
             self.busy_text.setText("  Busy  ")
-        else:
-            print "idle"
+        elif not busy and self.busy:
+            self.busy = False
             self.busy_text.setStyleSheet("QLabel { color: black }")
             self.busy_text.setText("  Idle  ")
+        else:
+            return
+        QApplication.processEvents()

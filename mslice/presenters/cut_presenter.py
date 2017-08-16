@@ -101,7 +101,6 @@ class CutPresenter(object):
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
 
-
     def _parse_input(self):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
         selected_workspaces = self._main_presenter.get_selected_workspaces()
