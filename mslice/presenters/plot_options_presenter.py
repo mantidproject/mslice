@@ -71,7 +71,6 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         super(CutPlotOptionsPresenter, self).__init__(plot_options_dialog, plot_figure_manager)
         self._xy_config.update({'x_log': self._model.x_log, 'y_log': self._model.y_log})
 
-        self._view.errorBarsEdited.connect(partial(self._value_modified, 'error_bars'))
         self._view.showLegendsEdited.connect(partial(self._value_modified, 'show_legends'))
         self._view.xLogEdited.connect(partial(self._xy_config_modified, 'x_log'))
         self._view.yLogEdited.connect(partial(self._xy_config_modified, 'y_log'))
@@ -95,4 +94,5 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
             setattr(self._model, key, value)
         line_data = self._view.get_line_data()
         self._model.set_line_data(line_data)
+        self._model.error_bars = self._view.error_bars
         return True

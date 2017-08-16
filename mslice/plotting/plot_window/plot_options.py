@@ -16,12 +16,6 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         super(PlotOptionsDialog, self).__init__()
         self.setupUi(self)
 
-        #  get reference to all child widgets
-        field = ['lneFigureTitle', 'lneXAxisLabel', 'lneYAxisLabel', 'lneXMin', 'lneXMax', 'chkXLog', 'lneYMax',
-                 'lneYMin', 'chkYLog']
-        for f in field:
-            setattr(self, f, self.axis_options.findChild((QtGui.QLineEdit, QtGui.QCheckBox), f))
-
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
         self.lneYAxisLabel.editingFinished.connect(self.yLabelEdited)
@@ -103,8 +97,7 @@ class SlicePlotOptions(PlotOptionsDialog):
         self.chkXLog.hide()
         self.chkYLog.hide()
         self.cut_options.hide()
-        self.setMaximumWidth(300)
-        self.buttonBox.setMaximumWidth(275)
+        self.setMaximumWidth(350)
 
         self.lneCMin.editingFinished.connect(self.cRangeEdited)
         self.lneCMax.editingFinished.connect(self.cRangeEdited)
@@ -141,7 +134,6 @@ class CutPlotOptions(PlotOptionsDialog):
 
     xLogEdited = pyqtSignal()
     yLogEdited = pyqtSignal()
-    errorBarsEdited = pyqtSignal()
     showLegendsEdited = pyqtSignal()
 
     def __init__(self):
@@ -151,7 +143,6 @@ class CutPlotOptions(PlotOptionsDialog):
 
         self.chkXLog.stateChanged.connect(self.xLogEdited)
         self.chkYLog.stateChanged.connect(self.yLogEdited)
-        self.chkShowErrorBars.stateChanged.connect(self.errorBarsEdited)
         self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
 
     def set_line_data(self, line_data):
@@ -160,7 +151,7 @@ class CutPlotOptions(PlotOptionsDialog):
             line_widget = LegendAndLineOptionsSetter(self, legend['label'], legend['visible'], line_options)
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
-        self.verticalLayout_legend.addStretch()
+            self.verticalLayout_legend.addStretch()
 
     def get_legends(self):
         legends = []
@@ -202,7 +193,7 @@ class CutPlotOptions(PlotOptionsDialog):
 
     @property
     def y_log(self):
-        return self.isChecked()
+        return self.chkYLog.isChecked()
 
     @y_log.setter
     def y_log(self, value):
@@ -289,6 +280,7 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.show_legend_label.setText("Show legend: ")
         self.show_legend = QtGui.QCheckBox(self)
         self.show_legend.setChecked(show_legend)
+        self.show_line_changed(line_options['show'])
 
         layout = QtGui.QVBoxLayout(self)
         row1 = QtGui.QHBoxLayout()

@@ -149,13 +149,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             alpha = 1
         else:
             alpha = 0.
-        for container in current_axis.containers:
-            if isinstance(container, ErrorbarContainer):
-                elements = container.get_children()
-                for i in range(len(elements)):
-                    # The first component is the actual line so we will not touch it
-                    if i != 0:
-                        elements[i].set_alpha(alpha)
+        for i in range(len(current_axis.containers)):
+            if isinstance(current_axis.containers[i], ErrorbarContainer):
+                elements = current_axis.containers[i].get_children()
+                if self.get_line_visible(i):
+                    elements[1].set_alpha(alpha) #  elements[0] is the actual line, elements[1] is error bars
+
 
     def _toggle_errorbars(self):
         state = self._has_errorbars()
