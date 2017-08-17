@@ -59,4 +59,3 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
         else:
             return
         QApplication.processEvents()
-        
