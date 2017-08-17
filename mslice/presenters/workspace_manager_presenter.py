@@ -94,7 +94,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_workspace()
             return
-          
+
         save_directory = self._workspace_manger_view.get_directory_to_save_workspaces()
         if not save_directory:
             self._workspace_manger_view.error_invalid_save_path()
