@@ -95,9 +95,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_one_workspace()
             return
 
-        save_directory = self._workspace_manger_view.get_directory_to_save_workspaces()
+        save_directory = self._workspace_manager_view.get_directory_to_save_workspaces()
         if not save_directory:
-            self._workspace_manger_view.error_invalid_save_path()
+            self._workspace_manager_view.error_invalid_save_path()
             return
         for workspace in selected_workspaces:
             filename = workspace
@@ -107,7 +107,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             try:
                 self._work_spaceprovider.save_nexus(workspace, path)
             except RuntimeError:
-                self._workspace_manger_view.error_unable_to_save()
+                self._workspace_manager_view.error_unable_to_save()
 
     def _remove_selected_workspaces(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
