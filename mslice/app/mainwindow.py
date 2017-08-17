@@ -12,7 +12,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
 
     def __init__(self):
         super(MainWindow,self).__init__()
-        self.setupUi(self)
+        self.init_ui()
 
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
@@ -34,11 +34,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
 
+    def init_ui(self):
+        self.setupUi(self)
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")
         self.busy = False
-
 
     def show_error(self, msg):
         """Show an error message on status bar. If msg ==""  the function will clear the displayed message """

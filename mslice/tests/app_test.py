@@ -48,7 +48,7 @@ class AppTests(unittest.TestCase):
         powder_view.get_presenter = mock.Mock(return_value=self.powder_presenter)
         cut_view.get_presenter = mock.Mock(return_value=self.cut_presenter)
 
-    def mock_setupUi(self, mock_setup):
+    def mock_init_Ui(self, mock_setup):
         self.wgtWorkspacemanager = workspace_view
         self.wgtSlice = slice_view
         self.wgtPowder = powder_view
@@ -56,7 +56,7 @@ class AppTests(unittest.TestCase):
         global mainview
         mainview = mock_setup
 
-    @patch.object(Ui_MainWindow, 'setupUi', mock_setupUi)
+    @patch.object(Ui_MainWindow, 'init_ui', mock_init_Ui)
     @patch.object(QtGui.QMainWindow, '__init__', lambda x: None)
     def test_mainwindow(self):
         """Test the MainWindow initialises correctly"""
