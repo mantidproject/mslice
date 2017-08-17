@@ -126,7 +126,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return workspace
         return workspace.name()
 
-    def get_emode(self, workspace):
+    def get_emode(self, workspace, default=None):
         """Returns the energy analysis mode (direct or indirect of a workspace)"""
         if isinstance(workspace, basestring):
             workspace_handle = self.get_workspace_handle(workspace)
@@ -135,7 +135,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         try:
             emode = workspace_handle.getEMode().name
         except AttributeError:
-            return None
+            return default
         if emode == 'Elastic':
             # Work-around for older versions of Mantid which does not set instrument name
             # in NXSPE files, so LoadNXSPE does not know if it is direct or indirect data
