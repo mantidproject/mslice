@@ -59,7 +59,6 @@ class AppTests(unittest.TestCase):
         global mainview
         mainview = mock_setup
 
-    @patch.object()
     @patch.object(Ui_MainWindow, 'setupUi', mock_setup_Ui)
     @patch.object(QtGui.QMainWindow, '__init__', lambda x: None)
     def test_mainwindow(self):
