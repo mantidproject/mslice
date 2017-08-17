@@ -12,6 +12,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
 
     def __init__(self):
         super(MainWindow,self).__init__()
+        self.setupUi(self)
         self.init_ui()
 
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
@@ -35,7 +36,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
         self.wgtPowder.busy.connect(self.show_busy)
 
     def init_ui(self):
-        self.setupUi(self)
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")
