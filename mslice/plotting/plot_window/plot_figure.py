@@ -105,7 +105,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if len(images) != 1:
             raise RuntimeError("Expected single image on axes, found " + str(len(images)))
         mappable = images[0]
-        mappable.set_clim(*colorbar_range)  # * unnecessary?
         vmin, vmax = colorbar_range
         if logarithmic and type(mappable.norm) != colors.LogNorm:
             mappable.colorbar.remove()
@@ -119,6 +118,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             norm = colors.Normalize(vmin, vmax)
             mappable.set_norm(norm)
             self.canvas.figure.colorbar(mappable)
+        mappable.set_clim((vmin, vmax))
 
     def set_legend_state(self, visible=True):
         """Show legends if true, hide legends is visible is false"""
