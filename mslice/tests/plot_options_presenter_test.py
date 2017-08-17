@@ -164,7 +164,6 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         # view -> model
         model_error_bars_mock.reset_mock()
         view_error_bars_mock.return_value = False
-        self.presenter._value_modified('error_bars')
         self.presenter.get_new_config()
 
         model_error_bars_mock.assert_called_once_with(False)

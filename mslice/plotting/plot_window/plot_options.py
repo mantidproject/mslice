@@ -151,7 +151,6 @@ class CutPlotOptions(PlotOptionsDialog):
             line_widget = LegendAndLineOptionsSetter(self, legend['label'], legend['visible'], line_options)
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
-            self.verticalLayout_legend.addStretch()
 
     def get_legends(self):
         legends = []
@@ -308,7 +307,6 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         row4.addWidget(self.show_legend_label)
         row4.addWidget(self.show_legend)
 
-        # noinspection PyUnresolvedReferences
         self.line_color.currentIndexChanged.connect(lambda selected: self.color_validator(selected))
         self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))
 
