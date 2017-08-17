@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QPrinter, QPrintDialog, QPixmap, QPainter
 import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter, \
@@ -30,6 +31,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
         self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
         self.action_save_image.triggered.connect(self.stock_toolbar.save_figure)
+        self.action_Print_Plot.triggered.connect(self.print_plot)
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
 
@@ -65,6 +67,17 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         new_config = presenter_class(view_class(), self).get_new_config()
         if new_config:
             self.canvas.draw()
+
+    def print_plot(self):
+        printer = QPrinter()
+        printer.setOrientation(QPrinter.Landscape)
+        print_dialog = QPrintDialog()
+        if print_dialog.exec_():
+            pixmap_image = QPixmap.grabWidget(self.canvas)
+            pixmap_image = pixmap_image.scaled(1100, 850, Qt.KeepAspectRatio)
+            painter = QPainter(printer)
+            painter.drawPixmap(0,0,pixmap_image)
+            painter.end()
 
     @staticmethod
     def get_min(data, absolute_minimum=-np.inf):
