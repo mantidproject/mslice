@@ -48,6 +48,7 @@ class AppTests(unittest.TestCase):
         slice_view.get_presenter = mock.Mock(return_value=self.slice_presenter)
         powder_view.get_presenter = mock.Mock(return_value=self.powder_presenter)
         cut_view.get_presenter = mock.Mock(return_value=self.cut_presenter)
+        MainWindow.init_ui = mock.Mock()
 
     def mock_setup_Ui(self, mock_setup):
         self.wgtWorkspacemanager = workspace_view
@@ -58,6 +59,7 @@ class AppTests(unittest.TestCase):
         global mainview
         mainview = mock_setup
 
+    @patch.object()
     @patch.object(Ui_MainWindow, 'setupUi', mock_setup_Ui)
     @patch.object(QtGui.QMainWindow, '__init__', lambda x: None)
     def test_mainwindow(self):
