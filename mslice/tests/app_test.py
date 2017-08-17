@@ -25,6 +25,7 @@ slice_view = mock.create_autospec(SlicePlotterView)
 powder_view = mock.create_autospec(PowderView)
 cut_view = mock.create_autospec(CutView)
 workspace_view = mock.create_autospec(WorkspaceView)
+busy_label = mock.create_autospec(QtGui.QLabel)
 
 class AppTests(unittest.TestCase):
     def setUp(self):
@@ -48,15 +49,16 @@ class AppTests(unittest.TestCase):
         powder_view.get_presenter = mock.Mock(return_value=self.powder_presenter)
         cut_view.get_presenter = mock.Mock(return_value=self.cut_presenter)
 
-    def mock_init_Ui(self, mock_setup):
+    def mock_setup_Ui(self, mock_setup):
         self.wgtWorkspacemanager = workspace_view
         self.wgtSlice = slice_view
         self.wgtPowder = powder_view
         self.wgtCut = cut_view
+        self.busy_text = busy_label
         global mainview
         mainview = mock_setup
 
-    @patch.object(Ui_MainWindow, 'init_ui', mock_init_Ui)
+    @patch.object(Ui_MainWindow, 'setupUi', mock_setup_Ui)
     @patch.object(QtGui.QMainWindow, '__init__', lambda x: None)
     def test_mainwindow(self):
         """Test the MainWindow initialises correctly"""
