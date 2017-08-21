@@ -20,6 +20,7 @@ class MatplotlibCutPlotter(CutPlotter):
         leg.draggable()
         plt.xlabel(self._getDisplayName(cut_axis.units, self._cut_algorithm.getComment(selected_workspace)))
         plt.ylabel(INTENSITY_LABEL)
+        plt.gcf().canvas.set_window_title(selected_workspace)
         plt.autoscale()
         plt.ylim(intensity_start, intensity_end)
         plt.draw_all()
