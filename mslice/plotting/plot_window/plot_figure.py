@@ -5,6 +5,7 @@ from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
 import numpy as np
+import six
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter, \
     LegendDescriptor
@@ -184,6 +185,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             handle.set_label(legends.get_legend_text(handle))
 
         self.set_legend_state(legends.visible)
+
+    def get_window_title(self):
+        return six.text_type(self.windowTitle())
+
+    def set_window_title(self, title):
+        self.setWindowTitle(title)
 
     @property
     def title(self):
