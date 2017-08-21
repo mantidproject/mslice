@@ -2,6 +2,7 @@
 
 class SlicePlotterView:
     error_occurred = None
+    busy = None
 
     def __init__(self):
         raise Exception("This abstract class must not be instantiated")

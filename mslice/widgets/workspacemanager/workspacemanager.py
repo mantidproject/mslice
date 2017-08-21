@@ -12,6 +12,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
 
     error_occurred = pyqtSignal('QString')
+    busy = pyqtSignal(bool)
 
     def __init__(self,parent):
         super(WorkspaceManagerWidget,self).__init__(parent)

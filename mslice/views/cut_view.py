@@ -2,6 +2,7 @@
 
 class CutView:
     error_occurred = None
+    busy = None
 
     def get_cut_axis(self):
         pass
