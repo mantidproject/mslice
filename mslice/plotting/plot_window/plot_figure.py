@@ -70,11 +70,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def print_plot(self):
         printer = QPrinter()
-        printer.setOrientation(QPrinter.Landscape)
-        print_dialog = QPrintDialog()
+        printer.setOrientation(QPrinter.Landscape) #  landscape by default
+        print_dialog = QPrintDialog(printer)
         if print_dialog.exec_():
             pixmap_image = QPixmap.grabWidget(self.canvas)
-            pixmap_image = pixmap_image.scaled(1100, 850, Qt.KeepAspectRatio)
+            page_size = printer.pageRect()
+            pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
             painter = QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
