@@ -23,8 +23,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
         plt.title(selected_workspace)
         plt.gcf().canvas.set_window_title(selected_workspace)
-        fig = plt.figure()
-        fig.canvas.set_window_title('new title')
         plt.show()
 
         plt.draw_all()
