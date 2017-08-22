@@ -6,8 +6,7 @@ import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
 import numpy as np
 
-from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter, \
-    LegendDescriptor
+from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
 
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
@@ -17,6 +16,10 @@ from .plot_options import SlicePlotOptions, CutPlotOptions
 class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def __init__(self, number, manager):
         super(PlotFigureManager, self).__init__(number, manager)
+
+        self.legends_shown = True
+        self.legends_visible = []
+        self.lines_visible = {}
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -105,7 +108,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if len(images) != 1:
             raise RuntimeError("Expected single image on axes, found " + str(len(images)))
         mappable = images[0]
-        mappable.set_clim(*colorbar_range)  # * unnecessary?
         vmin, vmax = colorbar_range
         if logarithmic and type(mappable.norm) != colors.LogNorm:
             mappable.colorbar.remove()
@@ -119,25 +121,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             norm = colors.Normalize(vmin, vmax)
             mappable.set_norm(norm)
             self.canvas.figure.colorbar(mappable)
-
-    def set_legend_state(self, visible=True):
-        """Show legends if true, hide legends is visible is false"""
-        current_axes = self.canvas.figure.gca()
-        if visible:
-            leg = current_axes.legend()
-            leg.draggable()
-        else:
-            if current_axes.legend_:
-                current_axes.legend_.remove()
-                current_axes.legend_ = None
-
-    def _toggle_legend(self):
-        current_axes = self.canvas.figure.gca()
-        if not list(current_axes._get_legend_handles()):
-            return  # Legends are not applicable to this plot
-        current_state = getattr(current_axes, 'legend_') is not None
-        self.set_legend_state(not current_state)
-        self.canvas.draw()
+        mappable.set_clim((vmin, vmax))
 
     def _has_errorbars(self):
         """True current axes has visible errorbars,
@@ -164,14 +148,13 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if state:
             alpha = 1
         else:
-            alpha = 0
-        for container in current_axis.containers:
-            if isinstance(container, ErrorbarContainer):
-                elements = container.get_children()
-                for i in range(len(elements)):
-                    # The first component is the actual line so we will not touch it
-                    if i != 0:
-                        elements[i].set_alpha(alpha)
+            alpha = 0.
+        for i in range(len(current_axis.containers)):
+            if isinstance(current_axis.containers[i], ErrorbarContainer):
+                elements = current_axis.containers[i].get_children()
+                if self.get_line_visible(i):
+                    elements[1].set_alpha(alpha) #  elements[0] is the actual line, elements[1] is error bars
+
 
     def _toggle_errorbars(self):
         state = self._has_errorbars()
@@ -179,11 +162,88 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             return
         self._set_errorbars_shown_state(not state)
 
-    def set_legends(self, legends):
-        for handle in legends.handles:
-            handle.set_label(legends.get_legend_text(handle))
+    def get_legends(self):
+        current_axis = self.canvas.figure.gca()
+        legends = []
+        labels = current_axis.get_legend_handles_labels()[1]
+        for i in range(len(labels)):
+            try:
+                v = self.legends_visible[i]
+            except IndexError:
+                v = True
+                self.legends_visible.append(True)
+            legends.append({'label': labels[i], 'visible': v})
+        return legends
 
-        self.set_legend_state(legends.visible)
+    def set_legends(self, legends):
+        current_axes = self.canvas.figure.gca()
+        if current_axes.legend_:
+            current_axes.legend_.remove()  # remove old legends
+        if legends is None or not self.legends_shown:
+            return
+        labels = []
+        handles_to_show = []
+        handles = current_axes.get_legend_handles_labels()[0]
+        for i in range(len(legends)):
+            container = current_axes.containers[i]
+            container.set_label(legends[i]['label'])
+            if legends[i]['visible']:
+                handles_to_show.append(handles[i])
+                labels.append(legends[i]['label'])
+            self.legends_visible[i] = legends[i]['visible']
+        x = current_axes.legend(handles_to_show, labels)  # add new legends
+        x.draggable()
+
+    def _toggle_legend(self):
+        self.legends_shown = not self.legends_shown
+        self.set_legends(self.get_legends())
+        self.canvas.draw()
+
+    def get_line_data(self):
+        legends = self.get_legends()
+        all_line_options = []
+        i = 0
+        for line_group in self.canvas.figure.gca().containers:
+            line_options = {}
+            line = line_group.get_children()[0]
+            line_options['show'] = self.get_line_visible(i)
+            line_options['color'] = line.get_color()
+            line_options['style'] = line.get_linestyle()
+            line_options['width'] = str(int(line.get_linewidth()))
+            line_options['marker'] = line.get_marker()
+            all_line_options.append(line_options)
+            i += 1
+        return zip(legends, all_line_options)
+
+    def set_line_data(self, line_data):
+        legends = []
+        i = 0
+        for line in line_data:
+            legend, line_options = line
+            legends.append(legend)
+            line_model = self.canvas.figure.gca().containers[i]
+            self.set_line_visible(i, line_options['show'])
+            for child in line_model.get_children():
+                child.set_color(line_options['color'])
+                child.set_linewidth(line_options['width'])
+            main_line = line_model.get_children()[0]
+            main_line.set_linestyle(line_options['style'])
+            main_line.set_marker(line_options['marker'])
+            i += 1
+        self.set_legends(legends)
+
+    def set_line_visible(self, line_index, visible):
+        self.lines_visible[line_index] = visible
+        for child in self.canvas.figure.gca().containers[line_index].get_children():
+            child.set_alpha(visible)
+
+    def get_line_visible(self, line_index):
+        try:
+            ret = self.lines_visible[line_index]
+            return ret
+        except KeyError:
+            self.lines_visible[line_index] = True
+            return True
 
     @property
     def title(self):
@@ -251,16 +311,10 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def error_bars(self, value):
         self._set_errorbars_shown_state(value)
 
-    # if a legend has been set to '' or has been hidden (by prefixing with '_)then it will be ignored by
-    # axes.get_legend_handles()
-    # That is the reason for the use of the private function axes._get_legend_handles
-    # This code was written against the 1.5.1 version of matplotlib.
-    def get_legends(self):
-        current_axis = self.canvas.figure.gca()
-        handles = list(current_axis._get_legend_handles())
-        if not handles:
-            legend = LegendDescriptor(applicable=False)
-        else:
-            visible = getattr(current_axis, 'legend_') is not None
-            legend = LegendDescriptor(visible=visible, handles=handles)
-        return legend
+    @property
+    def show_legends(self):
+        return self.legends_shown
+
+    @show_legends.setter
+    def show_legends(self, value):
+        self.legends_shown = value

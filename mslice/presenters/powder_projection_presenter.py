@@ -30,6 +30,7 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
 
     def notify(self, command):
         self._clear_displayed_error()
+        self._powder_view.busy.emit(True)
         if command == Command.CalculatePowderProjection:
             self._calculate_powder_projection()
         elif command == Command.U1Changed:
@@ -38,6 +39,7 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
             self._axis_changed(2)
         else:
             raise ValueError("Powder Projection Presenter received an unrecognised command")
+        self._powder_view.busy.emit(False)
 
     def _calculate_powder_projection(self):
         selected_workspaces = self._get_main_presenter().get_selected_workspaces()

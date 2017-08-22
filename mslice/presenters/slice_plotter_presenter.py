@@ -52,10 +52,12 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
 
     def notify(self, command):
         self._clear_displayed_error()
+        self._slice_view.busy.emit(True)
         if command == Command.DisplaySlice:
             self._display_slice()
         else:
             raise ValueError("Slice Plotter Presenter received an unrecognised command")
+        self._slice_view.busy.emit(False)
 
     def _display_slice(self):
         selected_workspaces = self._get_main_presenter().get_selected_workspaces()
