@@ -5,6 +5,7 @@ from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
 import numpy as np
+import six
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
 
@@ -245,6 +246,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.lines_visible[line_index] = True
             return True
 
+    def get_window_title(self):
+        return six.text_type(self.windowTitle())
+
+    def set_window_title(self, title):
+        self.setWindowTitle(title)
+
     @property
     def title(self):
         return self.canvas.figure.gca().get_title()
@@ -252,6 +259,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     @title.setter
     def title(self, value):
         self.canvas.figure.gca().set_title(value)
+        self.setWindowTitle(value)
 
     @property
     def x_label(self):
