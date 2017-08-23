@@ -1,4 +1,7 @@
 from workspace import Workspace
+from mantid.api import IMDEventWorkspace
 
 class PixelWorkspace(Workspace):
-    pass
+    def __init__(self, pixel_workspace):
+        pws = IMDEventWorkspace()
+        # pws.

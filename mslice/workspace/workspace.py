@@ -1,8 +1,11 @@
-
+from mantid.api import MatrixWorkspace
 
 class Workspace(object):
 
-    def __init__(self):
+    def __init__(self, matrix_workspace):
+        self.matrix_workspace = matrix_workspace
+        mws = MatrixWorkspace() #temp
+        #  mws.
         pass
 
     def get_coordinates(self):
