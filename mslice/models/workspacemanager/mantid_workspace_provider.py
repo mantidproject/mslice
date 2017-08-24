@@ -7,11 +7,14 @@ It uses mantid to perform the workspace operations
 # -----------------------------------------------------------------------------
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
                               RenameWorkspace, SaveNexus, SaveMD)
-from mantid.api import IMDWorkspace, Workspace
+from mantid.api import IMDWorkspace, Workspace, MatrixWorkspace, IMDEventWorkspace, IMDHistoWorkspace
 import numpy as np
 from scipy import constants
 
 from .workspace_provider import WorkspaceProvider
+from mslice.workspace.workspace import Workspace as WorkspaceWrapper
+from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 # -----------------------------------------------------------------------------
 # Classes and functions
@@ -96,6 +99,12 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         if self.get_emode(output_workspace) == 'Indirect':
             self._processEfixed(output_workspace)
         self._processLoadedWSLimits(output_workspace)
+        if isinstance(ws, MatrixWorkspace):
+            WorkspaceWrapper(ws)
+        elif isinstance(ws, IMDEventWorkspace):
+            PixelWorkspace(ws)
+        elif isinstance(ws, IMDHistoWorkspace):
+            HistogramWorkspace(ws)
         return ws
 
     def rename_workspace(self, selected_workspace, new_name):
@@ -132,7 +141,10 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             workspace_handle = self.get_workspace_handle(workspace)
         else:
             workspace_handle = workspace
-        emode = workspace_handle.getEMode().name
+        try:
+            emode = workspace_handle.getEMode().name
+        except:
+            return None
         if emode == 'Elastic':
             # Work-around for older versions of Mantid which does not set instrument name
             # in NXSPE files, so LoadNXSPE does not know if it is direct or indirect data
