@@ -99,12 +99,20 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         if self.get_emode(output_workspace) == 'Indirect':
             self._processEfixed(output_workspace)
         self._processLoadedWSLimits(output_workspace)
+
+        # temp testing code. Should probably just write proper tests at this point
         if isinstance(ws, MatrixWorkspace):
-            WorkspaceWrapper(ws)
+            wws = WorkspaceWrapper(ws)
+            wws = wws ** 2
+            print wws.get_signal()
         elif isinstance(ws, IMDEventWorkspace):
-            PixelWorkspace(ws)
+            pws = PixelWorkspace(ws)
+            pws = pws ** 2
+            print pws.get_signal()
         elif isinstance(ws, IMDHistoWorkspace):
-            HistogramWorkspace(ws)
+            hws = HistogramWorkspace(ws)
+            hws = hws ** 2
+            print hws.get_signal()
         return ws
 
     def rename_workspace(self, selected_workspace, new_name):

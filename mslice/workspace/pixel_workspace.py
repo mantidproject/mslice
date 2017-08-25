@@ -6,7 +6,7 @@ from mantid.simpleapi import BinMD
 class PixelWorkspace(Workspace):
 
     def __init__(self, pixel_workspace):
-        self.workspace = pixel_workspace
+        self.inner_workspace = pixel_workspace
         self.histogram_workspace = None
 
     def get_histogram_workspace(self):
@@ -14,12 +14,12 @@ class PixelWorkspace(Workspace):
             dim_values = []
             for x in range(6):
                 try:
-                    dim = self.workspace.getDimension(x)
+                    dim = self.inner_workspace.getDimension(x)
                     dim_info = dim.getName() + ',' + str(dim.getMinimum()) + ',' + str(dim.getMaximum()) + ',' + str(100)
                 except RuntimeError:
                     dim_info = None
                 dim_values.append(dim_info)
-            histo_workspace = BinMD(InputWorkspace=self.workspace, OutputWorkspace="",
+            histo_workspace = BinMD(InputWorkspace=self.inner_workspace, OutputWorkspace="BinMDoutput",
                                     AlignedDim0=dim_values[0], alignedDim1=dim_values[1],
                                     alignedDim2=dim_values[2], alignedDim3=dim_values[3],
                                     alignedDim4=dim_values[4], alignedDim5=dim_values[5])
