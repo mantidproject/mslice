@@ -100,18 +100,18 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self._processEfixed(output_workspace)
         self._processLoadedWSLimits(output_workspace)
 
-        # temp testing code. Should probably just write proper tests at this point
+        # temp testing code
         if isinstance(ws, MatrixWorkspace):
             wws = WorkspaceWrapper(ws)
-            wws = wws ** 2
+            wws += 1000
             print wws.get_signal()
         elif isinstance(ws, IMDEventWorkspace):
             pws = PixelWorkspace(ws)
-            pws = pws ** 2
+            np.set_printoptions(threshold=np.nan)
             print pws.get_signal()
         elif isinstance(ws, IMDHistoWorkspace):
             hws = HistogramWorkspace(ws)
-            hws = hws ** 2
+            hws += 1000
             print hws.get_signal()
         return ws
 

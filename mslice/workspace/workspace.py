@@ -2,6 +2,7 @@ import numpy as np
 import operator
 from mantid.simpleapi import BinMD, CreateMDHistoWorkspace, ReplicateMD
 
+
 class Workspace(object):
 
     def __init__(self, matrix_workspace):
@@ -27,15 +28,15 @@ class Workspace(object):
         if isinstance(other, list):
             other = np.asarray(other)
         if isinstance(other, Workspace):
-            inner_res = operator(self.inner_workspace, other.inner_workspace) #dimensionality/binning checks?
+            inner_res = operator(self.inner_workspace, other.inner_workspace)  # dimensionality/binning checks?
         elif isinstance(other, np.ndarray):
-            inner_res = self._binary_op_list(operator, other)
+            inner_res = self._binary_op_array(operator, other)
         else:
             inner_res = operator(self.inner_workspace, other)
         workspace_type = type(self)
         return workspace_type(inner_res)
 
-    def _binary_op_list(self, operator, other): #Does not work, seek help
+    def _binary_op_array(self, operator, other):  # Does not work, seek help
         min = np.amin(other)
         max = np.amax(other)
         size = other.size
@@ -46,7 +47,7 @@ class Workspace(object):
             print self.inner_workspace.getNumDims()
             print ws.getNumDims()
             replicated = ReplicateMD(self.inner_workspace, ws)
-            inner_res = operator(self.inner_workspace, replicated)
+            return operator(self.inner_workspace, replicated)
         except RuntimeError:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
 
@@ -63,11 +64,10 @@ class Workspace(object):
         return self._binary_op(operator.div, other)
 
     def __pow__(self, other):
-        orig = self
         new = self
         while other > 1:
-            new = new * orig
-            other-=1
+            new = new * self
+            other -= 1
         return new
 
     def __neg__(self):
