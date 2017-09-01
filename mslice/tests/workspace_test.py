@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from mantid.simpleapi import CreateWorkspace, CreateMDWorkspace, CreateMDHistoWorkspace
+from mantid.simpleapi import CreateWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace, ConvertToMD, AddSampleLog
 
 from mslice.workspace.workspace import Workspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -23,10 +23,25 @@ class BaseWorkspaceTest(unittest.TestCase):
         expected = np.zeros(100) + 4
         self.assertTrue((expected == self.workspace.get_variance().flatten()).all())
 
+    def check_add_workspace(self):
+        two_workspace = self.workspace + self.workspace
+        expected_values = np.linspace(0, 198, 100)
+        result = np.array(two_workspace.get_signal().flatten())
+        result.sort()
+        self.assertTrue((result == expected_values).all())
+
+    def check_mul_workspace(self):
+        two_workspace = self.workspace * 2
+        expected_values = np.linspace(0, 198, 100)
+        result = np.array(two_workspace.get_signal().flatten())
+        result.sort()
+        self.assertTrue((result == expected_values).all())
+
 
 class WorkspaceTest(BaseWorkspaceTest):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         x = np.linspace(0, 99, 100)
         y = x * 1
         e = y * 0 + 2
@@ -47,32 +62,16 @@ class WorkspaceTest(BaseWorkspaceTest):
     def test_get_variance(self):
         self.check_variance()
 
+    def test_add_workspace(self):
+        self.check_add_workspace()
 
-class PixelWorkspaceTest(BaseWorkspaceTest):
-
-    def setUp(self):
-        self.workspace = PixelWorkspace(CreateMDWorkspace(dimensions=2, Extents='0,100,0,100', names='Dim1,Dim2',
-                                                          units='U,U', OutputWorkspace='testPixelWorkspace'))
-
-    def test_get_coordinates(self):  # checks keys
-        self.assertTrue(set(self.workspace.get_coordinates()) == {'Dim1', 'Dim2'})
-
-    def test_get_signal(self):
-        expected = np.zeros((100, 100))
-        self.assertTrue((self.workspace.get_signal() == expected).all())
-
-    def test_get_error(self):
-        expected = np.zeros((100, 100))
-        self.assertTrue((self.workspace.get_error() == expected).all())
-
-    def test_get_variance(self):
-        expected = np.zeros((100, 100))
-        self.assertTrue((self.workspace.get_variance() == expected).all())
-
+    def test_mul_workspace_number(self):
+        self.check_mul_workspace()
 
 class HistogramWorkspaceTest(BaseWorkspaceTest):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         signal = range(0, 100)
         error = np.zeros(100) + 2
         self.workspace = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
@@ -92,3 +91,56 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     def test_get_variance(self):
         self.check_variance()
+
+    def test_add_workspace(self):
+        self.check_add_workspace()
+
+    def test_mul_workspace_number(self):
+        self.check_mul_workspace()
+        
+class PixelWorkspaceTest(BaseWorkspaceTest):
+
+    @classmethod
+    def setUpClass(self): #create non-zero test data
+        sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10], UnitX='DeltaE', OutputWorkspace='simws')
+        AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
+        self.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="Convertspace", QDimensions='|Q|', dEAnalysisMode='Direct',
+                                     MinValues='-10,0,0', MaxValues='10,6,500', SplitInto='50,50')
+        self.workspace = PixelWorkspace(self.workspace)
+
+
+    def test_get_coordinates(self):
+        np.set_printoptions(threshold=np.nan)
+        coords = self.workspace.get_coordinates()
+        self.assertEqual(set(coords), {'|Q|', 'DeltaE'})
+        self.assertEqual(coords['|Q|'][2], 0.20996594809147776)
+
+    def test_get_signal(self):
+        signal = self.workspace.get_signal()
+        self.assertEqual(0, signal[0][0])
+        self.assertEqual(12, signal[1][47])
+        self.assertEqual(32, signal[3][52])
+
+    def test_get_error(self):
+        expected = np.zeros((100, 100))
+        self.assertTrue((self.workspace.get_error() == expected).all())
+
+    def test_get_variance(self):
+        expected = np.zeros((100, 100))
+        self.assertTrue((self.workspace.get_variance() == expected).all())
+
+    def test_add_workspace(self):
+        np.set_printoptions(threshold=np.nan)
+        two_workspace = self.workspace + self.workspace
+        signal = two_workspace.get_signal()
+        self.assertEqual(0, signal[0][0])
+        self.assertEqual(24, signal[1][47])
+        self.assertEqual(64, signal[3][52])
+
+    def test_mul_workspace_number(self):
+        np.set_printoptions(threshold=np.nan)
+        three_workspace = self.workspace * 3
+        signal = three_workspace.get_signal()
+        self.assertEqual(0, signal[0][0])
+        self.assertEqual(36, signal[1][47])
+        self.assertEqual(96, signal[3][52])

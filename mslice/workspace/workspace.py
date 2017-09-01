@@ -28,7 +28,7 @@ class Workspace(object):
         if isinstance(other, list):
             other = np.asarray(other)
         if isinstance(other, Workspace):
-            inner_res = operator(self.inner_workspace, other.inner_workspace)  # dimensionality/binning checks?
+            inner_res = operator(self.inner_workspace, other.inner_workspace)  # type/dimensionality/binning checks?
         elif isinstance(other, np.ndarray):
             inner_res = self._binary_op_array(operator, other)
         else:
@@ -36,7 +36,7 @@ class Workspace(object):
         workspace_type = type(self)
         return workspace_type(inner_res)
 
-    def _binary_op_array(self, operator, other):  # Does not work, seek help
+    def _binary_op_array(self, operator, other):  # Does not work. Try adding matrixws instead of histo? Maybe can convert?
         min = np.amin(other)
         max = np.amax(other)
         size = other.size
