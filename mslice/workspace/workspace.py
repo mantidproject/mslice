@@ -1,5 +1,6 @@
 import numpy as np
 import operator
+from mantid.simpleapi import CreateWorkspace
 
 
 class Workspace(object):
@@ -34,6 +35,13 @@ class Workspace(object):
             inner_res = operator(self.inner_workspace, other)
         workspace_type = type(self)
         return workspace_type(inner_res)
+
+    def _binary_op_array(self, operator, other):
+        if(other.size == self.get_signal().size):
+           new_signal = operator(other, self.get_signal()[0])
+           return CreateWorkspace(self.inner_workspace.extractX(), new_signal, self.inner_workspace.extractE(), outputWorkspace=str(self))
+        else:
+            raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
 
     def __add__(self, other):
         return self._binary_op(operator.add, other)

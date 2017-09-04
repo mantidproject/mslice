@@ -89,6 +89,14 @@ class WorkspaceTest(BaseWorkspaceTest):
     def test_neg_workspace(self):
         self.check_neg_workspace()
 
+    def test_add_list(self):
+        print self.workspace.get_signal()
+        list = np.linspace(0, 99, 100)
+        result = self.workspace + list
+        result = result.get_signal()
+        expected_values = np.multiply(list, 2)
+        self.assertTrue((result == expected_values).all())
+
 
 class HistogramWorkspaceTest(BaseWorkspaceTest):
 
@@ -188,13 +196,12 @@ class PixelWorkspaceTest(BaseWorkspaceTest):
         self.assertEqual(36, signal[1][47])
         self.assertEqual(96, signal[3][52])
 
-    # fails : not yet implemented
-    # def test_pow_workspace(self):
-    #     squared_workspace = self.workspace ** 2
-    #     signal = squared_workspace.get_signal()
-    #     self.assertEqual(0, signal[0][0])
-    #     self.assertEqual(144, signal[1][47])
-    #     self.assertEqual(1024, signal[3][52])
+    def test_pow_workspace(self):
+        squared_workspace = self.workspace ** 2
+        signal = squared_workspace.get_signal()
+        self.assertEqual(0, signal[0][0])
+        self.assertEqual(144, signal[1][47])
+        self.assertEqual(1024, signal[3][52])
 
     def test_neg_workspace(self):
         neg_workspace = -self.workspace

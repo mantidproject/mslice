@@ -41,3 +41,10 @@ class PixelWorkspace(Workspace):
 
     def _binary_op_array(self, operator, other):
         return HistogramWorkspace(self.get_histogram_workspace()._binary_op_array(operator, other))
+
+    def __pow__(self, other):
+        new = self.get_histogram_workspace()
+        while other > 1:
+            new = new * self.histogram_workspace
+            other -= 1
+        return new
