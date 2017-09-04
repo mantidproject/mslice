@@ -23,7 +23,7 @@ class BaseWorkspaceTest(unittest.TestCase):
         expected = np.zeros(100) + 4
         self.assertTrue((expected == self.workspace.get_variance().flatten()).all())
 
-    def check_add_workspace(self):
+    def check_add_workspace(self): # These all follow similar pattern
         two_workspace = self.workspace + self.workspace
         expected_values = np.linspace(0, 198, 100)
         result = np.array(two_workspace.get_signal().flatten())
@@ -36,6 +36,21 @@ class BaseWorkspaceTest(unittest.TestCase):
         result = np.array(two_workspace.get_signal().flatten())
         result.sort()
         self.assertTrue((result == expected_values).all())
+
+    def check_pow_workspace(self):
+        squared_workspace = self.workspace ** 2
+        expected_values = np.square(np.linspace(0,99,100))
+        result = np.array(squared_workspace.get_signal().flatten())
+        result.sort()
+        self.assertTrue((result == expected_values).all())
+
+    def check_neg_workspace(self):
+        negative_workspace = -self.workspace
+        expected_values = np.linspace(-99, 0, 100)
+        result = np.array(negative_workspace.get_signal().flatten())
+        result.sort()
+        self.assertTrue((result == expected_values).all())
+
 
 
 class WorkspaceTest(BaseWorkspaceTest):
@@ -68,6 +83,12 @@ class WorkspaceTest(BaseWorkspaceTest):
     def test_mul_workspace_number(self):
         self.check_mul_workspace()
 
+    def test_pow_workspace(self):
+        self.check_pow_workspace()
+
+    def test_neg_workspace(self):
+        self.check_neg_workspace()
+
 class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     @classmethod
@@ -97,11 +118,17 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     def test_mul_workspace_number(self):
         self.check_mul_workspace()
+
+    def test_pow_workspace(self):
+        self.check_pow_workspace()
+
+    def test_neg_workspace(self):
+        self.check_neg_workspace()
         
 class PixelWorkspaceTest(BaseWorkspaceTest):
 
     @classmethod
-    def setUpClass(self): #create non-zero test data
+    def setUpClass(self): # create (non-zero) test data
         sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10], UnitX='DeltaE', OutputWorkspace='simws')
         AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
         self.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="Convertspace", QDimensions='|Q|', dEAnalysisMode='Direct',
@@ -110,7 +137,6 @@ class PixelWorkspaceTest(BaseWorkspaceTest):
 
 
     def test_get_coordinates(self):
-        np.set_printoptions(threshold=np.nan)
         coords = self.workspace.get_coordinates()
         self.assertEqual(set(coords), {'|Q|', 'DeltaE'})
         self.assertEqual(coords['|Q|'][2], 0.20996594809147776)
@@ -130,7 +156,6 @@ class PixelWorkspaceTest(BaseWorkspaceTest):
         self.assertTrue((self.workspace.get_variance() == expected).all())
 
     def test_add_workspace(self):
-        np.set_printoptions(threshold=np.nan)
         two_workspace = self.workspace + self.workspace
         signal = two_workspace.get_signal()
         self.assertEqual(0, signal[0][0])
@@ -138,9 +163,23 @@ class PixelWorkspaceTest(BaseWorkspaceTest):
         self.assertEqual(64, signal[3][52])
 
     def test_mul_workspace_number(self):
-        np.set_printoptions(threshold=np.nan)
         three_workspace = self.workspace * 3
         signal = three_workspace.get_signal()
         self.assertEqual(0, signal[0][0])
         self.assertEqual(36, signal[1][47])
         self.assertEqual(96, signal[3][52])
+
+    # fails : not yet implemented
+    # def test_pow_workspace(self):
+    #     squared_workspace = self.workspace ** 2
+    #     signal = squared_workspace.get_signal()
+    #     self.assertEqual(0, signal[0][0])
+    #     self.assertEqual(144, signal[1][47])
+    #     self.assertEqual(1024, signal[3][52])
+
+    def test_neg_workspace(self):
+        neg_workspace = -self.workspace
+        signal = neg_workspace.get_signal()
+        self.assertEqual(0, signal[0][0])
+        self.assertEqual(-12, signal[1][47])
+        self.assertEqual(-32, signal[3][52])
