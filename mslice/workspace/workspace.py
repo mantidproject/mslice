@@ -1,6 +1,5 @@
 import numpy as np
 import operator
-from mantid.simpleapi import BinMD, CreateMDHistoWorkspace, ReplicateMD
 
 
 class Workspace(object):
@@ -35,21 +34,6 @@ class Workspace(object):
             inner_res = operator(self.inner_workspace, other)
         workspace_type = type(self)
         return workspace_type(inner_res)
-
-    def _binary_op_array(self, operator, other):  # Does not work. Try adding matrixws instead of histo? Maybe can convert?
-        min = np.amin(other)
-        max = np.amax(other)
-        size = other.size
-        try:
-            ws = CreateMDHistoWorkspace(Dimensionality=1, Extents='' + str(min) + ',' + str(max),
-                                        SignalInput=other, ErrorInput=other, NumberOfBins=str(size), Names='Dim1',
-                                        Units='MomentumTransfer')
-            print self.inner_workspace.getNumDims()
-            print ws.getNumDims()
-            replicated = ReplicateMD(self.inner_workspace, ws)
-            return operator(self.inner_workspace, replicated)
-        except RuntimeError:
-            raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
 
     def __add__(self, other):
         return self._binary_op(operator.add, other)

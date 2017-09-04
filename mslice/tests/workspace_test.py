@@ -89,6 +89,7 @@ class WorkspaceTest(BaseWorkspaceTest):
     def test_neg_workspace(self):
         self.check_neg_workspace()
 
+
 class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     @classmethod
@@ -124,6 +125,23 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     def test_neg_workspace(self):
         self.check_neg_workspace()
+
+    def test_add_list(self):
+        list = np.linspace(0, -9, 10)
+        result = self.workspace + list
+        result = result.get_signal()
+
+        line = np.multiply(np.linspace(0,9,10), 10)
+        expected_values = np.empty((10,10))
+        for i in range(10):
+            expected_values[i] = line
+
+        self.assertTrue((result == expected_values).all())
+
+    def test_add_invalid_list(self):
+        list = np.linspace(0, -6, 3)
+        self.assertRaises(RuntimeError, lambda: self.workspace + list)
+
         
 class PixelWorkspaceTest(BaseWorkspaceTest):
 
@@ -134,6 +152,7 @@ class PixelWorkspaceTest(BaseWorkspaceTest):
         self.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="Convertspace", QDimensions='|Q|', dEAnalysisMode='Direct',
                                      MinValues='-10,0,0', MaxValues='10,6,500', SplitInto='50,50')
         self.workspace = PixelWorkspace(self.workspace)
+
 
 
     def test_get_coordinates(self):
@@ -183,3 +202,11 @@ class PixelWorkspaceTest(BaseWorkspaceTest):
         self.assertEqual(0, signal[0][0])
         self.assertEqual(-12, signal[1][47])
         self.assertEqual(-32, signal[3][52])
+
+    def test_add_list(self):
+        list = np.linspace(0, 99, 100)
+        result = self.workspace + list
+        result = result.get_signal()
+        self.assertEqual(0, result[0][0])
+        self.assertEqual(13, result[1][47])
+        self.assertEqual(35, result[3][52])

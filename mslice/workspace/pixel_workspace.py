@@ -1,13 +1,17 @@
+import numpy as np
 from workspace import Workspace
 from histogram_workspace import HistogramWorkspace
-from mantid.simpleapi import BinMD
+from mantid.simpleapi import BinMD, CreateMDHistoWorkspace, ReplicateMD, CloneMDWorkspace
 
 
 class PixelWorkspace(Workspace):
 
-    def __init__(self, pixel_workspace):
-        self.inner_workspace = pixel_workspace
-        self.histogram_workspace = None
+    def __init__(self, input_workspace):
+        if isinstance(input_workspace, HistogramWorkspace):
+            self.histogram_workspace = input_workspace
+        else:
+            self.inner_workspace = input_workspace
+            self.histogram_workspace = None
 
     def get_histogram_workspace(self):
         if self.histogram_workspace is None:
@@ -19,7 +23,7 @@ class PixelWorkspace(Workspace):
                 except RuntimeError:
                     dim_info = None
                 dim_values.append(dim_info)
-            histo_workspace = BinMD(InputWorkspace=self.inner_workspace, OutputWorkspace="BinMDoutput",
+            histo_workspace = BinMD(InputWorkspace=self.inner_workspace, OutputWorkspace=str(self),
                                     AlignedDim0=dim_values[0], alignedDim1=dim_values[1],
                                     alignedDim2=dim_values[2], alignedDim3=dim_values[3],
                                     alignedDim4=dim_values[4], alignedDim5=dim_values[5])
@@ -34,3 +38,6 @@ class PixelWorkspace(Workspace):
 
     def get_variance(self):
         return self.get_histogram_workspace().get_variance()
+
+    def _binary_op_array(self, operator, other):
+        return HistogramWorkspace(self.get_histogram_workspace()._binary_op_array(operator, other))
