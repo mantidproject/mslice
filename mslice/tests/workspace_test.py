@@ -23,7 +23,7 @@ class BaseWorkspaceTest(unittest.TestCase):
         expected = np.zeros(100) + 4
         self.assertTrue((expected == self.workspace.get_variance().flatten()).all())
 
-    def check_add_workspace(self): # These all follow similar pattern
+    def check_add_workspace(self):
         two_workspace = self.workspace + self.workspace
         expected_values = np.linspace(0, 198, 100)
         result = np.array(two_workspace.get_signal().flatten())
@@ -39,7 +39,7 @@ class BaseWorkspaceTest(unittest.TestCase):
 
     def check_pow_workspace(self):
         squared_workspace = self.workspace ** 2
-        expected_values = np.square(np.linspace(0,99,100))
+        expected_values = np.square(np.linspace(0, 99, 100))
         result = np.array(squared_workspace.get_signal().flatten())
         result.sort()
         self.assertTrue((result == expected_values).all())
@@ -52,15 +52,14 @@ class BaseWorkspaceTest(unittest.TestCase):
         self.assertTrue((result == expected_values).all())
 
 
-
 class WorkspaceTest(BaseWorkspaceTest):
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         x = np.linspace(0, 99, 100)
         y = x * 1
         e = y * 0 + 2
-        self.workspace = Workspace(CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace"))
+        cls.workspace = Workspace(CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace"))
 
     def test_get_coordinates(self):
         expected_values = np.linspace(0, 99, 100)
@@ -90,24 +89,23 @@ class WorkspaceTest(BaseWorkspaceTest):
         self.check_neg_workspace()
 
     def test_add_list(self):
-        print self.workspace.get_signal()
-        list = np.linspace(0, 99, 100)
-        result = self.workspace + list
+        list_to_add = np.linspace(0, 99, 100)
+        result = self.workspace + list_to_add
         result = result.get_signal()
-        expected_values = np.multiply(list, 2)
+        expected_values = np.multiply(list_to_add, 2)
         self.assertTrue((result == expected_values).all())
 
 
 class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         signal = range(0, 100)
         error = np.zeros(100) + 2
-        self.workspace = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
-                                                                   SignalInput=signal, ErrorInput=error,
-                                                                   NumberOfBins='10,10', Names='Dim1,Dim2',
-                                                                   Units='U,U', OutputWorkspace='testHistoWorkspace'))
+        cls.workspace = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
+                                                                  SignalInput=signal, ErrorInput=error,
+                                                                  NumberOfBins='10,10', Names='Dim1,Dim2',
+                                                                  Units='U,U', OutputWorkspace='testHistoWorkspace'))
 
     def test_get_coordinates(self):
         expected = np.linspace(0, 100, 10)
@@ -135,33 +133,33 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         self.check_neg_workspace()
 
     def test_add_list(self):
-        list = np.linspace(0, -9, 10)
-        result = self.workspace + list
+        list_to_add = np.linspace(0, -9, 10)
+        result = self.workspace + list_to_add
         result = result.get_signal()
 
-        line = np.multiply(np.linspace(0,9,10), 10)
-        expected_values = np.empty((10,10))
+        line = np.multiply(np.linspace(0, 9, 10), 10)
+        expected_values = np.empty((10, 10))
         for i in range(10):
             expected_values[i] = line
 
         self.assertTrue((result == expected_values).all())
 
     def test_add_invalid_list(self):
-        list = np.linspace(0, -6, 3)
-        self.assertRaises(RuntimeError, lambda: self.workspace + list)
+        invalid_list = np.linspace(0, -6, 3)
+        self.assertRaises(RuntimeError, lambda: self.workspace + invalid_list)
 
         
 class PixelWorkspaceTest(BaseWorkspaceTest):
 
     @classmethod
-    def setUpClass(self): # create (non-zero) test data
-        sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10], UnitX='DeltaE', OutputWorkspace='simws')
+    def setUpClass(cls):  # create (non-zero) test data
+        sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
+                                                  UnitX='DeltaE', OutputWorkspace='simws')
         AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
-        self.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="Convertspace", QDimensions='|Q|', dEAnalysisMode='Direct',
-                                     MinValues='-10,0,0', MaxValues='10,6,500', SplitInto='50,50')
-        self.workspace = PixelWorkspace(self.workspace)
-
-
+        cls.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="Convertspace", QDimensions='|Q|',
+                                    dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
+                                    SplitInto='50,50')
+        cls.workspace = PixelWorkspace(cls.workspace)
 
     def test_get_coordinates(self):
         coords = self.workspace.get_coordinates()
@@ -211,8 +209,8 @@ class PixelWorkspaceTest(BaseWorkspaceTest):
         self.assertEqual(-32, signal[3][52])
 
     def test_add_list(self):
-        list = np.linspace(0, 99, 100)
-        result = self.workspace + list
+        list_to_add = np.linspace(0, 99, 100)
+        result = self.workspace + list_to_add
         result = result.get_signal()
         self.assertEqual(0, result[0][0])
         self.assertEqual(13, result[1][47])

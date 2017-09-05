@@ -27,8 +27,11 @@ class Workspace(object):
     def _binary_op(self, operator, other):
         if isinstance(other, list):
             other = np.asarray(other)
-        if isinstance(other, Workspace):
-            inner_res = operator(self.inner_workspace, other.inner_workspace)  # type/dimensionality/binning checks?
+        if isinstance(other, self.__class__):
+            if self.check_dimensions(other):
+                inner_res = operator(self.inner_workspace, other.inner_workspace)
+            else:
+                raise RuntimeError("workspaces must have same dimensionality for binary operations (+, -, *, /)")
         elif isinstance(other, np.ndarray):
             inner_res = self._binary_op_array(operator, other)
         else:
@@ -37,11 +40,19 @@ class Workspace(object):
         return workspace_type(inner_res)
 
     def _binary_op_array(self, operator, other):
-        if(other.size == self.get_signal().size):
-           new_signal = operator(other, self.get_signal()[0])
-           return CreateWorkspace(self.inner_workspace.extractX(), new_signal, self.inner_workspace.extractE(), outputWorkspace=str(self))
+        if other.size == self.get_signal().size:
+            new_signal = operator(other, self.get_signal()[0])
+            return CreateWorkspace(self.inner_workspace.extractX(), new_signal,
+                                   self.inner_workspace.extractE(), outputWorkspace=str(self))
         else:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
+
+    def check_dimensions(self, workspace_to_check):
+        for i in range(self.inner_workspace.getNumDims()):
+            if self.inner_workspace.getDimension(i).getNBins() != \
+                    workspace_to_check.inner_workspace.getDimension(i).getNBins():
+                return False
+        return True
 
     def __add__(self, other):
         return self._binary_op(operator.add, other)

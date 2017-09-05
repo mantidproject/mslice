@@ -47,4 +47,4 @@ class PixelWorkspace(Workspace):
         while other > 1:
             new = new * self.histogram_workspace
             other -= 1
-        return new
+        return PixelWorkspace(new)
