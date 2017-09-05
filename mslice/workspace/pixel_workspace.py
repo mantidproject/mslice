@@ -1,7 +1,6 @@
-import numpy as np
 from workspace import Workspace
 from histogram_workspace import HistogramWorkspace
-from mantid.simpleapi import BinMD, CreateMDHistoWorkspace, ReplicateMD, CloneMDWorkspace
+from mantid.simpleapi import BinMD
 
 
 class PixelWorkspace(Workspace):

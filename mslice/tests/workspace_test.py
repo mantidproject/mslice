@@ -148,7 +148,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         invalid_list = np.linspace(0, -6, 3)
         self.assertRaises(RuntimeError, lambda: self.workspace + invalid_list)
 
-        
+
 class PixelWorkspaceTest(BaseWorkspaceTest):
 
     @classmethod

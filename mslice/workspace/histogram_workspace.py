@@ -23,8 +23,8 @@ class HistogramWorkspace(Workspace):
         max = np.amax(other)
         size = other.size
         ws = CreateMDHistoWorkspace(Dimensionality=1, Extents='' + str(min) + ',' + str(max),
-                                    SignalInput=other, ErrorInput=other, NumberOfBins=str(size), Names=self.inner_workspace.getDimension(0).getName(),
-                                    Units='MomentumTransfer')
+                                    SignalInput=other, ErrorInput=other, NumberOfBins=str(size),
+                                    Names=self.inner_workspace.getDimension(0).getName(), Units='MomentumTransfer')
         try:
             replicated = ReplicateMD(self.inner_workspace, ws)
             return operator(self.inner_workspace, replicated)
