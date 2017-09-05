@@ -12,9 +12,6 @@ import numpy as np
 from scipy import constants
 
 from .workspace_provider import WorkspaceProvider
-from mslice.workspace.workspace import Workspace as WorkspaceWrapper
-from mslice.workspace.pixel_workspace import PixelWorkspace
-from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 # -----------------------------------------------------------------------------
 # Classes and functions
