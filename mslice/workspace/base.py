@@ -4,9 +4,6 @@ import abc
 class WorkspaceBase(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, mantid_workspace):
-        self._raw_ws = mantid_workspace
-
     @abc.abstractmethod
     def get_coordinates(self):
         return

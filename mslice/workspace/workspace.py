@@ -7,6 +7,9 @@ from mantid.simpleapi import CreateWorkspace
 class Workspace(WorkspaceBase):
     """workspace wrapper for MatrixWorkspace"""
 
+    def __init__(self, mantid_workspace):
+        self._raw_ws = mantid_workspace
+
     def get_coordinates(self):
         """
         Gets dimensions and bins of a workspace.
