@@ -93,5 +93,3 @@ class WorkspaceTest(BaseWorkspaceTest):
         result = result.get_signal()
         expected_values = np.multiply(list_to_add, 2)
         self.assertTrue((result == expected_values).all())
-
-
