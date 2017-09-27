@@ -193,7 +193,7 @@ html_static_path = ['_static']
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
-# base.py URL from which the finished HTML is served.
+# base URL from which the finished HTML is served.
 #html_use_opensearch = ''
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
@@ -213,7 +213,7 @@ html_static_path = ['_static']
 # implements a search results scorer. If empty, the default will be used.
 #html_search_scorer = 'scorer.js'
 
-# Output file base.py name for HTML help builder.
+# Output file base name for HTML help builder.
 htmlhelp_basename = 'MSlicedoc'
 
 # -- Options for LaTeX output ---------------------------------------------
