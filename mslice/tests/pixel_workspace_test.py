@@ -17,6 +17,9 @@ class PixelWorkspaceTest(unittest.TestCase):
                                     SplitInto='50,50')
         cls.workspace = PixelWorkspace(cls.workspace)
 
+    def test_invalid_workspace(self):
+        self.assertRaises(TypeError, lambda: PixelWorkspace(4))
+
     def test_get_coordinates(self):
         coords = self.workspace.get_coordinates()
         self.assertEqual(set(coords), {'|Q|', 'DeltaE'})

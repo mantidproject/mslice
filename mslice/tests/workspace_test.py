@@ -60,6 +60,9 @@ class WorkspaceTest(BaseWorkspaceTest):
         e = y * 0 + 2
         cls.workspace = Workspace(CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace"))
 
+    def test_invalid_workspace(self):
+        self.assertRaises(TypeError, lambda: Workspace(4))
+
     def test_get_coordinates(self):
         expected_values = np.linspace(0, 99, 100)
         self.assertTrue((expected_values == self.workspace.get_coordinates()['']).all())

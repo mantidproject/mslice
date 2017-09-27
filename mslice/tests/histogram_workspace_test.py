@@ -17,6 +17,9 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
                                                                   NumberOfBins='10,10', Names='Dim1,Dim2',
                                                                   Units='U,U', OutputWorkspace='testHistoWorkspace'))
 
+    def test_invalid_workspace(self):
+        self.assertRaises(TypeError, lambda: HistogramWorkspace(4))
+
     def test_get_coordinates(self):
         expected = np.linspace(0, 100, 10)
         self.assertTrue((self.workspace.get_coordinates()['Dim1'] == expected).all())
@@ -51,7 +54,6 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         expected_values = np.empty((10, 10))
         for i in range(10):
             expected_values[i] = line
-
         self.assertTrue((result == expected_values).all())
 
     def test_add_invalid_list(self):

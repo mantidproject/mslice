@@ -21,6 +21,10 @@ class WorkspaceBase(object):
         return
 
     @abc.abstractmethod
+    def rewrap(self, ws):
+        return
+
+    @abc.abstractmethod
     def __add__(self, other):
         return
 

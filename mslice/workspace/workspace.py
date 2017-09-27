@@ -1,103 +1,17 @@
-import numpy as np
-import operator
 from base import WorkspaceBase
-from mantid.simpleapi import CreateWorkspace
+from workspace_mixin import WorkspaceMixin
+
+from mantid.api import MatrixWorkspace
 
 
-class Workspace(WorkspaceBase):
+class Workspace(WorkspaceMixin, WorkspaceBase):
     """workspace wrapper for MatrixWorkspace"""
 
-    def __init__(self, mantid_workspace):
-        self._raw_ws = mantid_workspace
-
-    def get_coordinates(self):
-        """
-        Gets dimensions and bins of a workspace.
-
-        :return: dict where keys are the names of the dimension and the values are a numpy array of the bins.
-        """
-        coords = {}
-        for i in range(self._raw_ws.getNumDims()):
-            dim = self._raw_ws.getDimension(i)
-            coords[dim.getName()] = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
-        return coords
-
-    def get_signal(self):
-        """Gets data values (Y axis) from the workspace as a numpy array."""
-        return self._raw_ws.extractY()
-
-    def get_error(self):
-        """Gets error values (E) from the workspace as a numpy array."""
-        return self._raw_ws.extractE()
-
-    def get_variance(self):
-        """Gets variance (error^2) from the workspace as a numpy array."""
-        return np.square(self.get_error())
-
-    def _binary_op(self, operator, other):
-        """
-        Delegate binary operations (+,-,*,/) performed on a workspace depending on type.
-
-        Unwrap mantid workspace (_raw_ws), perform operation, then rewrap.
-
-        Behaviour depends on type of other:
-        List - convert to numpy array, then pass to _binary_op_array method.
-        Numpy array - pass to _binary_op_array method.
-        Workspace wrapper (of the same type and dimensionality) - unwrap, apply operator to each bin, rewrap.
-        Else - try to apply operator to self._raw_ws. Works for numbers, unwrapped workspaces...
-
-        :param operator: binary operator (add, sub, mul, div)
-        :param other: object to add/sub/mul/div with self - can be list, numpy array, workspace, number...
-        :return: new workspace wrapper with same type as self.
-        """
-        if isinstance(other, list):
-            other = np.asarray(other)
-        if isinstance(other, self.__class__):
-            if self.check_dimensions(other):
-                inner_res = operator(self._raw_ws, other._raw_ws)
-            else:
-                raise RuntimeError("workspaces must have same dimensionality for binary operations (+, -, *, /)")
-        elif isinstance(other, np.ndarray):
-            inner_res = self._binary_op_array(operator, other)
+    def __init__(self, mantid_ws):
+        if isinstance(mantid_ws, MatrixWorkspace):
+            self._raw_ws = mantid_ws
         else:
-            inner_res = operator(self._raw_ws, other)
-        workspace_type = type(self)
-        return workspace_type(inner_res)
+            raise TypeError('Workspace expected matrixWorkspace, got %s' % mantid_ws.__class__.__name__)
 
-    def _binary_op_array(self, operator, other):
-        """Perform binary operation using a numpy array with the same number of elements as _raw_ws signal"""
-        if other.size == self.get_signal().size:
-            new_signal = operator(other, self.get_signal()[0])
-            return CreateWorkspace(self._raw_ws.extractX(), new_signal,
-                                   self._raw_ws.extractE(), outputWorkspace=str(self))
-        else:
-            raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
-
-    def check_dimensions(self, workspace_to_check):
-        """check if a workspace has the same number of bins as self for each dimension"""
-        for i in range(self._raw_ws.getNumDims()):
-            if self._raw_ws.getDimension(i).getNBins() != workspace_to_check._raw_ws.getDimension(i).getNBins():
-                return False
-        return True
-
-    def __add__(self, other):
-        return self._binary_op(operator.add, other)
-
-    def __sub__(self, other):
-        return self._binary_op(operator.sub, other)
-
-    def __mul__(self, other):
-        return self._binary_op(operator.mul, other)
-
-    def __div__(self, other):
-        return self._binary_op(operator.div, other)
-
-    def __pow__(self, other):
-        new = self
-        while other > 1:
-            new = new * self
-            other -= 1
-        return new
-
-    def __neg__(self):
-        return self * -1
+    def rewrap(self, mantid_ws):
+        return Workspace(mantid_ws)
