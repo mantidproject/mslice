@@ -71,6 +71,6 @@ class PixelWorkspaceTest(unittest.TestCase):
         list_to_add = np.linspace(0, 99, 100)
         result = self.workspace + list_to_add
         result = result.get_signal()
-        self.assertEqual(0, result[0][0])
-        self.assertEqual(13, result[1][47])
-        self.assertEqual(35, result[3][52])
+        self.assertAlmostEqual(0, result[0][0], 8)
+        self.assertAlmostEqual(13, result[1][47], 8)
+        self.assertAlmostEqual(35, result[3][52], 8)
