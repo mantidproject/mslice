@@ -1,7 +1,17 @@
 import numpy as np
 import operator
-from mantid.simpleapi import CreateWorkspace
 from mantid.api import AlgorithmManager
+
+
+def run_child_alg(name, output='OutputWorkspace', **kwargs):
+    alg = AlgorithmManager.createUnmanaged(name)
+    alg.setChild(True)
+    alg.initialize()
+    alg.setProperty('OutputWorkspace', 'dummy') # must be set for some algs but is not used
+    for key in kwargs.keys():
+        alg.setProperty(key, kwargs[key])
+    alg.execute()
+    return alg.getProperty(output).value
 
 class WorkspaceMixin(object):
 
@@ -62,8 +72,8 @@ class WorkspaceMixin(object):
         """Perform binary operation using a numpy array with the same number of elements as _raw_ws signal"""
         if other.size == self.get_signal().size:
             new_signal = operator(other, self.get_signal()[0])
-            return CreateWorkspace(self._raw_ws.extractX(), new_signal,
-                                   self._raw_ws.extractE(), outputWorkspace=str(self))
+            return run_child_alg('CreateWorkspace', DataX=self._raw_ws.extractX(), DataY=new_signal,
+                                   DataE=self._raw_ws.extractE(), outputWorkspace='dummy')
         else:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
 
@@ -90,11 +100,4 @@ class WorkspaceMixin(object):
         return self * -1
 
     def __pow__(self, exponent):
-        pow_alg = AlgorithmManager.createUnmanaged('PowerMD')
-        pow_alg.setChild(True)
-        pow_alg.initialize()
-        pow_alg.setProperty('InputWorkspace', self._raw_ws)
-        pow_alg.setProperty('OutputWorkspace', 'dummy')
-        pow_alg.setProperty('Exponent', exponent)
-        pow_alg.execute()
-        return self.rewrap(pow_alg.getProperty('OutputWorkspace').value)
+        return self.rewrap(run_child_alg('PowerMD', InputWorkspace=self._raw_ws, Exponent=exponent))

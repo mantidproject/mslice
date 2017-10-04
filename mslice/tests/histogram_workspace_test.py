@@ -54,7 +54,9 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         expected_values = np.empty((10, 10))
         for i in range(10):
             expected_values[i] = line
-        self.assertTrue((result == expected_values).all())
+        print expected_values
+        print result
+        np.testing.assert_array_almost_equal(expected_values, result, 8)
 
     def test_add_invalid_list(self):
         invalid_list = np.linspace(0, -6, 3)
