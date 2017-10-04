@@ -1,6 +1,6 @@
 from histogram_workspace import HistogramWorkspace
 from mantid.simpleapi import BinMD
-from workspace_mixin import run_child_alg
+
 
 class PixelMixin(object):
 

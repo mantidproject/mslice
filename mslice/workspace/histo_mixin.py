@@ -1,8 +1,5 @@
 import numpy as np
-from mantid.simpleapi import CreateMDHistoWorkspace, ReplicateMD
-from mantid.api import AlgorithmManager
 from workspace_mixin import run_child_alg
-import operator
 
 
 class HistoMixin(object):

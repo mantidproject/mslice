@@ -73,7 +73,7 @@ class WorkspaceMixin(object):
         if other.size == self.get_signal().size:
             new_signal = operator(other, self.get_signal()[0])
             return run_child_alg('CreateWorkspace', DataX=self._raw_ws.extractX(), DataY=new_signal,
-                                   DataE=self._raw_ws.extractE(), outputWorkspace='dummy')
+                                 DataE=self._raw_ws.extractE(), outputWorkspace='dummy')
         else:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
 
