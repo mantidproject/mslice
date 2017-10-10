@@ -72,7 +72,7 @@ class FigureManager(object):
     def _new_figure(fig_num=None):
         if fig_num is None:
             fig_num = 1
-            while any([fig_num == existing_fig_num for existing_fig_num in list(FigureManager._figures.keys())]):
+            while any([fig_num == existing_fig_num for existing_fig_num in FigureManager._figures.keys()]):
                 fig_num += 1
         new_fig = PlotFigureManager(fig_num, FigureManager)
         FigureManager._figures[fig_num] = new_fig

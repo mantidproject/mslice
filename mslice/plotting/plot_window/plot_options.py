@@ -1,5 +1,6 @@
 import PyQt4.QtGui as QtGui
 from PyQt4.QtCore import pyqtSignal
+from six import iteritems
 
 from .plot_options_ui import Ui_Dialog
 
@@ -230,9 +231,9 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
                     '*': 'Star', 'h': 'Hexagon 1', 'H': 'Hexagon 2', '+': 'Plus', 'x': 'X', 'D': 'Diamond',
                     'd': 'Diamond (thin)', '|': 'Vertical line', '_': 'Horizontal line', 'None': 'None'}
 
-    inverse_colors = {v: k for k, v in colors.items()}
-    inverse_styles = {v: k for k, v in styles.items()}
-    inverse_markers = {v: k for k, v in markers.items()}
+    inverse_colors = {v: k for k, v in iteritems(colors)}
+    inverse_styles = {v: k for k, v in iteritems(styles)}
+    inverse_markers = {v: k for k, v in iteritems(markers)}
 
     def __init__(self, parent, text, show_legend, line_options):
         super(LegendAndLineOptionsSetter, self).__init__(parent)

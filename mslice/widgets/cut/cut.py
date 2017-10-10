@@ -30,7 +30,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
             self.btnCutSaveToWorkspace: Command.SaveToWorkspace,
             self.btnCutSaveAscii: Command.SaveToAscii
         }
-        for button in list(self._command_lookup.keys()):
+        for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
         cut_algorithm = MantidCutAlgorithm()
         cut_plotter = MatplotlibCutPlotter(cut_algorithm)
