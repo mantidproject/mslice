@@ -23,22 +23,21 @@ class PixelMixin(object):
         return self._histo_ws
 
     def get_signal(self):
-        """Gets data values (Y axis) from the workspace as a numpy array. Overrides Workspace method."""
+        """Gets data values (Y axis) from the workspace as a numpy array."""
         return self.get_histo_ws().get_signal()
 
     def get_error(self):
-        """Gets error values (E) from the workspace as a numpy array. Overrides Workspace method."""
+        """Gets error values (E) from the workspace as a numpy array."""
         return self.get_histo_ws().get_error()
 
     def get_variance(self):
-        """Gets variance (error^2) from the workspace as a numpy array. Overrides Workspace method"""
+        """Gets variance (error^2) from the workspace as a numpy array."""
         return self.get_histo_ws().get_variance()
 
     def _binary_op_array(self, operator, other):
         """
         Perform binary operation (+,-,*,/) using a 1D numpy array.
 
-        Overrides Workspace method.
         Note this wraps the result in HistogramWorkspace object, which is then passed
          to PixelWorkspace constructor in Workspace._binary_op.
         """

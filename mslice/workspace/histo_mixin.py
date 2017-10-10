@@ -5,16 +5,17 @@ from workspace_mixin import run_child_alg
 class HistoMixin(object):
 
     def get_signal(self):
-        """Gets data values (Y axis) from the workspace as a numpy array. Overrides Workspace method."""
-        return self._raw_ws.getSignalArray()
+        """Gets data values (Y axis) from the workspace as a numpy array."""
+        return self._raw_ws.getSignalArray().copy()
 
     def get_error(self):
-        """Gets error values (E) from the workspace as a numpy array. Overrides Workspace method."""
-        return np.sqrt(self.get_variance())
+        """Gets error values (E) from the workspace as a numpy array."""
+        return np.sqrt(self.get_variance(False))
 
-    def get_variance(self):
-        """Gets variance (error^2) from the workspace as a numpy array. Overrides Workspace method"""
-        return self._raw_ws.getErrorSquaredArray()
+    def get_variance(self, copy=True):
+        """Gets variance (error^2) from the workspace as a numpy array."""
+        variance = self._raw_ws.getErrorSquaredArray()
+        return variance.copy() if copy else variance
 
     def _binary_op_array(self, op, other):
         """
@@ -38,7 +39,6 @@ class HistoMixin(object):
         except RuntimeError:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
         # return operator(self._raw_ws, replicated)
-        print "replicate completed"
         if op.__name__ == 'add':
             alg = 'PlusMD'
         elif op.__name__ == 'sub':

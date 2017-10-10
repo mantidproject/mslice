@@ -12,7 +12,7 @@ class PixelWorkspaceTest(unittest.TestCase):
         sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
                                                   UnitX='DeltaE', OutputWorkspace='simws')
         AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
-        cls.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="Convertspace", QDimensions='|Q|',
+        cls.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="convert_ws", QDimensions='|Q|',
                                     dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                     SplitInto='50,50')
         cls.workspace = PixelWorkspace(cls.workspace)
