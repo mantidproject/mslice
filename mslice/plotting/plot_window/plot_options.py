@@ -166,7 +166,7 @@ class CutPlotOptions(PlotOptionsDialog):
             for option in ['show', 'color', 'style', 'width', 'marker']:
                 line_options[option] = getattr(line_widget, option)
             all_line_options.append(line_options)
-        return zip(legends, all_line_options)
+        return list(zip(legends, all_line_options))
 
     def color_validator(self, selected):
         count = 0
@@ -230,9 +230,9 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
                     '*': 'Star', 'h': 'Hexagon 1', 'H': 'Hexagon 2', '+': 'Plus', 'x': 'X', 'D': 'Diamond',
                     'd': 'Diamond (thin)', '|': 'Vertical line', '_': 'Horizontal line', 'None': 'None'}
 
-    inverse_colors = {v: k for k, v in colors.iteritems()}
-    inverse_styles = {v: k for k, v in styles.iteritems()}
-    inverse_markers = {v: k for k, v in markers.iteritems()}
+    inverse_colors = {v: k for k, v in colors.items()}
+    inverse_styles = {v: k for k, v in styles.items()}
+    inverse_markers = {v: k for k, v in markers.items()}
 
     def __init__(self, parent, text, show_legend, line_options):
         super(LegendAndLineOptionsSetter, self).__init__(parent)
@@ -243,7 +243,7 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.color_label = QtGui.QLabel(self)
         self.color_label.setText("Color:")
         self.line_color = QtGui.QComboBox(self)
-        self.line_color.addItems(self.colors.values())
+        self.line_color.addItems(list(self.colors.values()))
         chosen_color_as_string = self.colors[line_options['color'].upper()]
         self.line_color.setCurrentIndex(self.line_color.findText(chosen_color_as_string))
         self.previous_color = self.line_color.currentIndex()
@@ -251,7 +251,7 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.style_label = QtGui.QLabel(self)
         self.style_label.setText("Style:")
         self.line_style = QtGui.QComboBox(self)
-        self.line_style.addItems(self.styles.values())
+        self.line_style.addItems(list(self.styles.values()))
         chosen_style_as_string = self.styles[line_options['style']]
         self.line_style.setCurrentIndex(self.line_style.findText(chosen_style_as_string))
 
@@ -264,7 +264,7 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.marker_label = QtGui.QLabel(self)
         self.marker_label.setText("Marker:")
         self.line_marker = QtGui.QComboBox(self)
-        markers = self.markers.values()
+        markers = list(self.markers.values())
         markers.sort()
         self.line_marker.addItems(markers)
         chosen_marker_as_string = self.markers[line_options['marker']]

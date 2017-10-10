@@ -173,8 +173,8 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
             return
-        self._slice_view.populate_slice_x_params(*map(lambda x: "%.5f" % x, (x_min, x_max, x_step)))
-        self._slice_view.populate_slice_y_params(*map(lambda x: "%.5f" % x, (y_min, y_max, y_step)))
+        self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
+        self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])
 
     def _clear_displayed_error(self):
         self._slice_view.clear_displayed_error()

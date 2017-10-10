@@ -176,7 +176,7 @@ class CutPresenter(object):
 
     def workspace_selection_changed(self):
         if self._previous_cut is not None and self._previous_axis is not None:
-            if self._previous_cut not in self._saved_parameters.keys():
+            if self._previous_cut not in list(self._saved_parameters.keys()):
                 self._saved_parameters[self._previous_cut] = dict()
             self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
 
@@ -200,8 +200,8 @@ class CutPresenter(object):
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
             self._cut_view.set_cut_axis(current_axis)
-            if workspace in self._saved_parameters.keys():
-                if current_axis in self._saved_parameters[workspace].keys():
+            if workspace in list(self._saved_parameters.keys()):
+                if current_axis in list(self._saved_parameters[workspace].keys()):
                     self._cut_view.populate_input_fields(self._saved_parameters[workspace][current_axis])
             self._previous_cut = workspace
             self._previous_axis = current_axis
@@ -215,7 +215,7 @@ class CutPresenter(object):
                 self._cut_view.force_normalization()
             self._cut_view.populate_cut_axis_options([cut_axis.units])
             def format_(*args):
-                return map(lambda x: "%.5f" % x, args)
+                return ["%.5f" % x for x in args]
             self._cut_view.populate_cut_params(*format_(cut_axis.start, cut_axis.end, cut_axis.step))
             self._cut_view.populate_integration_params(*format_(*integration_limits))
             self._minimumStep[cut_axis.units] = None
@@ -230,13 +230,13 @@ class CutPresenter(object):
 
     def _cut_axis_changed(self):
         if self._previous_axis is not None:
-            if self._previous_cut not in self._saved_parameters.keys():
+            if self._previous_cut not in list(self._saved_parameters.keys()):
                 self._saved_parameters[self._previous_cut] = dict()
             self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
         self._cut_view.clear_input_fields(keep_axes=True)
         if self._previous_cut is not None:
             self._previous_axis = self._cut_view.get_cut_axis()
-            if self._previous_axis in self._saved_parameters[self._previous_cut].keys():
+            if self._previous_axis in list(self._saved_parameters[self._previous_cut].keys()):
                 self._cut_view.populate_input_fields(self._saved_parameters[self._previous_cut][self._previous_axis])
         minStep = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(minStep)

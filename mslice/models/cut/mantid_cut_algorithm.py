@@ -99,8 +99,8 @@ class MantidCutAlgorithm(CutAlgorithm):
             except RuntimeError:
                 return False
             if algorithm.name() == 'BinMD':
-                if all(map(lambda x: not algorithm.getPropertyValue(x), empty_params))\
-                        and all(map(lambda x: algorithm.getPropertyValue(x), used_params)):
+                if all([not algorithm.getPropertyValue(x) for x in empty_params])\
+                        and all([algorithm.getPropertyValue(x) for x in used_params]):
                     return True
                 break
         return False
@@ -127,7 +127,7 @@ class MantidCutAlgorithm(CutAlgorithm):
         # The axis name is retreived from the workspace directly and not the binning string to avoid
         # adding/removing trailing spaces
         dim_name = cut_workspace.getDimension(0).getName()
-        cut_axis = Axis(dim_name, *map(float,cut_binning[1:]))
+        cut_axis = Axis(dim_name, *list(map(float,cut_binning[1:])))
         cut_axis.step = (cut_axis.end - cut_axis.start)/float(cut_binning[-1])
         return cut_axis, integration_range, is_norm
 

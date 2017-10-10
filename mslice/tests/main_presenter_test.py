@@ -24,7 +24,7 @@ class MainPresenterTests(unittest.TestCase):
         main_presenter.register_workspace_selector(self.workspace_presenter)
         return_value = main_presenter.get_selected_workspaces()
         self.workspace_presenter.get_selected_workspaces.assert_called()
-        self.assert_(return_value == SELECTED_WORKSPACES)
+        self.assertTrue(return_value == SELECTED_WORKSPACES)
 
     def test_selection_change_broadcast(self):
         main_presenter = MainPresenter(self.mainview)

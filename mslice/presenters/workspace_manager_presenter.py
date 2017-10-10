@@ -140,7 +140,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         get_name = self._work_spaceprovider.get_workspace_name
         index_list = []
         for item in workspace_list:
-            if isinstance(item, basestring):
+            if isinstance(item, str):
                 index_list.append(get_index(item))
             elif isinstance(item, int):
                 index_list.append(item)

@@ -75,7 +75,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                 return
 
     def get_workspace_selected(self):
-        selected_workspaces = map(lambda x: str(x.text()), self.lstWorkspaces.selectedItems())
+        selected_workspaces = [str(x.text()) for x in self.lstWorkspaces.selectedItems()]
         return list(selected_workspaces)
 
     def set_workspace_selected(self, index):

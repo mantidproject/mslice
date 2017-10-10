@@ -28,15 +28,15 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def delete_workspace(self, workspace):
         ws = DeleteWorkspace(Workspace=workspace)
-        if workspace in self._EfDefined.keys():
+        if workspace in list(self._EfDefined.keys()):
             del self._EfDefined[workspace]
-        if workspace in self._limits.keys():
+        if workspace in list(self._limits.keys()):
             del self._limits[workspace]
         return ws
 
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""
-        ws_name = workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)
+        ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(ws_name)
         try:
             [ws_h.getEFixed(ws_h.getDetector(i).getID()) for i in range(ws_h.getNumberHistograms())]
@@ -46,7 +46,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def _processLoadedWSLimits(self, workspace):
         """ Processes an (angle-deltaE) workspace to get the limits and step size in angle, energy and |Q| """
-        ws_name = workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)
+        ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(workspace)
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
         try:
@@ -78,7 +78,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         E2q = 2. * constants.m_n / (constants.hbar ** 2)  # Energy to (neutron momentum)^2 (==2m_n/hbar^2)
         meV2J = constants.e / 1000.                       # meV to Joules
         m2A = 1.e10                                       # metres to Angstrom
-        if ws_name not in self._limits.keys():
+        if ws_name not in list(self._limits.keys()):
             self._limits[ws_name] = {}
         th = np.array([np.min(theta), np.max(theta), np.mean(np.diff(theta))])
         # Use |Q| at elastic line to get minimum and step size
@@ -100,9 +100,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def rename_workspace(self, selected_workspace, new_name):
         ws = RenameWorkspace(InputWorkspace=selected_workspace, OutputWorkspace=new_name)
-        if selected_workspace in self._limits.keys():
+        if selected_workspace in list(self._limits.keys()):
             self._limits[new_name] = self._limits.pop(selected_workspace)
-        if selected_workspace in self._EfDefined.keys():
+        if selected_workspace in list(self._EfDefined.keys()):
             self._EfDefined[new_name] = self._EfDefined.pop(selected_workspace)
         return ws
 
@@ -122,13 +122,13 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_workspace_name(self, workspace):
         """Returns the name of a workspace given the workspace handle"""
-        if isinstance(workspace, basestring):
+        if isinstance(workspace, str):
             return workspace
         return workspace.name()
 
     def get_emode(self, workspace):
         """Returns the energy analysis mode (direct or indirect of a workspace)"""
-        if isinstance(workspace, basestring):
+        if isinstance(workspace, str):
             workspace_handle = self.get_workspace_handle(workspace)
         else:
             workspace_handle = workspace
@@ -141,21 +141,21 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return emode
 
     def has_efixed(self, workspace):
-        return self._EfDefined[workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)]
+        return self._EfDefined[workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)]
 
     def set_efixed(self, workspace, Ef):
         """Sets (overides) the fixed energy for all detectors (spectra) of this workspace"""
-        ws_name = workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)
+        ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
         ws_handle = self.get_workspace_handle(ws_name)
         for idx in range(ws_handle.getNumberHistograms()):
             ws_handle.setEFixed(ws_handle.getDetector(idx).getID(), Ef)
 
     def get_limits(self, workspace, axis):
         """Determines the limits of the data and minimum step size"""
-        if workspace not in self._limits.keys():
+        if workspace not in list(self._limits.keys()):
             self._processLoadedWSLimits(workspace)
         # If we cannot get the step size from the data, use the old 1/100 steps.
-        if axis in self._limits[workspace].keys():
+        if axis in list(self._limits[workspace].keys()):
             return self._limits[workspace][axis]
         else:
             ws_h = self.get_workspace_handle(workspace)
@@ -166,9 +166,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def propagate_properties(self, old_workspace, new_workspace):
         """Propagates MSlice only properties of workspaces, e.g. limits"""
-        if old_workspace in self._EfDefined.keys():
+        if old_workspace in list(self._EfDefined.keys()):
             self._EfDefined[new_workspace] = self._EfDefined[old_workspace]
-        if old_workspace in self._limits.keys():
+        if old_workspace in list(self._limits.keys()):
             self._limits[new_workspace] = self._limits[old_workspace]
 
     def getComment(self, workspace):

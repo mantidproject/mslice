@@ -29,7 +29,7 @@ import numpy as np
 # Handles older matplotlib than 1.5
 if MPL_COMPAT:
     def _string_to_bool(val):
-        if isinstance(val, basestring):
+        if isinstance(val, str):
              return 'on' in val.lower()
         return val
 else:

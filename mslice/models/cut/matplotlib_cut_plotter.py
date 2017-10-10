@@ -43,6 +43,6 @@ class MatplotlibCutPlotter(CutPlotter):
             mappings = {'DeltaE':'E', 'MomentumTransfer':'|Q|', 'Degrees':r'2Theta'}
         else:
             mappings = {'DeltaE':'E', 'MomentumTransfer':'|Q|', 'Degrees':r'2$\theta$'}
-        integrated_dim = mappings[integrated_dim] if integrated_dim in mappings.keys() else integrated_dim
+        integrated_dim = mappings[integrated_dim] if integrated_dim in list(mappings.keys()) else integrated_dim
         return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
             "%.2f" % integration_end

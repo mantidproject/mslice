@@ -1,5 +1,5 @@
 #This file defines generic functions to get and display variables from users
-from ui_mock import GetInputFromUser, display_message
+from .ui_mock import GetInputFromUser, display_message
 
 
 def get(title):

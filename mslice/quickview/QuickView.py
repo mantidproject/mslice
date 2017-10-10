@@ -1,6 +1,6 @@
 #TODO MOVE TO TOOLS
 import re
-from ui_mock import GetInputFromUser,display_message
+from .ui_mock import GetInputFromUser,display_message
 from PyQt4 import QtGui
 
 
@@ -28,11 +28,11 @@ class QuickView(QtGui.QWidget):
             try:
                 return object.__getattribute__(self,item)
             except AttributeError:
-                print item, 'Call handle failed'
+                print(item, 'Call handle failed')
                 raise AttributeError('Attribute %s not found'%item)
 
         self._title = item
-        for regex,function in self._handlers.items():
+        for regex,function in list(self._handlers.items()):
             if regex.match(item):
                 return function
         return self._default_handler
