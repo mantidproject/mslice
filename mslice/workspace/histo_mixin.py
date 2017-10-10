@@ -38,6 +38,7 @@ class HistoMixin(object):
         except RuntimeError:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
         # return operator(self._raw_ws, replicated)
+        print "replicate completed"
         if op.__name__ == 'add':
             alg = 'PlusMD'
         elif op.__name__ == 'sub':
