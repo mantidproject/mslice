@@ -138,13 +138,13 @@ class FigureManager(object):
 
     @staticmethod
     def assign_figure_to_category(fig_num, category, make_current=False):
-        if fig_num not in list(FigureManager._figures.keys()):
+        if fig_num not in FigureManager._figures:
             raise ValueError("Figure does not exist")
 
         if fig_num in FigureManager._unclassified_figures:
             FigureManager._unclassified_figures.remove(fig_num)
 
-        for a_category in list(FigureManager._figures_by_category.keys()):
+        for a_category in FigureManager._figures_by_category:
             if fig_num in FigureManager._figures_by_category[a_category]:
                 FigureManager._figures_by_category[a_category].remove(fig_num)
             if FigureManager._category_current_figures == fig_num:
@@ -162,7 +162,7 @@ class FigureManager(object):
         If it was the category current or global active figure then set that to NO_FIGURE"""
         if FigureManager._active_figure == figure_number:
             FigureManager._active_figure = NO_FIGURE
-        for a_category in list(FigureManager._figures_by_category.keys()):
+        for a_category in FigureManager._figures_by_category:
             if figure_number in FigureManager._figures_by_category[a_category]:
                 FigureManager._figures_by_category[a_category].remove(figure_number)
 
@@ -217,7 +217,7 @@ class FigureManager(object):
     def broadcast(category=None):
         """This method will broadcast to all figures in 'category' to update the displayed kept/current status"""
         if category is None:
-            broadcast_list = list(FigureManager._figures_by_category.keys())
+            broadcast_list = FigureManager._figures_by_category
         else:
             broadcast_list = [category]
 

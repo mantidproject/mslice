@@ -60,7 +60,7 @@ class BasePlotWindow(object):
         """Return a line of python code for a tuple in the log"""
         output = ""
         source_module, function_name, call_args, call_kwargs = command
-        if source_module in list(self._import_aliases.keys()):
+        if source_module in self._import_aliases:
             source_module = self._import_aliases[source_module]
 
         if source_module:
