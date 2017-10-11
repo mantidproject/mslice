@@ -18,6 +18,7 @@ from .cut_ui import Ui_Form
 # Classes and functions
 # -----------------------------------------------------------------------------
 
+
 class CutWidget(QWidget, CutView, Ui_Form):
     error_occurred = pyqtSignal('QString')
     busy = pyqtSignal(bool)
