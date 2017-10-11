@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt4 import QtGui

@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import uuid
 from mantid.simpleapi import ConvertToMD, SliceMD, TransformMD, ConvertSpectrumAxis, PreprocessDetectorsToMD
 from mantid.simpleapi import RenameWorkspace, DeleteWorkspace, SofQW3

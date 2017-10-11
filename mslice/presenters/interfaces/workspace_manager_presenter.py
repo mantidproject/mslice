@@ -1,3 +1,6 @@
+from __future__ import (absolute_import, division, print_function)
+
+
 class WorkspaceManagerPresenterInterface(object):
     def __init__(self, _workspace_view, _workspace_provider):
         raise Exception("Interface Class must not be instantiated")

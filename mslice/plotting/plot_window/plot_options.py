@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import PyQt4.QtGui as QtGui
 from PyQt4.QtCore import pyqtSignal
 from six import iteritems

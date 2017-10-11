@@ -1,3 +1,5 @@
+from __future__ import (absolute_import, division, print_function)
+
 """A concrete implementation of a WorkspaceProvider
 
 It uses mantid to perform the workspace operations

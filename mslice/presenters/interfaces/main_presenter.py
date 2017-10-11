@@ -1,3 +1,6 @@
+from __future__ import (absolute_import, division, print_function)
+
+
 class MainPresenterInterface(object):
     def __init__(self, _main_view):
         raise Exception("This class is an abstract interface and must no be instantiated")

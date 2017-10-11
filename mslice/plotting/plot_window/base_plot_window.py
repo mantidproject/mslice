@@ -1,3 +1,6 @@
+from __future__ import (absolute_import, division, print_function)
+
+
 class BasePlotWindow(object):
     """The Subclass MUST during construction initialize self.canvas as its canvas.
 

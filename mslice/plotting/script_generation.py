@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from .figuremanager import FigureManager
 
 def script_log(source_module):

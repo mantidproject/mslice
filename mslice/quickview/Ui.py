@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 #This file defines generic functions to get and display variables from users
 from .ui_mock import GetInputFromUser, display_message
 

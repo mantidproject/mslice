@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from tempfile import gettempdir
 from os.path import join
 import unittest

@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 #TODO MOVE TO TOOLS
 import re
 from .ui_mock import GetInputFromUser,display_message

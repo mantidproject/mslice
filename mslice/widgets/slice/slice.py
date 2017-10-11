@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 """A widget for defining slice calculations
 """
 # -----------------------------------------------------------------------------

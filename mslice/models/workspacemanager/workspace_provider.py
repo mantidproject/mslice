@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 """Defines the interface to an object responsible for performaing operations on
 workspaces
 """
