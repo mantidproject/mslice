@@ -6,7 +6,7 @@ It uses mantid to perform the workspace operations
 # Imports
 # -----------------------------------------------------------------------------
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
-                              RenameWorkspace, SaveNexus, SaveMD)
+                              RenameWorkspace, SaveNexus, SaveMD, MergeMD)
 from mantid.api import IMDWorkspace, Workspace
 import numpy as np
 from scipy import constants
@@ -80,7 +80,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         m2A = 1.e10                                       # metres to Angstrom
         if ws_name not in self._limits.keys():
             self._limits[ws_name] = {}
-        th = np.array([np.min(theta), np.max(theta), np.mean(np.diff(theta))])
+        # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.1 degrees
+        thdiff = np.diff(np.round(np.sort(theta)*573)/573)
+        th = np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff>0)])])
         # Use |Q| at elastic line to get minimum and step size
         qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(th)) * meV2J) / m2A)
         # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
@@ -106,12 +108,33 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self._EfDefined[new_name] = self._EfDefined.pop(selected_workspace)
         return ws
 
+    def combine_workspace(self, selected_workspaces, new_name):
+        ws = MergeMD(InputWorkspaces=selected_workspaces, OutputWorkspace=new_name)
+        # Use precalculated step size, otherwise get limits directly from workspace
+        ax1 = ws.getDimension(0)
+        ax2 = ws.getDimension(1)
+        step1 = []
+        step2 = []
+        for input_workspace in selected_workspaces:
+            step1.append(self.get_limits(input_workspace, ax1.name)[2])
+            step2.append(self.get_limits(input_workspace, ax2.name)[2])
+        if new_name not in self._limits.keys():
+            self._limits[new_name] = {}
+        self._limits[new_name][ax1.name] = [ax1.getMinimum(), ax1.getMaximum(), np.max(step1)]
+        self._limits[new_name][ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
+        return ws
+
     def save_nexus(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDWorkspace):
             SaveMD(InputWorkspace=workspace, Filename=path)
         else:
             SaveNexus(InputWorkspace=workspace, Filename=path)
+
+    def is_pixel_workspace(self, workspace_name):
+        from mantid.api import IMDEventWorkspace
+        workspace = self.get_workspace_handle(workspace_name)
+        return isinstance(workspace, IMDEventWorkspace)
 
     def get_workspace_handle(self, workspace_name):
         """"Return handle to workspace given workspace_name_as_string"""

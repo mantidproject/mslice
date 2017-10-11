@@ -30,6 +30,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._remove_selected_workspaces()
         elif command == Command.RenameWorkspace:
             self._rename_workspace()
+        elif command == Command.CombineWorkspace:
+            self._combine_workspace()
         elif command == Command.SelectionChanged:
             self._broadcast_selected_workspaces()
         else:
@@ -130,6 +132,20 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         new_name = self._workspace_manager_view.get_workspace_new_name()
         self._work_spaceprovider.rename_workspace(selected_workspace, new_name)
         self._workspace_manager_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
+
+    def _combine_workspace(self):
+        selected_workspaces = self._workspace_manager_view.get_workspace_selected()
+        if not selected_workspaces or len(selected_workspaces) == 1:
+            self._workspace_manager_view.error_select_more_than_one_workspaces()
+            return
+        new_workspace = selected_workspaces[0] + '_combined'
+        if all([self._work_spaceprovider.is_pixel_workspace(workspace) for workspace in selected_workspaces]):
+            self._work_spaceprovider.combine_workspace(selected_workspaces, new_workspace)
+        else:
+            self._workspace_manager_view.error_select_more_than_one_workspaces()
+            return
+        self._workspace_manager_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
+        return
 
     def get_selected_workspaces(self):
         """Get the currently selected workspaces from the user"""

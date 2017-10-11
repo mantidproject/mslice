@@ -30,7 +30,14 @@ class WorkspaceProvider(object):
         pass
 
     @abc.abstractmethod
+    def combine_workspace(self, selected_workspace, new_name):
+        pass
+
+    @abc.abstractmethod
     def save_nexus(self, workspace, path):
+        pass
+
+    def is_pixel_workspace(self, workspace_name):
         pass
 
     def get_workspace_handle(self, workspace_name):
