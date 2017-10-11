@@ -1,5 +1,5 @@
 import numpy as np
-from workspace_mixin import run_child_alg
+from .workspace_mixin import run_child_alg
 
 
 class HistoMixin(object):

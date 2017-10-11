@@ -1,8 +1,9 @@
 import abc
+from six import add_metaclass
 
 
+@add_metaclass(abc.ABCMeta)
 class WorkspaceBase(object):
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def get_coordinates(self):

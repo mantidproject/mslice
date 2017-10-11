@@ -10,7 +10,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     @classmethod
     def setUpClass(cls):
-        signal = range(0, 100)
+        signal = list(range(0, 100))
         error = np.zeros(100) + 2
         cls.workspace = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
                                                                   SignalInput=signal, ErrorInput=error,

@@ -1,5 +1,5 @@
-from base import WorkspaceBase
-from workspace_mixin import WorkspaceMixin
+from .base import WorkspaceBase
+from .workspace_mixin import WorkspaceMixin
 
 from mantid.api import MatrixWorkspace
 

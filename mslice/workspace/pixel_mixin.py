@@ -1,4 +1,4 @@
-from histogram_workspace import HistogramWorkspace
+from .histogram_workspace import HistogramWorkspace
 from mantid.simpleapi import BinMD
 
 
