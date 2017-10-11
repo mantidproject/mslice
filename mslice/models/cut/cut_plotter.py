@@ -1,4 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
 class CutPlotter(object):
     def __init__(self, _cut_algorithm):
         raise Exception('This class is an interface')

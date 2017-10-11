@@ -1,9 +1,9 @@
-from __future__ import (absolute_import, division, print_function)
 """A widget for defining slice calculations
 """
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import (absolute_import, division, print_function)
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import pyqtSignal
 

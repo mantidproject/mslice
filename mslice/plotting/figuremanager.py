@@ -1,4 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
 # This is the class responsible for handling which figures are current (will receive plotting commands) and which are
 # kept (will not be modified until it is made current once again).
 # The FigureManager in its responsibilities highly resembles the class maptplotlib._pylab_helpers.Gcf, However it
@@ -32,6 +31,7 @@ from __future__ import (absolute_import, division, print_function)
 #  dictionaries (Or maybe adding an add_category function to facilitate this)
 #
 #
+from __future__ import (absolute_import, division, print_function)
 from functools import wraps
 
 from mslice.plotting import get_figure_class

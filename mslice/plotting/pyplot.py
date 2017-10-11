@@ -1,7 +1,7 @@
-from __future__ import (absolute_import, division, print_function)
 # This file was created from matplotlib.pyplot
 # matplotlib version 1.5.2
 # flake8 warnings are disabled for this file
+from __future__ import (absolute_import, division, print_function)
 from .figuremanager import FigureManager, activate_category
 from .script_generation import script_log
 from ._pyplot_decorators import draw_colorbar

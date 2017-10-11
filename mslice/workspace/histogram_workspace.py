@@ -5,6 +5,7 @@ from .workspace_mixin import WorkspaceMixin
 
 from mantid.api import IMDHistoWorkspace
 
+
 class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
     """workspace wrapper for MDHistoWorkspace"""
 

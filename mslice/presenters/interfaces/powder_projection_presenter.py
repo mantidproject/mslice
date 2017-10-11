@@ -1,16 +1,18 @@
-from __future__ import (absolute_import, division, print_function)
+import abc
+from six import add_metaclass
 
 
+@add_metaclass(abc.ABCMeta)
 class PowderProjectionPresenterInterface(object):
 
-    def __init__(self, _powder_view, _projection_calculator):
-        raise Exception("This interface must not be instantiated")
-
+    @abc.abstractmethod
     def register_master(self, main_view):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def notify(self, command):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def set_workspace_provider(self, workspace_provider):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass

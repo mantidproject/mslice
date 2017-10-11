@@ -1,5 +1,4 @@
-from __future__ import (absolute_import, division, print_function)
-"""Defines the interface to an object responsible for performaing operations on
+"""Defines the interface to an object responsible for performing operations on
 workspaces
 """
 # -----------------------------------------------------------------------------
@@ -7,11 +6,14 @@ workspaces
 # -----------------------------------------------------------------------------
 
 import abc
+from six import add_metaclass
 
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
 
+
+@add_metaclass(abc.ABCMeta)
 class WorkspaceProvider(object):
 
     @abc.abstractmethod

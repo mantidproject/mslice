@@ -9,6 +9,7 @@ from PyQt4.QtGui import QFileDialog
 from os.path import splitext
 import numpy as np
 
+
 class CutPresenter(object):
     def __init__(self, cut_view, cut_algorithm, cut_plotter):
         self._cut_view = cut_view

@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 """A concrete implementation of a WorkspaceProvider
 
 It uses mantid to perform the workspace operations
@@ -7,11 +5,13 @@ It uses mantid to perform the workspace operations
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import (absolute_import, division, print_function)
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
                               RenameWorkspace, SaveNexus, SaveMD)
 from mantid.api import IMDWorkspace, Workspace
 import numpy as np
 from scipy import constants
+
 
 from .workspace_provider import WorkspaceProvider
 

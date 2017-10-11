@@ -1,5 +1,5 @@
-from __future__ import (absolute_import, division, print_function)
 #TODO MOVE TO TOOLS
+from __future__ import (absolute_import, division, print_function)
 import re
 from .ui_mock import GetInputFromUser,display_message
 from PyQt4 import QtGui

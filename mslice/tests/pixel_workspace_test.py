@@ -6,6 +6,7 @@ from mantid.simpleapi import CreateSimulationWorkspace, ConvertToMD, AddSampleLo
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
 
+
 class PixelWorkspaceTest(unittest.TestCase):
 
     @classmethod

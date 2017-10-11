@@ -1,9 +1,10 @@
-from __future__ import (absolute_import, division, print_function)
 """Enumeration for operations allowed in this module
 """
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+
+from __future__ import (absolute_import, division, print_function)
 
 # -----------------------------------------------------------------------------
 # Classes and functions
