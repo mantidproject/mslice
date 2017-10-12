@@ -71,15 +71,16 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         super(CutPlotOptionsPresenter, self).__init__(plot_options_dialog, plot_figure_manager)
         self._xy_config.update({'x_log': self._model.x_log, 'y_log': self._model.y_log})
 
-        self._view.errorBarsEdited.connect(partial(self._value_modified, 'error_bars'))
+        self._view.showLegendsEdited.connect(partial(self._value_modified, 'show_legends'))
         self._view.xLogEdited.connect(partial(self._xy_config_modified, 'x_log'))
         self._view.yLogEdited.connect(partial(self._xy_config_modified, 'y_log'))
 
-        legends = self._model.get_legends()
-        self._view.set_legends(legends)
+        line_data = self._model.get_line_data()
+        self._view.set_line_data(line_data)
 
     def set_properties(self):
-        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log', 'error_bars']
+        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log', 'error_bars',
+                      'show_legends']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 
@@ -91,47 +92,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
             self._model.change_cut_plot(self._xy_config)
         for key, value in self._modified_values.items():
             setattr(self._model, key, value)
-        legends = self._view.get_legends()
-        self._model.set_legends(legends)
+        line_data = self._view.get_line_data()
+        self._model.set_line_data(line_data)
+        self._model.error_bars = self._view.error_bars
         return True
-
-
-class LegendDescriptor(object):
-    """This is a class that describes the legends on a plot"""
-    def __init__(self, visible=False, applicable=True, handles=None):
-        self.visible = visible
-        self.applicable = applicable
-        if handles:
-            self.handles = list(handles)
-        else:
-            self.handles = []
-        self._labels = {}
-
-    def all_legends(self):
-        """An iterator which yields a dictionary description of legends containing the handle,
-        text and if visible or not"""
-        for handle in self.handles:
-            yield self.get_legend_descriptor(handle)
-
-    def set_legend_text(self, handle, text, visible=True):
-        if handle not in self.handles:
-            self.handles.append(handle)
-        if not visible:
-            text = '_' + text
-        self._labels[handle] = text
-
-    def get_legend_descriptor(self, handle):
-        if handle in self._labels.keys():
-            label = self._labels[handle]  # If a new value has been set for a handle return that
-        else:
-            label = handle.get_label()   # Else get the value from the plot
-        if label.startswith('_'):
-            x = {'text': label[1:], 'visible': False, 'handle': handle}
-        else:
-            x = {'text': label, 'visible': True, 'handle': handle}
-        return x
-
-    def get_legend_text(self, handle):
-        if handle in self._labels.keys():
-            return self._labels[handle]
-        return handle.get_label()

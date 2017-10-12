@@ -27,6 +27,7 @@ class BaseQtPlotWindow(BasePlotWindow, QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
         self.canvas = MatplotlibCanvas(self)
+        self.canvas.manager = self
         self.setCentralWidget(self.canvas)
         self.setWindowTitle('Figure %i'%number)
 

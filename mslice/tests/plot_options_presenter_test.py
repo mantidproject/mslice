@@ -1,8 +1,6 @@
 from mock import MagicMock, PropertyMock, Mock
 import unittest
-from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter, \
-    LegendDescriptor
-
+from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
 
 
 class PlotOptionsPresenterTest(unittest.TestCase):
@@ -166,24 +164,28 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         # view -> model
         model_error_bars_mock.reset_mock()
         view_error_bars_mock.return_value = False
-        self.presenter._value_modified('error_bars')
         self.presenter.get_new_config()
 
         model_error_bars_mock.assert_called_once_with(False)
 
-    def test_legends(self):
+    def test_line_options(self):
         #  model -> view
-        legends = LegendDescriptor(handles=['legend0', 'legend1'])
-        self.model.get_legends = Mock(return_value=legends)
+        line_options = [{'color': 'k', 'style': '-', 'width': '10', 'marker': '*'}]
+        legends = {'label': 'legend1', 'visible': True}
+        line_data = zip(legends, line_options)
+        self.model.get_line_data = Mock(return_value=line_data)
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
 
-        self.model.get_legends.assert_called_once_with()
-        self.view.set_legends.assert_called_once_with(legends)
+        self.model.get_line_data.assert_called_once_with()
+        self.view.set_line_data.assert_called_once_with(line_data)
 
         #  view -> model
-        legends2 = LegendDescriptor(visible=False, handles=['legend2'])
-        self.view.get_legends = Mock(return_value=legends2)
+        line_options2 = [{'color': 'b', 'style': '-', 'width': '10', 'marker': 'o'}]
+        legends2 = {'label': 'legend1', 'visible': False}
+        line_data2 = zip(legends2, line_options2)
+
+        self.view.get_line_data = Mock(return_value=line_data2)
         self.presenter.get_new_config()
 
-        self.view.get_legends.assert_called_once_with()
-        self.model.set_legends.assert_called_once_with(legends2)
+        self.view.get_line_data.assert_called_once_with()
+        self.model.set_line_data.assert_called_once_with(line_data2)

@@ -20,6 +20,7 @@ class PowderWidget(QWidget, Ui_Form, PowderView):
     """This widget is not usable without a main window which implements mainview"""
 
     error_occurred = pyqtSignal('QString')
+    busy = pyqtSignal(bool)
 
     def __init__(self, *args, **kwargs):
         super(PowderWidget, self).__init__(*args, **kwargs)
