@@ -11,9 +11,12 @@ branches:
 matrix:
     include:
         - python: "2.7_with_system_site_packages"
+          env: PYTHON=2.7
           env: PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
 
 cache: pip
+
+before_install: buildscripts/install_mantidnightly.sh ${PYTHON}
 
 install: buildscripts/install.sh
 
