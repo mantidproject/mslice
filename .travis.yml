@@ -12,6 +12,8 @@ matrix:
     include:
         - python: "2.7_with_system_site_packages"
           env: PY=2.7 PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
+        - python: "3.4_with_system_site_packages"
+          env: PY=3.4 PYTHONPATH=$PYTHONPATH:/opt/mantidnightly-python3/bin
 
 cache: pip
 
