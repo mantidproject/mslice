@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from PyQt4.QtGui import QApplication, QMainWindow, QLabel
 
 from mslice.presenters.main_presenter import MainPresenter

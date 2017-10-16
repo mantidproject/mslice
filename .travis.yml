@@ -8,34 +8,20 @@ branches:
   only:
   - master
 
-python:
-  # See https://github.com/travis-ci/travis-ci/issues/2219#issuecomment-41804942
-  - "2.7_with_system_site_packages" # for pyqt4
+matrix:
+    include:
+        - python: "2.7_with_system_site_packages"
+          env: PY=2.7 PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
+        - python: "3.4_with_system_site_packages"
+          env: PY=3.4 PYTHONPATH=$PYTHONPATH:/opt/mantidnightly-python3/bin
 
 cache: pip
 
-before_install:
-  - python -c 'import sys; print sys.path'
-  - sudo apt-add-repository ppa:mantid/mantid -y && sudo apt-get update -q
-  # Download deb file from sourceforge as it's far quicker that the ISIS repo
-  - sudo apt-get install gdebi -y
-  - export mantiddeb=$(curl -sL https://github.com/mantidproject/download.mantidproject.org/raw/master/releases/nightly.txt | grep trusty)
-  - wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
-  - sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
-  - mkdir $HOME/.mantid && echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > $HOME/.mantid/Mantid.user.properties
-  # Circumvent a bug in mantid when instrument updates are unavilable. Fixed on 17/08/2017
-  - mkdir $HOME/.mantid/instrument
-  
-install:
-  - pip install -r setup-requirements.txt -r install-requirements.txt -r test-requirements.txt coveralls
+before_install: buildscripts/install_mantidnightly.sh ${PY}
 
-env:
-  - PYTHONPATH=$PYTHONPATH:/opt/mantidnightly/bin
+install: buildscripts/install.sh
 
-script:
-  - set -e
-  - python setup.py flake8
-  - python setup.py nosetests
+script: buildscripts/run.sh
 
 after_success:
   - coveralls

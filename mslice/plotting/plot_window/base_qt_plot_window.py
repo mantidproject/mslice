@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt4 import QtGui
@@ -29,7 +30,7 @@ class BaseQtPlotWindow(BasePlotWindow, QtGui.QMainWindow):
         self.canvas = MatplotlibCanvas(self)
         self.canvas.manager = self
         self.setCentralWidget(self.canvas)
-        self.setWindowTitle('Figure %i'%number)
+        self.setWindowTitle('Figure {}'.format(number))
 
 
     def closeEvent(self, event):
