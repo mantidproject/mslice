@@ -19,7 +19,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
         self.ws_provider.delete_workspace('test_ws_provider')
 
-        self.assertEqual([], self.ws_provider.get_workspace_names())
+        self.assertFalse('test_ws_provider' in self.ws_provider.get_workspace_names())
         self.assertRaises(KeyError, lambda: self.ws_provider._EfDefined['test_ws_provider'])
         self.assertRaises(KeyError, lambda: self.ws_provider._limits['test_ws_provider'])
 
@@ -32,7 +32,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.ws_provider._EfDefined['test_ws_provider'] = False
         self.ws_provider._limits['test_ws_provider'] = [0, 2, 1]
         self.ws_provider.rename_workspace('test_ws_provider', 'newname')
-        self.assertEqual(['newname'], self.ws_provider.get_workspace_names())
+        self.assertTrue('newname' in self.ws_provider.get_workspace_names())
         self.assertRaises(KeyError, lambda: self.ws_provider._EfDefined['test_ws_provider'])
         self.assertRaises(KeyError, lambda: self.ws_provider._limits['test_ws_provider'])
         self.assertEqual(False, self.ws_provider._EfDefined['newname'])
