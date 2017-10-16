@@ -170,7 +170,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         """Propagates MSlice only properties of workspaces, e.g. limits"""
         if old_workspace in self._EfDefined:
             self._EfDefined[new_workspace] = self._EfDefined[old_workspace]
-        if old_workspace in self._limits.keys:
+        if old_workspace in self._limits:
             self._limits[new_workspace] = self._limits[old_workspace]
 
     def getComment(self, workspace):

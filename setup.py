@@ -80,7 +80,7 @@ class build_py(_build_py):
         try:
             compiler(src, dest)
         except Exception as e:
-            sys.stderr.write('[Error] %r\n' % str(e))
+            sys.stderr.write('[Error] {}\n'.format(str(e)))
 
     def run(self):
         from distutils.dep_util import newer
