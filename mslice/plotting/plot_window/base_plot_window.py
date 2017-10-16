@@ -1,3 +1,6 @@
+from __future__ import (absolute_import, division, print_function)
+
+
 class BasePlotWindow(object):
     """The Subclass MUST during construction initialize self.canvas as its canvas.
 
@@ -47,7 +50,7 @@ class BasePlotWindow(object):
 
     def get_script(self):
         script = ""
-        for library, alias in self._import_aliases.items():
+        for library, alias in list(self._import_aliases.items()):
             script += "import " + library + " as " + alias + "\n"
         for log in self._script_log:
             script += self._format_command(log) + "\n"
@@ -57,7 +60,7 @@ class BasePlotWindow(object):
         """Return a line of python code for a tuple in the log"""
         output = ""
         source_module, function_name, call_args, call_kwargs = command
-        if source_module in self._import_aliases.keys():
+        if source_module in self._import_aliases:
             source_module = self._import_aliases[source_module]
 
         if source_module:
@@ -68,7 +71,7 @@ class BasePlotWindow(object):
         formatted_call_args = ", ".join(call_args)
         output += formatted_call_args
 
-        call_kwargs = map(lambda x:"=".join(x), call_kwargs.items())
+        call_kwargs = ["=".join(x) for x in list(call_kwargs.items())]
         formatted_call_kwargs = ", ".join(call_kwargs)
 
         if formatted_call_kwargs:
@@ -80,4 +83,4 @@ class BasePlotWindow(object):
         return output
 
     def _dump_script_to_console(self):
-        print self.get_script()
+        print(self.get_script())

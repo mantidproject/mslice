@@ -1,8 +1,10 @@
-from base import WorkspaceBase
-from histo_mixin import HistoMixin
-from workspace_mixin import WorkspaceMixin
+from __future__ import (absolute_import, division, print_function)
+from .base import WorkspaceBase
+from .histo_mixin import HistoMixin
+from .workspace_mixin import WorkspaceMixin
 
 from mantid.api import IMDHistoWorkspace
+
 
 class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
     """workspace wrapper for MDHistoWorkspace"""

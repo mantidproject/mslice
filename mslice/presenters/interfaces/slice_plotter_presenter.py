@@ -1,15 +1,22 @@
+import abc
+from six import add_metaclass
+
+
+@add_metaclass(abc.ABCMeta)
 class SlicePlotterPresenterInterface(object):
-    def __init__(self, _slice_view, _slice_plotter):
-        raise Exception("This interface class must not be instantiated")
 
+    @abc.abstractmethod
     def register_master(self, main_view):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def notify(self,command):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def workspace_selection_changed(self):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def set_workspace_provider(self, workspace_provider):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass

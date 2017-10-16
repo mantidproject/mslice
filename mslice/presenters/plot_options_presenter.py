@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from functools import partial
 
 
@@ -50,7 +51,7 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
             return None
         if self._color_config['modified']:
             self._model.change_slice_plot(self._color_config['c_range'], self._color_config['log'])
-        for key, value in self._modified_values.items():
+        for key, value in list(self._modified_values.items()):
             setattr(self._model, key, value)
         self._model.x_range = self._xy_config['x_range']
         self._model.y_range = self._xy_config['y_range']
@@ -90,7 +91,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
             return None
         if self._xy_config['modified']:
             self._model.change_cut_plot(self._xy_config)
-        for key, value in self._modified_values.items():
+        for key, value in list(self._modified_values.items()):
             setattr(self._model, key, value)
         line_data = self._view.get_line_data()
         self._model.set_line_data(line_data)

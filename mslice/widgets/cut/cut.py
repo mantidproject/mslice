@@ -3,6 +3,7 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from __future__ import (absolute_import, division, print_function)
 from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtGui import QWidget
 
@@ -16,6 +17,7 @@ from .cut_ui import Ui_Form
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
+
 
 class CutWidget(QWidget, CutView, Ui_Form):
     error_occurred = pyqtSignal('QString')
@@ -133,7 +135,7 @@ class CutWidget(QWidget, CutView, Ui_Form):
             self.lneCutIntegrationEnd.setText(integration_end)
 
     def clear_input_fields(self, **kwargs):
-        if 'keep_axes' not in kwargs.keys() or not kwargs['keep_axes']:
+        if 'keep_axes' not in kwargs or not kwargs['keep_axes']:
             self.populate_cut_axis_options([])
         self.populate_cut_params("", "", "")
         self.populate_integration_params("", "")

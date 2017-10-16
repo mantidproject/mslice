@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from quickview.QuickView import QuickView
 from WorkspaceManagerPresenter import WorkspaceManagerPresenter
 from workspacemanager.WorkspaceView import WorkspaceView

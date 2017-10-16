@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import mock
 from mock import call
 import unittest
@@ -26,9 +27,9 @@ class FigureManagerTest(unittest.TestCase):
         mock_figure_class.side_effect = mock_figures
 
         FigureManager.get_figure_number()
-        self.assert_(1 in FigureManager.all_figure_numbers()) #Check that a new figure with number=1 was created
+        self.assertTrue(1 in FigureManager.all_figure_numbers()) #Check that a new figure with number=1 was created
         self.assertRaises(KeyError,FigureManager.get_category, 1) #Check that figure has no category
-        self.assert_(FigureManager.get_active_figure() == mock_figures[0]) # Check that it is set as the active figure
+        self.assertTrue(FigureManager.get_active_figure() == mock_figures[0]) # Check that it is set as the active figure
 
     @mock.patch(_plot_window_class)
     def test_create_multiple_unclassified_figures(self, mock_figure_class):
@@ -40,7 +41,7 @@ class FigureManagerTest(unittest.TestCase):
         for i in range(n):
             FigureManager.get_figure_number() # Create a new figure
         for i in range(1, n+1):
-            self.assert_(i in FigureManager.all_figure_numbers()) #Check that a new figure with number=i was created
+            self.assertTrue(i in FigureManager.all_figure_numbers()) #Check that a new figure with number=i was created
             self.assertRaises(KeyError,FigureManager.get_category, i) #Check that figure has no category
 
     @mock.patch(_plot_window_class)
@@ -52,9 +53,9 @@ class FigureManagerTest(unittest.TestCase):
         # to function FigureManager.get_active_figure
         categorised_get_active_figure = activate_category(category)(FigureManager.get_active_figure)
         fig = categorised_get_active_figure()
-        self.assert_(fig == mock_figures[0]) # Assert Figure object came from right place
-        self.assert_(FigureManager.get_category(1) == category)
-        self.assert_(FigureManager.get_active_figure() == mock_figures[0]) # Check that it is set as the active figure
+        self.assertTrue(fig == mock_figures[0]) # Assert Figure object came from right place
+        self.assertTrue(FigureManager.get_category(1) == category)
+        self.assertTrue(FigureManager.get_active_figure() == mock_figures[0]) # Check that it is set as the active figure
 
     @mock.patch(_plot_window_class)
     def test_create_categorised_figure_then_uncategorised_figure(self,mock_figure_class):
@@ -67,10 +68,10 @@ class FigureManagerTest(unittest.TestCase):
         fig2 = FigureManager.get_figure_number()
         fig1_number = FigureManager.number_of_figure(fig1)
         fig2_number = FigureManager.number_of_figure(fig2)
-        self.assert_(FigureManager.get_active_figure() == fig2)
-        self.assert_(FigureManager.get_category(fig1_number) == category)
+        self.assertTrue(FigureManager.get_active_figure() == fig2)
+        self.assertTrue(FigureManager.get_category(fig1_number) == category)
         self.assertRaises(KeyError,FigureManager.get_category,fig2_number)
-        self.assert_( fig1_number == 1 and fig2_number == 2)
+        self.assertTrue( fig1_number == 1 and fig2_number == 2)
 
     @mock.patch(_plot_window_class)
     def test_category_switching(self,mock_figure_class):
@@ -87,7 +88,7 @@ class FigureManagerTest(unittest.TestCase):
 
         mock_figures[0].test.assert_has_calls([call(1), call(3)])
         mock_figures[1].test.assert_has_calls([call(2)])
-        self.assert_(FigureManager._active_figure == 1)
+        self.assertTrue(FigureManager._active_figure == 1)
 
     @mock.patch(_plot_window_class)
     def test_close_only_window(self,mock_figure_class):
@@ -96,12 +97,12 @@ class FigureManagerTest(unittest.TestCase):
         # Get a figure
         fig1 = FigureManager.get_active_figure()
         # check that getting the active window doesnt bring up a new one
-        self.assert_(FigureManager.get_active_figure() == fig1)
+        self.assertTrue(FigureManager.get_active_figure() == fig1)
         FigureManager.figure_closed(1)
         fig2 = FigureManager.get_active_figure()
 
-        self.assert_(fig1 == mock_figures[0])
-        self.assert_(fig2 == mock_figures[1])
+        self.assertTrue(fig1 == mock_figures[0])
+        self.assertTrue(fig2 == mock_figures[1])
 
     @mock.patch(_plot_window_class)
     def test_close_non_existant_window_fail(self,mock_figure_class):
@@ -110,12 +111,12 @@ class FigureManagerTest(unittest.TestCase):
         # Get a figure
         fig1 = FigureManager.get_active_figure()
         # check that getting the active window doesnt bring up a new one
-        self.assert_(FigureManager.get_active_figure() == fig1)
+        self.assertTrue(FigureManager.get_active_figure() == fig1)
         self.assertRaises(KeyError, FigureManager.figure_closed, 2)
         fig2 = FigureManager.get_active_figure()
 
-        self.assert_(fig1 == mock_figures[0])
-        self.assert_(fig2 == mock_figures[0])
+        self.assertTrue(fig1 == mock_figures[0])
+        self.assertTrue(fig2 == mock_figures[0])
 
     @mock.patch(_plot_window_class)
     def test_categorizing_of_uncategorized_plot(self, mock_figure_class):
@@ -143,8 +144,8 @@ class FigureManagerTest(unittest.TestCase):
         mock_figures[1].test.assert_has_calls([call(2)])
         mock_figures[2].test.assert_has_calls([call(3), call(4)])
 
-        self.assert_(fig1_mock_manger.mock_calls[-1] == call.fig1_kept())  # assert final status of fig1 is kept
-        self.assert_(FigureManager._active_figure == 3)
+        self.assertTrue(fig1_mock_manger.mock_calls[-1] == call.fig1_kept())  # assert final status of fig1 is kept
+        self.assertTrue(FigureManager._active_figure == 3)
 
     @mock.patch(_plot_window_class)
     def test_make_current_with_single_category(self, mock_figure_class):
@@ -164,12 +165,12 @@ class FigureManagerTest(unittest.TestCase):
         FigureManager.set_figure_as_kept(1)  # now there is no active figure
         cat1_get_active_figure().test(2)  # this command should go to a new figure
 
-        self.assert_(mock_managers[0].mock_calls[-1] == call.fig_kept())     # assert fig1 now displays kept
-        self.assert_(mock_managers[1].mock_calls[-1] == call.fig_current())  # assert fig2 now displays current
+        self.assertTrue(mock_managers[0].mock_calls[-1] == call.fig_kept())     # assert fig1 now displays kept
+        self.assertTrue(mock_managers[1].mock_calls[-1] == call.fig_current())  # assert fig2 now displays current
 
         FigureManager.set_figure_as_current(1)
-        self.assert_(mock_managers[0].mock_calls[-1] == call.fig_current())     # assert fig1 now displays current
-        self.assert_(mock_managers[1].mock_calls[-1] == call.fig_kept())        # assert fig2 now displays kept
+        self.assertTrue(mock_managers[0].mock_calls[-1] == call.fig_current())     # assert fig1 now displays current
+        self.assertTrue(mock_managers[1].mock_calls[-1] == call.fig_kept())        # assert fig2 now displays kept
 
         cat1_get_active_figure().test(3)                # This should go to fig1
         FigureManager.get_active_figure().test(4)       # This should go to fig1 as well
@@ -177,4 +178,4 @@ class FigureManagerTest(unittest.TestCase):
         mock_figures[0].test.assert_has_calls([call(1), call(3), call(4)])
         mock_figures[1].test.assert_has_calls([call(2)])
 
-        self.assert_(FigureManager._active_figure == 1)
+        self.assertTrue(FigureManager._active_figure == 1)

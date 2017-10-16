@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 # Mantid Tools imported for convenience
+from __future__ import (absolute_import, division, print_function)
 from mantid.api import IMDWorkspace as _IMDWorkspace
 from mantid.api import Workspace as _Workspace
 from mantid.kernel.funcinspect import lhs_info as _lhs_info
