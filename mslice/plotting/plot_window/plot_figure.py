@@ -74,6 +74,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def print_plot(self):
         printer = QPrinter()
+        printer.setResolution(300)
         printer.setOrientation(QPrinter.Landscape) #  landscape by default
         print_dialog = QPrintDialog(printer)
         if print_dialog.exec_():
