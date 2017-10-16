@@ -1,7 +1,7 @@
 import mock
-import unittest
 from mock import patch
 from PyQt4 import QtGui
+import unittest
 
 from mslice.app.mainwindow import MainWindow
 from mslice.app.mainwindow_ui import Ui_MainWindow

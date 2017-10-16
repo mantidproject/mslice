@@ -1,5 +1,6 @@
-from base import WorkspaceBase
-from workspace_mixin import WorkspaceMixin
+from __future__ import (absolute_import, division, print_function)
+from .base import WorkspaceBase
+from .workspace_mixin import WorkspaceMixin
 
 from mantid.api import MatrixWorkspace
 

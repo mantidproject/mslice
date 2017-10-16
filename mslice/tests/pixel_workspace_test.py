@@ -1,9 +1,11 @@
+from __future__ import (absolute_import, division, print_function)
 import numpy as np
 import unittest
 
 from mantid.simpleapi import CreateSimulationWorkspace, ConvertToMD, AddSampleLog
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
+
 
 class PixelWorkspaceTest(unittest.TestCase):
 

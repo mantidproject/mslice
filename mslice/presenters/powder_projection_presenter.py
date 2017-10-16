@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.views.powder_projection_view import PowderView

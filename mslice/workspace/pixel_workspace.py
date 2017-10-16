@@ -1,7 +1,8 @@
-from base import WorkspaceBase
-from histogram_workspace import HistogramWorkspace
-from pixel_mixin import PixelMixin
-from workspace_mixin import WorkspaceMixin
+from __future__ import (absolute_import, division, print_function)
+from .base import WorkspaceBase
+from .histogram_workspace import HistogramWorkspace
+from .pixel_mixin import PixelMixin
+from .workspace_mixin import WorkspaceMixin
 
 from mantid.api import IMDEventWorkspace
 

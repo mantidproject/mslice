@@ -1,4 +1,5 @@
-from histogram_workspace import HistogramWorkspace
+from __future__ import (absolute_import, division, print_function)
+from .histogram_workspace import HistogramWorkspace
 from mantid.simpleapi import BinMD
 
 
