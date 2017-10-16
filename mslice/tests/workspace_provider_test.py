@@ -10,8 +10,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.ws_provider = MantidWorkspaceProvider()
         x = np.linspace(0, 99, 100)
         y = x * 1
-        e = y * 0 + 2
-        CreateWorkspace(x, y, e, OutputWorkspace='test_ws_provider')
+        CreateWorkspace(x, y, OutputWorkspace='test_ws_provider')
 
 
     def test_delete_workspace(self):
@@ -25,4 +24,30 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.assertRaises(KeyError, lambda: self.ws_provider._limits['test_ws_provider'])
 
     def test_process_EFixed(self):
-        pass
+        self.ws_provider._processEfixed('test_ws_provider')
+        self.assertFalse(self.ws_provider._EfDefined['test_ws_provider'])
+
+
+    def test_rename_workspace(self):
+        self.ws_provider._EfDefined['test_ws_provider'] = False
+        self.ws_provider._limits['test_ws_provider'] = [0, 2, 1]
+        self.ws_provider.rename_workspace('test_ws_provider', 'newname')
+        self.assertEqual(['newname'], self.ws_provider.get_workspace_names())
+        self.assertRaises(KeyError, lambda: self.ws_provider._EfDefined['test_ws_provider'])
+        self.assertRaises(KeyError, lambda: self.ws_provider._limits['test_ws_provider'])
+        self.assertEqual(False, self.ws_provider._EfDefined['newname'])
+        self.assertEqual([0, 2, 1], self.ws_provider._limits['newname'])
+
+    def test_propagate_properties(self):
+        x = np.linspace(0, 99, 100)
+        y = x * 1
+        CreateWorkspace(x, y, OutputWorkspace='test_ws_2')
+        self.ws_provider._EfDefined['test_ws_2'] = False
+        self.ws_provider._limits['test_ws_2'] = [0, 2, 1]
+        self.ws_provider.propagate_properties('test_ws_2', 'test_ws_provider')
+        self.ws_provider.delete_workspace('test_ws_2')
+        self.assertEqual(False, self.ws_provider._EfDefined['test_ws_provider'])
+        self.assertEqual([0, 2, 1], self.ws_provider._limits['test_ws_provider'])
+
+    def test_process_load_ws_limits_none(self):
+        self.assertEqual(None, self.ws_provider._processLoadedWSLimits('test_ws_provider'))
