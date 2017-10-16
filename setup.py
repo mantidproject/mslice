@@ -79,7 +79,7 @@ class build_py(_build_py):
         sys.stdout.write("compiling %s -> %s\n" % (src, dest))
         try:
             compiler(src, dest)
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write('[Error] %r\n' % str(e))
 
     def run(self):

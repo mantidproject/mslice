@@ -111,7 +111,7 @@ class SlicePlotterPresenter(SlicePlotterPresenterInterface):
             # will break if matplotlib change exception eror message
 
             # If the mesage string is not equal to what is set below the exception will be re-raised
-            if e.message != "minvalue must be less than or equal to maxvalue":
+            if str(e) != "minvalue must be less than or equal to maxvalue":
                 raise e
             self._slice_view.error_invalid_intensity_params()
 
