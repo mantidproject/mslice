@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from mslice.models.slice.slice_plotter import SlicePlotter
 from mslice.views.slice_plotter_view import SlicePlotterView
 from mslice.widgets.slice.command import Command
+from mantid.api import IMDHistoWorkspace
 from .interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter

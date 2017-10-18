@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
+from mantid.api import IMDHistoWorkspace
 
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt

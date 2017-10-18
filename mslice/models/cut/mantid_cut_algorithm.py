@@ -7,11 +7,12 @@ from mantid.api import MDNormalization
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 
 from .cut_algorithm import CutAlgorithm
+from mslice.models.utility import Utility
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.slice_plotter_presenter import Axis
 
 
-class MantidCutAlgorithm(CutAlgorithm):
+class MantidCutAlgorithm(Utility, CutAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
@@ -69,14 +70,6 @@ class MantidCutAlgorithm(CutAlgorithm):
         if is_norm:
             self._normalize_workspace(cut)
         return cut
-
-    def get_available_axis(self, workspace):
-        if isinstance(workspace, str):
-            workspace = self._workspace_provider.get_workspace_handle(workspace)
-        dim_names = []
-        for i in range(workspace.getNumDims()):
-            dim_names.append(workspace.getDimension(i).getName())
-        return dim_names
 
     def get_other_axis(self, workspace, axis):
         all_axis = self.get_available_axis(workspace)
@@ -170,30 +163,14 @@ class MantidCutAlgorithm(CutAlgorithm):
         workspace.setErrorSquaredArray(errors)
         workspace.setComment("Normalized By MSlice")
 
-    def _get_number_of_steps(self, axis):
-        return int(max(1, floor((axis.end - axis.start)/axis.step)))
-
     def _was_previously_normalized(self, workspace):
         return workspace.getComment() == "Normalized By MSlice"
 
-    def _fill_in_missing_input(self,axis,workspace):
-        dim = workspace.getDimensionIndexByName(axis.units)
-        dim = workspace.getDimension(dim)
+    def get_available_axis(self, workspace):
+        if isinstance(workspace, str):
+            workspace = self._workspace_provider.get_workspace_handle(workspace)
+        dim_names = []
+        for i in range(workspace.getNumDims()):
+            dim_names.append(workspace.getDimension(i).getName())
+        return dim_names
 
-        if axis.start is None:
-            axis.start = dim.getMinimum()
-
-        if axis.end is None:
-            axis.end = dim.getMaximum()
-
-        if axis.step is None:
-            axis.step = (axis.end - axis.start)/100
-
-    def get_axis_range(self, workspace, dimension_name):
-        return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
-
-    def set_workspace_provider(self, workspace_provider):
-        self._workspace_provider = workspace_provider
-
-    def getComment(self, workspace):
-        return self._workspace_provider.getComment(workspace)
