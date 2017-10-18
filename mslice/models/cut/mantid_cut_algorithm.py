@@ -7,12 +7,12 @@ from mantid.api import MDNormalization
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 
 from .cut_algorithm import CutAlgorithm
-from mslice.models.utility import Utility
+from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.slice_plotter_presenter import Axis
 
 
-class MantidCutAlgorithm(Utility, CutAlgorithm):
+class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
@@ -165,12 +165,3 @@ class MantidCutAlgorithm(Utility, CutAlgorithm):
 
     def _was_previously_normalized(self, workspace):
         return workspace.getComment() == "Normalized By MSlice"
-
-    def get_available_axis(self, workspace):
-        if isinstance(workspace, str):
-            workspace = self._workspace_provider.get_workspace_handle(workspace)
-        dim_names = []
-        for i in range(workspace.getNumDims()):
-            dim_names.append(workspace.getDimension(i).getName())
-        return dim_names
-

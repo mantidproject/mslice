@@ -5,11 +5,11 @@ from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
 
 from .slice_algorithm import SliceAlgorithm
-from mslice.models.utility import Utility
+from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 
-class MantidSliceAlgorithm(Utility, SliceAlgorithm):
+class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
@@ -44,12 +44,3 @@ class MantidSliceAlgorithm(Utility, SliceAlgorithm):
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()
         return (data - data.min())/data_range
-
-    def get_available_axis(self, selected_workspace):
-        axis = []
-        workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
-        if isinstance(workspace, IMDEventWorkspace):
-            for i in range(workspace.getNumDims()):
-                dim_name = workspace.getDimension(i).getName()
-                axis.append(dim_name)
-        return axis
