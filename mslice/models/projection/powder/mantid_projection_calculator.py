@@ -108,4 +108,4 @@ class MantidProjectionCalculator(ProjectionCalculator):
     def validate_workspace(self, ws):
         ws_type = self._workspace_provider.get_workspace_handle(ws).id()
         if ws_type != 'Workspace2D':
-            raise TypeError('Expected Workspace2D, {0} is a {1}'.format(ws, ws_type))
+            raise TypeError('{0} is a {1}. Please select a Workspace2D.'.format(ws, ws_type))
