@@ -4,7 +4,7 @@
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
-from PyQt4.QtGui import QWidget
+from PyQt4.QtGui import QWidget, QMessageBox
 from PyQt4.QtCore import pyqtSignal
 
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
@@ -93,3 +93,9 @@ class PowderWidget(QWidget, Ui_Form, PowderView):
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def display_message_box(self, message):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle('Powder Projection Error')
+        msg_box.setText(message)
+        msg_box.exec_()

@@ -49,12 +49,15 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         if axis1 == axis2:
             raise ValueError('equal axis')
         if not selected_workspaces:
-            raise NameError('no workspaces selected')
+            self._powder_view.display_message_box("No workspace is selected")
         units = self._powder_view.get_powder_units()
 
         outws = []
         for workspace in selected_workspaces:
-            outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2, units))
+            try:
+                outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2, units))
+            except TypeError as e:
+                self._powder_view.display_message_box(str(e))
         self._get_main_presenter().update_displayed_workspaces()
         self._get_main_presenter().set_selected_workspaces(outws)
 
