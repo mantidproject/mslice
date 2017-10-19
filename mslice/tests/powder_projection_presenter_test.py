@@ -98,7 +98,9 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         u2 = '|Q|'
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
-        self.assertRaises(NameError,self.powder_presenter.notify,Command.CalculatePowderProjection)
+        self.powder_view.display_message_box = mock.Mock()
+        self.powder_presenter.notify(Command.CalculatePowderProjection)
+        self.powder_view.display_message_box.assert_called_once_with("No workspace is selected")
         self.main_presenter.get_selected_workspaces.assert_called_once_with()
         self.powder_view.get_powder_u1.assert_called_once_with()
         self.powder_view.get_powder_u2.assert_called_once_with()

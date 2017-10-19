@@ -50,6 +50,7 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
             raise ValueError('equal axis')
         if not selected_workspaces:
             self._powder_view.display_message_box("No workspace is selected")
+            return
         units = self._powder_view.get_powder_units()
 
         outws = []
