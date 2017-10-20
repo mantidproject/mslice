@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
+from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.views.cut_view import CutView
 from mslice.widgets.cut.command import Command
@@ -10,7 +11,7 @@ from os.path import splitext
 import numpy as np
 
 
-class CutPresenter(object):
+class CutPresenter(PresenterUtility):
     def __init__(self, cut_view, cut_algorithm, cut_plotter):
         self._cut_view = cut_view
         self._cut_algorithm = cut_algorithm
@@ -26,13 +27,9 @@ class CutPresenter(object):
         self._previous_axis = None
         self._minimumStep = dict()
 
-    def register_master(self, main_presenter):
-        self._main_presenter = main_presenter
-        self._main_presenter.subscribe_to_workspace_selection_monitor(self)
-
     @require_main_presenter
     def notify(self, command):
-        self._clear_displayed_error()
+        self._clear_displayed_error(self._cut_view)
         self._cut_view.busy.emit(True)
         if command == Command.Plot:
             self._process_cuts(plot_over=False)
@@ -170,11 +167,6 @@ class CutPresenter(object):
         return selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
             intensity_end, width
 
-    def _to_float(self, x):
-        if x == "":
-            return None
-        return float(x)
-
     def _set_minimum_step(self, workspace, axis):
         """Gets axes limits from workspace_provider and then sets the minimumStep dictionary with those values"""
         for ax in axis:
@@ -250,9 +242,6 @@ class CutPresenter(object):
                 self._cut_view.populate_input_fields(self._saved_parameters[self._previous_cut][self._previous_axis])
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)
-
-    def _clear_displayed_error(self):
-        self._cut_view.clear_displayed_error()
 
     def set_workspace_provider(self, workspace_provider):
         self._cut_algorithm.set_workspace_provider(workspace_provider)
