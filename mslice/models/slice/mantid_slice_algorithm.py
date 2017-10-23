@@ -1,13 +1,15 @@
+from __future__ import (absolute_import, division, print_function)
 import numpy as np
 
 from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
 
 from .slice_algorithm import SliceAlgorithm
+from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 
-class MantidSliceAlgorithm(SliceAlgorithm):
+class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
@@ -39,41 +41,6 @@ class MantidSliceAlgorithm(SliceAlgorithm):
             plot_data = self._norm_to_one(plot_data)
         return plot_data, boundaries
 
-
-    def get_available_axis(self, selected_workspace):
-        axis = []
-        workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
-        if isinstance(workspace, IMDEventWorkspace):
-            for i in range(workspace.getNumDims()):
-                dim_name = workspace.getDimension(i).getName()
-                axis.append(dim_name)
-        return axis
-
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()
         return (data - data.min())/data_range
-
-    def _get_number_of_steps(self, axis):
-        return int(max(1, (axis.end - axis.start)/axis.step))
-
-    def _fill_in_missing_input(self,axis,workspace):
-        dim = workspace.getDimensionIndexByName(axis.units)
-        dim = workspace.getDimension(dim)
-
-        if axis.start is None:
-            axis.start = dim.getMinimum()
-
-        if axis.end is None:
-            axis.end = dim.getMaximum()
-
-        if axis.step is None:
-            axis.step = (axis.end - axis.start)/100
-
-    def get_axis_range(self, workspace, dimension_name):
-        return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
-
-    def set_workspace_provider(self, workspace_provider):
-        self._workspace_provider = workspace_provider
-
-    def getComment(self, workspace):
-        return self._workspace_provider.getComment(workspace)

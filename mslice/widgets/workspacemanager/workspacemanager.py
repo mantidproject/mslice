@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from PyQt4.QtGui import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
 from PyQt4.QtCore import pyqtSignal
 
@@ -12,6 +13,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
 
     error_occurred = pyqtSignal('QString')
+    busy = pyqtSignal(bool)
 
     def __init__(self,parent):
         super(WorkspaceManagerWidget,self).__init__(parent)
@@ -74,7 +76,7 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
                 return
 
     def get_workspace_selected(self):
-        selected_workspaces = map(lambda x: str(x.text()), self.lstWorkspaces.selectedItems())
+        selected_workspaces = [str(x.text()) for x in self.lstWorkspaces.selectedItems()]
         return list(selected_workspaces)
 
     def set_workspace_selected(self, index):
@@ -93,10 +95,8 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         paths = QFileDialog.getOpenFileNames()
         return [str(filename) for filename in paths]
 
-    def get_workspace_to_save_filepath(self):
-        extension = 'Nexus file (*.nxs)'
-        path = QFileDialog.getSaveFileName(filter=extension)
-        return str(path)
+    def get_directory_to_save_workspaces(self):
+        return QFileDialog.getExistingDirectory()
 
     def get_workspace_new_name(self):
         name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
