@@ -95,7 +95,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def load(self, filename, output_workspace):
         ws = Load(Filename=filename, OutputWorkspace=output_workspace)
-        if self.get_emode(output_workspace) == 'Indirect':
+        if self.get_EMode(output_workspace) == 'Indirect':
             self._processEfixed(output_workspace)
         self._processLoadedWSLimits(output_workspace)
         return ws
@@ -128,7 +128,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return workspace
         return workspace.name()
 
-    def get_emode(self, workspace, default=None):
+    def get_EMode(self, workspace, default=None):
         """Returns the energy analysis mode (direct or indirect of a workspace)"""
         if isinstance(workspace, str):
             workspace_handle = self.get_workspace_handle(workspace)
@@ -159,6 +159,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return ws_handle.getEFixed(detector)
 
     def _get_exp_info_using(self, ws_handle, get_exp_info, error_string):
+        '''get data from an MDHistoWorkspace's ExperimentInfo'''
         prev = None
         for exp in range(ws_handle.getNumExperimentInfo()):
             exp_value = get_exp_info(exp)

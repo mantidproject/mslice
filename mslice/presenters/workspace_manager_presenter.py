@@ -70,7 +70,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             else:
                 loaded.append(ws_name)
                 # Checks if this workspace has efixed set. If not, prompts the user and sets it.
-                if self._workspace_provider.get_emode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(ws_name):
+                if self._workspace_provider.get_EMode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(ws_name):
                     if not allChecked:
                         Ef, allChecked = self._workspace_manager_view.get_workspace_efixed(ws_name, multi)
                     self._workspace_provider.set_efixed(ws_name, Ef)
@@ -113,7 +113,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 filename += '.nxs'
             path = os.path.join(str(save_directory), filename)
             try:
-                self._work_spaceprovider.save_nexus(workspace, path)
+                self._workspace_provider.save_nexus(workspace, path)
             except RuntimeError:
                 self._workspace_manager_view.error_unable_to_save()
 

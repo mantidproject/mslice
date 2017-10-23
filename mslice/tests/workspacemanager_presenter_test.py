@@ -41,7 +41,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         workspace_name = 'cde'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=[path_to_nexus])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_name])
-        self.workspace_provider.get_emode = mock.Mock(return_value='Indirect')
+        self.workspace_provider.get_EMode = mock.Mock(return_value='Indirect')
         self.workspace_provider.has_efixed = mock.Mock(return_value=False)
         self.workspace_provider.set_efixed = mock.Mock()
         self.view.get_workspace_index = mock.Mock(return_value=0)
@@ -69,7 +69,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             return_value=[path1, path2, path3])
         self.workspace_provider.get_workspace_names = mock.Mock(
             return_value=[ws_name1, ws_name2, ws_name3])
-        self.workspace_provider.get_emode = mock.Mock(return_value='Direct')
+        self.workspace_provider.get_EMode = mock.Mock(return_value='Direct')
         # Makes the first file not load because of a name collision
         self.view.confirm_overwrite_workspace = mock.Mock(side_effect=[False, True, True])
         # Makes the second file fail to load, to check if it raise the correct error
@@ -100,7 +100,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         ws_name = 'file'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=[path])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[ws_name])
-        self.workspace_provider.get_emode = mock.Mock(return_value='Direct')
+        self.workspace_provider.get_EMode = mock.Mock(return_value='Direct')
         self.view.confirm_overwrite_workspace = mock.Mock(return_value=False)
 
         self.presenter.notify(Command.LoadWorkspace)
@@ -270,7 +270,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         for command in [x for x in dir(Command) if x[0] != "_"]:
             try:
                 presenter.notify(command)
-            except:
+            except ValueError:
                 pass
             self.view.clear_displayed_error.assert_called()
             self.view.reset_mock()
