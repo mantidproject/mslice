@@ -99,6 +99,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         ws_name = 'file'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=[path])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[ws_name])
+        self.workspace_provider.get_emode = mock.Mock(return_value='Direct')
         self.view.confirm_overwrite_workspace = mock.Mock(return_value=False)
 
         self.presenter.notify(Command.LoadWorkspace)

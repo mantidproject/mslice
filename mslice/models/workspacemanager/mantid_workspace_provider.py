@@ -142,14 +142,14 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def _get_ws_EMode(self, ws_handle):
         if isinstance(ws_handle, IMDHistoWorkspace):
-            get_emode = lambda e : ws_handle.getExperimentInfo(e).getEMode()
+            def get_emode(e): ws_handle.getExperimentInfo(e).getEMode()
             return self._get_exp_info_using(ws_handle, get_emode, "Workspace contains different EModes")
         else:
             return ws_handle.getEMode()
 
     def _get_EFixed(self, ws_handle, detector):
         if isinstance(ws_handle, IMDHistoWorkspace):
-            get_efixed = lambda e : ws_handle.getExperimentInfo(e).getEFixed(detector)
+            def get_efixed(e): ws_handle.getExperimentInfo(e).getEFixed(detector)
             return self._get_exp_info_using(ws_handle, get_efixed, "Workspace contains different EFixed values")
         else:
             return ws_handle.getEFixed(detector)
