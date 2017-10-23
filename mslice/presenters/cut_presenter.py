@@ -196,6 +196,10 @@ class CutPresenter(PresenterUtility):
             axis = self._cut_algorithm.get_available_axis(workspace)
             current_axis = axis[0]
             if self._previous_cut is not None and self._previous_axis is not None:
+                if self._previous_cut not in self._saved_parameters:
+                    self._saved_parameters[self._previous_cut] = dict()
+                if self._previous_axis not in self._saved_parameters[self._previous_cut]:
+                    self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
                 if axis == self._saved_parameters[self._previous_cut][self._previous_axis]['axes']:
                     current_axis = self._cut_view.get_cut_axis()
             self._cut_view.populate_cut_axis_options(axis)
