@@ -57,5 +57,8 @@ class WorkspaceView(object):
     def error_unable_to_save(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def error_workspace_exp_info(self, string):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def clear_displayed_error(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")

@@ -133,6 +133,9 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         else:
             return False
 
+    def error_workspace_exp_info(self, string):
+        self._display_error(string)
+
     def error_invalid_save_path(self):
         self._display_error('No files were saved')
 

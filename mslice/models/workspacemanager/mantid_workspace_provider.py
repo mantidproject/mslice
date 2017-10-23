@@ -7,7 +7,7 @@ It uses mantid to perform the workspace operations
 # -----------------------------------------------------------------------------
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
                               RenameWorkspace, SaveNexus, SaveMD)
-from mantid.api import IMDWorkspace, Workspace
+from mantid.api import IMDHistoWorkspace, IMDWorkspace, Workspace
 import numpy as np
 from scipy import constants
 
@@ -39,7 +39,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(ws_name)
         try:
-            [ws_h.getEFixed(ws_h.getDetector(i).getID()) for i in range(ws_h.getNumberHistograms())]
+            [self._get_EFixed(ws_h, ws_h.getDetector(i).getID()) for i in range(ws_h.getNumberHistograms())]
             self._EfDefined[ws_name] = True
         except RuntimeError:
             self._EfDefined[ws_name] = False
@@ -50,7 +50,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_h = self.get_workspace_handle(workspace)
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
         try:
-            efix = ws_h.getEFixed(ws_h.getDetector(0).getID())
+            efix = ws_h.get_ws_EFixed(ws_h.getDetector(0).getID())
         except RuntimeError:   # Efixed not defined
             # This could occur for malformed NXSPE without the instrument name set.
             # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
@@ -132,16 +132,37 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             workspace_handle = self.get_workspace_handle(workspace)
         else:
             workspace_handle = workspace
-        try:
-            emode = workspace_handle.getEMode().name
-        except AttributeError:
-            return default
+        emode = self._get_ws_EMode(workspace_handle)
         if emode == 'Elastic':
             # Work-around for older versions of Mantid which does not set instrument name
             # in NXSPE files, so LoadNXSPE does not know if it is direct or indirect data
             ei_log = workspace_handle.run().getProperty('Ei').value
             emode = 'Indirect' if np.isnan(ei_log) else 'Direct'
         return emode
+
+    def _get_ws_EMode(self, ws_handle):
+        if isinstance(ws_handle, IMDHistoWorkspace):
+            get_emode = lambda e : ws_handle.getExperimentInfo(e).getEMode()
+            return self._get_exp_info_using(ws_handle, get_emode, "Workspace contains different EModes")
+        else:
+            return ws_handle.getEMode()
+
+    def _get_EFixed(self, ws_handle, detector):
+        if isinstance(ws_handle, IMDHistoWorkspace):
+            get_efixed = lambda e : ws_handle.getExperimentInfo(e).getEFixed(detector)
+            return self._get_exp_info_using(ws_handle, get_efixed, "Workspace contains different EFixed values")
+        else:
+            return ws_handle.getEFixed(detector)
+
+    def _get_exp_info_using(self, ws_handle, get_exp_info, error_string):
+        prev = None
+        for exp in range(ws_handle.getNumExperimentInfo()):
+            exp_value = get_exp_info(exp)
+            if prev is not None:
+                if exp_value != prev:
+                    raise ValueError(error_string)
+            prev = exp_value
+        return prev
 
     def has_efixed(self, workspace):
         return self._EfDefined[workspace if isinstance(workspace, basestring) else self.get_workspace_name(workspace)]
