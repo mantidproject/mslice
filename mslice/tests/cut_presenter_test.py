@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import mock
 from mock import call
 import unittest
@@ -51,7 +52,7 @@ class CutPresenterTest(unittest.TestCase):
         cut_presenter.register_master(self.main_presenter)
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
-        for command in filter(lambda x: x[0] != "_", dir(Command)):
+        for command in [x for x in dir(Command) if x[0] != "_"]:
             try:
                 cut_presenter.notify(command)
             except:
@@ -384,7 +385,7 @@ class CutPresenterTest(unittest.TestCase):
         ]
         self.cut_algorithm.compute_cut_xye.assert_has_calls(call_list)
         callargs = np.savetxt.call_args[0]
-        self.assertEquals(callargs[0], join(tempdir, 'out_2.txt'))  # Indexed from zero
+        self.assertEqual(callargs[0], join(tempdir, 'out_2.txt'))  # Indexed from zero
         self.cut_plotter.plot_cut.assert_not_called()
 
     def test_change_axis(self):

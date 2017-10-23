@@ -1,7 +1,9 @@
+from __future__ import (absolute_import, division, print_function)
 
 
 class WorkspaceView(object):
     error_occurred = None
+    busy = None
 
     def __init__(self):
         raise Exception("This abstact base class must not be instantiated")

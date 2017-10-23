@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import os.path
 
 from mslice.widgets.workspacemanager.command import Command
@@ -5,11 +6,10 @@ from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInt
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
 
-#TODO tell user when file not found,file failed to load
 
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def __init__(self, workspace_view, workspace_provider):
-        #TODO add validation checks
+        # TODO add validation checks
         self._workspace_manager_view = workspace_view
         self._workspace_provider = workspace_provider
         self._main_presenter = None
@@ -22,6 +22,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def notify(self, command):
         self._clear_displayed_error()
+        self._workspace_manager_view.busy.emit(True)
         if command == Command.LoadWorkspace:
             self._load_workspace()
         elif command == Command.SaveSelectedWorkspace:
@@ -34,6 +35,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._broadcast_selected_workspaces()
         else:
             raise ValueError("Workspace Manager Presenter received an unrecognised command")
+        self._workspace_manager_view.busy.emit(False)
 
     def _broadcast_selected_workspaces(self):
         self._get_main_presenter().notify_workspace_selection_changed()
@@ -43,8 +45,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         return self._main_presenter
 
     def _load_workspace(self):
-        #TODO specify workspace name on load
-        #TODO what to do on fail?
+        # TODO specify workspace name on load
+        # TODO what to do on fail?
         workspace_to_load = self._workspace_manager_view.get_workspace_to_load_path()
         if not workspace_to_load:
             return
@@ -101,20 +103,19 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_workspace()
             return
-        if len(selected_workspaces) > 1:
-            self._workspace_manager_view.error_select_only_one_workspace()
-            return
-        selected_workspace = selected_workspaces[0]
-        path = self._workspace_manager_view.get_workspace_to_save_filepath()
-        if not path:
+        save_directory = self._workspace_manager_view.get_directory_to_save_workspaces()
+        if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
             return
-        if not path.endswith('.nxs'):
-            path += '.nxs'
-        try:
-            self._workspace_provider.save_nexus(selected_workspace, path)
-        except RuntimeError:
-            self._workspace_manager_view.error_unable_to_save()
+        for workspace in selected_workspaces:
+            filename = workspace
+            if not filename.endswith('.nxs'):
+                filename += '.nxs'
+            path = os.path.join(str(save_directory), filename)
+            try:
+                self._work_spaceprovider.save_nexus(workspace, path)
+            except RuntimeError:
+                self._workspace_manager_view.error_unable_to_save()
 
     def _remove_selected_workspaces(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
@@ -147,7 +148,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         get_name = self._workspace_provider.get_workspace_name
         index_list = []
         for item in workspace_list:
-            if isinstance(item, basestring):
+            if isinstance(item, str):
                 index_list.append(get_index(item))
             elif isinstance(item, int):
                 index_list.append(item)

@@ -1,5 +1,3 @@
-
-
 class MainView(object):
     def __init__(self):
         pass

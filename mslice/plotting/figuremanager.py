@@ -31,6 +31,7 @@
 #  dictionaries (Or maybe adding an add_category function to facilitate this)
 #
 #
+from __future__ import (absolute_import, division, print_function)
 from functools import wraps
 
 from mslice.plotting import get_figure_class
@@ -137,13 +138,13 @@ class FigureManager(object):
 
     @staticmethod
     def assign_figure_to_category(fig_num, category, make_current=False):
-        if fig_num not in FigureManager._figures.keys():
+        if fig_num not in FigureManager._figures:
             raise ValueError("Figure does not exist")
 
         if fig_num in FigureManager._unclassified_figures:
             FigureManager._unclassified_figures.remove(fig_num)
 
-        for a_category in FigureManager._figures_by_category.keys():
+        for a_category in FigureManager._figures_by_category:
             if fig_num in FigureManager._figures_by_category[a_category]:
                 FigureManager._figures_by_category[a_category].remove(fig_num)
             if FigureManager._category_current_figures == fig_num:
@@ -161,7 +162,7 @@ class FigureManager(object):
         If it was the category current or global active figure then set that to NO_FIGURE"""
         if FigureManager._active_figure == figure_number:
             FigureManager._active_figure = NO_FIGURE
-        for a_category in FigureManager._figures_by_category.keys():
+        for a_category in FigureManager._figures_by_category:
             if figure_number in FigureManager._figures_by_category[a_category]:
                 FigureManager._figures_by_category[a_category].remove(figure_number)
 
@@ -175,7 +176,7 @@ class FigureManager(object):
     @staticmethod
     def get_category(figure_number):
         """Return the category of the figure"""
-        for category,fig_list in FigureManager._figures_by_category.items():
+        for category,fig_list in list(FigureManager._figures_by_category.items()):
             if figure_number in fig_list:
                 figure_category = category
                 break
@@ -216,7 +217,7 @@ class FigureManager(object):
     def broadcast(category=None):
         """This method will broadcast to all figures in 'category' to update the displayed kept/current status"""
         if category is None:
-            broadcast_list = FigureManager._figures_by_category.keys()
+            broadcast_list = FigureManager._figures_by_category
         else:
             broadcast_list = [category]
 
@@ -238,7 +239,7 @@ class FigureManager(object):
     @staticmethod
     def all_figure_numbers():
         """An iterator over all figure numbers"""
-        return FigureManager._figures.keys()
+        return list(FigureManager._figures.keys())
 
     @staticmethod
     def all_figures_numbers_in_category(category):
@@ -264,11 +265,11 @@ class FigureManager(object):
     @staticmethod
     def all_figures():
         """Return an iterator over all figures"""
-        return FigureManager._figures.values()
+        return list(FigureManager._figures.values())
 
     @staticmethod
     def number_of_figure(figure):
-        for key,value in FigureManager._figures.items():
+        for key,value in list(FigureManager._figures.items()):
             if value == figure:
                 return key
         raise ValueError('Figure %s was not recognised'%figure)

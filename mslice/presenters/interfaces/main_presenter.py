@@ -1,21 +1,30 @@
+import abc
+from six import add_metaclass
+
+
+@add_metaclass(abc.ABCMeta)
 class MainPresenterInterface(object):
-    def __init__(self, _main_view):
-        raise Exception("This class is an abstract interface and must no be instantiated")
 
+    @abc.abstractmethod
     def get_selected_workspaces(self):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def set_selected_workspaces(self, workspace_list):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def update_displayed_workspaces(self):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def notify_workspace_selection_changed(self):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def subscribe_to_workspace_selection_monitor(self, client):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass
 
+    @abc.abstractmethod
     def register_workspace_selector(self, workspace_selector):
-        raise NotImplementedError("This method must be overriden in implementation")
+        pass

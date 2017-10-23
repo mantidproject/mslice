@@ -68,6 +68,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_save_image"/>
+   <addaction name="action_Print_Plot"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
    <addaction name="actionDataCursor"/>
@@ -145,6 +146,11 @@
   <action name="actionToggleLegends">
    <property name="text">
     <string>Toggle Legends</string>
+   </property>
+  </action>
+  <action name="action_Print_Plot">
+   <property name="text">
+    <string>Print Plot</string>
    </property>
   </action>
  </widget>
