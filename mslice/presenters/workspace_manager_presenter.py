@@ -97,6 +97,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
             return self._workspace_manager_view.confirm_overwrite_workspace()
+        else:
+            return True
 
     def _save_selected_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()

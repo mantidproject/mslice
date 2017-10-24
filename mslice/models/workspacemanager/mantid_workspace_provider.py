@@ -61,9 +61,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             else:
                 self._limits[ws_name] = None
                 return
-        # except AttributeError: # Wrong workspace type (e.g. cut)
-        #     self._limits[ws_name] = {}
-        #     return
+        except AttributeError: # Wrong workspace type (e.g. cut)
+            self._limits[ws_name] = {}
+            return
         # Checks that loaded data is in energy transfer.
         enAxis = ws_h.getAxis(0)
         if 'DeltaE' not in enAxis.getUnit().unitID():
