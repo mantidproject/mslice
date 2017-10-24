@@ -106,6 +106,11 @@ class MantidProjectionCalculator(ProjectionCalculator):
         self._workspace_provider = workspace_provider
 
     def validate_workspace(self, ws):
-        ws_type = self._workspace_provider.get_workspace_handle(ws).id()
-        if ws_type != 'Workspace2D':
-            raise TypeError('{0} is a {1}. Please select a Workspace2D.'.format(ws, ws_type))
+        try:
+            axes = [self._workspace_provider.get_workspace_handle(ws).getAxis(0),
+                    self._workspace_provider.get_workspace_handle(ws).getAxis(1)]
+            if not all([ax.isSpectra() or ax.getUnit().unitID() == 'DeltaE' for ax in axes]):
+                raise AttributeError
+        except (AttributeError, IndexError):
+            raise TypeError('Input workspace for projection calculation must be a reduced '
+                            'data workspace with a spectra and energy transfer axis.')
