@@ -91,7 +91,7 @@ def get_projection(input_workspace, axis1, axis2, units='meV'):
                                                                      axis2=axis2, units=units)
     try:
         names = _lhs_info('names')
-    except:
+    except RuntimeError:
         names = [output_workspace.getName()]
     if len(names) > 1:
         raise Exception('Too many left hand side arguments, %s' % str(names))
