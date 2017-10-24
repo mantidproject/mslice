@@ -56,16 +56,16 @@ def _string_to_axis(string):
     name = axis[0].strip()
     try:
         start = float(axis[1])
-    except:
+    except ValueError:
         raise ValueError("start '%s' is not a valid float"%axis[1])
     try:
         end = float(axis[2])
-    except:
+    except ValueError:
         raise ValueError("end '%s' is not a valid float"%axis[2])
 
     try:
         step = float(axis[3])
-    except:
+    except ValueError:
         raise ValueError("step '%s' is not a valid float"%axis[3])
     return _Axis(name, start, end, step)
 
