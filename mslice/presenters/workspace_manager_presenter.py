@@ -60,7 +60,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             # confirm that user wants to overwrite an existing workspace
             if not self._confirm_workspace_overwrite(ws_name):
                 not_loaded.append(ws_name)
-
+                continue
             try:
                 self._workspace_provider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
             except RuntimeError:
