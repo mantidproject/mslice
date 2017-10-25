@@ -8,7 +8,7 @@ It uses mantid to perform the workspace operations
 from __future__ import (absolute_import, division, print_function)
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
                               RenameWorkspace, SaveNexus, SaveMD)
-from mantid.api import IMDHistoWorkspace, IMDWorkspace, Workspace
+from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 import numpy as np
 from scipy import constants
 
@@ -110,7 +110,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def save_nexus(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
-        if isinstance(workspace_handle, IMDWorkspace):
+        if isinstance(workspace_handle, IMDEventWorkspace) or isinstance(workspace_handle, IMDHistoWorkspace):
             SaveMD(InputWorkspace=workspace, Filename=path)
         else:
             SaveNexus(InputWorkspace=workspace, Filename=path)
@@ -143,7 +143,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return emode
 
     def _get_ws_EMode(self, ws_handle):
-        if isinstance(ws_handle, IMDHistoWorkspace):
+        if isinstance(ws_handle, IMDHistoWorkspace) or isinstance(ws_handle, IMDEventWorkspace):
             def get_emode(e):
                 ws_handle.getExperimentInfo(e).getEMode()
             return self._get_exp_info_using(ws_handle, get_emode, "Workspace contains different EModes")
@@ -151,7 +151,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return ws_handle.getEMode()
 
     def _get_ws_EFixed(self, ws_handle, detector):
-        if isinstance(ws_handle, IMDHistoWorkspace):
+        if isinstance(ws_handle, IMDHistoWorkspace) or isinstance(ws_handle, IMDEventWorkspace):
             def get_efixed(e):
                 ws_handle.getExperimentInfo(e).getEFixed(detector)
             return self._get_exp_info_using(ws_handle, get_efixed, "Workspace contains different EFixed values")
@@ -159,7 +159,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return ws_handle.getEFixed(detector)
 
     def _get_exp_info_using(self, ws_handle, get_exp_info, error_string):
-        '''get data from an MDHistoWorkspace's ExperimentInfo'''
+        '''get data from MultipleExperimentInfo. Returns None if ExperimentInfo is not found'''
         prev = None
         for exp in range(ws_handle.getNumExperimentInfo()):
             exp_value = get_exp_info(exp)
