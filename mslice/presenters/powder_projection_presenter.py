@@ -51,10 +51,7 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
 
         outws = []
         for workspace in selected_workspaces:
-            try:
-                outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2, units))
-            except TypeError as e:
-                self._powder_view.display_message_box(str(e))
+            outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2, units))
         self._get_main_presenter().update_displayed_workspaces()
         self._get_main_presenter().set_selected_workspaces(outws)
 
@@ -84,6 +81,7 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         workspace_selection = self._main_presenter.get_selected_workspaces()
         try:
             for workspace in workspace_selection:
+                self._projection_calculator.validate_workspace(workspace)
                 self._projection_calculator.get_emode(workspace)
         except TypeError as e:
             self._powder_view.disable_calculate_projections(True)

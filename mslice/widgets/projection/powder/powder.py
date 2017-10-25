@@ -99,9 +99,3 @@ class PowderWidget(QWidget, Ui_Form, PowderView):
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
-
-    def display_message_box(self, message):
-        msg_box = QMessageBox()
-        msg_box.setWindowTitle('Powder Projection Error')
-        msg_box.setText(message)
-        msg_box.exec_()
