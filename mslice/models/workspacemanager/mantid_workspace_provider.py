@@ -12,7 +12,6 @@ from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 import numpy as np
 from scipy import constants
 
-
 from .workspace_provider import WorkspaceProvider
 
 # -----------------------------------------------------------------------------

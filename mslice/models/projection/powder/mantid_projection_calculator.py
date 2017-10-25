@@ -108,9 +108,8 @@ class MantidProjectionCalculator(ProjectionCalculator):
     def get_emode(self, ws):
         emode = self._workspace_provider.get_EMode(ws)
         if emode == "None":
-            raise TypeError('Selected workspace does not have EMode')
+            raise TypeError('Cannot read energy mode from workspace')
         return emode
-
 
     def validate_workspace(self, ws):
         try:
