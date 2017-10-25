@@ -65,8 +65,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._workspace_provider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
             except RuntimeError:
                 not_opened.append(ws_name)
-            except ValueError as e:
-                self._workspace_manager_view.error_workspace_exp_info(str(e))
             else:
                 loaded.append(ws_name)
                 # Checks if this workspace has efixed set. If not, prompts the user and sets it.
