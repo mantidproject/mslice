@@ -53,10 +53,7 @@ class CutPresenterTest(unittest.TestCase):
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
         for command in [x for x in dir(Command) if x[0] != "_"]:
-            try:
-                cut_presenter.notify(command)
-            except:
-                pass
+            cut_presenter.notify(command)
             self.view.clear_displayed_error.assert_called()
             self.view.reset_mock()
 
