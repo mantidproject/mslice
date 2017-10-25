@@ -4,7 +4,7 @@
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
-from PyQt4.QtGui import QWidget, QMessageBox
+from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import pyqtSignal
 
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
