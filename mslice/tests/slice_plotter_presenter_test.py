@@ -362,7 +362,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         for command in [x for x in dir(Command) if x[0] != "_"]:
             try:
                 presenter.notify(command)
-            except:
+            except ValueError:
                 pass
             self.slice_view.clear_displayed_error.assert_called()
             self.slice_view.reset_mock()
