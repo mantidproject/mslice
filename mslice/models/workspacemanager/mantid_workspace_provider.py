@@ -35,6 +35,20 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             del self._limits[workspace]
         return ws
 
+    def get_limits(self, workspace, axis):
+        """Determines the limits of the data and minimum step size"""
+        if workspace not in self._limits:
+            self._processLoadedWSLimits(workspace)
+        # If we cannot get the step size from the data, use the old 1/100 steps.
+        if axis in self._limits[workspace]:
+            return self._limits[workspace][axis]
+        else:
+            ws_h = self.get_workspace_handle(workspace)
+            dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
+            minimum = dim.getMinimum()
+            maximum = dim.getMaximum()
+            return minimum, maximum, (maximum - minimum) / 100.
+
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""
         ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
@@ -60,9 +74,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             else:
                 self._limits[ws_name] = None
                 return
-        except AttributeError: # Wrong workspace type (e.g. cut)
-            self._limits[ws_name] = {}
-            return
         # Checks that loaded data is in energy transfer.
         enAxis = ws_h.getAxis(0)
         if 'DeltaE' not in enAxis.getUnit().unitID():
@@ -177,20 +188,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_handle = self.get_workspace_handle(ws_name)
         for idx in range(ws_handle.getNumberHistograms()):
             ws_handle.setEFixed(ws_handle.getDetector(idx).getID(), Ef)
-
-    def get_limits(self, workspace, axis):
-        """Determines the limits of the data and minimum step size"""
-        if workspace not in self._limits:
-            self._processLoadedWSLimits(workspace)
-        # If we cannot get the step size from the data, use the old 1/100 steps.
-        if axis in self._limits[workspace]:
-            return self._limits[workspace][axis]
-        else:
-            ws_h = self.get_workspace_handle(workspace)
-            dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
-            minimum = dim.getMinimum()
-            maximum = dim.getMaximum()
-            return minimum, maximum, (maximum - minimum)/100.
 
     def propagate_properties(self, old_workspace, new_workspace):
         """Propagates MSlice only properties of workspaces, e.g. limits"""
