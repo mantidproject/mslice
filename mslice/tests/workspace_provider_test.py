@@ -10,7 +10,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.ws_provider = MantidWorkspaceProvider()
 
         self.test_ws_2d = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
-                                                  UnitX='DeltaE', OutputWorkspace='test_ws_2d')
+                                                    UnitX='DeltaE', OutputWorkspace='test_ws_2d')
         AddSampleLog(self.test_ws_2d, LogName='Ei', LogText='3.', LogType='Number')
         self.test_ws_md = ConvertToMD(InputWorkspace=self.test_ws_2d, OutputWorkspace="test_ws_md", QDimensions='|Q|',
                                       dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
@@ -58,8 +58,6 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.assertEqual(limits[2], 1)
 
     def test_get_limits_100_steps(self):
-        # for dim in range(self.test_ws_2d.getNumDims()):
-        #     print(self.test_ws_2d.getDimension(dim).name)
         self.ws_provider._limits['test_ws_md'] = []
         limits = self.ws_provider.get_limits('test_ws_md', 'DeltaE')
         self.assertAlmostEqual(limits[0], -10, places=4)
