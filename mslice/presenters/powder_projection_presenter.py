@@ -48,7 +48,6 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
             self._powder_view.display_message_box("No workspace is selected")
             return
         units = self._powder_view.get_powder_units()
-
         outws = []
         for workspace in selected_workspaces:
             outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2, units))
