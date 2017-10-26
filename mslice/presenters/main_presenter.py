@@ -33,7 +33,6 @@ class MainPresenter(MainPresenterInterface):
 
     def subscribe_to_workspace_selection_monitor(self, client):
         """Subcscribe a client to be notified when selected workspaces change
-
         client.workspace_selection_changed() will be called whenever the selected workspaces change"""
         if isinstance(getattr(client, "workspace_selection_changed",None), collections.Callable):
             self._selected_workspace_listener.append(client)
