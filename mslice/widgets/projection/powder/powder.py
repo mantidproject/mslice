@@ -12,10 +12,10 @@ from mslice.presenters.powder_projection_presenter import PowderProjectionPresen
 from mslice.views.powder_projection_view import PowderView
 from .command import Command
 from .powder_ui import Ui_Form
-
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
+
 
 class PowderWidget(QWidget, Ui_Form, PowderView):
     """This widget is not usable without a main window which implements mainview"""
@@ -87,6 +87,12 @@ class PowderWidget(QWidget, Ui_Form, PowderView):
 
     def get_powder_units(self):
         return str(self.cmbPowderUnits.currentText())
+
+    def disable_calculate_projections(self, disable):
+        self.groupBox.setDisabled(disable)
+
+    def display_projection_error(self, message):
+        self.error_msg.setText(message)
 
     def clear_displayed_error(self):
         self._display_error("")

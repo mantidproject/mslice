@@ -11,7 +11,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def __init__(self, workspace_view, workspace_provider):
         # TODO add validation checks
         self._workspace_manager_view = workspace_view
-        self._work_spaceprovider = workspace_provider
+        self._workspace_provider = workspace_provider
         self._main_presenter = None
 
     def register_master(self, main_presenter):
@@ -58,22 +58,27 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         allChecked = False
         for ii, ws_name in enumerate(ws_names):
             # confirm that user wants to overwrite an existing workspace
-            if ws_name in self._work_spaceprovider.get_workspace_names():
-                confirm_overwrite = self._workspace_manager_view.confirm_overwrite_workspace()
-                if not confirm_overwrite:
-                    not_loaded.append(ws_name)
-                    continue
+            if not self._confirm_workspace_overwrite(ws_name):
+                not_loaded.append(ws_name)
+                continue
             try:
-                self._work_spaceprovider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
+                self._workspace_provider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
             except RuntimeError:
                 not_opened.append(ws_name)
             else:
                 loaded.append(ws_name)
                 # Checks if this workspace has efixed set. If not, prompts the user and sets it.
-                if self._work_spaceprovider.get_emode(ws_name) == 'Indirect' and not self._work_spaceprovider.has_efixed(ws_name):
+                if self._workspace_provider.get_EMode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(ws_name):
                     if not allChecked:
                         Ef, allChecked = self._workspace_manager_view.get_workspace_efixed(ws_name, multi)
-                    self._work_spaceprovider.set_efixed(ws_name, Ef)
+                    self._workspace_provider.set_efixed(ws_name, Ef)
+
+        self._report_load_errors(ws_names, not_opened, not_loaded)
+        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
+        self._workspace_manager_view.set_workspace_selected(
+            [self._workspace_manager_view.get_workspace_index(ld_name) for ld_name in loaded])
+
+    def _report_load_errors(self, ws_names, not_opened, not_loaded):
         if len(not_opened) == len(ws_names):
             self._workspace_manager_view.error_unable_to_open_file()
             return
@@ -86,16 +91,18 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         elif len(not_loaded) > 0:
             errmsg = not_loaded[0] if len(not_loaded)==1 else ",".join(not_loaded)
             self._workspace_manager_view.no_workspace_has_been_loaded(errmsg)
-        self._workspace_manager_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
-        self._workspace_manager_view.set_workspace_selected(
-            [self._workspace_manager_view.get_workspace_index(ld_name) for ld_name in loaded])
+
+    def _confirm_workspace_overwrite(self, ws_name):
+        if ws_name in self._workspace_provider.get_workspace_names():
+            return self._workspace_manager_view.confirm_overwrite_workspace()
+        else:
+            return True
 
     def _save_selected_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_workspace()
             return
-
         save_directory = self._workspace_manager_view.get_directory_to_save_workspaces()
         if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
@@ -106,7 +113,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 filename += '.nxs'
             path = os.path.join(str(save_directory), filename)
             try:
-                self._work_spaceprovider.save_nexus(workspace, path)
+                self._workspace_provider.save_nexus(workspace, path)
             except RuntimeError:
                 self._workspace_manager_view.error_unable_to_save()
 
@@ -116,8 +123,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
         for workspace in selected_workspaces:
-            self._work_spaceprovider.delete_workspace(workspace)
-        self._workspace_manager_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
+            self._workspace_provider.delete_workspace(workspace)
+        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
 
     def _rename_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
@@ -129,8 +136,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         selected_workspace = selected_workspaces[0]
         new_name = self._workspace_manager_view.get_workspace_new_name()
-        self._work_spaceprovider.rename_workspace(selected_workspace, new_name)
-        self._workspace_manager_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
+        self._workspace_provider.rename_workspace(selected_workspace, new_name)
+        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
 
     def get_selected_workspaces(self):
         """Get the currently selected workspaces from the user"""
@@ -138,7 +145,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def set_selected_workspaces(self, workspace_list):
         get_index = self._workspace_manager_view.get_workspace_index
-        get_name = self._work_spaceprovider.get_workspace_name
+        get_name = self._workspace_provider.get_workspace_name
         index_list = []
         for item in workspace_list:
             if isinstance(item, str):
@@ -150,7 +157,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view.set_workspace_selected(index_list)
 
     def get_workspace_provider(self):
-        return self._work_spaceprovider
+        return self._workspace_provider
 
     def update_displayed_workspaces(self):
         """Update the workspaces shown to user.
@@ -158,7 +165,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         This function must be called by the main presenter if any other
         presenter does any operation that changes the name or type of any existing workspace or creates or removes a
         workspace"""
-        self._workspace_manager_view.display_loaded_workspaces(self._work_spaceprovider.get_workspace_names())
+        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
 
     def _clear_displayed_error(self):
         self._workspace_manager_view.clear_displayed_error()
