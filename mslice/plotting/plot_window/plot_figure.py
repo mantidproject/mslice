@@ -27,6 +27,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
 
+        self.actionS_Q_E.triggered.connect(self.show_s_q_e)
+        self.actionChi_Q_E.triggered.connect(self.show_chi_q_e)
+        self.actionChi_Q_E_magnetic.triggered.connect(self.show_chi_q_e_magnetic)
         self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
 
         self.actionDataCursor.toggled.connect(self.toggle_data_cursor)
@@ -47,6 +50,33 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def is_cut_figure(self):
         return not bool(self.canvas.figure.gca().get_images())
+
+    def intensity_selection(self, selected):
+        options = [self.actionS_Q_E, self.actionChi_Q_E, self.actionChi_Q_E_magnetic]
+        for op in options:
+            op.setChecked(False)
+        selected.setChecked(True)
+
+    def show_s_q_e(self):
+        if self.actionS_Q_E.isChecked():
+            self.intensity_selection(self.actionS_Q_E)
+            # ...
+        else:
+            self.actionS_Q_E.setChecked(True)
+
+    def show_chi_q_e(self):
+        if self.actionChi_Q_E.isChecked():
+            self.intensity_selection(self.actionChi_Q_E)
+            # ...
+        else:
+            self.actionChi_Q_E.setChecked(True)
+
+    def show_chi_q_e_magnetic(self):
+        if self.actionChi_Q_E_magnetic.isChecked():
+            self.intensity_selection(self.actionChi_Q_E_magnetic)
+            # ...
+        else:
+            self.actionChi_Q_E_magnetic.setChecked(True)
 
     def toggle_data_cursor(self):
         if self.actionDataCursor.isChecked():

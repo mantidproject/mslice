@@ -24,6 +24,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
         plt.title(selected_workspace)
         plt.gcf().canvas.set_window_title(selected_workspace)
+        plt.gcf()
         plt.draw_all()
 
     def _getDisplayName(self, axisUnits, comment=None):
