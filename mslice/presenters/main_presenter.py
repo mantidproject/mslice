@@ -1,4 +1,6 @@
+from __future__ import (absolute_import, division, print_function)
 from .interfaces.main_presenter import MainPresenterInterface
+import collections
 
 
 class MainPresenter(MainPresenterInterface):
@@ -31,9 +33,8 @@ class MainPresenter(MainPresenterInterface):
 
     def subscribe_to_workspace_selection_monitor(self, client):
         """Subcscribe a client to be notified when selected workspaces change
-
         client.workspace_selection_changed() will be called whenever the selected workspaces change"""
-        if callable(getattr(client, "workspace_selection_changed",None)):
+        if isinstance(getattr(client, "workspace_selection_changed",None), collections.Callable):
             self._selected_workspace_listener.append(client)
         else:
             raise TypeError("The client trying to subscribe does not implement the method 'workspace_selection_changed'")

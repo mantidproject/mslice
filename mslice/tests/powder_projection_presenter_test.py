@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import mock
 import unittest
 
@@ -97,7 +98,9 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         u2 = '|Q|'
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
-        self.assertRaises(NameError,self.powder_presenter.notify,Command.CalculatePowderProjection)
+        self.powder_view.display_message_box = mock.Mock()
+        self.powder_presenter.notify(Command.CalculatePowderProjection)
+        self.powder_view.display_message_box.assert_called_once_with("No workspace is selected")
         self.main_presenter.get_selected_workspaces.assert_called_once_with()
         self.powder_view.get_powder_u1.assert_called_once_with()
         self.powder_view.get_powder_u2.assert_called_once_with()
@@ -109,10 +112,10 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         presenter.register_master(self.main_presenter)
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
-        for command in filter(lambda x: x[0] != "_", dir(Command)):
+        for command in [x for x in dir(Command) if x[0] != "_"]:
             try:
                 presenter.notify(command)
-            except:
+            except ValueError:
                 pass
             self.powder_view.clear_displayed_error.assert_called()
             self.powder_view.reset_mock()

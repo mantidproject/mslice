@@ -3,7 +3,8 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
-from PyQt4.QtGui import QWidget
+from __future__ import (absolute_import, division, print_function)
+from PyQt4.QtGui import QWidget, QMessageBox
 from PyQt4.QtCore import pyqtSignal
 
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
@@ -11,10 +12,10 @@ from mslice.presenters.powder_projection_presenter import PowderProjectionPresen
 from mslice.views.powder_projection_view import PowderView
 from .command import Command
 from .powder_ui import Ui_Form
-
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
+
 
 class PowderWidget(QWidget, Ui_Form, PowderView):
     """This widget is not usable without a main window which implements mainview"""
@@ -87,8 +88,20 @@ class PowderWidget(QWidget, Ui_Form, PowderView):
     def get_powder_units(self):
         return str(self.cmbPowderUnits.currentText())
 
+    def disable_calculate_projections(self, disable):
+        self.groupBox.setDisabled(disable)
+
+    def display_projection_error(self, message):
+        self.error_msg.setText(message)
+
     def clear_displayed_error(self):
         self._display_error("")
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def display_message_box(self, message):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle('Powder Projection Error')
+        msg_box.setText(message)
+        msg_box.exec_()

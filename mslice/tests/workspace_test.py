@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import unittest
 
 import numpy as np
@@ -68,7 +69,7 @@ class WorkspaceTest(BaseWorkspaceTest):
         self.assertTrue((expected_values == self.workspace.get_coordinates()['']).all())
 
     def test_get_signal(self):
-        expected_values = range(0, 100)
+        expected_values = list(range(0, 100))
         result = np.array(self.workspace.get_signal().flatten())
         self.assertTrue((result == expected_values).all())
 

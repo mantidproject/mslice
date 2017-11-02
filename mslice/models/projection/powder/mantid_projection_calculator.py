@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import uuid
 from mantid.simpleapi import ConvertToMD, SliceMD, TransformMD, ConvertSpectrumAxis, PreprocessDetectorsToMD
 from mantid.simpleapi import RenameWorkspace, DeleteWorkspace, SofQW3
@@ -81,7 +82,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def calculate_projection(self, input_workspace, axis1, axis2, units):
         """Calculate the projection workspace AND return a python handle to it"""
-        emode = self._workspace_provider.get_emode(input_workspace)
+        emode = self.get_emode(input_workspace)
         # Calculates the projection - can have Q-E or 2theta-E or their transpose.
         if (axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL) or (axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL):
             retval, output_workspace = self._calcQEproj(input_workspace, emode, axis1, axis2)
@@ -102,3 +103,19 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def set_workspace_provider(self, workspace_provider):
         self._workspace_provider = workspace_provider
+
+    def get_emode(self, ws):
+        emode = self._workspace_provider.get_EMode(ws)
+        if emode == "None":
+            raise TypeError('Cannot read energy mode from workspace')
+        return emode
+
+    def validate_workspace(self, ws):
+        try:
+            axes = [self._workspace_provider.get_workspace_handle(ws).getAxis(0),
+                    self._workspace_provider.get_workspace_handle(ws).getAxis(1)]
+            if not all([ax.isSpectra() or ax.getUnit().unitID() == 'DeltaE' for ax in axes]):
+                raise AttributeError
+        except (AttributeError, IndexError):
+            raise TypeError('Input workspace for projection calculation must be a reduced '
+                            'data workspace with a spectra and energy transfer axis.')

@@ -1,12 +1,13 @@
+from __future__ import (absolute_import, division, print_function)
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
-from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
+from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.powder_projection_view import PowderView
 from mslice.widgets.projection.powder.command import Command
 from .interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
 from .validation_decorators import require_main_presenter
 
 
-class PowderProjectionPresenter(PowderProjectionPresenterInterface):
+class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInterface):
     def __init__(self, powder_view, projection_calculator):
         self._powder_view = powder_view
         self._projection_calculator = projection_calculator
@@ -24,12 +25,8 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         self._powder_view.populate_powder_projection_units(self._available_units)
         self._main_presenter = None
 
-    def register_master(self, main_presenter):
-        assert (isinstance(main_presenter, MainPresenterInterface))
-        self._main_presenter = main_presenter
-
     def notify(self, command):
-        self._clear_displayed_error()
+        self._clear_displayed_error(self._powder_view)
         self._powder_view.busy.emit(True)
         if command == Command.CalculatePowderProjection:
             self._calculate_powder_projection()
@@ -48,9 +45,9 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
         if axis1 == axis2:
             raise ValueError('equal axis')
         if not selected_workspaces:
-            raise NameError('no workspaces selected')
+            self._powder_view.display_message_box("No workspace is selected")
+            return
         units = self._powder_view.get_powder_units()
-
         outws = []
         for workspace in selected_workspaces:
             outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2, units))
@@ -60,9 +57,6 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
     @require_main_presenter
     def _get_main_presenter(self):
         return self._main_presenter
-
-    def _clear_displayed_error(self):
-        self._powder_view.clear_displayed_error()
 
     def _axis_changed(self, axis):
         """This is a private method which makes sure u1 and u2 are always different and one is always DeltaE"""
@@ -81,3 +75,16 @@ class PowderProjectionPresenter(PowderProjectionPresenterInterface):
 
     def set_workspace_provider(self, workspace_provider):
         self._projection_calculator.set_workspace_provider(workspace_provider)
+
+    def workspace_selection_changed(self):
+        workspace_selection = self._main_presenter.get_selected_workspaces()
+        try:
+            for workspace in workspace_selection:
+                self._projection_calculator.validate_workspace(workspace)
+                self._projection_calculator.get_emode(workspace)
+        except TypeError as e:
+            self._powder_view.disable_calculate_projections(True)
+            self._powder_view.display_projection_error(str(e))
+        else:
+            self._powder_view.disable_calculate_projections(False)
+            self._powder_view.display_projection_error("")

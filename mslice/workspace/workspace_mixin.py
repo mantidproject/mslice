@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 import numpy as np
 import operator
 from mantid.api import AlgorithmManager
@@ -8,7 +9,7 @@ def run_child_alg(name, output='OutputWorkspace', **kwargs):
     alg.setChild(True)
     alg.initialize()
     alg.setProperty('OutputWorkspace', 'dummy') # must be set for some algs but is not used
-    for key in kwargs.keys():
+    for key in kwargs:
         alg.setProperty(key, kwargs[key])
     alg.execute()
     return alg.getProperty(output).value

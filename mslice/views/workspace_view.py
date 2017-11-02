@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 
 
 class WorkspaceView(object):
@@ -59,6 +60,9 @@ class WorkspaceView(object):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def error_unable_to_save(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def error_workspace_exp_info(self, string):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def clear_displayed_error(self):

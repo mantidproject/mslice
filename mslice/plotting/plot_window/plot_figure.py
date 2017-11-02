@@ -1,9 +1,11 @@
+from __future__ import (absolute_import, division, print_function)
 from itertools import chain
 
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QPrinter, QPrintDialog, QPixmap, QPainter
 import numpy as np
 import six
 
@@ -34,6 +36,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
         self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
         self.action_save_image.triggered.connect(self.stock_toolbar.save_figure)
+        self.action_Print_Plot.triggered.connect(self.print_plot)
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
 
@@ -69,6 +72,19 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         new_config = presenter_class(view_class(), self).get_new_config()
         if new_config:
             self.canvas.draw()
+
+    def print_plot(self):
+        printer = QPrinter()
+        printer.setResolution(300)
+        printer.setOrientation(QPrinter.Landscape) #  landscape by default
+        print_dialog = QPrintDialog(printer)
+        if print_dialog.exec_():
+            pixmap_image = QPixmap.grabWidget(self.canvas)
+            page_size = printer.pageRect()
+            pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
+            painter = QPainter(printer)
+            painter.drawPixmap(0,0,pixmap_image)
+            painter.end()
 
     @staticmethod
     def get_min(data, absolute_minimum=-np.inf):
@@ -129,14 +145,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
          False if current axes has hidden errorbars"""
         current_axis = self.canvas.figure.gca()
         # If all the error bars have alpha= 0 they are all transparent (hidden)
-        containers = filter(lambda x: isinstance(x, ErrorbarContainer), current_axis.containers)
-        line_components = map(lambda x: x.get_children(), containers)
+        containers = [x for x in current_axis.containers if isinstance(x, ErrorbarContainer)]
+        line_components = [x.get_children() for x in containers]
         # drop the first element of each container because it is the the actual line
-        errorbars = map(lambda x: x[1:], line_components)
+        errorbars = [x[1:] for x in line_components]
         errorbars = chain(*errorbars)
-        alpha = map(lambda x: x.get_alpha(), errorbars)
+        alpha = [x.get_alpha() for x in errorbars]
         # replace None with 1(None indicates default which is 1)
-        alpha = map(lambda x: x if x is not None else 1, alpha)
+        alpha = [x if x is not None else 1 for x in alpha]
         if sum(alpha) == 0:
             has_errorbars = False
         else:
@@ -214,7 +230,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             line_options['marker'] = line.get_marker()
             all_line_options.append(line_options)
             i += 1
-        return zip(legends, all_line_options)
+        return list(zip(legends, all_line_options))
 
     def set_line_data(self, line_data):
         legends = []

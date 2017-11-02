@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 # Mantid Tools imported for convenience
+from __future__ import (absolute_import, division, print_function)
 from mantid.api import IMDWorkspace as _IMDWorkspace
 from mantid.api import Workspace as _Workspace
 from mantid.kernel.funcinspect import lhs_info as _lhs_info
@@ -55,16 +56,16 @@ def _string_to_axis(string):
     name = axis[0].strip()
     try:
         start = float(axis[1])
-    except:
+    except ValueError:
         raise ValueError("start '%s' is not a valid float"%axis[1])
     try:
         end = float(axis[2])
-    except:
+    except ValueError:
         raise ValueError("end '%s' is not a valid float"%axis[2])
 
     try:
         step = float(axis[3])
-    except:
+    except ValueError:
         raise ValueError("step '%s' is not a valid float"%axis[3])
     return _Axis(name, start, end, step)
 
@@ -90,7 +91,7 @@ def get_projection(input_workspace, axis1, axis2, units='meV'):
                                                                      axis2=axis2, units=units)
     try:
         names = _lhs_info('names')
-    except:
+    except RuntimeError:
         names = [output_workspace.getName()]
     if len(names) > 1:
         raise Exception('Too many left hand side arguments, %s' % str(names))

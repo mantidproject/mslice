@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function)
 from tempfile import gettempdir
 from os.path import join
 import unittest
@@ -40,7 +41,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         workspace_name = 'cde'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=[path_to_nexus])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_name])
-        self.workspace_provider.get_emode = mock.Mock(return_value='Indirect')
+        self.workspace_provider.get_EMode = mock.Mock(return_value='Indirect')
         self.workspace_provider.has_efixed = mock.Mock(return_value=False)
         self.workspace_provider.set_efixed = mock.Mock()
         self.view.get_workspace_index = mock.Mock(return_value=0)
@@ -56,8 +57,8 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_load_multiple_workspaces(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
-        # Create a view that will return three filepaths on on 3 subsequent calls to get_workspace_to_load_path
-        tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
+        # Create a view that will return three filepaths on 3 subsequent calls to get_workspace_to_load_path
+        tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
         path1 = join(tempdir,'file1.nxs')
         path2 = join(tempdir,'file2.nxs')
         path3 = join(tempdir,'file3.nxs')
@@ -68,11 +69,11 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             return_value=[path1, path2, path3])
         self.workspace_provider.get_workspace_names = mock.Mock(
             return_value=[ws_name1, ws_name2, ws_name3])
-        self.workspace_provider.get_emode = mock.Mock(return_value='Direct')
+        self.workspace_provider.get_EMode = mock.Mock(return_value='Direct')
         # Makes the first file not load because of a name collision
         self.view.confirm_overwrite_workspace = mock.Mock(side_effect=[False, True, True])
         # Makes the second file fail to load, to check if it raise the correct error
-        self.workspace_provider.load = mock.Mock(side_effect=[RuntimeError, 0])
+        self.workspace_provider.load = mock.Mock(side_effect=[RuntimeError, 0, 0])
         self.presenter.notify(Command.LoadWorkspace)
         # Because of the name collision, the first file name is not loaded.
         load_calls = [call(filename=path2, output_workspace=ws_name2),
@@ -99,6 +100,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         ws_name = 'file'
         self.view.get_workspace_to_load_path = mock.Mock(return_value=[path])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[ws_name])
+        self.workspace_provider.get_EMode = mock.Mock(return_value='Direct')
         self.view.confirm_overwrite_workspace = mock.Mock(return_value=False)
 
         self.presenter.notify(Command.LoadWorkspace)
@@ -108,10 +110,10 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def test_load_workspace_fail(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         # Create a view that will return a path on call to get_workspace_to_load_path
-        tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
+        tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
         path_to_nexus = join(tempdir,'cde.nxs')
         workspace_name = 'cde'
-        self.view.get_workspace_to_load_path = mock.Mock(return_value=path_to_nexus)
+        self.view.get_workspace_to_load_path = mock.Mock(return_value=[path_to_nexus])
         self.workspace_provider.get_workspace_names = mock.Mock(return_value=[workspace_name])
         self.workspace_provider.load = mock.Mock(side_effect=RuntimeError)
 
@@ -265,10 +267,10 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         presenter.register_master(self.main_presenter)
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
-        for command in filter(lambda x: x[0] != "_", dir(Command)):
+        for command in [x for x in dir(Command) if x[0] != "_"]:
             try:
                 presenter.notify(command)
-            except:
+            except ValueError:
                 pass
             self.view.clear_displayed_error.assert_called()
             self.view.reset_mock()

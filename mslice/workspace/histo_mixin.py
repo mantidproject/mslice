@@ -1,5 +1,6 @@
+from __future__ import (absolute_import, division, print_function)
 import numpy as np
-from workspace_mixin import run_child_alg
+from .workspace_mixin import run_child_alg
 
 
 class HistoMixin(object):
