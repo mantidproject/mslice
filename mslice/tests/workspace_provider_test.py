@@ -73,5 +73,5 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         limits = self.ws_provider._limits['test_ws_2d']
         np.testing.assert_array_equal(limits['DeltaE'], [-10, 10, 1])
         np.testing.assert_array_equal(limits['|Q|'], limits['MomentumTransfer'])
-        np.testing.assert_almost_equal(limits['|Q|'], [0.0720016, 3.452448, 0.0000194661], 5)
-        np.testing.assert_almost_equal(limits['Degrees'], [3.43, 134.14, -0.00092693], 5)
+        np.testing.assert_almost_equal(limits['|Q|'], [0.0699211, 3.454529, 0.0020998970], 5)
+        np.testing.assert_almost_equal(limits['Degrees'], [3.43, 134.14, 0.09999263], 5)

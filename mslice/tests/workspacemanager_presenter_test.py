@@ -299,5 +299,39 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_index.assert_called_once_with('ws')
         self.view.set_workspace_selected.assert_called_once_with([0])
 
+    def test_combine_workspace_single_ws(self):
+        # Checks that it will fail if only one workspace is selected.
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        selected_workspaces = ['ws1']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.presenter.notify(Command.CombineWorkspace)
+        self.view.get_workspace_selected.assert_called_once_with()
+        self.view.error_select_more_than_one_workspaces.assert_called_once_with()
+        self.workspace_provider.combine_workspace.assert_not_called()
+
+    def test_combine_workspace_wrong_type(self):
+        # Checks that it will fail if one of the workspace is not a MDEventWorkspace
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        selected_workspaces = ['ws1', 'ws2']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.workspace_provider.is_pixel_workspace = mock.Mock(side_effect=[True, False])
+        self.presenter.notify(Command.CombineWorkspace)
+        self.view.get_workspace_selected.assert_called_once_with()
+        check_calls = [call('ws1'), call('ws2')]
+        self.workspace_provider.is_pixel_workspace.assert_has_calls(check_calls, any_order= True)
+        self.view.error_select_more_than_one_workspaces.assert_called()
+
+    def test_combine_workspace(self):
+        # Now checks it suceeds otherwise
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        selected_workspaces = ['ws1', 'ws2']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.workspace_provider.is_pixel_workspace = mock.Mock(side_effect=[True, True])
+        self.presenter.notify(Command.CombineWorkspace)
+        self.view.get_workspace_selected.assert_called()
+        self.view.error_select_more_than_one_workspaces.assert_not_called()
+        self.workspace_provider.combine_workspace.assert_called_once_with(selected_workspaces,
+                                                                          selected_workspaces[0]+'_combined')
+
 if __name__ == '__main__':
     unittest.main()
