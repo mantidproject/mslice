@@ -39,7 +39,17 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
         if norm_to_one:
             plot_data = self._norm_to_one(plot_data)
-        return plot_data, boundaries
+        plot = [None, None, None]
+        plot[0] = plot_data
+        plot[1] = self.compute_chi(plot_data)
+        plot[2] = self.compute_chi_magnetic(plot_data)
+        return plot, boundaries
+
+    def compute_chi(self, scattering_data):
+        return scattering_data
+
+    def compute_chi_magnetic(self, scattering_data):
+        return scattering_data
 
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()

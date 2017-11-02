@@ -23,6 +23,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.legends_shown = True
         self.legends_visible = []
         self.lines_visible = {}
+        self.slice_plotter = None
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -51,6 +52,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def is_cut_figure(self):
         return not bool(self.canvas.figure.gca().get_images())
 
+    def add_slice_plotter(self, slice_plotter):
+        self.slice_plotter = slice_plotter
+
     def intensity_selection(self, selected):
         options = [self.actionS_Q_E, self.actionChi_Q_E, self.actionChi_Q_E_magnetic]
         for op in options:
@@ -60,21 +64,24 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def show_s_q_e(self):
         if self.actionS_Q_E.isChecked():
             self.intensity_selection(self.actionS_Q_E)
-            # ...
+            self.slice_plotter.show_scattering_function()
+            self.canvas.draw()
         else:
             self.actionS_Q_E.setChecked(True)
 
     def show_chi_q_e(self):
         if self.actionChi_Q_E.isChecked():
             self.intensity_selection(self.actionChi_Q_E)
-            # ...
+            self.slice_plotter.show_dynamical_susceptibility()
+            self.canvas.draw()
         else:
             self.actionChi_Q_E.setChecked(True)
 
     def show_chi_q_e_magnetic(self):
         if self.actionChi_Q_E_magnetic.isChecked():
             self.intensity_selection(self.actionChi_Q_E_magnetic)
-            # ...
+            self.slice_plotter.show_dynamical_susceptibility_magnetic()
+            self.canvas.draw()
         else:
             self.actionChi_Q_E_magnetic.setChecked(True)
 
