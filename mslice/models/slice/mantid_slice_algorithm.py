@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+import math
 import numpy as np
 
 from mantid.simpleapi import BinMD
@@ -7,6 +8,8 @@ from mantid.api import IMDEventWorkspace
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
+
+BOLTZMANN = 0.086173303 # meV/K
 
 
 class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
@@ -32,7 +35,6 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         # perform number of events normalization then mask cells where no data was found
         with np.errstate(invalid='ignore'):
             plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
-        plot_data = np.ma.masked_where(np.isnan(plot_data), plot_data)
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)
         self._workspace_provider.delete_workspace(thisslice)
@@ -41,15 +43,27 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             plot_data = self._norm_to_one(plot_data)
         plot = [None, None, None]
         plot[0] = plot_data
-        plot[1] = self.compute_chi(plot_data)
-        plot[2] = self.compute_chi_magnetic(plot_data)
+        plot[1] = self.compute_chi(plot_data, selected_workspace)
+        plot[2] = self.compute_chi_magnetic(plot_data, selected_workspace)
         return plot, boundaries
 
-    def compute_chi(self, scattering_data):
+    def compute_chi(self, scattering_data, ws):
+        plot_data = np.copy(scattering_data)
+        kBT = self.get_sample_temperature(ws) * BOLTZMANN
+        exp_kBT = math.exp(kBT)
+        for E in np.nditer(plot_data, op_flags=['readwrite']):
+            if E >= 0:
+                E *= (1 - math.exp(-E / kBT))
+            else:
+                E *= (math.exp(math.fabs(E) / kBT) - 1)
+        plot_data = plot_data * np.pi
+        return plot_data
+
+    def compute_chi_magnetic(self, scattering_data, ws):
         return scattering_data
 
-    def compute_chi_magnetic(self, scattering_data):
-        return scattering_data
+    def get_sample_temperature(self, ws):
+        return 15 # temporary
 
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()
