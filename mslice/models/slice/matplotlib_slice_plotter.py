@@ -15,17 +15,22 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.plot_data = [None, None, None]
         self.boundaries = None
         self.norm = None
+        self._x_label = None
+        self._y_label = None
+        self.colourmap = None
+        self.title = None
 
     def plot_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
         self.plot_data, self.boundaries = self._slice_algorithm.compute_slice(selected_workspace, x_axis, y_axis, smoothing,
                                                                     norm_to_one)
+        self.colourmap = colourmap
         self.norm = Normalize(vmin=intensity_start, vmax=intensity_end)
-        self.show_plot(self.plot_data[0], self.boundaries, colourmap)
         comment = self._slice_algorithm.getComment(selected_workspace)
-        plt.xlabel(self._getDisplayName(x_axis.units, comment))
-        plt.ylabel(self._getDisplayName(y_axis.units, comment))
-        plt.title(selected_workspace)
+        self._x_label = self._getDisplayName(x_axis.units, comment)
+        self._y_label = self._getDisplayName(y_axis.units, comment)
+        self.title = selected_workspace
+        self.show_scattering_function()
         plt.gcf().canvas.set_window_title(selected_workspace)
         plt.gcf().canvas.manager.add_slice_plotter(self)
         plt.draw_all()
@@ -44,18 +49,24 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             return axisUnits
 
-    def show_plot(self, plot_data, extent, colourmap='jet'):
-        plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=self.norm,
+    def _show_plot(self, plot_data, extent):
+        plt.imshow(plot_data, extent=extent, cmap=self.colourmap, aspect='auto', norm=self.norm,
                    interpolation='none', hold=False)
+        plt.title(self.title)
+        plt.xlabel(self._x_label)
+        plt.ylabel(self._y_label)
+        plt.gcf().get_axes()[1].set_ylabel('(arb. units)', labelpad=20, rotation=270)
 
     def show_scattering_function(self):
-        self.show_plot(self.plot_data[0], self.boundaries)
+        self._show_plot(self.plot_data[0], self.boundaries)
 
     def show_dynamical_susceptibility(self):
-        self.show_plot(self.plot_data[1], self.boundaries)
+        self._show_plot(self.plot_data[1], self.boundaries)
 
     def show_dynamical_susceptibility_magnetic(self):
-        self.show_plot(self.plot_data[2], self.boundaries)
+        self._show_plot(self.plot_data[2], self.boundaries)
+        plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^-1 sr^-1 f.u.^-1$)',
+                                           rotation=270, labelpad=20)
 
     def get_available_colormaps(self):
         return self._colormaps
