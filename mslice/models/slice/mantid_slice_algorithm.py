@@ -48,14 +48,11 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return plot, boundaries
 
     def compute_chi(self, scattering_data, ws):
-        chi = np.copy(scattering_data)
         kBT = self.get_sample_temperature(ws) * BOLTZMANN
-        for E in np.nditer(chi, op_flags=['readwrite']):
-            if E >= 0:
-                E *= (1 - math.exp(-E / kBT))
-            else:
-                E *= (math.exp(math.fabs(E) / kBT) - 1)
-        chi = chi * np.pi
+        signs = np.sign(scattering_data)
+        chi = np.exp(-scattering_data / kBT)
+        chi = signs + (chi * -signs)
+        chi = np.pi * chi * scattering_data
         return chi
 
     def compute_chi_magnetic(self, chi):
