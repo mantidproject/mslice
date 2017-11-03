@@ -67,8 +67,9 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         ws_name3 = 'file3'
         self.view.get_workspace_to_load_path = mock.Mock(
             return_value=[path1, path2, path3])
+        # Make the third workspace something not in current workspace list, so don't need ask overwrite
         self.workspace_provider.get_workspace_names = mock.Mock(
-            return_value=[ws_name1, ws_name2, ws_name3])
+            return_value=[ws_name1, ws_name2, ''])
         self.workspace_provider.get_EMode = mock.Mock(return_value='Direct')
         # Makes the first file not load because of a name collision
         self.view.confirm_overwrite_workspace = mock.Mock(side_effect=[False, True, True])
@@ -181,12 +182,14 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected = mock.Mock(return_value=['file1','file2'])
         result_paths = [join(path_to_save_to, 'file1.nxs'), join(path_to_save_to, 'file2.nxs')]
         self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
+        self.workspace_provider.save_nexus = mock.Mock(side_effect=[True,RuntimeError])
 
         self.presenter.notify(Command.SaveSelectedWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_directory_to_save_workspaces.assert_called_once_with()
         calls = [call('file1', result_paths[0]), call('file2', result_paths[1])]
         self.workspace_provider.save_nexus.assert_has_calls(calls)
+        self.view.error_unable_to_save.assert_called_once_with()
 
     def test_save_workspace_non_selected_prompt_user(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -298,6 +301,40 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.get_workspace_name.called_once_with(mock.Mock())
         self.view.get_workspace_index.assert_called_once_with('ws')
         self.view.set_workspace_selected.assert_called_once_with([0])
+
+    def test_combine_workspace_single_ws(self):
+        # Checks that it will fail if only one workspace is selected.
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        selected_workspaces = ['ws1']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.presenter.notify(Command.CombineWorkspace)
+        self.view.get_workspace_selected.assert_called_once_with()
+        self.view.error_select_more_than_one_workspaces.assert_called_once_with()
+        self.workspace_provider.combine_workspace.assert_not_called()
+
+    def test_combine_workspace_wrong_type(self):
+        # Checks that it will fail if one of the workspace is not a MDEventWorkspace
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        selected_workspaces = ['ws1', 'ws2']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.workspace_provider.is_pixel_workspace = mock.Mock(side_effect=[True, False])
+        self.presenter.notify(Command.CombineWorkspace)
+        self.view.get_workspace_selected.assert_called_once_with()
+        check_calls = [call('ws1'), call('ws2')]
+        self.workspace_provider.is_pixel_workspace.assert_has_calls(check_calls, any_order= True)
+        self.view.error_select_more_than_one_workspaces.assert_called()
+
+    def test_combine_workspace(self):
+        # Now checks it suceeds otherwise
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        selected_workspaces = ['ws1', 'ws2']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.workspace_provider.is_pixel_workspace = mock.Mock(side_effect=[True, True])
+        self.presenter.notify(Command.CombineWorkspace)
+        self.view.get_workspace_selected.assert_called()
+        self.view.error_select_more_than_one_workspaces.assert_not_called()
+        self.workspace_provider.combine_workspace.assert_called_once_with(selected_workspaces,
+                                                                          selected_workspaces[0]+'_combined')
 
 if __name__ == '__main__':
     unittest.main()
