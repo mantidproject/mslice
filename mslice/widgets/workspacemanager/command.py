@@ -14,4 +14,5 @@ class Command(object):
     LoadWorkspace = 3
     ComposeWorkspace = 5  # On hold for now
     RenameWorkspace = 1000
+    CombineWorkspace = 1010
     SelectionChanged = -1799

@@ -7,7 +7,7 @@ It uses mantid to perform the workspace operations
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
-                              RenameWorkspace, SaveNexus, SaveMD)
+                              RenameWorkspace, SaveNexus, SaveMD, MergeMD)
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 import numpy as np
 from scipy import constants
@@ -17,6 +17,7 @@ from .workspace_provider import WorkspaceProvider
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
+
 
 class MantidWorkspaceProvider(WorkspaceProvider):
     def __init__(self):
@@ -35,6 +36,20 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             del self._limits[workspace]
         return ws
 
+    def get_limits(self, workspace, axis):
+        """Determines the limits of the data and minimum step size"""
+        if workspace not in self._limits:
+            self._processLoadedWSLimits(workspace)
+        # If we cannot get the step size from the data, use the old 1/100 steps.
+        if axis in self._limits[workspace]:
+            return self._limits[workspace][axis]
+        else:
+            ws_h = self.get_workspace_handle(workspace)
+            dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
+            minimum = dim.getMinimum()
+            maximum = dim.getMaximum()
+            return minimum, maximum, (maximum - minimum) / 100.
+
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""
         ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
@@ -50,47 +65,57 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(workspace)
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
-        try:
-            efix = self._get_ws_EFixed(ws_h, ws_h.getDetector(0).getID())
-        except RuntimeError:   # Efixed not defined
-            # This could occur for malformed NXSPE without the instrument name set.
-            # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
-            if ws_h.run().hasProperty('Ei'):
-                efix = ws_h.run().getProperty('Ei').value
-            else:
-                self._limits[ws_name] = None
-                return
-        except AttributeError: # Wrong workspace type (e.g. cut)
+        efix = self._get_EFixed_for_limits(ws_h)
+        if efix is None:
             self._limits[ws_name] = {}
             return
-        # Checks that loaded data is in energy transfer.
-        enAxis = ws_h.getAxis(0)
-        if 'DeltaE' not in enAxis.getUnit().unitID():
-            self._limits[ws_name] = None
-            return
         en = ws_h.getAxis(0).extractValues()
-        # Don't parse all spectra in cases where there are alot to save time.
-        numHist = ws_h.getNumberHistograms()
-        if numHist > 500:
-            theta = [ws_h.detectorTwoTheta(ws_h.getDetector(i)) for i in range(0, numHist, int(numHist/500))]
-        else:
-            theta = [ws_h.detectorTwoTheta(ws_h.getDetector(i)) for i in range(numHist)]
         # Defines some conversion factors
         E2q = 2. * constants.m_n / (constants.hbar ** 2)  # Energy to (neutron momentum)^2 (==2m_n/hbar^2)
         meV2J = constants.e / 1000.                       # meV to Joules
         m2A = 1.e10                                       # metres to Angstrom
         if ws_name not in self._limits:
             self._limits[ws_name] = {}
-        th = np.array([np.min(theta), np.max(theta), np.mean(np.diff(theta))])
+        theta = self._get_theta_for_limits(ws_h)
         # Use |Q| at elastic line to get minimum and step size
-        qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(th)) * meV2J) / m2A)
+        qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
         # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
         emax = -np.min(en) if (str(ws_h.getEMode()) == 'Direct') else np.max(en)
-        qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(th[1])) * meV2J) / m2A
+        qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
         self._limits[ws_name]['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep]
-        self._limits[ws_name]['|Q|'] = self._limits[ws_name]['MomentumTransfer'] # ConverToMD renames it(!)
-        self._limits[ws_name]['Degrees'] = th * 180 / np.pi
+        self._limits[ws_name]['|Q|'] = self._limits[ws_name]['MomentumTransfer']  # ConvertToMD renames it(!)
+        self._limits[ws_name]['Degrees'] = theta * 180 / np.pi
         self._limits[ws_name]['DeltaE'] = [np.min(en), np.max(en), np.mean(np.diff(en))]
+
+    def _get_EFixed_for_limits(self, ws_handle):
+        try:
+            efix = self._get_ws_EFixed(ws_handle, ws_handle.getDetector(0).getID())
+        except RuntimeError:  # Efixed not defined
+            # This could occur for malformed NXSPE without the instrument name set.
+            # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
+            if ws_handle.run().hasProperty('Ei'):
+                efix = ws_handle.run().getProperty('Ei').value
+            else:
+                return None
+        except AttributeError:  # Wrong workspace type (e.g. cut)
+            return None
+        # Checks that loaded data is in energy transfer.
+        enAxis = ws_handle.getAxis(0)
+        if 'DeltaE' not in enAxis.getUnit().unitID():
+            return None
+        return efix
+
+    def _get_theta_for_limits(self, ws_handle):
+        # Don't parse all spectra in cases where there are alot to save time.
+        num_hist = ws_handle.getNumberHistograms()
+        if num_hist > 500:
+            theta = [ws_handle.detectorTwoTheta(ws_handle.getDetector(i))
+                     for i in range(0, num_hist, int(num_hist / 500))]
+        else:
+            theta = [ws_handle.detectorTwoTheta(ws_handle.getDetector(i)) for i in range(num_hist)]
+        # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.1 degrees
+        thdiff = np.diff(np.round(np.sort(theta)*573)/573)
+        return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff>0)])])
 
     def load(self, filename, output_workspace):
         ws = Load(Filename=filename, OutputWorkspace=output_workspace)
@@ -107,12 +132,33 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self._EfDefined[new_name] = self._EfDefined.pop(selected_workspace)
         return ws
 
+    def combine_workspace(self, selected_workspaces, new_name):
+        ws = MergeMD(InputWorkspaces=selected_workspaces, OutputWorkspace=new_name)
+        # Use precalculated step size, otherwise get limits directly from workspace
+        ax1 = ws.getDimension(0)
+        ax2 = ws.getDimension(1)
+        step1 = []
+        step2 = []
+        for input_workspace in selected_workspaces:
+            step1.append(self.get_limits(input_workspace, ax1.name)[2])
+            step2.append(self.get_limits(input_workspace, ax2.name)[2])
+        if new_name not in self._limits.keys():
+            self._limits[new_name] = {}
+        self._limits[new_name][ax1.name] = [ax1.getMinimum(), ax1.getMaximum(), np.max(step1)]
+        self._limits[new_name][ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
+        return ws
+
     def save_nexus(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace) or isinstance(workspace_handle, IMDHistoWorkspace):
             SaveMD(InputWorkspace=workspace, Filename=path)
         else:
             SaveNexus(InputWorkspace=workspace, Filename=path)
+
+    def is_pixel_workspace(self, workspace_name):
+        from mantid.api import IMDEventWorkspace
+        workspace = self.get_workspace_handle(workspace_name)
+        return isinstance(workspace, IMDEventWorkspace)
 
     def get_workspace_handle(self, workspace_name):
         """"Return handle to workspace given workspace_name_as_string"""
@@ -158,7 +204,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return ws_handle.getEFixed(detector)
 
     def _get_exp_info_using(self, ws_handle, get_exp_info, error_string):
-        '''get data from MultipleExperimentInfo. Returns None if ExperimentInfo is not found'''
+        """get data from MultipleExperimentInfo. Returns None if ExperimentInfo is not found"""
         prev = None
         for exp in range(ws_handle.getNumExperimentInfo()):
             exp_value = get_exp_info(exp)
@@ -177,20 +223,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_handle = self.get_workspace_handle(ws_name)
         for idx in range(ws_handle.getNumberHistograms()):
             ws_handle.setEFixed(ws_handle.getDetector(idx).getID(), Ef)
-
-    def get_limits(self, workspace, axis):
-        """Determines the limits of the data and minimum step size"""
-        if workspace not in self._limits:
-            self._processLoadedWSLimits(workspace)
-        # If we cannot get the step size from the data, use the old 1/100 steps.
-        if axis in self._limits[workspace]:
-            return self._limits[workspace][axis]
-        else:
-            ws_h = self.get_workspace_handle(workspace)
-            dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
-            minimum = dim.getMinimum()
-            maximum = dim.getMaximum()
-            return minimum, maximum, (maximum - minimum)/100.
 
     def propagate_properties(self, old_workspace, new_workspace):
         """Propagates MSlice only properties of workspaces, e.g. limits"""
