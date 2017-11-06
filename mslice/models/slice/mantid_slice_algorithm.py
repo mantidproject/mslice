@@ -1,5 +1,4 @@
 from __future__ import (absolute_import, division, print_function)
-import math
 import numpy as np
 
 from mantid.simpleapi import BinMD
@@ -16,7 +15,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
-    def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one):
+    def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one, sample_temp):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         assert isinstance(workspace,IMDEventWorkspace)
 
@@ -43,12 +42,12 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             plot_data = self._norm_to_one(plot_data)
         plot = [None, None, None]
         plot[0] = plot_data
-        plot[1] = self.compute_chi(plot_data, selected_workspace)
+        plot[1] = self.compute_chi(plot_data, selected_workspace, sample_temp)
         plot[2] = self.compute_chi_magnetic(plot[1])
         return plot, boundaries
 
-    def compute_chi(self, scattering_data, ws):
-        kBT = self.get_sample_temperature(ws) * BOLTZMANN
+    def compute_chi(self, scattering_data, ws, sample_temp):
+        kBT = sample_temp * BOLTZMANN
         signs = np.sign(scattering_data)
         chi = np.exp(-scattering_data / kBT)
         chi = signs + (chi * -signs)
@@ -59,9 +58,6 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         # 291 milibarns is the total neutron cross-section for a moment of one bohr magneton
         chi_magnetic = chi / 291
         return chi_magnetic
-
-    def get_sample_temperature(self, ws):
-        return 15 # temporary
 
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()

@@ -21,15 +21,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.title = None
 
     def plot_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
-                   colourmap):
-        self.plot_data, self.boundaries = self._slice_algorithm.compute_slice(selected_workspace, x_axis, y_axis, smoothing,
-                                                                    norm_to_one)
+                   colourmap, sample_temp):
+        self.plot_data, self.boundaries = self._slice_algorithm.compute_slice(selected_workspace, x_axis, y_axis,
+                                                                              smoothing, norm_to_one, sample_temp)
         self.colourmap = colourmap
         self.norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         comment = self._slice_algorithm.getComment(selected_workspace)
         self._x_label = self._getDisplayName(x_axis.units, comment)
         self._y_label = self._getDisplayName(y_axis.units, comment)
         self.title = selected_workspace
+        self.sample_temp = sample_temp
         self.show_scattering_function()
         plt.gcf().canvas.set_window_title(selected_workspace)
         plt.gcf().canvas.manager.add_slice_plotter(self)
@@ -65,11 +66,14 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def show_dynamical_susceptibility_magnetic(self):
         self._show_plot(self.plot_data[2], self.boundaries)
-        plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^-1 sr^-1 f.u.^-1$)',
+        plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
 
     def get_available_colormaps(self):
         return self._colormaps
+
+    def get_sample_temperature(self, ws):
+        return None # temporary
 
     def get_available_axis(self, selected_workspace):
         return self._slice_algorithm.get_available_axis(selected_workspace)

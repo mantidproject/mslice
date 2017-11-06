@@ -44,6 +44,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         self._slice_plotter = slice_plotter
         colormaps = self._slice_plotter.get_available_colormaps()
         self._slice_view.populate_colormap_options(colormaps)
+        self.sample_temp = None
 
     def notify(self, command):
         self._clear_displayed_error(self._slice_view)
@@ -95,10 +96,13 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             smoothing = self._to_int(smoothing)
         except ValueError:
             self._slice_view.error_invalid_smoothing_params()
-
+        sample_temp = self._slice_plotter.get_sample_temperature(selected_workspace)
+        if sample_temp is None:
+            sample_temp = self._slice_view.ask_sample_temperature()
+            print(sample_temp)
         try:
             self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
-                                           norm_to_one, colourmap)
+                                           norm_to_one, colourmap, sample_temp)
 
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
