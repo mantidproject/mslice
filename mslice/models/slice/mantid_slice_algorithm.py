@@ -18,7 +18,6 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one, sample_temp):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         assert isinstance(workspace,IMDEventWorkspace)
-
         self._fill_in_missing_input(x_axis, workspace)
         self._fill_in_missing_input(y_axis, workspace)
 

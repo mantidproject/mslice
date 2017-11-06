@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from mantid.simpleapi import AnalysisDataService
 from mslice.models.slice.slice_plotter import SlicePlotter
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.slice_plotter_view import SlicePlotterView
@@ -44,7 +45,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         self._slice_plotter = slice_plotter
         colormaps = self._slice_plotter.get_available_colormaps()
         self._slice_view.populate_colormap_options(colormaps)
-        self.sample_temp = None
+        self._sample_temp = {}
 
     def notify(self, command):
         self._clear_displayed_error(self._slice_view)
@@ -54,6 +55,19 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         else:
             raise ValueError("Slice Plotter Presenter received an unrecognised command")
         self._slice_view.busy.emit(False)
+
+    def get_sample_temperature(self, ws_name):
+        if ws_name[-3:] == '_QE':
+            ws_name = ws_name[:-3]
+        if ws_name in self._sample_temp:
+            return self._sample_temp[ws_name]
+        ws = AnalysisDataService[ws_name]
+        run_title = ws.run().getLogData('run_title').value
+        pos_k = run_title.find('K')
+        k_string = run_title[pos_k - 3:pos_k]
+        sample_temp = float(''.join(c for c in k_string if c.isdigit()))
+        self._sample_temp[ws_name] = sample_temp
+        return sample_temp
 
     def _display_slice(self):
         selected_workspaces = self._get_main_presenter().get_selected_workspaces()
@@ -96,7 +110,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             smoothing = self._to_int(smoothing)
         except ValueError:
             self._slice_view.error_invalid_smoothing_params()
-        sample_temp = self._slice_plotter.get_sample_temperature(selected_workspace)
+        sample_temp = self.get_sample_temperature(selected_workspace)
         if sample_temp is None:
             sample_temp = self._slice_view.ask_sample_temperature()
             print(sample_temp)

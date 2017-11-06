@@ -72,9 +72,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def get_available_colormaps(self):
         return self._colormaps
 
-    def get_sample_temperature(self, ws):
-        return None # temporary
-
     def get_available_axis(self, selected_workspace):
         return self._slice_algorithm.get_available_axis(selected_workspace)
 
