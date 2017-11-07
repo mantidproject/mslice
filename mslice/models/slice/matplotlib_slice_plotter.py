@@ -56,7 +56,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.title(self.title)
         plt.xlabel(self._x_label)
         plt.ylabel(self._y_label)
-        plt.gcf().get_axes()[1].set_ylabel('(arb. units)', labelpad=20, rotation=270)
+        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
 
     def show_scattering_function(self):
         self._show_plot(self.plot_data[0], self.boundaries)

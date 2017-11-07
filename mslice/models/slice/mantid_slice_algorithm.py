@@ -20,7 +20,6 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         assert isinstance(workspace,IMDEventWorkspace)
         self._fill_in_missing_input(x_axis, workspace)
         self._fill_in_missing_input(y_axis, workspace)
-
         n_x_bins = self._get_number_of_steps(x_axis)
         n_y_bins = self._get_number_of_steps(y_axis)
         x_dim_id = workspace.getDimensionIndexByName(x_axis.units)
@@ -41,15 +40,16 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             plot_data = self._norm_to_one(plot_data)
         plot = [None, None, None]
         plot[0] = plot_data
-        plot[1] = self.compute_chi(plot_data, selected_workspace, sample_temp)
+        plot[1] = self.compute_chi(plot_data, sample_temp, y_axis)
         plot[2] = self.compute_chi_magnetic(plot[1])
         return plot, boundaries
 
-    def compute_chi(self, scattering_data, ws, sample_temp):
+    def compute_chi(self, scattering_data, sample_temp, y_axis):
         kBT = sample_temp * BOLTZMANN
-        signs = np.sign(scattering_data)
-        chi = np.exp(-scattering_data / kBT)
-        chi = signs + (chi * -signs)
+        energy_transfer = np.arange(y_axis.start, y_axis.end, y_axis.step)
+        signs = np.sign(energy_transfer)
+        boltzmann_dist = np.exp(-energy_transfer / kBT)
+        chi = (signs + (boltzmann_dist * -signs))[:,None]
         chi = np.pi * chi * scattering_data
         return chi
 
