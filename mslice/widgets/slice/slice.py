@@ -4,7 +4,7 @@
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
-from PyQt4.QtGui import QInputDialog, QWidget
+from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import pyqtSignal
 
 from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter

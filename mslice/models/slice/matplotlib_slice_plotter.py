@@ -20,8 +20,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
                                                                     smoothing, norm_to_one, sample_temp)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self.slice_cache[selected_ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'x_axis': x_axis,
-                                                'y_axis': y_axis, 'colourmap': colourmap, 'norm': norm,
-                                                'sample_temp': sample_temp}
+                                         'y_axis': y_axis, 'colourmap': colourmap, 'norm': norm,
+                                         'sample_temp': sample_temp}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plotter(self)

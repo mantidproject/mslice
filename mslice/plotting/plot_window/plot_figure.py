@@ -24,6 +24,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.legends_visible = []
         self.lines_visible = {}
         self.slice_plotter = None
+        self.menuIntensity.setDisabled(True)
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -54,6 +55,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def add_slice_plotter(self, slice_plotter):
         self.slice_plotter = slice_plotter
+        self.menuIntensity.setDisabled(False)
 
     def intensity_selection(self, selected):
         options = [self.actionS_Q_E, self.actionChi_Q_E, self.actionChi_Q_E_magnetic]
