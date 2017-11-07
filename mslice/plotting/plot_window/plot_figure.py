@@ -5,7 +5,7 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QPrinter, QPrintDialog, QPixmap, QPainter
+from PyQt4.QtGui import QInputDialog, QPrinter, QPrintDialog, QPixmap, QPainter
 import numpy as np
 import six
 
@@ -64,7 +64,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def show_s_q_e(self):
         if self.actionS_Q_E.isChecked():
             self.intensity_selection(self.actionS_Q_E)
-            self.slice_plotter.show_scattering_function()
+            self.slice_plotter.show_scattering_function(self.title)
             self.canvas.draw()
         else:
             self.actionS_Q_E.setChecked(True)
@@ -72,7 +72,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def show_chi_q_e(self):
         if self.actionChi_Q_E.isChecked():
             self.intensity_selection(self.actionChi_Q_E)
-            self.slice_plotter.show_dynamical_susceptibility()
+            try:
+                self.slice_plotter.show_dynamical_susceptibility(self.title)
+            except ValueError:
+                temp = self.ask_sample_temperature()
+                self.slice_plotter.set_sample_temperature(self.title, temp)
+                self.slice_plotter.show_dynamical_susceptibility(self.title)
             self.canvas.draw()
         else:
             self.actionChi_Q_E.setChecked(True)
@@ -80,10 +85,17 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def show_chi_q_e_magnetic(self):
         if self.actionChi_Q_E_magnetic.isChecked():
             self.intensity_selection(self.actionChi_Q_E_magnetic)
-            self.slice_plotter.show_dynamical_susceptibility_magnetic()
+            self.slice_plotter.show_dynamical_susceptibility_magnetic(self.title)
             self.canvas.draw()
         else:
             self.actionChi_Q_E_magnetic.setChecked(True)
+
+    def ask_sample_temperature(self):
+        temp_box = QInputDialog()
+        temp_box.setWindowTitle('Sample Temperature')
+        temp_box.setLabelText('Sample temperature not found. Enter sample temperature:')
+        sample_temp = temp_box.exec_()
+        return float(sample_temp)
 
     def toggle_data_cursor(self):
         if self.actionDataCursor.isChecked():

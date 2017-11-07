@@ -63,13 +63,6 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
 
-    def ask_sample_temperature(self):
-        temp_box = QInputDialog()
-        temp_box.setWindowTitle('Sample Temperature')
-        temp_box.setLabelText('Sample temperature not found. Enter sample temperature:')
-        sample_temp = temp_box.exec_()
-        return float(sample_temp)
-
     def get_slice_x_axis(self):
         return str(self.cmbSliceXAxis.currentText())
 

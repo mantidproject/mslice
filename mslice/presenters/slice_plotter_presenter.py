@@ -111,9 +111,6 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         except ValueError:
             self._slice_view.error_invalid_smoothing_params()
         sample_temp = self.get_sample_temperature(selected_workspace)
-        if sample_temp is None:
-            sample_temp = self._slice_view.ask_sample_temperature()
-            print(sample_temp)
         try:
             self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
                                            norm_to_one, colourmap, sample_temp)

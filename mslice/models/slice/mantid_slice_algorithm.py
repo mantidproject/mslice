@@ -45,6 +45,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return plot, boundaries
 
     def compute_chi(self, scattering_data, sample_temp, y_axis):
+        if sample_temp is None:
+            return None
         kBT = sample_temp * BOLTZMANN
         energy_transfer = np.arange(y_axis.start, y_axis.end, y_axis.step)
         signs = np.sign(energy_transfer)
@@ -54,6 +56,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return chi
 
     def compute_chi_magnetic(self, chi):
+        if chi is None:
+            return None
         # 291 milibarns is the total neutron cross-section for a moment of one bohr magneton
         chi_magnetic = chi / 291
         return chi_magnetic

@@ -12,27 +12,18 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
         if not MPL_COMPAT:
             self._colormaps.insert(0, 'viridis')
-        self.plot_data = [None, None, None]
-        self.boundaries = None
-        self.norm = None
-        self._x_label = None
-        self._y_label = None
-        self.colourmap = None
-        self.title = None
+        self.slice_cache = {}
 
-    def plot_slice(self, selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
+    def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap, sample_temp):
-        self.plot_data, self.boundaries = self._slice_algorithm.compute_slice(selected_workspace, x_axis, y_axis,
-                                                                              smoothing, norm_to_one, sample_temp)
-        self.colourmap = colourmap
-        self.norm = Normalize(vmin=intensity_start, vmax=intensity_end)
-        comment = self._slice_algorithm.getComment(selected_workspace)
-        self._x_label = self._getDisplayName(x_axis.units, comment)
-        self._y_label = self._getDisplayName(y_axis.units, comment)
-        self.title = selected_workspace
-        self.sample_temp = sample_temp
-        self.show_scattering_function()
-        plt.gcf().canvas.set_window_title(selected_workspace)
+        plot_data, boundaries = self._slice_algorithm.compute_slice(selected_ws, x_axis, y_axis,
+                                                                    smoothing, norm_to_one, sample_temp)
+        norm = Normalize(vmin=intensity_start, vmax=intensity_end)
+        self.slice_cache[selected_ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'x_axis': x_axis,
+                                                'y_axis': y_axis, 'colourmap': colourmap, 'norm': norm,
+                                                'sample_temp': sample_temp}
+        self.show_scattering_function(selected_ws)
+        plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plotter(self)
         plt.draw_all()
 
@@ -50,24 +41,42 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             return axisUnits
 
-    def _show_plot(self, plot_data, extent):
-        plt.imshow(plot_data, extent=extent, cmap=self.colourmap, aspect='auto', norm=self.norm,
+    def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, x_axis, y_axis):
+        plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                    interpolation='none', hold=False)
-        plt.title(self.title)
-        plt.xlabel(self._x_label)
-        plt.ylabel(self._y_label)
+        plt.title(workspace_name)
+        comment = self._slice_algorithm.getComment(str(workspace_name))
+        plt.xlabel(self._getDisplayName(x_axis.units, comment))
+        plt.ylabel(self._getDisplayName(y_axis.units, comment))
         plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
 
-    def show_scattering_function(self):
-        self._show_plot(self.plot_data[0], self.boundaries)
+    def show_scattering_function(self, workspace):
+        slice_cache = self.slice_cache[workspace]
+        self._show_plot(workspace, slice_cache['plot_data'][0], slice_cache['boundaries'], slice_cache['colourmap'],
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
 
-    def show_dynamical_susceptibility(self):
-        self._show_plot(self.plot_data[1], self.boundaries)
+    def show_dynamical_susceptibility(self, workspace):
+        slice_cache = self.slice_cache[workspace]
+        if slice_cache['plot_data'][1] is None:
+            raise ValueError('plot_data not calculated')
+        self._show_plot(workspace, slice_cache['plot_data'][1], slice_cache['boundaries'], slice_cache['colourmap'],
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
 
-    def show_dynamical_susceptibility_magnetic(self):
-        self._show_plot(self.plot_data[2], self.boundaries)
+    def show_dynamical_susceptibility_magnetic(self, workspace):
+        slice_cache = self.slice_cache[workspace]
+        if slice_cache['plot_data'][1] is None:
+            raise ValueError('plot_data not calculated')
+        self._show_plot(workspace, slice_cache['plot_data'][2], slice_cache['boundaries'], slice_cache['colourmap'],
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
+
+    def set_sample_temperature(self, workspace, temp):
+        self.slice_cache[workspace]['sample_temp'] = temp
+        self.slice_cache[workspace]['plot_data'][1] = self._slice_algorithm.compute_chi(
+            self.slice_cache[workspace]['plot_data'][0], temp, self.slice_cache[workspace]['y_axis'])
+        self.slice_cache[workspace]['plot_data'][2] = self._slice_algorithm.compute_chi_magnetic(
+            self.slice_cache[workspace]['plot_data'][1])
 
     def get_available_colormaps(self):
         return self._colormaps
