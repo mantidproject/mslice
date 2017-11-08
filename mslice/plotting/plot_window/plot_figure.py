@@ -107,8 +107,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
         temp_field, confirm = QInputDialog.getItem(self, 'Sample Temperature',
-                                          'Sample Temperature not found. Select the sample temperature field:',
-                                          ws.run().keys(), False)
+                                                   'Sample Temperature not found. Select the sample temperature field:',
+                                                   ws.run().keys(), False)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
