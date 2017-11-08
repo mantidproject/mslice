@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
+import numpy as np
 from matplotlib.colors import Normalize
-
+from mantid.simpleapi import AnalysisDataService
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
@@ -13,9 +14,11 @@ class MatplotlibSlicePlotter(SlicePlotter):
         if not MPL_COMPAT:
             self._colormaps.insert(0, 'viridis')
         self.slice_cache = {}
+        self._sample_temp_fields = []
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
-                   colourmap, sample_temp):
+                   colourmap):
+        sample_temp = self.get_sample_temperature(selected_ws)
         plot_data, boundaries = self._slice_algorithm.compute_slice(selected_ws, x_axis, y_axis,
                                                                     smoothing, norm_to_one, sample_temp)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
@@ -71,12 +74,46 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
 
-    def set_sample_temperature(self, workspace, temp):
+    def add_sample_temperature_field(self, field_name):
+        self._sample_temp_fields.append(field_name)
+
+    def update_sample_temperature(self, workspace):
+        temp = self.sample_temperature(str(workspace))
         self.slice_cache[workspace]['sample_temp'] = temp
         self.slice_cache[workspace]['plot_data'][1] = self._slice_algorithm.compute_chi(
             self.slice_cache[workspace]['plot_data'][0], temp, self.slice_cache[workspace]['y_axis'])
         self.slice_cache[workspace]['plot_data'][2] = self._slice_algorithm.compute_chi_magnetic(
             self.slice_cache[workspace]['plot_data'][1])
+
+    def sample_temperature(self, ws_name):
+        if ws_name[-3:] == '_QE':
+            ws_name = ws_name[:-3]
+        ws = AnalysisDataService[ws_name]
+        sample_temp = None
+        for field_name in self._sample_temp_fields:
+            try:
+                sample_temp = ws.run().getLogData(field_name).value
+            except RuntimeError:
+                pass
+        try:
+            float(sample_temp)
+        except (ValueError, TypeError):
+            pass
+        else:
+            return sample_temp
+        if isinstance(sample_temp, str):
+            sample_temp = self.get_sample_temperature_from_string(sample_temp)
+        if isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
+            sample_temp = np.mean(sample_temp)
+        return sample_temp
+
+    def get_sample_temperature_from_string(self, string):
+        pos_k = string.find('K')
+        if pos_k == -1:
+            return None
+        k_string = string[pos_k - 3:pos_k]
+        sample_temp = float(''.join(c for c in k_string if c.isdigit()))
+        return sample_temp
 
     def get_available_colormaps(self):
         return self._colormaps

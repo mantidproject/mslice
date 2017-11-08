@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from itertools import chain
 
+from mantid.simpleapi import AnalysisDataService
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
@@ -77,14 +78,18 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             try:
                 self.slice_plotter.show_dynamical_susceptibility(self.title)
             except ValueError:
-                temp = self.ask_sample_temperature()
-                self.slice_plotter.set_sample_temperature(self.title, temp)
+                field = self.ask_sample_temperature_field(str(self.title))
+                self.slice_plotter.add_sample_temperature_field(field)
+                self.slice_plotter.update_sample_temperature(self.title)
                 self.slice_plotter.show_dynamical_susceptibility(self.title)
             self.canvas.draw()
         else:
             self.actionChi_Q_E.setChecked(True)
 
     def show_chi_q_e_magnetic(self):
+
+        # to be updated
+
         if self.actionChi_Q_E_magnetic.isChecked():
             self.intensity_selection(self.actionChi_Q_E_magnetic)
             self.slice_plotter.show_dynamical_susceptibility_magnetic(self.title)
@@ -92,12 +97,22 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         else:
             self.actionChi_Q_E_magnetic.setChecked(True)
 
-    def ask_sample_temperature(self):
-        temp_box = QInputDialog()
-        temp_box.setWindowTitle('Sample Temperature')
-        temp_box.setLabelText('Sample temperature not found. Enter sample temperature:')
-        sample_temp = temp_box.exec_()
-        return float(sample_temp)
+    def ask_sample_temperature_field(self, ws_name):
+        if ws_name[-3:] == '_QE':
+            ws_name = ws_name[:-3]
+        ws = AnalysisDataService[ws_name]
+        # temp_box = QInputDialog()
+        # temp_box.setWindowTitle('Sample Temperature')
+        # temp_box.setLabelText('Sample temperature not found. Select the sample temperature field:')
+        # temp_box.setComboBoxItems(ws.run().keys())
+        # temp_field = temp_box.exec_()
+        temp_field, confirm = QInputDialog.getItem(self, 'Sample Temperature',
+                                          'Sample Temperature not found. Select the sample temperature field:',
+                                          ws.run().keys(), False)
+        if not confirm:
+            pass # how to handle cancel click?
+        else:
+            return str(temp_field)
 
     def toggle_data_cursor(self):
         if self.actionDataCursor.isChecked():
