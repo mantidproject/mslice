@@ -18,7 +18,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
-        sample_temp = self.get_sample_temperature(selected_ws)
+        sample_temp = self.sample_temperature(selected_ws)
         plot_data, boundaries = self._slice_algorithm.compute_slice(selected_ws, x_axis, y_axis,
                                                                     smoothing, norm_to_one, sample_temp)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)

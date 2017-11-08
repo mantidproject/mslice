@@ -59,10 +59,15 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.menuIntensity.setDisabled(False)
 
     def intensity_selection(self, selected):
+        '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
         options = [self.actionS_Q_E, self.actionChi_Q_E, self.actionChi_Q_E_magnetic]
+        previous = None
         for op in options:
+            if op.isChecked() and op is not selected:
+                previous = op
             op.setChecked(False)
         selected.setChecked(True)
+        return previous
 
     def show_s_q_e(self):
         if self.actionS_Q_E.isChecked():
@@ -73,44 +78,39 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.actionS_Q_E.setChecked(True)
 
     def show_chi_q_e(self):
-        if self.actionChi_Q_E.isChecked():
-            self.intensity_selection(self.actionChi_Q_E)
-            try:
-                self.slice_plotter.show_dynamical_susceptibility(self.title)
-            except ValueError:
-                field = self.ask_sample_temperature_field(str(self.title))
-                self.slice_plotter.add_sample_temperature_field(field)
-                self.slice_plotter.update_sample_temperature(self.title)
-                self.slice_plotter.show_dynamical_susceptibility(self.title)
-            self.canvas.draw()
-        else:
-            self.actionChi_Q_E.setChecked(True)
+        self.show_temperature_dependent_plot(self.actionChi_Q_E, self.slice_plotter.show_dynamical_susceptibility)
 
     def show_chi_q_e_magnetic(self):
+        self.show_temperature_dependent_plot(self.actionChi_Q_E_magnetic,
+                                             self.slice_plotter.show_dynamical_susceptibility_magnetic)
 
-        # to be updated
-
-        if self.actionChi_Q_E_magnetic.isChecked():
-            self.intensity_selection(self.actionChi_Q_E_magnetic)
-            self.slice_plotter.show_dynamical_susceptibility_magnetic(self.title)
+    def show_temperature_dependent_plot(self, intensity_action, slice_plotter_method):
+        if intensity_action.isChecked():
+            previous = self.intensity_selection(intensity_action)
+            try:
+                slice_plotter_method(self.title)
+            except ValueError:  # sample temperature not yet set
+                try:
+                    field = self.ask_sample_temperature_field(str(self.title))
+                except RuntimeError:  # if cancel is clicked, return to previous selection
+                    self.intensity_selection(previous)
+                    return
+                self.slice_plotter.add_sample_temperature_field(field)
+                self.slice_plotter.update_sample_temperature(self.title)
+                slice_plotter_method(self.title)
             self.canvas.draw()
         else:
-            self.actionChi_Q_E_magnetic.setChecked(True)
+            intensity_action.setChecked(True)
 
     def ask_sample_temperature_field(self, ws_name):
         if ws_name[-3:] == '_QE':
             ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
-        # temp_box = QInputDialog()
-        # temp_box.setWindowTitle('Sample Temperature')
-        # temp_box.setLabelText('Sample temperature not found. Select the sample temperature field:')
-        # temp_box.setComboBoxItems(ws.run().keys())
-        # temp_field = temp_box.exec_()
         temp_field, confirm = QInputDialog.getItem(self, 'Sample Temperature',
                                           'Sample Temperature not found. Select the sample temperature field:',
                                           ws.run().keys(), False)
         if not confirm:
-            pass # how to handle cancel click?
+            raise RuntimeError("sample_temperature_dialog cancelled")
         else:
             return str(temp_field)
 
