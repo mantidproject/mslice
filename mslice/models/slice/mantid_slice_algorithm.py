@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
+from scipy import constants
 
 from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
@@ -7,8 +8,6 @@ from mantid.api import IMDEventWorkspace
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
-
-BOLTZMANN = 0.086173303  # meV/K
 
 
 class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
@@ -47,7 +46,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def compute_chi(self, scattering_data, sample_temp, y_axis):
         if sample_temp is None:
             return None
-        kBT = sample_temp * BOLTZMANN
+        kBT = sample_temp * constants.value('Boltzmann constant in eV/K') * 1000  # convert to meV/K
         energy_transfer = np.arange(y_axis.start, y_axis.end, y_axis.step)
         signs = np.sign(energy_transfer)
         boltzmann_dist = np.exp(-energy_transfer / kBT)
