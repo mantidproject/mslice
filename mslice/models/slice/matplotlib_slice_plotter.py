@@ -74,6 +74,11 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
 
+    def show_d2sigma(self, workspace):
+        slice_cache = self.slice_cache[workspace]
+        self._show_plot(workspace, slice_cache['plot_data'][3], slice_cache['boundaries'], slice_cache['colourmap'],
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
 

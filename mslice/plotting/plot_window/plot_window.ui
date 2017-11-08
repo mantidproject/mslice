@@ -43,6 +43,7 @@
     <addaction name="actionS_Q_E"/>
     <addaction name="actionChi_Q_E"/>
     <addaction name="actionChi_Q_E_magnetic"/>
+    <addaction name="actionD2sigma_dOmega_dE"/>
    </widget>
    <widget class="QMenu" name="menuMake_Script">
     <property name="title">
@@ -190,6 +191,14 @@
    </property>
    <property name="text">
     <string>chi''(Q,E) magnetic</string>
+   </property>
+  </action>
+  <action name="actionD2sigma_dOmega_dE">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>d2sigma/dOmega.dE</string>
    </property>
   </action>
  </widget>

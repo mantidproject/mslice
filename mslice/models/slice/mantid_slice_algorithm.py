@@ -3,6 +3,7 @@ import numpy as np
 
 from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
+from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
@@ -38,10 +39,11 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
         if norm_to_one:
             plot_data = self._norm_to_one(plot_data)
-        plot = [None, None, None]
+        plot = [None, None, None, None]
         plot[0] = plot_data
         plot[1] = self.compute_chi(plot_data, sample_temp, y_axis)
         plot[2] = self.compute_chi_magnetic(plot[1])
+        plot[3] = self.compute_d2sigma(plot[0], selected_workspace, y_axis)
         return plot, boundaries
 
     def compute_chi(self, scattering_data, sample_temp, y_axis):
@@ -61,6 +63,19 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         # 291 milibarns is the total neutron cross-section for a moment of one bohr magneton
         chi_magnetic = chi / 291
         return chi_magnetic
+
+    def compute_d2sigma(self, scattering_data, workspace, y_axis):
+        Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(workspace))
+        if Ei is None:
+            Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(workspace[:-3]))
+            if Ei is None:
+                return None
+        hbar = constants.value('Planck constant over 2 pi in eV s') * 1000  # convert to meV s
+        ki = np.sqrt(Ei*2*constants.neutron_mass) / hbar
+        energy_transfer = np.arange(y_axis.start, y_axis.end, y_axis.step)
+        kf = np.sqrt(((Ei - energy_transfer)*2*constants.neutron_mass) / hbar)[:,None]
+        d2sigma = scattering_data * kf / ki
+        return d2sigma
 
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()
