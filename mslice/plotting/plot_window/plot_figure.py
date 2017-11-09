@@ -25,6 +25,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.legends_visible = []
         self.lines_visible = {}
         self.slice_plotter = None
+        self.workspace_title = None
         self.menuIntensity.setDisabled(True)
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
@@ -58,6 +59,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def add_slice_plotter(self, slice_plotter):
         self.slice_plotter = slice_plotter
         self.menuIntensity.setDisabled(False)
+        self.ws_title = self.title
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
@@ -73,7 +75,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def show_s_q_e(self):
         if self.actionS_Q_E.isChecked():
             self.intensity_selection(self.actionS_Q_E)
-            self.slice_plotter.show_scattering_function(self.title)
+            self.slice_plotter.show_scattering_function(self.ws_title, self.title)
             self.canvas.draw()
         else:
             self.actionS_Q_E.setChecked(True)
@@ -97,16 +99,16 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if intensity_action.isChecked():
             previous = self.intensity_selection(intensity_action)
             try:
-                slice_plotter_method(self.title)
+                slice_plotter_method(self.ws_title, self.title)
             except ValueError:  # sample temperature not yet set
                 try:
-                    field = self.ask_sample_temperature_field(str(self.title))
-                except RuntimeError:  # if cancel is clicked, return to previous selection
+                    field = self.ask_sample_temperature_field(str(self.ws_title))
+                except RuntimeError:  # if cancel is clicked, go back to previous selection
                     self.intensity_selection(previous)
                     return
                 self.slice_plotter.add_sample_temperature_field(field)
-                self.slice_plotter.update_sample_temperature(self.title)
-                slice_plotter_method(self.title)
+                self.slice_plotter.update_sample_temperature(self.ws_title)
+                slice_plotter_method(self.ws_title)
             self.canvas.draw()
         else:
             intensity_action.setChecked(True)

@@ -179,7 +179,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>chi''(Q,E)</string>
+    <string>Chi''(Q,E)</string>
    </property>
   </action>
   <action name="actionChi_Q_E_magnetic">
@@ -190,7 +190,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>chi''(Q,E) magnetic</string>
+    <string>Chi''(Q,E) magnetic</string>
    </property>
   </action>
   <action name="actionD2sigma_dOmega_dE">

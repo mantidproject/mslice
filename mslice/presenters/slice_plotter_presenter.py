@@ -44,7 +44,6 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         self._slice_plotter = slice_plotter
         colormaps = self._slice_plotter.get_available_colormaps()
         self._slice_view.populate_colormap_options(colormaps)
-        self._sample_temp_fields = []
 
     def notify(self, command):
         self._clear_displayed_error(self._slice_view)
