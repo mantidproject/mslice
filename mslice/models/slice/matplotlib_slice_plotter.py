@@ -72,10 +72,12 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
 
-    def show_d2sigma(self, workspace):
+    def show_d2sigma(self, workspace, title=None):
         slice_cache = self.slice_cache[workspace]
+        if slice_cache['plot_data'][2] is None:
+            self.compute_d2sigma(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][3], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'], title)
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
@@ -96,6 +98,10 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self.compute_chi(workspace)
         self.slice_cache[workspace]['plot_data'][2] = self._slice_algorithm.compute_chi_magnetic(
             self.slice_cache[workspace]['plot_data'][1])
+
+    def compute_d2sigma(self, workspace):
+        self.slice_cache[workspace]['plot_data'][3] = self._slice_algorithm.compute_d2sigma(
+            self.slice_cache[workspace]['plot_data'][0], str(workspace), self.slice_cache[workspace]['y_axis'])
 
     def get_available_colormaps(self):
         return self._colormaps
