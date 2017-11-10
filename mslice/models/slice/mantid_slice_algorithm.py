@@ -65,6 +65,12 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         chi_magnetic = chi / 291
         return chi_magnetic
 
+    def compute_symmetrised(self, scattering_data, boltzmann_dist, y_axis):
+        energy_transfer = np.arange(y_axis.end, 0, -y_axis.step)
+        negatives = scattering_data[len(energy_transfer):] * boltzmann_dist[len(energy_transfer):,None]
+        print(len(scattering_data[:len(energy_transfer)]))
+        return np.concatenate((scattering_data[:len(energy_transfer)], negatives))
+
     def sample_temperature(self, ws_name, sample_temp_fields):
         if ws_name[-3:] == '_QE':
             ws_name = ws_name[:-3]  # mantid drops log data during projection, need unprojected workspace.

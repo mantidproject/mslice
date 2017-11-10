@@ -34,6 +34,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionS_Q_E.triggered.connect(self.show_s_q_e)
         self.actionChi_Q_E.triggered.connect(self.show_chi_q_e)
         self.actionChi_Q_E_magnetic.triggered.connect(self.show_chi_q_e_magnetic)
+        self.actionSymmetrised_S_Q_E.triggered.connect(self.show_symmetrised)
         self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
 
         self.actionDataCursor.toggled.connect(self.toggle_data_cursor)
@@ -62,7 +63,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
-        options = [self.actionS_Q_E, self.actionChi_Q_E, self.actionChi_Q_E_magnetic]
+        options = self.menuIntensity.actions()
         previous = None
         for op in options:
             if op.isChecked() and op is not selected:
@@ -85,6 +86,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def show_chi_q_e_magnetic(self):
         self.show_temperature_dependent_plot(self.actionChi_Q_E_magnetic,
                                              self.slice_plotter.show_dynamical_susceptibility_magnetic)
+
+    def show_symmetrised(self):
+        self.show_temperature_dependent_plot(self.actionSymmetrised_S_Q_E, self.slice_plotter.show_symmetrised)
 
     def show_temperature_dependent_plot(self, intensity_action, slice_plotter_method):
         if intensity_action.isChecked():
