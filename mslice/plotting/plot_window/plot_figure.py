@@ -83,7 +83,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             y_range = self.y_range
             title = self.title
             if temp_dependent:
-               if self.temp_handler(slice_plotter_method, previous) is 'cancelled':
+                if self.temp_handler(slice_plotter_method, previous) is 'cancelled':
                     return
             else:
                 slice_plotter_method(self.ws_title)
