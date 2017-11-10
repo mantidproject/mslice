@@ -178,9 +178,14 @@ class CutPresenter(PresenterUtility):
 
     def workspace_selection_changed(self):
         if self._previous_cut is not None and self._previous_axis is not None:
-            if self._previous_cut not in self._saved_parameters:
-                self._saved_parameters[self._previous_cut] = dict()
-            self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
+            if not self._cut_view.is_fields_cleared():
+                if self._previous_cut not in self._saved_parameters:
+                    self._saved_parameters[self._previous_cut] = dict()
+                self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
+                self._saved_parameters[self._previous_cut]['previous_axis'] = self._previous_axis
+            else:
+                self._previous_cut = None
+                self._previous_axis = None
 
         workspace_selection = self._main_presenter.get_selected_workspaces()
         if len(workspace_selection) < 1:
@@ -194,10 +199,21 @@ class CutPresenter(PresenterUtility):
     def _populate_fields_using_workspace(self, workspace, plotting=False):
         if self._cut_algorithm.is_cuttable(workspace):
             axis = self._cut_algorithm.get_available_axis(workspace)
-            current_axis = axis[0]
-            if self._previous_cut is not None and self._previous_axis is not None:
-                if axis == self._saved_parameters[self._previous_cut][self._previous_axis]['axes']:
-                    current_axis = self._cut_view.get_cut_axis()
+            # There are three choices for which axes to select:
+            #   1. If the current cut is of the same type (e.g. QE), and parameters for the current
+            #      axis in the new cut has not been defined by the user, use the current axis
+            #   2. If the user has looked at this cut and this axis before, use that
+            #   3. Otherwise use the first available axis
+            axis_is_same_as_prev = self._previous_cut is not None and self._previous_axis is not None \
+                and axis == self._saved_parameters[self._previous_cut][self._previous_axis]['axes']
+            axis_in_dict = workspace in self._saved_parameters \
+                and self._cut_view.get_cut_axis() in self._saved_parameters[workspace]
+            if axis_is_same_as_prev and not axis_in_dict:
+                current_axis = self._cut_view.get_cut_axis()
+            elif workspace in self._saved_parameters:
+                current_axis = self._saved_parameters[workspace]['previous_axis']
+            else:
+                current_axis = axis[0]
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
             self._cut_view.set_cut_axis(current_axis)
@@ -231,14 +247,14 @@ class CutPresenter(PresenterUtility):
             self._previous_axis = None
 
     def _cut_axis_changed(self):
-        if self._previous_axis is not None:
+        if self._previous_axis is not None and not self._cut_view.is_fields_cleared():
             if self._previous_cut not in self._saved_parameters:
                 self._saved_parameters[self._previous_cut] = dict()
             self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
         self._cut_view.clear_input_fields(keep_axes=True)
         if self._previous_cut is not None:
             self._previous_axis = self._cut_view.get_cut_axis()
-            if self._previous_axis in self._saved_parameters[self._previous_cut]:
+            if self._previous_cut in self._saved_parameters and self._previous_axis in self._saved_parameters[self._previous_cut]:
                 self._cut_view.populate_input_fields(self._saved_parameters[self._previous_cut][self._previous_axis])
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)

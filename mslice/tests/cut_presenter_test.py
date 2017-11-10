@@ -76,6 +76,7 @@ class CutPresenterTest(unittest.TestCase):
         fields = dict()
         fields['axes'] = available_dimensions
         self.view.get_input_fields = mock.Mock(return_value=fields)
+        self.view.is_fields_cleared = mock.Mock(return_value=False)
         cut_presenter.workspace_selection_changed()
         self.view.get_cut_axis.assert_called_with()
         # Change back to check that it repopulates the fields
@@ -405,6 +406,7 @@ class CutPresenterTest(unittest.TestCase):
         fields1['normtounity'] = False
         self.view.get_input_fields = mock.Mock(return_value=fields1)
         self.view.get_cut_axis = mock.Mock(return_value='dim2')
+        self.view.is_fields_cleared = mock.Mock(return_value=False)
         cut_presenter.notify(Command.AxisChanged)
         self.view.clear_input_fields.assert_called_with(keep_axes=True)
         self.view.populate_input_fields.assert_not_called()
