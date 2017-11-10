@@ -39,17 +39,21 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
         if norm_to_one:
             plot_data = self._norm_to_one(plot_data)
-        plot = [plot_data, None, None]
+        plot = [plot_data, None, None, None, None, None]
         return plot, boundaries
 
-    def compute_chi(self, scattering_data, sample_temp, y_axis):
+    def compute_boltzmann_dist(self, sample_temp, y_axis):
+        '''calculates exp(-E/kBT), a common factor in intensity corrections'''
         if sample_temp is None:
             return None
         kBT = sample_temp * KB_MEV
-        energy_transfer = np.arange(y_axis.start, y_axis.end, y_axis.step)
+        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        return np.exp(-energy_transfer / kBT)
+
+    def compute_chi(self, scattering_data, boltzmann_dist, y_axis):
+        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
         signs = np.sign(energy_transfer)
         signs[signs == 0] = 1
-        boltzmann_dist = np.exp(-energy_transfer / kBT)
         chi = (signs + (boltzmann_dist * -signs))[:, None]
         chi = np.pi * chi * scattering_data
         return chi

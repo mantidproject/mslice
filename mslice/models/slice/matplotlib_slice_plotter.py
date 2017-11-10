@@ -22,7 +22,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self.slice_cache[selected_ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'x_axis': x_axis,
                                          'y_axis': y_axis, 'colourmap': colourmap, 'norm': norm,
-                                         'sample_temp': sample_temp}
+                                         'sample_temp': sample_temp, 'boltzmann_dist': None}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plotter(self)
@@ -79,11 +79,17 @@ class MatplotlibSlicePlotter(SlicePlotter):
         temp = self._slice_algorithm.sample_temperature(str(workspace), self._sample_temp_fields)
         self.slice_cache[workspace]['sample_temp'] = temp
 
-    def compute_chi(self, workspace):
+    def compute_boltzmann_dist(self, workspace):
         if self.slice_cache[workspace]['sample_temp'] is None:
             raise ValueError('sample temperature not found')
+        self.slice_cache[workspace]['boltzmann_dist'] = self._slice_algorithm.compute_boltzmann_dist(
+            self.slice_cache[workspace]['sample_temp'], self.slice_cache[workspace]['y_axis'])
+
+    def compute_chi(self, workspace):
+        if self.slice_cache[workspace]['boltzmann_dist'] is None:
+            self.compute_boltzmann_dist(workspace)
         self.slice_cache[workspace]['plot_data'][1] = self._slice_algorithm.compute_chi(
-            self.slice_cache[workspace]['plot_data'][0], self.slice_cache[workspace]['sample_temp'],
+            self.slice_cache[workspace]['plot_data'][0], self.slice_cache[workspace]['boltzmann_dist'],
             self.slice_cache[workspace]['y_axis'])
 
     def compute_chi_magnetic(self, workspace):
