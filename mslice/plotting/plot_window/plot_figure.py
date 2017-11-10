@@ -62,7 +62,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
-        options = [self.actionS_Q_E, self.actionChi_Q_E, self.actionChi_Q_E_magnetic]
+        options = self.menuIntensity.actions()
         previous = None
         for op in options:
             if op.isChecked() and op is not selected:
@@ -74,13 +74,21 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def show_s_q_e(self):
         if self.actionS_Q_E.isChecked():
             self.intensity_selection(self.actionS_Q_E)
+            cbar_log = self.colorbar_log
+            x_range = self.x_range
+            y_range = self.y_range
             self.slice_plotter.show_scattering_function(self.ws_title, self.title)
+            self.change_slice_plot(self.colorbar_range, cbar_log)
+            self.x_range = x_range
+            self.y_range = y_range
             self.canvas.draw()
         else:
             self.actionS_Q_E.setChecked(True)
 
     def show_chi_q_e(self):
+
         self.show_temperature_dependent_plot(self.actionChi_Q_E, self.slice_plotter.show_dynamical_susceptibility)
+
 
     def show_chi_q_e_magnetic(self):
         self.show_temperature_dependent_plot(self.actionChi_Q_E_magnetic,
@@ -89,6 +97,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def show_temperature_dependent_plot(self, intensity_action, slice_plotter_method):
         if intensity_action.isChecked():
             previous = self.intensity_selection(intensity_action)
+            cbar_log = self.colorbar_log
+            x_range = self.x_range
+            y_range = self.y_range
             try:
                 slice_plotter_method(self.ws_title, self.title)
             except ValueError:  # sample temperature not yet set
@@ -100,6 +111,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 self.slice_plotter.add_sample_temperature_field(field)
                 self.slice_plotter.update_sample_temperature(self.ws_title)
                 slice_plotter_method(self.ws_title)
+            self.change_slice_plot(self.colorbar_range, cbar_log)
+            self.x_range = x_range
+            self.y_range = y_range
             self.canvas.draw()
         else:
             intensity_action.setChecked(True)
