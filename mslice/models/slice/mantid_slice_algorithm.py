@@ -73,7 +73,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
                 return None
         hbar = constants.value('Planck constant over 2 pi in eV s') * 1000  # convert to meV s
         ki = np.sqrt(Ei*2*constants.neutron_mass) / hbar
-        energy_transfer = np.arange(y_axis.start, y_axis.end, y_axis.step)
+        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
         kf = np.sqrt(((Ei - energy_transfer)*2*constants.neutron_mass) / hbar)[:, None]
         d2sigma = scattering_data * kf / ki
         return d2sigma
