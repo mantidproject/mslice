@@ -42,33 +42,33 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             return axisUnits
 
-    def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, x_axis, y_axis, title=None):
+    def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, x_axis, y_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                    interpolation='none', hold=False)
-        plt.title(workspace_name) if title is None else plt.title(title)
+        plt.title(workspace_name)
         comment = self._slice_algorithm.getComment(str(workspace_name))
         plt.xlabel(self._getDisplayName(x_axis.units, comment))
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
         plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
 
-    def show_scattering_function(self, workspace, title=None):
+    def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
         self._show_plot(workspace, slice_cache['plot_data'][0], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'], title)
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
 
-    def show_dynamical_susceptibility(self, workspace, title=None):
+    def show_dynamical_susceptibility(self, workspace):
         slice_cache = self.slice_cache[workspace]
         if slice_cache['plot_data'][1] is None:
             self.compute_chi(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][1], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'], title)
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
 
-    def show_dynamical_susceptibility_magnetic(self, workspace, title=None):
+    def show_dynamical_susceptibility_magnetic(self, workspace):
         slice_cache = self.slice_cache[workspace]
         if slice_cache['plot_data'][2] is None:
             self.compute_chi_magnetic(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][2], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'], title)
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
 

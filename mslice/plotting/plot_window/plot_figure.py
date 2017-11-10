@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from functools import partial
 from itertools import chain
 
 from mantid.simpleapi import AnalysisDataService
@@ -30,10 +31,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
-
-        self.actionS_Q_E.triggered.connect(self.show_s_q_e)
-        self.actionChi_Q_E.triggered.connect(self.show_chi_q_e)
-        self.actionChi_Q_E_magnetic.triggered.connect(self.show_chi_q_e_magnetic)
         self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
 
         self.actionDataCursor.toggled.connect(self.toggle_data_cursor)
@@ -59,6 +56,13 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.slice_plotter = slice_plotter
         self.menuIntensity.setDisabled(False)
         self.ws_title = self.title
+        self.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionS_Q_E,
+                                                   self.slice_plotter.show_scattering_function, False))
+        self.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E,
+                                                     self.slice_plotter.show_dynamical_susceptibility, True))
+        self.actionChi_Q_E_magnetic.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E_magnetic,
+                                                              self.slice_plotter.show_dynamical_susceptibility_magnetic,
+                                                              True))
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
@@ -71,52 +75,38 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         selected.setChecked(True)
         return previous
 
-    def show_s_q_e(self):
-        if self.actionS_Q_E.isChecked():
-            self.intensity_selection(self.actionS_Q_E)
+    def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
+        if action.isChecked():
+            previous = self.intensity_selection(action)
             cbar_log = self.colorbar_log
             x_range = self.x_range
             y_range = self.y_range
-            self.slice_plotter.show_scattering_function(self.ws_title, self.title)
+            title = self.title
+            if temp_dependent:
+               if self.temp_handler(slice_plotter_method, previous) is 'cancelled':
+                    return
+            else:
+                slice_plotter_method(self.ws_title)
             self.change_slice_plot(self.colorbar_range, cbar_log)
             self.x_range = x_range
             self.y_range = y_range
+            self.title = title
             self.canvas.draw()
         else:
-            self.actionS_Q_E.setChecked(True)
+            action.setChecked(True)
 
-    def show_chi_q_e(self):
-
-        self.show_temperature_dependent_plot(self.actionChi_Q_E, self.slice_plotter.show_dynamical_susceptibility)
-
-
-    def show_chi_q_e_magnetic(self):
-        self.show_temperature_dependent_plot(self.actionChi_Q_E_magnetic,
-                                             self.slice_plotter.show_dynamical_susceptibility_magnetic)
-
-    def show_temperature_dependent_plot(self, intensity_action, slice_plotter_method):
-        if intensity_action.isChecked():
-            previous = self.intensity_selection(intensity_action)
-            cbar_log = self.colorbar_log
-            x_range = self.x_range
-            y_range = self.y_range
+    def temp_handler(self, slice_plotter_method, previous):
             try:
-                slice_plotter_method(self.ws_title, self.title)
+                slice_plotter_method(self.ws_title)
             except ValueError:  # sample temperature not yet set
                 try:
                     field = self.ask_sample_temperature_field(str(self.ws_title))
                 except RuntimeError:  # if cancel is clicked, go back to previous selection
                     self.intensity_selection(previous)
-                    return
+                    return 'cancelled'
                 self.slice_plotter.add_sample_temperature_field(field)
                 self.slice_plotter.update_sample_temperature(self.ws_title)
                 slice_plotter_method(self.ws_title)
-            self.change_slice_plot(self.colorbar_range, cbar_log)
-            self.x_range = x_range
-            self.y_range = y_range
-            self.canvas.draw()
-        else:
-            intensity_action.setChecked(True)
 
     def ask_sample_temperature_field(self, ws_name):
         if ws_name[-3:] == '_QE':
