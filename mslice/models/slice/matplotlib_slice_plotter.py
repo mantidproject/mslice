@@ -108,7 +108,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def compute_gdos(self, workspace):
         if self.slice_cache[workspace]['boltzmann_dist'] is None:
             self.compute_boltzmann_dist(workspace)
-        self.slice_cache[workspace][5] = self._slice_algorithm.compute_gdos(
+        self.slice_cache[workspace]['plot_data'][5] = self._slice_algorithm.compute_gdos(
             self.slice_cache[workspace]['plot_data'][0], self.slice_cache[workspace]['boltzmann_dist'],
             self.slice_cache[workspace]['x_axis'], self.slice_cache[workspace]['y_axis'])
 
