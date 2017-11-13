@@ -163,8 +163,8 @@ def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_mi
     x_axis = _process_axis(x, 0, input_workspace)
     y_axis = _process_axis(y, 1, input_workspace)
 
-    _SLICE_MODEL.plot_slice(selected_workspace=input_workspace,x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
-                            intensity_start=intensity_min,intensity_end=intensity_max,
+    _SLICE_MODEL.plot_slice(selected_ws=input_workspace, x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
+                            intensity_start=intensity_min, intensity_end=intensity_max,
                             smoothing=None, norm_to_one=normalize)
 
 

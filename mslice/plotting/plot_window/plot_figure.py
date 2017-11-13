@@ -1,11 +1,13 @@
 from __future__ import (absolute_import, division, print_function)
+from functools import partial
 from itertools import chain
 
+from mantid.simpleapi import AnalysisDataService
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QPrinter, QPrintDialog, QPixmap, QPainter
+from PyQt4.QtGui import QInputDialog, QPrinter, QPrintDialog, QPixmap, QPainter
 import numpy as np
 import six
 
@@ -23,10 +25,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.legends_shown = True
         self.legends_visible = []
         self.lines_visible = {}
+        self.slice_plotter = None
+        self.workspace_title = None
+        self.menuIntensity.setDisabled(True)
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
-
         self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
 
         self.actionDataCursor.toggled.connect(self.toggle_data_cursor)
@@ -47,6 +51,75 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def is_cut_figure(self):
         return not bool(self.canvas.figure.gca().get_images())
+
+    def add_slice_plotter(self, slice_plotter):
+        self.slice_plotter = slice_plotter
+        self.menuIntensity.setDisabled(False)
+        self.ws_title = self.title
+        self.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionS_Q_E,
+                                                   self.slice_plotter.show_scattering_function, False))
+        self.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E,
+                                                     self.slice_plotter.show_dynamical_susceptibility, True))
+        self.actionChi_Q_E_magnetic.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E_magnetic,
+                                                              self.slice_plotter.show_dynamical_susceptibility_magnetic,
+                                                              True))
+
+    def intensity_selection(self, selected):
+        '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
+        options = self.menuIntensity.actions()
+        previous = None
+        for op in options:
+            if op.isChecked() and op is not selected:
+                previous = op
+            op.setChecked(False)
+        selected.setChecked(True)
+        return previous
+
+    def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
+        if action.isChecked():
+            previous = self.intensity_selection(action)
+            cbar_log = self.colorbar_log
+            x_range = self.x_range
+            y_range = self.y_range
+            title = self.title
+            if temp_dependent:
+                if not self._run_temp_dependent(slice_plotter_method, previous):
+                    return
+            else:
+                slice_plotter_method(self.ws_title)
+            self.change_slice_plot(self.colorbar_range, cbar_log)
+            self.x_range = x_range
+            self.y_range = y_range
+            self.title = title
+            self.canvas.draw()
+        else:
+            action.setChecked(True)
+
+    def _run_temp_dependent(self, slice_plotter_method, previous):
+        try:
+            slice_plotter_method(self.ws_title)
+        except ValueError:  # sample temperature not yet set
+            try:
+                field = self.ask_sample_temperature_field(str(self.ws_title))
+            except RuntimeError:  # if cancel is clicked, go back to previous selection
+                self.intensity_selection(previous)
+                return False
+            self.slice_plotter.add_sample_temperature_field(field)
+            self.slice_plotter.update_sample_temperature(self.ws_title)
+            slice_plotter_method(self.ws_title)
+        return True
+
+    def ask_sample_temperature_field(self, ws_name):
+        if ws_name[-3:] == '_QE':
+            ws_name = ws_name[:-3]
+        ws = AnalysisDataService[ws_name]
+        temp_field, confirm = QInputDialog.getItem(self, 'Sample Temperature',
+                                                   'Sample Temperature not found. Select the sample temperature field:',
+                                                   ws.run().keys(), False)
+        if not confirm:
+            raise RuntimeError("sample_temperature_dialog cancelled")
+        else:
+            return str(temp_field)
 
     def toggle_data_cursor(self):
         if self.actionDataCursor.isChecked():
