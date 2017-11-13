@@ -83,7 +83,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             y_range = self.y_range
             title = self.title
             if temp_dependent:
-                if self.temp_handler(slice_plotter_method, previous) is 'cancelled':
+                if not self._run_temp_dependent(slice_plotter_method, previous):
                     return
             else:
                 slice_plotter_method(self.ws_title)
@@ -95,18 +95,19 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         else:
             action.setChecked(True)
 
-    def temp_handler(self, slice_plotter_method, previous):
+    def _run_temp_dependent(self, slice_plotter_method, previous):
+        try:
+            slice_plotter_method(self.ws_title)
+        except ValueError:  # sample temperature not yet set
             try:
-                slice_plotter_method(self.ws_title)
-            except ValueError:  # sample temperature not yet set
-                try:
-                    field = self.ask_sample_temperature_field(str(self.ws_title))
-                except RuntimeError:  # if cancel is clicked, go back to previous selection
-                    self.intensity_selection(previous)
-                    return 'cancelled'
-                self.slice_plotter.add_sample_temperature_field(field)
-                self.slice_plotter.update_sample_temperature(self.ws_title)
-                slice_plotter_method(self.ws_title)
+                field = self.ask_sample_temperature_field(str(self.ws_title))
+            except RuntimeError:  # if cancel is clicked, go back to previous selection
+                self.intensity_selection(previous)
+                return False
+            self.slice_plotter.add_sample_temperature_field(field)
+            self.slice_plotter.update_sample_temperature(self.ws_title)
+            slice_plotter_method(self.ws_title)
+        return True
 
     def ask_sample_temperature_field(self, ws_name):
         if ws_name[-3:] == '_QE':
