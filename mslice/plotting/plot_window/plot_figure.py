@@ -63,6 +63,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionChi_Q_E_magnetic.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E_magnetic,
                                                               self.slice_plotter.show_dynamical_susceptibility_magnetic,
                                                               True))
+        self.actionSymmetrised_S_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionSymmetrised_S_Q_E,
+                                                               self.slice_plotter.show_symmetrised, True))
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
