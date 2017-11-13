@@ -56,16 +56,16 @@ def _string_to_axis(string):
     name = axis[0].strip()
     try:
         start = float(axis[1])
-    except:
+    except ValueError:
         raise ValueError("start '%s' is not a valid float"%axis[1])
     try:
         end = float(axis[2])
-    except:
+    except ValueError:
         raise ValueError("end '%s' is not a valid float"%axis[2])
 
     try:
         step = float(axis[3])
-    except:
+    except ValueError:
         raise ValueError("step '%s' is not a valid float"%axis[3])
     return _Axis(name, start, end, step)
 
@@ -91,7 +91,7 @@ def get_projection(input_workspace, axis1, axis2, units='meV'):
                                                                      axis2=axis2, units=units)
     try:
         names = _lhs_info('names')
-    except:
+    except RuntimeError:
         names = [output_workspace.getName()]
     if len(names) > 1:
         raise Exception('Too many left hand side arguments, %s' % str(names))
@@ -163,8 +163,8 @@ def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_mi
     x_axis = _process_axis(x, 0, input_workspace)
     y_axis = _process_axis(y, 1, input_workspace)
 
-    _SLICE_MODEL.plot_slice(selected_workspace=input_workspace,x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
-                            intensity_start=intensity_min,intensity_end=intensity_max,
+    _SLICE_MODEL.plot_slice(selected_ws=input_workspace, x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
+                            intensity_start=intensity_min, intensity_end=intensity_max,
                             smoothing=None, norm_to_one=normalize)
 
 

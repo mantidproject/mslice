@@ -23,11 +23,13 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
         self.btnWorkspaceCompose.clicked.connect(self._btn_clicked)
         self.btnWorkspaceRemove.clicked.connect(self._btn_clicked)
         self.btnRename.clicked.connect(self._btn_clicked)
+        self.btnCombine.clicked.connect(self._btn_clicked)
         self.button_mappings = {self.btnWorkspaceRemove: Command.RemoveSelectedWorkspaces,
                                 self.btnWorkspaceSave: Command.SaveSelectedWorkspace,
                                 self.btnWorkspaceCompose: Command.ComposeWorkspace,
                                 self.btnLoad: Command.LoadWorkspace,
-                                self.btnRename: Command.RenameWorkspace
+                                self.btnRename: Command.RenameWorkspace,
+                                self.btnCombine: Command.CombineWorkspace
                                 }
         self._main_window = None
         self.lstWorkspaces.itemSelectionChanged.connect(self.list_item_changed)
@@ -119,6 +121,9 @@ class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
 
     def error_select_one_workspace(self):
         self._display_error('Please select a workspace then try again')
+
+    def error_select_more_than_one_workspaces(self):
+        self._display_error('Please select more than one projected workspaces then try again')
 
     def error_unable_to_open_file(self, filename=None):
         self._display_error('MSlice was not able to load %s' % ('the selected file' if filename is None else filename))

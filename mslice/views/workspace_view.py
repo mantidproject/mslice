@@ -41,6 +41,9 @@ class WorkspaceView(object):
     def error_select_one_or_more_workspaces(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def error_select_more_than_one_workspaces(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def get_presenter(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
@@ -57,6 +60,9 @@ class WorkspaceView(object):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def error_unable_to_save(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def error_workspace_exp_info(self, string):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def clear_displayed_error(self):

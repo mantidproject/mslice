@@ -1,24 +1,26 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
+from scipy import constants
 
 from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
 
 from .slice_algorithm import SliceAlgorithm
+from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
+KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 
-class MantidSliceAlgorithm(SliceAlgorithm):
+
+class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
-    def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one):
+    def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one, sample_temp):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
-        assert isinstance(workspace,IMDEventWorkspace)
-
+        assert isinstance(workspace, IMDEventWorkspace)
         self._fill_in_missing_input(x_axis, workspace)
         self._fill_in_missing_input(y_axis, workspace)
-
         n_x_bins = self._get_number_of_steps(x_axis)
         n_y_bins = self._get_number_of_steps(y_axis)
         x_dim_id = workspace.getDimensionIndexByName(x_axis.units)
@@ -31,50 +33,68 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         # perform number of events normalization then mask cells where no data was found
         with np.errstate(invalid='ignore'):
             plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
-        plot_data = np.ma.masked_where(np.isnan(plot_data), plot_data)
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)
         self._workspace_provider.delete_workspace(thisslice)
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
         if norm_to_one:
             plot_data = self._norm_to_one(plot_data)
-        return plot_data, boundaries
+        plot = [plot_data, None, None, None, None, None]
+        return plot, boundaries
 
+    def compute_boltzmann_dist(self, sample_temp, y_axis):
+        '''calculates exp(-E/kBT), a common factor in intensity corrections'''
+        if sample_temp is None:
+            return None
+        kBT = sample_temp * KB_MEV
+        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        return np.exp(-energy_transfer / kBT)
 
-    def get_available_axis(self, selected_workspace):
-        axis = []
-        workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
-        if isinstance(workspace, IMDEventWorkspace):
-            for i in range(workspace.getNumDims()):
-                dim_name = workspace.getDimension(i).getName()
-                axis.append(dim_name)
-        return axis
+    def compute_chi(self, scattering_data, boltzmann_dist, y_axis):
+        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        signs = np.sign(energy_transfer)
+        signs[signs == 0] = 1
+        chi = (signs + (boltzmann_dist * -signs))[:, None]
+        chi = np.pi * chi * scattering_data
+        return chi
+
+    def compute_chi_magnetic(self, chi):
+        if chi is None:
+            return None
+        # 291 milibarns is the total neutron cross-section for a moment of one bohr magneton
+        chi_magnetic = chi / 291
+        return chi_magnetic
+
+    def sample_temperature(self, ws_name, sample_temp_fields):
+        if ws_name[-3:] == '_QE':
+            ws_name = ws_name[:-3]  # mantid drops log data during projection, need unprojected workspace.
+        ws = self._workspace_provider.get_workspace_handle(ws_name)
+        sample_temp = None
+        for field_name in sample_temp_fields:
+            try:
+                sample_temp = ws.run().getLogData(field_name).value
+            except RuntimeError:
+                pass
+        try:
+            float(sample_temp)
+        except (ValueError, TypeError):
+            pass
+        else:
+            return sample_temp
+        if isinstance(sample_temp, str):
+            sample_temp = self.get_sample_temperature_from_string(sample_temp)
+        if isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
+            sample_temp = np.mean(sample_temp)
+        return sample_temp
+
+    def get_sample_temperature_from_string(self, string):
+        pos_k = string.find('K')
+        if pos_k == -1:
+            return None
+        k_string = string[pos_k - 3:pos_k]
+        sample_temp = float(''.join(c for c in k_string if c.isdigit()))
+        return sample_temp
 
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()
         return (data - data.min())/data_range
-
-    def _get_number_of_steps(self, axis):
-        return int(max(1, (axis.end - axis.start)/axis.step))
-
-    def _fill_in_missing_input(self,axis,workspace):
-        dim = workspace.getDimensionIndexByName(axis.units)
-        dim = workspace.getDimension(dim)
-
-        if axis.start is None:
-            axis.start = dim.getMinimum()
-
-        if axis.end is None:
-            axis.end = dim.getMaximum()
-
-        if axis.step is None:
-            axis.step = (axis.end - axis.start)/100
-
-    def get_axis_range(self, workspace, dimension_name):
-        return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
-
-    def set_workspace_provider(self, workspace_provider):
-        self._workspace_provider = workspace_provider
-
-    def getComment(self, workspace):
-        return self._workspace_provider.getComment(workspace)

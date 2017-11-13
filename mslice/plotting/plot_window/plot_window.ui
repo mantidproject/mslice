@@ -34,9 +34,15 @@
     </property>
    </widget>
    <widget class="QMenu" name="menuIntensity">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>Intensity</string>
     </property>
+    <addaction name="actionS_Q_E"/>
+    <addaction name="actionChi_Q_E"/>
+    <addaction name="actionChi_Q_E_magnetic"/>
    </widget>
    <widget class="QMenu" name="menuMake_Script">
     <property name="title">
@@ -68,6 +74,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_save_image"/>
+   <addaction name="action_Print_Plot"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
    <addaction name="actionDataCursor"/>
@@ -145,6 +152,44 @@
   <action name="actionToggleLegends">
    <property name="text">
     <string>Toggle Legends</string>
+   </property>
+  </action>
+  <action name="action_Print_Plot">
+   <property name="text">
+    <string>Print Plot</string>
+   </property>
+  </action>
+  <action name="actionS_Q_E">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>S(Q,E)</string>
+   </property>
+  </action>
+  <action name="actionChi_Q_E">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Chi''(Q,E)</string>
+   </property>
+  </action>
+  <action name="actionChi_Q_E_magnetic">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Chi''(Q,E) magnetic</string>
    </property>
   </action>
  </widget>
