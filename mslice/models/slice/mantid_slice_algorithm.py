@@ -10,6 +10,7 @@ from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
+HBAR_MEV = constants.value('Planck constant over 2 pi in eV s') * 1000
 
 
 class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
@@ -66,15 +67,12 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return chi_magnetic
 
     def compute_d2sigma(self, scattering_data, workspace, y_axis):
-        Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(workspace))
+        Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(workspace))
         if Ei is None:
-            Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(workspace[:-3]))
-            if Ei is None:
-                return None
-        hbar = constants.value('Planck constant over 2 pi in eV s') * 1000  # convert to meV s
-        ki = np.sqrt(Ei*2*constants.neutron_mass) / hbar
+            return None
+        ki = np.sqrt(Ei*2*constants.neutron_mass) / HBAR_MEV
         energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
-        kf = np.sqrt(((Ei - energy_transfer)*2*constants.neutron_mass) / hbar)[:, None]
+        kf = np.sqrt(((Ei - energy_transfer)*2*constants.neutron_mass) / HBAR_MEV)[:, None]
         d2sigma = scattering_data * kf / ki
         return d2sigma
 
@@ -84,9 +82,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return np.concatenate((scattering_data[:len(energy_transfer)], negatives))
 
     def sample_temperature(self, ws_name, sample_temp_fields):
-        if ws_name[-3:] == '_QE':
-            ws_name = ws_name[:-3]  # mantid drops log data during projection, need unprojected workspace.
-        ws = self._workspace_provider.get_workspace_handle(ws_name)
+        ws = self._workspace_provider.get_parent_by_name(ws_name)
+        # mantid drops log data during projection, need unprojected workspace.
         sample_temp = None
         for field_name in sample_temp_fields:
             try:
