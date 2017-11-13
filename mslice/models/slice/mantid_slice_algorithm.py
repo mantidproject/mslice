@@ -11,6 +11,7 @@ from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorks
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 HBAR_MEV = constants.value('Planck constant over 2 pi in eV s') * 1000
+E_TO_K = np.sqrt(2*constants.neutron_mass)/HBAR_MEV
 
 
 class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
@@ -70,9 +71,9 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(workspace))
         if Ei is None:
             return None
-        ki = np.sqrt(Ei*2*constants.neutron_mass) / HBAR_MEV
+        ki = np.sqrt(Ei) * E_TO_K
         energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
-        kf = np.sqrt(((Ei - energy_transfer)*2*constants.neutron_mass) / HBAR_MEV)[:, None]
+        kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)[:, None]
         d2sigma = scattering_data * kf / ki
         return d2sigma
 
