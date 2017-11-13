@@ -77,6 +77,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         if slice_cache['plot_data'][2] is None:
             self.compute_d2sigma(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][3], slice_cache['boundaries'], slice_cache['colourmap'],
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
 
     def show_symmetrised(self, workspace):
         slice_cache = self.slice_cache[workspace]
