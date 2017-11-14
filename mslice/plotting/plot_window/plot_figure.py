@@ -31,7 +31,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
-        self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
 
         self.actionDataCursor.toggled.connect(self.toggle_data_cursor)
         self.stock_toolbar = NavigationToolbar2QT(self.canvas, self)
@@ -55,8 +54,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def add_slice_plotter(self, slice_plotter):
         self.slice_plotter = slice_plotter
         self.menuIntensity.setDisabled(False)
+        self.actionToggleLegends.setDisabled(True)
         self.ws_title = self.title
         self.arbitrary_nuclei = None
+
+        self.actionToggleLegends.triggered.connect(self._toggle_legend)
         self.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionS_Q_E,
                                                    self.slice_plotter.show_scattering_function, False))
         self.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E,
@@ -64,6 +66,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionChi_Q_E_magnetic.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E_magnetic,
                                                               self.slice_plotter.show_dynamical_susceptibility_magnetic,
                                                               True))
+        self.actionD2sigma_dOmega_dE.triggered.connect(partial(self.show_intensity_plot, self.actionD2sigma_dOmega_dE,
+                                                               self.slice_plotter.show_d2sigma, False))
         self.actionSymmetrised_S_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionSymmetrised_S_Q_E,
                                                                self.slice_plotter.show_symmetrised, True))
 

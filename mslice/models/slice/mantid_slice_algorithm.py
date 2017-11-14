@@ -1,9 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
-from scipy import constants
 
 from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
+from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
@@ -11,6 +11,7 @@ from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorks
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 HBAR_MEV = constants.value('Planck constant over 2 pi in eV s') * 1000
+E_TO_K = np.sqrt(2*constants.neutron_mass)/HBAR_MEV
 
 
 class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
@@ -48,11 +49,11 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         if sample_temp is None:
             return None
         kBT = sample_temp * KB_MEV
-        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
         return np.exp(-energy_transfer / kBT)
 
     def compute_chi(self, scattering_data, boltzmann_dist, y_axis):
-        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
         signs = np.sign(energy_transfer)
         signs[signs == 0] = 1
         chi = (signs + (boltzmann_dist * -signs))[:, None]
@@ -66,15 +67,24 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         chi_magnetic = chi / 291
         return chi_magnetic
 
+    def compute_d2sigma(self, scattering_data, workspace, y_axis):
+        Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(workspace))
+        if Ei is None:
+            return None
+        ki = np.sqrt(Ei) * E_TO_K
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
+        kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)[:, None]
+        d2sigma = scattering_data * kf / ki
+        return d2sigma
+
     def compute_symmetrised(self, scattering_data, boltzmann_dist, y_axis):
         energy_transfer = np.arange(y_axis.end, 0, -y_axis.step)
         negatives = scattering_data[len(energy_transfer):] * boltzmann_dist[len(energy_transfer):,None]
         return np.concatenate((scattering_data[:len(energy_transfer)], negatives))
 
     def sample_temperature(self, ws_name, sample_temp_fields):
-        if ws_name[-3:] == '_QE':
-            ws_name = ws_name[:-3]  # mantid drops log data during projection, need unprojected workspace.
-        ws = self._workspace_provider.get_workspace_handle(ws_name)
+        ws = self._workspace_provider.get_parent_by_name(ws_name)
+        # mantid drops log data during projection, need unprojected workspace.
         sample_temp = None
         for field_name in sample_temp_fields:
             try:
