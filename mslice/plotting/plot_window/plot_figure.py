@@ -63,6 +63,10 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionChi_Q_E_magnetic.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E_magnetic,
                                                               self.slice_plotter.show_dynamical_susceptibility_magnetic,
                                                               True))
+        self.actionD2sigma_dOmega_dE.triggered.connect(partial(self.show_intensity_plot, self.actionD2sigma_dOmega_dE,
+                                                               self.slice_plotter.show_d2sigma, False))
+        self.actionSymmetrised_S_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionSymmetrised_S_Q_E,
+                                                               self.slice_plotter.show_symmetrised, True))
         self.actionGDOS.triggered.connect(partial(self.show_intensity_plot, self.actionGDOS,
                                                   self.slice_plotter.show_gdos, True))
 
