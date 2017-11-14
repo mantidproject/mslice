@@ -56,6 +56,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.slice_plotter = slice_plotter
         self.menuIntensity.setDisabled(False)
         self.ws_title = self.title
+        self.arbitrary_nuclei = None
         self.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionS_Q_E,
                                                    self.slice_plotter.show_scattering_function, False))
         self.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E,
@@ -63,6 +64,24 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionChi_Q_E_magnetic.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E_magnetic,
                                                               self.slice_plotter.show_dynamical_susceptibility_magnetic,
                                                               True))
+        self.actionHydrogen.triggered.connect(partial(self.toggle_recoil_line, self.actionHydrogen, 1))
+        self.actionDeuterium.triggered.connect(partial(self.toggle_recoil_line, self.actionDeuterium, 2))
+        self.actionHelium.triggered.connect(partial(self.toggle_recoil_line, self.actionHelium, 4))
+        self.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
+    #
+    def toggle_recoil_line(self, action, relative_mass):
+        if action.isChecked():
+            self.slice_plotter.add_recoil_line(self.ws_title, relative_mass)
+        else:
+            self.slice_plotter.hide_recoil_line(self.ws_title, relative_mass)
+        self.canvas.draw()
+
+    def arbitrary_recoil_line(self):
+        if self.actionArbitrary_nuclei.isChecked():
+            self.arbitrary_nuclei, confirm = QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
+            if not confirm:
+                return
+        self.toggle_recoil_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei)
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''

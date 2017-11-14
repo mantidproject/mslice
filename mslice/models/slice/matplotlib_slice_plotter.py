@@ -16,6 +16,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self._colormaps.insert(0, 'viridis')
         self.slice_cache = {}
         self._sample_temp_fields = []
+        self.recoil_lines = {}
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
@@ -26,6 +27,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.slice_cache[selected_ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'x_axis': x_axis,
                                          'y_axis': y_axis, 'colourmap': colourmap, 'norm': norm,
                                          'sample_temp': sample_temp, 'boltzmann_dist': None}
+        self.recoil_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plotter(self)
@@ -48,13 +50,13 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, x_axis, y_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                    interpolation='none')
-        self.add_recoil_line(x_axis, y_axis)
         plt.title(workspace_name)
-        print(plot_data.shape)
         comment = self._slice_algorithm.getComment(str(workspace_name))
         plt.xlabel(self._getDisplayName(x_axis.units, comment))
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
-        # plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
+        plt.xlim(x_axis.start)
+        plt.ylim(y_axis.start)
+        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
@@ -77,15 +79,18 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
 
-    def add_recoil_line(self, x_axis, y_axis, relative_mass=4):
-        HBAR_MEV = constants.value('Planck constant over 2 pi in eV s') * 1000
-        momentum_transfer = np.arange(x_axis.start, x_axis.end, x_axis.step)
-        line = np.square(momentum_transfer * HBAR_MEV) / (2 * relative_mass * constants.neutron_mass)
-        print(line)
-        plt.xlim(x_axis.start)
-        plt.ylim(y_axis.start)
-        plt.gca().plot(momentum_transfer, line, 'r', alpha=.5)
+    def add_recoil_line(self, workspace, relative_mass):
+        if relative_mass in self.recoil_lines[workspace]:
+            self.recoil_lines[workspace][relative_mass].set_linestyle('-')  # make visible
+        else:
+            x_axis = self.slice_cache[workspace]['x_axis']
+            y_axis = self.slice_cache[workspace]['y_axis']
+            x, y = self._slice_algorithm.compute_recoil_line(x_axis, y_axis, relative_mass)
+            self.recoil_lines[workspace][relative_mass] = plt.gca().plot(x, y, 'g', alpha=.7)[0]
 
+    def hide_recoil_line(self, workspace, relative_mass):
+        if relative_mass in self.recoil_lines[workspace]:
+            self.recoil_lines[workspace][relative_mass].set_linestyle('')
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
