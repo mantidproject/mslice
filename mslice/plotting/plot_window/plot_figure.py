@@ -31,7 +31,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
-        self.actionDump_To_Console.triggered.connect(self._dump_script_to_console)
 
         self.actionDataCursor.toggled.connect(self.toggle_data_cursor)
         self.stock_toolbar = NavigationToolbar2QT(self.canvas, self)
