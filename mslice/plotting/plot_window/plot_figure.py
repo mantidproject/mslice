@@ -68,7 +68,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionDeuterium.triggered.connect(partial(self.toggle_recoil_line, self.actionDeuterium, 2))
         self.actionHelium.triggered.connect(partial(self.toggle_recoil_line, self.actionHelium, 4))
         self.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
-    #
+
     def toggle_recoil_line(self, action, relative_mass):
         if action.isChecked():
             self.slice_plotter.add_recoil_line(self.ws_title, relative_mass)

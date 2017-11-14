@@ -1,11 +1,8 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
-import numpy as np
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
-
-from scipy import constants
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
@@ -49,7 +46,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, x_axis, y_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
-                   interpolation='none')
+                   interpolation='none', hold=False)
         plt.title(workspace_name)
         comment = self._slice_algorithm.getComment(str(workspace_name))
         plt.xlabel(self._getDisplayName(x_axis.units, comment))
