@@ -23,11 +23,6 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuInformation">
     <property name="title">
      <string>Information</string>
@@ -46,23 +41,8 @@
     <addaction name="actionD2sigma_dOmega_dE"/>
     <addaction name="actionSymmetrised_S_Q_E"/>
    </widget>
-   <widget class="QMenu" name="menuMake_Script">
-    <property name="title">
-     <string>Make Script</string>
-    </property>
-    <addaction name="actionSave_To_File"/>
-    <addaction name="actionDump_To_Console"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-   </widget>
-   <addaction name="menuFile"/>
    <addaction name="menuInformation"/>
    <addaction name="menuIntensity"/>
-   <addaction name="menuMake_Script"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
