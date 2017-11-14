@@ -64,6 +64,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionChi_Q_E_magnetic.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E_magnetic,
                                                               self.slice_plotter.show_dynamical_susceptibility_magnetic,
                                                               True))
+        self.actionSymmetrised_S_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionSymmetrised_S_Q_E,
+                                                               self.slice_plotter.show_symmetrised, True))
+
         self.actionHydrogen.triggered.connect(partial(self.toggle_recoil_line, self.actionHydrogen, 1))
         self.actionDeuterium.triggered.connect(partial(self.toggle_recoil_line, self.actionDeuterium, 2))
         self.actionHelium.triggered.connect(partial(self.toggle_recoil_line, self.actionHelium, 4))
