@@ -1,8 +1,11 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
+import numpy as np
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
+
+from scipy import constants
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
@@ -44,12 +47,14 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, x_axis, y_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
-                   interpolation='none', hold=False)
+                   interpolation='none')
+        self.add_recoil_line(x_axis, y_axis)
         plt.title(workspace_name)
+        print(plot_data.shape)
         comment = self._slice_algorithm.getComment(str(workspace_name))
         plt.xlabel(self._getDisplayName(x_axis.units, comment))
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
-        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
+        # plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
@@ -71,6 +76,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
                         slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
+
+    def add_recoil_line(self, x_axis, y_axis, relative_mass=4):
+        HBAR_MEV = constants.value('Planck constant over 2 pi in eV s') * 1000
+        momentum_transfer = np.arange(x_axis.start, x_axis.end, x_axis.step)
+        line = np.square(momentum_transfer * HBAR_MEV) / (2 * relative_mass * constants.neutron_mass)
+        print(line)
+        plt.xlim(x_axis.start)
+        plt.ylim(y_axis.start)
+        plt.gca().plot(momentum_transfer, line, 'r', alpha=.5)
+
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
