@@ -43,6 +43,7 @@
     <addaction name="actionS_Q_E"/>
     <addaction name="actionChi_Q_E"/>
     <addaction name="actionChi_Q_E_magnetic"/>
+    <addaction name="actionD2sigma_dOmega_dE"/>
     <addaction name="actionSymmetrised_S_Q_E"/>
    </widget>
    <widget class="QMenu" name="menuMake_Script">
@@ -191,6 +192,14 @@
    </property>
    <property name="text">
     <string>Chi''(Q,E) magnetic</string>
+   </property>
+  </action>
+  <action name="actionD2sigma_dOmega_dE">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>d2sigma/dOmega.dE</string>
    </property>
   </action>
   <action name="actionSymmetrised_S_Q_E">
