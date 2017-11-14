@@ -49,11 +49,11 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         if sample_temp is None:
             return None
         kBT = sample_temp * KB_MEV
-        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
         return np.exp(-energy_transfer / kBT)
 
     def compute_chi(self, scattering_data, boltzmann_dist, y_axis):
-        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
         signs = np.sign(energy_transfer)
         signs[signs == 0] = 1
         chi = (signs + (boltzmann_dist * -signs))[:, None]
@@ -72,7 +72,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         if Ei is None:
             return None
         ki = np.sqrt(Ei) * E_TO_K
-        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
         kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)[:, None]
         d2sigma = scattering_data * kf / ki
         return d2sigma
