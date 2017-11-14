@@ -47,7 +47,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         if sample_temp is None:
             return None
         kBT = sample_temp * KB_MEV
-        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
         return np.exp(-energy_transfer / kBT)
 
     def compute_chi(self, scattering_data, boltzmann_dist, y_axis):
@@ -66,8 +66,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return chi_magnetic
 
     def compute_gdos(self, scattering_data, boltzmann_dist, x_axis, y_axis):
-        energy_transfer = np.arange(y_axis.end, y_axis.start, -y_axis.step)
-        momentum_transfer = np.arange(x_axis.start, x_axis.end, x_axis.step)
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
+        momentum_transfer = np.linspace(x_axis.start, x_axis.end, self._get_number_of_steps(x_axis))
         momentum_transfer = np.square(momentum_transfer[:scattering_data.shape[0]])
         gdos = scattering_data * momentum_transfer[:,None]
         gdos = gdos * energy_transfer[:,None]
