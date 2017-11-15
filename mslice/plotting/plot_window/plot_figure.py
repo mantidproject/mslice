@@ -316,7 +316,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         current_axes = self.canvas.figure.gca()
         if current_axes.legend_:
             current_axes.legend_.remove()  # remove old legends
-            return
         if legends is None or not self.legends_shown:
             return
         labels = []
