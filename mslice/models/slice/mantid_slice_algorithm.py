@@ -82,6 +82,15 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         negatives = scattering_data[len(energy_transfer):] * boltzmann_dist[len(energy_transfer):,None]
         return np.concatenate((scattering_data[:len(energy_transfer)], negatives))
 
+    def compute_gdos(self, scattering_data, boltzmann_dist, x_axis, y_axis):
+        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
+        momentum_transfer = np.linspace(x_axis.start, x_axis.end, self._get_number_of_steps(x_axis))
+        momentum_transfer = np.square(momentum_transfer, out=momentum_transfer)
+        gdos = scattering_data / momentum_transfer
+        gdos *= energy_transfer[:,None]
+        gdos *= (1 - boltzmann_dist)[:,None]
+        return gdos
+
     def sample_temperature(self, ws_name, sample_temp_fields):
         ws = self._workspace_provider.get_parent_by_name(ws_name)
         # mantid drops log data during projection, need unprojected workspace.
