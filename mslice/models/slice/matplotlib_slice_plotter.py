@@ -108,8 +108,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line.set_label(label)  # add to legend
         else:
             x_axis = self.slice_cache[workspace]['x_axis']
-            y_axis = self.slice_cache[workspace]['y_axis']
-            x, y = self._slice_algorithm.compute_recoil_line(x_axis, y_axis, relative_mass)
+            x, y = self._slice_algorithm.compute_recoil_line(x_axis, relative_mass)
             color = recoil_colors[relative_mass] if relative_mass in recoil_colors else 'c'
             self.recoil_lines[workspace][relative_mass] = plt.gca().plot(x, y, color, label=label, alpha=.7)[0]
 
