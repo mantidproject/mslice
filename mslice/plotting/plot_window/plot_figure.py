@@ -97,7 +97,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         for line in axes.get_lines():
             if line.get_linestyle() == '-':
                 visible_lines += 1
-        if visible_lines >= 2:
+                break
+        if visible_lines >= 1:
             legend = axes.legend(fontsize='small')
             legend.draggable()
         else:
