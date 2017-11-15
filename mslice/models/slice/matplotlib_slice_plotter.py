@@ -4,6 +4,9 @@ from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
 
+recoil_colors={1:'b', 2:'g', 4:'r'}
+recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
+
 
 class MatplotlibSlicePlotter(SlicePlotter):
     def __init__(self, slice_algorithm):
@@ -98,17 +101,23 @@ class MatplotlibSlicePlotter(SlicePlotter):
                         slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
 
     def add_recoil_line(self, workspace, relative_mass):
+        label = recoil_labels[relative_mass] if relative_mass in recoil_labels else 'Relative mass '+ str(relative_mass)
         if relative_mass in self.recoil_lines[workspace]:
-            self.recoil_lines[workspace][relative_mass].set_linestyle('-')  # make visible
+            line = self.recoil_lines[workspace][relative_mass]
+            line.set_linestyle('-')  # make visible
+            line.set_label(label)  # add to legend
         else:
             x_axis = self.slice_cache[workspace]['x_axis']
             y_axis = self.slice_cache[workspace]['y_axis']
             x, y = self._slice_algorithm.compute_recoil_line(x_axis, y_axis, relative_mass)
-            self.recoil_lines[workspace][relative_mass] = plt.gca().plot(x, y, 'g', alpha=.7)[0]
+            color = recoil_colors[relative_mass] if relative_mass in recoil_colors else 'c'
+            self.recoil_lines[workspace][relative_mass] = plt.gca().plot(x, y, color, label=label, alpha=.7)[0]
 
     def hide_recoil_line(self, workspace, relative_mass):
         if relative_mass in self.recoil_lines[workspace]:
-            self.recoil_lines[workspace][relative_mass].set_linestyle('')
+            line = self.recoil_lines[workspace][relative_mass]
+            line.set_linestyle('')
+            line.set_label('')
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)

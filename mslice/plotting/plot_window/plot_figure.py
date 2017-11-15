@@ -83,6 +83,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.slice_plotter.add_recoil_line(self.ws_title, relative_mass)
         else:
             self.slice_plotter.hide_recoil_line(self.ws_title, relative_mass)
+        self.update_recoil_legend()
         self.canvas.draw()
 
     def arbitrary_recoil_line(self):
@@ -91,6 +92,18 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             if not confirm:
                 return
         self.toggle_recoil_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei)
+
+    def update_recoil_legend(self):
+        visible_lines = 0
+        axes = self.canvas.figure.gca()
+        for line in axes.get_lines():
+            if line.get_linestyle() == '-':
+                visible_lines += 1
+        if visible_lines >= 2:
+            legend = axes.legend(fontsize='small')
+            legend.draggable()
+        else:
+            axes.legend_ = None  # remove legend
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
