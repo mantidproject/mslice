@@ -54,11 +54,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def add_slice_plotter(self, slice_plotter):
         self.slice_plotter = slice_plotter
         self.menuIntensity.setDisabled(False)
-        self.actionToggleLegends.setDisabled(True)
         self.ws_title = self.title
         self.arbitrary_nuclei = None
 
-        self.actionToggleLegends.triggered.connect(self._toggle_legend)
         self.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionS_Q_E,
                                                    self.slice_plotter.show_scattering_function, False))
         self.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E,
@@ -83,7 +81,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.slice_plotter.add_recoil_line(self.ws_title, relative_mass)
         else:
             self.slice_plotter.hide_recoil_line(self.ws_title, relative_mass)
-        self.update_recoil_legend()
+        self.update_slice_legend()
         self.canvas.draw()
 
     def arbitrary_recoil_line(self):
@@ -93,7 +91,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 return
         self.toggle_recoil_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei)
 
-    def update_recoil_legend(self):
+    def update_slice_legend(self):
         visible_lines = 0
         axes = self.canvas.figure.gca()
         for line in axes.get_lines():
@@ -104,6 +102,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             legend.draggable()
         else:
             axes.legend_ = None  # remove legend
+
+    def _toggle_slice_legend(self):
+        axes = self.canvas.figure.gca()
+        if axes.legend_ is None:
+            legend = axes.legend(fontsize='small')
+            legend.draggable()
+        else:
+            axes.legend_ = None
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
@@ -310,6 +316,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         current_axes = self.canvas.figure.gca()
         if current_axes.legend_:
             current_axes.legend_.remove()  # remove old legends
+            return
         if legends is None or not self.legends_shown:
             return
         labels = []
@@ -326,8 +333,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         x.draggable()
 
     def _toggle_legend(self):
-        self.legends_shown = not self.legends_shown
-        self.set_legends(self.get_legends())
+        if self.is_slice_figure():
+            self._toggle_slice_legend()
+        else:
+            self.legends_shown = not self.legends_shown
+            self.set_legends(self.get_legends())
         self.canvas.draw()
 
     def get_line_data(self):
