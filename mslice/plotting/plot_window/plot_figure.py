@@ -68,6 +68,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                                                                self.slice_plotter.show_d2sigma, False))
         self.actionSymmetrised_S_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionSymmetrised_S_Q_E,
                                                                self.slice_plotter.show_symmetrised, True))
+        self.actionGDOS.triggered.connect(partial(self.show_intensity_plot, self.actionGDOS,
+                                                  self.slice_plotter.show_gdos, True))
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''

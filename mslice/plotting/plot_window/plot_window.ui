@@ -40,6 +40,7 @@
     <addaction name="actionChi_Q_E_magnetic"/>
     <addaction name="actionD2sigma_dOmega_dE"/>
     <addaction name="actionSymmetrised_S_Q_E"/>
+	<addaction name="actionGDOS"/>
    </widget>
    <addaction name="menuInformation"/>
    <addaction name="menuIntensity"/>
@@ -188,6 +189,14 @@
    </property>
    <property name="text">
     <string>Symmetrised S(Q,E)</string>
+   </property>
+  </action>
+  <action name="actionGDOS">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>GDOS</string>
    </property>
   </action>
  </widget>

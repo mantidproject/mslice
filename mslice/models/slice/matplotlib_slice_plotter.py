@@ -86,6 +86,13 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self._show_plot(workspace, slice_cache['plot_data'][4], slice_cache['boundaries'], slice_cache['colourmap'],
                         slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
 
+    def show_gdos(self, workspace):
+        slice_cache = self.slice_cache[workspace]
+        if slice_cache['plot_data'][5] is None:
+            self.compute_gdos(workspace)
+        self._show_plot(workspace, slice_cache['plot_data'][5], slice_cache['boundaries'], slice_cache['colourmap'],
+                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
 
@@ -122,6 +129,13 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.slice_cache[workspace]['plot_data'][4] = self._slice_algorithm.compute_symmetrised(
             self.slice_cache[workspace]['plot_data'][0], self.slice_cache[workspace]['boltzmann_dist'],
             self.slice_cache[workspace]['y_axis'])
+
+    def compute_gdos(self, workspace):
+        if self.slice_cache[workspace]['boltzmann_dist'] is None:
+            self.compute_boltzmann_dist(workspace)
+        self.slice_cache[workspace]['plot_data'][5] = self._slice_algorithm.compute_gdos(
+            self.slice_cache[workspace]['plot_data'][0], self.slice_cache[workspace]['boltzmann_dist'],
+            self.slice_cache[workspace]['x_axis'], self.slice_cache[workspace]['y_axis'])
 
     def get_available_colormaps(self):
         return self._colormaps
