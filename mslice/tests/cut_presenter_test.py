@@ -16,6 +16,11 @@ from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.widgets.cut.command import Command
 from mslice.views.cut_view import CutView
 
+def isstr(s):
+    try:
+        return isinstance(s, basestring)
+    except NameError:
+        return isinstance(s, str)
 
 class CutPresenterTest(unittest.TestCase):
     def setUp(self):
@@ -122,7 +127,7 @@ class CutPresenterTest(unittest.TestCase):
         integration_start, integration_end, width = tuple(args[2:5])
         intensity_start, intensity_end, is_norm = tuple(args[5:8])
         workspace, integrated_axis = tuple(args[8:10])
-        if isinstance(workspace, basestring):
+        if isstr(workspace):
             workspace = [workspace]
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=workspace)
         self.view.get_cut_axis = mock.Mock(return_value=axis.units)
