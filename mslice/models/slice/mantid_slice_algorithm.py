@@ -120,6 +120,12 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         sample_temp = float(''.join(c for c in k_string if c.isdigit()))
         return sample_temp
 
+    def compute_recoil_line(self, x_axis, relative_mass=1):
+        momentum_transfer = np.arange(x_axis.start, x_axis.end, x_axis.step)
+        line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
+            (constants.elementary_charge / 1000)
+        return momentum_transfer, line
+
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()
         return (data - data.min())/data_range

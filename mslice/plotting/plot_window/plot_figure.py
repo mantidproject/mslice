@@ -54,9 +54,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def add_slice_plotter(self, slice_plotter):
         self.slice_plotter = slice_plotter
         self.menuIntensity.setDisabled(False)
-        self.actionToggleLegends.setDisabled(True)
         self.ws_title = self.title
-        self.actionToggleLegends.triggered.connect(self._toggle_legend)
+        self.arbitrary_nuclei = None
+
         self.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionS_Q_E,
                                                    self.slice_plotter.show_scattering_function, False))
         self.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, self.actionChi_Q_E,
@@ -70,6 +70,47 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                                                                self.slice_plotter.show_symmetrised, True))
         self.actionGDOS.triggered.connect(partial(self.show_intensity_plot, self.actionGDOS,
                                                   self.slice_plotter.show_gdos, True))
+
+        self.actionHydrogen.triggered.connect(partial(self.toggle_recoil_line, self.actionHydrogen, 1))
+        self.actionDeuterium.triggered.connect(partial(self.toggle_recoil_line, self.actionDeuterium, 2))
+        self.actionHelium.triggered.connect(partial(self.toggle_recoil_line, self.actionHelium, 4))
+        self.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
+
+    def toggle_recoil_line(self, action, relative_mass):
+        if action.isChecked():
+            self.slice_plotter.add_recoil_line(self.ws_title, relative_mass)
+        else:
+            self.slice_plotter.hide_recoil_line(self.ws_title, relative_mass)
+        self.update_slice_legend()
+        self.canvas.draw()
+
+    def arbitrary_recoil_line(self):
+        if self.actionArbitrary_nuclei.isChecked():
+            self.arbitrary_nuclei, confirm = QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
+            if not confirm:
+                return
+        self.toggle_recoil_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei)
+
+    def update_slice_legend(self):
+        visible_lines = 0
+        axes = self.canvas.figure.gca()
+        for line in axes.get_lines():
+            if line.get_linestyle() == '-':
+                visible_lines += 1
+                break
+        if visible_lines >= 1:
+            legend = axes.legend(fontsize='small')
+            legend.draggable()
+        else:
+            axes.legend_ = None  # remove legend
+
+    def _toggle_slice_legend(self):
+        axes = self.canvas.figure.gca()
+        if axes.legend_ is None:
+            legend = axes.legend(fontsize='small')
+            legend.draggable()
+        else:
+            axes.legend_ = None
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
@@ -292,8 +333,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         x.draggable()
 
     def _toggle_legend(self):
-        self.legends_shown = not self.legends_shown
-        self.set_legends(self.get_legends())
+        if self.is_slice_figure():
+            self._toggle_slice_legend()
+        else:
+            self.legends_shown = not self.legends_shown
+            self.set_legends(self.get_legends())
         self.canvas.draw()
 
     def get_line_data(self):

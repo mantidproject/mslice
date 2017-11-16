@@ -27,6 +27,16 @@
     <property name="title">
      <string>Information</string>
     </property>
+    <widget class="QMenu" name="menuRecoil_lines">
+     <property name="title">
+      <string>Recoil lines</string>
+     </property>
+     <addaction name="actionHydrogen"/>
+     <addaction name="actionDeuterium"/>
+     <addaction name="actionHelium"/>
+     <addaction name="actionArbitrary_nuclei"/>
+    </widget>
+    <addaction name="menuRecoil_lines"/>
    </widget>
    <widget class="QMenu" name="menuIntensity">
     <property name="enabled">
@@ -197,6 +207,38 @@
    </property>
    <property name="text">
     <string>GDOS</string>
+   </property>
+  </action>
+  <action name="actionHydrogen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hydrogen</string>
+   </property>
+  </action>
+  <action name="actionDeuterium">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Deuterium</string>
+   </property>
+  </action>
+  <action name="actionHelium">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Helium</string>
+   </property>
+  </action>
+  <action name="actionArbitrary_nuclei">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Arbitrary nuclei</string>
    </property>
   </action>
  </widget>
