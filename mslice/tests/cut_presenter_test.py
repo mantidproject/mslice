@@ -122,7 +122,7 @@ class CutPresenterTest(unittest.TestCase):
         integration_start, integration_end, width = tuple(args[2:5])
         intensity_start, intensity_end, is_norm = tuple(args[5:8])
         workspace, integrated_axis = tuple(args[8:10])
-        if not hasattr(workspace, '__iter__'):
+        if isinstance(workspace, basestring):
             workspace = [workspace]
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=workspace)
         self.view.get_cut_axis = mock.Mock(return_value=axis.units)
@@ -136,6 +136,7 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_intensity_is_norm_to_one = mock.Mock(return_value=is_norm)
         self.view.get_integration_width = mock.Mock(return_value=width)
         self.cut_algorithm.get_other_axis = mock.Mock(return_value=integrated_axis)
+        self.cut_algorithm.get_available_axis = mock.Mock(return_value=[axis.units,integrated_axis])
 
     def test_cut_parse_input_errors(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
@@ -365,8 +366,6 @@ class CutPresenterTest(unittest.TestCase):
         integrated_axis = 'integrated axis'
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, selected_workspaces, integrated_axis)
-        available_dimensions = ["dim1", "dim2"]
-        self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
         cut_presenter.notify(Command.Plot)
         call_list = [
             call(selected_workspace=selected_workspaces[0], cut_axis=processed_axis,
