@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
 
-from mantid.simpleapi import BinMD
+from mantid.simpleapi import BinMD, ConvertUnits
 from mantid.api import IMDEventWorkspace
 from scipy import constants
 
@@ -18,7 +18,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
-    def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one, sample_temp):
+    def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         assert isinstance(workspace, IMDEventWorkspace)
         self._fill_in_missing_input(x_axis, workspace)
@@ -31,13 +31,13 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         y_dim = workspace.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
-        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
-        # perform number of events normalization then mask cells where no data was found
+        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
+                          StoreInADS=False)
+        # perform number of events normalization
         with np.errstate(invalid='ignore'):
             plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)
-        self._workspace_provider.delete_workspace(thisslice)
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
         if norm_to_one:
             plot_data = self._norm_to_one(plot_data)
@@ -125,6 +125,10 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
             (constants.elementary_charge / 1000)
         return momentum_transfer, line
+
+    def compute_powder_line(self, ws_name, x_axis, y_axis, element):
+        # assume x_axis is 2theta for now
+        return # ...
 
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()

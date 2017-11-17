@@ -6,6 +6,7 @@ from mslice.app import MPL_COMPAT
 
 recoil_colors={1:'b', 2:'g', 4:'r'}
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
+powder_colors={'Aluminium': 'w', 'Copper':'m', 'Niobium':'y', 'Tantalum':'k'}
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
@@ -17,17 +18,19 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.slice_cache = {}
         self._sample_temp_fields = []
         self.recoil_lines = {}
+        self.powder_lines = {}
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
         sample_temp = self._slice_algorithm.sample_temperature(selected_ws, self._sample_temp_fields)
         plot_data, boundaries = self._slice_algorithm.compute_slice(selected_ws, x_axis, y_axis,
-                                                                    smoothing, norm_to_one, sample_temp)
+                                                                    smoothing, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self.slice_cache[selected_ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'x_axis': x_axis,
                                          'y_axis': y_axis, 'colourmap': colourmap, 'norm': norm,
                                          'sample_temp': sample_temp, 'boltzmann_dist': None}
         self.recoil_lines[selected_ws] = {}
+        self.powder_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plotter(self)
@@ -117,6 +120,18 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line = self.recoil_lines[workspace][relative_mass]
             line.set_linestyle('')
             line.set_label('')
+
+    def add_powder_line(self, workspace, element):
+        if element in self.powder_lines[workspace]:
+            line = self.powder_lines[workspace][element]
+            line.set_linestyle('-')  # make visible
+            line.set_label(element)  # add to legend
+        else:
+            x_axis = self.slice_cache[workspace]['x_axis']
+            y_axis = self.slice_cache[workspace]['x_axis']
+            x, y = self._slice_algorithm.compute_powder_line(workspace, x_axis, y_axis, element)
+            color = powder_colors[element]
+            self.recoil_lines[workspace][element] = plt.gca().plot(x, y, color, label=element, alpha=.7)[0]
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)

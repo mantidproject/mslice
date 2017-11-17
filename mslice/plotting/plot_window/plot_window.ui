@@ -36,7 +36,18 @@
      <addaction name="actionHelium"/>
      <addaction name="actionArbitrary_nuclei"/>
     </widget>
+    <widget class="QMenu" name="menuBragg_peaks">
+     <property name="title">
+      <string>Bragg peaks</string>
+     </property>
+     <addaction name="actionAluminium"/>
+     <addaction name="actionCopper"/>
+     <addaction name="actionNiobium"/>
+     <addaction name="actionTantalum"/>
+     <addaction name="actionCIF_file"/>
+    </widget>
     <addaction name="menuRecoil_lines"/>
+    <addaction name="menuBragg_peaks"/>
    </widget>
    <widget class="QMenu" name="menuIntensity">
     <property name="enabled">
@@ -50,7 +61,7 @@
     <addaction name="actionChi_Q_E_magnetic"/>
     <addaction name="actionD2sigma_dOmega_dE"/>
     <addaction name="actionSymmetrised_S_Q_E"/>
-	<addaction name="actionGDOS"/>
+    <addaction name="actionGDOS"/>
    </widget>
    <addaction name="menuInformation"/>
    <addaction name="menuIntensity"/>
@@ -239,6 +250,31 @@
    </property>
    <property name="text">
     <string>Arbitrary nuclei</string>
+   </property>
+  </action>
+  <action name="actionAluminium">
+   <property name="text">
+    <string>Aluminium</string>
+   </property>
+  </action>
+  <action name="actionCopper">
+   <property name="text">
+    <string>Copper</string>
+   </property>
+  </action>
+  <action name="actionNiobium">
+   <property name="text">
+    <string>Niobium</string>
+   </property>
+  </action>
+  <action name="actionTantalum">
+   <property name="text">
+    <string>Tantalum</string>
+   </property>
+  </action>
+  <action name="actionCIF_file">
+   <property name="text">
+    <string>CIF file</string>
    </property>
   </action>
  </widget>

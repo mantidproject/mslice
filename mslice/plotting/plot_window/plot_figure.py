@@ -75,6 +75,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionDeuterium.triggered.connect(partial(self.toggle_recoil_line, self.actionDeuterium, 2))
         self.actionHelium.triggered.connect(partial(self.toggle_recoil_line, self.actionHelium, 4))
         self.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
+        self.actionAluminium.triggered.connect(partial(self.toggle_powder_line, self.actionAluminium, 'Aluminium'))
 
     def toggle_recoil_line(self, action, relative_mass):
         if action.isChecked():
@@ -90,6 +91,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             if not confirm:
                 return
         self.toggle_recoil_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei)
+
+    def toggle_powder_line(self, action, material):
+        if action.isChecked():
+            self.slice_plotter.add_powder_line(self.ws_title, material)
+        else:
+            self.slice_plotter.add_powder_line(self.ws_title, material)
+        self.update_slice_legend()
+        self.canvas.draw()
 
     def update_slice_legend(self):
         visible_lines = 0
