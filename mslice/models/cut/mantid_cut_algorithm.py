@@ -124,6 +124,15 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         cut_axis.step = (cut_axis.end - cut_axis.start)/float(cut_binning[-1])
         return cut_axis, integration_range, is_norm
 
+    def set_saved_cut_parameters(self, workspace, axis, parameters):
+        self._workspace_provider.setCutParameters(workspace, axis, parameters)
+
+    def get_saved_cut_parameters(self, workspace, axis=None):
+        return self._workspace_provider.getCutParameters(workspace, axis)
+
+    def is_axis_saved(self, workspace, axis):
+        return self._workspace_provider.isAxisSaved(workspace, axis)
+
     def _num_events_normalized_array(self, workspace):
         assert isinstance(workspace, IMDHistoWorkspace)
         with np.errstate(invalid='ignore'):
