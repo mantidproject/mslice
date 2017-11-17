@@ -67,6 +67,7 @@ class CutPresenterTest(unittest.TestCase):
         available_dimensions = ["dim1", "dim2"]
         self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
         self.cut_algorithm.set_cut_axis = mock.Mock
+        self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
         cut_presenter.workspace_selection_changed()
         self.view.populate_cut_axis_options.assert_called_with(available_dimensions)
         self.view.enable.assert_called_with()
@@ -77,13 +78,17 @@ class CutPresenterTest(unittest.TestCase):
         fields['axes'] = available_dimensions
         self.view.get_input_fields = mock.Mock(return_value=fields)
         self.view.is_fields_cleared = mock.Mock(return_value=False)
+        self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(fields, available_dimensions[0]))
+        self.cut_algorithm.is_axis_saved = mock.Mock(return_value=False)
+        self.view.get_cut_axis = mock.Mock(return_value=available_dimensions[0])
         cut_presenter.workspace_selection_changed()
+        self.cut_algorithm.set_saved_cut_parameters.assert_called_with(workspace, available_dimensions[0], fields)
         self.view.get_cut_axis.assert_called_with()
         # Change back to check that it repopulates the fields
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
-        self.view.get_cut_axis = mock.Mock(return_value=available_dimensions[0])
         cut_presenter.workspace_selection_changed()
         self.view.populate_input_fields.assert_called_with(fields)
+        self.cut_algorithm.set_saved_cut_parameters.assert_called_with(new_workspace, available_dimensions[0], fields)
 
     def test_workspace_selection_changed_single_cut_workspace(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
@@ -395,6 +400,7 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.is_cuttable = mock.Mock(return_value=True)
         available_dimensions = ["dim1", "dim2"]
         self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
+        self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
         cut_presenter.workspace_selection_changed()
         # Set up a set of input values for this cut, then simulate changing axes.
         fields1 = dict()
@@ -408,6 +414,7 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_cut_axis = mock.Mock(return_value='dim2')
         self.view.is_fields_cleared = mock.Mock(return_value=False)
         cut_presenter.notify(Command.AxisChanged)
+        self.cut_algorithm.set_saved_cut_parameters.assert_called_with(workspace, 'dim1', fields1)
         self.view.clear_input_fields.assert_called_with(keep_axes=True)
         self.view.populate_input_fields.assert_not_called()
         # Set up a set of input values for this other cut, then simulate changing axes again.
@@ -420,7 +427,10 @@ class CutPresenterTest(unittest.TestCase):
         fields2['normtounity'] = True
         self.view.get_input_fields = mock.Mock(return_value=fields2)
         self.view.get_cut_axis = mock.Mock(return_value='dim1')
+        self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(fields1, 'dim1'))
         cut_presenter.notify(Command.AxisChanged)
+        self.cut_algorithm.set_saved_cut_parameters.assert_called_with(workspace, 'dim2', fields2)
+        self.cut_algorithm.get_saved_cut_parameters.assert_called_with(workspace, 'dim1')
         self.view.populate_input_fields.assert_called_with(fields1)
 
     def test_cut_step_size(self):
@@ -431,6 +441,7 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.is_cuttable = mock.Mock(return_value=True)
         available_dimensions = ["dim1", "dim2"]
         self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
+        self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
         cut_presenter.workspace_selection_changed()
         self.cut_algorithm.get_axis_range.assert_any_call(workspace, available_dimensions[0])
         self.cut_algorithm.get_axis_range.assert_any_call(workspace, available_dimensions[1])
