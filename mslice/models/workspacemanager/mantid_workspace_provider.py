@@ -131,6 +131,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self._limits[new_name] = self._limits.pop(selected_workspace)
         if selected_workspace in self._EfDefined:
             self._EfDefined[new_name] = self._EfDefined.pop(selected_workspace)
+        if selected_workspace in self._cutParameters:
+            self._cutParameters[new_name] = self._cutParameters.pop(selected_workspace)
         return ws
 
     def combine_workspace(self, selected_workspaces, new_name):
