@@ -66,7 +66,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(workspace)
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
-        efix = self._get_EFixed_for_limits(ws_h)
+        efix = self.get_EFixed(ws_h)
         if efix is None:
             self._limits[ws_name] = {}
             return
@@ -88,7 +88,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         self._limits[ws_name]['Degrees'] = theta * 180 / np.pi
         self._limits[ws_name]['DeltaE'] = [np.min(en), np.max(en), np.mean(np.diff(en))]
 
-    def _get_EFixed_for_limits(self, ws_handle):
+    def get_EFixed(self, ws_handle):
         try:
             efix = self._get_ws_EFixed(ws_handle, ws_handle.getDetector(0).getID())
         except RuntimeError:  # Efixed not defined
@@ -169,6 +169,12 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         if isinstance(workspace_name, Workspace):
             return workspace_name
         return AnalysisDataService[workspace_name]
+
+    def get_parent_by_name(self, ws_name):
+        if ws_name[-3:] == '_QE':
+            return self.get_workspace_handle(ws_name[:-3])
+        else:
+            self.get_workspace_handle(ws_name)
 
     def get_workspace_name(self, workspace):
         """Returns the name of a workspace given the workspace handle"""

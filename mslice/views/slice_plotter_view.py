@@ -8,6 +8,9 @@ class SlicePlotterView:
     def __init__(self):
         raise Exception("This abstract class must not be instantiated")
 
+    def ask_sample_temperature(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def get_slice_x_axis(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 

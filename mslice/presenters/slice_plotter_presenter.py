@@ -95,7 +95,6 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             smoothing = self._to_int(smoothing)
         except ValueError:
             self._slice_view.error_invalid_smoothing_params()
-
         try:
             self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
                                            norm_to_one, colourmap)

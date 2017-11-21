@@ -23,38 +23,37 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuInformation">
     <property name="title">
      <string>Information</string>
     </property>
+    <widget class="QMenu" name="menuRecoil_lines">
+     <property name="title">
+      <string>Recoil lines</string>
+     </property>
+     <addaction name="actionHydrogen"/>
+     <addaction name="actionDeuterium"/>
+     <addaction name="actionHelium"/>
+     <addaction name="actionArbitrary_nuclei"/>
+    </widget>
+    <addaction name="menuRecoil_lines"/>
    </widget>
    <widget class="QMenu" name="menuIntensity">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>Intensity</string>
     </property>
+    <addaction name="actionS_Q_E"/>
+    <addaction name="actionChi_Q_E"/>
+    <addaction name="actionChi_Q_E_magnetic"/>
+    <addaction name="actionD2sigma_dOmega_dE"/>
+    <addaction name="actionSymmetrised_S_Q_E"/>
+	<addaction name="actionGDOS"/>
    </widget>
-   <widget class="QMenu" name="menuMake_Script">
-    <property name="title">
-     <string>Make Script</string>
-    </property>
-    <addaction name="actionSave_To_File"/>
-    <addaction name="actionDump_To_Console"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-   </widget>
-   <addaction name="menuFile"/>
    <addaction name="menuInformation"/>
    <addaction name="menuIntensity"/>
-   <addaction name="menuMake_Script"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -151,6 +150,95 @@
   <action name="action_Print_Plot">
    <property name="text">
     <string>Print Plot</string>
+   </property>
+  </action>
+  <action name="actionS_Q_E">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>S(Q,E)</string>
+   </property>
+  </action>
+  <action name="actionChi_Q_E">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Chi''(Q,E)</string>
+   </property>
+  </action>
+  <action name="actionChi_Q_E_magnetic">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Chi''(Q,E) magnetic</string>
+   </property>
+  </action>
+  <action name="actionD2sigma_dOmega_dE">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>d2sigma/dOmega.dE</string>
+   </property>
+  </action>
+  <action name="actionSymmetrised_S_Q_E">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Symmetrised S(Q,E)</string>
+   </property>
+  </action>
+  <action name="actionGDOS">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>GDOS</string>
+   </property>
+  </action>
+  <action name="actionHydrogen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hydrogen</string>
+   </property>
+  </action>
+  <action name="actionDeuterium">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Deuterium</string>
+   </property>
+  </action>
+  <action name="actionHelium">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Helium</string>
+   </property>
+  </action>
+  <action name="actionArbitrary_nuclei">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Arbitrary nuclei</string>
    </property>
   </action>
  </widget>
