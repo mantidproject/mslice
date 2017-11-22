@@ -51,3 +51,12 @@ class WorkspaceProvider(object):
 
     def getComment(self, workspace):
         pass
+
+    def setCutParameters(self, workspace, axis, parameters):
+        pass
+
+    def getCutParameters(self, workspace, axis=None):
+        pass
+
+    def isAxisSaved(self, workspace, axis):
+        pass

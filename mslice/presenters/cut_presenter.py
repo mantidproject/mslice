@@ -22,7 +22,6 @@ class CutPresenter(PresenterUtility):
         self._cut_plotter = cut_plotter
         self._acting_on = None
         self._cut_view.disable()
-        self._saved_parameters = dict()
         self._previous_cut = None
         self._previous_axis = None
         self._minimumStep = dict()
@@ -174,9 +173,12 @@ class CutPresenter(PresenterUtility):
 
     def workspace_selection_changed(self):
         if self._previous_cut is not None and self._previous_axis is not None:
-            if self._previous_cut not in self._saved_parameters:
-                self._saved_parameters[self._previous_cut] = dict()
-            self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
+            if not self._cut_view.is_fields_cleared():
+                self._cut_algorithm.set_saved_cut_parameters(self._previous_cut, self._previous_axis,
+                                                             self._cut_view.get_input_fields())
+            else:
+                self._previous_cut = None
+                self._previous_axis = None
 
         workspace_selection = self._main_presenter.get_selected_workspaces()
         if len(workspace_selection) < 1:
@@ -190,20 +192,31 @@ class CutPresenter(PresenterUtility):
     def _populate_fields_using_workspace(self, workspace, plotting=False):
         if self._cut_algorithm.is_cuttable(workspace):
             axis = self._cut_algorithm.get_available_axis(workspace)
-            current_axis = axis[0]
-            if self._previous_cut is not None and self._previous_axis is not None:
-                if self._previous_cut not in self._saved_parameters:
-                    self._saved_parameters[self._previous_cut] = dict()
-                if self._previous_axis not in self._saved_parameters[self._previous_cut]:
-                    self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
-                if axis == self._saved_parameters[self._previous_cut][self._previous_axis]['axes']:
-                    current_axis = self._cut_view.get_cut_axis()
+            # There are three choices for which axes to select:
+            #   1. If the current cut is of the same type (e.g. QE), and parameters for the current
+            #      axis in the new cut has not been defined by the user, use the current axis
+            #   2. If the user has looked at this cut _and_ this axis before, use that
+            #   3. Otherwise use the first available axis
+            this_cut_par, prev_selected_axis = self._cut_algorithm.get_saved_cut_parameters(workspace)
+            prev_cut_par, _ = self._cut_algorithm.get_saved_cut_parameters(self._previous_cut, self._previous_axis)
+            axis_is_same_as_prev = prev_cut_par is not None and axis == prev_cut_par['axes']
+            axis_in_dict = self._cut_algorithm.is_axis_saved(workspace, self._previous_axis)
+            if axis_is_same_as_prev and not axis_in_dict:
+                current_axis = self._cut_view.get_cut_axis()
+                saved_parameters = prev_cut_par
+            elif this_cut_par is not None:
+                current_axis = prev_selected_axis
+                saved_parameters = this_cut_par
+            else:
+                current_axis = axis[0]
+                saved_parameters = None
+
+            self._cut_view.clear_input_fields()
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
             self._cut_view.set_cut_axis(current_axis)
-            if not plotting and workspace in self._saved_parameters:
-                if current_axis in self._saved_parameters[workspace]:
-                    self._cut_view.populate_input_fields(self._saved_parameters[workspace][current_axis])
+            if not plotting and saved_parameters is not None:
+                self._cut_view.populate_input_fields(saved_parameters)
             self._previous_cut = workspace
             self._previous_axis = current_axis
             self._set_minimum_step(workspace, axis)
@@ -231,15 +244,15 @@ class CutPresenter(PresenterUtility):
             self._previous_axis = None
 
     def _cut_axis_changed(self):
-        if self._previous_axis is not None:
-            if self._previous_cut not in self._saved_parameters:
-                self._saved_parameters[self._previous_cut] = dict()
-            self._saved_parameters[self._previous_cut][self._previous_axis] = self._cut_view.get_input_fields()
+        if self._previous_axis is not None and not self._cut_view.is_fields_cleared():
+            self._cut_algorithm.set_saved_cut_parameters(self._previous_cut, self._previous_axis,
+                                                         self._cut_view.get_input_fields())
         self._cut_view.clear_input_fields(keep_axes=True)
         if self._previous_cut is not None:
             self._previous_axis = self._cut_view.get_cut_axis()
-            if self._previous_axis in self._saved_parameters[self._previous_cut]:
-                self._cut_view.populate_input_fields(self._saved_parameters[self._previous_cut][self._previous_axis])
+            saved_parameters, _ = self._cut_algorithm.get_saved_cut_parameters(self._previous_cut, self._previous_axis)
+            if saved_parameters is not None:
+                self._cut_view.populate_input_fields(saved_parameters)
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)
 

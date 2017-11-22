@@ -24,6 +24,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         # Stores various parameters of workspaces not stored by Mantid
         self._EfDefined = {}
         self._limits = {}
+        self._cutParameters = {}
 
     def get_workspace_names(self):
         return AnalysisDataService.getObjectNames()
@@ -130,6 +131,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self._limits[new_name] = self._limits.pop(selected_workspace)
         if selected_workspace in self._EfDefined:
             self._EfDefined[new_name] = self._EfDefined.pop(selected_workspace)
+        if selected_workspace in self._cutParameters:
+            self._cutParameters[new_name] = self._cutParameters.pop(selected_workspace)
         return ws
 
     def combine_workspace(self, selected_workspaces, new_name):
@@ -242,3 +245,26 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return workspace.getComment()
         ws_handle = self.get_workspace_handle(workspace)
         return ws_handle.getComment()
+
+    def setCutParameters(self, workspace, axis, parameters):
+        if workspace not in self._cutParameters:
+            self._cutParameters[workspace] = dict()
+        self._cutParameters[workspace][axis] = parameters
+        self._cutParameters[workspace]['previous_axis'] = axis
+
+    def getCutParameters(self, workspace, axis=None):
+        if workspace in self._cutParameters:
+            if axis is not None:
+                if axis in self._cutParameters[workspace]:
+                    return self._cutParameters[workspace][axis], axis
+                else:
+                    return None, None
+            else:
+                prev_axis = self._cutParameters[workspace]['previous_axis']
+                return self._cutParameters[workspace][prev_axis], prev_axis
+        return None, None
+
+    def isAxisSaved(self, workspace, axis):
+        if workspace in self._cutParameters:
+            return True if axis in self._cutParameters[workspace] else False
+        return False

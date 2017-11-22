@@ -143,6 +143,18 @@ class CutWidget(QWidget, CutView, Ui_Form):
         self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
 
+    def is_fields_cleared(self):
+        current_fields = self.get_input_fields()
+        cleared_fields = {'cut_parameters': ['', '', ''],
+                          'integration_range': ['', ''],
+                          'integration_width': '',
+                          'smoothing': '',
+                          'normtounity': False}
+        for k in cleared_fields:
+            if current_fields[k] != cleared_fields[k]:
+                return False
+        return True
+
     def populate_input_fields(self, saved_input):
         self.populate_cut_params(*saved_input['cut_parameters'])
         self.populate_integration_params(*saved_input['integration_range'])
