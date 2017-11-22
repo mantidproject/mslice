@@ -105,14 +105,16 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.canvas.draw()
 
     def update_slice_legend(self):
-        visible_lines = 0
+        visible_lines = False
         axes = self.canvas.figure.gca()
         for line in axes.get_lines():
             if line.get_linestyle() == '-':
-                visible_lines += 1
+                visible_lines = True
                 break
-        if visible_lines >= 1:
-            legend = axes.legend(fontsize='small')
+        if visible_lines:
+            handles, labels = axes.get_legend_handles_labels()
+            by_label = dict(zip(labels, handles))  # prevents duplicate legend entries
+            legend = axes.legend(by_label.values(), by_label.keys(), fontsize='small')
             legend.draggable()
         else:
             axes.legend_ = None  # remove legend

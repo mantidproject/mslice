@@ -6,7 +6,7 @@ from mslice.app import MPL_COMPAT
 
 recoil_colors={1:'b', 2:'g', 4:'r'}
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
-powder_colors={'aluminium': 'c', 'copper':'m', 'niobium':'y', 'tantalum':'k'}
+powder_colors={'aluminium': 'g', 'copper':'m', 'niobium':'y', 'tantalum':'b'}
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
@@ -131,10 +131,14 @@ class MatplotlibSlicePlotter(SlicePlotter):
             y_axis = self.slice_cache[workspace]['x_axis']
             x, y = self._slice_algorithm.compute_powder_line(workspace, x_axis, element)
             color = powder_colors[element]
-            self.recoil_lines[workspace][element] = plt.gca().plot(x, y, color, label=element, alpha=.7)[0]
+            self.recoil_lines[workspace][element] = plt.gca().plot(x, y, color=color, label=element, alpha=.7)
 
-    def hide_powder_line(self, element):
-        pass
+    def hide_powder_line(self, workspace, element):
+        if element in self.recoil_lines[workspace]:
+            lines = self.recoil_lines[workspace][element]
+            for line in lines:
+                line.set_linestyle('')
+                line.set_label('')
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
