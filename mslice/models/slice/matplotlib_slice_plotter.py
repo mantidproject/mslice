@@ -4,9 +4,8 @@ from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
 
-recoil_colors={1:'b', 2:'g', 4:'r'}
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
-powder_colors={'aluminium': 'g', 'copper':'m', 'niobium':'y', 'tantalum':'b'}
+overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
@@ -17,8 +16,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self._colormaps.insert(0, 'viridis')
         self.slice_cache = {}
         self._sample_temp_fields = []
-        self.recoil_lines = {}
-        self.powder_lines = {}
+        self.overplot_lines = {}
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
@@ -29,8 +27,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.slice_cache[selected_ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'x_axis': x_axis,
                                          'y_axis': y_axis, 'colourmap': colourmap, 'norm': norm,
                                          'sample_temp': sample_temp, 'boltzmann_dist': None}
-        self.recoil_lines[selected_ws] = {}
-        self.powder_lines[selected_ws] = {}
+        self.overplot_lines[selected_ws] = {}
+        self.overplot_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plotter(self)
@@ -103,42 +101,30 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self._show_plot(workspace, slice_cache['plot_data'][5], slice_cache['boundaries'], slice_cache['colourmap'],
                         slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
 
-    def add_recoil_line(self, workspace, relative_mass):
-        label = recoil_labels[relative_mass] if relative_mass in recoil_labels else 'Relative mass '+ str(relative_mass)
-        if relative_mass in self.recoil_lines[workspace]:
-            line = self.recoil_lines[workspace][relative_mass]
+    def add_overplot_line(self, workspace, key, recoil):
+        if recoil: # key is relative mass
+            label = recoil_labels[key] if key in recoil_labels else \
+                'Relative mass ' + str(key)
+        else:  # key is element name
+            label = key
+        if key in self.overplot_lines[workspace]:
+            line = self.overplot_lines[workspace][key]
             line.set_linestyle('-')  # make visible
             line.set_label(label)  # add to legend
         else:
             x_axis = self.slice_cache[workspace]['x_axis']
-            x, y = self._slice_algorithm.compute_recoil_line(x_axis, relative_mass)
-            color = recoil_colors[relative_mass] if relative_mass in recoil_colors else 'c'
-            self.recoil_lines[workspace][relative_mass] = plt.gca().plot(x, y, color, label=label, alpha=.7)[0]
+            if recoil:
+                x, y = self._slice_algorithm.compute_recoil_line(x_axis, key)
+            else:
+                x, y = self._slice_algorithm.compute_powder_line(workspace, x_axis, key)
+            color = overplot_colors[key] if key in overplot_colors else 'c'
+            self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label, alpha=.7)[0]
 
-    def hide_recoil_line(self, workspace, relative_mass):
-        if relative_mass in self.recoil_lines[workspace]:
-            line = self.recoil_lines[workspace][relative_mass]
+    def hide_overplot_line(self, workspace, key):
+        if key in self.overplot_lines[workspace]:
+            line = self.overplot_lines[workspace][key]
             line.set_linestyle('')
             line.set_label('')
-
-    def add_powder_line(self, workspace, element):
-        if element in self.powder_lines[workspace]:
-            line = self.powder_lines[workspace][element]
-            line.set_linestyle('-')  # make visible
-            line.set_label(element)  # add to legend
-        else:
-            x_axis = self.slice_cache[workspace]['x_axis']
-            y_axis = self.slice_cache[workspace]['x_axis']
-            x, y = self._slice_algorithm.compute_powder_line(workspace, x_axis, element)
-            color = powder_colors[element]
-            self.recoil_lines[workspace][element] = plt.gca().plot(x, y, color=color, label=element, alpha=.7)
-
-    def hide_powder_line(self, workspace, element):
-        if element in self.recoil_lines[workspace]:
-            lines = self.recoil_lines[workspace][element]
-            for line in lines:
-                line.set_linestyle('')
-                line.set_label('')
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)

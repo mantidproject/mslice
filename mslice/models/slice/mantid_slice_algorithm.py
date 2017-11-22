@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
 
-from mantid.simpleapi import BinMD, ConvertUnits
+from mantid.simpleapi import BinMD
 from mantid.api import IMDEventWorkspace
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
@@ -14,10 +14,10 @@ KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 HBAR_MEV = constants.value('Planck constant over 2 pi in eV s') * 1000
 E_TO_K = np.sqrt(2*constants.neutron_mass)/HBAR_MEV
 E2L = 1.e23 * constants.h**2 / (2 * constants.m_n * constants.e)  # energy to wavelength conversion E = h^2/(2*m_n*l^2)
-crystal_structure = {'copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.0 0.05'],
-                     'aluminium': ['4.0495 4.0495 4.0495', 'F m -3 m', 'Al 0 0 0 1.0 0.05'],
-                     'niobium': ['3.3004 3.3004 3.3004', 'I m -3 m', 'Nb 0 0 0 1.0 0.05'],
-                     'tantalum': ['3.3013 3.3013 3.3013', 'I m -3 m', 'Ta 0 0 0 1.0 0.05']}
+crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.0 0.05'],
+                     'Aluminium': ['4.0495 4.0495 4.0495', 'F m -3 m', 'Al 0 0 0 1.0 0.05'],
+                     'Niobium': ['3.3004 3.3004 3.3004', 'I m -3 m', 'Nb 0 0 0 1.0 0.05'],
+                     'Tantalum': ['3.3013 3.3013 3.3013', 'I m -3 m', 'Ta 0 0 0 1.0 0.05']}
 MEV2J = 1 / (4000 * np.pi * constants.epsilon_0) # coulomb constant / 1000
 
 
@@ -136,13 +136,13 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def compute_powder_line(self, ws_name, x_axis, element):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
         if x_axis.units == 'MomentumTransfer':
-            x = self._compute_powder_line_momentum(ws_name, x_axis, element)
+            x0 = self._compute_powder_line_momentum(ws_name, x_axis, element)
         elif x_axis.units == 'Degrees':
-            x = self._compute_powder_line_degrees(ws_name, x_axis, element, efixed)
+            x0 = self._compute_powder_line_degrees(ws_name, x_axis, element, efixed)
         else:
-            raise RuntimeError("units of x_axis not recognised")
-        x = [x, x]
-        y = [efixed / 20,  -efixed / 20]
+            raise RuntimeError("units of axis not recognised")
+        x = sum([[xv, xv, np.nan] for xv in x0], [])
+        y = sum([[efixed / 20,  -efixed / 20, np.nan] for xv in x0], [])
         return x, y
 
     def _compute_powder_line_momentum(self, ws_name, x_axis, element):
