@@ -168,8 +168,12 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return AnalysisDataService[workspace_name]
 
     def get_parent_by_name(self, ws_name):
+        if isinstance(ws_name, unicode):
+            ws_name = str(ws_name)
         if ws_name[-3:] == '_QE':
             return self.get_workspace_handle(ws_name[:-3])
+        elif ws_name[-4:] == '_ThE':
+            return self.get_workspace_handle(ws_name[:-4])
         else:
             self.get_workspace_handle(ws_name)
 

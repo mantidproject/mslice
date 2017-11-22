@@ -253,26 +253,41 @@
    </property>
   </action>
   <action name="actionAluminium">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Aluminium</string>
    </property>
   </action>
   <action name="actionCopper">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Copper</string>
    </property>
   </action>
   <action name="actionNiobium">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Niobium</string>
    </property>
   </action>
   <action name="actionTantalum">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Tantalum</string>
    </property>
   </action>
   <action name="actionCIF_file">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>CIF file</string>
    </property>

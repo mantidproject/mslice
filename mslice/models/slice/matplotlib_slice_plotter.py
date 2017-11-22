@@ -6,7 +6,7 @@ from mslice.app import MPL_COMPAT
 
 recoil_colors={1:'b', 2:'g', 4:'r'}
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
-powder_colors={'Aluminium': 'w', 'Copper':'m', 'Niobium':'y', 'Tantalum':'k'}
+powder_colors={'aluminium': 'c', 'copper':'m', 'niobium':'y', 'tantalum':'k'}
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
@@ -129,15 +129,18 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             x_axis = self.slice_cache[workspace]['x_axis']
             y_axis = self.slice_cache[workspace]['x_axis']
-            x, y = self._slice_algorithm.compute_powder_line(workspace, x_axis, y_axis, element)
+            x, y = self._slice_algorithm.compute_powder_line(workspace, x_axis, element)
             color = powder_colors[element]
             self.recoil_lines[workspace][element] = plt.gca().plot(x, y, color, label=element, alpha=.7)[0]
+
+    def hide_powder_line(self, element):
+        pass
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
 
     def update_sample_temperature(self, workspace):
-        temp = self._slice_algorithm.sample_temperature(str(workspace), self._sample_temp_fields)
+        temp = self._slice_algorithm.sample_temperature(workspace, self._sample_temp_fields)
         self.slice_cache[workspace]['sample_temp'] = temp
 
     def compute_boltzmann_dist(self, workspace):
@@ -161,7 +164,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def compute_d2sigma(self, workspace):
         self.slice_cache[workspace]['plot_data'][3] = self._slice_algorithm.compute_d2sigma(
-            self.slice_cache[workspace]['plot_data'][0], str(workspace), self.slice_cache[workspace]['y_axis'])
+            self.slice_cache[workspace]['plot_data'][0], workspace, self.slice_cache[workspace]['y_axis'])
 
     def compute_symmetrised(self, workspace):
         if self.slice_cache[workspace]['boltzmann_dist'] is None:

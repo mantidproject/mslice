@@ -3,6 +3,7 @@ import numpy as np
 
 from mantid.simpleapi import BinMD, ConvertUnits
 from mantid.api import IMDEventWorkspace
+from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
@@ -12,6 +13,12 @@ from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorks
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 HBAR_MEV = constants.value('Planck constant over 2 pi in eV s') * 1000
 E_TO_K = np.sqrt(2*constants.neutron_mass)/HBAR_MEV
+E2L = 1.e23 * constants.h**2 / (2 * constants.m_n * constants.e)  # energy to wavelength conversion E = h^2/(2*m_n*l^2)
+crystal_structure = {'copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.0 0.05'],
+                     'aluminium': ['4.0495 4.0495 4.0495', 'F m -3 m', 'Al 0 0 0 1.0 0.05'],
+                     'niobium': ['3.3004 3.3004 3.3004', 'I m -3 m', 'Nb 0 0 0 1.0 0.05'],
+                     'tantalum': ['3.3013 3.3013 3.3013', 'I m -3 m', 'Ta 0 0 0 1.0 0.05']}
+MEV2J = 1 / (4000 * np.pi * constants.epsilon_0) # coulomb constant / 1000
 
 
 class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
@@ -126,9 +133,40 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             (constants.elementary_charge / 1000)
         return momentum_transfer, line
 
-    def compute_powder_line(self, ws_name, x_axis, y_axis, element):
-        # assume x_axis is 2theta for now
-        return # ...
+    def compute_powder_line(self, ws_name, x_axis, element):
+        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
+        if x_axis.units == 'MomentumTransfer':
+            x = self._compute_powder_line_momentum(ws_name, x_axis, element)
+        elif x_axis.units == 'Degrees':
+            x = self._compute_powder_line_degrees(ws_name, x_axis, element, efixed)
+        else:
+            raise RuntimeError("units of x_axis not recognised")
+        x = [x, x]
+        y = [efixed / 20,  -efixed / 20]
+        return x, y
+
+    def _compute_powder_line_momentum(self, ws_name, x_axis, element):
+        d_min = (2 * np.pi) / x_axis.end
+        d_max = (2 * np.pi) / x_axis.start
+        dvalues = self.compute_dvalues(d_min, d_max, element)
+        x = (2 * np.pi) / dvalues
+        return x
+
+    def _compute_powder_line_degrees(self, ws_name, x_axis, element, efixed):
+        wavelength = np.sqrt(E2L / efixed)
+        d_min = wavelength / (2 * np.sin(np.deg2rad(x_axis.end / 2)))
+        d_max = wavelength / (2 * np.sin(np.deg2rad(x_axis.start / 2)))
+        dvalues = self.compute_dvalues(d_min, d_max, element)
+        x = 2 * np.arcsin(wavelength / 2 / dvalues) * 180 / np.pi
+        return x
+
+    def compute_dvalues(self, d_min, d_max, element):
+        structure = CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
+                                     crystal_structure[element][2])
+        generator = ReflectionGenerator(structure)
+        hkls = generator.getUniqueHKLsUsingFilter(d_min, d_max, ReflectionConditionFilter.StructureFactor)
+        dvalues = np.sort(np.array(generator.getDValues(hkls)))[::-1]
+        return dvalues
 
     def _norm_to_one(self, data):
         data_range = data.max() - data.min()
