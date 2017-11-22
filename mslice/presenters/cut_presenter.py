@@ -211,6 +211,7 @@ class CutPresenter(PresenterUtility):
                 current_axis = axis[0]
                 saved_parameters = None
 
+            self._cut_view.clear_input_fields()
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
             self._cut_view.set_cut_axis(current_axis)

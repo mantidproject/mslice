@@ -377,6 +377,7 @@ class CutPresenterTest(unittest.TestCase):
         integrated_axis = 'integrated axis'
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, selected_workspaces, integrated_axis)
+        self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
         cut_presenter.notify(Command.Plot)
         call_list = [
             call(selected_workspace=selected_workspaces[0], cut_axis=processed_axis,
