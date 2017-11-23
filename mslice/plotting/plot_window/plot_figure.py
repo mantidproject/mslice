@@ -7,8 +7,9 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QInputDialog, QPrinter, QPrintDialog, QPixmap, QPainter
+from PyQt4.QtGui import QInputDialog, QFileDialog, QPrinter, QPrintDialog, QPixmap, QPainter
 import numpy as np
+import os.path as path
 import six
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
@@ -83,10 +84,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionNiobium.triggered.connect(partial(self.toggle_overplot_line, self.actionNiobium, 'Niobium', False))
         self.actionTantalum.triggered.connect(partial(self.toggle_overplot_line, self.actionTantalum,
                                                       'Tantalum', False))
+        self.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
 
-    def toggle_overplot_line(self, action, key, recoil):
+    def toggle_overplot_line(self, action, key, recoil, extra_info=None):
         if action.isChecked():
-            self.slice_plotter.add_overplot_line(self.ws_title, key, recoil)
+            self.slice_plotter.add_overplot_line(self.ws_title, key, recoil, extra_info)
         else:
             self.slice_plotter.hide_overplot_line(self.ws_title, key)
         self.update_slice_legend()
@@ -98,6 +100,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             if not confirm:
                 return
         self.toggle_overplot_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei, True)
+
+    def cif_file_powder_line(self):
+        cif_path = str(QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
+        key = path.basename(cif_path).rsplit('.')[0]
+        self.toggle_overplot_line(self.actionCIF_file, key, False, extra_info=cif_path)
 
     def update_slice_legend(self):
         visible_lines = False

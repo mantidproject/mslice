@@ -118,7 +118,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self._show_plot(workspace, slice_cache['plot_data'][5], slice_cache['boundaries'], slice_cache['colourmap'],
                         slice_cache['norm'], slice_cache['momentum_axis'], slice_cache['energy_axis'])
 
-    def add_overplot_line(self, workspace, key, recoil):
+    def add_overplot_line(self, workspace, key, recoil, extra_info):
         if recoil: # key is relative mass
             label = recoil_labels[key] if key in recoil_labels else \
                 'Relative mass ' + str(key)
@@ -133,7 +133,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             if recoil:
                 x, y = self._slice_algorithm.compute_recoil_line(momentum_axis, key)
             else:
-                x, y = self._slice_algorithm.compute_powder_line(workspace, momentum_axis, key)
+                x, y = self._slice_algorithm.compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
             color = overplot_colors[key] if key in overplot_colors else 'c'
             if self.slice_cache[workspace]['rotated']:
                 self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label, alpha=.7)[0]

@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
 
-from mantid.simpleapi import BinMD
+from mantid.simpleapi import BinMD, LoadCIF
 from mantid.api import IMDEventWorkspace
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
@@ -133,36 +133,45 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             (constants.elementary_charge / 1000)
         return momentum_transfer, line
 
-    def compute_powder_line(self, ws_name, axis, element):
+    def compute_powder_line(self, ws_name, axis, element, cif_file=False):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
         if axis.units == 'MomentumTransfer':
-            x0 = self._compute_powder_line_momentum(ws_name, axis, element)
+            x0 = self._compute_powder_line_momentum(ws_name, axis, element, cif_file)
         elif axis.units == 'Degrees':
-            x0 = self._compute_powder_line_degrees(ws_name, axis, element, efixed)
+            x0 = self._compute_powder_line_degrees(ws_name, axis, element, efixed, cif_file)
         else:
             raise RuntimeError("units of axis not recognised")
         x = sum([[xv, xv, np.nan] for xv in x0], [])
         y = sum([[efixed / 20,  -efixed / 20, np.nan] for xv in x0], [])
         return x, y
 
-    def _compute_powder_line_momentum(self, ws_name, q_axis, element):
+    def _compute_powder_line_momentum(self, ws_name, q_axis, element, cif_file):
         d_min = (2 * np.pi) / q_axis.end
         d_max = (2 * np.pi) / q_axis.start
-        dvalues = self.compute_dvalues(d_min, d_max, element)
+        structure = self._crystal_structure(ws_name, element, cif_file)
+        dvalues = self.compute_dvalues(d_min, d_max, structure)
         x = (2 * np.pi) / dvalues
         return x
 
-    def _compute_powder_line_degrees(self, ws_name, theta_axis, element, efixed):
+    def _crystal_structure(self, ws_name, element, cif_file):
+        if cif_file:
+            ws = self._workspace_provider.get_parent_by_name(ws_name)
+            LoadCIF(ws, cif_file)
+            return ws.sample().getCrystalStructure()
+        else:
+            return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
+                                         crystal_structure[element][2])
+
+    def _compute_powder_line_degrees(self, ws_name, theta_axis, element, efixed, cif_file):
         wavelength = np.sqrt(E2L / efixed)
         d_min = wavelength / (2 * np.sin(np.deg2rad(theta_axis.end / 2)))
         d_max = wavelength / (2 * np.sin(np.deg2rad(theta_axis.start / 2)))
-        dvalues = self.compute_dvalues(d_min, d_max, element)
+        structure = self._crystal_structure(ws_name, element, cif_file)
+        dvalues = self.compute_dvalues(d_min, d_max, structure)
         x = 2 * np.arcsin(wavelength / 2 / dvalues) * 180 / np.pi
         return x
 
-    def compute_dvalues(self, d_min, d_max, element):
-        structure = CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
-                                     crystal_structure[element][2])
+    def compute_dvalues(self, d_min, d_max, structure):
         generator = ReflectionGenerator(structure)
         hkls = generator.getUniqueHKLsUsingFilter(d_min, d_max, ReflectionConditionFilter.StructureFactor)
         dvalues = np.sort(np.array(generator.getDValues(hkls)))[::-1]
