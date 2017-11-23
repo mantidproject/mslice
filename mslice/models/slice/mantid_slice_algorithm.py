@@ -160,7 +160,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             return ws.sample().getCrystalStructure()
         else:
             return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
-                                         crystal_structure[element][2])
+                                    crystal_structure[element][2])
 
     def _compute_powder_line_degrees(self, ws_name, theta_axis, element, efixed, cif_file):
         wavelength = np.sqrt(E2L / efixed)
