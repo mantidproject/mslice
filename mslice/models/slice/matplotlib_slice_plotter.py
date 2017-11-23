@@ -24,15 +24,26 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plot_data, boundaries = self._slice_algorithm.compute_slice(selected_ws, x_axis, y_axis,
                                                                     smoothing, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
-        self.slice_cache[selected_ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'x_axis': x_axis,
-                                         'y_axis': y_axis, 'colourmap': colourmap, 'norm': norm,
-                                         'sample_temp': sample_temp, 'boltzmann_dist': None}
+        self._cache_slice(plot_data, selected_ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis)
         self.overplot_lines[selected_ws] = {}
         self.overplot_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plotter(self)
         plt.draw_all()
+
+    def _cache_slice(self, plot_data, ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis):
+        self.slice_cache[ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'colourmap': colourmap,
+                                         'norm': norm, 'sample_temp': sample_temp, 'boltzmann_dist': None}
+        if x_axis.units == 'MomentumTransfer' or x_axis.units == 'Degrees':
+            self.slice_cache[ws]['momentum_axis'] = x_axis
+            self.slice_cache[ws]['energy_axis'] = y_axis
+            self.slice_cache[ws]['rotated'] = False
+        else:
+            self.slice_cache[ws]['momentum_axis'] = y_axis
+            self.slice_cache[ws]['energy_axis'] = x_axis
+            self.slice_cache[ws]['rotated'] = True
+
 
     def _getDisplayName(self, axisUnits, comment=None):
         if 'DeltaE' in axisUnits:
@@ -48,10 +59,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             return axisUnits
 
-    def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, x_axis, y_axis):
+    def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                    interpolation='none', hold=False)
         plt.title(workspace_name)
+        if self.slice_cache[workspace_name]['rotated']:
+            x_axis = energy_axis
+            y_axis = momentum_axis
+        else:
+            x_axis = momentum_axis
+            y_axis = energy_axis
         comment = self._slice_algorithm.getComment(str(workspace_name))
         plt.xlabel(self._getDisplayName(x_axis.units, comment))
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
@@ -62,21 +79,21 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
         self._show_plot(workspace, slice_cache['plot_data'][0], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+                        slice_cache['norm'], slice_cache['momentum_axis'], slice_cache['energy_axis'])
 
     def show_dynamical_susceptibility(self, workspace):
         slice_cache = self.slice_cache[workspace]
         if slice_cache['plot_data'][1] is None:
             self.compute_chi(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][1], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+                        slice_cache['norm'], slice_cache['momentum_axis'], slice_cache['energy_axis'])
 
     def show_dynamical_susceptibility_magnetic(self, workspace):
         slice_cache = self.slice_cache[workspace]
         if slice_cache['plot_data'][2] is None:
             self.compute_chi_magnetic(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][2], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+                        slice_cache['norm'], slice_cache['momentum_axis'], slice_cache['energy_axis'])
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
 
@@ -85,21 +102,21 @@ class MatplotlibSlicePlotter(SlicePlotter):
         if slice_cache['plot_data'][2] is None:
             self.compute_d2sigma(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][3], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+                        slice_cache['norm'], slice_cache['momentum_axis'], slice_cache['energy_axis'])
 
     def show_symmetrised(self, workspace):
         slice_cache = self.slice_cache[workspace]
         if slice_cache['plot_data'][4] is None:
             self.compute_symmetrised(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][4], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+                        slice_cache['norm'], slice_cache['momentum_axis'], slice_cache['energy_axis'])
 
     def show_gdos(self, workspace):
         slice_cache = self.slice_cache[workspace]
         if slice_cache['plot_data'][5] is None:
             self.compute_gdos(workspace)
         self._show_plot(workspace, slice_cache['plot_data'][5], slice_cache['boundaries'], slice_cache['colourmap'],
-                        slice_cache['norm'], slice_cache['x_axis'], slice_cache['y_axis'])
+                        slice_cache['norm'], slice_cache['momentum_axis'], slice_cache['energy_axis'])
 
     def add_overplot_line(self, workspace, key, recoil):
         if recoil: # key is relative mass
@@ -112,13 +129,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line.set_linestyle('-')  # make visible
             line.set_label(label)  # add to legend
         else:
-            x_axis = self.slice_cache[workspace]['x_axis']
+            momentum_axis = self.slice_cache[workspace]['momentum_axis']
             if recoil:
-                x, y = self._slice_algorithm.compute_recoil_line(x_axis, key)
+                x, y = self._slice_algorithm.compute_recoil_line(momentum_axis, key)
             else:
-                x, y = self._slice_algorithm.compute_powder_line(workspace, x_axis, key)
+                x, y = self._slice_algorithm.compute_powder_line(workspace, momentum_axis, key)
             color = overplot_colors[key] if key in overplot_colors else 'c'
-            self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label, alpha=.7)[0]
+            if self.slice_cache[workspace]['rotated']:
+                self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label, alpha=.7)[0]
+            else:
+                self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label, alpha=.7)[0]
 
     def hide_overplot_line(self, workspace, key):
         if key in self.overplot_lines[workspace]:
@@ -137,14 +157,14 @@ class MatplotlibSlicePlotter(SlicePlotter):
         if self.slice_cache[workspace]['sample_temp'] is None:
             raise ValueError('sample temperature not found')
         self.slice_cache[workspace]['boltzmann_dist'] = self._slice_algorithm.compute_boltzmann_dist(
-            self.slice_cache[workspace]['sample_temp'], self.slice_cache[workspace]['y_axis'])
+            self.slice_cache[workspace]['sample_temp'], self.slice_cache[workspace]['energy_axis'])
 
     def compute_chi(self, workspace):
         if self.slice_cache[workspace]['boltzmann_dist'] is None:
             self.compute_boltzmann_dist(workspace)
         self.slice_cache[workspace]['plot_data'][1] = self._slice_algorithm.compute_chi(
             self.slice_cache[workspace]['plot_data'][0], self.slice_cache[workspace]['boltzmann_dist'],
-            self.slice_cache[workspace]['y_axis'])
+            self.slice_cache[workspace]['energy_axis'])
 
     def compute_chi_magnetic(self, workspace):
         if self.slice_cache[workspace]['plot_data'][1] is None:
@@ -154,21 +174,21 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def compute_d2sigma(self, workspace):
         self.slice_cache[workspace]['plot_data'][3] = self._slice_algorithm.compute_d2sigma(
-            self.slice_cache[workspace]['plot_data'][0], workspace, self.slice_cache[workspace]['y_axis'])
+            self.slice_cache[workspace]['plot_data'][0], workspace, self.slice_cache[workspace]['energy_axis'])
 
     def compute_symmetrised(self, workspace):
         if self.slice_cache[workspace]['boltzmann_dist'] is None:
             self.compute_boltzmann_dist(workspace)
         self.slice_cache[workspace]['plot_data'][4] = self._slice_algorithm.compute_symmetrised(
             self.slice_cache[workspace]['plot_data'][0], self.slice_cache[workspace]['boltzmann_dist'],
-            self.slice_cache[workspace]['y_axis'])
+            self.slice_cache[workspace]['energy_axis'])
 
     def compute_gdos(self, workspace):
         if self.slice_cache[workspace]['boltzmann_dist'] is None:
             self.compute_boltzmann_dist(workspace)
         self.slice_cache[workspace]['plot_data'][5] = self._slice_algorithm.compute_gdos(
             self.slice_cache[workspace]['plot_data'][0], self.slice_cache[workspace]['boltzmann_dist'],
-            self.slice_cache[workspace]['x_axis'], self.slice_cache[workspace]['y_axis'])
+            self.slice_cache[workspace]['momentum_axis'], self.slice_cache[workspace]['energy_axis'])
 
     def get_available_colormaps(self):
         return self._colormaps

@@ -95,7 +95,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.arbitrary_nuclei, confirm = QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
-        self.toggle_overplot_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei)
+        self.toggle_overplot_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei, True)
 
     def update_slice_legend(self):
         visible_lines = False

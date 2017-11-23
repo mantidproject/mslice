@@ -168,14 +168,13 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return AnalysisDataService[workspace_name]
 
     def get_parent_by_name(self, ws_name):
-        if isinstance(ws_name, unicode):
+        if not isinstance(ws_name, str):
             ws_name = str(ws_name)
-        if ws_name[-3:] == '_QE':
-            return self.get_workspace_handle(ws_name[:-3])
-        elif ws_name[-4:] == '_ThE':
-            return self.get_workspace_handle(ws_name[:-4])
+        suffixes = ('_QE', '_EQ', '_ETh', '_ThE')
+        if ws_name.endswith(suffixes):
+            return self.get_workspace_handle(ws_name.rsplit('_', 1)[0])
         else:
-            self.get_workspace_handle(ws_name)
+            return self.get_workspace_handle(ws_name)
 
     def get_workspace_name(self, workspace):
         """Returns the name of a workspace given the workspace handle"""

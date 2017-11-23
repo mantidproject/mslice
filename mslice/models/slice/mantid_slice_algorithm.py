@@ -51,16 +51,16 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         plot = [plot_data, None, None, None, None, None]
         return plot, boundaries
 
-    def compute_boltzmann_dist(self, sample_temp, y_axis):
+    def compute_boltzmann_dist(self, sample_temp, e_axis):
         '''calculates exp(-E/kBT), a common factor in intensity corrections'''
         if sample_temp is None:
             return None
         kBT = sample_temp * KB_MEV
-        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
+        energy_transfer = np.linspace(e_axis.end, e_axis.start, self._get_number_of_steps(e_axis))
         return np.exp(-energy_transfer / kBT)
 
-    def compute_chi(self, scattering_data, boltzmann_dist, y_axis):
-        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
+    def compute_chi(self, scattering_data, boltzmann_dist, e_axis):
+        energy_transfer = np.linspace(e_axis.end, e_axis.start, self._get_number_of_steps(e_axis))
         signs = np.sign(energy_transfer)
         signs[signs == 0] = 1
         chi = (signs + (boltzmann_dist * -signs))[:, None]
@@ -74,24 +74,24 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         chi_magnetic = chi / 291
         return chi_magnetic
 
-    def compute_d2sigma(self, scattering_data, workspace, y_axis):
+    def compute_d2sigma(self, scattering_data, workspace, e_axis):
         Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(workspace))
         if Ei is None:
             return None
         ki = np.sqrt(Ei) * E_TO_K
-        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
+        energy_transfer = np.linspace(e_axis.end, e_axis.start, self._get_number_of_steps(e_axis))
         kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)[:, None]
         d2sigma = scattering_data * kf / ki
         return d2sigma
 
-    def compute_symmetrised(self, scattering_data, boltzmann_dist, y_axis):
-        energy_transfer = np.arange(y_axis.end, 0, -y_axis.step)
+    def compute_symmetrised(self, scattering_data, boltzmann_dist, e_axis):
+        energy_transfer = np.arange(e_axis.end, 0, -e_axis.step)
         negatives = scattering_data[len(energy_transfer):] * boltzmann_dist[len(energy_transfer):,None]
         return np.concatenate((scattering_data[:len(energy_transfer)], negatives))
 
-    def compute_gdos(self, scattering_data, boltzmann_dist, x_axis, y_axis):
-        energy_transfer = np.linspace(y_axis.end, y_axis.start, self._get_number_of_steps(y_axis))
-        momentum_transfer = np.linspace(x_axis.start, x_axis.end, self._get_number_of_steps(x_axis))
+    def compute_gdos(self, scattering_data, boltzmann_dist, q_axis, e_axis):
+        energy_transfer = np.linspace(e_axis.end, e_axis.start, self._get_number_of_steps(e_axis))
+        momentum_transfer = np.linspace(q_axis.start, q_axis.end, self._get_number_of_steps(q_axis))
         momentum_transfer = np.square(momentum_transfer, out=momentum_transfer)
         gdos = scattering_data / momentum_transfer
         gdos *= energy_transfer[:,None]
@@ -127,35 +127,35 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         sample_temp = float(''.join(c for c in k_string if c.isdigit()))
         return sample_temp
 
-    def compute_recoil_line(self, x_axis, relative_mass=1):
-        momentum_transfer = np.arange(x_axis.start, x_axis.end, x_axis.step)
+    def compute_recoil_line(self, axis, relative_mass=1):
+        momentum_transfer = np.arange(axis.start, axis.end, axis.step)
         line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
             (constants.elementary_charge / 1000)
         return momentum_transfer, line
 
-    def compute_powder_line(self, ws_name, x_axis, element):
+    def compute_powder_line(self, ws_name, axis, element):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
-        if x_axis.units == 'MomentumTransfer':
-            x0 = self._compute_powder_line_momentum(ws_name, x_axis, element)
-        elif x_axis.units == 'Degrees':
-            x0 = self._compute_powder_line_degrees(ws_name, x_axis, element, efixed)
+        if axis.units == 'MomentumTransfer':
+            x0 = self._compute_powder_line_momentum(ws_name, axis, element)
+        elif axis.units == 'Degrees':
+            x0 = self._compute_powder_line_degrees(ws_name, axis, element, efixed)
         else:
             raise RuntimeError("units of axis not recognised")
         x = sum([[xv, xv, np.nan] for xv in x0], [])
         y = sum([[efixed / 20,  -efixed / 20, np.nan] for xv in x0], [])
         return x, y
 
-    def _compute_powder_line_momentum(self, ws_name, x_axis, element):
-        d_min = (2 * np.pi) / x_axis.end
-        d_max = (2 * np.pi) / x_axis.start
+    def _compute_powder_line_momentum(self, ws_name, q_axis, element):
+        d_min = (2 * np.pi) / q_axis.end
+        d_max = (2 * np.pi) / q_axis.start
         dvalues = self.compute_dvalues(d_min, d_max, element)
         x = (2 * np.pi) / dvalues
         return x
 
-    def _compute_powder_line_degrees(self, ws_name, x_axis, element, efixed):
+    def _compute_powder_line_degrees(self, ws_name, theta_axis, element, efixed):
         wavelength = np.sqrt(E2L / efixed)
-        d_min = wavelength / (2 * np.sin(np.deg2rad(x_axis.end / 2)))
-        d_max = wavelength / (2 * np.sin(np.deg2rad(x_axis.start / 2)))
+        d_min = wavelength / (2 * np.sin(np.deg2rad(theta_axis.end / 2)))
+        d_max = wavelength / (2 * np.sin(np.deg2rad(theta_axis.start / 2)))
         dvalues = self.compute_dvalues(d_min, d_max, element)
         x = 2 * np.arcsin(wavelength / 2 / dvalues) * 180 / np.pi
         return x
