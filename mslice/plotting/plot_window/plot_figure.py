@@ -28,6 +28,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.slice_plotter = None
         self.workspace_title = None
         self.menuIntensity.setDisabled(True)
+        self.menuInformation.setDisabled(True)
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -54,6 +55,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def add_slice_plotter(self, slice_plotter):
         self.slice_plotter = slice_plotter
         self.menuIntensity.setDisabled(False)
+        self.menuInformation.setDisabled(False)
         self.ws_title = self.title
         self.arbitrary_nuclei = None
 
