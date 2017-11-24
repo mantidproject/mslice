@@ -30,6 +30,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.workspace_title = None
         self.menuIntensity.setDisabled(True)
         self.menuInformation.setDisabled(True)
+        self.cif_file = None
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -80,14 +81,16 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
         self.actionAluminium.triggered.connect(partial(self.toggle_overplot_line, self.actionAluminium,
                                                        'Aluminium', False))
-        self.actionCopper.triggered.connect(partial(self.toggle_overplot_line, self.actionCopper, 'Copper', False))
-        self.actionNiobium.triggered.connect(partial(self.toggle_overplot_line, self.actionNiobium, 'Niobium', False))
+        self.actionCopper.triggered.connect(partial(self.toggle_overplot_line, self.actionCopper,
+                                                    'Copper',  False))
+        self.actionNiobium.triggered.connect(partial(self.toggle_overplot_line, self.actionNiobium,
+                                                     'Niobium', False))
         self.actionTantalum.triggered.connect(partial(self.toggle_overplot_line, self.actionTantalum,
                                                       'Tantalum', False))
         self.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
 
-    def toggle_overplot_line(self, action, key, recoil, extra_info=None):
-        if action.isChecked():
+    def toggle_overplot_line(self, action, key, recoil, checked, extra_info=None):
+        if checked:
             self.slice_plotter.add_overplot_line(self.ws_title, key, recoil, extra_info)
         else:
             self.slice_plotter.hide_overplot_line(self.ws_title, key)
@@ -101,10 +104,15 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 return
         self.toggle_overplot_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei, True)
 
-    def cif_file_powder_line(self):
-        cif_path = str(QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
-        key = path.basename(cif_path).rsplit('.')[0]
-        self.toggle_overplot_line(self.actionCIF_file, key, False, extra_info=cif_path)
+    def cif_file_powder_line(self, checked):
+        if checked:
+            cif_path = str(QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
+            key = path.basename(cif_path).rsplit('.')[0]
+            self.cif_file = key
+        else:
+            key = self.cif_file
+            cif_path = None
+        self.toggle_overplot_line(self.actionCIF_file, key, False, self.actionCIF_file.isChecked(), extra_info=cif_path)
 
     def update_slice_legend(self):
         visible_lines = False
