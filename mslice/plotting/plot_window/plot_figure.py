@@ -89,9 +89,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                                                       'Tantalum', False))
         self.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
 
-    def toggle_overplot_line(self, action, key, recoil, checked, extra_info=None):
+    def toggle_overplot_line(self, action, key, recoil, checked, cif_file=None):
         if checked:
-            self.slice_plotter.add_overplot_line(self.ws_title, key, recoil, extra_info)
+            self.slice_plotter.add_overplot_line(self.ws_title, key, recoil, cif_file)
         else:
             self.slice_plotter.hide_overplot_line(self.ws_title, key)
         self.update_slice_legend()
@@ -112,7 +112,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         else:
             key = self.cif_file
             cif_path = None
-        self.toggle_overplot_line(self.actionCIF_file, key, False, self.actionCIF_file.isChecked(), extra_info=cif_path)
+        self.toggle_overplot_line(self.actionCIF_file, key, False, self.actionCIF_file.isChecked(), cif_file=cif_path)
 
     def update_slice_legend(self):
         visible_lines = False
