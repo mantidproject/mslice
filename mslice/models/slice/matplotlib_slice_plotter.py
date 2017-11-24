@@ -110,7 +110,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_axis = self.slice_cache[workspace]['x_axis']
             x, y = self._slice_algorithm.compute_recoil_line(x_axis, relative_mass)
             color = recoil_colors[relative_mass] if relative_mass in recoil_colors else 'c'
-            self.recoil_lines[workspace][relative_mass] = plt.gca().plot(x, y, color, label=label, alpha=.7)[0]
+            self.recoil_lines[workspace][relative_mass] = plt.gca().plot(x, y, color, label=label, alpha=.7,
+                                                                         picker=5)[0]
 
     def hide_recoil_line(self, workspace, relative_mass):
         if relative_mass in self.recoil_lines[workspace]:

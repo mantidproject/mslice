@@ -6,12 +6,14 @@ from mantid.simpleapi import AnalysisDataService
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
+
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QInputDialog, QPrinter, QPrintDialog, QPixmap, QPainter
+from PyQt4 import QtGui
 import numpy as np
 import six
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
+from mslice.presenters.quick_options_presenter import quick_options
 
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
@@ -42,6 +44,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.action_Print_Plot.triggered.connect(self.print_plot)
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
+        self.canvas.mpl_connect('button_press_event', self.plot_clicked)
+        self.canvas.mpl_connect('pick_event', self.object_clicked)
 
         self.show()  # is not a good idea in non interactive mode
 
@@ -76,6 +80,15 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionHelium.triggered.connect(partial(self.toggle_recoil_line, self.actionHelium, 4))
         self.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
 
+    def plot_clicked(self, event):
+        figsize = self.canvas.figure.get_size_inches()*self.canvas.figure.dpi
+        print(figsize)
+
+    def object_clicked(self, event):
+        target = event.artist
+        quick_options(target, self)
+
+
     def toggle_recoil_line(self, action, relative_mass):
         if action.isChecked():
             self.slice_plotter.add_recoil_line(self.ws_title, relative_mass)
@@ -86,7 +99,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def arbitrary_recoil_line(self):
         if self.actionArbitrary_nuclei.isChecked():
-            self.arbitrary_nuclei, confirm = QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
+            self.arbitrary_nuclei, confirm = QtGui.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
         self.toggle_recoil_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei)
@@ -161,7 +174,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if ws_name[-3:] == '_QE':
             ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
-        temp_field, confirm = QInputDialog.getItem(self, 'Sample Temperature',
+        temp_field, confirm = QtGui.QInputDialog.getItem(self, 'Sample Temperature',
                                                    'Sample Temperature not found. Select the sample temperature field:',
                                                    ws.run().keys(), False)
         if not confirm:
@@ -195,15 +208,15 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.canvas.draw()
 
     def print_plot(self):
-        printer = QPrinter()
+        printer = QtGui.QPrinter()
         printer.setResolution(300)
-        printer.setOrientation(QPrinter.Landscape) #  landscape by default
-        print_dialog = QPrintDialog(printer)
+        printer.setOrientation(QtGui.QPrinter.Landscape) #  landscape by default
+        print_dialog = QtGui.QPrintDialog(printer)
         if print_dialog.exec_():
-            pixmap_image = QPixmap.grabWidget(self.canvas)
+            pixmap_image = QtGui.QPixmap.grabWidget(self.canvas)
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
-            painter = QPainter(printer)
+            painter = QtGui.QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
 
@@ -292,7 +305,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 elements = current_axis.containers[i].get_children()
                 if self.get_line_visible(i):
                     elements[1].set_alpha(alpha) #  elements[0] is the actual line, elements[1] is error bars
-
 
     def _toggle_errorbars(self):
         state = self._has_errorbars()

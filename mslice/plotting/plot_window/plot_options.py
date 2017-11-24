@@ -332,9 +332,9 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
     def get_color_index(self):
         return self.line_color.currentIndex()
 
-    @property
-    def show(self):
-        return bool(self.show_line.checkState())
+    # @property
+    # def show(self):
+    #     return bool(self.show_line.checkState())
 
     @property
     def color(self):
