@@ -7,8 +7,9 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QInputDialog, QPrinter, QPrintDialog, QPixmap, QPainter
+from PyQt4.QtGui import QInputDialog, QFileDialog, QPrinter, QPrintDialog, QPixmap, QPainter
 import numpy as np
+import os.path as path
 import six
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
@@ -28,6 +29,8 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.slice_plotter = None
         self.workspace_title = None
         self.menuIntensity.setDisabled(True)
+        self.menuInformation.setDisabled(True)
+        self.cif_file = None
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -54,6 +57,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def add_slice_plotter(self, slice_plotter):
         self.slice_plotter = slice_plotter
         self.menuIntensity.setDisabled(False)
+        self.menuInformation.setDisabled(False)
         self.ws_title = self.title
         self.arbitrary_nuclei = None
 
@@ -71,16 +75,25 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionGDOS.triggered.connect(partial(self.show_intensity_plot, self.actionGDOS,
                                                   self.slice_plotter.show_gdos, True))
 
-        self.actionHydrogen.triggered.connect(partial(self.toggle_recoil_line, self.actionHydrogen, 1))
-        self.actionDeuterium.triggered.connect(partial(self.toggle_recoil_line, self.actionDeuterium, 2))
-        self.actionHelium.triggered.connect(partial(self.toggle_recoil_line, self.actionHelium, 4))
+        self.actionHydrogen.triggered.connect(partial(self.toggle_overplot_line, self.actionHydrogen, 1, True))
+        self.actionDeuterium.triggered.connect(partial(self.toggle_overplot_line, self.actionDeuterium, 2, True))
+        self.actionHelium.triggered.connect(partial(self.toggle_overplot_line, self.actionHelium, 4, True))
         self.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
+        self.actionAluminium.triggered.connect(partial(self.toggle_overplot_line, self.actionAluminium,
+                                                       'Aluminium', False))
+        self.actionCopper.triggered.connect(partial(self.toggle_overplot_line, self.actionCopper,
+                                                    'Copper',  False))
+        self.actionNiobium.triggered.connect(partial(self.toggle_overplot_line, self.actionNiobium,
+                                                     'Niobium', False))
+        self.actionTantalum.triggered.connect(partial(self.toggle_overplot_line, self.actionTantalum,
+                                                      'Tantalum', False))
+        self.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
 
-    def toggle_recoil_line(self, action, relative_mass):
-        if action.isChecked():
-            self.slice_plotter.add_recoil_line(self.ws_title, relative_mass)
+    def toggle_overplot_line(self, action, key, recoil, checked, cif_file=None):
+        if checked:
+            self.slice_plotter.add_overplot_line(self.ws_title, key, recoil, cif_file)
         else:
-            self.slice_plotter.hide_recoil_line(self.ws_title, relative_mass)
+            self.slice_plotter.hide_overplot_line(self.ws_title, key)
         self.update_slice_legend()
         self.canvas.draw()
 
@@ -89,16 +102,26 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.arbitrary_nuclei, confirm = QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
-        self.toggle_recoil_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei)
+        self.toggle_overplot_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei, True)
+
+    def cif_file_powder_line(self, checked):
+        if checked:
+            cif_path = str(QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
+            key = path.basename(cif_path).rsplit('.')[0]
+            self.cif_file = key
+        else:
+            key = self.cif_file
+            cif_path = None
+        self.toggle_overplot_line(self.actionCIF_file, key, False, self.actionCIF_file.isChecked(), cif_file=cif_path)
 
     def update_slice_legend(self):
-        visible_lines = 0
+        visible_lines = False
         axes = self.canvas.figure.gca()
         for line in axes.get_lines():
             if line.get_linestyle() == '-':
-                visible_lines += 1
+                visible_lines = True
                 break
-        if visible_lines >= 1:
+        if visible_lines:
             legend = axes.legend(fontsize='small')
             legend.draggable()
         else:
