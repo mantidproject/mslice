@@ -26,3 +26,12 @@ class CutAlgorithm(object):
 
     def set_workspace_provider(self, workspace_provider):
         pass
+
+    def set_saved_cut_parameters(self, workspace, axis, parameters):
+        pass
+
+    def get_saved_cut_parameters(self, workspace, axis=None):
+        pass
+
+    def is_axis_saved(self, workspace, axis):
+        pass

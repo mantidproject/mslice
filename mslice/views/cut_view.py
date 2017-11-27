@@ -94,5 +94,8 @@ class CutView:
     def clear_input_fields(self, **kwargs):
         pass
 
+    def is_fields_cleared(self):
+        pass
+
     def clear_displayed_error(self):
         pass
