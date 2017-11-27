@@ -1,8 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
+import numpy as np
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
+from scipy import constants
 
 recoil_colors={1:'b', 2:'g', 4:'r'}
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
@@ -49,14 +51,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, x_axis, y_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
-                   interpolation='none', hold=False)
+                   interpolation='none')
+        self.add_recoil_line(x_axis, y_axis)
         plt.title(workspace_name)
+        print(plot_data.shape)
         comment = self._slice_algorithm.getComment(str(workspace_name))
         plt.xlabel(self._getDisplayName(x_axis.units, comment))
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
-        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
+        # plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
