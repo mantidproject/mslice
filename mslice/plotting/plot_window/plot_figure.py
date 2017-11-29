@@ -105,18 +105,18 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         bounds = self.calc_figure_boundaries()
         if event.x < bounds['y_label']:
             self.quick_presenter = quick_options('y_label', self)
-        elif event.x < bounds['y_ticks']:
-            self.quick_presenter = quick_options('y_ticks', self)
-        elif event.x > bounds['c_label']:
-            self.quick_presenter = quick_options('c_label', self)
-        elif event.x > bounds['c_ticks']:
-            self.quick_presenter = quick_options('c_ticks', self)
+        elif event.x < bounds['y_range']:
+            self.quick_presenter = quick_options('y_range', self)
+        elif event.x > bounds['colorbar_label']:
+            self.quick_presenter = quick_options('colorbar_label', self)
+        elif event.x > bounds['colorbar_range']:
+            self.quick_presenter = quick_options('colorbar_range', self)
         elif event.y > bounds['title']:
             self.quick_presenter = quick_options('title', self)
         elif event.y < bounds['x_label']:
             self.quick_presenter = quick_options('x_label', self)
-        elif event.y < bounds['x_ticks']:
-            self.quick_presenter = quick_options('x_ticks', self)
+        elif event.y < bounds['x_range']:
+            self.quick_presenter = quick_options('x_range', self)
 
     def object_clicked(self, event):
         target = event.artist
@@ -187,11 +187,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         fig_x, fig_y = self.canvas.figure.get_size_inches() * self.canvas.figure.dpi
         bounds = {}
         bounds['y_label'] = fig_x * 0.07
-        bounds['y_ticks'] = fig_x * 0.12
-        bounds['c_ticks'] = fig_x * 0.75
-        bounds['c_label'] = fig_x * 0.86
+        bounds['y_range'] = fig_x * 0.12
+        bounds['colorbar_range'] = fig_x * 0.75
+        bounds['colorbar_label'] = fig_x * 0.86
         bounds['title'] = fig_y * 0.9
-        bounds['x_ticks'] = fig_y * 0.09
+        bounds['x_range'] = fig_y * 0.09
         bounds['x_label'] = fig_y * 0.05
         return bounds
 
@@ -529,8 +529,20 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         return 'log' in self.canvas.figure.gca().get_yscale()
 
     @property
+    def colorbar_label(self):
+        return self.canvas.figure.get_axes()[1].get_ylabel()
+
+    @colorbar_label.setter
+    def colorbar_label(self, value):
+       self.canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270)
+
+    @property
     def colorbar_range(self):
         return self.canvas.figure.gca().get_images()[0].get_clim()
+
+    @colorbar_range.setter
+    def colorbar_range(self, value):
+        self.change_slice_plot(value, self.colorbar_log)
 
     @property
     def colorbar_log(self):

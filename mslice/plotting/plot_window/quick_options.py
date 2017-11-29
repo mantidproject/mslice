@@ -7,9 +7,45 @@ from PyQt4.QtCore import pyqtSignal
 
 class QuickAxisOptions(QtGui.QDialog):
 
-    def __init__(self, axis_type):
-        super(QuickAxisOptions, self).__init__()
+    ok_clicked = pyqtSignal()
+    cancel_clicked = pyqtSignal()
 
+    def __init__(self, target, existing_values):
+        super(QuickAxisOptions, self).__init__()
+        self.setWindowTitle("Edit " + target)
+        self.min_label = QtGui.QLabel("Min:")
+        self.min = QtGui.QLineEdit()
+        self.min.setText(str(existing_values[0]))
+        self.max_label = QtGui.QLabel("Max:")
+        self.max = QtGui.QLineEdit()
+        self.max.setText(str(existing_values[1]))
+        layout = QtGui.QVBoxLayout()
+        self.setLayout(layout)
+        self.ok_button = QtGui.QPushButton("OK", self)
+        self.cancel_button = QtGui.QPushButton("Cancel", self)
+        row1 = QtGui.QHBoxLayout()
+        row2 = QtGui.QHBoxLayout()
+        row3 = QtGui.QHBoxLayout()
+        row1.addWidget(self.min_label)
+        row1.addWidget(self.min)
+        row2.addWidget(self.max_label)
+        row2.addWidget(self.max)
+        row3.addWidget(self.ok_button)
+        row3.addWidget(self.cancel_button)
+        self.ok_button.clicked.connect(self.ok_clicked)
+        self.cancel_button.clicked.connect(self.cancel_clicked)
+        layout.addLayout(row1)
+        layout.addLayout(row2)
+        layout.addLayout(row3)
+        self.show()
+
+    @property
+    def range_min(self):
+        return self.min.text()
+
+    @property
+    def range_max(self):
+        return self.max.text()
 
 class QuickLabelOptions(QtGui.QDialog):
 

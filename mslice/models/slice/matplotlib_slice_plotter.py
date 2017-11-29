@@ -75,7 +75,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
-        #plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
+        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]

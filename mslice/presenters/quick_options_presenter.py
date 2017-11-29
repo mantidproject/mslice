@@ -5,10 +5,9 @@ from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLab
 
 def quick_options(target, model):
     if isinstance(target, str):
-        if target[2:] == 'ticks':
-            type = target[0]
-            view = QuickAxisOptions(type)
-            return QuickAxisPresenter(view, type, model)
+        if target[-5:] == 'range':
+            view = QuickAxisOptions(target, getattr(model, target))
+            return QuickAxisPresenter(view, target, model)
         else:
             view = QuickLabelOptions(target, getattr(model, target))
             return QuickLabelPresenter(view, target, model)
@@ -19,10 +18,21 @@ def quick_options(target, model):
 
 class QuickAxisPresenter(object):
 
-    def __init__(self, view, type, model):
+    def __init__(self, view, target, model):
         self.view = view
         self.type = type
         self.model = model
+        self.view.ok_clicked.connect(partial(self.set_range, target))
+        self.view.cancel_clicked.connect(self.close)
+
+    def set_range(self, target):
+        range = (float(self.view.range_min), float(self.view.range_max))
+        setattr(self.model, target, range)
+        self.model.canvas.draw()
+        self.close()
+
+    def close(self):
+        self.view.close()
 
 class QuickLabelPresenter(object):
 
