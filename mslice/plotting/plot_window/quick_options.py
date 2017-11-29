@@ -2,33 +2,40 @@
 from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
 
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 
 
-class QuickLineOptions(object):
+class QuickLineOptions(QtGui.QDialog):
 
-    def __init__(self, line):
+    ok_clicked = pyqtSignal()
+    cancel_clicked = pyqtSignal()
+
+    def __init__(self, line, parent=None):
+        super(QuickLineOptions, self).__init__(parent)
         line_options = {}
-        line_options['show'] = True
+        line_options['shown'] = True
         # print(target.get_color())
         # line_options['color'] = target.get_color()
         line_options['color'] = 'b'
         line_options['style'] = line.get_linestyle()
         line_options['width'] = str(int(line.get_linewidth()))
         line_options['marker'] = line.get_marker()
-        dialog = QtGui.QDialog()
-        dialog.setWindowTitle("Edit line")
+
+        self.setWindowTitle("Edit line")
         layout = QtGui.QVBoxLayout()
-        dialog.setLayout(layout)
-        self.line_widget = LegendAndLineOptionsSetter(dialog, line.get_label(), True, line_options)
-        self.ok_button = QtGui.QPushButton("OK", dialog)
-        self.cancel_button = QtGui.QPushButton("Cancel", dialog)
+        self.setLayout(layout)
+        self.line_widget = LegendAndLineOptionsSetter(line.get_label(), True, line_options, None)
+        self.ok_button = QtGui.QPushButton("OK", self)
+        self.cancel_button = QtGui.QPushButton("Cancel", self)
         new_row = QtGui.QHBoxLayout()
         layout.addWidget(self.line_widget)
         new_row.addWidget(self.ok_button)
         new_row.addWidget(self.cancel_button)
+        self.ok_button.clicked.connect(self.ok_clicked)
+        self.cancel_button.clicked.connect(self.cancel_clicked)
         layout.addLayout(new_row)
         self.line_widget.show()
-        dialog.exec_()
+        self.show()
 
     @property
     def color(self):
@@ -46,3 +53,14 @@ class QuickLineOptions(object):
     def width(self):
         return self.line_widget.width
 
+    @property
+    def label(self):
+        return self.line_widget.get_text()
+
+    @property
+    def shown(self):
+        return self.line_widget.shown
+
+    @property
+    def legend(self):
+        return self.line_widget.legend_visible()

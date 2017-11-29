@@ -28,7 +28,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._cache_slice(plot_data, selected_ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis)
         self.overplot_lines[selected_ws] = {}
-        self.overplot_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plotter(self)
@@ -63,7 +62,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
-                   interpolation='none')
+                   interpolation='none', hold=False)
         plt.title(workspace_name)
         if self.slice_cache[workspace_name]['rotated']:
             x_axis = energy_axis
@@ -76,7 +75,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.ylabel(self._getDisplayName(y_axis.units, comment))
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
-        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
+        #plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
@@ -138,9 +137,11 @@ class MatplotlibSlicePlotter(SlicePlotter):
                 x, y = self._slice_algorithm.compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
             color = overplot_colors[key] if key in overplot_colors else 'c'
             if self.slice_cache[workspace]['rotated']:
-                self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label, alpha=.7)[0]
+                self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label,
+                                                                     alpha=.7, picker=5)[0]
             else:
-                self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label, alpha=.7)[0]
+                self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label,
+                                                                     alpha=.7, picker=5)[0]
 
     def hide_overplot_line(self, workspace, key):
         if key in self.overplot_lines[workspace]:
@@ -200,6 +201,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def get_axis_range(self, workspace, dimension_name):
         return self._slice_algorithm.get_axis_range(workspace, dimension_name)
+
+    def get_recoil_label(self, key):
+        return recoil_labels[key]
 
     def set_workspace_provider(self, workspace_provider):
         self._slice_algorithm.set_workspace_provider(workspace_provider)

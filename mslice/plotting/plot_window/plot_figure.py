@@ -3,6 +3,8 @@ from functools import partial
 from itertools import chain
 
 from mantid.simpleapi import AnalysisDataService
+import matplotlib.lines as lines
+import matplotlib.legend as legend
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
@@ -29,11 +31,13 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.legends_shown = True
         self.legends_visible = []
         self.lines_visible = {}
+        self.legend_dict = {}
         self.slice_plotter = None
         self.workspace_title = None
         self.menuIntensity.setDisabled(True)
         self.menuInformation.setDisabled(True)
         self.cif_file = None
+        self.quick_presenter = None
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -48,8 +52,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.action_Print_Plot.triggered.connect(self.print_plot)
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
-        self.canvas.mpl_connect('button_press_event', self.plot_clicked)
-        self.canvas.mpl_connect('pick_event', self.object_clicked)
 
         self.show()  # is not a good idea in non interactive mode
 
@@ -93,14 +95,28 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionTantalum.triggered.connect(partial(self.toggle_overplot_line, self.actionTantalum,
                                                       'Tantalum', False))
         self.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
+        self.canvas.mpl_connect('button_press_event', self.plot_clicked)
+        self.canvas.mpl_connect('pick_event', self.object_clicked)
 
     def plot_clicked(self, event):
+        # bounds = self.calc_figure_boundaries()
         figsize = self.canvas.figure.get_size_inches()*self.canvas.figure.dpi
         print(figsize)
 
     def object_clicked(self, event):
         target = event.artist
-        quick_options(target, self)
+        if target in self.legend_dict:
+            self.quick_presenter = quick_options(self.legend_dict[target], self)
+        else:
+            self.quick_presenter = quick_options(target, self)
+
+    def reset_info_checkboxes(self):
+        for key, line in six.iteritems(self.slice_plotter.overplot_lines[self.ws_title]):
+            if str(line.get_linestyle()) == 'None':
+                if isinstance(key, int):
+                    key = self.slice_plotter.get_recoil_label(key)
+                action_checked = getattr(self, 'action' + key)
+                action_checked.setChecked(False)
 
     def toggle_overplot_line(self, action, key, recoil, checked, cif_file=None):
         if checked:
@@ -128,23 +144,27 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.toggle_overplot_line(self.actionCIF_file, key, False, self.actionCIF_file.isChecked(), cif_file=cif_path)
 
     def update_slice_legend(self):
-        visible_lines = False
+        lines = []
         axes = self.canvas.figure.gca()
         for line in axes.get_lines():
-            if line.get_linestyle() == '-':
-                visible_lines = True
-                break
-        if visible_lines:
+            if str(line.get_linestyle()) != 'None' and line.get_label() != '':
+                lines.append(line)
+        if len(lines) > 0:
             legend = axes.legend(fontsize='small')
-            legend.draggable()
+            # legend.draggable()
+            for legline, line in zip(legend.get_lines(), lines):
+                legline.set_picker(5)
+                self.legend_dict[legline] = line
+            for label, line in zip(legend.get_texts(), lines):
+                label.set_picker(5)
+                self.legend_dict[label] = line
         else:
             axes.legend_ = None  # remove legend
 
     def _toggle_slice_legend(self):
         axes = self.canvas.figure.gca()
         if axes.legend_ is None:
-            legend = axes.legend(fontsize='small')
-            legend.draggable()
+            self.update_slice_legend()
         else:
             axes.legend_ = None
 
@@ -382,7 +402,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         for line_group in self.canvas.figure.gca().containers:
             line_options = {}
             line = line_group.get_children()[0]
-            line_options['show'] = self.get_line_visible(i)
+            line_options['shown'] = self.get_line_visible(i)
             line_options['color'] = line.get_color()
             line_options['style'] = line.get_linestyle()
             line_options['width'] = str(int(line.get_linewidth()))
@@ -398,7 +418,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             legend, line_options = line
             legends.append(legend)
             line_model = self.canvas.figure.gca().containers[i]
-            self.set_line_visible(i, line_options['show'])
+            self.set_line_visible(i, line_options['shown'])
             for child in line_model.get_children():
                 child.set_color(line_options['color'])
                 child.set_linewidth(line_options['width'])
@@ -411,7 +431,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def set_line_visible(self, line_index, visible):
         self.lines_visible[line_index] = visible
         for child in self.canvas.figure.gca().containers[line_index].get_children():
-            child.set_alpha(visible)
+            child.set_visible(visible)
 
     def get_line_visible(self, line_index):
         try:
@@ -426,6 +446,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def set_window_title(self, title):
         self.setWindowTitle(title)
+
+    def closeEvent(self, event):
+        '''Override close event to also close submenus'''
+        if self.quick_presenter is not None:
+            self.quick_presenter.close()
 
     @property
     def title(self):
