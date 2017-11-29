@@ -99,9 +99,24 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.canvas.mpl_connect('pick_event', self.object_clicked)
 
     def plot_clicked(self, event):
-        # bounds = self.calc_figure_boundaries()
-        figsize = self.canvas.figure.get_size_inches()*self.canvas.figure.dpi
-        print(figsize)
+        print(event.x, event.y)
+        x = event.x
+        y = event.y
+        bounds = self.calc_figure_boundaries()
+        if event.x < bounds['x_label']:
+            self.quick_presenter = quick_options('x_label', self)
+        elif event.x < bounds['x_ticks']:
+            self.quick_presenter = quick_options('x_ticks', self)
+        elif event.x > bounds['c_label']:
+            self.quick_presenter = quick_options('c_label', self)
+        elif event.x > bounds['c_ticks']:
+            self.quick_presenter = quick_options('c_ticks', self)
+        elif event.y > bounds['title']:
+            self.quick_presenter = quick_options('title', self)
+        elif event.y < bounds['y_label']:
+            self.quick_presenter = quick_options('y_label', self)
+        elif event.y < bounds['y_ticks']:
+            self.quick_presenter = quick_options('y_ticks', self)
 
     def object_clicked(self, event):
         target = event.artist
@@ -167,6 +182,18 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.update_slice_legend()
         else:
             axes.legend_ = None
+
+    def calc_figure_boundaries(self):
+        fig_x, fig_y = self.canvas.figure.get_size_inches() * self.canvas.figure.dpi
+        bounds = {}
+        bounds['x_label'] = fig_x * 0.07
+        bounds['x_ticks'] = fig_x * 0.12
+        bounds['c_ticks'] = fig_x * 0.75
+        bounds['c_label'] = fig_x * 0.86
+        bounds['title'] = fig_y * 0.9
+        bounds['y_ticks'] = fig_y * 0.09
+        bounds['y_label'] = fig_y * 0.05
+        return bounds
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''

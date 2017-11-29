@@ -1,15 +1,26 @@
 from functools import partial
 
 from matplotlib import lines, legend
-from mslice.plotting.plot_window.quick_options import QuickLineOptions
+from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
 
 def quick_options(target, model):
     if isinstance(target, str):
-        view = quick_options_from_str(target)
+        if target[2:] == 'ticks':
+            type = target[0]
+            view = QuickAxisOptions(type)
+            return QuickAxisPresenter(view, type, model)
+        else:
+            view = QuickLabelOptions(target)
+            return QuickLabelPresenter(view, target, model)
     else:
         view = QuickLineOptions(target)
         return QuickLinePresenter(view, target, model)
 
+class QuickAxisPresenter(object):
+    pass
+
+class QuickLabelPresenter(object):
+    pass
 
 class QuickLinePresenter(object):
 

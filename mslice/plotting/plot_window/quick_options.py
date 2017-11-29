@@ -4,6 +4,17 @@ from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
+class QuickAxisOptions(QtGui.QDialog):
+
+    def __init__(self, view, axis_type, model):
+        super(QuickAxisOptions, self).__init__()
+
+
+class QuickLabelOptions(QtGui.QDialog):
+
+    def __init__(self, view, label_name, model):
+        super(QuickLabelOptions, self).__init__()
+
 
 class QuickLineOptions(QtGui.QDialog):
 
