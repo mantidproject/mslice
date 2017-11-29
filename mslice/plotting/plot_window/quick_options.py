@@ -4,16 +4,40 @@ from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
+
 class QuickAxisOptions(QtGui.QDialog):
 
-    def __init__(self, view, axis_type, model):
+    def __init__(self, axis_type):
         super(QuickAxisOptions, self).__init__()
 
 
 class QuickLabelOptions(QtGui.QDialog):
 
-    def __init__(self, view, label_name, model):
+    ok_clicked = pyqtSignal()
+    cancel_clicked = pyqtSignal()
+
+    def __init__(self, label_name, label_text):
         super(QuickLabelOptions, self).__init__()
+        self.setWindowTitle("Edit " + label_name)
+        self.line_edit = QtGui.QLineEdit()
+        self.line_edit.setText(label_text)
+        layout = QtGui.QVBoxLayout()
+        self.setLayout(layout)
+        layout.addWidget(self.line_edit)
+        self.ok_button = QtGui.QPushButton("OK", self)
+        self.cancel_button = QtGui.QPushButton("Cancel", self)
+        new_row = QtGui.QHBoxLayout()
+        new_row.addWidget(self.ok_button)
+        new_row.addWidget(self.cancel_button)
+        self.ok_button.clicked.connect(self.ok_clicked)
+        self.cancel_button.clicked.connect(self.cancel_clicked)
+        layout.addLayout(new_row)
+        self.line_edit.show()
+        self.show()
+
+    @property
+    def label(self):
+        return self.line_edit.text()
 
 
 class QuickLineOptions(QtGui.QDialog):

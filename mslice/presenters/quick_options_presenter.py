@@ -10,17 +10,38 @@ def quick_options(target, model):
             view = QuickAxisOptions(type)
             return QuickAxisPresenter(view, type, model)
         else:
-            view = QuickLabelOptions(target)
+            view = QuickLabelOptions(target, getattr(model, target))
             return QuickLabelPresenter(view, target, model)
     else:
         view = QuickLineOptions(target)
         return QuickLinePresenter(view, target, model)
 
+
 class QuickAxisPresenter(object):
-    pass
+
+    def __init__(self, view, type, model):
+        self.view = view
+        self.type = type
+        self.model = model
 
 class QuickLabelPresenter(object):
-    pass
+
+    def __init__(self, view, type, model):
+        self.view = view
+        self.type = type
+        self.model = model
+        self.view.ok_clicked.connect(partial(self.set_label, type))
+        self.view.cancel_clicked.connect(self.close)
+
+
+    def set_label(self, type):
+        setattr(self.model, type, self.view.label)
+        self.model.canvas.draw()
+        self.close()
+
+    def close(self):
+        self.view.close()
+
 
 class QuickLinePresenter(object):
 
