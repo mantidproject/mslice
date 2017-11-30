@@ -36,7 +36,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.menuInformation.setDisabled(True)
         self.cif_file = None
         self.quick_presenter = None
-        self.screen_array = None
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
