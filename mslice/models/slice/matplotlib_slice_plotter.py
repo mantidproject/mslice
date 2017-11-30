@@ -63,7 +63,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                    interpolation='none', hold=False)
-        plt.title(workspace_name)
+        plt.title(workspace_name, picker=5)
         if self.slice_cache[workspace_name]['rotated']:
             x_axis = energy_axis
             y_axis = momentum_axis
@@ -71,11 +71,13 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_axis = momentum_axis
             y_axis = energy_axis
         comment = self._slice_algorithm.getComment(str(workspace_name))
-        plt.xlabel(self._getDisplayName(x_axis.units, comment))
-        plt.ylabel(self._getDisplayName(y_axis.units, comment))
+        plt.xlabel(self._getDisplayName(x_axis.units, comment), picker=5)
+        plt.ylabel(self._getDisplayName(y_axis.units, comment), picker=5)
+        plt.xticks(picker=5)
+        plt.yticks(picker=5)
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
-        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270)
+        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=5)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]

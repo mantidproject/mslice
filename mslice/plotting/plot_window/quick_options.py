@@ -52,11 +52,11 @@ class QuickLabelOptions(QtGui.QDialog):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
 
-    def __init__(self, label_name, label_text):
+    def __init__(self, label):
         super(QuickLabelOptions, self).__init__()
-        self.setWindowTitle("Edit " + label_name)
+        self.setWindowTitle("Edit " + label.get_text())
         self.line_edit = QtGui.QLineEdit()
-        self.line_edit.setText(label_text)
+        self.line_edit.setText(label.get_text())
         layout = QtGui.QVBoxLayout()
         self.setLayout(layout)
         layout.addWidget(self.line_edit)

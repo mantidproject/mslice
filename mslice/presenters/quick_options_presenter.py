@@ -1,16 +1,15 @@
 from functools import partial
 
-from matplotlib import lines, legend
+from matplotlib import text
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
 
 def quick_options(target, model):
-    if isinstance(target, str):
-        if target[-5:] == 'range':
+    if isinstance(target, text.Text):
+        view = QuickLabelOptions(target)
+        return QuickLabelPresenter(view, target, model)
+    elif isinstance(target, str):
             view = QuickAxisOptions(target, getattr(model, target))
             return QuickAxisPresenter(view, target, model)
-        else:
-            view = QuickLabelOptions(target, getattr(model, target))
-            return QuickLabelPresenter(view, target, model)
     else:
         view = QuickLineOptions(target)
         return QuickLinePresenter(view, target, model)
@@ -36,16 +35,16 @@ class QuickAxisPresenter(object):
 
 class QuickLabelPresenter(object):
 
-    def __init__(self, view, type, model):
+    def __init__(self, view, target, model):
         self.view = view
-        self.type = type
+        self.target = target
         self.model = model
-        self.view.ok_clicked.connect(partial(self.set_label, type))
+        self.view.ok_clicked.connect(self.set_label)
         self.view.cancel_clicked.connect(self.close)
 
 
-    def set_label(self, type):
-        setattr(self.model, type, self.view.label)
+    def set_label(self):
+        self.target.set_text(self.view.label)
         self.model.canvas.draw()
         self.close()
 

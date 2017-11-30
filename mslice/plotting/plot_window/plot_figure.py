@@ -3,8 +3,6 @@ from functools import partial
 from itertools import chain
 
 from mantid.simpleapi import AnalysisDataService
-import matplotlib.lines as lines
-import matplotlib.legend as legend
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
@@ -38,6 +36,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.menuInformation.setDisabled(True)
         self.cif_file = None
         self.quick_presenter = None
+        self.screen_array = None
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -103,20 +102,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         x = event.x
         y = event.y
         bounds = self.calc_figure_boundaries()
-        if event.x < bounds['y_label']:
-            self.quick_presenter = quick_options('y_label', self)
-        elif event.x < bounds['y_range']:
-            self.quick_presenter = quick_options('y_range', self)
-        elif event.x > bounds['colorbar_label']:
-            self.quick_presenter = quick_options('colorbar_label', self)
-        elif event.x > bounds['colorbar_range']:
-            self.quick_presenter = quick_options('colorbar_range', self)
-        elif event.y > bounds['title']:
-            self.quick_presenter = quick_options('title', self)
-        elif event.y < bounds['x_label']:
-            self.quick_presenter = quick_options('x_label', self)
-        elif event.y < bounds['x_range']:
-            self.quick_presenter = quick_options('x_range', self)
+        if bounds['x_label'] < y < bounds['title']:
+            if bounds['y_label'] < x < bounds['colorbar_label']:
+                if y < bounds['x_range']:
+                    self.quick_presenter = quick_options('x_range', self)
+                elif x < bounds['y_range']:
+                    self.quick_presenter = quick_options('y_range', self)
+                elif x > bounds['colorbar_range']:
+                    self.quick_presenter = quick_options('colorbar_range', self)
 
     def object_clicked(self, event):
         target = event.artist
@@ -166,7 +159,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 lines.append(line)
         if len(lines) > 0:
             legend = axes.legend(fontsize='small')
-            # legend.draggable()
+            legend.draggable()
             for legline, line in zip(legend.get_lines(), lines):
                 legline.set_picker(5)
                 self.legend_dict[legline] = line
@@ -534,7 +527,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     @colorbar_label.setter
     def colorbar_label(self, value):
-       self.canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270)
+       self.canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
 
     @property
     def colorbar_range(self):
