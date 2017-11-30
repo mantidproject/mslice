@@ -5,10 +5,25 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 
-class QuickAxisOptions(QtGui.QDialog):
+class QuickOptions(QtGui.QDialog):
 
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
+
+    def __init__(self):
+        super(QuickOptions, self).__init__()
+        self.layout = QtGui.QVBoxLayout()
+        self.setLayout(self.layout)
+        self.ok_button = QtGui.QPushButton("OK", self)
+        self.cancel_button = QtGui.QPushButton("Cancel", self)
+        self.button_row = QtGui.QHBoxLayout()
+        self.button_row.addWidget(self.ok_button)
+        self.button_row.addWidget(self.cancel_button)
+        self.ok_button.clicked.connect(self.ok_clicked)
+        self.cancel_button.clicked.connect(self.cancel_clicked)
+
+
+class QuickAxisOptions(QuickOptions):
 
     def __init__(self, target, existing_values, log):
         super(QuickAxisOptions, self).__init__()
@@ -20,30 +35,21 @@ class QuickAxisOptions(QtGui.QDialog):
         self.max_label = QtGui.QLabel("Max:")
         self.max = QtGui.QLineEdit()
         self.max.setText(str(existing_values[1]))
-        layout = QtGui.QVBoxLayout()
-        self.setLayout(layout)
-        self.ok_button = QtGui.QPushButton("OK", self)
-        self.cancel_button = QtGui.QPushButton("Cancel", self)
         row1 = QtGui.QHBoxLayout()
         row2 = QtGui.QHBoxLayout()
-        row4 = QtGui.QHBoxLayout()
         row1.addWidget(self.min_label)
         row1.addWidget(self.min)
         row2.addWidget(self.max_label)
         row2.addWidget(self.max)
-        row4.addWidget(self.ok_button)
-        row4.addWidget(self.cancel_button)
-        self.ok_button.clicked.connect(self.ok_clicked)
-        self.cancel_button.clicked.connect(self.cancel_clicked)
-        layout.addLayout(row1)
-        layout.addLayout(row2)
+        self.layout.addLayout(row1)
+        self.layout.addLayout(row2)
         if log is not None:
             self.log_scale = QtGui.QCheckBox("Logarithmic", self)
             self.log_scale.setChecked(self.log)
             row3 = QtGui.QHBoxLayout()
             row3.addWidget(self.log_scale)
-            layout.addLayout(row3)
-        layout.addLayout(row4)
+            self.layout.addLayout(row3)
+        self.layout.addLayout(self.button_row)
         self.show()
 
     @property
@@ -54,7 +60,8 @@ class QuickAxisOptions(QtGui.QDialog):
     def range_max(self):
         return self.max.text()
 
-class QuickLabelOptions(QtGui.QDialog):
+
+class QuickLabelOptions(QuickOptions):
 
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
@@ -64,17 +71,8 @@ class QuickLabelOptions(QtGui.QDialog):
         self.setWindowTitle("Edit " + label.get_text())
         self.line_edit = QtGui.QLineEdit()
         self.line_edit.setText(label.get_text())
-        layout = QtGui.QVBoxLayout()
-        self.setLayout(layout)
-        layout.addWidget(self.line_edit)
-        self.ok_button = QtGui.QPushButton("OK", self)
-        self.cancel_button = QtGui.QPushButton("Cancel", self)
-        new_row = QtGui.QHBoxLayout()
-        new_row.addWidget(self.ok_button)
-        new_row.addWidget(self.cancel_button)
-        self.ok_button.clicked.connect(self.ok_clicked)
-        self.cancel_button.clicked.connect(self.cancel_clicked)
-        layout.addLayout(new_row)
+        self.layout.addWidget(self.line_edit)
+        self.layout.addLayout(self.button_row)
         self.line_edit.show()
         self.show()
 
@@ -83,13 +81,13 @@ class QuickLabelOptions(QtGui.QDialog):
         return self.line_edit.text()
 
 
-class QuickLineOptions(QtGui.QDialog):
+class QuickLineOptions(QuickOptions):
 
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
 
-    def __init__(self, line, parent=None):
-        super(QuickLineOptions, self).__init__(parent)
+    def __init__(self, line):
+        super(QuickLineOptions, self).__init__()
         line_options = {}
         line_options['shown'] = True
         line_options['color'] = line.get_color()
@@ -98,18 +96,9 @@ class QuickLineOptions(QtGui.QDialog):
         line_options['marker'] = line.get_marker()
 
         self.setWindowTitle("Edit line")
-        layout = QtGui.QVBoxLayout()
-        self.setLayout(layout)
         self.line_widget = LegendAndLineOptionsSetter(line.get_label(), True, line_options, None)
-        self.ok_button = QtGui.QPushButton("OK", self)
-        self.cancel_button = QtGui.QPushButton("Cancel", self)
-        new_row = QtGui.QHBoxLayout()
-        layout.addWidget(self.line_widget)
-        new_row.addWidget(self.ok_button)
-        new_row.addWidget(self.cancel_button)
-        self.ok_button.clicked.connect(self.ok_clicked)
-        self.cancel_button.clicked.connect(self.cancel_clicked)
-        layout.addLayout(new_row)
+        self.layout.addWidget(self.line_widget)
+        self.layout.addLayout(self.button_row)
         self.line_widget.show()
         self.show()
 
