@@ -97,7 +97,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.canvas.mpl_connect('pick_event', self.object_clicked)
 
     def plot_clicked(self, event):
-        print(event.x, event.y)
         x = event.x
         y = event.y
         bounds = self.calc_figure_boundaries()

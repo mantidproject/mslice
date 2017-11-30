@@ -65,7 +65,6 @@ class QuickLinePresenter(object):
         self.view.cancel_clicked.connect(self.close)
 
     def set_line_options(self, line):
-        print("OK!")
         line.set_color(self.view.color)
         line.set_linestyle(self.view.style)
         line.set_linewidth(self.view.width)
