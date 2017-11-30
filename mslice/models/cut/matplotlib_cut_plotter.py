@@ -23,6 +23,7 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.ylabel(INTENSITY_LABEL)
         plt.autoscale()
         plt.ylim(intensity_start, intensity_end)
+        plt.gcf().canvas.manager.add_cut_plot(self)
         plt.draw_all()
 
     def _getDisplayName(self, axisUnits, comment=None):

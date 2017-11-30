@@ -74,8 +74,6 @@ class QuickLinePresenter(object):
             line.set_linestyle('')
         if not self.view.legend:
             line.set_label('')
-        self.model.reset_info_checkboxes()
-        self.model.update_slice_legend()
         self.model.canvas.draw()
         self.close()
 
