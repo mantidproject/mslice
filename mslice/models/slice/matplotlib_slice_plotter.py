@@ -71,8 +71,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
         comment = self._slice_algorithm.getComment(str(workspace_name))
         plt.xlabel(self._getDisplayName(x_axis.units, comment), picker=5)
         plt.ylabel(self._getDisplayName(y_axis.units, comment), picker=5)
-        plt.xticks(picker=5)
-        plt.yticks(picker=5)
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
         plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=5)

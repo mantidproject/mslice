@@ -10,9 +10,10 @@ class QuickAxisOptions(QtGui.QDialog):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
 
-    def __init__(self, target, existing_values):
+    def __init__(self, target, existing_values, log):
         super(QuickAxisOptions, self).__init__()
         self.setWindowTitle("Edit " + target)
+        self.log = log
         self.min_label = QtGui.QLabel("Min:")
         self.min = QtGui.QLineEdit()
         self.min.setText(str(existing_values[0]))
@@ -25,18 +26,24 @@ class QuickAxisOptions(QtGui.QDialog):
         self.cancel_button = QtGui.QPushButton("Cancel", self)
         row1 = QtGui.QHBoxLayout()
         row2 = QtGui.QHBoxLayout()
-        row3 = QtGui.QHBoxLayout()
+        row4 = QtGui.QHBoxLayout()
         row1.addWidget(self.min_label)
         row1.addWidget(self.min)
         row2.addWidget(self.max_label)
         row2.addWidget(self.max)
-        row3.addWidget(self.ok_button)
-        row3.addWidget(self.cancel_button)
+        row4.addWidget(self.ok_button)
+        row4.addWidget(self.cancel_button)
         self.ok_button.clicked.connect(self.ok_clicked)
         self.cancel_button.clicked.connect(self.cancel_clicked)
         layout.addLayout(row1)
         layout.addLayout(row2)
-        layout.addLayout(row3)
+        if log is not None:
+            self.log_scale = QtGui.QCheckBox("Logarithmic", self)
+            self.log_scale.setChecked(self.log)
+            row3 = QtGui.QHBoxLayout()
+            row3.addWidget(self.log_scale)
+            layout.addLayout(row3)
+        layout.addLayout(row4)
         self.show()
 
     @property
@@ -85,9 +92,7 @@ class QuickLineOptions(QtGui.QDialog):
         super(QuickLineOptions, self).__init__(parent)
         line_options = {}
         line_options['shown'] = True
-        # print(target.get_color())
-        # line_options['color'] = target.get_color()
-        line_options['color'] = 'b'
+        line_options['color'] = line.get_color()
         line_options['style'] = line.get_linestyle()
         line_options['width'] = str(int(line.get_linewidth()))
         line_options['marker'] = line.get_marker()

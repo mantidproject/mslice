@@ -544,6 +544,10 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         norm = mappable.norm
         return isinstance(norm, colors.LogNorm)
 
+    @colorbar_log.setter
+    def colorbar_log(self, value):
+        self.change_slice_plot(self.colorbar_range, value)
+
     @property
     def error_bars(self):
         return self._has_errorbars()

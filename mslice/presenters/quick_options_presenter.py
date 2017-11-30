@@ -8,8 +8,9 @@ def quick_options(target, model):
         view = QuickLabelOptions(target)
         return QuickLabelPresenter(view, target, model)
     elif isinstance(target, str):
-            view = QuickAxisOptions(target, getattr(model, target))
-            return QuickAxisPresenter(view, target, model)
+        log = model.colorbar_log if target == 'colorbar_range' else None
+        view = QuickAxisOptions(target, getattr(model, target), log)
+        return QuickAxisPresenter(view, target, model)
     else:
         view = QuickLineOptions(target)
         return QuickLinePresenter(view, target, model)
@@ -27,6 +28,8 @@ class QuickAxisPresenter(object):
     def set_range(self, target):
         range = (float(self.view.range_min), float(self.view.range_max))
         setattr(self.model, target, range)
+        if target == 'colorbar_range':
+            self.model.colorbar_log = self.view.log_scale.isChecked()
         self.model.canvas.draw()
         self.close()
 
