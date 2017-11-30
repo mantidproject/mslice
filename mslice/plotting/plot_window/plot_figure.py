@@ -238,8 +238,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
         temp_field, confirm = QtGui.QInputDialog.getItem(self, 'Sample Temperature',
-                                                   'Sample Temperature not found. Select the sample temperature field:',
-                                                   ws.run().keys(), False)
+                                                         'Sample Temperature not found. ' +
+                                                         'Select the sample temperature field:',
+                                                         ws.run().keys(), False)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
@@ -527,7 +528,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     @colorbar_label.setter
     def colorbar_label(self, value):
-       self.canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
+        self.canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
 
     @property
     def colorbar_range(self):

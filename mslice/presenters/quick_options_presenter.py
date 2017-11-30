@@ -79,4 +79,3 @@ class QuickLinePresenter(object):
 
     def close(self):
         self.view.close()
-

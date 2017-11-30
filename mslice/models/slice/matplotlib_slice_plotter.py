@@ -1,10 +1,8 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
-import numpy as np
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
-from scipy import constants
 
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
 overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
