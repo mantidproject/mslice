@@ -22,8 +22,9 @@ class QuickAxisPresenter(object):
         self.view = view
         self.type = type
         self.model = model
-        self.view.ok_clicked.connect(partial(self.set_range, target))
-        self.view.cancel_clicked.connect(self.close)
+        accepted = self.view.exec_()
+        if accepted:
+            self.set_range(target)
 
     def set_range(self, target):
         range = (float(self.view.range_min), float(self.view.range_max))
@@ -31,10 +32,7 @@ class QuickAxisPresenter(object):
         if target == 'colorbar_range':
             self.model.colorbar_log = self.view.log_scale.isChecked()
         self.model.canvas.draw()
-        self.close()
 
-    def close(self):
-        self.view.close()
 
 class QuickLabelPresenter(object):
 
@@ -42,17 +40,13 @@ class QuickLabelPresenter(object):
         self.view = view
         self.target = target
         self.model = model
-        self.view.ok_clicked.connect(self.set_label)
-        self.view.cancel_clicked.connect(self.close)
-
+        accepted = self.view.exec_()
+        if accepted:
+            self.set_label()
 
     def set_label(self):
         self.target.set_text(self.view.label)
         self.model.canvas.draw()
-        self.close()
-
-    def close(self):
-        self.view.close()
 
 
 class QuickLinePresenter(object):
@@ -61,8 +55,9 @@ class QuickLinePresenter(object):
         self.view = view
         self.target = target
         self.model = model
-        self.view.ok_clicked.connect(partial(self.set_line_options, target))
-        self.view.cancel_clicked.connect(self.close)
+        accepted = self.view.exec_()
+        if accepted:
+            self.set_line_options(target)
 
     def set_line_options(self, line):
         line.set_color(self.view.color)
@@ -77,7 +72,4 @@ class QuickLinePresenter(object):
         self.model.reset_info_checkboxes()
         self.model.update_slice_legend()
         self.model.canvas.draw()
-        self.close()
 
-    def close(self):
-        self.view.close()

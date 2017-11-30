@@ -97,24 +97,26 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.canvas.mpl_connect('pick_event', self.object_clicked)
 
     def plot_clicked(self, event):
-        x = event.x
-        y = event.y
-        bounds = self.calc_figure_boundaries()
-        if bounds['x_label'] < y < bounds['title']:
-            if bounds['y_label'] < x < bounds['colorbar_label']:
-                if y < bounds['x_range']:
-                    self.quick_presenter = quick_options('x_range', self)
-                elif x < bounds['y_range']:
-                    self.quick_presenter = quick_options('y_range', self)
-                elif x > bounds['colorbar_range']:
-                    self.quick_presenter = quick_options('colorbar_range', self)
+        if event.dblclick:
+            x = event.x
+            y = event.y
+            bounds = self.calc_figure_boundaries()
+            if bounds['x_label'] < y < bounds['title']:
+                if bounds['y_label'] < x < bounds['colorbar_label']:
+                    if y < bounds['x_range']:
+                        self.quick_presenter = quick_options('x_range', self)
+                    elif x < bounds['y_range']:
+                        self.quick_presenter = quick_options('y_range', self)
+                    elif x > bounds['colorbar_range']:
+                        self.quick_presenter = quick_options('colorbar_range', self)
 
     def object_clicked(self, event):
-        target = event.artist
-        if target in self.legend_dict:
-            self.quick_presenter = quick_options(self.legend_dict[target], self)
-        else:
-            self.quick_presenter = quick_options(target, self)
+        if event.mouseevent.dblclick:
+            target = event.artist
+            if target in self.legend_dict:
+                self.quick_presenter = quick_options(self.legend_dict[target], self)
+            else:
+                self.quick_presenter = quick_options(target, self)
 
     def reset_info_checkboxes(self):
         for key, line in six.iteritems(self.slice_plotter.overplot_lines[self.ws_title]):
@@ -465,11 +467,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def set_window_title(self, title):
         self.setWindowTitle(title)
-
-    def closeEvent(self, event):
-        '''Override close event to also close submenus'''
-        if self.quick_presenter is not None:
-            self.quick_presenter.close()
 
     @property
     def title(self):

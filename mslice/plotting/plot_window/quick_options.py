@@ -7,9 +7,6 @@ from PyQt4.QtCore import pyqtSignal
 
 class QuickOptions(QtGui.QDialog):
 
-    ok_clicked = pyqtSignal()
-    cancel_clicked = pyqtSignal()
-
     def __init__(self):
         super(QuickOptions, self).__init__()
         self.layout = QtGui.QVBoxLayout()
@@ -19,8 +16,8 @@ class QuickOptions(QtGui.QDialog):
         self.button_row = QtGui.QHBoxLayout()
         self.button_row.addWidget(self.ok_button)
         self.button_row.addWidget(self.cancel_button)
-        self.ok_button.clicked.connect(self.ok_clicked)
-        self.cancel_button.clicked.connect(self.cancel_clicked)
+        self.ok_button.clicked.connect(self.accept)
+        self.cancel_button.clicked.connect(self.reject)
 
 
 class QuickAxisOptions(QuickOptions):
@@ -50,7 +47,6 @@ class QuickAxisOptions(QuickOptions):
             row3.addWidget(self.log_scale)
             self.layout.addLayout(row3)
         self.layout.addLayout(self.button_row)
-        self.show()
 
     @property
     def range_min(self):
@@ -74,7 +70,6 @@ class QuickLabelOptions(QuickOptions):
         self.layout.addWidget(self.line_edit)
         self.layout.addLayout(self.button_row)
         self.line_edit.show()
-        self.show()
 
     @property
     def label(self):
@@ -100,7 +95,6 @@ class QuickLineOptions(QuickOptions):
         self.layout.addWidget(self.line_widget)
         self.layout.addLayout(self.button_row)
         self.line_widget.show()
-        self.show()
 
     @property
     def color(self):
