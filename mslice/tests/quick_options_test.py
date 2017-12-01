@@ -60,9 +60,10 @@ class QuickLabelTest(unittest.TestCase):
         QuickLabelPresenter(self.view, self.target, self.model)
         self.target.set_text.assert_not_called()
         self.model.canvas.draw.assert_not_called()
-        
+
+
 class QuickLineTest(unittest.TestCase):
-    
+
     def setUp(self):
         self.view = MagicMock()
         self.model = MagicMock()
@@ -83,7 +84,6 @@ class QuickLineTest(unittest.TestCase):
         type(self.view).marker = marker
         label = PropertyMock(return_value=5)
         type(self.view).label = label
-        
 
     def test_accept(self):
         shown = PropertyMock(return_value=True)
