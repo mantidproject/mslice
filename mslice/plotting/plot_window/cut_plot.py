@@ -179,17 +179,6 @@ class CutPlot(object):
             self.lines_visible[line_index] = True
             return True
 
-    def __getattr__(self, name):
-        '''overridden to access shared properties of plot_figure. Called if property lookup fails'''
-        return getattr(self.plot_figure, name)
-
-    def __setattr__(self, name, value):
-        '''overridden to access shared properties of plot_figure. Always called when setting attribute'''
-        try:
-            object.__setattr__(self, name, value)
-        except KeyError:
-            setattr(self.plot_figure, name, value)
-
     @property
     def x_log(self):
         return 'log' in self.canvas.figure.gca().get_xscale()
