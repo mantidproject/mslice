@@ -1,5 +1,3 @@
-from functools import partial
-
 from matplotlib import text
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
 
@@ -72,4 +70,3 @@ class QuickLinePresenter(object):
         self.model.reset_info_checkboxes()
         self.model.update_slice_legend()
         self.model.canvas.draw()
-
