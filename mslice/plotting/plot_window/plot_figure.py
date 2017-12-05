@@ -6,13 +6,16 @@ from mantid.simpleapi import AnalysisDataService
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
+
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QInputDialog, QFileDialog, QPrinter, QPrintDialog, QPixmap, QPainter
+
+from PyQt4 import QtGui
 import numpy as np
 import os.path as path
 import six
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
+from mslice.presenters.quick_options_presenter import quick_options
 
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
@@ -26,11 +29,13 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.legends_shown = True
         self.legends_visible = []
         self.lines_visible = {}
+        self.legend_dict = {}
         self.slice_plotter = None
         self.workspace_title = None
         self.menuIntensity.setDisabled(True)
         self.menuInformation.setDisabled(True)
         self.cif_file = None
+        self.quick_presenter = None
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -82,12 +87,44 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.actionAluminium.triggered.connect(partial(self.toggle_overplot_line, self.actionAluminium,
                                                        'Aluminium', False))
         self.actionCopper.triggered.connect(partial(self.toggle_overplot_line, self.actionCopper,
-                                                    'Copper',  False))
+                                                    'Copper', False))
         self.actionNiobium.triggered.connect(partial(self.toggle_overplot_line, self.actionNiobium,
                                                      'Niobium', False))
         self.actionTantalum.triggered.connect(partial(self.toggle_overplot_line, self.actionTantalum,
                                                       'Tantalum', False))
         self.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
+        self.canvas.mpl_connect('button_press_event', self.plot_clicked)
+        self.canvas.mpl_connect('pick_event', self.object_clicked)
+
+    def plot_clicked(self, event):
+        if event.dblclick:
+            x = event.x
+            y = event.y
+            bounds = self.calc_figure_boundaries()
+            if bounds['x_label'] < y < bounds['title']:
+                if bounds['y_label'] < x < bounds['colorbar_label']:
+                    if y < bounds['x_range']:
+                        self.quick_presenter = quick_options('x_range', self)
+                    elif x < bounds['y_range']:
+                        self.quick_presenter = quick_options('y_range', self)
+                    elif x > bounds['colorbar_range']:
+                        self.quick_presenter = quick_options('colorbar_range', self)
+
+    def object_clicked(self, event):
+        if event.mouseevent.dblclick:
+            target = event.artist
+            if target in self.legend_dict:
+                self.quick_presenter = quick_options(self.legend_dict[target], self)
+            else:
+                self.quick_presenter = quick_options(target, self)
+
+    def reset_info_checkboxes(self):
+        for key, line in six.iteritems(self.slice_plotter.overplot_lines[self.ws_title]):
+            if str(line.get_linestyle()) == 'None':
+                if isinstance(key, int):
+                    key = self.slice_plotter.get_recoil_label(key)
+                action_checked = getattr(self, 'action' + key)
+                action_checked.setChecked(False)
 
     def toggle_overplot_line(self, action, key, recoil, checked, cif_file=None):
         if checked:
@@ -99,14 +136,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def arbitrary_recoil_line(self):
         if self.actionArbitrary_nuclei.isChecked():
-            self.arbitrary_nuclei, confirm = QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
+            self.arbitrary_nuclei, confirm = QtGui.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
         self.toggle_overplot_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei, True)
 
     def cif_file_powder_line(self, checked):
         if checked:
-            cif_path = str(QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
+            cif_path = str(QtGui.QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
             key = path.basename(cif_path).rsplit('.')[0]
             self.cif_file = key
         else:
@@ -115,25 +152,40 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.toggle_overplot_line(self.actionCIF_file, key, False, self.actionCIF_file.isChecked(), cif_file=cif_path)
 
     def update_slice_legend(self):
-        visible_lines = False
+        lines = []
         axes = self.canvas.figure.gca()
         for line in axes.get_lines():
-            if line.get_linestyle() == '-':
-                visible_lines = True
-                break
-        if visible_lines:
+            if str(line.get_linestyle()) != 'None' and line.get_label() != '':
+                lines.append(line)
+        if len(lines) > 0:
             legend = axes.legend(fontsize='small')
-            legend.draggable()
+            for legline, line in zip(legend.get_lines(), lines):
+                legline.set_picker(5)
+                self.legend_dict[legline] = line
+            for label, line in zip(legend.get_texts(), lines):
+                label.set_picker(5)
+                self.legend_dict[label] = line
         else:
             axes.legend_ = None  # remove legend
 
     def _toggle_slice_legend(self):
         axes = self.canvas.figure.gca()
         if axes.legend_ is None:
-            legend = axes.legend(fontsize='small')
-            legend.draggable()
+            self.update_slice_legend()
         else:
             axes.legend_ = None
+
+    def calc_figure_boundaries(self):
+        fig_x, fig_y = self.canvas.figure.get_size_inches() * self.canvas.figure.dpi
+        bounds = {}
+        bounds['y_label'] = fig_x * 0.07
+        bounds['y_range'] = fig_x * 0.12
+        bounds['colorbar_range'] = fig_x * 0.75
+        bounds['colorbar_label'] = fig_x * 0.86
+        bounds['title'] = fig_y * 0.9
+        bounds['x_range'] = fig_y * 0.09
+        bounds['x_label'] = fig_y * 0.05
+        return bounds
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
@@ -184,9 +236,10 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if ws_name[-3:] == '_QE':
             ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
-        temp_field, confirm = QInputDialog.getItem(self, 'Sample Temperature',
-                                                   'Sample Temperature not found. Select the sample temperature field:',
-                                                   ws.run().keys(), False)
+        temp_field, confirm = QtGui.QInputDialog.getItem(self, 'Sample Temperature',
+                                                         'Sample Temperature not found. ' +
+                                                         'Select the sample temperature field:',
+                                                         ws.run().keys(), False)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
@@ -218,15 +271,15 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.canvas.draw()
 
     def print_plot(self):
-        printer = QPrinter()
+        printer = QtGui.QPrinter()
         printer.setResolution(300)
-        printer.setOrientation(QPrinter.Landscape) #  landscape by default
-        print_dialog = QPrintDialog(printer)
+        printer.setOrientation(QtGui.QPrinter.Landscape) #  landscape by default
+        print_dialog = QtGui.QPrintDialog(printer)
         if print_dialog.exec_():
-            pixmap_image = QPixmap.grabWidget(self.canvas)
+            pixmap_image = QtGui.QPixmap.grabWidget(self.canvas)
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
-            painter = QPainter(printer)
+            painter = QtGui.QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
 
@@ -316,7 +369,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
                 if self.get_line_visible(i):
                     elements[1].set_alpha(alpha) #  elements[0] is the actual line, elements[1] is error bars
 
-
     def _toggle_errorbars(self):
         state = self._has_errorbars()
         if state is None:  # No errorbars in this plot
@@ -370,7 +422,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         for line_group in self.canvas.figure.gca().containers:
             line_options = {}
             line = line_group.get_children()[0]
-            line_options['show'] = self.get_line_visible(i)
+            line_options['shown'] = self.get_line_visible(i)
             line_options['color'] = line.get_color()
             line_options['style'] = line.get_linestyle()
             line_options['width'] = str(int(line.get_linewidth()))
@@ -386,7 +438,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             legend, line_options = line
             legends.append(legend)
             line_model = self.canvas.figure.gca().containers[i]
-            self.set_line_visible(i, line_options['show'])
+            self.set_line_visible(i, line_options['shown'])
             for child in line_model.get_children():
                 child.set_color(line_options['color'])
                 child.set_linewidth(line_options['width'])
@@ -399,7 +451,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def set_line_visible(self, line_index, visible):
         self.lines_visible[line_index] = visible
         for child in self.canvas.figure.gca().containers[line_index].get_children():
-            child.set_alpha(visible)
+            child.set_visible(visible)
 
     def get_line_visible(self, line_index):
         try:
@@ -465,14 +517,30 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         return 'log' in self.canvas.figure.gca().get_yscale()
 
     @property
+    def colorbar_label(self):
+        return self.canvas.figure.get_axes()[1].get_ylabel()
+
+    @colorbar_label.setter
+    def colorbar_label(self, value):
+        self.canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
+
+    @property
     def colorbar_range(self):
         return self.canvas.figure.gca().get_images()[0].get_clim()
+
+    @colorbar_range.setter
+    def colorbar_range(self, value):
+        self.change_slice_plot(value, self.colorbar_log)
 
     @property
     def colorbar_log(self):
         mappable = self.canvas.figure.gca().get_images()[0]
         norm = mappable.norm
         return isinstance(norm, colors.LogNorm)
+
+    @colorbar_log.setter
+    def colorbar_log(self, value):
+        self.change_slice_plot(self.colorbar_range, value)
 
     @property
     def error_bars(self):
