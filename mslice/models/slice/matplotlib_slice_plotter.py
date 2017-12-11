@@ -6,6 +6,7 @@ from mslice.app import MPL_COMPAT
 
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
 overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
+picker=5
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
@@ -61,7 +62,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                    interpolation='none', hold=False)
-        plt.title(workspace_name, picker=5)
+        plt.title(workspace_name, picker=picker)
         if self.slice_cache[workspace_name]['rotated']:
             x_axis = energy_axis
             y_axis = momentum_axis
@@ -69,11 +70,11 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_axis = momentum_axis
             y_axis = energy_axis
         comment = self._slice_algorithm.getComment(str(workspace_name))
-        plt.xlabel(self._getDisplayName(x_axis.units, comment), picker=5)
-        plt.ylabel(self._getDisplayName(y_axis.units, comment), picker=5)
+        plt.xlabel(self._getDisplayName(x_axis.units, comment), picker=picker)
+        plt.ylabel(self._getDisplayName(y_axis.units, comment), picker=picker)
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
-        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=5)
+        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
@@ -136,10 +137,10 @@ class MatplotlibSlicePlotter(SlicePlotter):
             color = overplot_colors[key] if key in overplot_colors else 'c'
             if self.slice_cache[workspace]['rotated']:
                 self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label,
-                                                                     alpha=.7, picker=5)[0]
+                                                                     alpha=.7, picker=picker)[0]
             else:
                 self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label,
-                                                                     alpha=.7, picker=5)[0]
+                                                                     alpha=.7, picker=picker)[0]
 
     def hide_overplot_line(self, workspace, key):
         if key in self.overplot_lines[workspace]:

@@ -40,12 +40,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
         self.show()  # is not a good idea in non interactive mode
 
-    def is_slice_figure(self):
-        return bool(self.canvas.figure.gca().get_images())
-
-    def is_cut_figure(self):
-        return not bool(self.canvas.figure.gca().get_images())
-
     def add_slice_plot(self, slice_plotter):
         self.plot_handler = SlicePlot(self, self.canvas, slice_plotter)
 
@@ -56,26 +50,27 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.plot_handler.toggle_legend()
 
     def plot_clicked(self, event):
-        x = event.x
-        y = event.y
-        bounds = self.calc_figure_boundaries()
-        if bounds['x_label'] < y < bounds['title']:
-            if bounds['y_label'] < x < bounds['colorbar_label']:
-                if y < bounds['x_range']:
-                    self.quick_presenter = quick_options('x_range', self)
-                elif x < bounds['y_range']:
-                    self.quick_presenter = quick_options('y_range', self)
-                elif x > bounds['colorbar_range']:
-                    self.quick_presenter = quick_options('colorbar_range', self)
+        if event.dblclick:
+            x = event.x
+            y = event.y
+            bounds = self.calc_figure_boundaries()
+            if bounds['x_label'] < y < bounds['title']:
+                if bounds['y_label'] < x < bounds['colorbar_label']:
+                    if y < bounds['x_range']:
+                        self.quick_presenter = quick_options('x_range', self)
+                    elif x < bounds['y_range']:
+                        self.quick_presenter = quick_options('y_range', self)
+                    elif x > bounds['colorbar_range']:
+                        self.quick_presenter = quick_options('colorbar_range', self)
 
     def object_clicked(self, event):
-        target = event.artist
-        print(self.legend_dict)
-        if target in self.legend_dict:
-            self.quick_presenter = quick_options(self.legend_dict[target], self)
-        else:
-            self.quick_presenter = quick_options(target, self)
-        self.plot_handler.post_click_event()
+        if event.mouseevent.dblclick:
+            target = event.artist
+            if target in self.legend_dict:
+                self.quick_presenter = quick_options(self.legend_dict[target], self)
+            else:
+                self.quick_presenter = quick_options(target, self)
+            self.plot_handler.post_click_event()
 
     def calc_figure_boundaries(self):
         fig_x, fig_y = self.canvas.figure.get_size_inches() * self.canvas.figure.dpi
@@ -126,11 +121,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def set_window_title(self, title):
         self.setWindowTitle(title)
-
-    def closeEvent(self, event):
-        '''Override close event to also close submenus'''
-        if self.quick_presenter is not None:
-            self.quick_presenter.close()
 
     @property
     def title(self):
