@@ -88,6 +88,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if self.actionDataCursor.isChecked():
             self.stock_toolbar.message.connect(self.statusbar.showMessage)
             self.canvas.setCursor(Qt.CrossCursor)
+
         else:
             self.stock_toolbar.message.disconnect()
             self.canvas.setCursor(Qt.ArrowCursor)

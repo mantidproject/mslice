@@ -120,7 +120,6 @@ class SlicePlot(object):
                 lines.append(line)
         if len(lines) > 0:
             legend = axes.legend(fontsize='small')
-            legend.draggable()
             for legline, line in zip(legend.get_lines(), lines):
                 legline.set_picker(5)
                 self.plot_figure.legend_dict[legline] = line

@@ -15,7 +15,7 @@ class QuickAxisTest(unittest.TestCase):
         range_max = PropertyMock(return_value=10)
         type(self.view).range_max = range_max
 
-    def test__accept(self):
+    def test_accept(self):
         self.view.exec_ = MagicMock(return_value=True)
         QuickAxisPresenter(self.view, 'x_range', self.model)
         self.model.canvas.draw.assert_called_once()
