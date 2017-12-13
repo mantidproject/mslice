@@ -74,7 +74,7 @@ class SlicePlot(object):
                 elif x < bounds['y_range']:
                     self._quick_presenter = quick_options('y_range', self)
                 elif x > bounds['colorbar_range']:
-                    self._quick_presenter = quick_options('colorbar_range', self)
+                    self._quick_presenter = quick_options('colorbar_range', self, self.colorbar_log)
             self._canvas.draw()
 
     def object_clicked(self, target):

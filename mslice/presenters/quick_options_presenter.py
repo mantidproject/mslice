@@ -1,14 +1,13 @@
 from matplotlib import text
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
 
-def quick_options(target, model):
+def quick_options(target, model, log=None):
     if isinstance(target, text.Text):
         view = QuickLabelOptions(target)
         return QuickLabelPresenter(view, target, model)
     elif isinstance(target, str):
-        log = model.colorbar_log if target == 'colorbar_range' else None
         view = QuickAxisOptions(target, getattr(model, target), log)
-        return QuickAxisPresenter(view, target, model)
+        return QuickAxisPresenter(view, target, model, log)
     else:
         view = QuickLineOptions(target)
         return QuickLinePresenter(view, target, model)
@@ -16,20 +15,19 @@ def quick_options(target, model):
 
 class QuickAxisPresenter(object):
 
-    def __init__(self, view, target, model):
+    def __init__(self, view, target, model, log):
         self.view = view
         self.type = type
         self.model = model
         accepted = self.view.exec_()
         if accepted:
-            self.set_range(target)
+            self.set_range(target, log)
 
-    def set_range(self, target):
+    def set_range(self, target, log):
         range = (float(self.view.range_min), float(self.view.range_max))
         setattr(self.model, target, range)
-        if target == 'colorbar_range':
-            self.model.colorbar_log = self.view.log_scale.isChecked()
-
+        if log is not None:
+            setattr(self.model, target[:-5] + 'log', self.view.log_scale.isChecked())
 
 
 class QuickLabelPresenter(object):

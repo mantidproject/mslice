@@ -4,6 +4,7 @@ from matplotlib.container import ErrorbarContainer
 import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
+from mslice.presenters.quick_options_presenter import quick_options
 from .plot_options import CutPlotOptions
 
 
@@ -19,6 +20,7 @@ class CutPlot(object):
         self._legend_dict = {}
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
+        np.seterr(invalid='ignore')
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
@@ -26,10 +28,32 @@ class CutPlot(object):
             self._canvas.draw()
 
     def object_clicked(self, target):
-        pass  # not yet implemented
+        if target in self._legend_dict:
+            self._quick_presenter = quick_options(self._legend_dict[target], self)
+        else:
+            self._quick_presenter = quick_options(target, self)
+        # self.update_legend()
+        self._canvas.draw()
 
     def plot_clicked(self, x, y):
-        pass  # not yet implemented
+        bounds = self.calc_figure_boundaries()
+        if bounds['x_label'] < y < bounds['title']:
+            if bounds['y_label'] < x:
+                if y < bounds['x_range']:
+                    self._quick_presenter = quick_options('x_range', self, self.x_log)
+                elif x < bounds['y_range']:
+                    self._quick_presenter = quick_options('y_range', self, self.y_log)
+            self._canvas.draw()
+
+    def calc_figure_boundaries(self):
+        fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
+        bounds = {}
+        bounds['y_label'] = fig_x * 0.07
+        bounds['y_range'] = fig_x * 0.12
+        bounds['title'] = fig_y * 0.9
+        bounds['x_range'] = fig_y * 0.09
+        bounds['x_label'] = fig_y * 0.05
+        return bounds
 
     @staticmethod
     def get_min(data, absolute_minimum=-np.inf):
@@ -42,6 +66,9 @@ class CutPlot(object):
             except ValueError:  # If data is empty or not array of numbers
                 pass
         return np.min(running_min) if running_min else absolute_minimum
+
+    def xy_config(self):
+        return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
 
     def change_axis_scale(self, xy_config):
         current_axis = self._canvas.figure.gca()
@@ -189,9 +216,23 @@ class CutPlot(object):
     def x_log(self):
         return 'log' in self._canvas.figure.gca().get_xscale()
 
+    @x_log.setter
+    def x_log(self, value):
+        config = self.xy_config()
+        config['x_log'] = value
+        self.change_axis_scale(config)
+        self._canvas.draw()
+
     @property
     def y_log(self):
         return 'log' in self._canvas.figure.gca().get_yscale()
+
+    @y_log.setter
+    def y_log(self, value):
+        config = self.xy_config()
+        config['y_log'] = value
+        self.change_axis_scale(config)
+        self._canvas.draw()
 
     @property
     def error_bars(self):
