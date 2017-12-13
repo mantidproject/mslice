@@ -163,4 +163,3 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     @y_range.setter
     def y_range(self, value):
         self.canvas.figure.gca().set_ylim(value)
-

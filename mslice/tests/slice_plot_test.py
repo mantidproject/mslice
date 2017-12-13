@@ -20,7 +20,7 @@ class SlicePlotTest(unittest.TestCase):
         norm = PropertyMock(return_value = colors.Normalize)
         type(image).norm = norm
         self.axes.get_images = MagicMock(return_value=[image])
-        self.slice_plot.change_slice_plot((0,10), True)
+        self.slice_plot.change_axis_scale((0, 10), True)
         image.set_norm.assert_called_once()
         norm_set = image.set_norm.call_args_list[0][0][0]
         self.assertEqual(norm_set.vmin, 0.001)
@@ -33,10 +33,27 @@ class SlicePlotTest(unittest.TestCase):
         norm = PropertyMock(return_value=colors.LogNorm)
         type(image).norm = norm
         self.axes.get_images = MagicMock(return_value=[image])
-        self.slice_plot.change_slice_plot((0, 15), False)
+        self.slice_plot.change_axis_scale((0, 15), False)
         image.set_norm.assert_called_once()
         norm_set = image.set_norm.call_args_list[0][0][0]
         self.assertEqual(norm_set.vmin, 0)
         self.assertEqual(norm_set.vmax, 15)
         self.assertEqual(type(norm_set), colors.Normalize)
         image.set_clim.assert_called_once_with((0, 15))
+
+    def test_reset_checkboxes(self):
+        self.slice_plot.ws_title = 'title'
+        line1 = MagicMock()
+        line2 = MagicMock()
+        line1.get_linestyle = MagicMock(return_value='None')
+        line2.get_linestyle = MagicMock(return_value = '-')
+        self.slice_plotter.overplot_lines.__getitem__ = MagicMock(return_value={0: line1, 1: line2})
+        self.slice_plotter.get_recoil_label = MagicMock()
+        self.slice_plotter.get_recoil_label.side_effect = ['0', '1']
+        action0 = PropertyMock()
+        type(self.slice_plot).action0 = action0
+        action1 = PropertyMock()
+        type(self.slice_plot).action1 = action1
+        self.slice_plot.reset_info_checkboxes()
+        self.slice_plot.action0.setChecked.assert_called_once_with(False)
+        self.slice_plot.action1.setChecked.assert_not_called()

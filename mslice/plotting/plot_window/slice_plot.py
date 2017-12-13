@@ -11,7 +11,7 @@ from .plot_options import SlicePlotOptions
 
 
 class SlicePlot(object):
-    
+
     def __init__(self, plot_figure, canvas, slice_plotter):
         self.plot_figure = plot_figure
         self.canvas = canvas
@@ -19,33 +19,42 @@ class SlicePlot(object):
         self.ws_title = plot_figure.title
         self.arbitrary_nuclei = None
         self.cif_file = None
-    
+
         plot_figure.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionS_Q_E,
-                                                   self.slice_plotter.show_scattering_function, False))
+                                                          self.slice_plotter.show_scattering_function, False))
         plot_figure.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionChi_Q_E,
-                                                     self.slice_plotter.show_dynamical_susceptibility, True))
-        plot_figure.actionChi_Q_E_magnetic.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionChi_Q_E_magnetic,
-                                                              self.slice_plotter.show_dynamical_susceptibility_magnetic,
-                                                              True))
-        plot_figure.actionD2sigma_dOmega_dE.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionD2sigma_dOmega_dE,
-                                                               self.slice_plotter.show_d2sigma, False))
-        plot_figure.actionSymmetrised_S_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionSymmetrised_S_Q_E,
-                                                               self.slice_plotter.show_symmetrised, True))
+                                                            self.slice_plotter.show_dynamical_susceptibility, True))
+
+        plot_figure.actionChi_Q_E_magnetic.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.actionChi_Q_E_magnetic,
+                    self.slice_plotter.show_dynamical_susceptibility_magnetic, True))
+
+        plot_figure.actionD2sigma_dOmega_dE.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.actionD2sigma_dOmega_dE,
+                    self.slice_plotter.show_d2sigma, False))
+
+        plot_figure.actionSymmetrised_S_Q_E.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.actionSymmetrised_S_Q_E,
+                    self.slice_plotter.show_symmetrised, True))
+
         plot_figure.actionGDOS.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionGDOS,
-                                                  self.slice_plotter.show_gdos, True))
+                                                         self.slice_plotter.show_gdos, True))
     
-        plot_figure.actionHydrogen.triggered.connect(partial(self.toggle_overplot_line, plot_figure.actionHydrogen, 1, True))
-        plot_figure.actionDeuterium.triggered.connect(partial(self.toggle_overplot_line, plot_figure.actionDeuterium, 2, True))
-        plot_figure.actionHelium.triggered.connect(partial(self.toggle_overplot_line, plot_figure.actionHelium, 4, True))
+        plot_figure.actionHydrogen.triggered.connect(
+            partial(self.toggle_overplot_line, plot_figure.actionHydrogen, 1, True))
+        plot_figure.actionDeuterium.triggered.connect(
+            partial(self.toggle_overplot_line, plot_figure.actionDeuterium, 2, True))
+        plot_figure.actionHelium.triggered.connect(
+            partial(self.toggle_overplot_line, plot_figure.actionHelium, 4, True))
         plot_figure.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
-        plot_figure.actionAluminium.triggered.connect(partial(self.toggle_overplot_line, plot_figure.actionAluminium,
-                                                       'Aluminium', False))
-        plot_figure.actionCopper.triggered.connect(partial(self.toggle_overplot_line, plot_figure.actionCopper,
-                                                    'Copper', False))
-        plot_figure.actionNiobium.triggered.connect(partial(self.toggle_overplot_line, plot_figure.actionNiobium,
-                                                     'Niobium', False))
-        plot_figure.actionTantalum.triggered.connect(partial(self.toggle_overplot_line, plot_figure.actionTantalum,
-                                                      'Tantalum', False))
+        plot_figure.actionAluminium.triggered.connect(
+            partial(self.toggle_overplot_line, plot_figure.actionAluminium, 'Aluminium', False))
+        plot_figure.actionCopper.triggered.connect(
+            partial(self.toggle_overplot_line, plot_figure.actionCopper, 'Copper', False))
+        plot_figure.actionNiobium.triggered.connect(
+            partial(self.toggle_overplot_line, plot_figure.actionNiobium, 'Niobium', False))
+        plot_figure.actionTantalum.triggered.connect(
+            partial(self.toggle_overplot_line, plot_figure.actionTantalum, 'Tantalum', False))
         plot_figure.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
 
     def plot_options(self):
@@ -57,7 +66,7 @@ class SlicePlot(object):
         self.reset_info_checkboxes()
         self.update_legend()
 
-    def change_slice_plot(self, colorbar_range, logarithmic):
+    def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self.canvas.figure.gca()
         images = current_axis.get_images()
         if len(images) != 1:
@@ -159,7 +168,7 @@ class SlicePlot(object):
                     return
             else:
                 slice_plotter_method(self.ws_title)
-            self.change_slice_plot(self.colorbar_range, cbar_log)
+            self.change_axis_scale(self.colorbar_range, cbar_log)
             self.x_range = x_range
             self.y_range = y_range
             self.title = title
@@ -208,7 +217,7 @@ class SlicePlot(object):
 
     @colorbar_range.setter
     def colorbar_range(self, value):
-        self.change_slice_plot(value, self.colorbar_log)
+        self.change_axis_scale(value, self.colorbar_log)
 
     @property
     def colorbar_log(self):
@@ -218,7 +227,7 @@ class SlicePlot(object):
 
     @colorbar_log.setter
     def colorbar_log(self, value):
-        self.change_slice_plot(self.colorbar_range, value)
+        self.change_axis_scale(self.colorbar_range, value)
 
     @property
     def title(self):

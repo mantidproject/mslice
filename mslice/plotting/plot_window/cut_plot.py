@@ -37,7 +37,7 @@ class CutPlot(object):
                 pass
         return np.min(running_min) if running_min else absolute_minimum
 
-    def change_cut_plot(self, xy_config):
+    def change_axis_scale(self, xy_config):
         current_axis = self.canvas.figure.gca()
         if xy_config['x_log']:
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
