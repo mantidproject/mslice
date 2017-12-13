@@ -17,7 +17,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     def __init__(self, number, manager):
         super(PlotFigureManager, self).__init__(number, manager)
 
-        self.plot_handler = None
+        self._plot_handler = None
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -38,21 +38,21 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self.show()  # is not a good idea in non interactive mode
 
     def add_slice_plot(self, slice_plotter):
-        self.plot_handler = SlicePlot(self, self.canvas, slice_plotter)
+        self._plot_handler = SlicePlot(self, self.canvas, slice_plotter)
 
     def add_cut_plot(self, cut_plotter):
-        self.plot_handler = CutPlot(self, self.canvas, cut_plotter)
+        self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
 
     def _toggle_legend(self):
-        self.plot_handler.toggle_legend()
+        self._plot_handler.toggle_legend()
 
     def plot_clicked(self, event):
         if event.dblclick:
-            self.plot_handler.plot_clicked(event.x, event.y)
+            self._plot_handler.plot_clicked(event.x, event.y)
 
     def object_clicked(self, event):
         if event.mouseevent.dblclick:
-            self.plot_handler.object_clicked(event.artist)
+            self._plot_handler.object_clicked(event.artist)
 
     def toggle_data_cursor(self):
         if self.actionDataCursor.isChecked():
@@ -72,7 +72,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.actionKeep.setChecked(False)
 
     def _plot_options(self):
-        self.plot_handler.plot_options()
+        self._plot_handler.plot_options()
 
     def print_plot(self):
         printer = QtGui.QPrinter()

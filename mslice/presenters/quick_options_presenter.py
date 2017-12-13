@@ -29,7 +29,7 @@ class QuickAxisPresenter(object):
         setattr(self.model, target, range)
         if target == 'colorbar_range':
             self.model.colorbar_log = self.view.log_scale.isChecked()
-        self.model.canvas.draw()
+
 
 
 class QuickLabelPresenter(object):
@@ -44,7 +44,6 @@ class QuickLabelPresenter(object):
 
     def set_label(self):
         self.target.set_text(self.view.label)
-        self.model.canvas.draw()
 
 
 class QuickLinePresenter(object):
@@ -67,4 +66,3 @@ class QuickLinePresenter(object):
             line.set_linestyle('')
         if not self.view.legend:
             line.set_label('')
-        self.model.canvas.draw()

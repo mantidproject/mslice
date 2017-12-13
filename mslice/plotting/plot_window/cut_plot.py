@@ -11,19 +11,19 @@ class CutPlot(object):
 
     def __init__(self, plot_figure, canvas, cut_plotter):
         self.plot_figure = plot_figure
-        self.canvas = canvas
-        self.cut_plotter = cut_plotter
-        self.lines_visible = {}
-        self.legends_shown = True
-        self.legends_visible = []
-        self.legend_dict = {}
+        self._canvas = canvas
+        self._cut_plotter = cut_plotter
+        self._lines_visible = {}
+        self._legends_shown = True
+        self._legends_visible = []
+        self._legend_dict = {}
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
         if new_config:
-            self.canvas.draw()
+            self._canvas.draw()
 
     def object_clicked(self, target):
         pass  # not yet implemented
@@ -44,7 +44,7 @@ class CutPlot(object):
         return np.min(running_min) if running_min else absolute_minimum
 
     def change_axis_scale(self, xy_config):
-        current_axis = self.canvas.figure.gca()
+        current_axis = self._canvas.figure.gca()
         if xy_config['x_log']:
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
             xmin = self.get_min(xdata, absolute_minimum=0.)
@@ -67,7 +67,7 @@ class CutPlot(object):
     def _has_errorbars(self):
         """True current axes has visible errorbars,
          False if current axes has hidden errorbars"""
-        current_axis = self.canvas.figure.gca()
+        current_axis = self._canvas.figure.gca()
         # If all the error bars have alpha= 0 they are all transparent (hidden)
         containers = [x for x in current_axis.containers if isinstance(x, ErrorbarContainer)]
         line_components = [x.get_children() for x in containers]
@@ -85,7 +85,7 @@ class CutPlot(object):
 
     def _set_errorbars_shown_state(self, state):
         """Show errrorbar if state = 1, hide if state = 0"""
-        current_axis = self.canvas.figure.gca()
+        current_axis = self._canvas.figure.gca()
         if state:
             alpha = 1
         else:
@@ -103,23 +103,23 @@ class CutPlot(object):
         self._set_errorbars_shown_state(not state)
 
     def get_legends(self):
-        current_axis = self.canvas.figure.gca()
+        current_axis = self._canvas.figure.gca()
         legends = []
         labels = current_axis.get_legend_handles_labels()[1]
         for i in range(len(labels)):
             try:
-                v = self.legends_visible[i]
+                v = self._legends_visible[i]
             except IndexError:
                 v = True
-                self.legends_visible.append(True)
+                self._legends_visible.append(True)
             legends.append({'label': labels[i], 'visible': v})
         return legends
 
     def set_legends(self, legends):
-        current_axes = self.canvas.figure.gca()
+        current_axes = self._canvas.figure.gca()
         if current_axes.legend_:
             current_axes.legend_.remove()  # remove old legends
-        if legends is None or not self.legends_shown:
+        if legends is None or not self._legends_shown:
             return
         labels = []
         handles_to_show = []
@@ -130,20 +130,20 @@ class CutPlot(object):
             if legends[i]['visible']:
                 handles_to_show.append(handles[i])
                 labels.append(legends[i]['label'])
-            self.legends_visible[i] = legends[i]['visible']
+            self._legends_visible[i] = legends[i]['visible']
         x = current_axes.legend(handles_to_show, labels)  # add new legends
         x.draggable()
 
     def toggle_legend(self):
-        self.legends_shown = not self.legends_shown
+        self._legends_shown = not self._legends_shown
         self.set_legends(self.get_legends())
-        self.canvas.draw()
+        self._canvas.draw()
 
     def get_line_data(self):
         legends = self.get_legends()
         all_line_options = []
         i = 0
-        for line_group in self.canvas.figure.gca().containers:
+        for line_group in self._canvas.figure.gca().containers:
             line_options = {}
             line = line_group.get_children()[0]
             line_options['shown'] = self.get_line_visible(i)
@@ -161,7 +161,7 @@ class CutPlot(object):
         for line in line_data:
             legend, line_options = line
             legends.append(legend)
-            line_model = self.canvas.figure.gca().containers[i]
+            line_model = self._canvas.figure.gca().containers[i]
             self.set_line_visible(i, line_options['shown'])
             for child in line_model.get_children():
                 child.set_color(line_options['color'])
@@ -173,25 +173,25 @@ class CutPlot(object):
         self.set_legends(legends)
 
     def set_line_visible(self, line_index, visible):
-        self.lines_visible[line_index] = visible
-        for child in self.canvas.figure.gca().containers[line_index].get_children():
+        self._lines_visible[line_index] = visible
+        for child in self._canvas.figure.gca().containers[line_index].get_children():
             child.set_visible(visible)
 
     def get_line_visible(self, line_index):
         try:
-            ret = self.lines_visible[line_index]
+            ret = self._lines_visible[line_index]
             return ret
         except KeyError:
-            self.lines_visible[line_index] = True
+            self._lines_visible[line_index] = True
             return True
 
     @property
     def x_log(self):
-        return 'log' in self.canvas.figure.gca().get_xscale()
+        return 'log' in self._canvas.figure.gca().get_xscale()
 
     @property
     def y_log(self):
-        return 'log' in self.canvas.figure.gca().get_yscale()
+        return 'log' in self._canvas.figure.gca().get_yscale()
 
     @property
     def error_bars(self):
@@ -203,11 +203,11 @@ class CutPlot(object):
 
     @property
     def show_legends(self):
-        return self.legends_shown
+        return self._legends_shown
 
     @show_legends.setter
     def show_legends(self, value):
-        self.legends_shown = value
+        self._legends_shown = value
 
     @property
     def title(self):

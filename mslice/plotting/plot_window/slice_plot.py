@@ -15,33 +15,33 @@ class SlicePlot(object):
 
     def __init__(self, plot_figure, canvas, slice_plotter):
         self.plot_figure = plot_figure
-        self.canvas = canvas
-        self.slice_plotter = slice_plotter
-        self.ws_title = plot_figure.title
-        self.arbitrary_nuclei = None
-        self.cif_file = None
-        self.quick_presenter = None
-        self.legend_dict = {}
+        self._canvas = canvas
+        self._slice_plotter = slice_plotter
+        self._ws_title = plot_figure.title
+        self._arbitrary_nuclei = None
+        self._cif_file = None
+        self._quick_presenter = None
+        self._legend_dict = {}
 
         plot_figure.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionS_Q_E,
-                                                          self.slice_plotter.show_scattering_function, False))
+                                                          self._slice_plotter.show_scattering_function, False))
         plot_figure.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionChi_Q_E,
-                                                            self.slice_plotter.show_dynamical_susceptibility, True))
+                                                            self._slice_plotter.show_dynamical_susceptibility, True))
 
         plot_figure.actionChi_Q_E_magnetic.triggered.connect(
             partial(self.show_intensity_plot, plot_figure.actionChi_Q_E_magnetic,
-                    self.slice_plotter.show_dynamical_susceptibility_magnetic, True))
+                    self._slice_plotter.show_dynamical_susceptibility_magnetic, True))
 
         plot_figure.actionD2sigma_dOmega_dE.triggered.connect(
             partial(self.show_intensity_plot, plot_figure.actionD2sigma_dOmega_dE,
-                    self.slice_plotter.show_d2sigma, False))
+                    self._slice_plotter.show_d2sigma, False))
 
         plot_figure.actionSymmetrised_S_Q_E.triggered.connect(
             partial(self.show_intensity_plot, plot_figure.actionSymmetrised_S_Q_E,
-                    self.slice_plotter.show_symmetrised, True))
+                    self._slice_plotter.show_symmetrised, True))
 
         plot_figure.actionGDOS.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionGDOS,
-                                                         self.slice_plotter.show_gdos, True))
+                                                         self._slice_plotter.show_gdos, True))
 
         plot_figure.actionHydrogen.triggered.connect(
             partial(self.toggle_overplot_line, plot_figure.actionHydrogen, 1, True))
@@ -63,29 +63,31 @@ class SlicePlot(object):
     def plot_options(self):
         new_config = SlicePlotOptionsPresenter(SlicePlotOptions(), self).get_new_config()
         if new_config:
-            self.canvas.draw()
+            self._canvas.draw()
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
         if bounds['x_label'] < y < bounds['title']:
             if bounds['y_label'] < x < bounds['colorbar_label']:
                 if y < bounds['x_range']:
-                    self.quick_presenter = quick_options('x_range', self)
+                    self._quick_presenter = quick_options('x_range', self)
                 elif x < bounds['y_range']:
-                    self.quick_presenter = quick_options('y_range', self)
+                    self._quick_presenter = quick_options('y_range', self)
                 elif x > bounds['colorbar_range']:
-                    self.quick_presenter = quick_options('colorbar_range', self)
+                    self._quick_presenter = quick_options('colorbar_range', self)
+            self._canvas.draw()
 
     def object_clicked(self, target):
-        if target in self.legend_dict:
-            self.quick_presenter = quick_options(self.legend_dict[target], self)
+        if target in self._legend_dict:
+            self._quick_presenter = quick_options(self._legend_dict[target], self)
         else:
-            self.quick_presenter = quick_options(target, self)
-        self.post_click_event()
-        self.canvas.draw()
+            self._quick_presenter = quick_options(target, self)
+        self.reset_info_checkboxes()
+        self.update_legend()
+        self._canvas.draw()
 
     def calc_figure_boundaries(self):
-        fig_x, fig_y = self.canvas.figure.get_size_inches() * self.canvas.figure.dpi
+        fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
         bounds = {}
         bounds['y_label'] = fig_x * 0.07
         bounds['y_range'] = fig_x * 0.12
@@ -96,12 +98,8 @@ class SlicePlot(object):
         bounds['x_label'] = fig_y * 0.05
         return bounds
 
-    def post_click_event(self):
-        self.reset_info_checkboxes()
-        self.update_legend()
-
     def change_axis_scale(self, colorbar_range, logarithmic):
-        current_axis = self.canvas.figure.gca()
+        current_axis = self._canvas.figure.gca()
         images = current_axis.get_images()
         if len(images) != 1:
             raise RuntimeError("Expected single image on axes, found " + str(len(images)))
@@ -113,51 +111,51 @@ class SlicePlot(object):
                 vmin = 0.001
             norm = colors.LogNorm(vmin, vmax)
             mappable.set_norm(norm)
-            self.canvas.figure.colorbar(mappable)
+            self._canvas.figure.colorbar(mappable)
         elif not logarithmic and type(mappable.norm) != colors.Normalize:
             mappable.colorbar.remove()
             norm = colors.Normalize(vmin, vmax)
             mappable.set_norm(norm)
-            self.canvas.figure.colorbar(mappable)
+            self._canvas.figure.colorbar(mappable)
         mappable.set_clim((vmin, vmax))
 
     def reset_info_checkboxes(self):
-        for key, line in six.iteritems(self.slice_plotter.overplot_lines[self.ws_title]):
+        for key, line in six.iteritems(self._slice_plotter.overplot_lines[self._ws_title]):
             if str(line.get_linestyle()) == 'None':
                 if isinstance(key, int):
-                    key = self.slice_plotter.get_recoil_label(key)
+                    key = self._slice_plotter.get_recoil_label(key)
                 action_checked = getattr(self, 'action' + key)
                 action_checked.setChecked(False)
 
     def toggle_overplot_line(self, action, key, recoil, checked, cif_file=None):
         if checked:
-            self.slice_plotter.add_overplot_line(self.ws_title, key, recoil, cif_file)
+            self._slice_plotter.add_overplot_line(self._ws_title, key, recoil, cif_file)
         else:
-            self.slice_plotter.hide_overplot_line(self.ws_title, key)
+            self._slice_plotter.hide_overplot_line(self._ws_title, key)
         self.update_legend()
-        self.canvas.draw()
+        self._canvas.draw()
 
     def arbitrary_recoil_line(self):
         if self.plot_figure.actionArbitrary_nuclei.isChecked():
-            self.arbitrary_nuclei, confirm = QtGui.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
+            self._arbitrary_nuclei, confirm = QtGui.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
-        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self.arbitrary_nuclei, True)
+        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self._arbitrary_nuclei, True)
 
     def cif_file_powder_line(self, checked):
         if checked:
             cif_path = str(QtGui.QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
             key = path.basename(cif_path).rsplit('.')[0]
-            self.cif_file = key
+            self._cif_file = key
         else:
-            key = self.cif_file
+            key = self._cif_file
             cif_path = None
         self.toggle_overplot_line(self.plot_figure.actionCIF_file, key, False,
                                   self.plot_figure.actionCIF_file.isChecked(), cif_file=cif_path)
 
     def update_legend(self):
         lines = []
-        axes = self.canvas.figure.gca()
+        axes = self._canvas.figure.gca()
         for line in axes.get_lines():
             if str(line.get_linestyle()) != 'None' and line.get_label() != '':
                 lines.append(line)
@@ -165,15 +163,15 @@ class SlicePlot(object):
             legend = axes.legend(fontsize='small')
             for legline, line in zip(legend.get_lines(), lines):
                 legline.set_picker(5)
-                self.legend_dict[legline] = line
+                self._legend_dict[legline] = line
             for label, line in zip(legend.get_texts(), lines):
                 label.set_picker(5)
-                self.legend_dict[label] = line
+                self._legend_dict[label] = line
         else:
             axes.legend_ = None  # remove legend
 
     def toggle_legend(self):
-        axes = self.canvas.figure.gca()
+        axes = self._canvas.figure.gca()
         if axes.legend_ is None:
             self.update_legend()
         else:
@@ -201,27 +199,27 @@ class SlicePlot(object):
                 if not self._run_temp_dependent(slice_plotter_method, previous):
                     return
             else:
-                slice_plotter_method(self.ws_title)
+                slice_plotter_method(self._ws_title)
             self.change_axis_scale(self.colorbar_range, cbar_log)
             self.x_range = x_range
             self.y_range = y_range
             self.title = title
-            self.canvas.draw()
+            self._canvas.draw()
         else:
             action.setChecked(True)
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         try:
-            slice_plotter_method(self.ws_title)
+            slice_plotter_method(self._ws_title)
         except ValueError:  # sample temperature not yet set
             try:
-                field = self.ask_sample_temperature_field(str(self.ws_title))
+                field = self.ask_sample_temperature_field(str(self._ws_title))
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.intensity_selection(previous)
                 return False
-            self.slice_plotter.add_sample_temperature_field(field)
-            self.slice_plotter.update_sample_temperature(self.ws_title)
-            slice_plotter_method(self.ws_title)
+            self._slice_plotter.add_sample_temperature_field(field)
+            self._slice_plotter.update_sample_temperature(self._ws_title)
+            slice_plotter_method(self._ws_title)
         return True
 
     def ask_sample_temperature_field(self, ws_name):
@@ -239,15 +237,15 @@ class SlicePlot(object):
 
     @property
     def colorbar_label(self):
-        return self.canvas.figure.get_axes()[1].get_ylabel()
+        return self._canvas.figure.get_axes()[1].get_ylabel()
 
     @colorbar_label.setter
     def colorbar_label(self, value):
-        self.canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
+        self._canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
 
     @property
     def colorbar_range(self):
-        return self.canvas.figure.gca().get_images()[0].get_clim()
+        return self._canvas.figure.gca().get_images()[0].get_clim()
 
     @colorbar_range.setter
     def colorbar_range(self, value):
@@ -255,7 +253,7 @@ class SlicePlot(object):
 
     @property
     def colorbar_log(self):
-        mappable = self.canvas.figure.gca().get_images()[0]
+        mappable = self._canvas.figure.gca().get_images()[0]
         norm = mappable.norm
         return isinstance(norm, colors.LogNorm)
 

@@ -42,7 +42,7 @@ class SlicePlotTest(unittest.TestCase):
         image.set_clim.assert_called_once_with((0, 15))
 
     def test_reset_checkboxes(self):
-        self.slice_plot.ws_title = 'title'
+        self.slice_plot._ws_title = 'title'
         line1 = MagicMock()
         line2 = MagicMock()
         line1.get_linestyle = MagicMock(return_value='None')
