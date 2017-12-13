@@ -149,7 +149,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter._xy_config_modified('y_log')
         self.presenter.get_new_config()
         self.model.change_axis_scale.assert_called_once_with({'x_range': (1, 2), 'y_range': (3, 4), 'modified': True,
-                                                            'x_log': False,    'y_log': True})
+                                                              'x_log': False,    'y_log': True})
 
     def test_show_error_bars(self):
         view_error_bars_mock = PropertyMock()
