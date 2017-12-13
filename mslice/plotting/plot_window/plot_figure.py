@@ -8,7 +8,6 @@ import six
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
-from mslice.presenters.quick_options_presenter import quick_options
 
 from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
@@ -19,8 +18,6 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         super(PlotFigureManager, self).__init__(number, manager)
 
         self.plot_handler = None
-        self.quick_presenter = None
-        self.legend_dict = {}
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -51,38 +48,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def plot_clicked(self, event):
         if event.dblclick:
-            x = event.x
-            y = event.y
-            bounds = self.calc_figure_boundaries()
-            if bounds['x_label'] < y < bounds['title']:
-                if bounds['y_label'] < x < bounds['colorbar_label']:
-                    if y < bounds['x_range']:
-                        self.quick_presenter = quick_options('x_range', self)
-                    elif x < bounds['y_range']:
-                        self.quick_presenter = quick_options('y_range', self)
-                    elif x > bounds['colorbar_range']:
-                        self.quick_presenter = quick_options('colorbar_range', self)
+            self.plot_handler.plot_clicked(event.x, event.y)
 
     def object_clicked(self, event):
         if event.mouseevent.dblclick:
-            target = event.artist
-            if target in self.legend_dict:
-                self.quick_presenter = quick_options(self.legend_dict[target], self)
-            else:
-                self.quick_presenter = quick_options(target, self)
-            self.plot_handler.post_click_event()
-
-    def calc_figure_boundaries(self):
-        fig_x, fig_y = self.canvas.figure.get_size_inches() * self.canvas.figure.dpi
-        bounds = {}
-        bounds['y_label'] = fig_x * 0.07
-        bounds['y_range'] = fig_x * 0.12
-        bounds['colorbar_range'] = fig_x * 0.75
-        bounds['colorbar_label'] = fig_x * 0.86
-        bounds['title'] = fig_y * 0.9
-        bounds['x_range'] = fig_y * 0.09
-        bounds['x_label'] = fig_y * 0.05
-        return bounds
+            self.plot_handler.object_clicked(event.artist)
 
     def toggle_data_cursor(self):
         if self.actionDataCursor.isChecked():

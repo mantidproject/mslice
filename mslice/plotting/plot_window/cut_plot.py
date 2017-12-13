@@ -25,6 +25,12 @@ class CutPlot(object):
         if new_config:
             self.canvas.draw()
 
+    def object_clicked(self, target):
+        pass  # not yet implemented
+
+    def plot_clicked(self, x, y):
+        pass  # not yet implemented
+
     @staticmethod
     def get_min(data, absolute_minimum=-np.inf):
         """Determines the minimum of a set of numpy arrays"""

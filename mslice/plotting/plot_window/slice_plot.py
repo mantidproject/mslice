@@ -7,6 +7,7 @@ import matplotlib.colors as colors
 from mantid.simpleapi import AnalysisDataService
 
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
+from mslice.presenters.quick_options_presenter import quick_options
 from .plot_options import SlicePlotOptions
 
 
@@ -19,6 +20,8 @@ class SlicePlot(object):
         self.ws_title = plot_figure.title
         self.arbitrary_nuclei = None
         self.cif_file = None
+        self.quick_presenter = None
+        self.legend_dict = {}
 
         plot_figure.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionS_Q_E,
                                                           self.slice_plotter.show_scattering_function, False))
@@ -39,7 +42,7 @@ class SlicePlot(object):
 
         plot_figure.actionGDOS.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionGDOS,
                                                          self.slice_plotter.show_gdos, True))
-    
+
         plot_figure.actionHydrogen.triggered.connect(
             partial(self.toggle_overplot_line, plot_figure.actionHydrogen, 1, True))
         plot_figure.actionDeuterium.triggered.connect(
@@ -61,6 +64,37 @@ class SlicePlot(object):
         new_config = SlicePlotOptionsPresenter(SlicePlotOptions(), self).get_new_config()
         if new_config:
             self.canvas.draw()
+
+    def plot_clicked(self, x, y):
+        bounds = self.calc_figure_boundaries()
+        if bounds['x_label'] < y < bounds['title']:
+            if bounds['y_label'] < x < bounds['colorbar_label']:
+                if y < bounds['x_range']:
+                    self.quick_presenter = quick_options('x_range', self)
+                elif x < bounds['y_range']:
+                    self.quick_presenter = quick_options('y_range', self)
+                elif x > bounds['colorbar_range']:
+                    self.quick_presenter = quick_options('colorbar_range', self)
+
+    def object_clicked(self, target):
+        if target in self.legend_dict:
+            self.quick_presenter = quick_options(self.legend_dict[target], self)
+        else:
+            self.quick_presenter = quick_options(target, self)
+        self.post_click_event()
+        self.canvas.draw()
+
+    def calc_figure_boundaries(self):
+        fig_x, fig_y = self.canvas.figure.get_size_inches() * self.canvas.figure.dpi
+        bounds = {}
+        bounds['y_label'] = fig_x * 0.07
+        bounds['y_range'] = fig_x * 0.12
+        bounds['colorbar_range'] = fig_x * 0.75
+        bounds['colorbar_label'] = fig_x * 0.86
+        bounds['title'] = fig_y * 0.9
+        bounds['x_range'] = fig_y * 0.09
+        bounds['x_label'] = fig_y * 0.05
+        return bounds
 
     def post_click_event(self):
         self.reset_info_checkboxes()
@@ -131,10 +165,10 @@ class SlicePlot(object):
             legend = axes.legend(fontsize='small')
             for legline, line in zip(legend.get_lines(), lines):
                 legline.set_picker(5)
-                self.plot_figure.legend_dict[legline] = line
+                self.legend_dict[legline] = line
             for label, line in zip(legend.get_texts(), lines):
                 label.set_picker(5)
-                self.plot_figure.legend_dict[label] = line
+                self.legend_dict[label] = line
         else:
             axes.legend_ = None  # remove legend
 
