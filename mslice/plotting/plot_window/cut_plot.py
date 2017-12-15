@@ -18,6 +18,7 @@ class CutPlot(object):
         self._legends_shown = True
         self._legends_visible = []
         self._legend_dict = {}
+        self._lines = self.line_containers()
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
         np.seterr(invalid='ignore')
@@ -28,12 +29,21 @@ class CutPlot(object):
             self._canvas.draw()
 
     def object_clicked(self, target):
+        print(type(target))
         if target in self._legend_dict:
             self._quick_presenter = quick_options(self._legend_dict[target], self)
         else:
-            self._quick_presenter = quick_options(target, self)
-        # self.update_legend()
+            self._quick_presenter = quick_options(self.get_line_container(target), self)
+        self.update_legend()
         self._canvas.draw()
+
+    def get_line_container(self, line):
+        try:
+            return self._lines[line]
+        except KeyError:
+            self._lines=self.line_containers()
+            return self._lines[line]
+
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
@@ -166,38 +176,47 @@ class CutPlot(object):
         self.set_legends(self.get_legends())
         self._canvas.draw()
 
-    def get_line_data(self):
+    def line_containers(self):
+        line_containers = {}
+        containers = self._canvas.figure.gca().containers
+        for index in range(len(containers)):
+            container = containers[index]
+            line = container.get_children()[0]
+            line_containers[line] = container
+        return line_containers
+
+    def get_all_line_data(self):
         legends = self.get_legends()
         all_line_options = []
-        i = 0
-        for line_group in self._canvas.figure.gca().containers:
-            line_options = {}
-            line = line_group.get_children()[0]
-            line_options['shown'] = self.get_line_visible(i)
-            line_options['color'] = line.get_color()
-            line_options['style'] = line.get_linestyle()
-            line_options['width'] = str(int(line.get_linewidth()))
-            line_options['marker'] = line.get_marker()
+        containers = self._canvas.figure.gca().containers
+        for i in range(len(containers)):
+            line_options = self.get_line_data(containers[i])
             all_line_options.append(line_options)
-            i += 1
         return list(zip(legends, all_line_options))
 
-    def set_line_data(self, line_data):
-        legends = []
-        i = 0
-        for line in line_data:
-            legend, line_options = line
-            legends.append(legend)
-            line_model = self._canvas.figure.gca().containers[i]
-            self.set_line_visible(i, line_options['shown'])
-            for child in line_model.get_children():
-                child.set_color(line_options['color'])
-                child.set_linewidth(line_options['width'])
-            main_line = line_model.get_children()[0]
-            main_line.set_linestyle(line_options['style'])
-            main_line.set_marker(line_options['marker'])
-            i += 1
-        self.set_legends(legends)
+    def get_line_data(self, container):
+        line_options = {}
+        line = container.get_children()[0]
+        line_options['label'] = container.get_label()
+        line_options['shown'] = True
+        line_options['color'] = line.get_color()
+        line_options['style'] = line.get_linestyle()
+        line_options['width'] = str(int(line.get_linewidth()))
+        line_options['marker'] = line.get_marker()
+        return line_options
+
+    def set_line_data(self, container, line_options):
+        container.set_label(line_options['label'])
+        main_line = container.get_children()[0]
+        main_line.set_linestyle(line_options['style'])
+        main_line.set_marker(line_options['marker'])
+        for child in container.get_children():
+            child.set_color(line_options['color'])
+            child.set_linewidth(line_options['width'])
+            child.set_visible(line_options['shown'])
+
+    def update_legend(self):
+        self._canvas.figure.gca().legend(fontsize='medium')
 
     def set_line_visible(self, line_index, visible):
         self._lines_visible[line_index] = visible
@@ -289,3 +308,4 @@ class CutPlot(object):
     @y_range.setter
     def y_range(self, value):
         self.plot_figure.y_range = value
+

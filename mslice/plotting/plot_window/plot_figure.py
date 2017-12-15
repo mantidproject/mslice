@@ -87,6 +87,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
 
+
     def get_window_title(self):
         return six.text_type(self.windowTitle())
 

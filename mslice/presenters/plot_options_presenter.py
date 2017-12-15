@@ -71,7 +71,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._view.xLogEdited.connect(partial(self._xy_config_modified, 'x_log'))
         self._view.yLogEdited.connect(partial(self._xy_config_modified, 'y_log'))
 
-        line_data = self._model.get_line_data()
+        line_data = self._model.get_all_line_data()
         self._view.set_line_data(line_data)
 
     def set_properties(self):

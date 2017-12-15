@@ -9,7 +9,7 @@ def quick_options(target, model, log=None):
         view = QuickAxisOptions(target, getattr(model, target), log)
         return QuickAxisPresenter(view, target, model, log)
     else:
-        view = QuickLineOptions(target)
+        view = QuickLineOptions(model.get_line_data(target))
         return QuickLinePresenter(view, target, model)
 
 
@@ -55,12 +55,8 @@ class QuickLinePresenter(object):
             self.set_line_options(target)
 
     def set_line_options(self, line):
-        line.set_color(self.view.color)
-        line.set_linestyle(self.view.style)
-        line.set_linewidth(self.view.width)
-        line.set_marker(self.view.marker)
-        line.set_label(self.view.label)
-        if not self.view.shown:
-            line.set_linestyle('')
-        if not self.view.legend:
-            line.set_label('')
+        line_options = {}
+        values = ['color', 'style', 'width', 'marker', 'label', 'shown', 'legend']
+        for value in values:
+            line_options[value] = getattr(self.view, value)
+        self.model.set_line_data(line, line_options)

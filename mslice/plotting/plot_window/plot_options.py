@@ -150,7 +150,7 @@ class CutPlotOptions(PlotOptionsDialog):
     def set_line_data(self, line_data):
         for line in line_data:
             legend, line_options = line
-            line_widget = LegendAndLineOptionsSetter(legend['label'], legend['visible'], line_options,
+            line_widget = LegendAndLineOptionsSetter(legend['visible'], line_options,
                                                      self.color_validator)
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
@@ -237,10 +237,10 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
     inverse_styles = {v: k for k, v in iteritems(styles)}
     inverse_markers = {v: k for k, v in iteritems(markers)}
 
-    def __init__(self, text, show_legend, line_options, color_validator):
+    def __init__(self, show_legend, line_options, color_validator):
         super(LegendAndLineOptionsSetter, self).__init__()
         self.legendText = QtGui.QLineEdit(self)
-        self.legendText.setText(text)
+        self.legendText.setText(line_options['label'])
         self.color_validator = color_validator
 
         self.color_label = QtGui.QLabel(self)

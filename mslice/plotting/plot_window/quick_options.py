@@ -81,17 +81,10 @@ class QuickLineOptions(QuickOptions):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
 
-    def __init__(self, line):
+    def __init__(self, line_options):
         super(QuickLineOptions, self).__init__()
-        line_options = {}
-        line_options['shown'] = True
-        line_options['color'] = line.get_color()
-        line_options['style'] = line.get_linestyle()
-        line_options['width'] = str(int(line.get_linewidth()))
-        line_options['marker'] = line.get_marker()
-
         self.setWindowTitle("Edit line")
-        self.line_widget = LegendAndLineOptionsSetter(line.get_label(), True, line_options, None)
+        self.line_widget = LegendAndLineOptionsSetter(True, line_options, None)
         self.layout.addWidget(self.line_widget)
         self.layout.addLayout(self.button_row)
         self.line_widget.show()

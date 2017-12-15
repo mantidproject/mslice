@@ -4,6 +4,7 @@ from mslice.app import MPL_COMPAT
 from .cut_plotter import CutPlotter
 
 INTENSITY_LABEL = 'Signal/#Events'
+picker=5
 
 
 class MatplotlibCutPlotter(CutPlotter):
@@ -16,8 +17,8 @@ class MatplotlibCutPlotter(CutPlotter):
                                                       norm_to_one)
         integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
         legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
-        plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o')
-        leg = plt.legend()
+        line = plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o', picker=picker)
+        leg = plt.legend(fontsize='medium')
         leg.draggable()
         plt.xlabel(self._getDisplayName(cut_axis.units, self._cut_algorithm.getComment(selected_workspace)))
         plt.ylabel(INTENSITY_LABEL)
