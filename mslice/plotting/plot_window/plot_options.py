@@ -158,7 +158,7 @@ class CutPlotOptions(PlotOptionsDialog):
     def get_legends(self):
         legends = []
         for line_widget in self._line_widgets:
-            legends.append({'label': line_widget.get_text(), 'visible': line_widget.legend_visible()})
+            legends.append({'label': line_widget.label(), 'visible': line_widget.legend_visible()})
         return legends
 
     def get_line_data(self):
@@ -330,7 +330,8 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
     def legend_visible(self):
         return self.show_legend.checkState()
 
-    def get_text(self):
+    @property
+    def label(self):
         return str(self.legendText.text())
 
     def get_color_index(self):

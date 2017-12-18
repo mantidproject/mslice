@@ -1,6 +1,7 @@
 from itertools import chain
 
 from matplotlib.container import ErrorbarContainer
+from matplotlib.lines import Line2D
 import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
@@ -21,6 +22,7 @@ class CutPlot(object):
         self._lines = self.line_containers()
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
+        self.update_legend()
         np.seterr(invalid='ignore')
 
     def plot_options(self):
@@ -29,12 +31,13 @@ class CutPlot(object):
             self._canvas.draw()
 
     def object_clicked(self, target):
+        leg_pos = self._canvas.figure.gca().get_legend()._loc
         print(type(target))
-        if target in self._legend_dict:
-            self._quick_presenter = quick_options(self._legend_dict[target], self)
-        else:
-            self._quick_presenter = quick_options(self.get_line_container(target), self)
-        self.update_legend()
+        if isinstance(target, Line2D):
+            target = self.get_line_container(target)
+        self._quick_presenter = quick_options(target, self)
+        # self.update_legend()
+        self._canvas.figure.gca().get_legend()._loc = leg_pos
         self._canvas.draw()
 
     def get_line_container(self, line):
@@ -186,13 +189,12 @@ class CutPlot(object):
         return line_containers
 
     def get_all_line_data(self):
-        legends = self.get_legends()
         all_line_options = []
         containers = self._canvas.figure.gca().containers
         for i in range(len(containers)):
             line_options = self.get_line_data(containers[i])
             all_line_options.append(line_options)
-        return list(zip(legends, all_line_options))
+        return all_line_options
 
     def get_line_data(self, container):
         line_options = {}
@@ -215,8 +217,17 @@ class CutPlot(object):
             child.set_linewidth(line_options['width'])
             child.set_visible(line_options['shown'])
 
+    def set_all_line_data(self, list_of_line_options):
+        containers = self._canvas.figure.gca().containers
+        i = 0
+        for line_options in list_of_line_options:
+            self.set_line_data(containers[i], line_options)
+            i+=1
+
     def update_legend(self):
-        self._canvas.figure.gca().legend(fontsize='medium')
+        leg = self._canvas.figure.gca().legend(fontsize='medium')
+        leg.draggable()
+
 
     def set_line_visible(self, line_index, visible):
         self._lines_visible[line_index] = visible
