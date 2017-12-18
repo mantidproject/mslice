@@ -170,13 +170,6 @@ class SlicePlot(object):
         else:
             axes.legend_ = None  # remove legend
 
-    def toggle_legend(self):
-        axes = self._canvas.figure.gca()
-        if axes.legend_ is None:
-            self.update_legend()
-        else:
-            axes.legend_ = None
-
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
         options = self.plot_figure.menuIntensity.actions()

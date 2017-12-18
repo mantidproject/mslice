@@ -301,7 +301,6 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         row4.addWidget(self.show_legend_label)
         row4.addWidget(self.show_legend)
 
-
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
         self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))

@@ -154,11 +154,6 @@ class CutPlot(object):
             self._legends_visible.append(True)
         return v
 
-    def toggle_legend(self):
-        self._legends_shown = not self._legends_shown
-        self.update_legend()
-        self._canvas.draw()
-
     def line_containers(self):
         line_containers = {}
         containers = self._canvas.figure.gca().containers
@@ -317,4 +312,3 @@ class CutPlot(object):
     @y_range.setter
     def y_range(self, value):
         self.plot_figure.y_range = value
-
