@@ -1,6 +1,8 @@
 from itertools import chain
 
 from matplotlib.container import ErrorbarContainer
+from matplotlib.legend import Legend
+from matplotlib.lines import Line2D
 import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
@@ -29,11 +31,12 @@ class CutPlot(object):
             self._canvas.draw()
 
     def object_clicked(self, target):
-        print(type(target))
-        if target in self._legend_dict:
-            self._quick_presenter = quick_options(self._legend_dict[target], self)
-        else:
+        if isinstance(target, Legend):
+            return
+        elif isinstance(target, Line2D):
             self._quick_presenter = quick_options(self.get_line_container(target), self)
+        else:
+            self._quick_presenter = quick_options(target, self)
         self.update_legend()
         self._canvas.draw()
 
@@ -216,7 +219,7 @@ class CutPlot(object):
             child.set_visible(line_options['shown'])
 
     def update_legend(self):
-        self._canvas.figure.gca().legend(fontsize='medium')
+        self._canvas.figure.gca().legend(fontsize='medium').draggable()
 
     def set_line_visible(self, line_index, visible):
         self._lines_visible[line_index] = visible
