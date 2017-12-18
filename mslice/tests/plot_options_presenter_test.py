@@ -174,10 +174,10 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         line_options = [{'color': 'k', 'style': '-', 'width': '10', 'marker': '*'}]
         legends = {'label': 'legend1', 'visible': True}
         line_data = list(zip(legends, line_options))
-        self.model.get_line_data = Mock(return_value=line_data)
+        self.model.get_all_line_data = Mock(return_value=line_data)
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
 
-        self.model.get_line_data.assert_called_once_with()
+        self.model.get_all_line_data.assert_called_once_with()
         self.view.set_line_data.assert_called_once_with(line_data)
 
         #  view -> model
@@ -189,4 +189,4 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter.get_new_config()
 
         self.view.get_line_data.assert_called_once_with()
-        self.model.set_line_data.assert_called_once_with(line_data2)
+        self.model.set_all_line_data.assert_called_once_with(line_data2)
