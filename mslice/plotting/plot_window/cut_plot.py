@@ -34,19 +34,23 @@ class CutPlot(object):
         if isinstance(target, Legend):
             return
         elif isinstance(target, Line2D):
-            self._quick_presenter = quick_options(self.get_line_container(target), self)
+            self._quick_presenter = quick_options(self.get_line_index(target), self)
         else:
             self._quick_presenter = quick_options(target, self)
         self.update_legend()
         self._canvas.draw()
 
-    def get_line_container(self, line):
+    def get_line_index(self, line):
         try:
-            return self._lines[line]
+            container = self._lines[line]
         except KeyError:
             self._lines=self.line_containers()
-            return self._lines[line]
-
+            container = self._lines[line]
+        i = 0
+        for c in self._canvas.figure.gca().containers:
+            if container == c:
+                return i
+            i+=1
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
@@ -142,41 +146,17 @@ class CutPlot(object):
             return
         self._set_errorbars_shown_state(not state)
 
-    def get_legends(self):
-        current_axis = self._canvas.figure.gca()
-        legends = []
-        labels = current_axis.get_legend_handles_labels()[1]
-        for i in range(len(labels)):
-            try:
-                v = self._legends_visible[i]
-            except IndexError:
-                v = True
-                self._legends_visible.append(True)
-            legends.append({'label': labels[i], 'visible': v})
-        return legends
-
-    def set_legends(self, legends):
-        current_axes = self._canvas.figure.gca()
-        if current_axes.legend_:
-            current_axes.legend_.remove()  # remove old legends
-        if legends is None or not self._legends_shown:
-            return
-        labels = []
-        handles_to_show = []
-        handles = current_axes.get_legend_handles_labels()[0]
-        for i in range(len(legends)):
-            container = current_axes.containers[i]
-            container.set_label(legends[i]['label'])
-            if legends[i]['visible']:
-                handles_to_show.append(handles[i])
-                labels.append(legends[i]['label'])
-            self._legends_visible[i] = legends[i]['visible']
-        x = current_axes.legend(handles_to_show, labels)  # add new legends
-        x.draggable()
+    def legend_visible(self, index):
+        try:
+            v = self._legends_visible[index]
+        except IndexError:
+            v = True
+            self._legends_visible.append(True)
+        return v
 
     def toggle_legend(self):
         self._legends_shown = not self._legends_shown
-        self.set_legends(self.get_legends())
+        self.update_legend()
         self._canvas.draw()
 
     def line_containers(self):
@@ -189,18 +169,24 @@ class CutPlot(object):
         return line_containers
 
     def get_all_line_data(self):
-        legends = self.get_legends()
         all_line_options = []
+        for i in range(len(self._canvas.figure.gca().containers)):
+            line_options = self.get_line_data(i)
+            all_line_options.append(line_options)
+        return all_line_options
+
+    def set_all_line_data(self, line_data):
         containers = self._canvas.figure.gca().containers
         for i in range(len(containers)):
-            line_options = self.get_line_data(containers[i])
-            all_line_options.append(line_options)
-        return list(zip(legends, all_line_options))
+            self.set_line_data(i, line_data[i])
+        self.update_legend(line_data)
 
-    def get_line_data(self, container):
+    def get_line_data(self, index):
         line_options = {}
+        container = self._canvas.figure.gca().containers[index]
         line = container.get_children()[0]
         line_options['label'] = container.get_label()
+        line_options['legend'] = self.legend_visible(index)
         line_options['shown'] = True
         line_options['color'] = line.get_color()
         line_options['style'] = line.get_linestyle()
@@ -208,18 +194,38 @@ class CutPlot(object):
         line_options['marker'] = line.get_marker()
         return line_options
 
-    def set_line_data(self, container, line_options):
+    def set_line_data(self, index, line_options):
+        container = self._canvas.figure.gca().containers[index]
         container.set_label(line_options['label'])
         main_line = container.get_children()[0]
         main_line.set_linestyle(line_options['style'])
         main_line.set_marker(line_options['marker'])
+        self._legends_visible[index] = bool(line_options['legend'])
         for child in container.get_children():
             child.set_color(line_options['color'])
             child.set_linewidth(line_options['width'])
             child.set_visible(line_options['shown'])
 
-    def update_legend(self):
-        self._canvas.figure.gca().legend(fontsize='medium').draggable()
+    def update_legend(self, line_data=None):
+        axes = self._canvas.figure.gca()
+        labels_to_show = []
+        handles_to_show = []
+        handles, labels = axes.get_legend_handles_labels()
+        if line_data is None:
+            i = 0
+            for handle, label in zip(handles, labels):
+                if self.legend_visible(i):
+                    labels_to_show.append(label)
+                    handles_to_show.append(handle)
+                i+=1
+        else:
+            containers = axes.containers
+            for i in range(len(containers)):
+                if line_data[i]['legend']:
+                    handles_to_show.append(handles[i])
+                    labels_to_show.append(line_data[i]['label'])
+                self._legends_visible[i] = line_data[i]['legend']
+        axes.legend(handles_to_show, labels_to_show, fontsize='medium').draggable()  # add new legends
 
     def set_line_visible(self, line_index, visible):
         self._lines_visible[line_index] = visible

@@ -64,9 +64,9 @@ class QuickLabelOptions(QuickOptions):
 
     def __init__(self, label):
         super(QuickLabelOptions, self).__init__()
-        self.setWindowTitle("Edit " + label.get_text())
+        self.setWindowTitle("Edit " + label.label())
         self.line_edit = QtGui.QLineEdit()
-        self.line_edit.setText(label.get_text())
+        self.line_edit.setText(label.label())
         self.layout.addWidget(self.line_edit)
         self.layout.addLayout(self.button_row)
         self.line_edit.show()
@@ -84,9 +84,10 @@ class QuickLineOptions(QuickOptions):
     def __init__(self, line_options):
         super(QuickLineOptions, self).__init__()
         self.setWindowTitle("Edit line")
-        self.line_widget = LegendAndLineOptionsSetter(True, line_options, None)
+        self.line_widget = LegendAndLineOptionsSetter(line_options, None)
         self.layout.addWidget(self.line_widget)
         self.layout.addLayout(self.button_row)
+
         self.line_widget.show()
 
     @property
@@ -107,7 +108,7 @@ class QuickLineOptions(QuickOptions):
 
     @property
     def label(self):
-        return self.line_widget.get_text()
+        return self.line_widget.label
 
     @property
     def shown(self):
@@ -115,4 +116,4 @@ class QuickLineOptions(QuickOptions):
 
     @property
     def legend(self):
-        return self.line_widget.legend_visible()
+        return self.line_widget.legend

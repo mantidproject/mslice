@@ -4,7 +4,7 @@ from mslice.app import MPL_COMPAT
 from .cut_plotter import CutPlotter
 
 INTENSITY_LABEL = 'Signal/#Events'
-picker=5
+picker=3
 
 
 class MatplotlibCutPlotter(CutPlotter):
