@@ -64,9 +64,9 @@ class QuickLabelOptions(QuickOptions):
 
     def __init__(self, label):
         super(QuickLabelOptions, self).__init__()
-        self.setWindowTitle("Edit " + label.label())
+        self.setWindowTitle("Edit " + label.get_text())
         self.line_edit = QtGui.QLineEdit()
-        self.line_edit.setText(label.label())
+        self.line_edit.setText(label.get_text())
         self.layout.addWidget(self.line_edit)
         self.layout.addLayout(self.button_row)
         self.line_edit.show()
