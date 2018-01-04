@@ -4,6 +4,7 @@ from PyQt4.QtGui import QApplication, QMainWindow, QLabel
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.views.mainview import MainView
 from .mainwindow_ui import Ui_MainWindow
+from mslice.widgets.ipythonconsole.ipython_widget import MantidIPythonWidget
 
 # ==============================================================================
 # Classes
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, MainView):
         self.wgtSlice.busy.connect(self.show_busy)
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
+        MantidIPythonWidget()
 
     def init_ui(self):
         self.busy_text = QLabel()
