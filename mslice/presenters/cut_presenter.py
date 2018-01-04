@@ -44,6 +44,7 @@ class CutPresenter(PresenterUtility):
             self._cut_axis_changed()
         self._cut_view.busy.emit(False)
 
+
     def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None, workspace_index=0):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
         integration_start to integration_end """

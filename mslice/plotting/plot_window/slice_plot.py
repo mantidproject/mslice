@@ -74,7 +74,7 @@ class SlicePlot(object):
                 elif x < bounds['y_range']:
                     self._quick_presenter = quick_options('y_range', self)
                 elif x > bounds['colorbar_range']:
-                    self._quick_presenter = quick_options('colorbar_range', self)
+                    self._quick_presenter = quick_options('colorbar_range', self, self.colorbar_log)
             self._canvas.draw()
 
     def object_clicked(self, target):
@@ -169,13 +169,6 @@ class SlicePlot(object):
                 self._legend_dict[label] = line
         else:
             axes.legend_ = None  # remove legend
-
-    def toggle_legend(self):
-        axes = self._canvas.figure.gca()
-        if axes.legend_ is None:
-            self.update_legend()
-        else:
-            axes.legend_ = None
 
     def intensity_selection(self, selected):
         '''Ticks selected and un-ticks other intensity options. Returns previous selection'''

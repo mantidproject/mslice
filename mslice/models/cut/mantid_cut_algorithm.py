@@ -36,7 +36,8 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
 
         plot_data = self._num_events_normalized_array(cut)
         plot_data = plot_data.squeeze()
-        errors = np.sqrt(cut.getErrorSquaredArray())/cut.getNumEventsArray()
+        with np.errstate(invalid='ignore'):
+            errors = np.sqrt(cut.getErrorSquaredArray())/cut.getNumEventsArray()
         errors = errors.squeeze()
 
         x = np.linspace(cut_axis.start, cut_axis.end, plot_data.size)

@@ -44,7 +44,12 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
 
     def _toggle_legend(self):
-        self._plot_handler.toggle_legend()
+        axes = self.canvas.figure.gca()
+        if axes.legend_ is None:
+            self._plot_handler.update_legend()
+        else:
+            axes.legend_ = None
+        self.canvas.draw()
 
     def plot_clicked(self, event):
         if event.dblclick:
@@ -86,6 +91,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             painter = QtGui.QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
+
 
     def get_window_title(self):
         return six.text_type(self.windowTitle())

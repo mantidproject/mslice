@@ -149,27 +149,18 @@ class CutPlotOptions(PlotOptionsDialog):
 
     def set_line_data(self, line_data):
         for line in line_data:
-            legend, line_options = line
-            line_widget = LegendAndLineOptionsSetter(legend['label'], legend['visible'], line_options,
-                                                     self.color_validator)
+            line_widget = LegendAndLineOptionsSetter(line, self.color_validator)
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
 
-    def get_legends(self):
-        legends = []
-        for line_widget in self._line_widgets:
-            legends.append({'label': line_widget.get_text(), 'visible': line_widget.legend_visible()})
-        return legends
-
     def get_line_data(self):
-        legends = self.get_legends()
         all_line_options = []
         for line_widget in self._line_widgets:
             line_options = {}
-            for option in ['shown', 'color', 'style', 'width', 'marker']:
+            for option in ['shown', 'color', 'style', 'width', 'marker', 'legend', 'label']:
                 line_options[option] = getattr(line_widget, option)
             all_line_options.append(line_options)
-        return list(zip(legends, all_line_options))
+        return all_line_options
 
     def color_validator(self, selected):
         count = 0
@@ -237,10 +228,10 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
     inverse_styles = {v: k for k, v in iteritems(styles)}
     inverse_markers = {v: k for k, v in iteritems(markers)}
 
-    def __init__(self, text, show_legend, line_options, color_validator):
+    def __init__(self, line_options, color_validator):
         super(LegendAndLineOptionsSetter, self).__init__()
         self.legendText = QtGui.QLineEdit(self)
-        self.legendText.setText(text)
+        self.legendText.setText(line_options['label'])
         self.color_validator = color_validator
 
         self.color_label = QtGui.QLabel(self)
@@ -281,8 +272,8 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.show_legend_label = QtGui.QLabel(self)
         self.show_legend_label.setText("Show legend: ")
         self.show_legend = QtGui.QCheckBox(self)
-        self.show_legend.setChecked(show_legend)
-        self.show_line_changed(line_options['shown'])
+        self.show_legend.setChecked(line_options['legend'])
+        self.show_legend.setEnabled(line_options['shown'])
 
         layout = QtGui.QVBoxLayout(self)
         row1 = QtGui.QHBoxLayout()
@@ -327,14 +318,16 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
         self.show_legend.setEnabled(state)
         self.show_legend.setChecked(state)
 
-    def legend_visible(self):
-        return self.show_legend.checkState()
-
-    def get_text(self):
-        return str(self.legendText.text())
-
     def get_color_index(self):
         return self.line_color.currentIndex()
+
+    @property
+    def legend(self):
+        return self.show_legend.checkState()
+
+    @property
+    def label(self):
+        return str(self.legendText.text())
 
     @property
     def shown(self):
