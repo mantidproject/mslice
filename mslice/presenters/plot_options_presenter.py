@@ -3,8 +3,8 @@ from functools import partial
 
 
 class PlotOptionsPresenter(object):
-    def __init__(self, plot_options_dialog, plot_figure_manager):
-        self._model = plot_figure_manager
+    def __init__(self, plot_options_dialog, plot_handler):
+        self._model = plot_handler
         self._view = plot_options_dialog
         self._modified_values = {}
         self._xy_config = {'x_range': self._model.x_range, 'y_range': self._model.y_range, 'modified': False}
@@ -17,11 +17,6 @@ class PlotOptionsPresenter(object):
         self._view.xRangeEdited.connect(partial(self._xy_config_modified, 'x_range'))
         self._view.yRangeEdited.connect(partial(self._xy_config_modified, 'y_range'))
 
-    def set_properties(self):
-        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range']
-        for p in properties:
-            setattr(self._view, p, getattr(self._model, p))
-
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
 
@@ -32,8 +27,8 @@ class PlotOptionsPresenter(object):
 
 class SlicePlotOptionsPresenter(PlotOptionsPresenter):
 
-    def __init__(self, plot_options_dialog, plot_figure_manager):
-        super(SlicePlotOptionsPresenter, self).__init__(plot_options_dialog, plot_figure_manager)
+    def __init__(self, plot_options_dialog, slice_handler):
+        super(SlicePlotOptionsPresenter, self).__init__(plot_options_dialog, slice_handler)
 
         self._color_config = {'c_range': self._model.colorbar_range, 'log': self._model.colorbar_log, 'modified': False}
 
@@ -50,7 +45,7 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
         if not dialog_accepted:
             return None
         if self._color_config['modified']:
-            self._model.change_slice_plot(self._color_config['c_range'], self._color_config['log'])
+            self._model.change_axis_scale(self._color_config['c_range'], self._color_config['log'])
         for key, value in list(self._modified_values.items()):
             setattr(self._model, key, value)
         self._model.x_range = self._xy_config['x_range']
@@ -68,8 +63,8 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
 
 class CutPlotOptionsPresenter(PlotOptionsPresenter):
 
-    def __init__(self, plot_options_dialog, plot_figure_manager):
-        super(CutPlotOptionsPresenter, self).__init__(plot_options_dialog, plot_figure_manager)
+    def __init__(self, plot_options_dialog, cut_handler):
+        super(CutPlotOptionsPresenter, self).__init__(plot_options_dialog, cut_handler)
         self._xy_config.update({'x_log': self._model.x_log, 'y_log': self._model.y_log})
 
         self._view.showLegendsEdited.connect(partial(self._value_modified, 'show_legends'))
@@ -90,7 +85,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         if not dialog_accepted:
             return None
         if self._xy_config['modified']:
-            self._model.change_cut_plot(self._xy_config)
+            self._model.change_axis_scale(self._xy_config)
         for key, value in list(self._modified_values.items()):
             setattr(self._model, key, value)
         line_data = self._view.get_line_data()

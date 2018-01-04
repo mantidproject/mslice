@@ -94,7 +94,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter2 = CutPlotOptionsPresenter(self.view, self.model)
         self.presenter2._xy_config_modified('x_range')
         self.presenter2.get_new_config()
-        self.model.change_cut_plot.assert_called_once()
+        self.model.change_axis_scale.assert_called_once()
 
     def test_change_colorbar_config(self):
         view_colorbar_range_mock = PropertyMock()
@@ -121,7 +121,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter._set_c_range()
         self.presenter._set_colorbar_log()
         self.presenter.get_new_config()
-        self.model.change_slice_plot.assert_called_once_with((2, 10), True)
+        self.model.change_axis_scale.assert_called_once_with((2, 10), True)
 
     def test_change_xy_log(self):
         view_x_log_mock = PropertyMock()
@@ -148,8 +148,8 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter._xy_config_modified('x_log')
         self.presenter._xy_config_modified('y_log')
         self.presenter.get_new_config()
-        self.model.change_cut_plot.assert_called_once_with({'x_range': (1, 2), 'y_range': (3, 4), 'modified': True,
-                                                            'x_log': False,    'y_log': True})
+        self.model.change_axis_scale.assert_called_once_with({'x_range': (1, 2), 'y_range': (3, 4), 'modified': True,
+                                                              'x_log': False,    'y_log': True})
 
     def test_show_error_bars(self):
         view_error_bars_mock = PropertyMock()
