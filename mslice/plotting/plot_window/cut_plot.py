@@ -23,7 +23,6 @@ class CutPlot(object):
         self._lines = self.line_containers()
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
-        np.seterr(invalid='ignore')
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
