@@ -7,9 +7,9 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.container import ErrorbarContainer
 import matplotlib.colors as colors
 
-from PyQt4.QtCore import Qt
+from qtpy.QtCore import Qt
 
-from PyQt4 import QtGui
+from qtpy import QtWidgets
 import numpy as np
 import os.path as path
 import six
@@ -136,14 +136,14 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
 
     def arbitrary_recoil_line(self):
         if self.actionArbitrary_nuclei.isChecked():
-            self.arbitrary_nuclei, confirm = QtGui.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
+            self.arbitrary_nuclei, confirm = QtQtWidgets.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
         self.toggle_overplot_line(self.actionArbitrary_nuclei, self.arbitrary_nuclei, True)
 
     def cif_file_powder_line(self, checked):
         if checked:
-            cif_path = str(QtGui.QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
+            cif_path = str(QtQtWidgets.QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
             key = path.basename(cif_path).rsplit('.')[0]
             self.cif_file = key
         else:
@@ -236,7 +236,7 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         if ws_name[-3:] == '_QE':
             ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
-        temp_field, confirm = QtGui.QInputDialog.getItem(self, 'Sample Temperature',
+        temp_field, confirm = QtQtWidgets.QInputDialog.getItem(self, 'Sample Temperature',
                                                          'Sample Temperature not found. ' +
                                                          'Select the sample temperature field:',
                                                          ws.run().keys(), False)
@@ -271,15 +271,15 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             self.canvas.draw()
 
     def print_plot(self):
-        printer = QtGui.QPrinter()
+        printer = QtQtWidgets.QPrinter()
         printer.setResolution(300)
-        printer.setOrientation(QtGui.QPrinter.Landscape) #  landscape by default
-        print_dialog = QtGui.QPrintDialog(printer)
+        printer.setOrientation(QtQtWidgets.QPrinter.Landscape) #  landscape by default
+        print_dialog = QtQtWidgets.QPrintDialog(printer)
         if print_dialog.exec_():
-            pixmap_image = QtGui.QPixmap.grabWidget(self.canvas)
+            pixmap_image = QtQtWidgets.QPixmap.grabWidget(self.canvas)
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
-            painter = QtGui.QPainter(printer)
+            painter = QtQtWidgets.QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
 

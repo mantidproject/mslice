@@ -1,6 +1,6 @@
 import mock
 from mock import patch
-from PyQt4 import QtGui
+from qtpy import QtWidgets
 import unittest
 
 from mslice.app.mainwindow import MainWindow
@@ -25,7 +25,7 @@ slice_view = mock.create_autospec(SlicePlotterView)
 powder_view = mock.create_autospec(PowderView)
 cut_view = mock.create_autospec(CutView)
 workspace_view = mock.create_autospec(WorkspaceView)
-busy_label = mock.create_autospec(QtGui.QLabel)
+busy_label = mock.create_autospec(QtWidgets.QLabel)
 
 class AppTests(unittest.TestCase):
     def setUp(self):
@@ -60,7 +60,7 @@ class AppTests(unittest.TestCase):
         mainview = mock_setup
 
     @patch.object(Ui_MainWindow, 'setupUi', mock_setup_Ui)
-    @patch.object(QtGui.QMainWindow, '__init__', lambda x: None)
+    @patch.object(QtWidgets.QMainWindow, '__init__', lambda x: None)
     def test_mainwindow(self):
         """Test the MainWindow initialises correctly"""
         MainWindow()

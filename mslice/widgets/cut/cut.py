@@ -4,8 +4,8 @@
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
-from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QWidget
+from qtpy.QtCore import Signal
+from qtpy.QtWidgets import QWidget
 
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
@@ -20,8 +20,8 @@ from .cut_ui import Ui_Form
 
 
 class CutWidget(QWidget, CutView, Ui_Form):
-    error_occurred = pyqtSignal('QString')
-    busy = pyqtSignal(bool)
+    error_occurred = Signal('QString')
+    busy = Signal(bool)
 
     def __init__(self, *args, **kwargs):
         super(CutWidget, self).__init__(*args, **kwargs)

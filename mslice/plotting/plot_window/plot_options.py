@@ -1,18 +1,18 @@
 from __future__ import (absolute_import, division, print_function)
-import PyQt4.QtGui as QtGui
-from PyQt4.QtCore import pyqtSignal
+import qtpy.QtWidgets as QtWidgets
+from qtpy.QtCore import Signal
 from six import iteritems
 
 from .plot_options_ui import Ui_Dialog
 
 
-class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
+class PlotOptionsDialog(QtWidgets.QDialog, Ui_Dialog):
 
-    titleEdited = pyqtSignal()
-    xLabelEdited = pyqtSignal()
-    yLabelEdited = pyqtSignal()
-    xRangeEdited = pyqtSignal()
-    yRangeEdited = pyqtSignal()
+    titleEdited = Signal()
+    xLabelEdited = Signal()
+    yLabelEdited = Signal()
+    xRangeEdited = Signal()
+    yRangeEdited = Signal()
 
     def __init__(self):
         super(PlotOptionsDialog, self).__init__()
@@ -91,8 +91,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
 
 class SlicePlotOptions(PlotOptionsDialog):
 
-    cRangeEdited = pyqtSignal()
-    cLogEdited = pyqtSignal()
+    cRangeEdited = Signal()
+    cLogEdited = Signal()
 
     def __init__(self):
         super(SlicePlotOptions, self).__init__()
@@ -134,9 +134,9 @@ class SlicePlotOptions(PlotOptionsDialog):
 
 class CutPlotOptions(PlotOptionsDialog):
 
-    xLogEdited = pyqtSignal()
-    yLogEdited = pyqtSignal()
-    showLegendsEdited = pyqtSignal()
+    xLogEdited = Signal()
+    yLogEdited = Signal()
+    showLegendsEdited = Signal()
 
     def __init__(self):
         super(CutPlotOptions, self).__init__()
@@ -178,9 +178,9 @@ class CutPlotOptions(PlotOptionsDialog):
                 count += 1
         if count <= 1:
             return True
-        msg_box = QtGui.QMessageBox(self)
+        msg_box = QtWidgets.QMessageBox(self)
         msg_box.setWindowTitle("Selection Invalid")
-        msg_box.setIcon(QtGui.QMessageBox.Warning)
+        msg_box.setIcon(QtWidgets.QMessageBox.Warning)
         msg_box.setText("Cannot have two lines the same colour.")
         msg_box.exec_()
         return False
@@ -218,7 +218,7 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkShowLegends.setChecked(value)
 
 
-class LegendAndLineOptionsSetter(QtGui.QWidget):
+class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     """This is a widget that has various legend and line controls for each line of a plot"""
 
     # dictionaries used to convert from matplotlib arguments to UI selection and vice versa
@@ -239,59 +239,59 @@ class LegendAndLineOptionsSetter(QtGui.QWidget):
 
     def __init__(self, text, show_legend, line_options, color_validator):
         super(LegendAndLineOptionsSetter, self).__init__()
-        self.legendText = QtGui.QLineEdit(self)
+        self.legendText = QtWidgets.QLineEdit(self)
         self.legendText.setText(text)
         self.color_validator = color_validator
 
-        self.color_label = QtGui.QLabel(self)
+        self.color_label = QtWidgets.QLabel(self)
         self.color_label.setText("Color:")
-        self.line_color = QtGui.QComboBox(self)
+        self.line_color = QtWidgets.QComboBox(self)
         self.line_color.addItems(list(self.colors.values()))
         chosen_color_as_string = self.colors[line_options['color'].upper()]
         self.line_color.setCurrentIndex(self.line_color.findText(chosen_color_as_string))
         self.previous_color = self.line_color.currentIndex()
 
-        self.style_label = QtGui.QLabel(self)
+        self.style_label = QtWidgets.QLabel(self)
         self.style_label.setText("Style:")
-        self.line_style = QtGui.QComboBox(self)
+        self.line_style = QtWidgets.QComboBox(self)
         self.line_style.addItems(list(self.styles.values()))
         chosen_style_as_string = self.styles[line_options['style']]
         self.line_style.setCurrentIndex(self.line_style.findText(chosen_style_as_string))
 
-        self.width_label = QtGui.QLabel(self)
+        self.width_label = QtWidgets.QLabel(self)
         self.width_label.setText("Width:")
-        self.line_width = QtGui.QComboBox(self)
+        self.line_width = QtWidgets.QComboBox(self)
         self.line_width.addItems([str(x+1) for x in range(10)])
         self.line_width.setCurrentIndex(self.line_width.findText(line_options['width']))
 
-        self.marker_label = QtGui.QLabel(self)
+        self.marker_label = QtWidgets.QLabel(self)
         self.marker_label.setText("Marker:")
-        self.line_marker = QtGui.QComboBox(self)
+        self.line_marker = QtWidgets.QComboBox(self)
         markers = list(self.markers.values())
         markers.sort()
         self.line_marker.addItems(markers)
         chosen_marker_as_string = self.markers[line_options['marker']]
         self.line_marker.setCurrentIndex(self.line_marker.findText(chosen_marker_as_string))
 
-        self.show_line_label = QtGui.QLabel(self)
+        self.show_line_label = QtWidgets.QLabel(self)
         self.show_line_label.setText("Show: ")
-        self.show_line = QtGui.QCheckBox(self)
+        self.show_line = QtWidgets.QCheckBox(self)
         self.show_line.setChecked(line_options['shown'])
 
-        self.show_legend_label = QtGui.QLabel(self)
+        self.show_legend_label = QtWidgets.QLabel(self)
         self.show_legend_label.setText("Show legend: ")
-        self.show_legend = QtGui.QCheckBox(self)
+        self.show_legend = QtWidgets.QCheckBox(self)
         self.show_legend.setChecked(show_legend)
         self.show_line_changed(line_options['shown'])
 
-        layout = QtGui.QVBoxLayout(self)
-        row1 = QtGui.QHBoxLayout()
+        layout = QtWidgets.QVBoxLayout(self)
+        row1 = QtWidgets.QHBoxLayout()
         layout.addLayout(row1)
-        row2 = QtGui.QHBoxLayout()
+        row2 = QtWidgets.QHBoxLayout()
         layout.addLayout(row2)
-        row3 = QtGui.QHBoxLayout()
+        row3 = QtWidgets.QHBoxLayout()
         layout.addLayout(row3)
-        row4 = QtGui.QHBoxLayout()
+        row4 = QtWidgets.QHBoxLayout()
         layout.addLayout(row4)
         layout.addStretch()
 
