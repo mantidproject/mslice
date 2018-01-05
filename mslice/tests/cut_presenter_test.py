@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import mock
 from mock import call
 import unittest
+import warnings
 from tempfile import gettempdir
 from os.path import join
 
@@ -486,3 +487,28 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.get_axis_range = mock.Mock(side_effect=KeyError)
         cut_presenter.workspace_selection_changed()
         self.view.set_minimum_step.assert_called_with(None)
+
+    def test_invalid_step(self):
+        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter.register_master(self.main_presenter)
+        axis = Axis("units", "0", "100", "")
+        processed_axis = Axis("units", 0, 100, 0)
+        integration_start = 3
+        integration_end = 5
+        width = ""
+        intensity_start = 11
+        intensity_end = 30
+        is_norm = True
+        workspace = "workspace"
+        integrated_axis = 'integrated axis'
+        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        self.view.get_minimum_step = mock.Mock(return_value=1)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            cut_presenter.notify(Command.Plot)
+        self.cut_algorithm.compute_cut.assert_not_called()
+        self.view.get_minimum_step.assert_called_with()
+        self.view.error_invalid_cut_step_parameter.assert_called_with()
+        self.view.populate_cut_params.assert_called_with("0", "100", "1.00000")

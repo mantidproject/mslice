@@ -64,6 +64,9 @@ class CutView:
     def error_current_selection_invalid(self):
         pass
 
+    def error_invalid_cut_step_parameter(self):
+        pass
+
     def populate_cut_axis_options(self,options):
         pass
 
