@@ -18,6 +18,9 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         super(PlotFigureManager, self).__init__(number, manager)
 
         self._plot_handler = None
+        # Need flags here as matplotlib provides no way to access the grid state
+        self._xgrid = False
+        self._ygrid = False
 
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
@@ -139,3 +142,21 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
     @y_range.setter
     def y_range(self, value):
         self.canvas.figure.gca().set_ylim(value)
+
+    @property
+    def x_grid(self):
+        return self._xgrid
+
+    @x_grid.setter
+    def x_grid(self, value):
+        self._xgrid = value
+        self.canvas.figure.gca().grid(value, axis='x')
+
+    @property
+    def y_grid(self):
+        return self._ygrid
+
+    @y_grid.setter
+    def y_grid(self, value):
+        self._ygrid = value
+        self.canvas.figure.gca().grid(value, axis='y')

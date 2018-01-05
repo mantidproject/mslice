@@ -13,6 +13,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     yLabelEdited = pyqtSignal()
     xRangeEdited = pyqtSignal()
     yRangeEdited = pyqtSignal()
+    xGridEdited = pyqtSignal()
+    yGridEdited = pyqtSignal()
 
     def __init__(self):
         super(PlotOptionsDialog, self).__init__()
@@ -27,6 +29,8 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
         self.lneYMax.editingFinished.connect(self.yRangeEdited)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
+        self.chkXGrid.stateChanged.connect(self.xGridEdited)
+        self.chkYGrid.stateChanged.connect(self.yGridEdited)
 
     @property
     def x_range(self):
@@ -88,6 +92,23 @@ class PlotOptionsDialog(QtGui.QDialog, Ui_Dialog):
     def y_label(self, value):
         self.lneYAxisLabel.setText(value)
 
+    @property
+    def x_grid(self):
+        return self.chkXGrid.isChecked()
+
+    @x_grid.setter
+    def x_grid(self, value):
+        self.chkXGrid.setChecked(value)
+
+    @property
+    def y_grid(self):
+        return self.chkYGrid.isChecked()
+
+    @y_grid.setter
+    def y_grid(self, value):
+        self.chkYGrid.setChecked(value)
+
+
 
 class SlicePlotOptions(PlotOptionsDialog):
 
@@ -96,6 +117,8 @@ class SlicePlotOptions(PlotOptionsDialog):
 
     def __init__(self):
         super(SlicePlotOptions, self).__init__()
+        self._swap_widgets(self.gridLayout, self.chkXLog, self.chkXGrid, (2, 0), (2, 1))
+        self._swap_widgets(self.gridLayout_2, self.chkYLog, self.chkYGrid, (2, 0), (2, 1))
         self.chkXLog.hide()
         self.chkYLog.hide()
         self.cut_options.hide()
@@ -104,6 +127,12 @@ class SlicePlotOptions(PlotOptionsDialog):
         self.lneCMin.editingFinished.connect(self.cRangeEdited)
         self.lneCMax.editingFinished.connect(self.cRangeEdited)
         self.chkLogarithmic.stateChanged.connect(self.cLogEdited)
+
+    def _swap_widgets(self, gridLayout, widget1, widget2, pos1, pos2):
+        gridLayout.removeWidget(widget1)
+        gridLayout.removeWidget(widget2)
+        gridLayout.addWidget(widget1, *pos2)
+        gridLayout.addWidget(widget2, *pos1)
 
     @property
     def colorbar_range(self):

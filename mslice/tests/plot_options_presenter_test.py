@@ -69,6 +69,42 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         model_x_label_mock.assert_called_once_with('x1')
         model_y_label_mock.assert_called_once_with('y1')
 
+    def test_change_grid(self):
+
+        view_x_grid_mock = PropertyMock()
+        view_y_grid_mock = PropertyMock()
+        model_x_grid_mock = PropertyMock(return_value=False)
+        model_y_grid_mock = PropertyMock(return_value=False)
+
+        type(self.view).x_grid = view_x_grid_mock
+        type(self.view).y_grid = view_y_grid_mock
+        type(self.model).x_grid = model_x_grid_mock
+        type(self.model).y_grid = model_y_grid_mock
+
+        # labels passed model -> view
+        self.presenter = SlicePlotOptionsPresenter(self.view, self.model)
+        model_x_grid_mock.assert_called_once_with()
+        model_y_grid_mock.assert_called_once_with()
+        view_x_grid_mock.assert_called_once_with(False)
+        view_y_grid_mock.assert_called_once_with(False)
+
+        # labels passed view -> model
+        model_x_grid_mock.reset_mock()
+        model_y_grid_mock.reset_mock()
+        view_x_grid_mock.reset_mock()
+        view_y_grid_mock.reset_mock()
+
+        view_x_grid_mock.return_value = True
+        view_y_grid_mock.return_value = True
+        self.presenter._value_modified('x_grid')
+        self.presenter._value_modified('y_grid')
+        self.presenter.get_new_config()
+
+        view_x_grid_mock.assert_called_once_with()
+        view_y_grid_mock.assert_called_once_with()
+        model_x_grid_mock.assert_called_once_with(True)
+        model_y_grid_mock.assert_called_once_with(True)
+
     def test_change_xrange(self):
 
         view_x_range_mock = PropertyMock()

@@ -16,6 +16,8 @@ class PlotOptionsPresenter(object):
         self._view.yLabelEdited.connect(partial(self._value_modified, 'y_label'))
         self._view.xRangeEdited.connect(partial(self._xy_config_modified, 'x_range'))
         self._view.yRangeEdited.connect(partial(self._xy_config_modified, 'y_range'))
+        self._view.xGridEdited.connect(partial(self._value_modified, 'x_grid'))
+        self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
@@ -36,7 +38,8 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
         self._view.cRangeEdited.connect(self._set_c_range)
 
     def set_properties(self):
-        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'colorbar_range', 'colorbar_log']
+        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_grid', 'y_grid',
+                      'colorbar_range', 'colorbar_log']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 
@@ -75,8 +78,8 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._view.set_line_data(line_data)
 
     def set_properties(self):
-        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log', 'error_bars',
-                      'show_legends']
+        properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log',
+                      'x_grid', 'y_grid', 'error_bars', 'show_legends']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 
