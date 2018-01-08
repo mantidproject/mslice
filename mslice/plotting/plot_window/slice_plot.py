@@ -136,11 +136,12 @@ class SlicePlot(object):
         self._canvas.draw()
 
     def arbitrary_recoil_line(self):
-        if self.plot_figure.actionArbitrary_nuclei.isChecked():
+        checked = self.plot_figure.actionArbitrary_nuclei.isChecked()
+        if checked:
             self._arbitrary_nuclei, confirm = QtWidgets.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
-        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self._arbitrary_nuclei, True)
+        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self._arbitrary_nuclei, True, checked)
 
     def cif_file_powder_line(self, checked):
         if checked:
@@ -220,9 +221,9 @@ class SlicePlot(object):
             ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
-                                                         'Sample Temperature not found. ' +
-                                                         'Select the sample temperature field:',
-                                                         ws.run().keys(), False)
+                                                             'Sample Temperature not found. ' +
+                                                             'Select the sample temperature field:',
+                                                             ws.run().keys(), False)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
