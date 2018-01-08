@@ -1,7 +1,5 @@
 from functools import partial
-import sip
 import six
-import qtpy
 
 from qtpy import QtWidgets
 
