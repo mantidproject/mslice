@@ -145,7 +145,7 @@ class SlicePlot(object):
 
     def cif_file_powder_line(self, checked):
         if checked:
-            cif_path = str(QtWidgets.QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
+            cif_path = str(QtWidgets.QFileDialog().getOpenFileName(self.plot_figure, 'Open CIF file', '/home', 'Files (*.cif)'))
             key = path.basename(cif_path).rsplit('.')[0]
             self._cif_file = key
         else:
