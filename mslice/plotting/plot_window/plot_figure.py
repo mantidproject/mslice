@@ -1,9 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 
-from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
-
 from qtpy.QtCore import Qt
 from qtpy import QtWidgets
+
+from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 import six
 

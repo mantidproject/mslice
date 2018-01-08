@@ -1,6 +1,6 @@
+from qtpy import QtWidgets
 import mock
 from mock import patch
-from qtpy import QtWidgets
 import unittest
 
 from mslice.app.mainwindow import MainWindow
