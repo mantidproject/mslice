@@ -136,15 +136,16 @@ class SlicePlot(object):
         self._canvas.draw()
 
     def arbitrary_recoil_line(self):
-        if self.plot_figure.actionArbitrary_nuclei.isChecked():
-            self._arbitrary_nuclei, confirm = QtGui.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
+        checked = self.plot_figure.actionArbitrary_nuclei.isChecked()
+        if checked:
+            self._arbitrary_nuclei, confirm = QtGui.QInputDialog.getInt(self.plot_figure, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
-        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self._arbitrary_nuclei, True)
+        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self._arbitrary_nuclei, True, checked)
 
     def cif_file_powder_line(self, checked):
         if checked:
-            cif_path = str(QtGui.QFileDialog().getOpenFileName(self, 'Open CIF file', '/home', 'Files (*.cif)'))
+            cif_path = str(QtGui.QFileDialog().getOpenFileName(self.plot_figure, 'Open CIF file', '/home', 'Files (*.cif)'))
             key = path.basename(cif_path).rsplit('.')[0]
             self._cif_file = key
         else:
