@@ -503,6 +503,7 @@ class CutPresenterTest(unittest.TestCase):
         integrated_axis = 'integrated axis'
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        self.view.get_cut_axis_step = mock.Mock(return_value="")
         self.view.get_minimum_step = mock.Mock(return_value=1)
 
         with warnings.catch_warnings():

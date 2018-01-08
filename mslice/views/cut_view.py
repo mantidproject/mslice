@@ -46,6 +46,9 @@ class CutView:
     def set_minimum_step(self, value):
         pass
 
+    def get_minimum_step(self):
+        pass
+
     def error_select_a_workspace(self):
         pass
 

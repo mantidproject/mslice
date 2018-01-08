@@ -114,6 +114,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
     def set_minimum_step(self, value):
         self._minimumStep = value
 
+    def get_minimum_step(self):
+        return self._minimumStep
+
     def populate_cut_axis_options(self, options):
         self.cmbCutAxis.blockSignals(True)
         self.cmbCutAxis.clear()
