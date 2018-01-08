@@ -1,6 +1,10 @@
 from functools import partial
+import sip
 import six
+import qtpy
+
 from qtpy import QtWidgets
+
 import os.path as path
 import matplotlib.colors as colors
 
