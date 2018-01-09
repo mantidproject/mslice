@@ -3,17 +3,17 @@ from qtpy.QtWidgets import QApplication, QMainWindow, QLabel
 
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.views.mainview import MainView
-from .mainwindow_ui import Ui_MainWindow
+from mslice.load_ui import load_ui
 
 # ==============================================================================
 # Classes
 # ==============================================================================
 
-class MainWindow(QMainWindow, Ui_MainWindow, MainView):
+class MainWindow(QMainWindow, MainView):
 
     def __init__(self):
         super(MainWindow,self).__init__()
-        self.setupUi(self)
+        load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
 
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()

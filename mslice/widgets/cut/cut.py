@@ -7,25 +7,26 @@ from __future__ import (absolute_import, division, print_function)
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget
 
+from mslice.load_ui import load_ui
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 from mslice.presenters.cut_presenter import CutPresenter
 from mslice.views.cut_view import CutView
 from .command import Command
-from .cut_ui import Ui_Form
+
 
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
 
 
-class CutWidget(QWidget, CutView, Ui_Form):
+class CutWidget(QWidget, CutView):
     error_occurred = Signal('QString')
     busy = Signal(bool)
 
     def __init__(self, *args, **kwargs):
         super(CutWidget, self).__init__(*args, **kwargs)
-        self.setupUi(self)
+        load_ui(__file__, 'cut.ui', self)
         self._command_lookup = {
             self.btnCutPlot: Command.Plot,
             self.btnCutPlotOver: Command.PlotOver,

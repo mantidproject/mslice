@@ -3,6 +3,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from qtpy import QtWidgets
 
+from mslice.load_ui import load_ui
 from .base_plot_window import BasePlotWindow
 
 class MatplotlibCanvas(FigureCanvas):
@@ -26,12 +27,10 @@ class BaseQtPlotWindow(BasePlotWindow, QtWidgets.QMainWindow):
     def __init__(self, number, manager):
         super(BaseQtPlotWindow,self).__init__(number,manager)
         QtWidgets.QMainWindow.__init__(self)
-        self.setupUi(self)
+        load_ui(__file__, 'plot_window.ui', self)
         self.canvas = MatplotlibCanvas(self)
         self.canvas.manager = self
         self.setCentralWidget(self.canvas)
-        self.setWindowTitle('Figure {}'.format(number))
-
 
     def closeEvent(self, event):
         self._manager.figure_closed(self.number)

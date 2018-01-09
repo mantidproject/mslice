@@ -3,10 +3,10 @@ import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from six import iteritems
 
-from .plot_options_ui import Ui_Dialog
+from mslice.load_ui import load_ui
 
 
-class PlotOptionsDialog(QtWidgets.QDialog, Ui_Dialog):
+class PlotOptionsDialog(QtWidgets.QDialog):
 
     titleEdited = Signal()
     xLabelEdited = Signal()
@@ -16,7 +16,7 @@ class PlotOptionsDialog(QtWidgets.QDialog, Ui_Dialog):
 
     def __init__(self):
         super(PlotOptionsDialog, self).__init__()
-        self.setupUi(self)
+        load_ui(__file__, 'plot_options.ui', self)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)

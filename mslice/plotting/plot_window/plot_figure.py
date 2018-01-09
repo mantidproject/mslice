@@ -7,14 +7,14 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 import six
 
+from mslice.load_ui import load_ui
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 
-from .plot_window_ui import Ui_MainWindow
 from .base_qt_plot_window import BaseQtPlotWindow
 
 
-class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
+class PlotFigureManager(BaseQtPlotWindow):
     def __init__(self, number, manager):
         super(PlotFigureManager, self).__init__(number, manager)
 

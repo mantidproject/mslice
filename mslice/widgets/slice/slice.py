@@ -7,19 +7,18 @@ from __future__ import (absolute_import, division, print_function)
 from qtpy.QtWidgets import QWidget
 from qtpy.QtCore import Signal
 
+from mslice.load_ui import load_ui
 from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
 from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.views.slice_plotter_view import SlicePlotterView
 from .command import Command
-from .slice_ui import Ui_Form
-
 
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
 
-class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
+class SliceWidget(QWidget, SlicePlotterView):
     error_occurred = Signal('QString')
     busy = Signal(bool)
 
@@ -28,7 +27,7 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
 
         The main window must implement MainView"""
         super(SliceWidget, self).__init__(*args, **kwargs)
-        self.setupUi(self)
+        load_ui(__file__, 'slice.ui', self)
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
         plotter = MatplotlibSlicePlotter(MantidSliceAlgorithm())

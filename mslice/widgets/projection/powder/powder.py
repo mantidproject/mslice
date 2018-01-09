@@ -7,17 +7,18 @@ from __future__ import (absolute_import, division, print_function)
 from qtpy.QtWidgets import QWidget, QMessageBox
 from qtpy.QtCore import Signal
 
+from mslice.load_ui import load_ui
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.views.powder_projection_view import PowderView
 from .command import Command
-from .powder_ui import Ui_Form
+
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
 
 
-class PowderWidget(QWidget, Ui_Form, PowderView):
+class PowderWidget(QWidget, PowderView):
     """This widget is not usable without a main window which implements mainview"""
 
     error_occurred = Signal('QString')
@@ -25,7 +26,7 @@ class PowderWidget(QWidget, Ui_Form, PowderView):
 
     def __init__(self, *args, **kwargs):
         super(PowderWidget, self).__init__(*args, **kwargs)
-        self.setupUi(self)
+        load_ui(__file__, 'powder.ui', self)
         self.btnPowderCalculateProjection.clicked.connect(self._btn_clicked)
         self._presenter = PowderProjectionPresenter(self, MantidProjectionCalculator())
         self.cmbPowderU1.currentIndexChanged.connect(self._u1_changed)
