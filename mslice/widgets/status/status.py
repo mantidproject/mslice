@@ -7,7 +7,7 @@ Displays information/errors to the user
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 
-from PyQt4.QtGui import QWidget
+from qtpy.QtWidgets import QWidget
 
 from .status_ui import Ui_Form
 

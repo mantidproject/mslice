@@ -1,6 +1,8 @@
 from functools import partial
 import six
-from PyQt4 import QtGui
+
+from qtpy import QtWidgets
+
 import os.path as path
 import matplotlib.colors as colors
 
@@ -138,14 +140,14 @@ class SlicePlot(object):
     def arbitrary_recoil_line(self):
         checked = self.plot_figure.actionArbitrary_nuclei.isChecked()
         if checked:
-            self._arbitrary_nuclei, confirm = QtGui.QInputDialog.getInt(self.plot_figure, 'Arbitrary Nuclei', 'Enter relative mass:')
+            self._arbitrary_nuclei, confirm = QtWidgets.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
         self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self._arbitrary_nuclei, True, checked)
 
     def cif_file_powder_line(self, checked):
         if checked:
-            cif_path = str(QtGui.QFileDialog().getOpenFileName(self.plot_figure, 'Open CIF file', '/home', 'Files (*.cif)'))
+            cif_path = str(QtWidgets.QFileDialog().getOpenFileName(self.plot_figure, 'Open CIF file', '/home', 'Files (*.cif)'))
             key = path.basename(cif_path).rsplit('.')[0]
             self._cif_file = key
         else:
@@ -220,10 +222,10 @@ class SlicePlot(object):
         if ws_name[-3:] == '_QE':
             ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
-        temp_field, confirm = QtGui.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
-                                                         'Sample Temperature not found. ' +
-                                                         'Select the sample temperature field:',
-                                                         ws.run().keys(), False)
+        temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
+                                                             'Sample Temperature not found. ' +
+                                                             'Select the sample temperature field:',
+                                                             ws.run().keys(), False)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:

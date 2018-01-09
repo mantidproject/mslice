@@ -1,9 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
 
+from qtpy.QtCore import Qt
+from qtpy import QtWidgets
+
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
-from PyQt4.QtCore import Qt
-from PyQt4 import QtGui
 import six
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
@@ -80,18 +81,17 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
         self._plot_handler.plot_options()
 
     def print_plot(self):
-        printer = QtGui.QPrinter()
+        printer = QtWidgets.QPrinter()
         printer.setResolution(300)
-        printer.setOrientation(QtGui.QPrinter.Landscape) #  landscape by default
-        print_dialog = QtGui.QPrintDialog(printer)
+        printer.setOrientation(QtWidgets.QPrinter.Landscape) #  landscape by default
+        print_dialog = QtWidgets.QPrintDialog(printer)
         if print_dialog.exec_():
-            pixmap_image = QtGui.QPixmap.grabWidget(self.canvas)
+            pixmap_image = QtWidgets.QPixmap.grabWidget(self.canvas)
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
-            painter = QtGui.QPainter(printer)
+            painter = QtWidgets.QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
-
 
     def get_window_title(self):
         return six.text_type(self.windowTitle())

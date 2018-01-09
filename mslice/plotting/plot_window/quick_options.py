@@ -1,19 +1,19 @@
 
 from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from qtpy import QtWidgets
+from qtpy.QtCore import Signal
 
 
-class QuickOptions(QtGui.QDialog):
+class QuickOptions(QtWidgets.QDialog):
 
     def __init__(self):
         super(QuickOptions, self).__init__()
-        self.layout = QtGui.QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.layout)
-        self.ok_button = QtGui.QPushButton("OK", self)
-        self.cancel_button = QtGui.QPushButton("Cancel", self)
-        self.button_row = QtGui.QHBoxLayout()
+        self.ok_button = QtWidgets.QPushButton("OK", self)
+        self.cancel_button = QtWidgets.QPushButton("Cancel", self)
+        self.button_row = QtWidgets.QHBoxLayout()
         self.button_row.addWidget(self.ok_button)
         self.button_row.addWidget(self.cancel_button)
         self.ok_button.clicked.connect(self.accept)
@@ -26,14 +26,14 @@ class QuickAxisOptions(QuickOptions):
         super(QuickAxisOptions, self).__init__()
         self.setWindowTitle("Edit " + target)
         self.log = log
-        self.min_label = QtGui.QLabel("Min:")
-        self.min = QtGui.QLineEdit()
+        self.min_label = QtWidgets.QLabel("Min:")
+        self.min = QtWidgets.QLineEdit()
         self.min.setText(str(existing_values[0]))
-        self.max_label = QtGui.QLabel("Max:")
-        self.max = QtGui.QLineEdit()
+        self.max_label = QtWidgets.QLabel("Max:")
+        self.max = QtWidgets.QLineEdit()
         self.max.setText(str(existing_values[1]))
-        row1 = QtGui.QHBoxLayout()
-        row2 = QtGui.QHBoxLayout()
+        row1 = QtWidgets.QHBoxLayout()
+        row2 = QtWidgets.QHBoxLayout()
         row1.addWidget(self.min_label)
         row1.addWidget(self.min)
         row2.addWidget(self.max_label)
@@ -41,9 +41,9 @@ class QuickAxisOptions(QuickOptions):
         self.layout.addLayout(row1)
         self.layout.addLayout(row2)
         if log is not None:
-            self.log_scale = QtGui.QCheckBox("Logarithmic", self)
+            self.log_scale = QtWidgets.QCheckBox("Logarithmic", self)
             self.log_scale.setChecked(self.log)
-            row3 = QtGui.QHBoxLayout()
+            row3 = QtWidgets.QHBoxLayout()
             row3.addWidget(self.log_scale)
             self.layout.addLayout(row3)
         self.layout.addLayout(self.button_row)
@@ -59,13 +59,13 @@ class QuickAxisOptions(QuickOptions):
 
 class QuickLabelOptions(QuickOptions):
 
-    ok_clicked = pyqtSignal()
-    cancel_clicked = pyqtSignal()
+    ok_clicked = Signal()
+    cancel_clicked = Signal()
 
     def __init__(self, label):
         super(QuickLabelOptions, self).__init__()
         self.setWindowTitle("Edit " + label.get_text())
-        self.line_edit = QtGui.QLineEdit()
+        self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText(label.get_text())
         self.layout.addWidget(self.line_edit)
         self.layout.addLayout(self.button_row)
@@ -78,8 +78,8 @@ class QuickLabelOptions(QuickOptions):
 
 class QuickLineOptions(QuickOptions):
 
-    ok_clicked = pyqtSignal()
-    cancel_clicked = pyqtSignal()
+    ok_clicked = Signal()
+    cancel_clicked = Signal()
 
     def __init__(self, line_options):
         super(QuickLineOptions, self).__init__()

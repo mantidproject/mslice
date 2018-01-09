@@ -4,8 +4,8 @@
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
-from PyQt4.QtGui import QWidget, QMessageBox
-from PyQt4.QtCore import pyqtSignal
+from qtpy.QtWidgets import QWidget, QMessageBox
+from qtpy.QtCore import Signal
 
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
@@ -20,8 +20,8 @@ from .powder_ui import Ui_Form
 class PowderWidget(QWidget, Ui_Form, PowderView):
     """This widget is not usable without a main window which implements mainview"""
 
-    error_occurred = pyqtSignal('QString')
-    busy = pyqtSignal(bool)
+    error_occurred = Signal('QString')
+    busy = Signal(bool)
 
     def __init__(self, *args, **kwargs):
         super(PowderWidget, self).__init__(*args, **kwargs)
