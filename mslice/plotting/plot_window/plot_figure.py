@@ -7,7 +7,6 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 import six
 
-from mslice.load_ui import load_ui
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 
