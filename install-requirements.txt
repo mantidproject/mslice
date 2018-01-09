@@ -2,4 +2,3 @@ ipython
 numpy
 matplotlib>=1.5
 six
-qtpy

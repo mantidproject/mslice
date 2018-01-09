@@ -3,7 +3,6 @@ import mock
 from mock import call
 import unittest
 
-import qtpy # noqa
 from mslice.plotting.figuremanager import FigureManager
 from mslice.plotting.figuremanager import activate_category
 

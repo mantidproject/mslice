@@ -1,7 +1,6 @@
 from mock import MagicMock, PropertyMock
 import unittest
 
-import qtpy # noqa
 import matplotlib.colors as colors
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 
