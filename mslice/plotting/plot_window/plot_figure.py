@@ -95,6 +95,11 @@ class PlotFigureManager(BaseQtPlotWindow, Ui_MainWindow):
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
 
+    def update_grid(self):
+        if self._xgrid:
+            self.canvas.figure.gca().grid(True, axis='x')
+        if self._ygrid:
+            self.canvas.figure.gca().grid(True, axis='y')
 
     def get_window_title(self):
         return six.text_type(self.windowTitle())

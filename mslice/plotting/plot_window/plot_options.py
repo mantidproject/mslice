@@ -117,8 +117,6 @@ class SlicePlotOptions(PlotOptionsDialog):
 
     def __init__(self):
         super(SlicePlotOptions, self).__init__()
-        self._swap_widgets(self.gridLayout, self.chkXLog, self.chkXGrid, (2, 0), (2, 1))
-        self._swap_widgets(self.gridLayout_2, self.chkYLog, self.chkYGrid, (2, 0), (2, 1))
         self.chkXLog.hide()
         self.chkYLog.hide()
         self.cut_options.hide()
@@ -127,12 +125,6 @@ class SlicePlotOptions(PlotOptionsDialog):
         self.lneCMin.editingFinished.connect(self.cRangeEdited)
         self.lneCMax.editingFinished.connect(self.cRangeEdited)
         self.chkLogarithmic.stateChanged.connect(self.cLogEdited)
-
-    def _swap_widgets(self, gridLayout, widget1, widget2, pos1, pos2):
-        gridLayout.removeWidget(widget1)
-        gridLayout.removeWidget(widget2)
-        gridLayout.addWidget(widget1, *pos2)
-        gridLayout.addWidget(widget2, *pos1)
 
     @property
     def colorbar_range(self):
