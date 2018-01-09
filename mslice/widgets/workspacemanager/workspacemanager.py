@@ -1,10 +1,11 @@
 from __future__ import (absolute_import, division, print_function)
-from qtpy.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
-from qtpy.QtCore import Signal
 
-from mslice.load_ui import load_ui
+from qtpy.QtCore import Signal
+from qtpy.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
+
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from mslice.util.load_ui import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
 from .inputdialog import EfInputDialog

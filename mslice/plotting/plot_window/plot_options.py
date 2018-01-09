@@ -1,9 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
+
 import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from six import iteritems
 
-from mslice.load_ui import load_ui
+from mslice.util.load_ui import load_ui
 
 
 class PlotOptionsDialog(QtWidgets.QDialog):

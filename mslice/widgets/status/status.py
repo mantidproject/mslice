@@ -9,7 +9,8 @@ from __future__ import (absolute_import, division, print_function)
 
 from qtpy.QtWidgets import QWidget
 
-from mslice.load_ui import load_ui
+from mslice.util.load_ui import load_ui
+
 
 # -----------------------------------------------------------------------------
 # Classes and functions

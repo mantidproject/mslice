@@ -1,10 +1,12 @@
 from __future__ import (absolute_import, division, print_function)
+
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from qtpy import QtWidgets
 
-from mslice.load_ui import load_ui
+from mslice.util.load_ui import load_ui
 from .base_plot_window import BasePlotWindow
+
 
 class MatplotlibCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""

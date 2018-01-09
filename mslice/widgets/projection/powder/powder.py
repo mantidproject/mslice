@@ -4,14 +4,16 @@
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
-from qtpy.QtWidgets import QWidget, QMessageBox
-from qtpy.QtCore import Signal
 
-from mslice.load_ui import load_ui
+from qtpy.QtCore import Signal
+from qtpy.QtWidgets import QWidget, QMessageBox
+
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
+from mslice.util.load_ui import load_ui
 from mslice.views.powder_projection_view import PowderView
 from .command import Command
+
 
 # -----------------------------------------------------------------------------
 # Classes and functions

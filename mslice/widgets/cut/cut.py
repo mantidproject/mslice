@@ -4,13 +4,14 @@
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
+
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget
 
-from mslice.load_ui import load_ui
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 from mslice.presenters.cut_presenter import CutPresenter
+from mslice.util.load_ui import load_ui
 from mslice.views.cut_view import CutView
 from .command import Command
 
