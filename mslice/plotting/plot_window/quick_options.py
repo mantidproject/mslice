@@ -22,7 +22,7 @@ class QuickOptions(QtGui.QDialog):
 
 class QuickAxisOptions(QuickOptions):
 
-    def __init__(self, target, existing_values, grid_state, log):
+    def __init__(self, target, existing_values, grid, log):
         super(QuickAxisOptions, self).__init__()
         self.setWindowTitle("Edit " + target)
         self.log = log
@@ -32,21 +32,20 @@ class QuickAxisOptions(QuickOptions):
         self.max_label = QtGui.QLabel("Max:")
         self.max = QtGui.QLineEdit()
         self.max.setText(str(existing_values[1]))
-        self.grid_label = QtGui.QLabel("Grid")
-        self.grid = QtGui.QCheckBox()
-        self.grid.setCheckState(grid_state)
         row1 = QtGui.QHBoxLayout()
         row2 = QtGui.QHBoxLayout()
-        row3 = QtGui.QHBoxLayout()
         row1.addWidget(self.min_label)
         row1.addWidget(self.min)
         row2.addWidget(self.max_label)
         row2.addWidget(self.max)
-        row3.addWidget(self.grid_label)
-        row3.addWidget(self.grid)
         self.layout.addLayout(row1)
         self.layout.addLayout(row2)
-        self.layout.addLayout(row3)
+        if grid is not None:
+            self.grid = QtGui.QCheckBox("Grid", self)
+            self.grid.setChecked(grid)
+            row3 = QtGui.QHBoxLayout()
+            row3.addWidget(self.grid)
+            self.layout.addLayout(row3)
         if log is not None:
             self.log_scale = QtGui.QCheckBox("Logarithmic", self)
             self.log_scale.setChecked(self.log)
