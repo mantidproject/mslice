@@ -5,7 +5,7 @@ from qtpy.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, 
 
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
-from mslice.util.load_ui import load_ui
+from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
 from .inputdialog import EfInputDialog

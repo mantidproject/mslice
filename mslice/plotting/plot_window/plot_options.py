@@ -4,7 +4,7 @@ import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from six import iteritems
 
-from mslice.util.load_ui import load_ui
+from mslice.util.qt import load_ui
 
 
 class PlotOptionsDialog(QtWidgets.QDialog):

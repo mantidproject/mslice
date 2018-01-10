@@ -4,7 +4,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from qtpy import QtWidgets
 
-from mslice.util.load_ui import load_ui
+from mslice.util.qt import load_ui
 from .base_plot_window import BasePlotWindow
 
 

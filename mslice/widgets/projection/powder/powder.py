@@ -10,7 +10,7 @@ from qtpy.QtWidgets import QWidget, QMessageBox
 
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
-from mslice.util.load_ui import load_ui
+from mslice.util.qt import load_ui
 from mslice.views.powder_projection_view import PowderView
 from .command import Command
 
