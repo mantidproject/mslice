@@ -19,4 +19,3 @@ def load_ui(caller_filename, ui_relfilename, baseinstance=None):
         return loadUi(filepath, baseinstance=baseinstance)
     else:
         return loadUiType(filepath)
-    
