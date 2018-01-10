@@ -6,7 +6,8 @@ def quick_options(target, model, log=None):
         view = QuickLabelOptions(target)
         return QuickLabelPresenter(view, target, model)
     elif isinstance(target, str):
-        view = QuickAxisOptions(target, getattr(model, target), log)
+        grid_state = getattr(model, target[:-5] + 'grid')
+        view = QuickAxisOptions(target, getattr(model, target), grid_state, log)
         return QuickAxisPresenter(view, target, model, log)
     else:
         view = QuickLineOptions(model.get_line_data(target))
@@ -22,6 +23,7 @@ class QuickAxisPresenter(object):
         accepted = self.view.exec_()
         if accepted:
             self.set_range(target, log)
+            self.set_grid(target)
 
     def set_range(self, target, log):
         range = (float(self.view.range_min), float(self.view.range_max))
@@ -29,6 +31,8 @@ class QuickAxisPresenter(object):
         if log is not None:
             setattr(self.model, target[:-5] + 'log', self.view.log_scale.isChecked())
 
+    def set_grid(self, target):
+        setattr(self.model, target[:-5] + 'grid', self.view.grid_state)
 
 class QuickLabelPresenter(object):
 
