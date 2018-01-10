@@ -7,5 +7,4 @@
 @set PYTHON_EXE=C:\MantidInstall\bin\python.exe
 @set QT_API=pyqt
 
-)
 %THIS_DIR%\scripts\mslice.bat
