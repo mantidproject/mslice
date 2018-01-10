@@ -41,15 +41,15 @@ class QuickAxisOptions(QuickOptions):
         self.layout.addLayout(row1)
         self.layout.addLayout(row2)
         if grid is not None:
-            self.grid = QtGui.QCheckBox("Grid", self)
+            self.grid = QtWidgets.QCheckBox("Grid", self)
             self.grid.setChecked(grid)
-            row3 = QtGui.QHBoxLayout()
+            row3 = QtWidgets.QHBoxLayout()
             row3.addWidget(self.grid)
             self.layout.addLayout(row3)
         if log is not None:
             self.log_scale = QtWidgets.QCheckBox("Logarithmic", self)
             self.log_scale.setChecked(self.log)
-            row4 = QtGui.QHBoxLayout()
+            row4 = QtWidgets.QHBoxLayout()
             row4.addWidget(self.log_scale)
             self.layout.addLayout(row4)
         self.layout.addLayout(self.button_row)
