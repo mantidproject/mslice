@@ -1,6 +1,7 @@
+from qtpy.uic import loadUi, loadUiType
+import os.path as osp
+
 def load_ui(caller_filename, ui_relfilename, baseinstance=None):
-    from qtpy.uic import loadUi, loadUiType
-    import os.path as osp
     """Load a ui file assuming it is relative to a given callers filepath. If
     an existing instance is given then the this instance is set as the baseclass
     and the new Ui instance is returned otherwise the loaded Ui class is returned
