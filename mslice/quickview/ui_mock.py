@@ -1,9 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 from getter_ui import Ui_Dialog
-from PyQt4 import QtGui
+from qtpy import QtWidgets
 
 
-class GetInputFromUser(Ui_Dialog, QtGui.QDialog):
+class GetInputFromUser(Ui_Dialog, QtWidgets.QDialog):
     """This is a generic _window to get input from user.
 
      Type input in the input box and click a button to return the contents of the input field explicitly typecasted to
@@ -12,7 +12,7 @@ class GetInputFromUser(Ui_Dialog, QtGui.QDialog):
       filepath"""
 
     def __init__(self,title):
-        super(QtGui.QDialog,self).__init__()
+        super(QtWidgets.QDialog,self).__init__()
         self.setupUi(self)
         self.setWindowTitle(title)
         self.btnInt.clicked.connect(self.on_click)
@@ -47,7 +47,7 @@ class GetInputFromUser(Ui_Dialog, QtGui.QDialog):
         if sender == self.lineEdit:
             self._data = eval(text)
         if sender == self.btnFilepath:
-            self._data = str(QtGui.QFileDialog.getSaveFileName())
+            self._data = str(QtWidgets.QFileDialog.getSaveFileName())
         self._done = True
         self.accept()
 
@@ -59,7 +59,7 @@ def display_message(title, *args):
     #Pad message box so whole title is visible
     padding = len(title) * '   '
     args_and_types[0] += padding
-    messageBox = QtGui.QMessageBox()
+    messageBox = QtWidgets.QMessageBox()
     messageBox.setWindowTitle(title)
     messageBox.setText('\n'.join(args_and_types))
     messageBox.setGeometry(100,100,4000,200)

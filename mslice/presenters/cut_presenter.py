@@ -6,7 +6,7 @@ from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.views.cut_view import CutView
 from mslice.widgets.cut.command import Command
 from .validation_decorators import require_main_presenter
-from PyQt4.QtGui import QFileDialog
+from qtpy.QtWidgets import QFileDialog
 from os.path import splitext
 import numpy as np
 
@@ -43,6 +43,7 @@ class CutPresenter(PresenterUtility):
         elif command == Command.AxisChanged:
             self._cut_axis_changed()
         self._cut_view.busy.emit(False)
+
 
     def _process_cuts(self, plot_over=False, save_to_workspace=False, save_to_file=None, workspace_index=0):
         """This function handles the width parameter. If it is not specified a single cut is plotted from

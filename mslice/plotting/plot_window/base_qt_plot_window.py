@@ -1,9 +1,12 @@
 from __future__ import (absolute_import, division, print_function)
+
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from PyQt4 import QtGui
+from qtpy import QtWidgets
 
+from mslice.util.qt import load_ui
 from .base_plot_window import BasePlotWindow
+
 
 class MatplotlibCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -14,24 +17,22 @@ class MatplotlibCanvas(FigureCanvas):
         self.setParent(parent)
 
         FigureCanvas.setSizePolicy(self,
-                                   QtGui.QSizePolicy.Expanding,
-                                   QtGui.QSizePolicy.Expanding)
+                                   QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
 
-class BaseQtPlotWindow(BasePlotWindow, QtGui.QMainWindow):
+class BaseQtPlotWindow(BasePlotWindow, QtWidgets.QMainWindow):
     """Inherit from this and a Ui_MainWindow from QT Designer to get a working PlotWindow
 
     The central widget will be replaced by the canvas"""
     def __init__(self, number, manager):
         super(BaseQtPlotWindow,self).__init__(number,manager)
-        QtGui.QMainWindow.__init__(self)
-        self.setupUi(self)
+        QtWidgets.QMainWindow.__init__(self)
+        load_ui(__file__, 'plot_window.ui', self)
         self.canvas = MatplotlibCanvas(self)
         self.canvas.manager = self
         self.setCentralWidget(self.canvas)
-        self.setWindowTitle('Figure {}'.format(number))
-
 
     def closeEvent(self, event):
         self._manager.figure_closed(self.number)
