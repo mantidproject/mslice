@@ -2,10 +2,10 @@
 from __future__ import (absolute_import, division, print_function)
 import re
 from .ui_mock import GetInputFromUser,display_message
-from PyQt4 import QtGui
+from qtpy import QtWidgets
 
 
-class QuickView(QtGui.QWidget):
+class QuickView(QtWidgets.QWidget):
     """QuickView is a base class for dynamically generated view for use while developing MVP applications.
 
     The constructor takes a'command' class or object. The command class should contain only constants that will be sent to Presenter via
@@ -14,7 +14,7 @@ class QuickView(QtGui.QWidget):
     self._presenter should be supplied in constructor in child class """
 
     def __init__(self,commands):
-        super(QtGui.QWidget,self).__init__()
+        super(QtWidgets.QWidget,self).__init__()
         #Supply two default _handlers
         #Starting variable names with _ breaks the whole tool due to __getattr__ override
         self._handlers = {re.compile("get.*"): self._get, re.compile('populate.*'): self._display}
@@ -61,15 +61,15 @@ class QuickView(QtGui.QWidget):
 
     def _setupCommandCenter(self):
 
-        self._window = QtGui.QWidget()
-        self._layout = QtGui.QGridLayout()
+        self._window = QtWidgets.QWidget()
+        self._layout = QtWidgets.QGridLayout()
         self._window.setWindowTitle('Send Notifications')
         self._buttons = {}
         for i,command in enumerate(dir(self._commands)):
             if command[:2] == '__':
                 continue
             self._buttons[command] = getattr(self._commands, command)
-            btn = QtGui.QPushButton(parent=self._window, text=command)
+            btn = QtWidgets.QPushButton(parent=self._window, text=command)
             self._layout.addWidget(btn, i % 4, i // 4)
             btn.clicked.connect(self._notify_presenter)
         self._window.setLayout(self._layout)
@@ -81,7 +81,7 @@ class QuickView(QtGui.QWidget):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication([])
+    app = QtWidgets.QApplication([])
     m = QuickView()
     m.get_data_from_user()
     m.say_hi('A',1,(1,1,1,1,1,1,1,1))

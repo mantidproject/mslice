@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
-from PyQt4.QtGui import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
-from PyQt4.QtCore import pyqtSignal
+from qtpy.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
+from qtpy.QtCore import Signal
 
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
@@ -12,8 +12,8 @@ from .workspacemanager_ui import Ui_Form
 class WorkspaceManagerWidget(QWidget,Ui_Form,WorkspaceView):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
 
-    error_occurred = pyqtSignal('QString')
-    busy = pyqtSignal(bool)
+    error_occurred = Signal('QString')
+    busy = Signal(bool)
 
     def __init__(self,parent):
         super(WorkspaceManagerWidget,self).__init__(parent)

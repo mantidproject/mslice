@@ -6,7 +6,7 @@ from tempfile import gettempdir
 from os.path import join
 
 import numpy as np
-from PyQt4.QtGui import QFileDialog
+from qtpy.QtWidgets import QFileDialog
 
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter

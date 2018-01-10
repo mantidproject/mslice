@@ -3241,7 +3241,7 @@ def autoscale(enable=True, axis='both', tight=None):
 _setup_pyplot_info_docstrings()
 
 if __name__ == '__main__':
-    from PyQt4.QtGui import QApplication
+    from qtpy.QtWidgets import QApplication
     qapp = QApplication([])
     imshow([[1,2],[3,4]])
     plot([1,2,3,4])

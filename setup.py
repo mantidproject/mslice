@@ -129,7 +129,7 @@ class build_py(_build_py):
 
     @staticmethod
     def compile_ui(ui_file, py_file):
-        from PyQt4 import uic
+        from qtpy import uic
 
         with open(py_file, 'w') as fp:
             uic.compileUi(ui_file, fp)

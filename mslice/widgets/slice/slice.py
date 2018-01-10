@@ -4,8 +4,8 @@
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
-from PyQt4.QtGui import QWidget
-from PyQt4.QtCore import pyqtSignal
+from qtpy.QtWidgets import QWidget
+from qtpy.QtCore import Signal
 
 from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
 from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
@@ -20,8 +20,8 @@ from .slice_ui import Ui_Form
 # -----------------------------------------------------------------------------
 
 class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
-    error_occurred = pyqtSignal('QString')
-    busy = pyqtSignal(bool)
+    error_occurred = Signal('QString')
+    busy = Signal(bool)
 
     def __init__(self, *args, **kwargs):
         """This Widget provides basic control over displaying slices. This widget is NOT USABLE without a main window
