@@ -27,6 +27,9 @@ try:
     from qtconsole.rich_jupyter_widget import RichJupyterWidget as RichIPythonWidget
     from qtconsole.inprocess import QtInProcessKernelManager
 except ImportError:
+    # fix for bug with old ipython versions
+    import mslice.external.ipython as _ # noqa
+
     from IPython.qt.console.rich_ipython_widget import RichIPythonWidget
     from IPython.qt.inprocess import QtInProcessKernelManager
 
@@ -61,27 +64,21 @@ def our_run_code(self, code_obj, result=None):
     return 0
 
 
-class MantidIPythonWidget(RichIPythonWidget):
+class IPythonWidget(RichIPythonWidget):
     """ Extends IPython's qt widget to include setting up and in-process kernel as well as the
         Mantid environment, plus our trick to avoid blocking the event loop while processing commands.
         This widget is set in the QDockWidget that houses the script interpreter within ApplicationWindow.
     """
 
     def __init__(self, *args, **kw):
-        super(MantidIPythonWidget, self).__init__(*args, **kw)
+        super(IPythonWidget, self).__init__(*args, **kw)
 
         # Create an in-process kernel
         kernel_manager = QtInProcessKernelManager()
         kernel_manager.start_kernel()
         kernel = kernel_manager.kernel
         kernel.gui = 'qt4'
-
-        # Figure out the full path to the mantidplotrc.py file and then %run it
-        from os import path
-        mantidplotpath = path.split(path.dirname(__file__))[0] # It's the directory above this one
-        mantidplotrc = path.join(mantidplotpath, 'mantidplotrc.py')
         shell = kernel.shell
-        shell.run_line_magic('run',mantidplotrc)
 
         # These 3 lines replace the run_code method of IPython's InteractiveShell class (of which the
         # shell variable is a derived instance) with our method defined above. The original method

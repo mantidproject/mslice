@@ -38,36 +38,6 @@ def main():
     QAPP_REF = QApplication([])
     show_gui()
     return QAPP_REF.exec_()
-        # return
-
-    # # We're doing our own startup. There seems to be an issue with starting ipython from within
-    # # PyCharm. The assumption is that the standard input/output redirection messes things up and
-    # # IPython can't properly run the event loop.
-    # # Currently if we detect we are inside PyCharm then we will not start IPython
-    # # Are we already running IPython?
-    # not_inside_pycharm = "PYCHARM_HOSTED" not in os.environ
-    # try:
-    #     ip = get_ipython()
-    #     ip_running = True
-    # except NameError:
-    #     ip_running = False
-    #
-    # if ip_running:
-    #     # IPython handles the Qt event loop exec so we can return control to the ipython terminal
-    #     ip.enable_matplotlib('qt4')  # selects the backend
-    #     # Older IPython versions would start this automatically but the newer ones do not
-    #     if QApplication.instance() is None:
-    #         QAPP_REF = QApplication([])
-    #     show_gui()
-    # else:
-    #     QAPP_REF = QApplication([])
-    #     if not_inside_pycharm:
-    #         start_ipython(["--matplotlib=qt4", "-i",
-    #                        "-c from mslice.app import show_gui; show_gui();"])
-    #         # IPython will call EventLoop.exec when required
-    #     else:
-    #         show_gui()
-    #         return QAPP_REF.exec_()
 
 def show_gui():
     """Display the top-level main window.
