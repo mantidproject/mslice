@@ -22,7 +22,7 @@ class QuickOptions(QtWidgets.QDialog):
 
 class QuickAxisOptions(QuickOptions):
 
-    def __init__(self, target, existing_values, log):
+    def __init__(self, target, existing_values, grid, log):
         super(QuickAxisOptions, self).__init__()
         self.setWindowTitle("Edit " + target)
         self.log = log
@@ -40,12 +40,18 @@ class QuickAxisOptions(QuickOptions):
         row2.addWidget(self.max)
         self.layout.addLayout(row1)
         self.layout.addLayout(row2)
+        if grid is not None:
+            self.grid = QtWidgets.QCheckBox("Grid", self)
+            self.grid.setChecked(grid)
+            row3 = QtWidgets.QHBoxLayout()
+            row3.addWidget(self.grid)
+            self.layout.addLayout(row3)
         if log is not None:
             self.log_scale = QtWidgets.QCheckBox("Logarithmic", self)
             self.log_scale.setChecked(self.log)
-            row3 = QtWidgets.QHBoxLayout()
-            row3.addWidget(self.log_scale)
-            self.layout.addLayout(row3)
+            row4 = QtWidgets.QHBoxLayout()
+            row4.addWidget(self.log_scale)
+            self.layout.addLayout(row4)
         self.layout.addLayout(self.button_row)
 
     @property
@@ -56,6 +62,9 @@ class QuickAxisOptions(QuickOptions):
     def range_max(self):
         return self.max.text()
 
+    @property
+    def grid_state(self):
+        return self.grid.checkState()
 
 class QuickLabelOptions(QuickOptions):
 

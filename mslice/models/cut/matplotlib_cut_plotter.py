@@ -25,6 +25,8 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.autoscale()
         plt.ylim(intensity_start, intensity_end)
         plt.gcf().canvas.manager.add_cut_plot(self)
+        if not plot_over:
+            plt.gcf().canvas.manager.update_grid()
         plt.draw_all()
 
     def _getDisplayName(self, axisUnits, comment=None):

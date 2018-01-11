@@ -8,11 +8,14 @@ from .plot_options_ui import Ui_Dialog
 
 class PlotOptionsDialog(QtWidgets.QDialog, Ui_Dialog):
 
+
     titleEdited = Signal()
     xLabelEdited = Signal()
     yLabelEdited = Signal()
     xRangeEdited = Signal()
     yRangeEdited = Signal()
+    xGridEdited = Signal()
+    yGridEdited = Signal()
 
     def __init__(self):
         super(PlotOptionsDialog, self).__init__()
@@ -27,6 +30,8 @@ class PlotOptionsDialog(QtWidgets.QDialog, Ui_Dialog):
         self.lneYMax.editingFinished.connect(self.yRangeEdited)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
+        self.chkXGrid.stateChanged.connect(self.xGridEdited)
+        self.chkYGrid.stateChanged.connect(self.yGridEdited)
 
     @property
     def x_range(self):
@@ -87,6 +92,23 @@ class PlotOptionsDialog(QtWidgets.QDialog, Ui_Dialog):
     @y_label.setter
     def y_label(self, value):
         self.lneYAxisLabel.setText(value)
+
+    @property
+    def x_grid(self):
+        return self.chkXGrid.isChecked()
+
+    @x_grid.setter
+    def x_grid(self, value):
+        self.chkXGrid.setChecked(value)
+
+    @property
+    def y_grid(self):
+        return self.chkYGrid.isChecked()
+
+    @y_grid.setter
+    def y_grid(self, value):
+        self.chkYGrid.setChecked(value)
+
 
 
 class SlicePlotOptions(PlotOptionsDialog):
