@@ -27,8 +27,8 @@ class BaseQtPlotWindow(BasePlotWindow, QtWidgets.QMainWindow):
 
     The central widget will be replaced by the canvas"""
     def __init__(self, number, manager):
-        super(BaseQtPlotWindow,self).__init__(number,manager)
-        QtWidgets.QMainWindow.__init__(self)
+        QtWidgets.QMainWindow.__init__(self, None)
+        BasePlotWindow.__init__(self, number, manager)
         load_ui(__file__, 'plot_window.ui', self)
         self.canvas = MatplotlibCanvas(self)
         self.canvas.manager = self

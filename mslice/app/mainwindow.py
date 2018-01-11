@@ -11,10 +11,10 @@ from mslice.views.mainview import MainView
 # Classes
 # ==============================================================================
 
-class MainWindow(QMainWindow, MainView):
+class MainWindow(MainView, QMainWindow):
 
-    def __init__(self):
-        super(MainWindow,self).__init__()
+    def __init__(self, parent=None):
+        QMainWindow.__init__(self, parent)
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
 

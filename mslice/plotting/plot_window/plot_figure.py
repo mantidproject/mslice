@@ -15,7 +15,7 @@ from .base_qt_plot_window import BaseQtPlotWindow
 
 class PlotFigureManager(BaseQtPlotWindow):
     def __init__(self, number, manager):
-        super(PlotFigureManager, self).__init__(number, manager)
+        BaseQtPlotWindow.__init__(self, number, manager)
 
         self._plot_handler = None
 

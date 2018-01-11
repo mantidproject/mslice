@@ -15,8 +15,8 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     xRangeEdited = Signal()
     yRangeEdited = Signal()
 
-    def __init__(self):
-        super(PlotOptionsDialog, self).__init__()
+    def __init__(self, parent=None):
+        QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)

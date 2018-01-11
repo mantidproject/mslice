@@ -21,12 +21,12 @@ from .command import Command
 # -----------------------------------------------------------------------------
 
 
-class CutWidget(QWidget, CutView):
+class CutWidget(CutView, QWidget):
     error_occurred = Signal('QString')
     busy = Signal(bool)
 
-    def __init__(self, *args, **kwargs):
-        super(CutWidget, self).__init__(*args, **kwargs)
+    def __init__(self, parent=None, *args, **kwargs):
+        QWidget.__init__(self, parent, *args, **kwargs)
         load_ui(__file__, 'cut.ui', self)
         self._command_lookup = {
             self.btnCutPlot: Command.Plot,
