@@ -1,21 +1,51 @@
 from __future__ import (absolute_import, division, print_function)
 
+import importlib
+
+from matplotlib.figure import Figure
+import six
+from qtpy import QT_VERSION
 from qtpy.QtCore import Qt
 from qtpy import QtWidgets
 
-from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
-
-import six
-
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
+from mslice.util.qt import load_ui
+from mslice.plotting.plot_window.base_plot_window import BasePlotWindow
 
-from .base_qt_plot_window import BaseQtPlotWindow
+# The FigureCanvas & Toolbar are QWidgets so we must import it from the mpl backend that matches
+# the version of Qt we are running with
+mpl_qt_backend  = importlib.import_module('matplotlib.backends.backend_qt{}agg'.format(QT_VERSION[0]))
+FigureCanvasQTAgg = getattr(mpl_qt_backend, 'FigureCanvasQTAgg')
+NavigationToolbar2QT = getattr(mpl_qt_backend, 'NavigationToolbar2QT')
 
 
-class PlotFigureManager(BaseQtPlotWindow):
+class MatplotlibCanvas(FigureCanvasQTAgg):
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        self.figure = Figure(figsize=(width, height), dpi=dpi)
+        FigureCanvasQTAgg.__init__(self, self.figure)
+        self.setParent(parent)
+
+        FigureCanvasQTAgg.setSizePolicy(self,
+                                   QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
+        FigureCanvasQTAgg.updateGeometry(self)
+
+
+PlotWindowUI, _ = load_ui(__file__, 'plot_window.ui')
+
+
+class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
     def __init__(self, number, manager):
-        BaseQtPlotWindow.__init__(self, number, manager)
+        QtWidgets.QMainWindow.__init__(self)
+        BasePlotWindow.__init__(self, number, manager)
+        self.setupUi(self)
+
+        self.canvas = MatplotlibCanvas(self)
+        self.canvas.manager = self
+        self.setCentralWidget(self.canvas)
 
         self._plot_handler = None
 
