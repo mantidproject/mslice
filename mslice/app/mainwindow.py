@@ -13,8 +13,8 @@ from mslice.views.mainview import MainView
 
 class MainWindow(MainView, QMainWindow):
 
-    def __init__(self, parent=None):
-        QMainWindow.__init__(self, parent)
+    def __init__(self):
+        QMainWindow.__init__(self)
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
 
