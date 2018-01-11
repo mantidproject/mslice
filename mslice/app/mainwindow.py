@@ -23,6 +23,7 @@ class MainWindow(QMainWindow, MainView):
         self.centralWidget().layout().addWidget(ipython)
         ipython.setFixedHeight(200)
 
+        # loader_presenter = self.data_loading.get_presenter()
         # workspace_presenter = self.workspace_manager.get_presenter()
         # self._presenter(MainPresenter(self, workspace_presenter ... ))
 
