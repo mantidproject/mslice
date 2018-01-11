@@ -30,6 +30,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plot(self)
+        plt.gcf().canvas.manager.update_grid()
         plt.draw_all()
 
     def _cache_slice(self, plot_data, ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis):

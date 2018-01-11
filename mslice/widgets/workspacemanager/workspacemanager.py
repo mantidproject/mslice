@@ -11,14 +11,14 @@ from .command import Command
 from .inputdialog import EfInputDialog
 
 
-class WorkspaceManagerWidget(QWidget, WorkspaceView):
+class WorkspaceManagerWidget(WorkspaceView, QWidget):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
 
     error_occurred = Signal('QString')
     busy = Signal(bool)
 
-    def __init__(self,parent):
-        super(WorkspaceManagerWidget,self).__init__(parent)
+    def __init__(self, parent=None):
+        QWidget.__init__(self, parent)
         load_ui(__file__, 'workspacemanager.ui', self)
         self.btnWorkspaceSave.clicked.connect(self._btn_clicked)
         self.btnLoad.clicked.connect(self._btn_clicked)

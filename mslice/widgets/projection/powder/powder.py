@@ -20,14 +20,14 @@ from .command import Command
 # -----------------------------------------------------------------------------
 
 
-class PowderWidget(QWidget, PowderView):
+class PowderWidget(PowderView, QWidget):
     """This widget is not usable without a main window which implements mainview"""
 
     error_occurred = Signal('QString')
     busy = Signal(bool)
 
-    def __init__(self, *args, **kwargs):
-        super(PowderWidget, self).__init__(*args, **kwargs)
+    def __init__(self, parent=None, *args, **kwargs):
+        QWidget.__init__(self, parent, *args, **kwargs)
         load_ui(__file__, 'powder.ui', self)
         self.btnPowderCalculateProjection.clicked.connect(self._btn_clicked)
         self._presenter = PowderProjectionPresenter(self, MantidProjectionCalculator())

@@ -9,6 +9,7 @@ from .validation_decorators import require_main_presenter
 from qtpy.QtWidgets import QFileDialog
 from os.path import splitext
 import numpy as np
+import warnings
 
 
 class CutPresenter(PresenterUtility):
@@ -50,6 +51,7 @@ class CutPresenter(PresenterUtility):
         integration_start to integration_end """
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         try:
+            self._parse_step()
             params = self._parse_input(workspace_index)
         except ValueError:
             return
@@ -106,6 +108,19 @@ class CutPresenter(PresenterUtility):
         cut_params = params[:5]
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
+
+    def _parse_step(self):
+        step = self._cut_view.get_cut_axis_step()
+        try:
+            step = float(step)
+        except ValueError:
+            step = self._cut_view.get_minimum_step()
+            if step is not None:
+                self._cut_view.populate_cut_params(self._cut_view.get_cut_axis_start(),
+                                                   self._cut_view.get_cut_axis_end(),
+                                                   "%0.5f" % step)
+                self._cut_view.error_invalid_cut_step_parameter()
+                warnings.warn("Invalid cut step, using default value")
 
     def _parse_input(self, workspace_index=0):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging

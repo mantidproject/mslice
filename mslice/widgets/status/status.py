@@ -17,6 +17,6 @@ from mslice.util.qt import load_ui
 # -----------------------------------------------------------------------------
 
 class StatusWidget(QWidget):
-    def __init__(self, *args, **kwargs):
-        super(StatusWidget, self).__init__(*args, **kwargs)
+    def __init__(self, parent=None, *args, **kwargs):
+        QWidget.__init__(self, parent, *args, **kwargs)
         load_ui(__file__, 'status.ui', self)

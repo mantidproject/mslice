@@ -9,14 +9,17 @@ from mslice.util.qt import load_ui
 
 class PlotOptionsDialog(QtWidgets.QDialog):
 
+
     titleEdited = Signal()
     xLabelEdited = Signal()
     yLabelEdited = Signal()
     xRangeEdited = Signal()
     yRangeEdited = Signal()
+    xGridEdited = Signal()
+    yGridEdited = Signal()
 
-    def __init__(self):
-        super(PlotOptionsDialog, self).__init__()
+    def __init__(self, parent=None):
+        QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
@@ -28,6 +31,8 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.lneYMax.editingFinished.connect(self.yRangeEdited)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
+        self.chkXGrid.stateChanged.connect(self.xGridEdited)
+        self.chkYGrid.stateChanged.connect(self.yGridEdited)
 
     @property
     def x_range(self):
@@ -88,6 +93,23 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     @y_label.setter
     def y_label(self, value):
         self.lneYAxisLabel.setText(value)
+
+    @property
+    def x_grid(self):
+        return self.chkXGrid.isChecked()
+
+    @x_grid.setter
+    def x_grid(self, value):
+        self.chkXGrid.setChecked(value)
+
+    @property
+    def y_grid(self):
+        return self.chkYGrid.isChecked()
+
+    @y_grid.setter
+    def y_grid(self, value):
+        self.chkYGrid.setChecked(value)
+
 
 
 class SlicePlotOptions(PlotOptionsDialog):

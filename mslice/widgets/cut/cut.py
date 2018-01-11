@@ -21,12 +21,12 @@ from .command import Command
 # -----------------------------------------------------------------------------
 
 
-class CutWidget(QWidget, CutView):
+class CutWidget(CutView, QWidget):
     error_occurred = Signal('QString')
     busy = Signal(bool)
 
-    def __init__(self, *args, **kwargs):
-        super(CutWidget, self).__init__(*args, **kwargs)
+    def __init__(self, parent=None, *args, **kwargs):
+        QWidget.__init__(self, parent, *args, **kwargs)
         load_ui(__file__, 'cut.ui', self)
         self._command_lookup = {
             self.btnCutPlot: Command.Plot,
@@ -54,7 +54,8 @@ class CutWidget(QWidget, CutView):
             try:
                 value = float(self.lneCutStep.text())
             except ValueError:
-                return
+                value = 0
+                self.error_invalid_cut_step_parameter()
             if value == 0:
                 self.lneCutStep.setText('%.5f' % (self._minimumStep))
                 self._display_error('Setting step size to default.')
@@ -114,6 +115,9 @@ class CutWidget(QWidget, CutView):
 
     def set_minimum_step(self, value):
         self._minimumStep = value
+
+    def get_minimum_step(self):
+        return self._minimumStep
 
     def populate_cut_axis_options(self, options):
         self.cmbCutAxis.blockSignals(True)
@@ -243,6 +247,9 @@ class CutWidget(QWidget, CutView):
 
     def error_invalid_cut_axis_parameters(self):
         self._display_error("Invalid cut axis parameters")
+
+    def error_invalid_cut_step_parameter(self):
+        self._display_error("Invalid cut step parameter. Using default.")
 
     def error_invalid_integration_parameters(self):
         self._display_error("Invalid parameters for integration")

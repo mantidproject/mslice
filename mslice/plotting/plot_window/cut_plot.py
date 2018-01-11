@@ -311,3 +311,19 @@ class CutPlot(object):
     @y_range.setter
     def y_range(self, value):
         self.plot_figure.y_range = value
+
+    @property
+    def x_grid(self):
+        return self.plot_figure.x_grid
+
+    @x_grid.setter
+    def x_grid(self, value):
+        self.plot_figure.x_grid = value
+
+    @property
+    def y_grid(self):
+        return self.plot_figure.y_grid
+
+    @y_grid.setter
+    def y_grid(self, value):
+        self.plot_figure.y_grid = value
