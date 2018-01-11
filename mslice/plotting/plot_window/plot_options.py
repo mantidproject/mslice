@@ -1,12 +1,13 @@
 from __future__ import (absolute_import, division, print_function)
+
 import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from six import iteritems
 
-from .plot_options_ui import Ui_Dialog
+from mslice.util.qt import load_ui
 
 
-class PlotOptionsDialog(QtWidgets.QDialog, Ui_Dialog):
+class PlotOptionsDialog(QtWidgets.QDialog):
 
 
     titleEdited = Signal()
@@ -17,9 +18,9 @@ class PlotOptionsDialog(QtWidgets.QDialog, Ui_Dialog):
     xGridEdited = Signal()
     yGridEdited = Signal()
 
-    def __init__(self):
-        super(PlotOptionsDialog, self).__init__()
-        self.setupUi(self)
+    def __init__(self, parent=None):
+        QtWidgets.QDialog.__init__(self, parent)
+        load_ui(__file__, 'plot_options.ui', self)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)

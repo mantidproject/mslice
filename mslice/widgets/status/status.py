@@ -9,13 +9,14 @@ from __future__ import (absolute_import, division, print_function)
 
 from qtpy.QtWidgets import QWidget
 
-from .status_ui import Ui_Form
+from mslice.util.qt import load_ui
+
 
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
 
-class StatusWidget(QWidget, Ui_Form):
-    def __init__(self, *args, **kwargs):
-        super(StatusWidget, self).__init__(*args, **kwargs)
-        self.setupUi(self)
+class StatusWidget(QWidget):
+    def __init__(self, parent=None, *args, **kwargs):
+        QWidget.__init__(self, parent, *args, **kwargs)
+        load_ui(__file__, 'status.ui', self)

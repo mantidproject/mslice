@@ -4,7 +4,6 @@ from mock import patch
 import unittest
 
 from mslice.app.mainwindow import MainWindow
-from mslice.app.mainwindow_ui import Ui_MainWindow
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
@@ -50,16 +49,16 @@ class AppTests(unittest.TestCase):
         cut_view.get_presenter = mock.Mock(return_value=self.cut_presenter)
         MainWindow.init_ui = mock.Mock()
 
-    def mock_setup_Ui(self, mock_setup):
-        self.wgtWorkspacemanager = workspace_view
-        self.wgtSlice = slice_view
-        self.wgtPowder = powder_view
-        self.wgtCut = cut_view
-        self.busy_text = busy_label
+    def mock_setup_Ui(self, mock_setup, mainwindow):
+        mainwindow.wgtWorkspacemanager = workspace_view
+        mainwindow.wgtSlice = slice_view
+        mainwindow.wgtPowder = powder_view
+        mainwindow.wgtCut = cut_view
+        mainwindow.busy_text = busy_label
         global mainview
         mainview = mock_setup
 
-    @patch.object(Ui_MainWindow, 'setupUi', mock_setup_Ui)
+    @patch('mslice.app.mainwindow.load_ui', mock_setup_Ui)
     @patch.object(QtWidgets.QMainWindow, '__init__', lambda x: None)
     def test_mainwindow(self):
         """Test the MainWindow initialises correctly"""
