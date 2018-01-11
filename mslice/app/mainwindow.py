@@ -7,6 +7,8 @@ from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
 from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 
+from mslice.widgets.dataloader.dataloader import DataLoaderWidget
+
 # ==============================================================================
 # Classes
 # ==============================================================================
@@ -20,6 +22,7 @@ class MainWindow(MainView, QMainWindow):
         ipython = IPythonWidget()
         self.centralWidget().layout().addWidget(ipython)
         ipython.setFixedHeight(200)
+
 
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
