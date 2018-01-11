@@ -51,7 +51,8 @@ class SliceWidget(QWidget, Ui_Form, SlicePlotterView):
             try:
                 value = float(lineEdit.text())
             except ValueError:
-                return
+                value = 0
+                self._display_error('Invalid step parameter. Using default value.')
             if value == 0:
                 lineEdit.setText(str(self._minimumStep[idx]))
                 self._display_error('Setting step size to default.')

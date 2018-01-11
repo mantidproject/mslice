@@ -109,13 +109,20 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def _get_theta_for_limits(self, ws_handle):
         # Don't parse all spectra in cases where there are alot to save time.
         num_hist = ws_handle.getNumberHistograms()
-        if num_hist > 500:
-            theta = [ws_handle.detectorTwoTheta(ws_handle.getDetector(i))
-                     for i in range(0, num_hist, int(num_hist / 500))]
+        if num_hist > 1000:
+            n_segments = 5
+            interval = int(num_hist / n_segments)
+            theta = []
+            for segment in range(n_segments):
+                i0 = segment * interval
+                theta.append([ws_handle.detectorTwoTheta(ws_handle.getDetector(i))
+                              for i in range(i0, i0+200)])
+            round_fac = 573
         else:
             theta = [ws_handle.detectorTwoTheta(ws_handle.getDetector(i)) for i in range(num_hist)]
-        # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.1 degrees
-        thdiff = np.diff(np.round(np.sort(theta)*573)/573)
+            round_fac = 100
+        # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
+        thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
         return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff>0)])])
 
     def load(self, filename, output_workspace):

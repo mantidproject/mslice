@@ -52,7 +52,8 @@ class CutWidget(QWidget, CutView, Ui_Form):
             try:
                 value = float(self.lneCutStep.text())
             except ValueError:
-                return
+                value = 0
+                self.error_invalid_cut_step_parameter()
             if value == 0:
                 self.lneCutStep.setText('%.5f' % (self._minimumStep))
                 self._display_error('Setting step size to default.')
@@ -112,6 +113,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
     def set_minimum_step(self, value):
         self._minimumStep = value
+
+    def get_minimum_step(self):
+        return self._minimumStep
 
     def populate_cut_axis_options(self, options):
         self.cmbCutAxis.blockSignals(True)
@@ -241,6 +245,9 @@ class CutWidget(QWidget, CutView, Ui_Form):
 
     def error_invalid_cut_axis_parameters(self):
         self._display_error("Invalid cut axis parameters")
+
+    def error_invalid_cut_step_parameter(self):
+        self._display_error("Invalid cut step parameter. Using default.")
 
     def error_invalid_integration_parameters(self):
         self._display_error("Invalid parameters for integration")
