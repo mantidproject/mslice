@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>788</width>
-    <height>679</height>
+    <width>533</width>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="iconSize">
        <size>
@@ -38,7 +38,7 @@
         <height>16</height>
        </size>
       </property>
-      <widget class="QWidget" name="data_loading">
+      <widget class="DataLoaderWidget" name="data_loading">
        <attribute name="title">
         <string>Data Loading</string>
        </attribute>
@@ -94,7 +94,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>788</width>
+     <width>533</width>
      <height>21</height>
     </rect>
    </property>
@@ -129,6 +129,12 @@
    <class>PowderWidget</class>
    <extends>QWidget</extends>
    <header>mslice/widgets/projection/powder/powder.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DataLoaderWidget</class>
+   <extends>QWidget</extends>
+   <header>mslice/widgets/dataloader/dataloader.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
