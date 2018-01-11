@@ -7,9 +7,11 @@ on Mantid (http://www.mantidproject.org).
 """
 from __future__ import print_function
 
+import fnmatch
 import os
-from setuptools import find_packages, setup
 import sys
+
+from setuptools import find_packages, setup
 
 from mslice import __project_url__, __version__
 
@@ -34,6 +36,14 @@ def read_requirements_from_file(filepath):
     with open(filepath, 'rU') as req_file:
         return req_file.readlines()
 
+def get_package_data():
+    """Return data_files in a platform dependent manner"""
+    package_data = []
+    package_dir = os.path.join(THIS_DIR, NAME)
+    for root, dirnames, filenames in os.walk(package_dir):
+        for filename in fnmatch.filter(filenames, '*.ui'):
+            package_data.append(os.path.relpath(os.path.join(root, filename), start=package_dir))
+    return {NAME: package_data}
 
 def get_data_files():
     """Return data_files in a platform dependent manner"""
@@ -55,6 +65,7 @@ setup_args = dict(name=NAME,
                   url=__project_url__,
                   keywords=['PyQt4'],
                   packages=find_packages(exclude=["misc"]),
+                  package_data=get_package_data(),
                   data_files=get_data_files(),
                   # Install this as a directory
                   zip_safe=False,
