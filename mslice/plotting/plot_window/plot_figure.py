@@ -29,8 +29,8 @@ class MatplotlibCanvas(FigureCanvasQTAgg):
         self.setParent(parent)
 
         FigureCanvasQTAgg.setSizePolicy(self,
-                                   QtWidgets.QSizePolicy.Expanding,
-                                   QtWidgets.QSizePolicy.Expanding)
+                                        QtWidgets.QSizePolicy.Expanding,
+                                        QtWidgets.QSizePolicy.Expanding)
         FigureCanvasQTAgg.updateGeometry(self)
 
 
