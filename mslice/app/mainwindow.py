@@ -17,6 +17,8 @@ TAB_SLICE = 1
 TAB_CUT = 2
 TAB_POWDER = 0
 
+from mslice.widgets.dataloader.dataloader import DataLoaderWidget
+
 # ==============================================================================
 # Classes
 # ==============================================================================
@@ -39,6 +41,7 @@ class MainWindow(MainView, QMainWindow):
         self.buttons_to_enable = {TAB_2D: [self.btnAdd, self.btnSubtract],
                                   TAB_EVENT: [self.btnMerge],
                                   TAB_HISTO: [self.btnPlot, self.btnOverplot]}
+
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
