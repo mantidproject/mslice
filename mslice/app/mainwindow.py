@@ -18,14 +18,29 @@ class MainWindow(QMainWindow, MainView):
         super(MainWindow,self).__init__()
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
-        self._presenter = MainPresenter(self)
         ipython = IPythonWidget()
         self.centralWidget().layout().addWidget(ipython)
         ipython.setFixedHeight(200)
 
-        # loader_presenter = self.data_loading.get_presenter()
-        # workspace_presenter = self.workspace_manager.get_presenter()
-        # self._presenter(MainPresenter(self, workspace_presenter ... ))
+        workspace_presenter = self.wgtWorkspacemanager.get_presenter()
+        slice_presenter = self.wgtSlice.get_presenter()
+        powder_presenter = self.wgtPowder.get_presenter()
+        cut_presenter = self.wgtCut.get_presenter()
+        self._presenter = MainPresenter(self, workspace_presenter, slice_presenter, powder_presenter, cut_presenter)
+
+        workspace_provider = workspace_presenter.get_workspace_provider()
+        powder_presenter.set_workspace_provider(workspace_provider)
+        slice_presenter.set_workspace_provider(workspace_provider)
+        cut_presenter.set_workspace_provider(workspace_provider)
+
+        self.wgtCut.error_occurred.connect(self.show_error)
+        self.wgtSlice.error_occurred.connect(self.show_error)
+        self.wgtWorkspacemanager.error_occurred.connect(self.show_error)
+        self.wgtPowder.error_occurred.connect(self.show_error)
+        self.wgtCut.busy.connect(self.show_busy)
+        self.wgtSlice.busy.connect(self.show_busy)
+        self.wgtWorkspacemanager.busy.connect(self.show_busy)
+        self.wgtPowder.busy.connect(self.show_busy)
 
     def init_ui(self):
         self.busy_text = QLabel()
