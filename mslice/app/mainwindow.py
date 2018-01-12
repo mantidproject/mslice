@@ -23,7 +23,6 @@ class MainWindow(MainView, QMainWindow):
         self.centralWidget().layout().addWidget(ipython)
         ipython.setFixedHeight(200)
 
-
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
         powder_presenter = self.wgtPowder.get_presenter()
