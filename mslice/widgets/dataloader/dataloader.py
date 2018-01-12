@@ -1,5 +1,5 @@
 
-from qtpy.QtWidgets import QWidget, QFileSystemModel, QTableView, QGridLayout, QAbstractItemView
+from qtpy.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView
 from qtpy.QtCore import QDir
 
 from mslice.util.qt import load_ui
@@ -9,18 +9,34 @@ class DataLoaderWidget(QWidget): # and some view interface
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         load_ui(__file__, 'dataloader.ui', self)
+
         self.file_system = QFileSystemModel()
         self.file_system.setRootPath(QDir.currentPath())
+        self.directory = QDir("C:/")
         self.table_view.setModel(self.file_system)
         self.table_view.setColumnWidth(0, 320)
-        self.table_view.setColumnWidth(3, 150)
+        self.table_view.setColumnWidth(1, 0)
+        self.table_view.setColumnWidth(3, 0)
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.table_view.doubleClicked.connect(self.clicked)
-        self.table_view.show()
 
+        self.table_view.doubleClicked.connect(self.clicked)
+        self.btnrefresh.clicked.connect(self.refresh)
+        self.btnback.clicked.connect(self.back)
 
     def clicked(self, file_clicked):
-        file_clicked = file_clicked.sibling(file_clicked.row(), 0)
-        if self.file_system.isDir(file_clicked):
-            self.table_view.setRootIndex(file_clicked)
-            self.txtpath.setText(self.file_system.filePath(file_clicked))
+        file_clicked = file_clicked.sibling(file_clicked.row(), 0) # clicking anywhere on row gives filename (column 0)
+        self.directory.cd(self.file_system.fileName(file_clicked))
+        self._update_from_path()
+
+    def refresh(self): #TODO: needs error checking. Also, perform automatically on line edit?
+        self.directory = QDir(self.txtpath.text())
+        self._update_from_path()
+
+    def _update_from_path(self):
+        new_path = self.directory.absolutePath()
+        self.table_view.setRootIndex(self.file_system.index(new_path))
+        self.txtpath.setText(new_path)
+
+    def back(self):
+        self.directory.cdUp()
+        self._update_from_path()

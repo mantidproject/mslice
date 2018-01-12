@@ -13,8 +13,8 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <widget class="QWidget" name="widget" native="true">
      <property name="maximumSize">
       <size>
@@ -24,42 +24,26 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QTextEdit" name="txtpath">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>25</height>
-         </size>
+       <widget class="QLineEdit" name="txtpath"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnrefresh">
+        <property name="text">
+         <string>Refresh</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="widget_4" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QPushButton" name="btnrefresh">
-           <property name="text">
-            <string>Refresh</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnback">
-           <property name="text">
-            <string>Back</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <widget class="QPushButton" name="btnback">
+        <property name="text">
+         <string>Back</string>
+        </property>
        </widget>
       </item>
      </layout>
-     <zorder>widget_3</zorder>
-     <zorder>widget_4</zorder>
-     <zorder>txtpath</zorder>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item>
     <widget class="QWidget" name="widget_3" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
