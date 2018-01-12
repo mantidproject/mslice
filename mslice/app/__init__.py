@@ -1,11 +1,9 @@
 """Package defining top-level MSlice application
 and entry points.
 """
-import os
 
 from qtpy.QtWidgets import QApplication
 
-from mslice.external.ipython import start_ipython
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
@@ -23,18 +21,10 @@ def check_mpl():
         MPL_COMPAT = True
 
 def main():
-    """Start the application. Detects the current environment and
-    runs accordingly:
-      - if an existing QApplication is detected then this is used and IPython
-      - is not started, otherwise  a application is created.
-      - if an existing IPython shell is detected this instance is used
-        and matplotlib support is enabled otherwise a new one is created
+    """Start the application.
     """
     check_mpl()
     global QAPP_REF
-    # if QApplication.instance():
-        # We must be embedded in some other application that has already started the event loop
-        # just show the UI...
     QAPP_REF = QApplication([])
     show_gui()
     return QAPP_REF.exec_()
