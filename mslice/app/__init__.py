@@ -7,7 +7,6 @@ from qtpy.QtWidgets import QApplication
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
-QAPP_REF = None
 MPL_COMPAT = False
 
 def check_mpl():
@@ -24,10 +23,9 @@ def main():
     """Start the application.
     """
     check_mpl()
-    global QAPP_REF
-    QAPP_REF = QApplication([])
+    qapp_ref = QApplication([])
     show_gui()
-    return QAPP_REF.exec_()
+    return qapp_ref.exec_()
 
 def show_gui():
     """Display the top-level main window.
