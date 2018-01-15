@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
-from qtpy.QtCore import Signal
-from qtpy.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
+from mslice.util.qt.QtCore import Signal
+from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
 
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter

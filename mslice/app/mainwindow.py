@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from qtpy.QtWidgets import QApplication, QMainWindow, QLabel
+from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
 
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui

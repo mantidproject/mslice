@@ -3,7 +3,7 @@ and entry points.
 """
 import os
 
-from qtpy.QtWidgets import QApplication
+from mslice.util.qt.QtWidgets import QApplication
 
 from mslice.external.ipython import start_ipython
 

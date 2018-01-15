@@ -1,4 +1,4 @@
-from qtpy.uic import loadUi, loadUiType
+from mslice.util.qt.uic import loadUi, loadUiType
 import os.path as osp
 
 def load_ui(caller_filename, ui_relfilename, baseinstance=None):
