@@ -22,6 +22,7 @@ class SlicePlot(object):
         self._ws_title = plot_figure.title
         self._arbitrary_nuclei = None
         self._cif_file = None
+        self._cif_path = None
         self._quick_presenter = None
         self._legend_dict = {}
 
@@ -150,9 +151,10 @@ class SlicePlot(object):
             cif_path = str(QtWidgets.QFileDialog().getOpenFileName(self.plot_figure, 'Open CIF file', '/home', 'Files (*.cif)'))
             key = path.basename(cif_path).rsplit('.')[0]
             self._cif_file = key
+            self._cif_path = cif_path
         else:
             key = self._cif_file
-            cif_path = None
+            self._cif_path = None
         self.toggle_overplot_line(self.plot_figure.actionCIF_file, key, False,
                                   self.plot_figure.actionCIF_file.isChecked(), cif_file=cif_path)
 
@@ -200,6 +202,8 @@ class SlicePlot(object):
             self.x_range = x_range
             self.y_range = y_range
             self.title = title
+            self.plot_figure.update_grid()
+            self._update_lines()
             self._canvas.draw()
         else:
             action.setChecked(True)
@@ -230,6 +234,23 @@ class SlicePlot(object):
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
             return str(temp_field)
+
+    def _update_lines(self):
+        """ Updates the powder/recoil overplots lines when intensity type changes """
+        lines = {self.plot_figure.actionHydrogen:[1, True, ''],
+                 self.plot_figure.actionDeuterium:[2, True, ''], 
+                 self.plot_figure.actionHelium:[4, True, ''],
+                 self.plot_figure.actionArbitrary_nuclei:[self._arbitrary_nuclei, True, ''], 
+                 self.plot_figure.actionAluminium:['Aluminium', False, ''],
+                 self.plot_figure.actionCopper:['Copper', False, ''],
+                 self.plot_figure.actionNiobium:['Niobium', False, ''],
+                 self.plot_figure.actionTantalum:['Tantalum', False, ''],
+                 self.plot_figure.actionCIF_file:[self._cif_file, False, self._cif_path]}
+        for line in lines:
+            if line.isChecked():
+                self._slice_plotter.overplot_lines[self._ws_title].pop(lines[line][0])
+                self._slice_plotter.add_overplot_line(self._ws_title, *lines[line])
+                self.update_legend()
 
     @property
     def colorbar_label(self):
