@@ -5,8 +5,8 @@
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 
-from qtpy.QtCore import Signal
-from qtpy.QtWidgets import QWidget
+from mslice.util.qt.QtCore import Signal
+from mslice.util.qt.QtWidgets import QWidget
 
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter

@@ -6,7 +6,7 @@ from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.views.cut_view import CutView
 from mslice.widgets.cut.command import Command
 from .validation_decorators import require_main_presenter
-from qtpy.QtWidgets import QFileDialog
+from mslice.util.qt.QtWidgets import QFileDialog
 from os.path import splitext
 import numpy as np
 import warnings

@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
-import qtpy.QtWidgets as QtWidgets
-from qtpy.QtCore import Signal
+import mslice.util.qt.QtWidgets as QtWidgets
+from mslice.util.qt.QtCore import Signal
 from six import iteritems
 
 from mslice.util.qt import load_ui
