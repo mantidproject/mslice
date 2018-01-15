@@ -141,7 +141,7 @@ class SlicePlot(object):
     def arbitrary_recoil_line(self):
         checked = self.plot_figure.actionArbitrary_nuclei.isChecked()
         if checked:
-            self._arbitrary_nuclei, confirm = QtWidgets.QInputDialog.getInt(self, 'Arbitrary Nuclei', 'Enter relative mass:')
+            self._arbitrary_nuclei, confirm = QtWidgets.QInputDialog.getInt(self.plot_figure, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
         self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self._arbitrary_nuclei, True, checked)
@@ -154,7 +154,7 @@ class SlicePlot(object):
             self._cif_path = cif_path
         else:
             key = self._cif_file
-            self._cif_path = None
+            cif_path = None
         self.toggle_overplot_line(self.plot_figure.actionCIF_file, key, False,
                                   self.plot_figure.actionCIF_file.isChecked(), cif_file=cif_path)
 
