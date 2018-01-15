@@ -237,6 +237,7 @@ def sci(im):
 
 
 def raiseWindow(figure):
+    figure.show()
     window = figure.canvas.parent()
     window.raise_()
     window.activateWindow()
