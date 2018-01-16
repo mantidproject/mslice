@@ -6,14 +6,7 @@ import threading
 import types
 import warnings
 
-from PyQt4 import QtGui
-
-# IPython monkey patches the  pygments.lexer.RegexLexer.get_tokens_unprocessed method
-# and breaks Sphinx when running within MantidPlot.
-# We store the original method definition here on the pygments module before importing IPython
-from pygments.lexer import RegexLexer
-# Monkeypatch!
-RegexLexer.get_tokens_unprocessed_unpatched = RegexLexer.get_tokens_unprocessed
+from mslice.util.qt import QtWidgets
 
 # Ignore Jupyter/IPython deprecation warnings that we can't do anything about
 warnings.filterwarnings('ignore', category=DeprecationWarning, module='IPython.*')
@@ -58,16 +51,15 @@ def our_run_code(self, code_obj, result=None):
         t = threading.Thread(target=self.ipython_run_code, args=[code_obj])
     t.start()
     while t.is_alive():
-        QtGui.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents()
     # We don't capture the return value of the ipython_run_code method but as far as I can tell
     #   it doesn't make any difference what's returned
     return 0
 
 
 class IPythonWidget(RichIPythonWidget):
-    """ Extends IPython's qt widget to include setting up and in-process kernel as well as the
-        Mantid environment, plus our trick to avoid blocking the event loop while processing commands.
-        This widget is set in the QDockWidget that houses the script interpreter within ApplicationWindow.
+    """ Extends IPython's qt widget to include setting up and in-process kernel,
+     plus our trick to avoid blocking the event loop while processing commands.
     """
 
     def __init__(self, *args, **kw):
@@ -77,7 +69,7 @@ class IPythonWidget(RichIPythonWidget):
         kernel_manager = QtInProcessKernelManager()
         kernel_manager.start_kernel()
         kernel = kernel_manager.kernel
-        kernel.gui = 'qt4'
+        kernel.gui = 'qt'
         shell = kernel.shell
 
         # These 3 lines replace the run_code method of IPython's InteractiveShell class (of which the
