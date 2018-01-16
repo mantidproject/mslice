@@ -2,10 +2,10 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
+from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
 
-class DataLoaderPresenter(PresenterUtility): #TODO: create interface
+class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
 
 
     def __init__(self, data_loader_view):
@@ -23,7 +23,7 @@ class DataLoaderPresenter(PresenterUtility): #TODO: create interface
             file_paths = ['+'.join(file_paths)]
         self._load_ws(file_paths, ws_names)
 
-    def _load_ws(self, file_paths, ws_names): #TODO: handle ValueError when merging WS with different X arrays
+    def _load_ws(self, file_paths, ws_names):
         not_loaded = []
         not_opened = []
         multi = len(ws_names) > 1
@@ -33,6 +33,8 @@ class DataLoaderPresenter(PresenterUtility): #TODO: create interface
             else:
                 try:
                     self._workspace_provider.load(filename=file_paths[i], output_workspace=ws_name)
+                except ValueError as e:
+                    self._view.error_loading_workspace(e)
                 except RuntimeError:
                     not_opened.append(ws_name)
                 else:
