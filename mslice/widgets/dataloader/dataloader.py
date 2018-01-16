@@ -2,13 +2,17 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 
-from qtpy.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView
-from qtpy.QtCore import QDir
+from qtpy.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView, QMessageBox
+from qtpy.QtCore import Signal, QDir
 
+from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.util.qt import load_ui
+from .inputdialog import EfInputDialog
 
 
 class DataLoaderWidget(QWidget): # and some view interface
+
+    error_occurred = Signal('QString')
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -22,6 +26,7 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.table_view.setColumnWidth(1, 0)
         self.table_view.setColumnWidth(3, 0)
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self._presenter = DataLoaderPresenter(self)
 
         self.table_view.doubleClicked.connect(self.clicked)
         self.btnrefresh.clicked.connect(self.refresh)
@@ -50,8 +55,35 @@ class DataLoaderWidget(QWidget): # and some view interface
         file_selected = self.table_view.selectionModel().selectedRows()[0] #TODO: if multiple selected?
         file_selected = file_selected.sibling(file_selected.row(), 0)
         file_selected = os.path.join(self.directory.absolutePath(), self.file_system.fileName(file_selected))
-        print(file_selected)
-        self.presenter.load_workspace(file_selected)
+        self._presenter.load_workspace(file_selected)
+
+    def get_workspace_efixed(self, workspace, hasMultipleWS=False):
+        Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, None)
+        if not success:
+            raise ValueError('Fixed final energy not given')
+        return Ef, applyToAll
 
     def get_presenter(self):
         return self._presenter
+
+    def error_unable_to_open_file(self, filename=None):
+        self._display_error('MSlice was not able to load %s' % ('the selected file' if filename is None else filename))
+
+    def no_workspace_has_been_loaded(self, filename=None):
+        if filename is None:
+            self._display_error('No new workspaces have been loaded')
+        else:
+            self._display_error('File %s has not been loaded' % (filename))
+
+    def confirm_overwrite_workspace(self):
+        reply = QMessageBox.question(self,'Confirm Overwrite', 'The workspace you want to load has the same name as'
+                                                               'an existing workspace, Are you sure you want to '
+                                                               'overwrite it? ',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            return True
+        else:
+            return False
+
+    def _display_error(self, error_string):
+        self.error_occurred.emit(error_string)
