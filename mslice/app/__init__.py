@@ -2,7 +2,7 @@
 and entry points.
 """
 
-from qtpy.QtWidgets import QApplication
+from mslice.util.qt.QtWidgets import QApplication
 
 
 # Module-level reference to keep main window alive after show_gui has returned

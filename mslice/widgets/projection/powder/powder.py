@@ -5,8 +5,8 @@
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 
-from qtpy.QtCore import Signal
-from qtpy.QtWidgets import QWidget, QMessageBox
+from mslice.util.qt.QtCore import Signal
+from mslice.util.qt.QtWidgets import QWidget, QMessageBox
 
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter

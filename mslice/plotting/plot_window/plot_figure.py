@@ -4,9 +4,9 @@ import importlib
 
 from matplotlib.figure import Figure
 import six
-from qtpy import QT_VERSION
-from qtpy.QtCore import Qt
-from qtpy import QtWidgets
+from mslice.util.qt import QT_VERSION
+from mslice.util.qt.QtCore import Qt
+from mslice.util.qt import QtWidgets
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
