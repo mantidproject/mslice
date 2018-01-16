@@ -2,6 +2,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 
+from functools import partial
+
 from qtpy.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView, QMessageBox
 from qtpy.QtCore import Signal, QDir
 
@@ -31,7 +33,8 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.table_view.doubleClicked.connect(self.clicked)
         self.btnrefresh.clicked.connect(self.refresh)
         self.btnback.clicked.connect(self.back)
-        self.btnload.clicked.connect(self.load)
+        self.btnload.clicked.connect(partial(self.load, False))
+        self.btnmerge.clicked.connect(partial(self.load, True))
 
     def clicked(self, file_clicked):
         file_clicked = file_clicked.sibling(file_clicked.row(), 0) # so clicking anywhere on row gives filename
@@ -51,8 +54,11 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.directory.cdUp()
         self._update_from_path()
 
-    def load(self):
-        self._presenter.load_workspace(self.get_selected_file_paths())
+    def load(self, merge):
+        if merge:
+            self._presenter.load_and_merge_workspace(self.get_selected_file_paths())
+        else:
+            self._presenter.load_workspace(self.get_selected_file_paths())
 
     def get_selected_file_paths(self):
         selected = self.table_view.selectionModel().selectedRows()
@@ -60,7 +66,6 @@ class DataLoaderWidget(QWidget): # and some view interface
             selected[i] = selected[i].sibling(selected[i].row(), 0)
             selected[i] = str(os.path.join(self.directory.absolutePath(), self.file_system.fileName(selected[i])))
         return selected
-
 
     def get_workspace_efixed(self, workspace, hasMultipleWS=False):
         Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, None)
