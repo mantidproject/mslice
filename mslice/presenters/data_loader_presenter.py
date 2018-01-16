@@ -17,7 +17,6 @@ class DataLoaderPresenter(PresenterUtility): #TODO: create interface
         self._workspace_provider = workspace_provider
 
     def load_workspace(self, workspace_to_load):
-        workspace_to_load = [str(workspace_to_load)] #TODO: tmp until multiple can be loaded
         ws_names = [os.path.splitext(os.path.basename(base))[0] for base in workspace_to_load]
         not_loaded = []
         not_opened = []
@@ -30,7 +29,6 @@ class DataLoaderPresenter(PresenterUtility): #TODO: create interface
                 not_loaded.append(ws_name)
                 continue
             try:
-                print(workspace_to_load)
                 self._workspace_provider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
             except RuntimeError:
                 not_opened.append(ws_name)
