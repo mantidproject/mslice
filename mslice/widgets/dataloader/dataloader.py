@@ -52,10 +52,15 @@ class DataLoaderWidget(QWidget): # and some view interface
         self._update_from_path()
 
     def load(self):
-        file_selected = self.table_view.selectionModel().selectedRows()[0] #TODO: if multiple selected?
-        file_selected = file_selected.sibling(file_selected.row(), 0)
-        file_selected = os.path.join(self.directory.absolutePath(), self.file_system.fileName(file_selected))
-        self._presenter.load_workspace(file_selected)
+        self._presenter.load_workspace(self.get_selected_file_paths())
+
+    def get_selected_file_paths(self):
+        selected = self.table_view.selectionModel().selectedRows()
+        for i in range(len(selected)):
+            selected[i] = selected[i].sibling(selected[i].row(), 0)
+            selected[i] = str(os.path.join(self.directory.absolutePath(), self.file_system.fileName(selected[i])))
+        return selected
+
 
     def get_workspace_efixed(self, workspace, hasMultipleWS=False):
         Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, None)
