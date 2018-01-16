@@ -41,6 +41,7 @@ class MainWindow(MainView, QMainWindow):
         self.wgtSlice.error_occurred.connect(self.show_error)
         self.wgtWorkspacemanager.error_occurred.connect(self.show_error)
         self.wgtPowder.error_occurred.connect(self.show_error)
+        self.data_loading.error_occurred.connect(self.show_error)
         self.wgtCut.busy.connect(self.show_busy)
         self.wgtSlice.busy.connect(self.show_busy)
         self.wgtWorkspacemanager.busy.connect(self.show_busy)

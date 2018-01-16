@@ -21,8 +21,8 @@ class DataLoaderWidget(QWidget): # and some view interface
         load_ui(__file__, 'dataloader.ui', self)
 
         self.file_system = QFileSystemModel()
-        self.file_system.setRootPath(QDir.currentPath())
         self.directory = QDir("C:/")
+        self.file_system.setRootPath(self.directory.absolutePath())
         self.table_view.setModel(self.file_system)
         self.table_view.setColumnWidth(0, 320)
         self.table_view.setColumnWidth(1, 0)
@@ -32,6 +32,7 @@ class DataLoaderWidget(QWidget): # and some view interface
 
         self.table_view.doubleClicked.connect(self.clicked)
         self.btnrefresh.clicked.connect(self.refresh)
+        self.txtpath.editingFinished.connect(self.refresh)
         self.btnback.clicked.connect(self.back)
         self.btnload.clicked.connect(partial(self.load, False))
         self.btnmerge.clicked.connect(partial(self.load, True))
@@ -41,9 +42,13 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.directory.cd(self.file_system.fileName(file_clicked))
         self._update_from_path()
 
-    def refresh(self): #TODO: needs error checking. Also, perform automatically on line edit?
-        self.directory = QDir(self.txtpath.text())
-        self._update_from_path()
+    def refresh(self):
+        path_entered = QDir(self.txtpath.text())
+        if path_entered.exists():
+            self.directory = path_entered
+            self._update_from_path()
+        else:
+            self._display_error("Invalid file path")
 
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
@@ -91,6 +96,9 @@ class DataLoaderWidget(QWidget): # and some view interface
             return True
         else:
             return False
+
+    def error_loading_workspace(self, message):
+        self._display_error(str(message))
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
