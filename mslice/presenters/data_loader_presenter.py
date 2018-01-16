@@ -16,54 +16,36 @@ class DataLoaderPresenter(PresenterUtility): #TODO: create interface
     def set_workspace_provider(self, workspace_provider):
         self._workspace_provider = workspace_provider
 
-    def load_workspace(self, workspace_to_load):
-        ws_names = [os.path.splitext(os.path.basename(base))[0] for base in workspace_to_load]
+    def load_workspace(self, file_paths, merge):
+        ws_names = [os.path.splitext(os.path.basename(base))[0] for base in file_paths]
+        if merge:
+            ws_names = [ws_names[0] + '_merged']
+            file_paths = ['+'.join(file_paths)]
+        self._load_ws(file_paths, ws_names)
+
+    def _load_ws(self, file_paths, ws_names): #TODO: handle ValueError when merging WS with different X arrays
         not_loaded = []
         not_opened = []
-        loaded = []
         multi = len(ws_names) > 1
-        for ii, ws_name in enumerate(ws_names):
-            # confirm that user wants to overwrite an existing workspace
+        for i, ws_name in enumerate(ws_names):
             if not self._confirm_workspace_overwrite(ws_name):
                 not_loaded.append(ws_name)
-                continue
-            try:
-                self._workspace_provider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
-            except RuntimeError:
-                not_opened.append(ws_name)
             else:
-                loaded.append(ws_name)
-                # Checks if this workspace has efixed set. If not, prompts the user and sets it.
-                if self._workspace_provider.get_EMode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(ws_name):
-                    Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi)
-                    self._workspace_provider.set_efixed(ws_name, Ef)
+                try:
+                    self._workspace_provider.load(filename=file_paths[i], output_workspace=ws_name)
+                except RuntimeError:
+                    not_opened.append(ws_name)
+                else:
+                    self.check_efixed(ws_name, multi)
         self._report_load_errors(ws_names, not_opened, not_loaded)
         self._main_presenter.update_displayed_workspaces()
 
-    def load_and_merge_workspace(self, workspace_to_load):
-        ws_names = [os.path.splitext(os.path.basename(base))[0] for base in workspace_to_load]
-        not_loaded = []
-        not_opened = []
-        loaded = []
-        multi = len(ws_names) > 1
-        merged_ws_name = ws_names[0] + '_merged'
-        if not self._confirm_workspace_overwrite(merged_ws_name):
-            not_loaded.append(merged_ws_name)
-        load_file_paths = workspace_to_load[0]
-        for path in workspace_to_load[1:]:
-            load_file_paths+= '+' + path
-        try:
-            self._workspace_provider.load(filename=load_file_paths, output_workspace=merged_ws_name)
-        except RuntimeError:
-            not_opened.append(merged_ws_name)
-        else:
-            loaded.append(merged_ws_name)
-            if self._workspace_provider.get_EMode(merged_ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(
-                    merged_ws_name):
-                Ef, allChecked = self._view.get_workspace_efixed(merged_ws_name, multi)
-                self._workspace_provider.set_efixed(merged_ws_name, Ef)
-        self._report_load_errors([merged_ws_name], not_opened, not_loaded)
-        self._main_presenter.update_displayed_workspaces()
+    def check_efixed(self, ws_name, multi=False):
+        '''checks if a newly loaded workspace has efixed set'''
+        if self._workspace_provider.get_EMode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(
+                ws_name):
+            Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi)
+            self._workspace_provider.set_efixed(ws_name, Ef)
 
 
     def _confirm_workspace_overwrite(self, ws_name):
