@@ -5,7 +5,7 @@ from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
-
+from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 
 # ==============================================================================
 # Classes
@@ -17,12 +17,15 @@ class MainWindow(MainView, QMainWindow):
         QMainWindow.__init__(self)
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
+        ipython = IPythonWidget()
+        self.centralWidget().layout().addWidget(ipython)
+        ipython.setFixedHeight(200)
 
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
         powder_presenter = self.wgtPowder.get_presenter()
         cut_presenter = self.wgtCut.get_presenter()
-        self._presenter = MainPresenter(self, workspace_presenter, slice_presenter , powder_presenter, cut_presenter)
+        self._presenter = MainPresenter(self, workspace_presenter, slice_presenter, powder_presenter, cut_presenter)
 
         workspace_provider = workspace_presenter.get_workspace_provider()
         powder_presenter.set_workspace_provider(workspace_provider)
