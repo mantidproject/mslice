@@ -238,9 +238,9 @@ class SlicePlot(object):
     def _update_lines(self):
         """ Updates the powder/recoil overplots lines when intensity type changes """
         lines = {self.plot_figure.actionHydrogen:[1, True, ''],
-                 self.plot_figure.actionDeuterium:[2, True, ''], 
+                 self.plot_figure.actionDeuterium:[2, True, ''],
                  self.plot_figure.actionHelium:[4, True, ''],
-                 self.plot_figure.actionArbitrary_nuclei:[self._arbitrary_nuclei, True, ''], 
+                 self.plot_figure.actionArbitrary_nuclei:[self._arbitrary_nuclei, True, ''],
                  self.plot_figure.actionAluminium:['Aluminium', False, ''],
                  self.plot_figure.actionCopper:['Copper', False, ''],
                  self.plot_figure.actionNiobium:['Niobium', False, ''],
