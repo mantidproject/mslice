@@ -8,7 +8,6 @@ from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresen
 from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
-from .inputdialog import EfInputDialog
 
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
@@ -109,12 +108,6 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
             raise ValueError('No Valid Name supplied')
         return str(name)
 
-    def get_workspace_efixed(self, workspace, hasMultipleWS=False):
-        Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, None)
-        if not success:
-            raise ValueError('Fixed final energy not given')
-        return Ef, applyToAll
-
     def error_select_only_one_workspace(self):
         self._display_error('Please select only one workspace and then try again')
 
@@ -127,27 +120,8 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
     def error_select_more_than_one_workspaces(self):
         self._display_error('Please select more than one projected workspaces then try again')
 
-    def error_unable_to_open_file(self, filename=None):
-        self._display_error('MSlice was not able to load %s' % ('the selected file' if filename is None else filename))
-
-    def confirm_overwrite_workspace(self):
-        reply = QMessageBox.question(self,'Confirm Overwrite', 'The workspace you want to load has the same name as'
-                                                               'an existing workspace, Are you sure you want to '
-                                                               'overwrite it? ',
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            return True
-        else:
-            return False
-
     def error_invalid_save_path(self):
         self._display_error('No files were saved')
-
-    def no_workspace_has_been_loaded(self, filename=None):
-        if filename is None:
-            self._display_error('No new workspaces have been loaded')
-        else:
-            self._display_error('File %s has not been loaded' % (filename))
 
     def get_presenter(self):
         return self._presenter

@@ -46,20 +46,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def _get_main_presenter(self):
         return self._main_presenter
 
-    def _report_load_errors(self, ws_names, not_opened, not_loaded):
-        if len(not_opened) == len(ws_names):
-            self._workspace_manager_view.error_unable_to_open_file()
-            return
-        elif len(not_opened) > 0:
-            errmsg = not_opened[0] if len(not_opened)==1 else ",".join(not_opened)
-            self._workspace_manager_view.error_unable_to_open_file(errmsg)
-        if len(not_loaded) == len(ws_names):
-            self._workspace_manager_view.no_workspace_has_been_loaded()
-            return
-        elif len(not_loaded) > 0:
-            errmsg = not_loaded[0] if len(not_loaded)==1 else ",".join(not_loaded)
-            self._workspace_manager_view.no_workspace_has_been_loaded(errmsg)
-
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
             return self._workspace_manager_view.confirm_overwrite_workspace()
