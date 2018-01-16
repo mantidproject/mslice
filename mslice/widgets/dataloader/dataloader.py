@@ -55,10 +55,7 @@ class DataLoaderWidget(QWidget): # and some view interface
         self._update_from_path()
 
     def load(self, merge):
-        if merge:
-            self._presenter.load_and_merge_workspace(self.get_selected_file_paths())
-        else:
-            self._presenter.load_workspace(self.get_selected_file_paths())
+        self._presenter.load_workspace(self.get_selected_file_paths(), merge)
 
     def get_selected_file_paths(self):
         selected = self.table_view.selectionModel().selectedRows()
