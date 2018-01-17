@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
+
 from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
 
 from mslice.presenters.main_presenter import MainPresenter
@@ -7,7 +8,12 @@ from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
 from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 
-from mslice.widgets.dataloader.dataloader import DataLoaderWidget
+TAB_2D = 0
+TAB_EVENT = 1
+TAB_HISTO = 2
+TAB_SLICE = 1
+TAB_CUT = 2
+TAB_POWDER = 0
 
 # ==============================================================================
 # Classes
@@ -22,7 +28,10 @@ class MainWindow(MainView, QMainWindow):
         ipython = IPythonWidget()
         self.centralWidget().layout().addWidget(ipython)
         ipython.setFixedHeight(200)
-
+        self.tabs = [self.wgtSlice, self.wgtCut, self.wgtPowder]
+        self.tabs_to_show = {TAB_2D: [TAB_POWDER],
+                             TAB_EVENT: [TAB_SLICE, TAB_CUT],
+                             TAB_HISTO: []}
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
@@ -50,7 +59,16 @@ class MainWindow(MainView, QMainWindow):
         self.wgtPowder.busy.connect(self.show_busy)
 
     def ws_tab_changed(self, tab):
-        print(tab)
+        self.tabWidget_2.show()
+        tab_to_show = self.tabs_to_show[tab]
+        for tab_index in range(3):
+            self.tabWidget_2.setTabEnabled(tab_index, False)
+        if tab_to_show:
+            self.tabWidget_2.setCurrentIndex(tab_to_show[0])
+            for tab_index in tab_to_show:
+                    self.tabWidget_2.setTabEnabled(tab_index, True)
+        else:
+            self.tabWidget_2.hide()
 
     def init_ui(self):
         self.busy_text = QLabel()
