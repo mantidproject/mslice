@@ -31,7 +31,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QListWidget" name="lstWorkspaces2D">
+        <widget class="QListWidget" name="listWorkspaces2D">
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
@@ -55,7 +55,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QListWidget" name="lstWorkspacesHisto"/>
+        <widget class="QListWidget" name="listWorkspacesHisto"/>
        </item>
       </layout>
      </widget>
