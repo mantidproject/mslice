@@ -23,9 +23,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def notify(self, command):
         self._clear_displayed_error()
         self._workspace_manager_view.busy.emit(True)
-        if command == Command.LoadWorkspace:
-            self._load_workspace()
-        elif command == Command.SaveSelectedWorkspace:
+        if command == Command.SaveSelectedWorkspace:
             self._save_selected_workspace()
         elif command == Command.RemoveSelectedWorkspaces:
             self._remove_selected_workspaces()

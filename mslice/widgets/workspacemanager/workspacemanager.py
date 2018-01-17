@@ -11,6 +11,9 @@ from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
 
+TAB_2D = 0
+TAB_EVENT = 1
+TAB_HISTO = 2
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
@@ -25,12 +28,18 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         self.button_mappings = {}
         self._main_window = None
         self.onscreen_workspaces = []
+        self.tab_to_list = {TAB_2D: self.listWorkspaces2D,
+                            TAB_EVENT: self.listWorkspacesEvent,
+                            TAB_HISTO: self.listWorkspacesHisto}
         self.tabWidget.currentChanged.connect(self.tab_changed)
         self.listWorkspaces2D.itemSelectionChanged.connect(self.list_item_changed)
         self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def current_list(self):
+        return self.tab_to_list[self.tabWidget.currentIndex()]
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -74,18 +83,20 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
                     return
 
     def get_workspace_selected(self):
-        selected_workspaces = [str(x.text()) for x in self.listWorkspaces2D.selectedItems()]
+        selected_workspaces = [str(x.text()) for x in self.current_list().selectedItems()]
         return list(selected_workspaces)
 
     def set_workspace_selected(self, index):
-        for item_index in range(self.listWorkspaces2D.count()):
-            self.listWorkspaces2D.setItemSelected(self.listWorkspaces2D.item(item_index), False)
+        current_list = self.current_list()
+        for item_index in range(current_list.count()):
+            self.listWorkspaces2D.setItemSelected(current_list.item(item_index), False)
         for this_index in (index if hasattr(index, "__iter__") else [index]):
-            self.listWorkspaces2D.setItemSelected(self.listWorkspaces2D.item(this_index), True)
+            self.listWorkspaces2D.setItemSelected(current_list.item(this_index), True)
 
     def get_workspace_index(self, ws_name):
-        for index in range(self.listWorkspaces2D.count()):
-            if str(self.listWorkspaces2D.item(index).text()) == ws_name:
+        current_list = self.current_list()
+        for index in range(current_list.count()):
+            if str(current_list.item(index).text()) == ws_name:
                 return index
         return -1
 
