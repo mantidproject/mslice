@@ -23,7 +23,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab2D">
       <attribute name="title">
@@ -45,7 +45,11 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QListWidget" name="listWorkspacesEvent"/>
+        <widget class="QListWidget" name="listWorkspacesEvent">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -55,7 +59,11 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QListWidget" name="listWorkspacesHisto"/>
+        <widget class="QListWidget" name="listWorkspacesHisto">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

@@ -7,6 +7,7 @@ from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
 from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
+from mslice.widgets.workspacemanager.command import Command as ws_command
 
 TAB_2D = 0
 TAB_EVENT = 1
@@ -32,21 +33,25 @@ class MainWindow(MainView, QMainWindow):
         self.tabs_to_show = {TAB_2D: [TAB_POWDER],
                              TAB_EVENT: [TAB_SLICE, TAB_CUT],
                              TAB_HISTO: []}
-        workspace_presenter = self.wgtWorkspacemanager.get_presenter()
+        self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
         powder_presenter = self.wgtPowder.get_presenter()
         cut_presenter = self.wgtCut.get_presenter()
-        self._presenter = MainPresenter(self, workspace_presenter, dataloader_presenter,
+        self._presenter = MainPresenter(self, self.workspace_presenter, dataloader_presenter,
                                         slice_presenter, powder_presenter, cut_presenter)
 
-        workspace_provider = workspace_presenter.get_workspace_provider()
+        workspace_provider = self.workspace_presenter.get_workspace_provider()
         dataloader_presenter.set_workspace_provider(workspace_provider)
         powder_presenter.set_workspace_provider(workspace_provider)
         slice_presenter.set_workspace_provider(workspace_provider)
         cut_presenter.set_workspace_provider(workspace_provider)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
+        self.btnSave.clicked.connect(self.button_save)
+        self.btnRename.clicked.connect(self.button_rename)
+        self.btnDelete.clicked.connect(self.button_delete)
+        self.btnMerge.clicked.connect(self.button_merge)
 
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)
@@ -69,6 +74,18 @@ class MainWindow(MainView, QMainWindow):
                     self.tabWidget_2.setTabEnabled(tab_index, True)
         else:
             self.tabWidget_2.hide()
+
+    def button_save(self):
+        self.workspace_presenter.notify(ws_command.SaveSelectedWorkspace)
+
+    def button_rename(self):
+        self.workspace_presenter.notify(ws_command.RenameWorkspace)
+
+    def button_delete(self):
+        self.workspace_presenter.notify(ws_command.RemoveSelectedWorkspaces)
+
+    def button_merge(self):
+        self.workspace_presenter.notify(ws_command.CombineWorkspace)
 
     def init_ui(self):
         self.busy_text = QLabel()
