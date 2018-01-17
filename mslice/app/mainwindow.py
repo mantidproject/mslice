@@ -37,6 +37,8 @@ class MainWindow(MainView, QMainWindow):
         slice_presenter.set_workspace_provider(workspace_provider)
         cut_presenter.set_workspace_provider(workspace_provider)
 
+        self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
+
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)
         self.wgtWorkspacemanager.error_occurred.connect(self.show_error)
@@ -46,6 +48,9 @@ class MainWindow(MainView, QMainWindow):
         self.wgtSlice.busy.connect(self.show_busy)
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
+
+    def ws_tab_changed(self, tab):
+        print(tab)
 
     def init_ui(self):
         self.busy_text = QLabel()
