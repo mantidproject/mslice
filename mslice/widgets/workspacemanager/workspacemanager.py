@@ -19,21 +19,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         load_ui(__file__, 'workspacemanager.ui', self)
-        self.btnWorkspaceSave.clicked.connect(self._btn_clicked)
-        self.btnLoad.clicked.connect(self._btn_clicked)
-        self.btnWorkspaceCompose.clicked.connect(self._btn_clicked)
-        self.btnWorkspaceRemove.clicked.connect(self._btn_clicked)
-        self.btnRename.clicked.connect(self._btn_clicked)
-        self.btnCombine.clicked.connect(self._btn_clicked)
-        self.button_mappings = {self.btnWorkspaceRemove: Command.RemoveSelectedWorkspaces,
-                                self.btnWorkspaceSave: Command.SaveSelectedWorkspace,
-                                self.btnWorkspaceCompose: Command.ComposeWorkspace,
-                                self.btnLoad: Command.LoadWorkspace,
-                                self.btnRename: Command.RenameWorkspace,
-                                self.btnCombine: Command.CombineWorkspace
-                                }
+        self.button_mappings = {}
         self._main_window = None
-        self.lstWorkspaces.itemSelectionChanged.connect(self.list_item_changed)
+        self.lstWorkspaces2D.itemSelectionChanged.connect(self.list_item_changed)
         self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
     def _display_error(self, error_string):
@@ -49,20 +37,20 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def display_loaded_workspaces(self, workspaces):
         onscreen_workspaces = []
-        for index in range(self.lstWorkspaces.count()):
-            qitem = self.lstWorkspaces.item(index)
+        for index in range(self.lstWorkspaces2D.count()):
+            qitem = self.lstWorkspaces2D.item(index)
             onscreen_workspaces.append(str(qitem.text()))
         for workspace in workspaces:
             if workspace in onscreen_workspaces:
                 onscreen_workspaces.remove(workspace)
                 continue
             item = QListWidgetItem(workspace)
-            self.lstWorkspaces.addItem(item)
+            self.lstWorkspaces2D.addItem(item)
 
         # remove any onscreen workspaces that are no longer here
         items = [] #items contains (qlistitem, index) tuples
-        for index in range(self.lstWorkspaces.count()):
-            items.append(self.lstWorkspaces.item(index))
+        for index in range(self.lstWorkspaces2D.count()):
+            items.append(self.lstWorkspaces2D.item(index))
         for item in items:
             if str(item.text()) in onscreen_workspaces:
                 self.remove_item_from_list(item)
@@ -73,24 +61,24 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         Must be done in seperate function because items are removed by index and removing an items may alter the indexes
         of other items"""
         text = qlistwidget_item.text()
-        for index in range(self.lstWorkspaces.count()):
-            if self.lstWorkspaces.item(index).text() == text:
-                self.lstWorkspaces.takeItem(index)
+        for index in range(self.lstWorkspaces2D.count()):
+            if self.lstWorkspaces2D.item(index).text() == text:
+                self.lstWorkspaces2D.takeItem(index)
                 return
 
     def get_workspace_selected(self):
-        selected_workspaces = [str(x.text()) for x in self.lstWorkspaces.selectedItems()]
+        selected_workspaces = [str(x.text()) for x in self.lstWorkspaces2D.selectedItems()]
         return list(selected_workspaces)
 
     def set_workspace_selected(self, index):
-        for item_index in range(self.lstWorkspaces.count()):
-            self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(item_index), False)
+        for item_index in range(self.lstWorkspaces2D.count()):
+            self.lstWorkspaces2D.setItemSelected(self.lstWorkspaces2D.item(item_index), False)
         for this_index in (index if hasattr(index, "__iter__") else [index]):
-            self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(this_index), True)
+            self.lstWorkspaces2D.setItemSelected(self.lstWorkspaces2D.item(this_index), True)
 
     def get_workspace_index(self, ws_name):
-        for index in range(self.lstWorkspaces.count()):
-            if str(self.lstWorkspaces.item(index).text()) == ws_name:
+        for index in range(self.lstWorkspaces2D.count()):
+            if str(self.lstWorkspaces2D.item(index).text()) == ws_name:
                 return index
         return -1
 
