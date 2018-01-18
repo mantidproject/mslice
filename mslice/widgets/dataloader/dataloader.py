@@ -36,6 +36,8 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.table_view.doubleClicked.connect(self.clicked)
         self.txtpath.editingFinished.connect(self.refresh)
         self.btnback.clicked.connect(self.back)
+        self.sort.currentIndexChanged.connect(self.sort_files)
+        self.btnhome.clicked.connect(self.go_to_home)
         self.btnload.clicked.connect(partial(self.load, False))
         self.btnmerge.clicked.connect(partial(self.load, True))
 
@@ -63,6 +65,13 @@ class DataLoaderWidget(QWidget): # and some view interface
 
     def load(self, merge):
         self._presenter.load_workspace(self.get_selected_file_paths(), merge)
+
+    def sort_files(self, column):
+        self.table_view.sortByColumn(column, order=column % 2)  # descending for size/modified, ascending for name/type
+
+    def go_to_home(self):
+        self.directory = QDir(os.path.expanduser('~'))
+        self._update_from_path()
 
     def get_selected_file_paths(self):
         selected = self.table_view.selectionModel().selectedRows()
