@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>785</width>
+    <width>702</width>
     <height>389</height>
    </rect>
   </property>
@@ -27,9 +27,9 @@
        <widget class="QLineEdit" name="txtpath"/>
       </item>
       <item>
-       <widget class="QPushButton" name="btnrefresh">
+       <widget class="QPushButton" name="btnhome">
         <property name="text">
-         <string>Refresh</string>
+         <string>Home</string>
         </property>
        </widget>
       </item>
@@ -66,11 +66,67 @@
        <widget class="QWidget" name="widget_5" native="true">
         <property name="minimumSize">
          <size>
-          <width>200</width>
+          <width>100</width>
           <height>0</height>
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QWidget" name="widget_2" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Sort by:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="ComboBox" name="sort">
+              <property name="editable">
+               <bool>false</bool>
+              </property>
+              <property name="currentText">
+               <string>Unsorted</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>Unsorted</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Name</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Last modified</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Type</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item>
           <widget class="QPushButton" name="btnload">
            <property name="text">
@@ -85,6 +141,19 @@
            </property>
           </widget>
          </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </widget>
       </item>
@@ -93,6 +162,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>mslice/widgets/dataloader/combo_box.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
