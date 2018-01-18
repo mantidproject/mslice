@@ -87,13 +87,8 @@
                <bool>false</bool>
               </property>
               <property name="currentText">
-               <string>Unsorted</string>
+               <string>Name</string>
               </property>
-              <item>
-               <property name="text">
-                <string>Unsorted</string>
-               </property>
-              </item>
               <item>
                <property name="text">
                 <string>Name</string>
@@ -101,12 +96,17 @@
               </item>
               <item>
                <property name="text">
-                <string>Last modified</string>
+                <string>Size</string>
                </property>
               </item>
               <item>
                <property name="text">
                 <string>Type</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Last modified</string>
                </property>
               </item>
              </widget>
