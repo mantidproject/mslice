@@ -15,6 +15,7 @@ from .inputdialog import EfInputDialog
 class DataLoaderWidget(QWidget): # and some view interface
 
     error_occurred = Signal('QString')
+    busy = Signal(bool)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -32,8 +33,11 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.table_view.setColumnWidth(3, 0)
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._presenter = DataLoaderPresenter(self)
+        self.btnload.setEnabled(False)
+        self.btnmerge.setEnabled(False)
 
-        self.table_view.doubleClicked.connect(self.clicked)
+        self.table_view.doubleClicked.connect(self.enter_dir)
+        self.table_view.clicked.connect(self.validate_selection)
         self.txtpath.editingFinished.connect(self.refresh)
         self.btnback.clicked.connect(self.back)
         self.sort.currentIndexChanged.connect(self.sort_files)
@@ -41,7 +45,7 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.btnload.clicked.connect(partial(self.load, False))
         self.btnmerge.clicked.connect(partial(self.load, True))
 
-    def clicked(self, file_clicked):
+    def enter_dir(self, file_clicked):
         file_clicked = file_clicked.sibling(file_clicked.row(), 0) # so clicking anywhere on row gives filename
         self.directory.cd(self.file_system.fileName(file_clicked))
         self._update_from_path()
@@ -58,6 +62,7 @@ class DataLoaderWidget(QWidget): # and some view interface
         new_path = self.directory.absolutePath()
         self.table_view.setRootIndex(self.file_system.index(new_path))
         self.txtpath.setText(new_path)
+        self._clear_displayed_error()
 
     def back(self):
         self.directory.cdUp()
@@ -72,6 +77,17 @@ class DataLoaderWidget(QWidget): # and some view interface
     def go_to_home(self):
         self.directory = QDir(os.path.expanduser('~'))
         self._update_from_path()
+
+    def validate_selection(self):
+        self.btnload.setEnabled(False)
+        self.btnmerge.setEnabled(False)
+        selected = self.get_selected_file_paths()
+        for selection in selected:
+            if self.file_system.isDir(self.file_system.index(selection)):
+                return
+        self.btnload.setEnabled(True)
+        if len(selected) > 1:
+            self.btnmerge.setEnabled(True)
 
     def get_selected_file_paths(self):
         selected = self.table_view.selectionModel().selectedRows()
@@ -113,3 +129,6 @@ class DataLoaderWidget(QWidget): # and some view interface
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def _clear_displayed_error(self):
+        self._display_error("")
