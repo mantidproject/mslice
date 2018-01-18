@@ -46,11 +46,13 @@ class MainWindow(MainView, QMainWindow):
         self.wgtSlice.busy.connect(self.show_busy)
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
+        self.data_loading.busy.connect(self.show_busy)
 
     def init_ui(self):
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")
+        self.busy_text.setStyleSheet("QLabel { color: black }")
         self.busy = False
 
     def show_error(self, msg):
