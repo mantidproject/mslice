@@ -53,6 +53,7 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
             outws.append(self._projection_calculator.calculate_projection(workspace, axis1, axis2, units))
         self._get_main_presenter().update_displayed_workspaces()
         self._get_main_presenter().set_selected_workspaces(outws)
+        self._get_main_presenter().change_ws_tab(1)
 
     @require_main_presenter
     def _get_main_presenter(self):
