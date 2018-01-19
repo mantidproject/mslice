@@ -29,6 +29,22 @@ class MatplotlibCutPlotter(CutPlotter):
             plt.gcf().canvas.manager.update_grid()
         plt.draw_all()
 
+    def plot_cut_from_x_y_e(self, x, y, e, selected_workspace, plot_over):
+        # integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
+        # legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
+        legend= None
+        plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o', picker=picker)
+        leg = plt.legend(fontsize='medium')
+        leg.draggable()
+        # plt.xlabel(self._getDisplayName(cut_axis.units, self._cut_algorithm.getComment(selected_workspace)),
+        #            picker=picker)
+        plt.ylabel(INTENSITY_LABEL, picker=picker)
+        plt.autoscale()
+        plt.gcf().canvas.manager.add_cut_plot(self)
+        if not plot_over:
+            plt.gcf().canvas.manager.update_grid()
+        plt.draw_all()
+
     def _getDisplayName(self, axisUnits, comment=None):
         if 'DeltaE' in axisUnits:
             # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX
