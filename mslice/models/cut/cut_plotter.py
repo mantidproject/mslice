@@ -6,5 +6,5 @@ class CutPlotter(object):
                  intensity_end, plot_over):
         raise NotImplementedError('This class is an abstract interface')
 
-    def plot_cut_from_x_y_e(self, x, y, e, selected_workspace, plot_over):
+    def plot_cut_from_x_y_e(self, x, y, e, x_units, selected_workspace, plot_over):
         raise NotImplementedError('This class is an abstract interface')

@@ -39,11 +39,10 @@ class CutPresenter(PresenterUtility):
             self._cut_top_level(plot_over=False)
         elif command == Command.PlotOver:
             self._cut_top_level(plot_over=True)
-        elif command == Command.PlotOnly:
-            self._cut_top_level(histo_ws=True, plot_over=False, save_to_workspace=False)
-            # self.plot_cut_from_workspace()
-        elif command == Command.PlotOverOnly:
-            self._cut_top_level(histo_ws=True, plot_over=True, save_to_workspace=False)
+        elif command == Command.PlotFromWorkspace:
+            self._plot_cut_from_workspace(plot_over=False)
+        elif command == Command.PlotOverFromWorkspace:
+            self._plot_cut_from_workspace(plot_over=True)
         elif command == Command.SaveToWorkspace:
             self._cut_top_level(plot=False)
         elif command == Command.SaveToAscii:
@@ -57,10 +56,10 @@ class CutPresenter(PresenterUtility):
     def _cut_top_level(self, histo_ws=False, plot_over=False, plot=True, save_to_workspace=True, save_to_file=None): #TODO: rename
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         output_method = self._output_method(plot_over, save_to_workspace, plot, save_to_file)
+        self._parse_step()
         for workspace in selected_workspaces:
-            params = self.get_cut_params(workspace, histo_ws)
+            params = (workspace,) + self._parse_input()
             self._cut(params, output_method, plot_over, save_to_workspace, save_to_file)
-
 
     def _cut(self, params, output_method, plot_over=False, save_to_workspace=True, save_to_file=None): #TODO: rename
             width = params[-1]
@@ -69,22 +68,6 @@ class CutPresenter(PresenterUtility):
                 self._plot_with_width(params, output_method, width, save_to_file)
             else:
                 output_method(params, plot_over, save_to_file)
-
-    def get_cut_params(self, workspace, histo_ws):
-        if histo_ws:
-            # params = self._cut_algorithm.get_cut_params(workspace) # original method
-            params = None
-            mantid_ws = MantidWorkspaceProvider().get_workspace_handle(workspace)
-            dim = mantid_ws.getDimension(0)
-            x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
-            y = mantid_ws.getSignalArray() / mantid_ws.getNumEventsArray()
-            e = np.sqrt(mantid_ws.getErrorSquaredArray()/mantid_ws.getNumEventsArray())
-            e = e.squeeze()
-            self._cut_plotter.plot_cut_from_x_y_e(x, y, e, workspace, False)
-        else:
-            self._parse_step()
-            params = self._parse_input()
-        return (workspace,) + params
 
     def _output_method(self, plot_over, save_to_workspace, plot, save_to_file):
         if save_to_file is not None:
@@ -134,6 +117,22 @@ class CutPresenter(PresenterUtility):
         cut_params = params[:5]
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
+
+    def _plot_cut_from_workspace(self, plot_over):
+        selected_workspaces = self._main_presenter.get_selected_workspaces()
+        for workspace in selected_workspaces:
+            x, y, e, units = self.get_arrays_from_workspace(workspace)
+            self._cut_plotter.plot_cut_from_x_y_e(x, y, e, units, workspace, plot_over)
+            # plot over should become true after first loop
+
+    def get_arrays_from_workspace(self, workspace):
+        mantid_ws = MantidWorkspaceProvider().get_workspace_handle(workspace)
+        dim = mantid_ws.getDimension(0)
+        x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
+        y = mantid_ws.getSignalArray() / mantid_ws.getNumEventsArray()
+        e = np.sqrt(mantid_ws.getErrorSquaredArray()/mantid_ws.getNumEventsArray())
+        e = e.squeeze()
+        return x, y, e, dim.getUnits()
 
     def _parse_step(self):
         step = self._cut_view.get_cut_axis_step()

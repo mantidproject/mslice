@@ -49,7 +49,6 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         return x, plot_data, errors
 
     def compute_cut(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
-
         input_workspace_name = selected_workspace
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         self._fill_in_missing_input(cut_axis, selected_workspace)
