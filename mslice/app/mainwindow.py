@@ -52,6 +52,7 @@ class MainWindow(MainView, QMainWindow):
         self.btnRename.clicked.connect(self.button_rename)
         self.btnDelete.clicked.connect(self.button_delete)
         self.btnMerge.clicked.connect(self.button_merge)
+        self.btnMerge.setEnabled(False)
 
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)
@@ -64,6 +65,7 @@ class MainWindow(MainView, QMainWindow):
         self.wgtPowder.busy.connect(self.show_busy)
 
     def ws_tab_changed(self, tab):
+        self.btnMerge.setEnabled(tab == TAB_EVENT)
         self.tabWidget_2.show()
         tab_to_show = self.tabs_to_show[tab]
         for tab_index in range(3):
