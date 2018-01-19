@@ -33,6 +33,8 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
                             TAB_HISTO: self.listWorkspacesHisto}
         self.tabWidget.currentChanged.connect(self.tab_changed)
         self.listWorkspaces2D.itemSelectionChanged.connect(self.list_item_changed)
+        self.listWorkspacesEvent.itemSelectionChanged.connect(self.list_item_changed)
+        self.listWorkspacesHisto.itemSelectionChanged.connect(self.list_item_changed)
         self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
     def _display_error(self, error_string):
@@ -40,6 +42,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def current_list(self):
         return self.tab_to_list[self.tabWidget.currentIndex()]
+
+    def change_tab(self, tab):
+        self.tabWidget.setCurrentIndex(tab)
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -84,7 +89,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def get_workspace_selected(self):
         selected_workspaces = [str(x.text()) for x in self.current_list().selectedItems()]
-        return list(selected_workspaces)
+        return selected_workspaces
 
     def set_workspace_selected(self, index):
         current_list = self.current_list()

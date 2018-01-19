@@ -53,6 +53,8 @@ class MainWindow(MainView, QMainWindow):
         self.btnDelete.clicked.connect(self.button_delete)
         self.btnMerge.clicked.connect(self.button_merge)
         self.btnMerge.setEnabled(False)
+        self.tabWidget_2.setTabEnabled(1, False)
+        self.tabWidget_2.setTabEnabled(2, False)
 
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)

@@ -13,6 +13,9 @@ class MainPresenter(MainPresenterInterface):
     def get_selected_workspaces(self):
         return self._workspace_presenter.get_selected_workspaces()
 
+    def change_ws_tab(self, tab):
+        self._workspace_presenter.change_tab(tab)
+
     def set_selected_workspaces(self, workspace_list):
         self._workspace_presenter.set_selected_workspaces(workspace_list)
 
