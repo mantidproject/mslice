@@ -12,9 +12,6 @@ class CutAlgorithm(object):
     def is_cut(self, workspace):
         pass
 
-    def get_cut_params(self, cut_workspace):
-        pass
-
     def get_available_axis(self, workspace):
         pass
 
