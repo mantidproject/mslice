@@ -1,10 +1,14 @@
 from __future__ import (absolute_import, division, print_function)
+
+from mantid.api import IMDHistoWorkspace
+
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.views.cut_view import CutView
 from mslice.widgets.cut.command import Command
+from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from .validation_decorators import require_main_presenter
 from mslice.util.qt.QtWidgets import QFileDialog
 from os.path import splitext
@@ -32,75 +36,93 @@ class CutPresenter(PresenterUtility):
         self._clear_displayed_error(self._cut_view)
         self._cut_view.busy.emit(True)
         if command == Command.Plot:
-            self._process_cuts(plot_over=False)
+            self._cut_top_level(plot_over=False)
         elif command == Command.PlotOver:
-            self._process_cuts(plot_over=True)
+            self._cut_top_level(plot_over=True)
         elif command == Command.PlotOnly:
-            self._process_cuts(plot_over=False, save_to_workspace=False)
+            self._cut_top_level(histo_ws=True, plot_over=False, save_to_workspace=False)
+            # self.plot_cut_from_workspace()
         elif command == Command.PlotOverOnly:
-            self._process_cuts(plot_over=True, save_to_workspace=False)
+            self._cut_top_level(histo_ws=True, plot_over=True, save_to_workspace=False)
         elif command == Command.SaveToWorkspace:
-            self._process_cuts(plot=False)
+            self._cut_top_level(plot=False)
         elif command == Command.SaveToAscii:
             fname = str(QFileDialog.getSaveFileName(caption='Select File for Saving'))
             if fname:
-                self._process_cuts(save_to_file=fname)
+                self._cut_top_level(save_to_file=fname)
         elif command == Command.AxisChanged:
             self._cut_axis_changed()
         self._cut_view.busy.emit(False)
 
-
-    def _process_cuts(self, plot_over=False, save_to_workspace=True, plot=True, save_to_file=None, workspace_index=0):
-        """This function handles the width parameter. If it is not specified a single cut is plotted from
-        integration_start to integration_end """
+    def _cut_top_level(self, histo_ws=False, plot_over=False, plot=True, save_to_workspace=True, save_to_file=None): #TODO: rename
         selected_workspaces = self._main_presenter.get_selected_workspaces()
-        try:
+        output_method = self._output_method(plot_over, save_to_workspace, plot, save_to_file)
+        for workspace in selected_workspaces:
+            params = self.get_cut_params(workspace, histo_ws)
+            self._cut(params, output_method, plot_over, save_to_workspace, save_to_file)
+
+
+    def _cut(self, params, output_method, plot_over=False, save_to_workspace=True, save_to_file=None): #TODO: rename
+            width = params[-1]
+            params = params[:-1]
+            if width is not None:
+                self._plot_with_width(params, output_method, width, save_to_file)
+            else:
+                output_method(params, plot_over, save_to_file)
+
+    def get_cut_params(self, workspace, histo_ws):
+        if histo_ws:
+            # params = self._cut_algorithm.get_cut_params(workspace) # original method
+            params = None
+            mantid_ws = MantidWorkspaceProvider().get_workspace_handle(workspace)
+            dim = mantid_ws.getDimension(0)
+            x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
+            y = mantid_ws.getSignalArray() / mantid_ws.getNumEventsArray()
+            e = np.sqrt(mantid_ws.getErrorSquaredArray()/mantid_ws.getNumEventsArray())
+            e = e.squeeze()
+            self._cut_plotter.plot_cut_from_x_y_e(x, y, e, workspace, False)
+        else:
             self._parse_step()
-            params = self._parse_input(workspace_index)
-        except ValueError:
-            return
+            params = self._parse_input()
+        return (workspace,) + params
+
+    def _output_method(self, plot_over, save_to_workspace, plot, save_to_file):
         if save_to_file is not None:
-            def handler(params, _, save_to_file):
-                self._save_cut_to_file(params, save_to_file)
+            return self._save_cut_to_file
+        elif not plot:
+            return self._save_cut_to_workspace
+        elif not save_to_workspace:
+            return self._plot_cut
         else:
-            def handler(params, plot_over, _):
-                if plot:
-                    self._plot_cut(params, plot_over)
-                if save_to_workspace:
-                    self._save_cut_to_workspace(params)
-        width = params[-1]
-        params = params[:-1]
-        if width is not None:
-            integration_start, integration_end = params[2:4]
-            cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
-            index = 0
-            while cut_start != cut_end:
-                params = params[:2] + (cut_start, cut_end) + params[4:]
-                if save_to_file is not None:
-                    filename, file_extension = splitext(save_to_file)
-                    output_file_part = filename+'_'+str(index)+file_extension
-                else:
-                    output_file_part = None
-                index += 1
-                handler(params, plot_over, output_file_part)
-                cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
-                # The first plot will respect which button the user pressed. The rest will over plot
-                plot_over = True
-        else:
-            # No width specified, just plot a single cut
-            handler(params, plot_over, save_to_file)
+            return self._plot_and_save_to_workspace
 
-        if workspace_index < len(selected_workspaces) - 1:
-            workspace_index += 1
-            self._populate_fields_using_workspace(selected_workspaces[workspace_index], plotting=True)
-            self._process_cuts(plot_over=True, save_to_workspace=save_to_workspace, plot=plot,
-                               save_to_file=save_to_file, workspace_index=workspace_index)
+    def _plot_with_width(self, params, output_method, width, plot_over, save_to_file=None, workspace_index=0):
+        """This function handles the width parameter."""
+        integration_start, integration_end = params[2:4]
+        cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
+        index = 0
+        while cut_start != cut_end:
+            params = params[:2] + (cut_start, cut_end) + params[4:]
+            if save_to_file is not None:
+                filename, file_extension = splitext(save_to_file)
+                output_file_part = filename+'_'+str(index)+file_extension
+            else:
+                output_file_part = None
+            output_method(params, plot_over, output_file_part)
+            index += 1
+            cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
+            # The first plot will respect which button the user pressed. The rest will over plot
+            plot_over = True
 
-    def _plot_cut(self, params, plot_over):
+    def _plot_and_save_to_workspace(self, params, plot_over, _):
+        self._plot_cut(params, plot_over, _)
+        self._save_cut_to_workspace(params, plot_over, _)
+
+    def _plot_cut(self, params, plot_over, _):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
         self._main_presenter.change_ws_tab(2)
 
-    def _save_cut_to_file(self, params, output_file):
+    def _save_cut_to_file(self, params, plot_over, output_file):
         cut_params = params[:5]
         x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
         header = 'MSlice Cut of workspace "%s" along "%s" between %f and %f' % (params[:4])
@@ -108,7 +130,7 @@ class CutPresenter(PresenterUtility):
         out_data = np.c_[x, y, e]
         np.savetxt(str(output_file), out_data, fmt='%12.9e', header=header)
 
-    def _save_cut_to_workspace(self, params):
+    def _save_cut_to_workspace(self, params, _, __):
         cut_params = params[:5]
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
@@ -126,10 +148,8 @@ class CutPresenter(PresenterUtility):
                 self._cut_view.error_invalid_cut_step_parameter()
                 warnings.warn("Invalid cut step, using default value")
 
-    def _parse_input(self, workspace_index=0):
+    def _parse_input(self):
         # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
-        selected_workspaces = self._main_presenter.get_selected_workspaces()
-        selected_workspace = selected_workspaces[workspace_index]
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
                         self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
         if cut_axis.units == "":
@@ -179,7 +199,7 @@ class CutPresenter(PresenterUtility):
                 raise ValueError("Invalid width")
         else:
             width = None
-        return selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
+        return cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
             intensity_end, width
 
     def _set_minimum_step(self, workspace, axis):

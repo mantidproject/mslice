@@ -103,28 +103,6 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         workspace = self._workspace_provider.get_workspace_handle(workspace)
         return isinstance(workspace, IMDEventWorkspace) and workspace.getNumDims() == 2
 
-    def get_cut_params(self, cut_workspace):
-        cut_workspace = self._workspace_provider.get_workspace_handle(cut_workspace)
-        assert isinstance(cut_workspace, IMDHistoWorkspace)
-        is_norm = self._was_previously_normalized(cut_workspace)
-        bin_md = None
-        history = cut_workspace.getHistory()
-        for i in range(history.size()-1,-1,-1):
-            algorithm = history.getAlgorithm(i)
-            if algorithm.name() == 'BinMD':
-                bin_md = algorithm
-                break
-        integration_binning = bin_md.getPropertyValue("AlignedDim1").split(",")
-        integration_range = float(integration_binning[1]), float(integration_binning[2])
-
-        cut_binning = bin_md.getPropertyValue("AlignedDim0").split(",")
-        # The axis name is retreived from the workspace directly and not the binning string to avoid
-        # adding/removing trailing spaces
-        dim_name = cut_workspace.getDimension(0).getName()
-        cut_axis = Axis(dim_name, *list(map(float,cut_binning[1:])))
-        cut_axis.step = (cut_axis.end - cut_axis.start)/float(cut_binning[-1])
-        return cut_axis, integration_range, is_norm
-
     def set_saved_cut_parameters(self, workspace, axis, parameters):
         self._workspace_provider.setCutParameters(workspace, axis, parameters)
 
