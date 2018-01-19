@@ -296,7 +296,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         layout.addLayout(row3)
         layout.addStretch()
 
-        # row1.addWidget(self.show_legend)
         row1.addWidget(self.legendText)
         row2.addWidget(self.color_label)
         row2.addWidget(self.line_color)
@@ -334,7 +333,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
-
 
     def color_valid(self, index):
         if self.color_validator is None:
