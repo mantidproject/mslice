@@ -49,7 +49,14 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="WorkspaceManagerWidget" name="wgtWorkspacemanager" native="true"/>
+         <widget class="WorkspaceManagerWidget" name="wgtWorkspacemanager" native="true">
+          <property name="maximumSize">
+           <size>
+            <width>500</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QWidget" name="controls" native="true">
@@ -57,21 +64,17 @@
            <item>
             <widget class="QWidget" name="widget_3" native="true">
              <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
-               <widget class="QPushButton" name="btnSave">
+              <item row="6" column="1">
+               <widget class="QPushButton" name="btnHistory">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
-                 <string>Save</string>
+                 <string>History</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="btnRename">
-                <property name="text">
-                 <string>Rename</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
+              <item row="6" column="0">
                <widget class="QPushButton" name="btnDelete">
                 <property name="text">
                  <string>Delete</string>
@@ -79,9 +82,51 @@
                </widget>
               </item>
               <item row="1" column="1">
+               <widget class="QPushButton" name="btnRename">
+                <property name="text">
+                 <string>Rename</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QPushButton" name="btnSave">
+                <property name="text">
+                 <string>Save</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QPushButton" name="btnPlot">
+                <property name="text">
+                 <string>Plot</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="0">
                <widget class="QPushButton" name="btnMerge">
                 <property name="text">
                  <string>Merge</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QPushButton" name="btnOverplot">
+                <property name="text">
+                 <string>Overplot</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QPushButton" name="btnSubtract">
+                <property name="text">
+                 <string>Subtract</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QPushButton" name="btnAdd">
+                <property name="text">
+                 <string>Add</string>
                 </property>
                </widget>
               </item>

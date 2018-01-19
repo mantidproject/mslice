@@ -8,6 +8,7 @@ from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
 from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 from mslice.widgets.workspacemanager.command import Command as ws_command
+from mslice.widgets.cut.command import Command as cut_command
 
 TAB_2D = 0
 TAB_EVENT = 1
@@ -29,32 +30,39 @@ class MainWindow(MainView, QMainWindow):
         ipython = IPythonWidget()
         self.centralWidget().layout().addWidget(ipython)
         ipython.setFixedHeight(200)
+
         self.tabs = [self.wgtSlice, self.wgtCut, self.wgtPowder]
         self.tabs_to_show = {TAB_2D: [TAB_POWDER],
                              TAB_EVENT: [TAB_SLICE, TAB_CUT],
                              TAB_HISTO: []}
+
+        self.buttons_to_enable = {TAB_2D: [self.btnAdd, self.btnSubtract],
+                                  TAB_EVENT: [self.btnMerge],
+                                  TAB_HISTO: [self.btnPlot, self.btnOverplot]}
+
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
         powder_presenter = self.wgtPowder.get_presenter()
-        cut_presenter = self.wgtCut.get_presenter()
+        self.cut_presenter = self.wgtCut.get_presenter()
         self._presenter = MainPresenter(self, self.workspace_presenter, dataloader_presenter,
-                                        slice_presenter, powder_presenter, cut_presenter)
+                                        slice_presenter, powder_presenter, self.cut_presenter)
 
         workspace_provider = self.workspace_presenter.get_workspace_provider()
         dataloader_presenter.set_workspace_provider(workspace_provider)
         powder_presenter.set_workspace_provider(workspace_provider)
         slice_presenter.set_workspace_provider(workspace_provider)
-        cut_presenter.set_workspace_provider(workspace_provider)
+        self.cut_presenter.set_workspace_provider(workspace_provider)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.btnSave.clicked.connect(self.button_save)
         self.btnRename.clicked.connect(self.button_rename)
         self.btnDelete.clicked.connect(self.button_delete)
         self.btnMerge.clicked.connect(self.button_merge)
-        self.btnMerge.setEnabled(False)
-        self.tabWidget_2.setTabEnabled(1, False)
-        self.tabWidget_2.setTabEnabled(2, False)
+        self.btnPlot.clicked.connect(self.button_plot)
+        self.btnOverplot.clicked.connect(self.button_overplot)
+        self.btnHistory.hide()
+        self.ws_tab_changed(0)
 
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)
@@ -68,9 +76,14 @@ class MainWindow(MainView, QMainWindow):
         self.data_loading.busy.connect(self.show_busy)
 
     def ws_tab_changed(self, tab):
-        self.btnMerge.setEnabled(tab == TAB_EVENT)
+        self.enable_widget_tabs(tab)
+        self.enable_buttons(tab)
+
+    def enable_widget_tabs(self, workspace_tab):
+        '''enables correct powder/slice/cut tabs based on workspace tab'''
+        self.btnMerge.setEnabled(workspace_tab == TAB_EVENT)
         self.tabWidget_2.show()
-        tab_to_show = self.tabs_to_show[tab]
+        tab_to_show = self.tabs_to_show[workspace_tab]
         for tab_index in range(3):
             self.tabWidget_2.setTabEnabled(tab_index, False)
         if tab_to_show:
@@ -79,6 +92,14 @@ class MainWindow(MainView, QMainWindow):
                     self.tabWidget_2.setTabEnabled(tab_index, True)
         else:
             self.tabWidget_2.hide()
+
+    def enable_buttons(self, tab):
+        '''enables correct buttons based on workspace tab'''
+        variable_buttons = [self.btnAdd, self.btnSubtract, self.btnMerge, self.btnPlot, self.btnOverplot]
+        for button in variable_buttons:
+            button.hide()
+        for button in self.buttons_to_enable[tab]:
+            button.show()
 
     def button_save(self):
         self.workspace_presenter.notify(ws_command.SaveSelectedWorkspace)
@@ -91,6 +112,12 @@ class MainWindow(MainView, QMainWindow):
 
     def button_merge(self):
         self.workspace_presenter.notify(ws_command.CombineWorkspace)
+
+    def button_plot(self):
+        self.cut_presenter.notify(cut_command.PlotOnly)
+
+    def button_overplot(self):
+        self.cut_presenter.notify(cut_command.PlotOverOnly)
 
     def init_ui(self):
         self.busy_text = QLabel()
