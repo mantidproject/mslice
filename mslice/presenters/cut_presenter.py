@@ -35,8 +35,12 @@ class CutPresenter(PresenterUtility):
             self._process_cuts(plot_over=False)
         elif command == Command.PlotOver:
             self._process_cuts(plot_over=True)
+        elif command == Command.PlotOnly:
+            self._process_cuts(plot_over=False, save_to_workspace=False)
+        elif command == Command.PlotOverOnly:
+            self._process_cuts(plot_over=True, save_to_workspace=False)
         elif command == Command.SaveToWorkspace:
-            self._process_cuts(save_to_workspace_only=True)
+            self._process_cuts(plot=False)
         elif command == Command.SaveToAscii:
             fname = str(QFileDialog.getSaveFileName(caption='Select File for Saving'))
             if fname:
@@ -46,7 +50,7 @@ class CutPresenter(PresenterUtility):
         self._cut_view.busy.emit(False)
 
 
-    def _process_cuts(self, plot_over=False, save_to_workspace_only=False, save_to_file=None, workspace_index=0):
+    def _process_cuts(self, plot_over=False, save_to_workspace=True, plot=True, save_to_file=None, workspace_index=0):
         """This function handles the width parameter. If it is not specified a single cut is plotted from
         integration_start to integration_end """
         selected_workspaces = self._main_presenter.get_selected_workspaces()
@@ -55,17 +59,15 @@ class CutPresenter(PresenterUtility):
             params = self._parse_input(workspace_index)
         except ValueError:
             return
-        if save_to_workspace_only:
-            def handler(*args):
-                self._save_cut_to_workspace(args[0])
-        elif save_to_file is not None:
+        if save_to_file is not None:
             def handler(params, _, save_to_file):
                 self._save_cut_to_file(params, save_to_file)
         else:
             def handler(params, plot_over, _):
-                self._save_cut_to_workspace(params)
-                self._plot_cut(params, plot_over)
-
+                if plot:
+                    self._plot_cut(params, plot_over)
+                if save_to_workspace:
+                    self._save_cut_to_workspace(params)
         width = params[-1]
         params = params[:-1]
         if width is not None:
@@ -91,8 +93,8 @@ class CutPresenter(PresenterUtility):
         if workspace_index < len(selected_workspaces) - 1:
             workspace_index += 1
             self._populate_fields_using_workspace(selected_workspaces[workspace_index], plotting=True)
-            self._process_cuts(plot_over=True, save_to_workspace_only=save_to_workspace_only, save_to_file=save_to_file,
-                               workspace_index=workspace_index)
+            self._process_cuts(plot_over=True, save_to_workspace=save_to_workspace, plot=plot,
+                               save_to_file=save_to_file, workspace_index=workspace_index)
 
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
