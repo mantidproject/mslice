@@ -307,7 +307,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         row3.addWidget(self.line_marker)
 
         if line_options['shown'] is not None and line_options['legend'] is not None:
-            self.show_line_label = QtWidgets.QLabel(self)
+            self.show_line_label = QtWidgets.QLabel(self) 
             self.show_line_label.setText("Show: ")
             self.show_line = QtWidgets.QCheckBox(self)
             self.show_line.setChecked(line_options['shown'])
