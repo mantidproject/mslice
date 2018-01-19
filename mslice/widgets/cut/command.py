@@ -16,5 +16,5 @@ class Command(object):
     SaveToWorkspace = -997
     SaveToAscii = -996
     AxisChanged = -995
-    PlotOnly = -994
-    PlotOverOnly = -993
+    PlotFromWorkspace = -994
+    PlotOverFromWorkspace = -993
