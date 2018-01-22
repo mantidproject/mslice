@@ -49,10 +49,15 @@ class CutPresenter(PresenterUtility):
 
     def _cut(self, output_method, histo_ws=False, plot_over=False, save_to_file=None):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
-        self._parse_step()
+        try:
+            self._parse_step()
+            parsed_params = self._parse_input()
+        except ValueError:
+            return
         for workspace in selected_workspaces:
-            params = (workspace,) + self._parse_input()
+            params = (workspace,) + parsed_params
             self._run_cut_method(params, output_method, plot_over, save_to_file)
+            plot_over = True # The first plot will respect which button the user pressed. The rest will over plot
 
     def _run_cut_method(self, params, output_method, plot_over=False, save_to_file=None):
             width = params[-1]

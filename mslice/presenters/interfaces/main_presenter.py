@@ -28,3 +28,7 @@ class MainPresenterInterface(object):
     @abc.abstractmethod
     def register_workspace_selector(self, workspace_selector):
         pass
+
+    @abc.abstractmethod
+    def change_ws_tab(self, tab):
+        pass
