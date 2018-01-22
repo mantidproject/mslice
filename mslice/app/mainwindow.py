@@ -115,10 +115,10 @@ class MainWindow(MainView, QMainWindow):
         self.workspace_presenter.notify(ws_command.CombineWorkspace)
 
     def button_plot(self):
-        self.cut_presenter.notify(cut_command.PlotOnly)
+        self.cut_presenter.notify(cut_command.PlotFromWorkspace)
 
     def button_overplot(self):
-        self.cut_presenter.notify(cut_command.PlotOverOnly)
+        self.cut_presenter.notify(cut_command.PlotOverFromWorkspace)
 
     def init_ui(self):
         self.busy_text = QLabel()
