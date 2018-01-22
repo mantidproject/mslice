@@ -1,11 +1,13 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
+from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QSplitter
 
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
 from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
+
+from mslice.widgets.dataloader.dataloader import DataLoaderWidget
 
 # ==============================================================================
 # Classes
@@ -18,16 +20,19 @@ class MainWindow(MainView, QMainWindow):
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
         ipython = IPythonWidget()
-        self.centralWidget().layout().addWidget(ipython)
-        ipython.setFixedHeight(200)
+        self.splitter.addWidget(ipython)
+        self.splitter.setSizes([500, 250])
 
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
+        dataloader_presenter = self.data_loading.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
         powder_presenter = self.wgtPowder.get_presenter()
         cut_presenter = self.wgtCut.get_presenter()
-        self._presenter = MainPresenter(self, workspace_presenter, slice_presenter, powder_presenter, cut_presenter)
+        self._presenter = MainPresenter(self, workspace_presenter, dataloader_presenter,
+                                        slice_presenter, powder_presenter, cut_presenter)
 
         workspace_provider = workspace_presenter.get_workspace_provider()
+        dataloader_presenter.set_workspace_provider(workspace_provider)
         powder_presenter.set_workspace_provider(workspace_provider)
         slice_presenter.set_workspace_provider(workspace_provider)
         cut_presenter.set_workspace_provider(workspace_provider)
@@ -36,15 +41,19 @@ class MainWindow(MainView, QMainWindow):
         self.wgtSlice.error_occurred.connect(self.show_error)
         self.wgtWorkspacemanager.error_occurred.connect(self.show_error)
         self.wgtPowder.error_occurred.connect(self.show_error)
+        self.data_loading.error_occurred.connect(self.show_error)
         self.wgtCut.busy.connect(self.show_busy)
         self.wgtSlice.busy.connect(self.show_busy)
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
+        self.data_loading.busy.connect(self.show_busy)
+        self.actionQuit.triggered.connect(self.close)
 
     def init_ui(self):
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")
+        self.busy_text.setStyleSheet("QLabel { color: black }")
         self.busy = False
 
     def show_error(self, msg):

@@ -46,54 +46,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def _get_main_presenter(self):
         return self._main_presenter
 
-    def _load_workspace(self):
-        # TODO specify workspace name on load
-        # TODO what to do on fail?
-        workspace_to_load = self._workspace_manager_view.get_workspace_to_load_path()
-        if not workspace_to_load:
-            return
-        ws_names = [os.path.splitext(os.path.basename(base))[0] for base in workspace_to_load]
-        not_loaded = []
-        not_opened = []
-        loaded = []
-        multi = len(ws_names) > 1
-        allChecked = False
-        for ii, ws_name in enumerate(ws_names):
-            # confirm that user wants to overwrite an existing workspace
-            if not self._confirm_workspace_overwrite(ws_name):
-                not_loaded.append(ws_name)
-                continue
-            try:
-                self._workspace_provider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
-            except RuntimeError:
-                not_opened.append(ws_name)
-            else:
-                loaded.append(ws_name)
-                # Checks if this workspace has efixed set. If not, prompts the user and sets it.
-                if self._workspace_provider.get_EMode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(ws_name):
-                    if not allChecked:
-                        Ef, allChecked = self._workspace_manager_view.get_workspace_efixed(ws_name, multi)
-                    self._workspace_provider.set_efixed(ws_name, Ef)
-
-        self._report_load_errors(ws_names, not_opened, not_loaded)
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
-        self._workspace_manager_view.set_workspace_selected(
-            [self._workspace_manager_view.get_workspace_index(ld_name) for ld_name in loaded])
-
-    def _report_load_errors(self, ws_names, not_opened, not_loaded):
-        if len(not_opened) == len(ws_names):
-            self._workspace_manager_view.error_unable_to_open_file()
-            return
-        elif len(not_opened) > 0:
-            errmsg = not_opened[0] if len(not_opened)==1 else ",".join(not_opened)
-            self._workspace_manager_view.error_unable_to_open_file(errmsg)
-        if len(not_loaded) == len(ws_names):
-            self._workspace_manager_view.no_workspace_has_been_loaded()
-            return
-        elif len(not_loaded) > 0:
-            errmsg = not_loaded[0] if len(not_loaded)==1 else ",".join(not_loaded)
-            self._workspace_manager_view.no_workspace_has_been_loaded(errmsg)
-
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
             return self._workspace_manager_view.confirm_overwrite_workspace()
