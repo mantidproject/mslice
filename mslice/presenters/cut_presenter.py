@@ -1,7 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mantid.api import IMDHistoWorkspace
-
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.presenters.presenter_utility import PresenterUtility
