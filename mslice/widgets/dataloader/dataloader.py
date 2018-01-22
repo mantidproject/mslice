@@ -72,7 +72,7 @@ class DataLoaderWidget(QWidget): # and some view interface
         self._presenter.load_workspace(self.get_selected_file_paths(), merge)
 
     def sort_files(self, column):
-        self.table_view.sortByColumn(column, order=column % 2)  # descending for size/modified, ascending for name/type
+        self.table_view.sortByColumn(column, column % 2)  # descending order for size/modified, ascending for name/type
 
     def go_to_home(self):
         self.directory = QDir(os.path.expanduser('~'))
