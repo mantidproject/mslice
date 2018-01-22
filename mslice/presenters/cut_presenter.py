@@ -122,8 +122,8 @@ class CutPresenter(PresenterUtility):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         for workspace in selected_workspaces:
             x, y, e, units = self.get_arrays_from_workspace(workspace)
-            self._cut_plotter.plot_cut_from_x_y_e(x, y, e, units, workspace, plot_over)
-            # plot over should become true after first loop
+            self._cut_plotter.plot_cut_from_xye(x, y, e, units, workspace, plot_over)
+            # TODO: plot over should become true after first loop
 
     def get_arrays_from_workspace(self, workspace):
         mantid_ws = MantidWorkspaceProvider().get_workspace_handle(workspace)
@@ -211,22 +211,29 @@ class CutPresenter(PresenterUtility):
         self._cut_view.set_minimum_step(self._minimumStep[axis[0]])
 
     def workspace_selection_changed(self):
-        if self._previous_cut is not None and self._previous_axis is not None:
-            if not self._cut_view.is_fields_cleared():
-                self._cut_algorithm.set_saved_cut_parameters(self._previous_cut, self._previous_axis,
-                                                             self._cut_view.get_input_fields())
-            else:
-                self._previous_cut = None
-                self._previous_axis = None
-
+        #
+        # if self._previous_cut is not None and self._previous_axis is not None:
+        #     if not self._cut_view.is_fields_cleared():
+        #         self._cut_algorithm.set_saved_cut_parameters(self._previous_cut, self._previous_axis,
+        #                                                      self._cut_view.get_input_fields())
+        #     else:
+        #         self._previous_cut = None
+        #         self._previous_axis = None
+        #
         workspace_selection = self._main_presenter.get_selected_workspaces()
-        if len(workspace_selection) < 1:
-            self._cut_view.clear_input_fields()
-            self._cut_view.disable()
-            self._previous_cut = None
-            self._previous_axis = None
-            return
-        self._populate_fields_using_workspace(workspace_selection[0])
+        # if len(workspace_selection) < 1:
+        #     self._cut_view.clear_input_fields()
+        #     self._cut_view.disable()
+        #     self._previous_cut = None
+        #     self._previous_axis = None
+        #     return
+        self._populate_fields_using_workspace_2(workspace_selection[0])
+
+    def _populate_fields_using_workspace_2(self, workspace):
+        if self._cut_algorithm.is_cuttable(workspace):
+            print("cuttable")
+            self._cut_view.populate_cut_axis_options(self._cut_algorithm.get_available_axis(workspace))
+            self._cut_view.enable()
 
     def _populate_fields_using_workspace(self, workspace, plotting=False):
         if self._cut_algorithm.is_cuttable(workspace):
