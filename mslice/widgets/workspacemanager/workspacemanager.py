@@ -31,7 +31,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         self.tab_to_list = {TAB_2D: self.listWorkspaces2D,
                             TAB_EVENT: self.listWorkspacesEvent,
                             TAB_HISTO: self.listWorkspacesHisto}
-        self.tabWidget.currentChanged.connect(self.tab_changed)
+        self.tabWidget.currentChanged.connect(self.tab_changed_method)
         self.listWorkspaces2D.itemSelectionChanged.connect(self.list_item_changed)
         self.listWorkspacesEvent.itemSelectionChanged.connect(self.list_item_changed)
         self.listWorkspacesHisto.itemSelectionChanged.connect(self.list_item_changed)
@@ -39,6 +39,14 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def tab_changed_method(self, tab_index):
+        self.clear_selection()
+        self.tab_changed.emit(tab_index)
+
+    def clear_selection(self):
+        for ws_list in [self.listWorkspaces2D, self.listWorkspacesEvent, self.listWorkspacesHisto]:
+            ws_list.clearSelection()
 
     def current_list(self):
         return self.tab_to_list[self.tabWidget.currentIndex()]
@@ -94,9 +102,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
     def set_workspace_selected(self, index):
         current_list = self.current_list()
         for item_index in range(current_list.count()):
-            self.listWorkspaces2D.setItemSelected(current_list.item(item_index), False)
+            current_list.setItemSelected(current_list.item(item_index), False)
         for this_index in (index if hasattr(index, "__iter__") else [index]):
-            self.listWorkspaces2D.setItemSelected(current_list.item(this_index), True)
+            current_list.setItemSelected(current_list.item(this_index), True)
 
     def get_workspace_index(self, ws_name):
         current_list = self.current_list()
