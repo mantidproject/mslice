@@ -58,14 +58,10 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
 
-        output_workspace_name = input_workspace_name + "_cut"
+        output_ws_name = input_workspace_name + "_cut(" + str(integration_start) + "," + str(integration_end) + ")"
         index = 1
-        existing_workspaces = self._workspace_provider.get_workspace_names()
-        while output_workspace_name + str(index) in existing_workspaces:
-            index += 1
-        output_workspace_name += str(index)
-        cut = BinMD(selected_workspace, OutputWorkspace=output_workspace_name, AxisAligned="1", AlignedDim1=integration_binning,
-                    AlignedDim0=cut_binning)
+        cut = BinMD(selected_workspace, OutputWorkspace=output_ws_name, AxisAligned="1",
+                    AlignedDim1=integration_binning, AlignedDim0=cut_binning)
         if is_norm:
             self._normalize_workspace(cut)
         return cut
