@@ -96,28 +96,6 @@ class CutPresenterTest(unittest.TestCase):
         self.view.populate_input_fields.assert_called_with(fields)
         self.cut_algorithm.set_saved_cut_parameters.assert_called_with(new_workspace, available_dimensions[0], fields)
 
-    def test_workspace_selection_changed_single_cut_workspace(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
-        cut_presenter.register_master(self.main_presenter)
-        workspace = 'workspace'
-        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
-        self.cut_algorithm.is_cuttable = mock.Mock(return_value=False)
-        self.cut_algorithm.is_cut = mock.Mock(return_value=True)
-        cut_axis = Axis( "units", 0, 10, .1)
-        integration_limits = (11, 12)
-        formatted_integration_limits = ("11.00000", "12.00000")
-        is_normed = False
-        self.cut_algorithm.get_cut_params = mock.Mock(return_value=[cut_axis, integration_limits, is_normed])
-        cut_presenter.workspace_selection_changed()
-        self.view.populate_cut_axis_options.assert_called_with([cut_axis.units])
-        self.view.populate_integration_params.assert_called_with(*formatted_integration_limits)
-        self.view.plotting_params_only.assert_called_once()
-        self.view.enable.assert_not_called()
-        is_normed = True
-        self.cut_algorithm.get_cut_params = mock.Mock(return_value=[cut_axis, integration_limits, is_normed])
-        cut_presenter.workspace_selection_changed()
-        self.view.force_normalization.assert_called_with()
-
     def test_workspace_selection_changed_single_noncut_workspace(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
@@ -252,7 +230,6 @@ class CutPresenterTest(unittest.TestCase):
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
 
         cut_presenter.notify(Command.Plot)
-        self.cut_algorithm.compute_cut.assert_not_called()
         self.cut_plotter.plot_cut.assert_called_with(selected_workspace=workspace, cut_axis=processed_axis,
                                                      integration_start=integration_start, integration_end=integration_end,
                                                      norm_to_one=is_norm, intensity_start=intensity_start,
@@ -274,7 +251,6 @@ class CutPresenterTest(unittest.TestCase):
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
         cut_presenter.notify(Command.PlotOver)
-        self.cut_algorithm.compute_cut.assert_not_called()
         self.cut_plotter.plot_cut.assert_called_with(selected_workspace=workspace, cut_axis=processed_axis,
                                                      integration_start=integration_start, integration_end=integration_end,
                                                      norm_to_one=is_norm, intensity_start=None,
@@ -299,37 +275,6 @@ class CutPresenterTest(unittest.TestCase):
         cut_presenter.notify(Command.SaveToWorkspace)
         self.cut_algorithm.compute_cut.assert_called_with(workspace, processed_axis, integration_start,
                                                           integration_end, is_norm)
-        self.cut_plotter.plot_cut.assert_not_called()
-
-    def test_cut_save_ascii(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
-        cut_presenter.register_master(self.main_presenter)
-        axis = Axis("units", "0", "100", "1")
-        processed_axis = Axis("units", 0, 100, 1)
-        integration_start = 3
-        integration_end = 5
-        width = ""
-        intensity_start = 11
-        intensity_end = 30
-        is_norm = True
-        workspace = "workspace"
-        integrated_axis = 'integrated axis'
-        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
-                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
-        # Create a view that will return a path on call to get_workspace_to_load_path
-        tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
-        path_to_savefile = join(tempdir,'out.txt')
-        x = np.array([1, 2, 3])
-        y = np.array([1, 4, 9])
-        e = np.array([1, 1, 1])
-        self.cut_algorithm.compute_cut_xye = mock.Mock(return_value=(x, y, e))
-        QFileDialog.getSaveFileName = mock.Mock(return_value=path_to_savefile)
-        np.savetxt = mock.Mock()
-        cut_presenter.notify(Command.SaveToAscii)
-        self.cut_algorithm.compute_cut_xye.assert_called_with(workspace, processed_axis, integration_start,
-                                                              integration_end, is_norm)
-        QFileDialog.getSaveFileName.assert_called_once()
-        np.savetxt.assert_called_once()
         self.cut_plotter.plot_cut.assert_not_called()
 
     def test_plot_multiple_cuts_with_width(self):
@@ -360,7 +305,6 @@ class CutPresenterTest(unittest.TestCase):
                  integration_end=8,norm_to_one=is_norm,intensity_start=intensity_start,
                  intensity_end=intensity_end, plot_over=True)
         ]
-        self.cut_algorithm.compute_cut.assert_not_called()
         self.cut_plotter.plot_cut.assert_has_calls(call_list)
 
     def test_plot_multiple_workspaces_cut(self):
@@ -390,45 +334,7 @@ class CutPresenterTest(unittest.TestCase):
                  norm_to_one=is_norm, intensity_start=intensity_start,
                  intensity_end=intensity_end, plot_over=True),
         ]
-        self.cut_algorithm.compute_cut.assert_not_called()
         self.cut_plotter.plot_cut.assert_has_calls(call_list)
-
-    def test_multiple_cut_save_ascii(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
-        cut_presenter.register_master(self.main_presenter)
-        axis = Axis("units", "0", "100", "1")
-        processed_axis = Axis("units", 0, 100, 1)
-        integration_start = 3
-        integration_end = 8
-        width = "2"
-        intensity_start = 11
-        intensity_end = 30
-        is_norm = True
-        workspace = "workspace"
-        integrated_axis = 'integrated axis'
-        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
-                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
-        # Create a view that will return a path on call to get_workspace_to_load_path
-        tempdir = gettempdir()  # To insure sample paths are valid on platform of execution
-        path_to_savefile = join(tempdir,'out.txt')
-        x = np.array([1, 2, 3])
-        y = np.array([1, 4, 9])
-        e = np.array([1, 1, 1])
-        self.cut_algorithm.compute_cut_xye = mock.Mock(return_value=(x, y, e))
-        QFileDialog.getSaveFileName = mock.Mock(return_value=path_to_savefile)
-        np.savetxt = mock.Mock()
-        cut_presenter.notify(Command.SaveToAscii)
-        QFileDialog.getSaveFileName.assert_called_once()
-        w = float(width)
-        call_list = [
-            call(workspace, processed_axis, integration_start, integration_start+w, is_norm),
-            call(workspace, processed_axis, integration_start+w, integration_start+w+w, is_norm),
-            call(workspace, processed_axis, integration_start+w+w, integration_end, is_norm),
-        ]
-        self.cut_algorithm.compute_cut_xye.assert_has_calls(call_list)
-        callargs = np.savetxt.call_args[0]
-        self.assertEqual(callargs[0], join(tempdir, 'out_2.txt'))  # Indexed from zero
-        self.cut_plotter.plot_cut.assert_not_called()
 
     def test_change_axis(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)

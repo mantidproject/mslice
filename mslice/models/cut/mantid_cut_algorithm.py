@@ -21,11 +21,8 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         cut_computed = False
         copy_created = False
         copy_name = '_to_be_normalized_xyx_123_qme78hj'  # This is just a valid name
-        if not self.is_cut(selected_workspace):
-            cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm=False)
-            cut_computed = True
-        else:
-            cut = self._workspace_provider.get_workspace_handle(selected_workspace)
+        cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm=False)
+        cut_computed = True
         if is_norm:
             # If the cut previously existed in the ADS we will not modify it
             if not cut_computed:
@@ -69,29 +66,6 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         all_axis = self.get_available_axis(workspace)
         all_axis.remove(axis.units)
         return all_axis[0]
-
-    def is_cut(self, workspace):
-        workspace = self._workspace_provider.get_workspace_handle(workspace)
-        if not isinstance(workspace, IMDHistoWorkspace):
-            return False
-        if workspace.getNumDims() != 2 or len(workspace.getNonIntegratedDimensions()) != 1:
-            return False
-        history = workspace.getHistory()
-        # If any of these were set in the last BinMD call then this is not a cut
-        empty_params = ('AlignedDim2','AlignedDim3', 'AlignedDim4', 'AlignedDim5')
-        # If these were not set then this is not a cut
-        used_params = ('AxisAligned', 'AlignedDim0', 'AlignedDim1')
-        for i in range(history.size()-1, -1, -1):
-            try:
-                algorithm = history.getAlgorithm(i)
-            except RuntimeError:
-                return False
-            if algorithm.name() == 'BinMD':
-                if all([not algorithm.getPropertyValue(x) for x in empty_params])\
-                        and all([algorithm.getPropertyValue(x) for x in used_params]):
-                    return True
-                break
-        return False
 
     def is_cuttable(self, workspace):
         workspace = self._workspace_provider.get_workspace_handle(workspace)
