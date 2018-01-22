@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
+from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QSplitter
 
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui
@@ -20,8 +20,8 @@ class MainWindow(MainView, QMainWindow):
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
         ipython = IPythonWidget()
-        self.centralWidget().layout().addWidget(ipython)
-        ipython.setFixedHeight(200)
+        self.splitter.addWidget(ipython)
+        self.splitter.setSizes([500, 250])
 
         workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
@@ -47,6 +47,7 @@ class MainWindow(MainView, QMainWindow):
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
+        self.actionQuit.triggered.connect(self.close)
 
     def init_ui(self):
         self.busy_text = QLabel()
