@@ -252,6 +252,24 @@ class SlicePlot(object):
                 self._slice_plotter.add_overplot_line(self._ws_title, *lines[line])
                 self.update_legend()
 
+    def get_line_data(self, target):
+        line_options = {}
+        line_options['label'] = target.get_label()
+        line_options['legend'] = None
+        line_options['shown'] = None
+        line_options['color'] = target.get_color()
+        line_options['style'] = target.get_linestyle()
+        line_options['width'] = str(int(target.get_linewidth()))
+        line_options['marker'] = target.get_marker()
+        return line_options
+
+    def set_line_data(self, line, line_options):
+        line.set_label(line_options['label'])
+        line.set_linestyle(line_options['style'])
+        line.set_marker(line_options['marker'])
+        line.set_color(line_options['color'])
+        line.set_linewidth(line_options['width'])
+
     @property
     def colorbar_label(self):
         return self._canvas.figure.get_axes()[1].get_ylabel()
