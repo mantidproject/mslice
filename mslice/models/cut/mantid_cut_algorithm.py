@@ -8,7 +8,6 @@ from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
-from mslice.presenters.slice_plotter_presenter import Axis
 
 
 class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
