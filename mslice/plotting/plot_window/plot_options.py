@@ -287,17 +287,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         chosen_marker_as_string = self.markers[line_options['marker']]
         self.line_marker.setCurrentIndex(self.line_marker.findText(chosen_marker_as_string))
 
-        self.show_line_label = QtWidgets.QLabel(self)
-        self.show_line_label.setText("Show: ")
-        self.show_line = QtWidgets.QCheckBox(self)
-        self.show_line.setChecked(line_options['shown'])
-
-        self.show_legend_label = QtWidgets.QLabel(self)
-        self.show_legend_label.setText("Show legend: ")
-        self.show_legend = QtWidgets.QCheckBox(self)
-        self.show_legend.setChecked(line_options['legend'])
-        self.show_legend.setEnabled(line_options['shown'])
-
         layout = QtWidgets.QVBoxLayout(self)
         row1 = QtWidgets.QHBoxLayout()
         layout.addLayout(row1)
@@ -305,11 +294,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         layout.addLayout(row2)
         row3 = QtWidgets.QHBoxLayout()
         layout.addLayout(row3)
-        row4 = QtWidgets.QHBoxLayout()
-        layout.addLayout(row4)
         layout.addStretch()
 
-        row1.addWidget(self.show_legend)
         row1.addWidget(self.legendText)
         row2.addWidget(self.color_label)
         row2.addWidget(self.line_color)
@@ -319,14 +305,34 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         row3.addWidget(self.line_width)
         row3.addWidget(self.marker_label)
         row3.addWidget(self.line_marker)
-        row4.addWidget(self.show_line_label)
-        row4.addWidget(self.show_line)
-        row4.addWidget(self.show_legend_label)
-        row4.addWidget(self.show_legend)
+
+        if line_options['shown'] is not None and line_options['legend'] is not None:
+            self.show_line_label = QtWidgets.QLabel(self)
+            self.show_line_label.setText("Show: ")
+            self.show_line = QtWidgets.QCheckBox(self)
+            self.show_line.setChecked(line_options['shown'])
+
+            self.show_legend_label = QtWidgets.QLabel(self)
+            self.show_legend_label.setText("Show legend: ")
+            self.show_legend = QtWidgets.QCheckBox(self)
+            self.show_legend.setChecked(line_options['legend'])
+            self.show_legend.setEnabled(line_options['shown'])
+
+            row4 = QtWidgets.QHBoxLayout()
+            layout.addLayout(row4)
+
+            row4.addWidget(self.show_line_label)
+            row4.addWidget(self.show_line)
+            row4.addWidget(self.show_legend_label)
+            row4.addWidget(self.show_legend)
+
+            self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))
+        else:
+            self.show_line = None
+            self.show_legend = None
 
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
-        self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))
 
     def color_valid(self, index):
         if self.color_validator is None:
@@ -346,6 +352,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def legend(self):
+        if self.show_legend is None:
+            return None
         return self.show_legend.checkState()
 
     @property
@@ -354,6 +362,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def shown(self):
+        if self.show_line is None:
+            return None
         return bool(self.show_line.checkState())
 
     @property
