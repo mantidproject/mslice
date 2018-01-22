@@ -217,8 +217,13 @@ class SlicePlot(object):
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.intensity_selection(previous)
                 return False
-            self._slice_plotter.add_sample_temperature_field(field)
-            self._slice_plotter.update_sample_temperature(self._ws_title)
+            try:
+                field = int(field)
+            except ValueError:
+                self._slice_plotter.add_sample_temperature_field(field)
+                self._slice_plotter.update_sample_temperature(self._ws_title)
+            else:
+                self._slice_plotter.set_sample_temperature(self._ws_title, field)
             slice_plotter_method(self._ws_title)
         return True
 
@@ -228,8 +233,8 @@ class SlicePlot(object):
         ws = AnalysisDataService[ws_name]
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
                                                              'Sample Temperature not found. ' +
-                                                             'Select the sample temperature field:',
-                                                             ws.run().keys(), False)
+                                                             'Select the sample temperature field or enter a value:',
+                                                             ws.run().keys())
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:

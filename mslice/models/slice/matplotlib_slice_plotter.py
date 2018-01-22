@@ -156,6 +156,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
         temp = self._slice_algorithm.sample_temperature(workspace, self._sample_temp_fields)
         self.slice_cache[workspace]['sample_temp'] = temp
 
+    def set_sample_temperature(self, workspace, temp):
+        self.slice_cache[workspace]['sample_temp'] = temp
+
     def compute_boltzmann_dist(self, workspace):
         if self.slice_cache[workspace]['sample_temp'] is None:
             raise ValueError('sample temperature not found')
