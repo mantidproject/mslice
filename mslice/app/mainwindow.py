@@ -27,12 +27,14 @@ class MainWindow(MainView, QMainWindow):
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
         ipython = IPythonWidget()
-        self.centralWidget().layout().addWidget(ipython)
-        ipython.setFixedHeight(200)
+        self.splitter.addWidget(ipython)
+        self.splitter.setSizes([500, 250])
+
         self.tabs = [self.wgtSlice, self.wgtCut, self.wgtPowder]
         self.tabs_to_show = {TAB_2D: [TAB_POWDER],
                              TAB_EVENT: [TAB_SLICE, TAB_CUT],
                              TAB_HISTO: []}
+
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
         slice_presenter = self.wgtSlice.get_presenter()
