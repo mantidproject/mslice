@@ -104,8 +104,9 @@ class CutPresenter(PresenterUtility):
         mantid_ws = MantidWorkspaceProvider().get_workspace_handle(workspace)
         dim = mantid_ws.getDimension(0)
         x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
-        y = mantid_ws.getSignalArray() / mantid_ws.getNumEventsArray()
-        e = np.sqrt(mantid_ws.getErrorSquaredArray()/mantid_ws.getNumEventsArray())
+        with np.errstate(invalid='ignore'):
+            y = mantid_ws.getSignalArray() / mantid_ws.getNumEventsArray()
+            e = np.sqrt(mantid_ws.getErrorSquaredArray())/mantid_ws.getNumEventsArray()
         e = e.squeeze()
         return x, y, e, dim.getUnits()
 
