@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-
 from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
 
 from mslice.presenters.main_presenter import MainPresenter
@@ -68,6 +67,7 @@ class MainWindow(MainView, QMainWindow):
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
+        self.actionQuit.triggered.connect(self.close)
 
     def ws_tab_changed(self, tab):
         self.btnMerge.setEnabled(tab == TAB_EVENT)

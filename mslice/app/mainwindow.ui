@@ -148,13 +148,19 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuOptions">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>Options</string>
+     <string>File</string>
     </property>
+    <addaction name="actionQuit"/>
    </widget>
-   <addaction name="menuOptions"/>
+   <addaction name="menuFile"/>
   </widget>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
