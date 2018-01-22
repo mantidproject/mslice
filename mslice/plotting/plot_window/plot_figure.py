@@ -85,11 +85,11 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.canvas.draw()
 
     def plot_clicked(self, event):
-        if event.dblclick:
+        if event.dblclick or event.button == 3:
             self._plot_handler.plot_clicked(event.x, event.y)
 
     def object_clicked(self, event):
-        if event.mouseevent.dblclick:
+        if event.mouseevent.dblclick or event.mouseevent.button == 3:
             self._plot_handler.object_clicked(event.artist)
 
     def toggle_data_cursor(self):
