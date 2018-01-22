@@ -43,10 +43,6 @@ class CutPresenter(PresenterUtility):
             self._plot_cut_from_workspace(plot_over=True)
         elif command == Command.SaveToWorkspace:
             self._cut(output_method=self._save_cut_to_workspace)
-        elif command == Command.SaveToAscii:
-            fname = str(QFileDialog.getSaveFileName(caption='Select File for Saving'))
-            if fname:
-                self._cut(output_method=self._save_cut_to_file, save_to_file=fname)
         elif command == Command.AxisChanged:
             self._cut_axis_changed()
         self._cut_view.busy.emit(False)
@@ -91,14 +87,6 @@ class CutPresenter(PresenterUtility):
     def _plot_cut(self, params, plot_over, _):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
         self._main_presenter.change_ws_tab(2)
-
-    def _save_cut_to_file(self, params, plot_over, output_file):
-        cut_params = params[:5]
-        x, y, e = self._cut_algorithm.compute_cut_xye(*cut_params)
-        header = 'MSlice Cut of workspace "%s" along "%s" between %f and %f' % (params[:4])
-        header += ' %s normalising to unity' % ('with' if params[4] else 'without')
-        out_data = np.c_[x, y, e]
-        np.savetxt(str(output_file), out_data, fmt='%12.9e', header=header)
 
     def _save_cut_to_workspace(self, params, _, __):
         cut_params = params[:5]
