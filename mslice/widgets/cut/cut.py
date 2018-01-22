@@ -31,8 +31,7 @@ class CutWidget(CutView, QWidget):
         self._command_lookup = {
             self.btnCutPlot: Command.Plot,
             self.btnCutPlotOver: Command.PlotOver,
-            self.btnCutSaveToWorkspace: Command.SaveToWorkspace,
-            self.btnCutSaveAscii: Command.SaveToAscii
+            self.btnCutSaveToWorkspace: Command.SaveToWorkspace
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
@@ -199,7 +198,6 @@ class CutWidget(CutView, QWidget):
         self.btnCutPlot.setEnabled(False)
         self.btnCutPlotOver.setEnabled(False)
 
-        self.btnCutSaveAscii.setEnabled(True)
         self.btnCutSaveToWorkspace.setEnabled(True)
         self.btnCutPlot.setEnabled(True)
         self.btnCutPlotOver.setEnabled(True)
@@ -218,7 +216,6 @@ class CutWidget(CutView, QWidget):
         self.lneCutIntensityEnd.setEnabled(False)
         self.rdoCutNormToOne.setEnabled(False)
 
-        self.btnCutSaveAscii.setEnabled(False)
         self.btnCutSaveToWorkspace.setEnabled(False)
         self.btnCutPlot.setEnabled(False)
         self.btnCutPlotOver.setEnabled(False)
