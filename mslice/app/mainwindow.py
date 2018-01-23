@@ -83,6 +83,9 @@ class MainWindow(MainView, QMainWindow):
     def change_main_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)
 
+    def change_main_tab(self, tab):
+        self.tabWidget.setCurrentIndex(1)
+
     def ws_tab_changed(self, tab):
         self.enable_widget_tabs(tab)
         self.enable_buttons(tab)
