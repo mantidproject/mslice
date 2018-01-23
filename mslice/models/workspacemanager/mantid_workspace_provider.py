@@ -170,9 +170,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         finally:
             self.delete_workspace(scaled_bg_ws)
 
-
-        self.delete_workspace(scaled_bg_ws)
-
     def save_nexus(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace) or isinstance(workspace_handle, IMDHistoWorkspace):
