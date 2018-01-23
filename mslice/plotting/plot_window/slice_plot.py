@@ -213,23 +213,28 @@ class SlicePlot(object):
             slice_plotter_method(self._ws_title)
         except ValueError:  # sample temperature not yet set
             try:
-                field = self.ask_sample_temperature_field(str(self._ws_title))
+                temp_value, field = self.ask_sample_temperature_field(str(self._ws_title))
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.intensity_selection(previous)
                 return False
-            try:
-                field = int(field)
-            except ValueError:
-                self._slice_plotter.add_sample_temperature_field(field)
+            if field:
+                self._slice_plotter.add_sample_temperature_field(temp_value)
                 self._slice_plotter.update_sample_temperature(self._ws_title)
             else:
-                self._slice_plotter.set_sample_temperature(self._ws_title, field)
+                try:
+                    temp_value = float(temp_value)
+                except ValueError:
+                    self.plot_figure.error_box("Invalid value entered for sample temperature. Enter a number or a \
+                                               sample log field.")
+                    self.intensity_selection(previous)
+                    return False
+                else:
+                    self._slice_plotter.set_sample_temperature(self._ws_title, temp_value)
             slice_plotter_method(self._ws_title)
         return True
 
     def ask_sample_temperature_field(self, ws_name):
-        if ws_name[-3:] == '_QE':
-            ws_name = ws_name[:-3]
+        ws_name = ws_name[:ws_name.rfind("_")]
         ws = AnalysisDataService[ws_name]
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
                                                              'Sample Temperature not found. ' +
@@ -238,7 +243,7 @@ class SlicePlot(object):
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
-            return str(temp_field)
+            return str(temp_field), temp_field in ws.run().keys()
 
     def _update_lines(self):
         """ Updates the powder/recoil overplots lines when intensity type changes """
