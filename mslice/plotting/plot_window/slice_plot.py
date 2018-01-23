@@ -223,9 +223,11 @@ class SlicePlot(object):
             else:
                 try:
                     temp_value = float(temp_value)
+                    if temp_value < 0:
+                        raise ValueError
                 except ValueError:
-                    self.plot_figure.error_box("Invalid value entered for sample temperature. Enter a number or a \
-                                               sample log field.")
+                    self.plot_figure.error_box("Invalid value entered for sample temperature. Enter a value in Kelvin \
+                                               or a sample log field.")
                     self.intensity_selection(previous)
                     return False
                 else:
@@ -237,8 +239,8 @@ class SlicePlot(object):
         ws_name = ws_name[:ws_name.rfind("_")]
         ws = AnalysisDataService[ws_name]
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
-                                                             'Sample Temperature not found. ' +
-                                                             'Select the sample temperature field or enter a value:',
+                                                             'Sample Temperature not found. Select the sample ' +
+                                                             'temperature field or enter a value in Kelvin:',
                                                              ws.run().keys())
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
