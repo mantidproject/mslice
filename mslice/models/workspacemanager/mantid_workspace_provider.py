@@ -161,9 +161,16 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def subtract(self, workspaces, background_ws, ssf):
         bg_ws = self.get_workspace_handle(str(background_ws))
         scaled_bg_ws = Scale(bg_ws, ssf)
-        for ws_name in workspaces:
-            ws = self.get_workspace_handle(ws_name)
-            Minus(LHSWorkspace=ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
+        try:
+            for ws_name in workspaces:
+                ws = self.get_workspace_handle(ws_name)
+                Minus(LHSWorkspace=ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
+        except ValueError as e:
+            raise ValueError(e)
+        finally:
+            self.delete_workspace(scaled_bg_ws)
+
+
         self.delete_workspace(scaled_bg_ws)
 
     def save_nexus(self, workspace, path):
