@@ -16,6 +16,9 @@ class MainPresenter(MainPresenterInterface):
     def change_ws_tab(self, tab):
         self._workspace_presenter.change_tab(tab)
 
+    def show_workspace_manager_tab(self):
+        self._mainView.change_main_tab(1)
+
     def set_selected_workspaces(self, workspace_list):
         self._workspace_presenter.set_selected_workspaces(workspace_list)
 
