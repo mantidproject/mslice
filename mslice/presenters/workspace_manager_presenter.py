@@ -33,6 +33,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._combine_workspace()
         elif command == Command.SelectionChanged:
             self._broadcast_selected_workspaces()
+        elif command  == Command.Subtract:
+            self._subtract_workspace()
         else:
             raise ValueError("Workspace Manager Presenter received an unrecognised command")
         self._workspace_manager_view.busy.emit(False)
@@ -107,6 +109,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
         return
+
+    def _subtract_workspace(self):
+        selected_workspaces = self._workspace_manager_view.get_workspace_selected()
+        background_ws, ssf,  = self._workspace_manager_view.subtraction_input()
+        print(background_ws, ssf)
+        # self._workspace_provider.subtract(selected_workspaces, background_ws, ssf)
 
     def get_selected_workspaces(self):
         """Get the currently selected workspaces from the user"""
