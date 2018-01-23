@@ -114,7 +114,10 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
         background_ws, ssf,  = self._workspace_manager_view.subtraction_input()
         print(background_ws, ssf)
-        self._workspace_provider.subtract(selected_workspaces, background_ws, ssf)
+        try:
+            self._workspace_provider.subtract(selected_workspaces, background_ws, ssf)
+        except ValueError as e:
+            self._workspace_manager_view._display_error(str(e))
         self.update_displayed_workspaces()
 
     def get_selected_workspaces(self):
