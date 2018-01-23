@@ -98,8 +98,10 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def subtraction_input(self):
         sub_input = SubtractInputBox(self.listWorkspaces2D, self)
-        sub_input.exec_()
-        return sub_input.user_input()
+        if sub_input.exec_():
+            return sub_input.user_input()
+        else:
+            raise RuntimeError('dialog cancelled')
 
     def get_workspace_selected(self):
         selected_workspaces = [str(x.text()) for x in self.current_list().selectedItems()]
