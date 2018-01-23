@@ -57,6 +57,7 @@ class MainWindow(MainView, QMainWindow):
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.btnSave.clicked.connect(self.button_save)
         self.btnRename.clicked.connect(self.button_rename)
+        self.btnSubtract.clicked.connect(self.button_subtract)
         self.btnDelete.clicked.connect(self.button_delete)
         self.btnMerge.clicked.connect(self.button_merge)
         self.btnPlot.clicked.connect(self.button_plot)
@@ -100,6 +101,9 @@ class MainWindow(MainView, QMainWindow):
             button.hide()
         for button in self.buttons_to_enable[tab]:
             button.show()
+
+    def button_subtract(self):
+        self.workspace_presenter.notify(ws_command.Subtract)
 
     def button_save(self):
         self.workspace_presenter.notify(ws_command.SaveSelectedWorkspace)
