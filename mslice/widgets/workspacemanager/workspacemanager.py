@@ -1,5 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
+from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
+
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
 
@@ -9,35 +11,40 @@ from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
 
+TAB_2D = 0
+TAB_EVENT = 1
+TAB_HISTO = 2
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
 
     error_occurred = Signal('QString')
+    tab_changed = Signal(int)
     busy = Signal(bool)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         load_ui(__file__, 'workspacemanager.ui', self)
-        self.btnWorkspaceSave.clicked.connect(self._btn_clicked)
-        self.btnLoad.clicked.connect(self._btn_clicked)
-        self.btnWorkspaceCompose.clicked.connect(self._btn_clicked)
-        self.btnWorkspaceRemove.clicked.connect(self._btn_clicked)
-        self.btnRename.clicked.connect(self._btn_clicked)
-        self.btnCombine.clicked.connect(self._btn_clicked)
-        self.button_mappings = {self.btnWorkspaceRemove: Command.RemoveSelectedWorkspaces,
-                                self.btnWorkspaceSave: Command.SaveSelectedWorkspace,
-                                self.btnWorkspaceCompose: Command.ComposeWorkspace,
-                                self.btnLoad: Command.LoadWorkspace,
-                                self.btnRename: Command.RenameWorkspace,
-                                self.btnCombine: Command.CombineWorkspace
-                                }
+        self.button_mappings = {}
         self._main_window = None
-        self.lstWorkspaces.itemSelectionChanged.connect(self.list_item_changed)
+        self.onscreen_workspaces = []
+        self.tab_to_list = {TAB_2D: self.listWorkspaces2D,
+                            TAB_EVENT: self.listWorkspacesEvent,
+                            TAB_HISTO: self.listWorkspacesHisto}
+        self.tabWidget.currentChanged.connect(self.tab_changed)
+        self.listWorkspaces2D.itemSelectionChanged.connect(self.list_item_changed)
+        self.listWorkspacesEvent.itemSelectionChanged.connect(self.list_item_changed)
+        self.listWorkspacesHisto.itemSelectionChanged.connect(self.list_item_changed)
         self._presenter = WorkspaceManagerPresenter(self, MantidWorkspaceProvider())
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def current_list(self):
+        return self.tab_to_list[self.tabWidget.currentIndex()]
+
+    def change_tab(self, tab):
+        self.tabWidget.setCurrentIndex(tab)
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -47,50 +54,54 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
             raise Exception('Invalid sender')
         self._presenter.notify(command)
 
+    def add_workspace(self, workspace):
+        item = QListWidgetItem(workspace)
+        self.onscreen_workspaces.append(workspace)
+        workspace = self._presenter.get_workspace_provider().get_workspace_handle(workspace)
+        if isinstance(workspace, IMDEventWorkspace):
+            self.listWorkspacesEvent.addItem(item)
+        elif isinstance(workspace, IMDHistoWorkspace):
+            self.listWorkspacesHisto.addItem(item)
+        elif isinstance(workspace, Workspace):
+            self.listWorkspaces2D.addItem(item)
+        else:
+            raise TypeError("Loaded file is not a valid workspace")
+
     def display_loaded_workspaces(self, workspaces):
-        onscreen_workspaces = []
-        for index in range(self.lstWorkspaces.count()):
-            qitem = self.lstWorkspaces.item(index)
-            onscreen_workspaces.append(str(qitem.text()))
         for workspace in workspaces:
-            if workspace in onscreen_workspaces:
-                onscreen_workspaces.remove(workspace)
-                continue
-            item = QListWidgetItem(workspace)
-            self.lstWorkspaces.addItem(item)
+            if workspace not in self.onscreen_workspaces:
+                self.add_workspace(workspace)
+        for workspace in self.onscreen_workspaces:
+            if workspace not in workspaces:
+                self.remove_workspace(workspace)
 
-        # remove any onscreen workspaces that are no longer here
-        items = [] #items contains (qlistitem, index) tuples
-        for index in range(self.lstWorkspaces.count()):
-            items.append(self.lstWorkspaces.item(index))
-        for item in items:
-            if str(item.text()) in onscreen_workspaces:
-                self.remove_item_from_list(item)
-
-    def remove_item_from_list(self,qlistwidget_item):
-        """Remove given qlistwidget_item from list.
+    def remove_workspace(self, workspace):
+        """Remove workspace from list.
 
         Must be done in seperate function because items are removed by index and removing an items may alter the indexes
         of other items"""
-        text = qlistwidget_item.text()
-        for index in range(self.lstWorkspaces.count()):
-            if self.lstWorkspaces.item(index).text() == text:
-                self.lstWorkspaces.takeItem(index)
-                return
+        self.onscreen_workspaces.remove(workspace)
+        for ws_list in [self.listWorkspaces2D, self.listWorkspacesEvent, self.listWorkspacesHisto]:
+            for index in range(ws_list.count()):
+                if ws_list.item(index).text() == workspace:
+                    ws_list.takeItem(index)
+                    return
 
     def get_workspace_selected(self):
-        selected_workspaces = [str(x.text()) for x in self.lstWorkspaces.selectedItems()]
-        return list(selected_workspaces)
+        selected_workspaces = [str(x.text()) for x in self.current_list().selectedItems()]
+        return selected_workspaces
 
     def set_workspace_selected(self, index):
-        for item_index in range(self.lstWorkspaces.count()):
-            self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(item_index), False)
+        current_list = self.current_list()
+        for item_index in range(current_list.count()):
+            self.listWorkspaces2D.setItemSelected(current_list.item(item_index), False)
         for this_index in (index if hasattr(index, "__iter__") else [index]):
-            self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(this_index), True)
+            self.listWorkspaces2D.setItemSelected(current_list.item(this_index), True)
 
     def get_workspace_index(self, ws_name):
-        for index in range(self.lstWorkspaces.count()):
-            if str(self.lstWorkspaces.item(index).text()) == ws_name:
+        current_list = self.current_list()
+        for index in range(current_list.count()):
+            if str(current_list.item(index).text()) == ws_name:
                 return index
         return -1
 

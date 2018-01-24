@@ -23,9 +23,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def notify(self, command):
         self._clear_displayed_error()
         self._workspace_manager_view.busy.emit(True)
-        if command == Command.LoadWorkspace:
-            self._load_workspace()
-        elif command == Command.SaveSelectedWorkspace:
+        if command == Command.SaveSelectedWorkspace:
             self._save_selected_workspace()
         elif command == Command.RemoveSelectedWorkspaces:
             self._remove_selected_workspaces()
@@ -45,6 +43,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     @require_main_presenter
     def _get_main_presenter(self):
         return self._main_presenter
+
+    def change_tab(self, tab):
+        self._workspace_manager_view.change_tab(tab)
 
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
