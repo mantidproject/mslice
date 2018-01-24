@@ -26,7 +26,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
                                                                     smoothing, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._cache_slice(plot_data, selected_ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis)
-        self.overplot_lines[selected_ws] = {}
+        if selected_ws not in self.overplot_lines:
+            self.overplot_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plot(self)
