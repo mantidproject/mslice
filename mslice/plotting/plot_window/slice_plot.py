@@ -2,6 +2,7 @@ from functools import partial
 import six
 
 from mslice.util.qt import QtWidgets
+from mslice.util.qt.QtCore import Qt
 
 import os.path as path
 import matplotlib.colors as colors
@@ -10,6 +11,7 @@ from mantid.simpleapi import AnalysisDataService
 
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
+from .interactive_cut import InteractiveCut
 from .plot_options import SlicePlotOptions
 
 
@@ -25,6 +27,9 @@ class SlicePlot(object):
         self._cif_path = None
         self._quick_presenter = None
         self._legend_dict = {}
+
+        plot_figure.actionInteractive_Cuts.setEnabled(True)
+        plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
 
         plot_figure.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionS_Q_E,
                                                           self._slice_plotter.show_scattering_function, False))
@@ -269,6 +274,19 @@ class SlicePlot(object):
         line.set_marker(line_options['marker'])
         line.set_color(line_options['color'])
         line.set_linewidth(line_options['width'])
+
+    def interactive_cuts(self):
+        self._canvas.setCursor(Qt.CrossCursor)
+        self._canvas.mpl_connect('button_press_event', self.icut_pos_start)
+
+
+    def icut_pos_start(self, mouse_event):
+        self._canvas.mpl_connect('button_release_event', partial(self.create_icut, mouse_event))
+
+    def create_icut(self, start_cut, end_cut):
+        start_cut = (start_cut.xdata, start_cut.ydata)
+        end_cut = (end_cut.xdata, end_cut.ydata)
+        self.icut = InteractiveCut(self, self._canvas, start_cut, end_cut)
 
     @property
     def colorbar_label(self):

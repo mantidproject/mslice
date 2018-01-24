@@ -84,6 +84,7 @@
    <addaction name="actionDataCursor"/>
    <addaction name="actionPlotOptions"/>
    <addaction name="actionToggleLegends"/>
+   <addaction name="actionInteractive_Cuts"/>
    <addaction name="actionKeep"/>
    <addaction name="actionMakeCurrent"/>
   </widget>
@@ -290,6 +291,11 @@
    </property>
    <property name="text">
     <string>CIF file</string>
+   </property>
+  </action>
+  <action name="actionInteractive_Cuts">
+   <property name="text">
+    <string>Interactive Cuts</string>
    </property>
   </action>
  </widget>

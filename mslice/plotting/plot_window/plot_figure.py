@@ -65,6 +65,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.action_Print_Plot.triggered.connect(self.print_plot)
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
+        self.actionInteractive_Cuts.setEnabled(False)
         self.canvas.mpl_connect('button_press_event', self.plot_clicked)
         self.canvas.mpl_connect('pick_event', self.object_clicked)
 
