@@ -27,6 +27,8 @@ class SlicePlot(object):
         self._cif_path = None
         self._quick_presenter = None
         self._legend_dict = {}
+        self.icut_event = [None, None]
+        self.icut = None
 
         plot_figure.actionInteractive_Cuts.setEnabled(True)
         plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
@@ -277,16 +279,20 @@ class SlicePlot(object):
 
     def interactive_cuts(self):
         self._canvas.setCursor(Qt.CrossCursor)
-        self._canvas.mpl_connect('button_press_event', self.icut_pos_start)
-
+        self.icut_event[0] = self._canvas.mpl_connect('button_press_event', self.icut_pos_start)
 
     def icut_pos_start(self, mouse_event):
-        self._canvas.mpl_connect('button_release_event', partial(self.create_icut, mouse_event))
+        self.icut_event[1] = self._canvas.mpl_connect('button_release_event', partial(self.create_icut, mouse_event))
 
     def create_icut(self, start_cut, end_cut):
+        if self.icut is not None:
+            self.icut.clear()
         start_cut = (start_cut.xdata, start_cut.ydata)
         end_cut = (end_cut.xdata, end_cut.ydata)
         self.icut = InteractiveCut(self, self._canvas, start_cut, end_cut)
+        self._canvas.mpl_disconnect(self.icut_event[0])
+        self._canvas.mpl_disconnect(self.icut_event[1])
+
 
     @property
     def colorbar_label(self):
