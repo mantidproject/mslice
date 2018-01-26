@@ -18,13 +18,14 @@ class InteractiveCut(object):
         self.orient = None
         self.rect = None
         self.coords = None
+        self.dragging = False
         self._cut_algorithm = MantidCutAlgorithm()
         self._cut_plotter = MatplotlibCutPlotter(self._cut_algorithm)
         self.create_box(start_pos, end_pos)
-        # self.create_cut()
+        self.create_cut(False)
         self._canvas.mpl_connect('button_press_event', self.clicked)
 
-    def create_cut(self):
+    def create_cut(self, update):
         # assuming horizontal for now
         x_start = self.coords[0][0]
         x_end = self.coords[1][0]
@@ -32,7 +33,11 @@ class InteractiveCut(object):
         ax = Axis('MomentumTransfer', x_start, x_end, step)
         integration_start = self.coords[0][1]
         integration_end = self.coords[1][1]
-        self._cut_plotter.plot_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
+        if update:
+            self._cut_plotter.update_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
+                                       False, None, None, False)
+        else:
+            self._cut_plotter.plot_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
                                    False, None, None, False)
 
     def create_box(self, start_pos, end_pos):
@@ -52,7 +57,7 @@ class InteractiveCut(object):
         self.rect = patches.Rectangle((x, y), width, height, linewidth=1, edgecolor='r', facecolor='none')
         self._canvas.restore_region(self.background)
         self._canvas.figure.gca().add_patch(self.rect)
-        # self._canvas.figure.gca().draw_artist(self.rect)
+        self._canvas.figure.gca().draw_artist(self.rect)
         self._canvas.blit(self._canvas.figure.gca().bbox)
         self.coords = self.rect.get_bbox().get_points()
 
@@ -78,9 +83,14 @@ class InteractiveCut(object):
         return self.coords[0][0] < xpos < self.coords[1][0] and self.coords[0][1] < ypos < self.coords[1][1]
 
     def clicked(self, event):
-        if self.inside_cut(event.xdata, event.ydata):
-            self.drag_orig_pos = [event.xdata, event.ydata]
-            self._canvas.mpl_connect('motion_notify_event', self.drag)
+        if self.dragging:
+            self._canvas.mpl_disconnect(self.connect_event)
+            self.dragging = False
+        else:
+            self.dragging = True
+            if self.inside_cut(event.xdata, event.ydata):
+                self.drag_orig_pos = [event.xdata, event.ydata]
+                self.connect_event = self._canvas.mpl_connect('motion_notify_event', self.drag)
 
     def drag(self, event):
         xchange = event.xdata - self.drag_orig_pos[0]
@@ -88,8 +98,11 @@ class InteractiveCut(object):
         self.drag_orig_pos[0] = event.xdata
         self.drag_orig_pos[1] = event.ydata
         self.update_coords(xchange, ychange)
-        self.create_cut()
+        self.create_cut(True)
 
     def clear(self):
         self.rect.remove()
         del self
+
+    def none(self, event):
+        pass
