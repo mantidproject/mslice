@@ -48,6 +48,8 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.setCentralWidget(self.canvas)
 
         self._plot_handler = None
+        self.picking = None
+
         # Need flags here as matplotlib provides no way to access the grid state
         self._xgrid = False
         self._ygrid = False
@@ -67,7 +69,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
         self.actionInteractive_Cuts.setEnabled(False)
         self.canvas.mpl_connect('button_press_event', self.plot_clicked)
-        self.canvas.mpl_connect('pick_event', self.object_clicked)
+        self.picking_connected(True)
 
         self.show()  # is not a good idea in non interactive mode
 
@@ -76,6 +78,12 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
 
     def add_cut_plot(self, cut_plotter):
         self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
+
+    def picking_connected(self, connect):
+        if connect:
+            self.picking = self.canvas.mpl_connect('pick_event', self.object_clicked)
+        else:
+            self.canvas.mpl_disconnect(self.picking)
 
     def _toggle_legend(self):
         axes = self.canvas.figure.gca()

@@ -294,6 +294,9 @@
    </property>
   </action>
   <action name="actionInteractive_Cuts">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Interactive Cuts</string>
    </property>

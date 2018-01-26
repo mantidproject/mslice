@@ -278,8 +278,20 @@ class SlicePlot(object):
         line.set_linewidth(line_options['width'])
 
     def interactive_cuts(self):
-        self._canvas.setCursor(Qt.CrossCursor)
-        self.icut_event[0] = self._canvas.mpl_connect('button_press_event', self.icut_pos_start)
+        if not self.icut:
+            self.plot_figure.picking_connected(False)
+            self.plot_figure.actionKeep.trigger()
+            self.plot_figure.actionKeep.setEnabled(False)
+            self.plot_figure.actionMakeCurrent.setEnabled(False)
+            self._canvas.setCursor(Qt.CrossCursor)
+            self.icut_event[0] = self._canvas.mpl_connect('button_press_event', self.icut_pos_start)
+        else:
+            self.plot_figure.picking_connected(True)
+            self.plot_figure.actionKeep.setEnabled(True)
+            self.plot_figure.actionMakeCurrent.setEnabled(True)
+            self._canvas.setCursor(Qt.ArrowCursor)
+            self.icut.clear()
+            self.icut = None
 
     def icut_pos_start(self, mouse_event):
         self.icut_event[1] = self._canvas.mpl_connect('button_release_event', partial(self.create_icut, mouse_event))

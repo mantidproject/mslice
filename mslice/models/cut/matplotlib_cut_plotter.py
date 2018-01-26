@@ -16,7 +16,6 @@ class MatplotlibCutPlotter(CutPlotter):
         x, y, e = self._cut_algorithm.compute_cut_xye(selected_workspace, cut_axis, integration_start, integration_end,
                                                       norm_to_one)
         integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
-        self.background = plt.gcf().canvas.copy_from_bbox(plt.gca().bbox)
         self.legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
         plt.xlabel(self._getDisplayName(cut_axis.units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
         plt.ylabel(INTENSITY_LABEL, picker=picker)
@@ -25,20 +24,19 @@ class MatplotlibCutPlotter(CutPlotter):
         self.line = plt.errorbar(x, y, yerr=e, label=self.legend, hold=plot_over, marker='o', picker=picker)
         leg = plt.legend(fontsize='medium')
         leg.draggable()
-        # plt.gca().get_xaxis().set_animated(True)
         plt.gcf().canvas.manager.add_cut_plot(self)
         if not plot_over:
             plt.gcf().canvas.manager.update_grid()
         plt.draw_all()
         self.canvas = plt.gcf().canvas
+        self.axes = self.canvas.figure.gca()
 
-    def update_cut(self, workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, intensity_end, plot_over):
+    def update_cut(self, workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, intensity_end):
         x, y, e = self._cut_algorithm.compute_cut_xye(workspace, cut_axis, integration_start, integration_end,
                                                       norm_to_one)
-        self.canvas.restore_region(self.background)
-        plt.errorbar(x, y, yerr=e, label=self.legend, hold=plot_over, marker='o', picker=picker)
-        self.canvas.figure.gca().draw_artist(self.canvas.figure.get_children()[1])
-        self.canvas.blit(self.canvas.figure.gca().clipbox)
+        plt.plot(x, y, label=self.legend, hold=False, marker='o')
+        self.axes.draw_artist(self.canvas.figure.get_children()[1])
+        self.canvas.blit(self.axes.clipbox)
         self.canvas.draw()
 
     def _getDisplayName(self, axisUnits, comment=None):
