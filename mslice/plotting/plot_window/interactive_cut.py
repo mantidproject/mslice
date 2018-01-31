@@ -6,8 +6,6 @@ from matplotlib.lines import Line2D
 from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 
-VERTICAL = 0
-HORIZONTAL = 1
 INIT_WIDTH = 0.05
 LEFT = 0
 RIGHT = 1
@@ -21,7 +19,7 @@ class InteractiveCut(object):
         self.slice_plot = slice_plot
         self._canvas = canvas
         self.background = self._canvas.copy_from_bbox(self._canvas.figure.gca().bbox)
-        self.orient = None
+        self.horizontal = None
         self.rect = None
         self.coords = None
         self.dragging = False
@@ -35,7 +33,7 @@ class InteractiveCut(object):
         self.connect_event[0] = self._canvas.mpl_connect('motion_notify_event', self.select_box)
 
     def create_cut(self, update):
-        # assuming horizontal for now
+        # assuming horizontal for now. Cut along y axis?
         x_start = self.coords[0][0]
         x_end = self.coords[1][0]
         step = 0.02 # hardcode for now, possibly get default value?
@@ -44,13 +42,17 @@ class InteractiveCut(object):
         integration_end = self.coords[1][1]
         if update:
             self._cut_plotter.update_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
-                                       False, None, None)
+                                         False, None, None)
         else:
             self._cut_plotter.plot_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
-                                   False, None, None, False)
+                                       False, None, None, False)
 
     def create_box(self, start_pos, end_pos):
-        x, y, width, height = self.calc_box_size(start_pos, end_pos)
+        self.set_box_orientation(start_pos, end_pos)
+        if self.horizontal:
+            height, x, y, width = self.box_dimensions(start_pos, end_pos, self.slice_plot.y_range[1])
+        else:
+            width, y, x, height = self.box_dimensions(start_pos, end_pos, self.slice_plot.x_range[1])
         self.draw_box(x, y, width, height)
         self._canvas.draw()
 
@@ -70,55 +72,44 @@ class InteractiveCut(object):
         self._canvas.blit(self._canvas.figure.gca().bbox)
         self.coords = self.rect.get_bbox().get_points()
 
-    def calc_box_size(self, start_pos, end_pos):
+    def set_box_orientation(self, start_pos, end_pos):
         x_diff = abs(start_pos[0] - end_pos[0])
         y_diff = abs(start_pos[1] - end_pos[1])
-        self.orient = HORIZONTAL if x_diff > y_diff else VERTICAL
-        print(self.orient)
-        if self.orient == HORIZONTAL:
-            height = INIT_WIDTH * self.slice_plot.y_range[1]
-            x = min(start_pos[0], end_pos[0])
-            y = (start_pos[1] + end_pos[1] - height) / 2
-            width = max(start_pos[0], end_pos[0]) - x
-            return x, y, width, height
-        else:
-            width = INIT_WIDTH * self.slice_plot.x_range[1]
-            y = min(start_pos[1], end_pos[1])
-            x = (start_pos[0] + end_pos[0] - width) / 2
-            height = max(start_pos[1], end_pos[1]) - y
-        return x, y, width, height
+        self.horizontal =  x_diff > y_diff
+
+    def box_dimensions(self, start_pos, end_pos, axis_maximum):
+        orient = int(self.horizontal)
+        not_orient = int(not self.horizontal)  # list indices swap depending on self.horizontal
+        length1 = INIT_WIDTH * axis_maximum
+        pos1 = min(start_pos[not_orient], end_pos[not_orient])
+        pos2 = (start_pos[orient] + end_pos[orient] - length1) / 2
+        length2 = max(start_pos[not_orient], end_pos[not_orient]) - pos1
+        return length1, pos1, pos2, length2
 
     def inside_cut(self, xpos, ypos):
         return self.coords[0][0] < xpos < self.coords[1][0] and self.coords[0][1] < ypos < self.coords[1][1]
 
     def clicked(self, event):
-        if self.highlight:
-            self.side_clicked(event)
-            return
         if self.dragging:
-            self._canvas.mpl_disconnect(self.connect_event[0])
-            self._canvas.mpl_disconnect(self.connect_event[1])
-            self.dragging = False
+            self.end_transform()
         else:
-            if self.inside_cut(event.xdata, event.ydata):
-                self.dragging = True
-                self.drag_orig_pos = [event.xdata, event.ydata]
-                self.connect_event[0] = self._canvas.mpl_connect('motion_notify_event', self.drag)
-                self.connect_event[1] = self._canvas.mpl_connect('button_release_event', self.clicked)
+            self.drag_orig_pos = [event.xdata, event.ydata]
+            if self.highlight:
+                self.side_extending = self.closest_side(event.x, event.y)
+                self.start_transform(self.extend)
+            elif self.inside_cut(event.xdata, event.ydata):
+                self.start_transform(self.drag)
 
-    def side_clicked(self, event):
-        if self.dragging:
-            self._canvas.mpl_disconnect(self.connect_event[0])
-            self._canvas.mpl_disconnect(self.connect_event[1])
-            self.dragging = False
-        else:
-            self.dragging = True
-            x_click = event.xdata
-            y_click = event.ydata
-            self.drag_orig_pos = [x_click, y_click]
-            self.side_extending = self.closest_side(event.x, event.y)
-            self.connect_event[0] = self._canvas.mpl_connect('motion_notify_event', self.extend)
-            self.connect_event[1] = self._canvas.mpl_connect('button_release_event', self.side_clicked)
+    def end_transform(self):
+        self.dragging = False
+        self._canvas.mpl_disconnect(self.connect_event[0])
+        self._canvas.mpl_disconnect(self.connect_event[1])
+
+    def start_transform(self, motion_slot):
+        self.dragging = True
+        self.connect_event[0] = self._canvas.mpl_connect('motion_notify_event', motion_slot)
+        self.connect_event[1] = self._canvas.mpl_connect('button_release_event', self.clicked)
+
 
     def extend(self, event):
         delta_x = self.drag_orig_pos[0] - event.xdata
@@ -156,20 +147,23 @@ class InteractiveCut(object):
         return dist.index(min(dist))
 
     def dist_to_sides(self, x, y):
-        '''calculates which side of the rectangle is closest to the given coordinates. parameters must be given
+        '''calculates which side of the rectangle is closest to the given coordinates. Parameters must be given
         in terms of the actual location, NOT the data coordinates from the axes.'''
         coords = self._canvas.figure.gca().transData.transform(self.coords)
         dist = []
-        centre_points = [[], [], [], []]
-        centre_points[LEFT] = [coords[0][0], (coords[0][1] + coords[1][1]) / 2]
-        centre_points[RIGHT] = [coords[1][0], (coords[0][1] + coords[1][1]) / 2]
-        centre_points[TOP] = [(coords[0][0] + coords[1][0]) / 2, coords[1][1]]
-        centre_points[BOTTOM] = [(coords[0][0] + coords[1][0]) / 2, coords[0][1]]
+        midpoints = [[], [], [], []]
 
-        dist.append(np.hypot(x - centre_points[0][0], y - centre_points[0][1]))
-        dist.append(np.hypot(x - centre_points[1][0], y - centre_points[1][1]))
-        dist.append(np.hypot(x - centre_points[2][0], y - centre_points[2][1]))
-        dist.append(np.hypot(x - centre_points[3][0], y - centre_points[3][1]))
+        # get midpoint of each line
+        mid_vertical = (coords[0][1] + coords[1][1]) / 2
+        mid_horizontal = (coords[0][0] + coords[1][0]) / 2
+        midpoints[LEFT] = [coords[0][0], mid_vertical]
+        midpoints[RIGHT] = [coords[1][0], mid_vertical]
+        midpoints[TOP] = [mid_horizontal, coords[1][1]]
+        midpoints[BOTTOM] = [mid_horizontal, coords[0][1]]
+
+        # use pythagoras to get distance from each midpoint to (x,y)
+        for point in midpoints:
+            dist.append(np.hypot(x - point[0], y - point[1]))
         return dist
 
     def select_box(self, event):
@@ -181,31 +175,19 @@ class InteractiveCut(object):
         self.highlight_side(highlight_side)
 
     def highlight_side(self, side):
-        line = False
-        if side == LEFT:
-            x0 = self.coords[0][0]
+        line = True
+        if side is None:
+            line = False
+        elif side < 2: # left or right side
+            x0 = self.coords[0][0] if side == LEFT else self.coords[1][0]
             x1 = x0
             y0 = self.coords[0][1]
             y1 = self.coords[1][1]
-            line = True
-        elif side == RIGHT:
-            x0 = self.coords[1][0]
-            x1 = x0
-            y0 = self.coords[0][1]
-            y1 = self.coords[1][1]
-            line = True
-        elif side == TOP:
+        else: # top or bottom side
             x0 = self.coords[0][0]
             x1 = self.coords[1][0]
-            y0 = self.coords[1][1]
+            y0 = self.coords[1][1] if side == TOP else self.coords[0][1]
             y1 = y0
-            line = True
-        elif side == BOTTOM:
-            x0 = self.coords[0][0]
-            x1 = self.coords[1][0]
-            y0 = self.coords[0][1]
-            y1 = y0
-            line = True
         if self.highlight is not None:
             self.highlight.set_visible(False)
             self._canvas.figure.gca().lines.remove(self.highlight)
