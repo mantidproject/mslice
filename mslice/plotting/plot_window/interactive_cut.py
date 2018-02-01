@@ -5,6 +5,7 @@ from matplotlib.lines import Line2D
 
 from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
+from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 INIT_WIDTH = 0.05
 LEFT = 0
@@ -33,19 +34,24 @@ class InteractiveCut(object):
         self.connect_event[0] = self._canvas.mpl_connect('motion_notify_event', self.select_box)
 
     def create_cut(self, update):
-        # assuming horizontal for now. Cut along y axis?
-        x_start = self.coords[0][0]
-        x_end = self.coords[1][0]
-        step = 0.02 # hardcode for now, possibly get default value?
-        ax = Axis('MomentumTransfer', x_start, x_end, step)
-        integration_start = self.coords[0][1]
-        integration_end = self.coords[1][1]
+        start, end, step, integration_start, integration_end = self.get_cut_parameters(self.coords, self.horizontal)
+        units = self._canvas.figure.gca().get_xaxis().units if self.horizontal else \
+            self._canvas.figure.gca().get_yaxis().units
+        ax = Axis(units, start, end, step)
         if update:
             self._cut_plotter.update_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
                                          False, None, None)
         else:
             self._cut_plotter.plot_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
                                        False, None, None, False)
+
+    def get_cut_parameters(self, coords, horizontal):
+        start = self.coords[0][not horizontal]
+        end = self.coords[1][not horizontal]
+        step = 0.02  # hardcode for now, possibly get default value?
+        integration_start = self.coords[0][horizontal]
+        integration_end = self.coords[1][horizontal]
+        return start, end, step, integration_start, integration_end
 
     def create_box(self, start_pos, end_pos):
         self.set_box_orientation(start_pos, end_pos)
@@ -78,12 +84,12 @@ class InteractiveCut(object):
         self.horizontal =  x_diff > y_diff
 
     def box_dimensions(self, start_pos, end_pos, axis_maximum):
-        orient = int(self.horizontal)
-        not_orient = int(not self.horizontal)  # list indices swap depending on self.horizontal
+        """get length, width and co-ords of the bottom left corner of the box. The x or y coordinates of start_pos
+        and end_pos are accessed depending on self.horizontal (direction of the cut)."""
         length1 = INIT_WIDTH * axis_maximum
-        pos1 = min(start_pos[not_orient], end_pos[not_orient])
-        pos2 = (start_pos[orient] + end_pos[orient] - length1) / 2
-        length2 = max(start_pos[not_orient], end_pos[not_orient]) - pos1
+        pos1 = min(start_pos[not self.horizontal], end_pos[not self.horizontal])
+        pos2 = (start_pos[self.horizontal] + end_pos[self.horizontal] - length1) / 2
+        length2 = max(start_pos[not self.horizontal], end_pos[not self.horizontal]) - pos1
         return length1, pos1, pos2, length2
 
     def inside_cut(self, xpos, ypos):
@@ -147,8 +153,8 @@ class InteractiveCut(object):
         return dist.index(min(dist))
 
     def dist_to_sides(self, x, y):
-        '''calculates which side of the rectangle is closest to the given coordinates. Parameters must be given
-        in terms of the actual location, NOT the data coordinates from the axes.'''
+        """calculates which side of the rectangle is closest to the given coordinates. Parameters must be given
+        in terms of the actual location, NOT the data coordinates from the axes."""
         coords = self._canvas.figure.gca().transData.transform(self.coords)
         dist = []
         midpoints = [[], [], [], []]
