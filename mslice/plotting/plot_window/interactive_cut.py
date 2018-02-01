@@ -5,7 +5,6 @@ from matplotlib.lines import Line2D
 
 from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 INIT_WIDTH = 0.05
 LEFT = 0
@@ -25,19 +24,19 @@ class InteractiveCut(object):
         self.coords = None
         self.dragging = False
         self.highlight = None
+        self.units = None
+        self.connect_event = [None, None]
+
         self._cut_algorithm = MantidCutAlgorithm()
         self._cut_plotter = MatplotlibCutPlotter(self._cut_algorithm)
         self.create_box(start_pos, end_pos)
         self.create_cut(False)
-        self.connect_event = [None, None]
         self._canvas.mpl_connect('button_press_event', self.clicked)
         self.connect_event[0] = self._canvas.mpl_connect('motion_notify_event', self.select_box)
 
     def create_cut(self, update):
         start, end, step, integration_start, integration_end = self.get_cut_parameters(self.coords, self.horizontal)
-        units = self._canvas.figure.gca().get_xaxis().units if self.horizontal else \
-            self._canvas.figure.gca().get_yaxis().units
-        ax = Axis(units, start, end, step)
+        ax = Axis(self.units, start, end, step)
         if update:
             self._cut_plotter.update_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
                                          False, None, None)
@@ -82,6 +81,8 @@ class InteractiveCut(object):
         x_diff = abs(start_pos[0] - end_pos[0])
         y_diff = abs(start_pos[1] - end_pos[1])
         self.horizontal =  x_diff > y_diff
+        self.units = self._canvas.figure.gca().get_xaxis().units if self.horizontal else \
+            self._canvas.figure.gca().get_yaxis().units
 
     def box_dimensions(self, start_pos, end_pos, axis_maximum):
         """get length, width and co-ords of the bottom left corner of the box. The x or y coordinates of start_pos
@@ -115,7 +116,6 @@ class InteractiveCut(object):
         self.dragging = True
         self.connect_event[0] = self._canvas.mpl_connect('motion_notify_event', motion_slot)
         self.connect_event[1] = self._canvas.mpl_connect('button_release_event', self.clicked)
-
 
     def extend(self, event):
         delta_x = self.drag_orig_pos[0] - event.xdata
