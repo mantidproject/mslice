@@ -31,14 +31,20 @@ class InteractiveCut(object):
         self._cut_algorithm = MantidCutAlgorithm()
         self._cut_plotter = MatplotlibCutPlotter(self._cut_algorithm)
         self.create_box(start_pos, end_pos)
-        self.create_cut(False)
+        self.create_cut()
         self._canvas.mpl_connect('button_press_event', self.clicked)
         self._canvas.mpl_connect('motion_notify_event', self.select_box)
 
-    def create_cut(self, update):
+    def create_cut(self):
+        ax, integration_start, integration_end = self.get_cut_parameters()
+        self._cut_plotter.create_quick_cut()
+        self._cut_plotter.plot_quick_cut(str(self._ws_title), ax, integration_start, integration_end,
+                                         False, None, None)
+
+    def update_cut(self):
         ax, integration_start, integration_end = self.get_cut_parameters()
         self._cut_plotter.plot_quick_cut(str(self._ws_title), ax, integration_start, integration_end,
-                                         False, None, None, update)
+                                           False, None, None)
 
     def get_cut_parameters(self):
         start = self.coords[0][not self.horizontal]
@@ -136,7 +142,7 @@ class InteractiveCut(object):
         self.drag_orig_pos[0] = event.xdata
         self.drag_orig_pos[1] = event.ydata
         self.draw_box(x, y, width, height)
-        self.create_cut(True)
+        self.update_cut()
 
     def drag(self, event):
         xchange = event.xdata - self.drag_orig_pos[0]
@@ -144,7 +150,7 @@ class InteractiveCut(object):
         self.drag_orig_pos[0] = event.xdata
         self.drag_orig_pos[1] = event.ydata
         self.update_coords(xchange, ychange)
-        self.create_cut(True)
+        self.update_cut()
 
     def closest_side(self, x, y):
         dist = self.dist_to_sides(x, y)

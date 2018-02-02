@@ -31,14 +31,15 @@ class MatplotlibCutPlotter(CutPlotter):
             plt.gcf().canvas.manager.update_grid()
         plt.draw_all()
 
+    def create_quick_cut(self):
+        self.canvas = plt.gcf().canvas
+        self.axes = self.canvas.figure.gca()
+        plt.gcf().canvas.manager.add_cut_plot(self)
+        self.canvas.manager.set_as_icut()
+        self.canvas.draw()
+
     def plot_quick_cut(self, workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
-                       intensity_end, update_old):
-        if not update_old:
-            self.canvas = plt.gcf().canvas
-            self.axes = self.canvas.figure.gca()
-            plt.gcf().canvas.manager.add_cut_plot(self)
-            self.canvas.manager.set_as_icut()
-            self.canvas.draw()
+                       intensity_end):
         x, y, e = self._cut_algorithm.compute_cut_xye(workspace, cut_axis, integration_start, integration_end,
                                                       norm_to_one)
         plt.errorbar(x, y, yerr=e, hold=False, marker='o')
