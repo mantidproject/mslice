@@ -36,19 +36,19 @@ class InteractiveCut(object):
         self._canvas.mpl_connect('motion_notify_event', self.select_box)
 
     def create_cut(self, update):
-        start, end, step, integration_start, integration_end = self.get_cut_parameters()
-        ax = Axis(self.units, start, end, step)
+        ax, integration_start, integration_end = self.get_cut_parameters()
         self._cut_plotter.plot_quick_cut(str(self._ws_title), ax, integration_start, integration_end,
-                                         False, None, None, update, self)
+                                         False, None, None, update)
 
     def get_cut_parameters(self):
         start = self.coords[0][not self.horizontal]
         end = self.coords[1][not self.horizontal]
         # hard code step for now. When sliceMD is fixed, can get minimum step with cut_algorithm.get_axis_range()
         step = 0.02
+        ax = Axis(self.units, start, end, step)
         integration_start = self.coords[0][self.horizontal]
         integration_end = self.coords[1][self.horizontal]
-        return start, end, step, integration_start, integration_end
+        return ax, integration_start, integration_end
 
     def create_box(self, start_pos, end_pos):
         self.set_box_orientation(start_pos, end_pos)
@@ -204,8 +204,7 @@ class InteractiveCut(object):
             self._canvas.blit(self._canvas.figure.gca().bbox)
 
     def save_cut(self):
-        start, end, step, integration_start, integration_end = self.get_cut_parameters()
-        ax = Axis(self.units, start, end, step)
+        ax, integration_start, integration_end = self.get_cut_parameters()
         self._cut_plotter.save_cut((str(self._ws_title), ax, integration_start, integration_end, False))
         self.update_workspaces()
 

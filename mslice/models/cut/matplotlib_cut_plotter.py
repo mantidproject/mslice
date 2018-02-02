@@ -33,9 +33,8 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.draw_all()
 
     def plot_quick_cut(self, workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
-                       intensity_end, update_old, icut=None):
+                       intensity_end, update_old):
         if not update_old:
-            self.icut = icut
             self.canvas = plt.gcf().canvas
             self.axes = self.canvas.figure.gca()
             plt.gcf().canvas.manager.add_cut_plot(self)

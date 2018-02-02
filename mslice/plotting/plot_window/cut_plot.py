@@ -7,7 +7,6 @@ import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
-from mslice.presenters.slice_plotter_presenter import Axis
 from .plot_options import CutPlotOptions
 
 
@@ -17,7 +16,6 @@ class CutPlot(object):
         self.plot_figure = plot_figure
         self._canvas = canvas
         self._cut_plotter = cut_plotter
-        self._ws_title = plot_figure.title
         self._lines_visible = {}
         self._legends_shown = True
         self._legends_visible = []
