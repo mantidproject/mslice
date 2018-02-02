@@ -1,5 +1,4 @@
 from __future__ import (absolute_import, division, print_function)
-from matplotlib.text import Text
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
 from .cut_plotter import CutPlotter
