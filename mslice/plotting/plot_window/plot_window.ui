@@ -85,6 +85,7 @@
    <addaction name="actionPlotOptions"/>
    <addaction name="actionToggleLegends"/>
    <addaction name="actionInteractive_Cuts"/>
+   <addaction name="actionSave_Cut"/>
    <addaction name="actionKeep"/>
    <addaction name="actionMakeCurrent"/>
   </widget>
@@ -299,6 +300,11 @@
    </property>
    <property name="text">
     <string>Interactive Cuts</string>
+   </property>
+  </action>
+  <action name="actionSave_Cut">
+   <property name="text">
+    <string>Save Cut</string>
    </property>
   </action>
  </widget>

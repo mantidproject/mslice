@@ -106,7 +106,7 @@ class CutPresenter(PresenterUtility):
 
     def _save_cut_to_workspace(self, params):
         cut_params = params[:5]
-        self._cut_algorithm.compute_cut(*cut_params)
+        self._cut_plotter.save_cut(cut_params)
         self._main_presenter.update_displayed_workspaces()
 
     def _parse_step(self):

@@ -7,6 +7,7 @@ import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
+from mslice.presenters.slice_plotter_presenter import Axis
 from .plot_options import CutPlotOptions
 
 
@@ -16,6 +17,7 @@ class CutPlot(object):
         self.plot_figure = plot_figure
         self._canvas = canvas
         self._cut_plotter = cut_plotter
+        self._ws_title = plot_figure.title
         self._lines_visible = {}
         self._legends_shown = True
         self._legends_visible = []
@@ -23,11 +25,23 @@ class CutPlot(object):
         self._lines = self.line_containers()
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
+        plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
         if new_config:
             self._canvas.draw()
+
+    def set_as_icut(self):
+        self.plot_figure.actionSave_Cut.setVisible(True)
+        self.plot_figure.actionPlotOptions.setEnabled(False)
+        self.plot_figure.actionToggleLegends.setEnabled(False)
+        self.plot_figure.actionKeep.setEnabled(False)
+        self.plot_figure.actionMakeCurrent.setEnabled(False)
+
+    def save_icut(self):
+        icut = self._cut_plotter.get_icut()
+        icut.save_cut()
 
     def object_clicked(self, target):
         if isinstance(target, Legend):

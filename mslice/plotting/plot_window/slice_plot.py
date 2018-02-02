@@ -32,6 +32,7 @@ class SlicePlot(object):
 
         plot_figure.actionInteractive_Cuts.setEnabled(True)
         plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
+        plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
 
         plot_figure.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionS_Q_E,
                                                           self._slice_plotter.show_scattering_function, False))
@@ -283,12 +284,14 @@ class SlicePlot(object):
             self.plot_figure.actionKeep.trigger()
             self.plot_figure.actionKeep.setEnabled(False)
             self.plot_figure.actionMakeCurrent.setEnabled(False)
+            self.plot_figure.actionSave_Cut.setVisible(True)
             self._canvas.setCursor(Qt.CrossCursor)
             self.icut_event[0] = self._canvas.mpl_connect('button_press_event', self.icut_pos_start)
         else:
             self.plot_figure.picking_connected(True)
             self.plot_figure.actionKeep.setEnabled(True)
             self.plot_figure.actionMakeCurrent.setEnabled(True)
+            self.plot_figure.actionSave_Cut.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
             self.icut.clear()
             self.icut = None
@@ -301,10 +304,15 @@ class SlicePlot(object):
             self.icut.clear()
         start_cut = (start_cut.xdata, start_cut.ydata)
         end_cut = (end_cut.xdata, end_cut.ydata)
-        self.icut = InteractiveCut(self, self._canvas, start_cut, end_cut)
-        self._canvas.mpl_disconnect(self.icut_event[0])
-        self._canvas.mpl_disconnect(self.icut_event[1])
+        self.icut = InteractiveCut(self, self._canvas, self._ws_title, start_cut, end_cut)
+        for event in self.icut_event:
+            self._canvas.mpl_disconnect(event)
 
+    def save_icut(self):
+        self.icut.save_cut()
+
+    def update_workspaces(self):
+        self._slice_plotter.update_displayed_workspaces()
 
     @property
     def colorbar_label(self):

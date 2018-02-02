@@ -14,11 +14,12 @@ BOTTOM = 3
 
 class InteractiveCut(object):
 
-    def __init__(self, slice_plot, canvas, start_pos, end_pos):
+    def __init__(self, slice_plot, canvas, ws_title, start_pos, end_pos):
         from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
         self.slice_plot = slice_plot
         self._canvas = canvas
         self.background = self._canvas.copy_from_bbox(self._canvas.figure.gca().bbox)
+        self._ws_title = ws_title
         self.horizontal = None
         self.rect = None
         self.coords = None
@@ -32,24 +33,21 @@ class InteractiveCut(object):
         self.create_box(start_pos, end_pos)
         self.create_cut(False)
         self._canvas.mpl_connect('button_press_event', self.clicked)
-        self.connect_event[0] = self._canvas.mpl_connect('motion_notify_event', self.select_box)
+        self._canvas.mpl_connect('motion_notify_event', self.select_box)
 
     def create_cut(self, update):
-        start, end, step, integration_start, integration_end = self.get_cut_parameters(self.coords, self.horizontal)
+        start, end, step, integration_start, integration_end = self.get_cut_parameters()
         ax = Axis(self.units, start, end, step)
-        if update:
-            self._cut_plotter.update_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
-                                         False, None, None)
-        else:
-            self._cut_plotter.plot_cut(str(self.slice_plot._ws_title), ax, integration_start, integration_end,
-                                       False, None, None, False)
+        self._cut_plotter.plot_quick_cut(str(self._ws_title), ax, integration_start, integration_end,
+                                         False, None, None, update, self)
 
-    def get_cut_parameters(self, coords, horizontal):
-        start = self.coords[0][not horizontal]
-        end = self.coords[1][not horizontal]
-        step = 0.02  # hardcode for now, possibly get default value?
-        integration_start = self.coords[0][horizontal]
-        integration_end = self.coords[1][horizontal]
+    def get_cut_parameters(self):
+        start = self.coords[0][not self.horizontal]
+        end = self.coords[1][not self.horizontal]
+        # hard code step for now. When sliceMD is fixed, can get minimum step with cut_algorithm.get_axis_range()
+        step = 0.02
+        integration_start = self.coords[0][self.horizontal]
+        integration_end = self.coords[1][self.horizontal]
         return start, end, step, integration_start, integration_end
 
     def create_box(self, start_pos, end_pos):
@@ -204,6 +202,15 @@ class InteractiveCut(object):
             self._canvas.figure.gca().add_line(self.highlight)
             self._canvas.figure.gca().draw_artist(self.highlight)
             self._canvas.blit(self._canvas.figure.gca().bbox)
+
+    def save_cut(self):
+        start, end, step, integration_start, integration_end = self.get_cut_parameters()
+        ax = Axis(self.units, start, end, step)
+        self._cut_plotter.save_cut((str(self._ws_title), ax, integration_start, integration_end, False))
+        self.update_workspaces()
+
+    def update_workspaces(self):
+        self.slice_plot.update_workspaces()
 
     def clear(self):
         self.rect.remove()

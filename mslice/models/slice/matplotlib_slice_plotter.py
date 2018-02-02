@@ -10,11 +10,13 @@ picker=5
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
+
     def __init__(self, slice_algorithm):
         self._slice_algorithm = slice_algorithm
         self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
         if not MPL_COMPAT:
             self._colormaps.insert(0, 'viridis')
+        self.listener = None
         self.slice_cache = {}
         self._sample_temp_fields = []
         self.overplot_lines = {}
@@ -206,6 +208,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def get_recoil_label(self, key):
         return recoil_labels[key]
+
+    def update_displayed_workspaces(self):
+        self.listener.update_workspaces()
 
     def set_workspace_provider(self, workspace_provider):
         self._slice_algorithm.set_workspace_provider(workspace_provider)

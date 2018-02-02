@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from matplotlib.text import Text
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
 from .cut_plotter import CutPlotter
@@ -10,34 +11,45 @@ picker=3
 class MatplotlibCutPlotter(CutPlotter):
     def __init__(self, cut_algorithm):
         self._cut_algorithm = cut_algorithm
+        self.axes = None
+        self.canvas = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
                  intensity_end, plot_over):
         x, y, e = self._cut_algorithm.compute_cut_xye(selected_workspace, cut_axis, integration_start, integration_end,
                                                       norm_to_one)
         integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
-        self.legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
+        legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
         plt.xlabel(self._getDisplayName(cut_axis.units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
         plt.ylabel(INTENSITY_LABEL, picker=picker)
         plt.autoscale()
         plt.ylim(intensity_start, intensity_end)
-        self.line = plt.errorbar(x, y, yerr=e, label=self.legend, hold=plot_over, marker='o', picker=picker)
+        plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o', picker=picker)
         leg = plt.legend(fontsize='medium')
         leg.draggable()
         plt.gcf().canvas.manager.add_cut_plot(self)
         if not plot_over:
             plt.gcf().canvas.manager.update_grid()
         plt.draw_all()
-        self.canvas = plt.gcf().canvas
-        self.axes = self.canvas.figure.gca()
 
-    def update_cut(self, workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start, intensity_end):
+    def plot_quick_cut(self, workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
+                       intensity_end, update_old, icut=None):
+        if not update_old:
+            self.icut = icut
+            self.canvas = plt.gcf().canvas
+            self.axes = self.canvas.figure.gca()
+            plt.gcf().canvas.manager.add_cut_plot(self)
+            self.canvas.manager.set_as_icut()
+            self.canvas.draw()
         x, y, e = self._cut_algorithm.compute_cut_xye(workspace, cut_axis, integration_start, integration_end,
                                                       norm_to_one)
-        plt.plot(x, y, label=self.legend, hold=False, marker='o')
+        plt.errorbar(x, y, yerr=e, hold=False, marker='o')
         self.axes.draw_artist(self.canvas.figure.get_children()[1])
-        self.canvas.blit(self.axes.clipbox)
+        self.canvas.blit(self.canvas.figure.gca().clipbox)
         self.canvas.draw()
+
+    def save_cut(self, params):
+        self._cut_algorithm.compute_cut(*params)
 
     def _getDisplayName(self, axisUnits, comment=None):
         if 'DeltaE' in axisUnits:
@@ -61,3 +73,6 @@ class MatplotlibCutPlotter(CutPlotter):
         integrated_dim = mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
         return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
             "%.2f" % integration_end
+
+    def get_icut(self):
+        return self.icut

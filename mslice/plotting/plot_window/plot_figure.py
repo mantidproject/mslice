@@ -68,6 +68,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
         self.actionInteractive_Cuts.setEnabled(False)
+        self.actionSave_Cut.setVisible(False)
         self.canvas.mpl_connect('button_press_event', self.plot_clicked)
         self.picking_connected(True)
 
@@ -78,6 +79,9 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
 
     def add_cut_plot(self, cut_plotter):
         self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
+
+    def set_as_icut(self):
+        self._plot_handler.set_as_icut()
 
     def picking_connected(self, connect):
         if connect:

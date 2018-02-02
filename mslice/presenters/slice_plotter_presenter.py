@@ -42,6 +42,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         self._slice_view = slice_view
         self._main_presenter = None
         self._slice_plotter = slice_plotter
+        slice_plotter.listener = self
         colormaps = self._slice_plotter.get_available_colormaps()
         self._slice_view.populate_colormap_options(colormaps)
 
@@ -159,6 +160,9 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             return
         self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
         self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])
+
+    def update_workspaces(self):
+        self._main_presenter.update_displayed_workspaces()
 
     def set_workspace_provider(self, workspace_provider):
         self._slice_plotter.set_workspace_provider(workspace_provider)
