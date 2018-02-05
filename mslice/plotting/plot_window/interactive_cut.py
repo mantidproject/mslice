@@ -44,7 +44,7 @@ class InteractiveCut(object):
     def update_cut(self):
         ax, integration_start, integration_end = self.get_cut_parameters()
         self._cut_plotter.plot_quick_cut(str(self._ws_title), ax, integration_start, integration_end,
-                                           False, None, None)
+                                         False, None, None)
 
     def get_cut_parameters(self):
         start = self.coords[0][not self.horizontal]
