@@ -298,7 +298,7 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.compute_cut_xye = mock.Mock(return_value=('x', 'y', 'e'))
         cut_presenter.notify(Command.SaveToWorkspace)
         self.cut_plotter.save_cut.assert_called_with((workspace, processed_axis, integration_start,
-                                                          integration_end, is_norm))
+                                                      integration_end, is_norm))
         self.cut_plotter.plot_cut.assert_not_called()
 
     def test_cut_save_ascii(self):
