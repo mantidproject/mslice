@@ -64,4 +64,4 @@ class SlicePlotTest(unittest.TestCase):
         new_slice_plot = SlicePlot(self.plot_figure, self.canvas, self.slice_plotter)
 
         self.assertTrue(new_slice_plot.plot_figure.actionHelium.checked)
-        self.slice_plotter.add_overplot_line.assert_called_with(self.plot_figure.title, 4, True, '')
+        self.slice_plotter.add_overplot_line.assert_any_call(self.plot_figure.title, 4, True, '')
