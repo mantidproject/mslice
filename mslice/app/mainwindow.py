@@ -28,8 +28,8 @@ class MainWindow(MainView, QMainWindow):
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
         ipython = IPythonWidget()
-        self.centralWidget().layout().addWidget(ipython)
-        ipython.setFixedHeight(200)
+        self.splitter.addWidget(ipython)
+        self.splitter.setSizes([500, 250])
 
         self.tabs = [self.wgtSlice, self.wgtCut, self.wgtPowder]
         self.tabs_to_show = {TAB_2D: [TAB_POWDER],
@@ -75,6 +75,7 @@ class MainWindow(MainView, QMainWindow):
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
+        self.actionQuit.triggered.connect(self.close)
 
     def change_main_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)

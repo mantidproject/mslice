@@ -12,6 +12,7 @@ from mslice.views.workspace_view import WorkspaceView
 from .command import Command
 from .subtract_input_box import SubtractInputBox
 
+
 TAB_2D = 0
 TAB_EVENT = 1
 TAB_HISTO = 2
