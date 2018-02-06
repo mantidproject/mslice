@@ -62,6 +62,7 @@ class SlicePlot(object):
         plot_figure.actionTantalum.triggered.connect(
             partial(self.toggle_overplot_line, plot_figure.actionTantalum, 'Tantalum', False))
         plot_figure.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
+        self._update_lines()
 
     def plot_options(self):
         new_config = SlicePlotOptionsPresenter(SlicePlotOptions(), self).get_new_config()
@@ -260,7 +261,8 @@ class SlicePlot(object):
                  self.plot_figure.actionCIF_file:[self._cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
-                self._slice_plotter.overplot_lines[self._ws_title].pop(lines[line][0])
+                if  lines[line][0] in self._slice_plotter.overplot_lines[self._ws_title]:
+                    self._slice_plotter.overplot_lines[self._ws_title].pop(lines[line][0])
                 self._slice_plotter.add_overplot_line(self._ws_title, *lines[line])
                 self.update_legend()
 
