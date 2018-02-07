@@ -5,7 +5,6 @@ from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 import numpy as np
 
-from mslice.util.qt.QtWidgets import QApplication
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
 from .plot_options import CutPlotOptions
