@@ -3,13 +3,14 @@ from __future__ import (absolute_import, division, print_function)
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 
 from mslice.util.qt.QtCore import Signal
-from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
+from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog
 
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
+from .subtract_input_box import SubtractInputBox
 
 TAB_2D = 0
 TAB_EVENT = 1
@@ -94,6 +95,13 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
                 if ws_list.item(index).text() == workspace:
                     ws_list.takeItem(index)
                     return
+
+    def subtraction_input(self):
+        sub_input = SubtractInputBox(self.listWorkspaces2D, self)
+        if sub_input.exec_():
+            return sub_input.user_input()
+        else:
+            raise RuntimeError('dialog cancelled')
 
     def get_workspace_selected(self):
         selected_workspaces = [str(x.text()) for x in self.current_list().selectedItems()]

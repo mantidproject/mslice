@@ -33,6 +33,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._combine_workspace()
         elif command == Command.SelectionChanged:
             self._broadcast_selected_workspaces()
+        elif command  == Command.Subtract:
+            self._subtract_workspace()
         else:
             raise ValueError("Workspace Manager Presenter received an unrecognised command")
         self._workspace_manager_view.busy.emit(False)
@@ -79,7 +81,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         for workspace in selected_workspaces:
             self._workspace_provider.delete_workspace(workspace)
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
+        self.update_displayed_workspaces()
 
     def _rename_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
@@ -92,7 +94,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         selected_workspace = selected_workspaces[0]
         new_name = self._workspace_manager_view.get_workspace_new_name()
         self._workspace_provider.rename_workspace(selected_workspace, new_name)
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
+        self.update_displayed_workspaces()
 
     def _combine_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
@@ -105,8 +107,23 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         else:
             self._workspace_manager_view.error_select_more_than_one_workspaces()
             return
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
+        self.update_displayed_workspaces()
         return
+
+    def _subtract_workspace(self):
+        selected_workspaces = self._workspace_manager_view.get_workspace_selected()
+        if not selected_workspaces:
+            self._workspace_manager_view.error_select_one_or_more_workspaces()
+            return
+        try:
+            background_ws, ssf  = self._workspace_manager_view.subtraction_input()
+        except RuntimeError:
+            return
+        try:
+            self._workspace_provider.subtract(selected_workspaces, background_ws, ssf)
+        except ValueError as e:
+            self._workspace_manager_view._display_error(str(e))
+        self.update_displayed_workspaces()
 
     def get_selected_workspaces(self):
         """Get the currently selected workspaces from the user"""
