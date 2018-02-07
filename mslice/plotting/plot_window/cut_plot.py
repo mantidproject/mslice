@@ -32,10 +32,10 @@ class CutPlot(object):
 
     def set_as_icut(self):
         self.plot_figure.actionSave_Cut.setVisible(True)
-        self.plot_figure.actionPlotOptions.setEnabled(False)
-        self.plot_figure.actionToggleLegends.setEnabled(False)
-        self.plot_figure.actionKeep.setEnabled(False)
-        self.plot_figure.actionMakeCurrent.setEnabled(False)
+        self.plot_figure.actionPlotOptions.setVisible(False)
+        self.plot_figure.actionToggleLegends.setVisible(False)
+        self.plot_figure.actionKeep.setVisible(False)
+        self.plot_figure.actionMakeCurrent.setVisible(False)
 
     def save_icut(self):
         icut = self._cut_plotter.get_icut()

@@ -57,8 +57,8 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
 
-        self.actionDataCursor.toggled.connect(self.toggle_data_cursor)
         self.stock_toolbar = NavigationToolbar2QT(self.canvas, self)
+        self.stock_toolbar.message.connect(self.statusbar.showMessage)
         self.stock_toolbar.hide()
 
         self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
@@ -67,7 +67,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.action_Print_Plot.triggered.connect(self.print_plot)
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
-        self.actionInteractive_Cuts.setEnabled(False)
+        self.actionInteractive_Cuts.setVisible(False)
         self.actionSave_Cut.setVisible(False)
         self.canvas.mpl_connect('button_press_event', self.plot_clicked)
         self.picking_connected(True)
@@ -104,15 +104,6 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
     def object_clicked(self, event):
         if event.mouseevent.dblclick or event.mouseevent.button == 3:
             self._plot_handler.object_clicked(event.artist)
-
-    def toggle_data_cursor(self):
-        if self.actionDataCursor.isChecked():
-            self.stock_toolbar.message.connect(self.statusbar.showMessage)
-            self.canvas.setCursor(Qt.CrossCursor)
-
-        else:
-            self.stock_toolbar.message.disconnect()
-            self.canvas.setCursor(Qt.ArrowCursor)
 
     def _display_status(self, status):
         if status == "kept":

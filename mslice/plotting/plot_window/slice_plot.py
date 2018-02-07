@@ -30,7 +30,7 @@ class SlicePlot(object):
         self.icut_event = [None, None]
         self.icut = None
 
-        plot_figure.actionInteractive_Cuts.setEnabled(True)
+        plot_figure.actionInteractive_Cuts.setVisible(True)
         plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
         plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
 
