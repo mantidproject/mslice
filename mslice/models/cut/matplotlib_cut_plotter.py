@@ -15,10 +15,13 @@ class MatplotlibCutPlotter(CutPlotter):
 
     def plot_cut(self, selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
                  intensity_end, plot_over):
+        if self.canvas is None:
+            self._create_cut()
         x, y, e = self._cut_algorithm.compute_cut_xye(selected_workspace, cut_axis, integration_start, integration_end,
                                                       norm_to_one)
         integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
         legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
+        self.canvas.restore_region(self.background)
         plt.xlabel(self._getDisplayName(cut_axis.units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
         plt.ylabel(INTENSITY_LABEL, picker=picker)
         plt.autoscale()
@@ -26,25 +29,25 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o', picker=picker)
         leg = plt.legend(fontsize='medium')
         leg.draggable()
-        plt.gcf().canvas.manager.add_cut_plot(self)
         if not plot_over:
             plt.gcf().canvas.manager.update_grid()
-        plt.draw_all()
-
-    def create_quick_cut(self):
-        self.canvas = plt.gcf().canvas
-        self.axes = self.canvas.figure.gca()
-        plt.gcf().canvas.manager.add_cut_plot(self)
-        self.canvas.manager.set_as_icut()
-        self.canvas.draw()
-
-    def plot_quick_cut(self, workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
-                       intensity_end):
-        x, y, e = self._cut_algorithm.compute_cut_xye(workspace, cut_axis, integration_start, integration_end,
-                                                      norm_to_one)
-        plt.errorbar(x, y, yerr=e, hold=False, marker='o')
         self.axes.draw_artist(self.canvas.figure.get_children()[1])
         self.canvas.blit(self.canvas.figure.gca().clipbox)
+
+    def _create_cut(self):
+        self.canvas = plt.gcf().canvas
+        self.axes = self.canvas.figure.gca()
+
+        # don't include axis ticks in the saved background
+        self.canvas.figure.gca().xaxis.set_visible(False)
+        self.canvas.figure.gca().yaxis.set_visible(False)
+        self.canvas.draw()
+        self.background = plt.gcf().canvas.copy_from_bbox(self.canvas.figure.bbox)
+
+        self.canvas.figure.gca().xaxis.set_visible(True)
+        self.canvas.figure.gca().yaxis.set_visible(True)
+        plt.gcf().canvas.manager.add_cut_plot(self)
+        self.canvas.manager.set_as_icut()
         self.canvas.draw()
 
     def save_cut(self, params):
