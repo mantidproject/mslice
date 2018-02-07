@@ -5,6 +5,7 @@ from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 import numpy as np
 
+from mslice.util.qt.QtWidgets import QApplication
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
 from .plot_options import CutPlotOptions
@@ -30,12 +31,14 @@ class CutPlot(object):
         if new_config:
             self._canvas.draw()
 
-    def set_as_icut(self):
-        self.plot_figure.actionSave_Cut.setVisible(True)
-        self.plot_figure.actionPlotOptions.setVisible(False)
-        self.plot_figure.actionToggleLegends.setVisible(False)
-        self.plot_figure.actionKeep.setVisible(False)
-        self.plot_figure.actionMakeCurrent.setVisible(False)
+    def is_icut(self, is_icut):
+        self.plot_figure.actionSave_Cut.setVisible(is_icut)
+        print(self.plot_figure.actionSave_Cut.isVisible())
+        self.plot_figure.actionPlotOptions.setVisible(not is_icut)
+        self.plot_figure.actionToggleLegends.setVisible(not is_icut)
+        self.plot_figure.actionKeep.setVisible(not is_icut)
+        self.plot_figure.actionMakeCurrent.setVisible(not is_icut)
+        self.plot_figure.show()
 
     def save_icut(self):
         icut = self._cut_plotter.get_icut()

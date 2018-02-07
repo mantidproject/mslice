@@ -8,3 +8,6 @@ class CutPlotter(object):
 
     def save_cut(self, params):
         raise NotImplementedError('This class is an abstract interface')
+
+    def is_icut(self, is_icut):
+        raise NotImplementedError('This class is an abstract interface')

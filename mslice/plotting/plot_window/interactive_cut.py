@@ -32,6 +32,7 @@ class InteractiveCut(object):
         self._cut_plotter = MatplotlibCutPlotter(self._cut_algorithm)
         self.create_box(start_pos, end_pos)
         self.plot_cut()
+        self._cut_plotter.is_icut(True)
         self._canvas.mpl_connect('button_press_event', self.clicked)
         self._canvas.mpl_connect('motion_notify_event', self.select_box)
 

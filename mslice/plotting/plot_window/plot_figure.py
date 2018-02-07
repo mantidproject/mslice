@@ -80,8 +80,8 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
     def add_cut_plot(self, cut_plotter):
         self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
 
-    def set_as_icut(self):
-        self._plot_handler.set_as_icut()
+    def is_icut(self, is_icut):
+        self._plot_handler.is_icut(is_icut)
 
     def picking_connected(self, connect):
         if connect:

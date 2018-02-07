@@ -95,6 +95,7 @@ class CutPresenter(PresenterUtility):
 
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
+        self._cut_plotter.is_icut(False)
 
     def _save_cut_to_file(self, params, output_file):
         cut_params = params[:5]
