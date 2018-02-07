@@ -33,6 +33,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._combine_workspace()
         elif command == Command.SelectionChanged:
             self._broadcast_selected_workspaces()
+        elif command == Command.Add:
+            self._add_workspaces()
         elif command  == Command.Subtract:
             self._subtract_workspace()
         else:
@@ -98,9 +100,11 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def _combine_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
-        if not selected_workspaces or len(selected_workspaces) == 1:
+        if not selected_workspaces:
             self._workspace_manager_view.error_select_more_than_one_workspaces()
             return
+        elif len(selected_workspaces) == 1:
+            selected_workspaces.append(str(self._workspace_manager_view.add_workspace_dialog()))
         new_workspace = selected_workspaces[0] + '_combined'
         if all([self._workspace_provider.is_pixel_workspace(workspace) for workspace in selected_workspaces]):
             self._workspace_provider.combine_workspace(selected_workspaces, new_workspace)
@@ -109,6 +113,19 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         self.update_displayed_workspaces()
         return
+
+    def _add_workspaces(self):
+        selected_ws = self._workspace_manager_view.get_workspace_selected()
+        if not selected_ws:
+            self._workspace_manager_view.error_select_one_or_more_workspaces()
+            return
+        if len(selected_ws) == 1:
+            selected_ws.append(self._workspace_manager_view.add_workspace_dialog())
+        try:
+            self._workspace_provider.add_workspace_runs(selected_ws)
+        except ValueError as e:
+            self._workspace_manager_view._display_error(str(e))
+        self.update_displayed_workspaces()
 
     def _subtract_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
