@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QSplitter
+from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
 
 
 from mslice.presenters.main_presenter import MainPresenter
@@ -17,7 +17,6 @@ TAB_SLICE = 1
 TAB_CUT = 2
 TAB_POWDER = 0
 
-from mslice.widgets.dataloader.dataloader import DataLoaderWidget
 
 # ==============================================================================
 # Classes
@@ -41,7 +40,6 @@ class MainWindow(MainView, QMainWindow):
         self.buttons_to_enable = {TAB_2D: [self.btnAdd, self.btnSubtract],
                                   TAB_EVENT: [self.btnMerge],
                                   TAB_HISTO: [self.btnPlot, self.btnOverplot]}
-
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
@@ -80,9 +78,6 @@ class MainWindow(MainView, QMainWindow):
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
         self.actionQuit.triggered.connect(self.close)
-
-    def change_main_tab(self, tab):
-        self.tabWidget.setCurrentIndex(tab)
 
     def change_main_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)

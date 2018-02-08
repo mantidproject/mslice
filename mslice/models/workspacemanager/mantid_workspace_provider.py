@@ -9,6 +9,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
                               RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
+
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 import numpy as np
 from scipy import constants
