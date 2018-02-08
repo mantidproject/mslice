@@ -107,7 +107,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return efix
 
     def _get_theta_for_limits(self, ws_handle):
-        # Don't parse all spectra in cases where there are alot to save time.
+        # Don't parse all spectra in cases where there are a lot to save time.
         num_hist = ws_handle.getNumberHistograms()
         if num_hist > 1000:
             n_segments = 5
@@ -188,15 +188,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         if isinstance(workspace_name, Workspace):
             return workspace_name
         return AnalysisDataService[workspace_name]
-
-    def get_parent_by_name(self, ws_name):
-        if not isinstance(ws_name, str):
-            ws_name = str(ws_name)
-        suffixes = ('_QE', '_EQ', '_ETh', '_ThE')
-        if ws_name.endswith(suffixes):
-            return self.get_workspace_handle(ws_name.rsplit('_', 1)[0])
-        else:
-            return self.get_workspace_handle(ws_name)
 
     def get_workspace_name(self, workspace):
         """Returns the name of a workspace given the workspace handle"""

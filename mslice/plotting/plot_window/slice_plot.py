@@ -223,8 +223,6 @@ class SlicePlot(object):
         return True
 
     def ask_sample_temperature_field(self, ws_name):
-        if ws_name[-3:] == '_QE':
-            ws_name = ws_name[:-3]
         ws = AnalysisDataService[ws_name]
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
                                                              'Sample Temperature not found. ' +
