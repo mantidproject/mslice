@@ -81,7 +81,6 @@
    <addaction name="action_Print_Plot"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
-   <addaction name="actionDataCursor"/>
    <addaction name="actionPlotOptions"/>
    <addaction name="actionToggleLegends"/>
    <addaction name="actionKeep"/>
@@ -116,14 +115,6 @@
   <action name="actionZoom_Out">
    <property name="text">
     <string>Zoom Out</string>
-   </property>
-  </action>
-  <action name="actionDataCursor">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Data Cursor</string>
    </property>
   </action>
   <action name="actionKeep">
