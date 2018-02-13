@@ -79,14 +79,14 @@
    </attribute>
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
+   <addaction name="actionToggleLegends"/>
    <addaction name="separator"/>
-   <addaction name="actionMakeCurrent"/>
    <addaction name="actionKeep"/>
+   <addaction name="actionMakeCurrent"/>
    <addaction name="separator"/>
    <addaction name="action_save_image"/>
    <addaction name="action_Print_Plot"/>
    <addaction name="actionPlotOptions"/>
-   <addaction name="actionToggleLegends"/>
   </widget>
   <action name="action_save_image">
    <property name="text">
