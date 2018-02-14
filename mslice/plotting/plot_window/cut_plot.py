@@ -32,7 +32,6 @@ class CutPlot(object):
 
     def is_icut(self, is_icut):
         self.plot_figure.actionSave_Cut.setVisible(is_icut)
-        print(self.plot_figure.actionSave_Cut.isVisible())
         self.plot_figure.actionPlotOptions.setVisible(not is_icut)
         self.plot_figure.actionToggleLegends.setVisible(not is_icut)
         self.plot_figure.actionKeep.setVisible(not is_icut)

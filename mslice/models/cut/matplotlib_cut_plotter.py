@@ -49,8 +49,15 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.gcf().canvas.manager.add_cut_plot(self)
         self.canvas.draw()
 
-    def is_icut(self, is_icut):
-        self.canvas.manager.is_icut(is_icut)
+    def set_icut(self, icut):
+        self.canvas.manager.is_icut(True)
+        self.icut = icut
+
+    def get_icut(self):
+        if self.icut is not None:
+            return self.icut
+        else:
+            return None
 
     def save_cut(self, params):
         self._cut_algorithm.compute_cut(*params)

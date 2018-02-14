@@ -286,27 +286,19 @@ class SlicePlot(object):
             self.plot_figure.actionMakeCurrent.setEnabled(False)
             self.plot_figure.actionSave_Cut.setVisible(True)
             self._canvas.setCursor(Qt.CrossCursor)
-            self.icut_event[0] = self._canvas.mpl_connect('button_press_event', self.icut_pos_start)
         else:
             self.plot_figure.picking_connected(True)
             self.plot_figure.actionKeep.setEnabled(True)
             self.plot_figure.actionMakeCurrent.setEnabled(True)
             self.plot_figure.actionSave_Cut.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
-            self.icut.clear()
-            self.icut = None
+        self.create_icut()
 
-    def icut_pos_start(self, mouse_event):
-        self.icut_event[1] = self._canvas.mpl_connect('button_release_event', partial(self.create_icut, mouse_event))
-
-    def create_icut(self, start_cut, end_cut):
+    def create_icut(self):
         if self.icut is not None:
             self.icut.clear()
-        start_cut = (start_cut.xdata, start_cut.ydata)
-        end_cut = (end_cut.xdata, end_cut.ydata)
-        self.icut = InteractiveCut(self, self._canvas, self._ws_title, start_cut, end_cut)
-        for event in self.icut_event:
-            self._canvas.mpl_disconnect(event)
+            self.icut = None
+        self.icut = InteractiveCut(self, self._canvas, self._ws_title)
 
     def save_icut(self):
         self.icut.save_cut()
