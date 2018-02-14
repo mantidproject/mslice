@@ -77,15 +77,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_save_image"/>
-   <addaction name="action_Print_Plot"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
-   <addaction name="actionDataCursor"/>
-   <addaction name="actionPlotOptions"/>
    <addaction name="actionToggleLegends"/>
+   <addaction name="separator"/>
    <addaction name="actionKeep"/>
    <addaction name="actionMakeCurrent"/>
+   <addaction name="separator"/>
+   <addaction name="action_save_image"/>
+   <addaction name="action_Print_Plot"/>
+   <addaction name="actionPlotOptions"/>
   </widget>
   <action name="action_save_image">
    <property name="text">
@@ -118,14 +119,6 @@
     <string>Zoom Out</string>
    </property>
   </action>
-  <action name="actionDataCursor">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Data Cursor</string>
-   </property>
-  </action>
   <action name="actionKeep">
    <property name="checkable">
     <bool>true</bool>
@@ -154,8 +147,14 @@
    </property>
   </action>
   <action name="actionToggleLegends">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Toggle Legends</string>
+    <string>Legends</string>
    </property>
   </action>
   <action name="action_Print_Plot">
