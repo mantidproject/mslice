@@ -292,9 +292,9 @@ class SlicePlot(object):
             self.plot_figure.actionMakeCurrent.setEnabled(True)
             self.plot_figure.actionSave_Cut.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
-        self.create_icut()
+        self.toggle_icut()
 
-    def create_icut(self):
+    def toggle_icut(self):
         if self.icut is not None:
             self.icut.clear()
             self.icut = None
