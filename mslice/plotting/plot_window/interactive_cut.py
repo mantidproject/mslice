@@ -27,9 +27,10 @@ class InteractiveCut(object):
         self._canvas.mpl_connect('button_press_event', self.clicked)
 
     def plot_cut(self, x1, x2, y1, y2):
-        ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
-        self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_start, integration_end,
-                                   False, None, None, False)
+        if x2 > x1 and y2 > y1:
+            ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
+            self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_start, integration_end,
+                                       False, None, None, False)
 
     def get_cut_parameters(self, pos1, pos2):
         start = pos1[not self.horizontal]
