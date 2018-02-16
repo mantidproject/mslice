@@ -29,6 +29,8 @@ class SlicePlot(object):
         self._legend_dict = {}
         self.icut_event = [None, None]
         self.icut = None
+        pos = self.plot_figure.pos()
+        self.plot_figure.move(pos.x() - 375, pos.y())
 
         plot_figure.actionInteractive_Cuts.setVisible(True)
         plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
