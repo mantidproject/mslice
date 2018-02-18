@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from six import string_types
 import numpy as np
 
 from mantid.simpleapi import BinMD, LoadCIF
@@ -112,7 +113,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             pass
         else:
             return sample_temp
-        if isinstance(sample_temp, str):
+        if isinstance(sample_temp, string_types):
             sample_temp = self.get_sample_temperature_from_string(sample_temp)
         if isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
             sample_temp = np.mean(sample_temp)

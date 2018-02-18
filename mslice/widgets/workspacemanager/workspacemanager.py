@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
+from mslice.util.qt import QT_VERSION
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog, QMessageBox
 
@@ -84,10 +85,16 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return list(selected_workspaces)
 
     def set_workspace_selected(self, index):
-        for item_index in range(self.lstWorkspaces.count()):
-            self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(item_index), False)
-        for this_index in (index if hasattr(index, "__iter__") else [index]):
-            self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(this_index), True)
+        if QT_VERSION.startswith('5'):
+            for item_index in range(self.lstWorkspaces.count()):
+                self.lstWorkspaces.item(item_index).setSelected(False)
+            for this_index in (index if hasattr(index, "__iter__") else [index]):
+                self.lstWorkspaces.item(this_index).setSelected(True)
+        else:
+            for item_index in range(self.lstWorkspaces.count()):
+                self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(item_index), False)
+            for this_index in (index if hasattr(index, "__iter__") else [index]):
+                self.lstWorkspaces.setItemSelected(self.lstWorkspaces.item(this_index), True)
 
     def get_workspace_index(self, ws_name):
         for index in range(self.lstWorkspaces.count()):
@@ -97,7 +104,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def get_workspace_to_load_path(self):
         paths = QFileDialog.getOpenFileNames()
-        return [str(filename) for filename in paths]
+        return paths[0] if isinstance(paths, tuple) else [str(filename) for filename in paths]
 
     def get_directory_to_save_workspaces(self):
         return QFileDialog.getExistingDirectory()

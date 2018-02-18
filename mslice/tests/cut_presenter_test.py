@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from six import string_types
 import mock
 from mock import call
 import unittest
@@ -16,12 +17,6 @@ from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.widgets.cut.command import Command
 from mslice.views.cut_view import CutView
-
-def isstr(s):
-    try:
-        return isinstance(s, basestring)
-    except NameError:
-        return isinstance(s, str)
 
 class CutPresenterTest(unittest.TestCase):
     def setUp(self):
@@ -134,7 +129,7 @@ class CutPresenterTest(unittest.TestCase):
         integration_start, integration_end, width = tuple(args[2:5])
         intensity_start, intensity_end, is_norm = tuple(args[5:8])
         workspace, integrated_axis = tuple(args[8:10])
-        if isstr(workspace):
+        if isinstance(workspace, string_types):
             workspace = [workspace]
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=workspace)
         self.view.get_cut_axis = mock.Mock(return_value=axis.units)

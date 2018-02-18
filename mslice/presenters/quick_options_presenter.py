@@ -1,3 +1,4 @@
+from six import string_types
 from matplotlib import text
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
 
@@ -5,7 +6,7 @@ def quick_options(target, model, log=None):
     if isinstance(target, text.Text):
         view = QuickLabelOptions(target)
         return QuickLabelPresenter(view, target, model)
-    elif isinstance(target, str):
+    elif isinstance(target, string_types):
         if target[:1] == 'x' or target[:1] == 'y':
             grid = getattr(model, target[:-5] + 'grid')
         else:

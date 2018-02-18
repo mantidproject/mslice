@@ -1,3 +1,4 @@
+from six import string_types
 
 class AlgWorkspaceOps(object):
 
@@ -28,7 +29,7 @@ class AlgWorkspaceOps(object):
 
     def get_available_axis(self, workspace):
         dim_names = []
-        if isinstance(workspace, str):
+        if isinstance(workspace, string_types):
             workspace = self._workspace_provider.get_workspace_handle(workspace)
         for i in range(workspace.getNumDims()):
             dim_names.append(workspace.getDimension(i).getName())
