@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
 
+
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
@@ -15,6 +16,7 @@ TAB_HISTO = 2
 TAB_SLICE = 1
 TAB_CUT = 2
 TAB_POWDER = 0
+
 
 # ==============================================================================
 # Classes
@@ -55,6 +57,7 @@ class MainWindow(MainView, QMainWindow):
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.btnSave.clicked.connect(self.button_save)
+        self.btnAdd.clicked.connect(self.button_add)
         self.btnRename.clicked.connect(self.button_rename)
         self.btnSubtract.clicked.connect(self.button_subtract)
         self.btnDelete.clicked.connect(self.button_delete)
@@ -110,6 +113,9 @@ class MainWindow(MainView, QMainWindow):
 
     def button_save(self):
         self.workspace_presenter.notify(ws_command.SaveSelectedWorkspace)
+
+    def button_add(self):
+        self.workspace_presenter.notify(ws_command.Add)
 
     def button_rename(self):
         self.workspace_presenter.notify(ws_command.RenameWorkspace)

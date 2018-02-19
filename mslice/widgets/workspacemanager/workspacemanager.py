@@ -96,6 +96,20 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
                     ws_list.takeItem(index)
                     return
 
+    def add_workspace_dialog(self):
+        items = []
+        current_list = self.current_list()
+        for i in range(current_list.count()):
+            item = current_list.item(i).text()
+            items.append(item)
+        dialog = QInputDialog()
+        dialog.setWindowTitle("Add Workspace")
+        dialog.setLabelText("Choose a workspace to add:")
+        dialog.setOptions(QInputDialog.UseListViewForComboBoxItems)
+        dialog.setComboBoxItems(items)
+        dialog.exec_()
+        return dialog.textValue()
+
     def subtraction_input(self):
         sub_input = SubtractInputBox(self.listWorkspaces2D, self)
         if sub_input.exec_():
