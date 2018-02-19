@@ -39,8 +39,8 @@ class CutPresenter(PresenterUtility):
             self._process_cuts(save_to_workspace=True)
         elif command == Command.SaveToAscii:
             fname = QFileDialog.getSaveFileName(caption='Select File for Saving')
+            fname = str(fname[0]) if isinstance(fname, tuple) else str(fname)
             if fname:
-                fname = str(fname[0]) if isinstance(fname, tuple) else str(fname)
                 self._process_cuts(save_to_file=fname)
         elif command == Command.AxisChanged:
             self._cut_axis_changed()
