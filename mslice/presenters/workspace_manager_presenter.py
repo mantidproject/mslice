@@ -38,7 +38,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         elif command  == Command.Subtract:
             self._subtract_workspace()
         else:
-            raise ValueError("Workspace Manager Presenter received an unrecognised command")
+            raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
         self._workspace_manager_view.busy.emit(False)
 
     def _broadcast_selected_workspaces(self):
