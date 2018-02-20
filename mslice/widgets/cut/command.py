@@ -16,3 +16,5 @@ class Command(object):
     SaveToWorkspace = -997
     SaveToAscii = -996
     AxisChanged = -995
+    PlotFromWorkspace = -994
+    PlotOverFromWorkspace = -993

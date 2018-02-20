@@ -43,6 +43,9 @@ download_latest_build ${JENKINS_ROOT_URL}/job/${nightly_job} ${nightly_deb}
 # Install
 sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n  ${nightly_deb}
 
+# Install X virtual framebuffer to emulate X server
+sudo apt-get install -y xvfb
+
 # Configure mantid options
 mantid_cfg_dir=$HOME/.mantid
 mkdir -p ${mantid_cfg_dir} && echo -e "UpdateInstrumentDefinitions.OnStartup=0\nCheckMantidVersion.OnStartup=0\n" > ${mantid_cfg_dir}/Mantid.user.properties

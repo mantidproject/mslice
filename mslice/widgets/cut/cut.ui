@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>150</height>
+    <width>542</width>
+    <height>197</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -149,16 +149,6 @@
       <widget class="QPushButton" name="btnCutPlot">
        <property name="text">
         <string>Plot</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" colspan="2">
-      <widget class="QPushButton" name="btnCutSaveAscii">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Save Ascii</string>
        </property>
       </widget>
      </item>

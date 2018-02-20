@@ -6,8 +6,10 @@ It uses mantid to perform the workspace operations
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
-from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load,
-                              RenameWorkspace, SaveNexus, SaveMD, MergeMD)
+
+from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
+                              RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
+
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 import numpy as np
 from scipy import constants
@@ -157,6 +159,21 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         self._limits[new_name][ax1.name] = [ax1.getMinimum(), ax1.getMaximum(), np.max(step1)]
         self._limits[new_name][ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
         return ws
+
+    def add_workspace_runs(self, selected_ws):
+        MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=selected_ws[0] + '_sum')
+
+    def subtract(self, workspaces, background_ws, ssf):
+        bg_ws = self.get_workspace_handle(str(background_ws))
+        scaled_bg_ws = Scale(bg_ws, ssf)
+        try:
+            for ws_name in workspaces:
+                ws = self.get_workspace_handle(ws_name)
+                Minus(LHSWorkspace=ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
+        except ValueError as e:
+            raise ValueError(e)
+        finally:
+            self.delete_workspace(scaled_bg_ws)
 
     def save_nexus(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
