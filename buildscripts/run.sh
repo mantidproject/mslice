@@ -2,4 +2,4 @@
 
 set -e
 python setup.py flake8
-python setup.py nosetests
+xvfb-run python setup.py nosetests
