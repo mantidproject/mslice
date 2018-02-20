@@ -123,6 +123,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return selected_workspaces
 
     def set_workspace_selected(self, index):
+        current_list = self.current_list()
         if QT_VERSION.startswith('5'):
             for item_index in range(current_list.count()):
                 current_list.item(item_index).setSelected(False)

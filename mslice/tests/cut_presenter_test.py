@@ -1,5 +1,4 @@
 from __future__ import (absolute_import, division, print_function)
-from six import string_types
 import mock
 from mock import call
 import unittest
