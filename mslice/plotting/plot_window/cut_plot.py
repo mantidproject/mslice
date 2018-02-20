@@ -24,8 +24,7 @@ class CutPlot(object):
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
         plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
-        pos = self.plot_figure.pos()
-        self.plot_figure.move(pos.x() + 375, pos.y())
+        self.plot_figure.move_window(self.plot_figure.width() / 2, 0)
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()

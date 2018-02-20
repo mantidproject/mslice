@@ -29,8 +29,7 @@ class SlicePlot(object):
         self._legend_dict = {}
         self.icut_event = [None, None]
         self.icut = None
-        pos = self.plot_figure.pos()
-        self.plot_figure.move(pos.x() - 375, pos.y())
+        self.plot_figure.move_window(-self.plot_figure.width() / 2, 0)
 
         plot_figure.actionInteractive_Cuts.setVisible(True)
         plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
@@ -300,7 +299,8 @@ class SlicePlot(object):
         if self.icut is not None:
             self.icut.clear()
             self.icut = None
-        self.icut = InteractiveCut(self, self._canvas, self._ws_title)
+        else:
+            self.icut = InteractiveCut(self, self._canvas, self._ws_title)
 
     def save_icut(self):
         self.icut.save_cut()

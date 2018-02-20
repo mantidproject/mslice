@@ -135,6 +135,9 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         if self._ygrid:
             self.canvas.figure.gca().grid(True, axis='y')
 
+    def move_window(self, x, y):
+        self.move(self.pos().x() + x, self.pos().y() + y)
+
     def get_window_title(self):
         return six.text_type(self.windowTitle())
 

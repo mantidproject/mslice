@@ -12,7 +12,7 @@ class InteractiveCut(object):
         self._canvas = canvas
         self._ws_title = ws_title
         self.horizontal = None
-        self.connect_event = [None, None]
+        self.connect_event = [None, None, None]
         self._cut_algorithm = MantidCutAlgorithm()
         self._cut_plotter = MatplotlibCutPlotter(self._cut_algorithm)
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
@@ -24,7 +24,7 @@ class InteractiveCut(object):
         self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - erelease.y)
         self.plot_cut(eclick.xdata, erelease.xdata, eclick.ydata, erelease.ydata)
         self._cut_plotter.set_icut(self)
-        self._canvas.mpl_connect('button_press_event', self.clicked)
+        self.connect_event[2] = self._canvas.mpl_connect('button_press_event', self.clicked)
 
     def plot_cut(self, x1, x2, y1, y2):
         if x2 > x1 and y2 > y1:
@@ -64,4 +64,6 @@ class InteractiveCut(object):
 
     def clear(self):
         self.rect.set_active(False)
+        for event in self.connect_event:
+            self._canvas.mpl_disconnect(event)
         self._canvas.draw()
