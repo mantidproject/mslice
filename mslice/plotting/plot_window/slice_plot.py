@@ -160,6 +160,8 @@ class SlicePlot(object):
         if key:
             self.toggle_overplot_line(self.plot_figure.actionCIF_file, key, False,
                                       self.plot_figure.actionCIF_file.isChecked(), cif_file=cif_path)
+        else:
+            self.plot_figure.actionCIF_file.setChecked(False)
 
     def update_legend(self):
         lines = []
