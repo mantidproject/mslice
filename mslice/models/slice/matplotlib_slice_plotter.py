@@ -133,7 +133,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             momentum_axis = self.slice_cache[workspace]['momentum_axis']
             if recoil:
-                x, y = self._slice_algorithm.compute_recoil_line(momentum_axis, key)
+                x, y = self._slice_algorithm.compute_recoil_line(workspace, momentum_axis, key)
             else:
                 x, y = self._slice_algorithm.compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
             color = overplot_colors[key] if key in overplot_colors else 'c'
