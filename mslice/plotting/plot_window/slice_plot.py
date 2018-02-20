@@ -62,6 +62,7 @@ class SlicePlot(object):
         plot_figure.actionTantalum.triggered.connect(
             partial(self.toggle_overplot_line, plot_figure.actionTantalum, 'Tantalum', False))
         plot_figure.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
+        self._update_lines()
 
     def plot_options(self):
         new_config = SlicePlotOptionsPresenter(SlicePlotOptions(), self).get_new_config()
@@ -213,27 +214,39 @@ class SlicePlot(object):
             slice_plotter_method(self._ws_title)
         except ValueError:  # sample temperature not yet set
             try:
-                field = self.ask_sample_temperature_field(str(self._ws_title))
+                temp_value, field = self.ask_sample_temperature_field(str(self._ws_title))
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.intensity_selection(previous)
                 return False
-            self._slice_plotter.add_sample_temperature_field(field)
-            self._slice_plotter.update_sample_temperature(self._ws_title)
+            if field:
+                self._slice_plotter.add_sample_temperature_field(temp_value)
+                self._slice_plotter.update_sample_temperature(self._ws_title)
+            else:
+                try:
+                    temp_value = float(temp_value)
+                    if temp_value < 0:
+                        raise ValueError
+                except ValueError:
+                    self.plot_figure.error_box("Invalid value entered for sample temperature. Enter a value in Kelvin \
+                                               or a sample log field.")
+                    self.intensity_selection(previous)
+                    return False
+                else:
+                    self._slice_plotter.set_sample_temperature(self._ws_title, temp_value)
             slice_plotter_method(self._ws_title)
         return True
 
     def ask_sample_temperature_field(self, ws_name):
-        if ws_name[-3:] == '_QE':
-            ws_name = ws_name[:-3]
+        ws_name = ws_name[:ws_name.rfind("_")]
         ws = AnalysisDataService[ws_name]
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
-                                                             'Sample Temperature not found. ' +
-                                                             'Select the sample temperature field:',
-                                                             ws.run().keys(), False)
+                                                             'Sample Temperature not found. Select the sample ' +
+                                                             'temperature field or enter a value in Kelvin:',
+                                                             ws.run().keys())
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
-            return str(temp_field)
+            return str(temp_field), temp_field in ws.run().keys()
 
     def _update_lines(self):
         """ Updates the powder/recoil overplots lines when intensity type changes """
@@ -248,7 +261,8 @@ class SlicePlot(object):
                  self.plot_figure.actionCIF_file:[self._cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
-                self._slice_plotter.overplot_lines[self._ws_title].pop(lines[line][0])
+                if  lines[line][0] in self._slice_plotter.overplot_lines[self._ws_title]:
+                    self._slice_plotter.overplot_lines[self._ws_title].pop(lines[line][0])
                 self._slice_plotter.add_overplot_line(self._ws_title, *lines[line])
                 self.update_legend()
 
