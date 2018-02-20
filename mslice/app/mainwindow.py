@@ -28,9 +28,6 @@ class MainWindow(MainView, QMainWindow):
         QMainWindow.__init__(self)
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
-        ipython = IPythonWidget()
-        self.splitter.addWidget(ipython)
-        self.splitter.setSizes([500, 250])
 
         self.tabs = [self.wgtSlice, self.wgtCut, self.wgtPowder]
         self.tabs_to_show = {TAB_2D: [TAB_POWDER],
@@ -133,6 +130,10 @@ class MainWindow(MainView, QMainWindow):
         self.cut_presenter.notify(cut_command.PlotOverFromWorkspace)
 
     def init_ui(self):
+        ipython = IPythonWidget()
+        self.splitter.addWidget(ipython)
+        self.splitter.setSizes([500, 250])
+
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")
