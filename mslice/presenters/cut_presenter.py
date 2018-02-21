@@ -84,16 +84,16 @@ class CutPresenter(PresenterUtility):
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
 
-    def _plot_cut(self, params, plot_over):
+    def _plot_cut(self, params, plot_over, _):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
         self._cut_plotter.set_icut(False)
         self._main_presenter.change_ws_tab(2)
 
-    def _plot_and_save_to_workspace(self, params, plot_over):
-        self._plot_cut(params, plot_over)
-        self._save_cut_to_workspace(params, plot_over)
+    def _plot_and_save_to_workspace(self, params, plot_over, _):
+        self._plot_cut(params, plot_over, _)
+        self._save_cut_to_workspace(params, plot_over, _)
 
-    def _save_cut_to_workspace(self, params, _):
+    def _save_cut_to_workspace(self, params, _, __):
         cut_params = params[:5]
         self._cut_plotter.save_cut(cut_params)
         self._main_presenter.update_displayed_workspaces()
