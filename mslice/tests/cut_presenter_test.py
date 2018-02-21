@@ -265,8 +265,8 @@ class CutPresenterTest(unittest.TestCase):
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
         self.cut_algorithm.compute_cut_xye = mock.Mock(return_value=('x', 'y', 'e'))
         cut_presenter.notify(Command.SaveToWorkspace)
-        self.cut_algorithm.compute_cut.assert_called_with(workspace, processed_axis, integration_start,
-                                                          integration_end, is_norm)
+        self.cut_plotter.save_cut.assert_called_with((workspace, processed_axis, integration_start,
+                                                      integration_end, is_norm))
         self.cut_plotter.plot_cut.assert_not_called()
 
     def test_plot_multiple_cuts_with_width(self):

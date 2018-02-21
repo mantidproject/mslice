@@ -2,6 +2,7 @@ from functools import partial
 import six
 
 from mslice.util.qt import QtWidgets
+from mslice.util.qt.QtCore import Qt
 
 import os.path as path
 import matplotlib.colors as colors
@@ -10,6 +11,7 @@ from mantid.simpleapi import AnalysisDataService
 
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
+from .interactive_cut import InteractiveCut
 from .plot_options import SlicePlotOptions
 
 
@@ -25,6 +27,13 @@ class SlicePlot(object):
         self._cif_path = None
         self._quick_presenter = None
         self._legend_dict = {}
+        self.icut_event = [None, None]
+        self.icut = None
+        self.plot_figure.move_window(-self.plot_figure.width() / 2, 0)
+
+        plot_figure.actionInteractive_Cuts.setVisible(True)
+        plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
+        plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
 
         plot_figure.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionS_Q_E,
                                                           self._slice_plotter.show_scattering_function, False))
@@ -287,6 +296,35 @@ class SlicePlot(object):
         line.set_marker(line_options['marker'])
         line.set_color(line_options['color'])
         line.set_linewidth(line_options['width'])
+
+    def interactive_cuts(self):
+        if not self.icut:
+            self.plot_figure.picking_connected(False)
+            self.plot_figure.actionKeep.trigger()
+            self.plot_figure.actionKeep.setEnabled(False)
+            self.plot_figure.actionMakeCurrent.setEnabled(False)
+            self.plot_figure.actionSave_Cut.setVisible(True)
+            self._canvas.setCursor(Qt.CrossCursor)
+        else:
+            self.plot_figure.picking_connected(True)
+            self.plot_figure.actionKeep.setEnabled(True)
+            self.plot_figure.actionMakeCurrent.setEnabled(True)
+            self.plot_figure.actionSave_Cut.setVisible(False)
+            self._canvas.setCursor(Qt.ArrowCursor)
+        self.toggle_icut()
+
+    def toggle_icut(self):
+        if self.icut is not None:
+            self.icut.clear()
+            self.icut = None
+        else:
+            self.icut = InteractiveCut(self, self._canvas, self._ws_title)
+
+    def save_icut(self):
+        self.icut.save_cut()
+
+    def update_workspaces(self):
+        self._slice_plotter.update_displayed_workspaces()
 
     @property
     def colorbar_label(self):

@@ -10,11 +10,13 @@ picker=5
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
+
     def __init__(self, slice_algorithm):
         self._slice_algorithm = slice_algorithm
         self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
         if not MPL_COMPAT:
             self._colormaps.insert(0, 'viridis')
+        self.listener = None
         self.slice_cache = {}
         self._sample_temp_fields = []
         self.overplot_lines = {}
@@ -77,6 +79,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
         plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)
+        plt.gca().get_xaxis().set_units(x_axis.units)
+        plt.gca().get_yaxis().set_units(y_axis.units)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
@@ -208,6 +212,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def get_recoil_label(self, key):
         return recoil_labels[key]
+
+    def update_displayed_workspaces(self):
+        self.listener.update_workspaces()
 
     def set_workspace_provider(self, workspace_provider):
         self._slice_algorithm.set_workspace_provider(workspace_provider)

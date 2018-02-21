@@ -46,7 +46,7 @@ class CutPresenter(PresenterUtility):
             self._cut_axis_changed()
         self._cut_view.busy.emit(False)
 
-    def _cut(self, output_method, histo_ws=False, plot_over=False, save_to_file=None):
+    def _cut(self, output_method, plot_over=False, save_to_file=None):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         try:
             self._parse_step()
@@ -56,7 +56,7 @@ class CutPresenter(PresenterUtility):
         for workspace in selected_workspaces:
             params = (workspace,) + parsed_params
             self._run_cut_method(params, output_method, plot_over, save_to_file)
-            plot_over = True # The first plot will respect which button the user pressed. The rest will over plot
+            plot_over = True  # The first plot will respect which button the user pressed. The rest will over plot
 
     def _run_cut_method(self, params, output_method, plot_over=False, save_to_file=None):
             width = params[-1]
@@ -66,7 +66,7 @@ class CutPresenter(PresenterUtility):
             else:
                 output_method(params, plot_over, save_to_file)
 
-    def _plot_with_width(self, params, output_method, width, plot_over, save_to_file=None, workspace_index=0):
+    def _plot_with_width(self, params, output_method, width, plot_over, save_to_file=None):
         """This function handles the width parameter."""
         integration_start, integration_end = params[2:4]
         cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
@@ -84,17 +84,18 @@ class CutPresenter(PresenterUtility):
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
 
+    def _plot_cut(self, params, plot_over, _):
+        self._cut_plotter.plot_cut(*params, plot_over=plot_over)
+        self._cut_plotter.set_icut(False)
+        self._main_presenter.change_ws_tab(2)
+
     def _plot_and_save_to_workspace(self, params, plot_over, _):
         self._plot_cut(params, plot_over, _)
         self._save_cut_to_workspace(params, plot_over, _)
 
-    def _plot_cut(self, params, plot_over, _):
-        self._cut_plotter.plot_cut(*params, plot_over=plot_over)
-        self._main_presenter.change_ws_tab(2)
-
     def _save_cut_to_workspace(self, params, _, __):
         cut_params = params[:5]
-        self._cut_algorithm.compute_cut(*cut_params)
+        self._cut_plotter.save_cut(cut_params)
         self._main_presenter.update_displayed_workspaces()
 
     def _plot_cut_from_workspace(self, plot_over):
@@ -102,7 +103,7 @@ class CutPresenter(PresenterUtility):
         for workspace in selected_workspaces:
             x, y, e, units = self.get_arrays_from_workspace(workspace)
             self._cut_plotter.plot_cut_from_xye(x, y, e, units, workspace, plot_over)
-            plot_over = True # plot over if multiple workspaces selected
+            plot_over = True  # plot over if multiple workspaces selected
 
     def get_arrays_from_workspace(self, workspace):
         mantid_ws = MantidWorkspaceProvider().get_workspace_handle(workspace)
