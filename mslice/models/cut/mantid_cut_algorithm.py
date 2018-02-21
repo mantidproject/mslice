@@ -33,7 +33,11 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         plot_data = self._num_events_normalized_array(cut)
         plot_data = plot_data.squeeze()
         with np.errstate(invalid='ignore'):
-            errors = np.sqrt(cut.getErrorSquaredArray())/cut.getNumEventsArray()
+            if cut.displayNormalization() == MDNormalization.NoNormalization:
+                errors = np.sqrt(cut.getErrorSquaredArray())
+                errors[np.where(cut.getNumEventsArray() == 0)] = np.nan
+            else:
+                errors = np.sqrt(cut.getErrorSquaredArray()) / cut.getNumEventsArray()
         errors = errors.squeeze()
 
         x = np.linspace(cut_axis.start, cut_axis.end, plot_data.size)
@@ -61,6 +65,23 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
             self._normalize_workspace(cut)
         return cut
 
+    def get_arrays_from_workspace(self, workspace):
+        mantid_ws = self._workspace_provider.get_workspace_handle(workspace)
+        dim = mantid_ws.getDimension(0)
+        x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
+        with np.errstate(invalid='ignore'):
+            if mantid_ws.displayNormalization() == MDNormalization.NoNormalization:
+                y = np.array(mantid_ws.getSignalArray())
+                e = np.sqrt(mantid_ws.getErrorSquaredArray())
+                nanidx = np.where(mantid_ws.getNumEventsArray() == 0)
+                y[nanidx] = np.nan
+                e[nanidx] = np.nan
+            else:
+                y = mantid_ws.getSignalArray() / mantid_ws.getNumEventsArray()
+                e = np.sqrt(mantid_ws.getErrorSquaredArray()) / mantid_ws.getNumEventsArray()
+        e = e.squeeze()
+        return x, y, e, dim.getUnits()
+
     def get_other_axis(self, workspace, axis):
         all_axis = self.get_available_axis(workspace)
         all_axis.remove(axis.units)
@@ -82,7 +103,11 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
     def _num_events_normalized_array(self, workspace):
         assert isinstance(workspace, IMDHistoWorkspace)
         with np.errstate(invalid='ignore'):
-            data = workspace.getSignalArray() / workspace.getNumEventsArray()
+            if workspace.displayNormalization() == MDNormalization.NoNormalization:
+                data = np.array(workspace.getSignalArray())
+                data[np.where(workspace.getNumEventsArray() == 0)] = np.nan
+            else:
+                data = workspace.getSignalArray() / workspace.getNumEventsArray()
         data = np.ma.masked_where(np.isnan(data), data)
         return data
 
@@ -100,14 +125,15 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
 
     def _normalize_workspace(self, workspace):
         assert isinstance(workspace, IMDHistoWorkspace)
-        if workspace.displayNormalization() != MDNormalization.NumEventsNormalization:
-            workspace.setDisplayNormalization(MDNormalization.NumEventsNormalization)
         num_events = workspace.getNumEventsArray()
         average_event_intensity = self._num_events_normalized_array(workspace)
         average_event_range = average_event_intensity.max() - average_event_intensity.min()
 
         normed_average_event_intensity = (average_event_intensity - average_event_intensity.min())/average_event_range
-        new_data = normed_average_event_intensity * num_events
+        if workspace.displayNormalization() == MDNormalization.NoNormalization:
+            new_data = normed_average_event_intensity
+        else:
+            new_data = normed_average_event_intensity * num_events
         new_data = np.array(new_data)
 
         new_data = np.nan_to_num(new_data)

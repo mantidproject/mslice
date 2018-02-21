@@ -6,10 +6,7 @@ from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.views.cut_view import CutView
 from mslice.widgets.cut.command import Command
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from .validation_decorators import require_main_presenter
-from os.path import splitext
-import numpy as np
 import warnings
 
 
@@ -46,7 +43,7 @@ class CutPresenter(PresenterUtility):
             self._cut_axis_changed()
         self._cut_view.busy.emit(False)
 
-    def _cut(self, output_method, histo_ws=False, plot_over=False, save_to_file=None):
+    def _cut(self, output_method, histo_ws=False, plot_over=False):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         try:
             self._parse_step()
@@ -55,44 +52,39 @@ class CutPresenter(PresenterUtility):
             return
         for workspace in selected_workspaces:
             params = (workspace,) + parsed_params
-            self._run_cut_method(params, output_method, plot_over, save_to_file)
+            self._run_cut_method(params, output_method, plot_over)
             plot_over = True # The first plot will respect which button the user pressed. The rest will over plot
 
-    def _run_cut_method(self, params, output_method, plot_over=False, save_to_file=None):
+    def _run_cut_method(self, params, output_method, plot_over=False):
             width = params[-1]
             params = params[:-1]
             if width is not None:
-                self._plot_with_width(params, output_method, width, plot_over, save_to_file)
+                self._plot_with_width(params, output_method, width, plot_over)
             else:
-                output_method(params, plot_over, save_to_file)
+                output_method(params, plot_over)
 
-    def _plot_with_width(self, params, output_method, width, plot_over, save_to_file=None, workspace_index=0):
+    def _plot_with_width(self, params, output_method, width, plot_over, workspace_index=0):
         """This function handles the width parameter."""
         integration_start, integration_end = params[2:4]
         cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
         index = 0
         while cut_start != cut_end:
             params = params[:2] + (cut_start, cut_end) + params[4:]
-            if save_to_file is not None:
-                filename, file_extension = splitext(save_to_file)
-                output_file_part = filename+'_'+str(index)+file_extension
-            else:
-                output_file_part = None
-            output_method(params, plot_over, output_file_part)
+            output_method(params, plot_over)
             index += 1
             cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
 
-    def _plot_and_save_to_workspace(self, params, plot_over, _):
-        self._plot_cut(params, plot_over, _)
-        self._save_cut_to_workspace(params, plot_over, _)
+    def _plot_and_save_to_workspace(self, params, plot_over):
+        self._plot_cut(params, plot_over)
+        self._save_cut_to_workspace(params, plot_over)
 
-    def _plot_cut(self, params, plot_over, _):
+    def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
         self._main_presenter.change_ws_tab(2)
 
-    def _save_cut_to_workspace(self, params, _, __):
+    def _save_cut_to_workspace(self, params, _):
         cut_params = params[:5]
         self._cut_algorithm.compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
@@ -100,19 +92,9 @@ class CutPresenter(PresenterUtility):
     def _plot_cut_from_workspace(self, plot_over):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         for workspace in selected_workspaces:
-            x, y, e, units = self.get_arrays_from_workspace(workspace)
+            x, y, e, units = self._cut_algorithm.get_arrays_from_workspace(workspace)
             self._cut_plotter.plot_cut_from_xye(x, y, e, units, workspace, plot_over)
             plot_over = True # plot over if multiple workspaces selected
-
-    def get_arrays_from_workspace(self, workspace):
-        mantid_ws = MantidWorkspaceProvider().get_workspace_handle(workspace)
-        dim = mantid_ws.getDimension(0)
-        x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
-        with np.errstate(invalid='ignore'):
-            y = mantid_ws.getSignalArray() / mantid_ws.getNumEventsArray()
-            e = np.sqrt(mantid_ws.getErrorSquaredArray())/mantid_ws.getNumEventsArray()
-        e = e.squeeze()
-        return x, y, e, dim.getUnits()
 
     def _parse_step(self):
         step = self._cut_view.get_cut_axis_step()
