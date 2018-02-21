@@ -11,3 +11,6 @@ class CutPlotter(object):
 
     def set_icut(self, icut):
         raise NotImplementedError('This class is an abstract interface')
+
+    def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, plot_over):
+        raise NotImplementedError('This class is an abstract interface')

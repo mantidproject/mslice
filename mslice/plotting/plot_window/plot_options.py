@@ -236,8 +236,14 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     """This is a widget that has various legend and line controls for each line of a plot"""
 
     # dictionaries used to convert from matplotlib arguments to UI selection and vice versa
-    colors = {'B': 'Blue', 'G': 'Green', 'R': 'Red', 'C': 'Cyan', 'M': 'Magenta', 'Y': 'Yellow',
-                   'K': 'Black', 'W': 'White'}
+    import matplotlib
+    if matplotlib.__version__.startswith('1'):
+        colors = {'b': 'Blue', 'g': 'Green', 'r': 'Red', 'c': 'Cyan', 'm': 'Magenta', 'y': 'Yellow',
+                  'k': 'Black', 'w': 'White'}
+    else:
+        colors = {'#1f77b4': 'Blue', '#ff7f0e': 'Orange', '#2ca02c': 'Green', '#d62728': 'Red',
+                  '#9467bd': 'Purple', '#8c564b': 'Brown', '#e377c2': 'Pink', '#7f7f7f': 'Grey',
+                  '#bcbd22': 'Olive', '#17becf': 'Cyan'}
 
     styles = {'-': 'Solid', '--': 'Dashed', '-.': 'Dashdot', ':': 'Dotted'}
 
@@ -261,7 +267,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         self.color_label.setText("Color:")
         self.line_color = QtWidgets.QComboBox(self)
         self.line_color.addItems(list(self.colors.values()))
-        chosen_color_as_string = self.colors[line_options['color'].upper()]
+        chosen_color_as_string = self.colors[line_options['color'].lower()]
         self.line_color.setCurrentIndex(self.line_color.findText(chosen_color_as_string))
         self.previous_color = self.line_color.currentIndex()
 

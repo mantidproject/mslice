@@ -7,6 +7,7 @@ import six
 from mslice.util.qt import QT_VERSION
 from mslice.util.qt.QtCore import Qt
 from mslice.util.qt import QtWidgets
+import qtawesome as qta
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
@@ -60,6 +61,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.stock_toolbar = NavigationToolbar2QT(self.canvas, self)
         self.stock_toolbar.message.connect(self.statusbar.showMessage)
         self.stock_toolbar.hide()
+        self.set_icons()
 
         self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
         self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
@@ -128,6 +130,13 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
             painter = QtWidgets.QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
+
+    def set_icons(self):
+        self.action_save_image.setIcon(qta.icon('fa.save'))
+        self.action_Print_Plot.setIcon(qta.icon('fa.print'))
+        self.actionZoom_In.setIcon(qta.icon('fa.search-plus'))
+        self.actionZoom_Out.setIcon(qta.icon('fa.search-minus'))
+        self.actionPlotOptions.setIcon(qta.icon('fa.cog'))
 
     def error_box(self, message):
         error_box = QtWidgets.QMessageBox(self)

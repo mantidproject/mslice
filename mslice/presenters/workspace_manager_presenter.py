@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from six import string_types
 import os.path
 
 from mslice.widgets.workspacemanager.command import Command
@@ -23,9 +24,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def notify(self, command):
         self._clear_displayed_error()
         self._workspace_manager_view.busy.emit(True)
-        if command == Command.LoadWorkspace:
-            self._load_workspace()
-        elif command == Command.SaveSelectedWorkspace:
+        if command == Command.SaveSelectedWorkspace:
             self._save_selected_workspace()
         elif command == Command.RemoveSelectedWorkspaces:
             self._remove_selected_workspaces()
@@ -35,8 +34,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._combine_workspace()
         elif command == Command.SelectionChanged:
             self._broadcast_selected_workspaces()
+        elif command == Command.Add:
+            self._add_workspaces()
+        elif command  == Command.Subtract:
+            self._subtract_workspace()
         else:
-            raise ValueError("Workspace Manager Presenter received an unrecognised command")
+            raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
         self._workspace_manager_view.busy.emit(False)
 
     def _broadcast_selected_workspaces(self):
@@ -46,53 +49,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def _get_main_presenter(self):
         return self._main_presenter
 
-    def _load_workspace(self):
-        # TODO specify workspace name on load
-        # TODO what to do on fail?
-        workspace_to_load = self._workspace_manager_view.get_workspace_to_load_path()
-        if not workspace_to_load:
-            return
-        ws_names = [os.path.splitext(os.path.basename(base))[0] for base in workspace_to_load]
-        not_loaded = []
-        not_opened = []
-        loaded = []
-        multi = len(ws_names) > 1
-        allChecked = False
-        for ii, ws_name in enumerate(ws_names):
-            # confirm that user wants to overwrite an existing workspace
-            if not self._confirm_workspace_overwrite(ws_name):
-                not_loaded.append(ws_name)
-                continue
-            try:
-                self._workspace_provider.load(filename=workspace_to_load[ii], output_workspace=ws_name)
-            except RuntimeError:
-                not_opened.append(ws_name)
-            else:
-                loaded.append(ws_name)
-                # Checks if this workspace has efixed set. If not, prompts the user and sets it.
-                if self._workspace_provider.get_EMode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(ws_name):
-                    if not allChecked:
-                        Ef, allChecked = self._workspace_manager_view.get_workspace_efixed(ws_name, multi)
-                    self._workspace_provider.set_efixed(ws_name, Ef)
-
-        self._report_load_errors(ws_names, not_opened, not_loaded)
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
-        self._workspace_manager_view.set_workspace_selected(
-            [self._workspace_manager_view.get_workspace_index(ld_name) for ld_name in loaded])
-
-    def _report_load_errors(self, ws_names, not_opened, not_loaded):
-        if len(not_opened) == len(ws_names):
-            self._workspace_manager_view.error_unable_to_open_file()
-            return
-        elif len(not_opened) > 0:
-            errmsg = not_opened[0] if len(not_opened)==1 else ",".join(not_opened)
-            self._workspace_manager_view.error_unable_to_open_file(errmsg)
-        if len(not_loaded) == len(ws_names):
-            self._workspace_manager_view.no_workspace_has_been_loaded()
-            return
-        elif len(not_loaded) > 0:
-            errmsg = not_loaded[0] if len(not_loaded)==1 else ",".join(not_loaded)
-            self._workspace_manager_view.no_workspace_has_been_loaded(errmsg)
+    def change_tab(self, tab):
+        self._workspace_manager_view.change_tab(tab)
 
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
@@ -126,7 +84,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         for workspace in selected_workspaces:
             self._workspace_provider.delete_workspace(workspace)
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
+        self.update_displayed_workspaces()
 
     def _rename_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
@@ -139,21 +97,51 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         selected_workspace = selected_workspaces[0]
         new_name = self._workspace_manager_view.get_workspace_new_name()
         self._workspace_provider.rename_workspace(selected_workspace, new_name)
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
+        self.update_displayed_workspaces()
 
     def _combine_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
-        if not selected_workspaces or len(selected_workspaces) == 1:
+        if not selected_workspaces:
             self._workspace_manager_view.error_select_more_than_one_workspaces()
             return
+        elif len(selected_workspaces) == 1:
+            selected_workspaces.append(str(self._workspace_manager_view.add_workspace_dialog()))
         new_workspace = selected_workspaces[0] + '_combined'
         if all([self._workspace_provider.is_pixel_workspace(workspace) for workspace in selected_workspaces]):
             self._workspace_provider.combine_workspace(selected_workspaces, new_workspace)
         else:
             self._workspace_manager_view.error_select_more_than_one_workspaces()
             return
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
+        self.update_displayed_workspaces()
         return
+
+    def _add_workspaces(self):
+        selected_ws = self._workspace_manager_view.get_workspace_selected()
+        if not selected_ws:
+            self._workspace_manager_view.error_select_one_or_more_workspaces()
+            return
+        if len(selected_ws) == 1:
+            selected_ws.append(self._workspace_manager_view.add_workspace_dialog())
+        try:
+            self._workspace_provider.add_workspace_runs(selected_ws)
+        except ValueError as e:
+            self._workspace_manager_view._display_error(str(e))
+        self.update_displayed_workspaces()
+
+    def _subtract_workspace(self):
+        selected_workspaces = self._workspace_manager_view.get_workspace_selected()
+        if not selected_workspaces:
+            self._workspace_manager_view.error_select_one_or_more_workspaces()
+            return
+        try:
+            background_ws, ssf  = self._workspace_manager_view.subtraction_input()
+        except RuntimeError:
+            return
+        try:
+            self._workspace_provider.subtract(selected_workspaces, background_ws, ssf)
+        except ValueError as e:
+            self._workspace_manager_view._display_error(str(e))
+        self.update_displayed_workspaces()
 
     def get_selected_workspaces(self):
         """Get the currently selected workspaces from the user"""
@@ -164,7 +152,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         get_name = self._workspace_provider.get_workspace_name
         index_list = []
         for item in workspace_list:
-            if isinstance(item, str):
+            if isinstance(item, string_types):
                 index_list.append(get_index(item))
             elif isinstance(item, int):
                 index_list.append(item)

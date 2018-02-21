@@ -11,6 +11,9 @@ class WorkspaceView(object):
     def display_loaded_workspaces(self, workspaces):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def add_workspace_dialog(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def get_workspace_to_load_path(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 

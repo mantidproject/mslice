@@ -22,13 +22,17 @@ class MatplotlibCutPlotter(CutPlotter):
         integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
         legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
         self.canvas.restore_region(self.background)
-        plt.xlabel(self._getDisplayName(cut_axis.units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
-        plt.ylabel(INTENSITY_LABEL, picker=picker)
-        plt.autoscale()
+        self.plot_cut_from_xye(x, y, e, cut_axis.units, selected_workspace, plot_over, legend)
         plt.ylim(intensity_start, intensity_end)
+
+    def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, plot_over, legend=None):
+        legend = selected_workspace if legend is None else legend
         plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o', picker=picker)
         leg = plt.legend(fontsize='medium')
         leg.draggable()
+        plt.xlabel(self._getDisplayName(x_units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
+        plt.ylabel(INTENSITY_LABEL, picker=picker)
+        plt.autoscale()
         if not plot_over:
             plt.gcf().canvas.manager.update_grid()
         self.axes.draw_artist(self.canvas.figure.get_children()[1])

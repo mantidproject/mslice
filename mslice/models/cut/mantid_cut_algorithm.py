@@ -8,7 +8,6 @@ from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
-from mslice.presenters.slice_plotter_presenter import Axis
 
 
 class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
@@ -22,11 +21,8 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         cut_computed = False
         copy_created = False
         copy_name = '_to_be_normalized_xyx_123_qme78hj'  # This is just a valid name
-        if not self.is_cut(selected_workspace):
-            cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm=False)
-            cut_computed = True
-        else:
-            cut = self._workspace_provider.get_workspace_handle(selected_workspace)
+        cut = self.compute_cut(selected_workspace, cut_axis, integration_start, integration_end, is_norm=False)
+        cut_computed = True
         if is_norm:
             # If the cut previously existed in the ADS we will not modify it
             if not cut_computed:
@@ -49,7 +45,6 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         return x, plot_data, errors
 
     def compute_cut(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
-
         input_workspace_name = selected_workspace
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         self._fill_in_missing_input(cut_axis, selected_workspace)
@@ -59,14 +54,10 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
 
-        output_workspace_name = input_workspace_name + "_cut"
-        index = 1
-        existing_workspaces = self._workspace_provider.get_workspace_names()
-        while output_workspace_name + str(index) in existing_workspaces:
-            index += 1
-        output_workspace_name += str(index)
-        cut = BinMD(selected_workspace, OutputWorkspace=output_workspace_name, AxisAligned="1", AlignedDim1=integration_binning,
-                    AlignedDim0=cut_binning)
+        output_ws_name = input_workspace_name + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
+            integration_end) + ")"
+        cut = BinMD(selected_workspace, OutputWorkspace=output_ws_name, AxisAligned="1",
+                    AlignedDim1=integration_binning, AlignedDim0=cut_binning)
         if is_norm:
             self._normalize_workspace(cut)
         return cut
@@ -76,54 +67,9 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         all_axis.remove(axis.units)
         return all_axis[0]
 
-    def is_cut(self, workspace):
-        workspace = self._workspace_provider.get_workspace_handle(workspace)
-        if not isinstance(workspace, IMDHistoWorkspace):
-            return False
-        if workspace.getNumDims() != 2 or len(workspace.getNonIntegratedDimensions()) != 1:
-            return False
-        history = workspace.getHistory()
-        # If any of these were set in the last BinMD call then this is not a cut
-        empty_params = ('AlignedDim2','AlignedDim3', 'AlignedDim4', 'AlignedDim5')
-        # If these were not set then this is not a cut
-        used_params = ('AxisAligned', 'AlignedDim0', 'AlignedDim1')
-        for i in range(history.size()-1, -1, -1):
-            try:
-                algorithm = history.getAlgorithm(i)
-            except RuntimeError:
-                return False
-            if algorithm.name() == 'BinMD':
-                if all([not algorithm.getPropertyValue(x) for x in empty_params])\
-                        and all([algorithm.getPropertyValue(x) for x in used_params]):
-                    return True
-                break
-        return False
-
     def is_cuttable(self, workspace):
         workspace = self._workspace_provider.get_workspace_handle(workspace)
         return isinstance(workspace, IMDEventWorkspace) and workspace.getNumDims() == 2
-
-    def get_cut_params(self, cut_workspace):
-        cut_workspace = self._workspace_provider.get_workspace_handle(cut_workspace)
-        assert isinstance(cut_workspace, IMDHistoWorkspace)
-        is_norm = self._was_previously_normalized(cut_workspace)
-        bin_md = None
-        history = cut_workspace.getHistory()
-        for i in range(history.size()-1,-1,-1):
-            algorithm = history.getAlgorithm(i)
-            if algorithm.name() == 'BinMD':
-                bin_md = algorithm
-                break
-        integration_binning = bin_md.getPropertyValue("AlignedDim1").split(",")
-        integration_range = float(integration_binning[1]), float(integration_binning[2])
-
-        cut_binning = bin_md.getPropertyValue("AlignedDim0").split(",")
-        # The axis name is retreived from the workspace directly and not the binning string to avoid
-        # adding/removing trailing spaces
-        dim_name = cut_workspace.getDimension(0).getName()
-        cut_axis = Axis(dim_name, *list(map(float,cut_binning[1:])))
-        cut_axis.step = (cut_axis.end - cut_axis.start)/float(cut_binning[-1])
-        return cut_axis, integration_range, is_norm
 
     def set_saved_cut_parameters(self, workspace, axis, parameters):
         self._workspace_provider.setCutParameters(workspace, axis, parameters)
