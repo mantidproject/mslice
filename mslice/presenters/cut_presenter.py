@@ -43,7 +43,7 @@ class CutPresenter(PresenterUtility):
             self._cut_axis_changed()
         self._cut_view.busy.emit(False)
 
-    def _cut(self, output_method, histo_ws=False, plot_over=False):
+    def _cut(self, output_method, plot_over=False):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         try:
             self._parse_step()
@@ -63,7 +63,7 @@ class CutPresenter(PresenterUtility):
             else:
                 output_method(params, plot_over)
 
-    def _plot_with_width(self, params, output_method, width, plot_over, workspace_index=0):
+    def _plot_with_width(self, params, output_method, width, plot_over):
         """This function handles the width parameter."""
         integration_start, integration_end = params[2:4]
         cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
@@ -82,11 +82,12 @@ class CutPresenter(PresenterUtility):
 
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
+        self._cut_plotter.set_icut(False)
         self._main_presenter.change_ws_tab(2)
 
     def _save_cut_to_workspace(self, params, _):
         cut_params = params[:5]
-        self._cut_algorithm.compute_cut(*cut_params)
+        self._cut_plotter.save_cut(cut_params)
         self._main_presenter.update_displayed_workspaces()
 
     def _plot_cut_from_workspace(self, plot_over):
@@ -94,7 +95,7 @@ class CutPresenter(PresenterUtility):
         for workspace in selected_workspaces:
             x, y, e, units = self._cut_algorithm.get_arrays_from_workspace(workspace)
             self._cut_plotter.plot_cut_from_xye(x, y, e, units, workspace, plot_over)
-            plot_over = True # plot over if multiple workspaces selected
+            plot_over = True  # plot over if multiple workspaces selected
 
     def _parse_step(self):
         step = self._cut_view.get_cut_axis_step()
