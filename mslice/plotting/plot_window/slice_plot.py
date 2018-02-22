@@ -17,7 +17,7 @@ from .plot_options import SlicePlotOptions
 
 class SlicePlot(object):
 
-    def __init__(self, plot_figure, canvas, slice_plotter):
+    def __init__(self, plot_figure, canvas, slice_plotter, new_figure):
         self.plot_figure = plot_figure
         self._canvas = canvas
         self._slice_plotter = slice_plotter
@@ -29,6 +29,11 @@ class SlicePlot(object):
         self._legend_dict = {}
         self.icut_event = [None, None]
         self.icut = None
+        if new_figure:
+            self.setup_connections(plot_figure)
+        self._update_lines()
+
+    def setup_connections(self, plot_figure):
         self.plot_figure.move_window(-self.plot_figure.width() / 2, 0)
 
         plot_figure.actionInteractive_Cuts.setVisible(True)
@@ -71,7 +76,6 @@ class SlicePlot(object):
         plot_figure.actionTantalum.triggered.connect(
             partial(self.toggle_overplot_line, plot_figure.actionTantalum, 'Tantalum', False))
         plot_figure.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
-        self._update_lines()
 
     def plot_options(self):
         new_config = SlicePlotOptionsPresenter(SlicePlotOptions(), self).get_new_config()
