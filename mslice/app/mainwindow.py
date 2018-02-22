@@ -6,7 +6,6 @@ from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
-from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 from mslice.widgets.workspacemanager.command import Command as ws_command
 from mslice.widgets.cut.command import Command as cut_command
 
@@ -130,10 +129,6 @@ class MainWindow(MainView, QMainWindow):
         self.cut_presenter.notify(cut_command.PlotOverFromWorkspace)
 
     def init_ui(self):
-        ipython = IPythonWidget()
-        self.splitter.addWidget(ipython)
-        self.splitter.setSizes([500, 250])
-
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")
