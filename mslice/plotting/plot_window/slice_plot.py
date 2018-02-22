@@ -6,6 +6,7 @@ from mslice.util.qt.QtCore import Qt
 
 import os.path as path
 import matplotlib.colors as colors
+from matplotlib.lines import Line2D
 
 from mantid.simpleapi import AnalysisDataService
 
@@ -175,12 +176,15 @@ class SlicePlot(object):
 
     def update_legend(self):
         lines = []
+        labels = []
         axes = self._canvas.figure.gca()
-        for line in axes.get_lines():
+        line_artists = [artist for artist in axes.get_children() if isinstance(artist, Line2D)]
+        for line in line_artists:
             if str(line.get_linestyle()) != 'None' and line.get_label() != '':
                 lines.append(line)
+                labels.append(line.get_label())
         if len(lines) > 0:
-            legend = axes.legend(fontsize='small')
+            legend = axes.legend(lines, labels, fontsize='small')
             for legline, line in zip(legend.get_lines(), lines):
                 legline.set_picker(5)
                 self._legend_dict[legline] = line
@@ -276,8 +280,8 @@ class SlicePlot(object):
         for line in lines:
             if line.isChecked():
                 self._slice_plotter.add_overplot_line(self._ws_title, *lines[line])
-                self.update_legend()
-                self._canvas.draw()
+        self.update_legend()
+        self._canvas.draw()
 
     def get_line_data(self, target):
         line_options = {}
