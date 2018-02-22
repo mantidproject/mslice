@@ -12,8 +12,7 @@ from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
-HBAR_MEV = constants.value('Planck constant over 2 pi in eV s') * 1000
-E_TO_K = np.sqrt(2*constants.neutron_mass)/HBAR_MEV
+E_TO_K = np.sqrt(2 * constants.neutron_mass * constants.elementary_charge / 1000) / constants.hbar
 E2L = 1.e23 * constants.h**2 / (2 * constants.m_n * constants.e)  # energy to wavelength conversion E = h^2/(2*m_n*l^2)
 crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.0 0.05'],
                      'Aluminium': ['4.0495 4.0495 4.0495', 'F m -3 m', 'Al 0 0 0 1.0 0.05'],
@@ -131,11 +130,22 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         sample_temp = float(''.join(c for c in k_string if c.isdigit()))
         return sample_temp
 
-    def compute_recoil_line(self, axis, relative_mass=1):
-        momentum_transfer = np.arange(axis.start, axis.end, axis.step)
-        line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
-            (constants.elementary_charge / 1000)
-        return momentum_transfer, line
+    def compute_recoil_line(self, ws_name, axis, relative_mass=1):
+        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
+        x_axis = np.arange(axis.start, axis.end, axis.step)
+        if axis.units == 'MomentumTransfer':
+            momentum_transfer = x_axis
+            line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
+                (constants.elementary_charge / 1000)
+        elif axis.units == 'Degrees':
+            tth = x_axis * np.pi / 180.
+            if 'Direct' in self._workspace_provider.get_EMode(self._workspace_provider.get_parent_by_name(ws_name)):
+                line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass + 1 - np.cos(tth))
+            else:
+                line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass - 1 + np.cos(tth))
+        else:
+            raise RuntimeError("units of axis not recognised")
+        return x_axis, line
 
     def compute_powder_line(self, ws_name, axis, element, cif_file=False):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
