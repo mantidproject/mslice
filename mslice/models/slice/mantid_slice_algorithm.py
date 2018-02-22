@@ -3,7 +3,7 @@ from six import string_types
 import numpy as np
 
 from mantid.simpleapi import BinMD, LoadCIF
-from mantid.api import IMDEventWorkspace
+from mantid.api import IMDEventWorkspace, MDNormalization
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
@@ -41,7 +41,11 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
-            plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
+            if thisslice.displayNormalization() == MDNormalization.NoNormalization:
+                plot_data = np.array(thisslice.getSignalArray())
+                plot_data[np.where(thisslice.getNumEventsArray() == 0)] = np.nan
+            else:
+                plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)
         self._workspace_provider.delete_workspace(thisslice)

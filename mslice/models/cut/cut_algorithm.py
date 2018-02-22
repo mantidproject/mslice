@@ -6,6 +6,9 @@ class CutAlgorithm(object):
     def compute_cut_xye(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
         pass
 
+    def get_arrays_from_workspace(self, workspace):
+        pass
+
     def is_cuttable(self, workspace):
         pass
 
