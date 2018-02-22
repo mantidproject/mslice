@@ -17,7 +17,7 @@ from .plot_options import SlicePlotOptions
 
 class SlicePlot(object):
 
-    def __init__(self, plot_figure, canvas, slice_plotter, new_figure):
+    def __init__(self, plot_figure, canvas, slice_plotter):
         self.plot_figure = plot_figure
         self._canvas = canvas
         self._slice_plotter = slice_plotter
@@ -29,13 +29,10 @@ class SlicePlot(object):
         self._legend_dict = {}
         self.icut_event = [None, None]
         self.icut = None
-        if new_figure:
-            self.setup_connections(plot_figure)
+        self.setup_connections(plot_figure)
         self._update_lines()
 
     def setup_connections(self, plot_figure):
-        self.plot_figure.move_window(-self.plot_figure.width() / 2, 0)
-
         plot_figure.actionInteractive_Cuts.setVisible(True)
         plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
         plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
@@ -278,10 +275,9 @@ class SlicePlot(object):
                  self.plot_figure.actionCIF_file:[self._cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
-                if  lines[line][0] in self._slice_plotter.overplot_lines[self._ws_title]:
-                    self._slice_plotter.overplot_lines[self._ws_title].pop(lines[line][0])
                 self._slice_plotter.add_overplot_line(self._ws_title, *lines[line])
                 self.update_legend()
+                self._canvas.draw()
 
     def get_line_data(self, target):
         line_options = {}
@@ -329,6 +325,25 @@ class SlicePlot(object):
 
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
+
+    def disconnect(self, plot_figure):
+        plot_figure.actionInteractive_Cuts.triggered.disconnect()
+        plot_figure.actionSave_Cut.triggered.disconnect()
+        plot_figure.actionS_Q_E.triggered.disconnect()
+        plot_figure.actionChi_Q_E.triggered.disconnect()
+        plot_figure.actionChi_Q_E_magnetic.triggered.disconnect()
+        plot_figure.actionD2sigma_dOmega_dE.triggered.disconnect()
+        plot_figure.actionSymmetrised_S_Q_E.triggered.disconnect()
+        plot_figure.actionGDOS.triggered.disconnect()
+        plot_figure.actionHydrogen.triggered.disconnect()
+        plot_figure.actionDeuterium.triggered.disconnect()
+        plot_figure.actionHelium.triggered.disconnect()
+        plot_figure.actionArbitrary_nuclei.triggered.disconnect()
+        plot_figure.actionAluminium.triggered.disconnect()
+        plot_figure.actionCopper.triggered.disconnect()
+        plot_figure.actionNiobium.triggered.disconnect()
+        plot_figure.actionTantalum.triggered.disconnect()
+        plot_figure.actionCIF_file.triggered.disconnect()
 
     @property
     def colorbar_label(self):
