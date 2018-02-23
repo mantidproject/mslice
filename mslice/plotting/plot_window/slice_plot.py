@@ -299,6 +299,9 @@ class SlicePlot(object):
 
     def interactive_cuts(self):
         if not self.icut:
+            if self.plot_figure.actionZoom_In.isChecked():
+                self.plot_figure.actionZoom_In.setChecked(False)
+                self.plot_figure.actionZoom_In.triggered.emit(False)  # turn off zoom
             self.plot_figure.picking_connected(False)
             self.plot_figure.actionKeep.trigger()
             self.plot_figure.actionKeep.setEnabled(False)
