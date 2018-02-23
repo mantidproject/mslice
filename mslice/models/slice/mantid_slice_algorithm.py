@@ -51,7 +51,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
         if norm_to_one:
             plot_data = self._norm_to_one(plot_data)
-        plot = [plot_data, None, None, None, None, None]
+        plot = [plot_data] + [None]*5
         return plot, boundaries
 
     def compute_boltzmann_dist(self, sample_temp, e_axis):
@@ -192,5 +192,5 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return dvalues
 
     def _norm_to_one(self, data):
-        data_range = data.max() - data.min()
-        return (data - data.min())/data_range
+        data_range = np.nanmax(data) - np.nanmin(data)
+        return (data - np.nanmin(data))/data_range
