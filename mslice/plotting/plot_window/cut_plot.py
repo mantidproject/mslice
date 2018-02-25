@@ -36,8 +36,6 @@ class CutPlot(object):
         self.plot_figure.actionToggleLegends.setVisible(not is_icut)
         self.plot_figure.actionKeep.setVisible(not is_icut)
         self.plot_figure.actionMakeCurrent.setVisible(not is_icut)
-        if is_icut:
-            self.plot_figure.actionMakeCurrent.trigger()
         self.plot_figure.show()
 
     def save_icut(self):
