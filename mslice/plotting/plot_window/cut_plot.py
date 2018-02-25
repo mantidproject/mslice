@@ -24,7 +24,6 @@ class CutPlot(object):
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
         plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
-        self.plot_figure.move_window(self.plot_figure.width() / 2, 0)
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
@@ -37,6 +36,8 @@ class CutPlot(object):
         self.plot_figure.actionToggleLegends.setVisible(not is_icut)
         self.plot_figure.actionKeep.setVisible(not is_icut)
         self.plot_figure.actionMakeCurrent.setVisible(not is_icut)
+        if is_icut:
+            self.plot_figure.actionMakeCurrent.trigger()
         self.plot_figure.show()
 
     def save_icut(self):
