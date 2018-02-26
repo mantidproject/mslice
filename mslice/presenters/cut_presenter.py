@@ -241,4 +241,4 @@ class CutPresenter(PresenterUtility):
         self._cut_view.set_minimum_step(min_step)
 
     def set_workspace_provider(self, workspace_provider):
-        self._cut_algorithm.set_workspace_provider(workspace_provider)
+        self._cut_plotter.set_workspace_provider(workspace_provider)

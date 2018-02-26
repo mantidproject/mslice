@@ -12,6 +12,7 @@ class MatplotlibCutPlotter(CutPlotter):
         self._cut_algorithm = cut_algorithm
         self.axes = None
         self.canvas = None
+        self.workspace_provider = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
                  intensity_end, plot_over):
@@ -88,3 +89,7 @@ class MatplotlibCutPlotter(CutPlotter):
         integrated_dim = mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
         return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
             "%.2f" % integration_end
+
+    def set_workspace_provider(self, workspace_provider):
+        self.workspace_provider = workspace_provider
+        self._cut_algorithm.set_workspace_provider(workspace_provider)

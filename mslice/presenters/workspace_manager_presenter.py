@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 from six import string_types
-import os.path
 
 from mslice.widgets.workspacemanager.command import Command
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
@@ -58,32 +57,17 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         else:
             return True
 
-    def _save_selected_workspace(self): #TODO: messy, please clean up
+    def _save_selected_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_workspace()
             return
-        save_directory = self._workspace_manager_view.get_directory_to_save_workspaces(len(selected_workspaces) > 1)
+        save_directory, ex = self._workspace_manager_view.get_directory_to_save_workspaces(len(selected_workspaces) > 1)
         if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
             return
-        save_method = self._workspace_provider.save_nexus
-        if save_directory.endswith('.txt'):
-            save_method = self._workspace_provider.save_ascii
-        elif save_directory.endswith('.mat'):
-            save_method = self._workspace_provider.save_matlab
-        else: # multiple workspaces selected
-            for workspace in selected_workspaces:
-                filename = workspace
-                if not filename.endswith('.nxs'):
-                    filename += '.nxs'
-                path = os.path.join(str(save_directory), filename)
-                try:
-                    save_method(workspace, path)
-                except RuntimeError:
-                    self._workspace_manager_view.error_unable_to_save()
         try:
-            save_method(selected_workspaces[0], save_directory)
+            self._workspace_provider.save_workspace(selected_workspaces, save_directory, ex)
         except RuntimeError:
             self._workspace_manager_view.error_unable_to_save()
 

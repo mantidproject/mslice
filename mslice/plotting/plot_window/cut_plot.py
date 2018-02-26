@@ -240,6 +240,9 @@ class CutPlot(object):
                 self._legends_visible[i] = line_data[i]['legend']
         axes.legend(handles_to_show, labels_to_show, fontsize='medium').draggable()  # add new legends
 
+    def workspace_provider(self):
+        return self._cut_plotter.workspace_provider
+
     def set_line_visible(self, line_index, visible):
         self._lines_visible[line_index] = visible
         for child in self._canvas.figure.gca().containers[line_index].get_children():

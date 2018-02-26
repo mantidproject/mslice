@@ -1,5 +1,6 @@
 from functools import partial
 import six
+import os.path
 
 from mslice.util.qt import QtWidgets
 from mslice.util.qt.QtCore import Qt
@@ -329,6 +330,9 @@ class SlicePlot(object):
 
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
+
+    def workspace_provider(self):
+        return self._slice_plotter.workspace_provider
 
     def disconnect(self, plot_figure):
         plot_figure.actionInteractive_Cuts.triggered.disconnect()

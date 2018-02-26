@@ -6,6 +6,7 @@ It uses mantid to perform the workspace operations
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
+import os.path
 from six import string_types
 
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale, SaveAscii,
@@ -16,7 +17,6 @@ import numpy as np
 from scipy import constants
 from scipy.io import savemat
 
-from mslice.presenters.slice_plotter_presenter import Axis
 from .workspace_provider import WorkspaceProvider
 
 # -----------------------------------------------------------------------------
@@ -177,6 +177,20 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             raise ValueError(e)
         finally:
             self.delete_workspace(scaled_bg_ws)
+
+    def save_workspace(self, workspaces, path, save_name, extension):
+        if extension == '.nxs':
+            save_method = self._workspace_provider.save_nexus
+        elif extension == '.txt':
+            save_method = self._workspace_provider.save_ascii
+        elif extension == '.mat':
+            save_method = self._workspace_provider.save_matlab
+        else:
+            raise RuntimeError("unrecognised file extension")
+        for workspace in workspaces:
+            filename = save_name + extension
+            path = os.path.join(str(path), filename)
+            save_method(workspace, path)
 
     def save_nexus(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)

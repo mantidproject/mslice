@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import importlib
+import os.path
 
 from matplotlib.figure import Figure
 import six
@@ -65,7 +66,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
 
         self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
         self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
-        self.action_save_image.triggered.connect(self.stock_toolbar.save_figure)
+        self.action_save_image.triggered.connect(self.save_plot)
         self.action_Print_Plot.triggered.connect(self.print_plot)
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
@@ -138,6 +139,24 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
             painter = QtWidgets.QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
+
+    def save_plot(self):
+        file_path = QtWidgets.QFileDialog.getSaveFileName(
+            self, filter="Image (*.png);; PDF (*.pdf);; Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat)")
+        ext = file_path[file_path.rfind('.'):]
+        save_name = os.path.basename(file_path)
+        file_path = os.path.dirname(file_path)
+        title = self._plot_handler._ws_title
+        try:
+            self._plot_handler.workspace_provider().save_workspace(title, file_path, save_name, ext)
+        except RuntimeError as e:
+            if e.message == "unrecognised file extension":
+                self.save_image(os.path.join(file_path, save_name))
+            else:
+                raise RuntimeError(e)
+
+    def save_image(self, path):
+        self.canvas.figure.savefig(path)
 
     def set_icons(self):
         self.action_save_image.setIcon(qta.icon('fa.save'))
