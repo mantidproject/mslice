@@ -15,6 +15,7 @@ from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 import numpy as np
 from scipy import constants
 
+from mslice.presenters.slice_plotter_presenter import Axis
 from .workspace_provider import WorkspaceProvider
 
 # -----------------------------------------------------------------------------
@@ -185,7 +186,33 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def save_ascii(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
-        SaveAscii(InputWorkspace=workspace, Filename=path)
+        if isinstance(workspace_handle, IMDEventWorkspace):
+            raise RuntimeError("Cannot save MDEventWorkspace as ascii")
+        elif isinstance(workspace_handle, IMDHistoWorkspace):
+            self._save_cut_to_ascii(workspace_handle, workspace, path)
+        else:
+            SaveAscii(InputWorkspace=workspace, Filename=path)
+
+    def _save_cut_to_ascii(self, workspace, ws_name, output_path):
+        # get integration ranges from the name
+        int_ranges = ws_name[ws_name.find('('):]
+        int_start = int_ranges[1:int_ranges.find(',')]
+        int_end = int_ranges[int_ranges.find(',')+1:-1]
+        ws_name = ws_name[:ws_name.find('_cut')]
+
+        dim = workspace.getDimension(0)
+        start = dim.getMinimum()
+        end = dim.getMaximum()
+        step = dim.getBinWidth()
+        units = dim.getUnits()
+
+        x = np.arange(start, end, step)
+        y = workspace.getSignalArray()
+        e = np.sqrt(workspace.getErrorSquaredArray())
+        header = 'MSlice Cut of workspace "%s" along "%s" between %s and %s' % (ws_name, units, int_start, int_end)
+        print(x.shape, y.shape, e.shape)
+        out_data = np.c_[x, y, e]
+        np.savetxt(str(output_path), out_data, fmt='%12.9e', header=header)
 
     def save_matlab(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
