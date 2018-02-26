@@ -6,6 +6,7 @@ from mslice.util.qt.QtCore import Qt
 
 import os.path as path
 import matplotlib.colors as colors
+from matplotlib.lines import Line2D
 
 from mantid.simpleapi import AnalysisDataService
 
@@ -29,8 +30,10 @@ class SlicePlot(object):
         self._legend_dict = {}
         self.icut_event = [None, None]
         self.icut = None
-        self.plot_figure.move_window(-self.plot_figure.width() / 2, 0)
+        self.setup_connections(plot_figure)
+        self._update_lines()
 
+    def setup_connections(self, plot_figure):
         plot_figure.actionInteractive_Cuts.setVisible(True)
         plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
         plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
@@ -71,7 +74,6 @@ class SlicePlot(object):
         plot_figure.actionTantalum.triggered.connect(
             partial(self.toggle_overplot_line, plot_figure.actionTantalum, 'Tantalum', False))
         plot_figure.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
-        self._update_lines()
 
     def plot_options(self):
         new_config = SlicePlotOptionsPresenter(SlicePlotOptions(), self).get_new_config()
@@ -137,7 +139,7 @@ class SlicePlot(object):
             if str(line.get_linestyle()) == 'None':
                 if isinstance(key, int):
                     key = self._slice_plotter.get_recoil_label(key)
-                action_checked = getattr(self, 'action' + key)
+                action_checked = getattr(self.plot_figure, 'action' + key)
                 action_checked.setChecked(False)
 
     def toggle_overplot_line(self, action, key, recoil, checked, cif_file=None):
@@ -174,12 +176,15 @@ class SlicePlot(object):
 
     def update_legend(self):
         lines = []
+        labels = []
         axes = self._canvas.figure.gca()
-        for line in axes.get_lines():
+        line_artists = [artist for artist in axes.get_children() if isinstance(artist, Line2D)]
+        for line in line_artists:
             if str(line.get_linestyle()) != 'None' and line.get_label() != '':
                 lines.append(line)
+                labels.append(line.get_label())
         if len(lines) > 0:
-            legend = axes.legend(fontsize='small')
+            legend = axes.legend(lines, labels, fontsize='small')
             for legline, line in zip(legend.get_lines(), lines):
                 legline.set_picker(5)
                 self._legend_dict[legline] = line
@@ -274,10 +279,9 @@ class SlicePlot(object):
                  self.plot_figure.actionCIF_file:[self._cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
-                if  lines[line][0] in self._slice_plotter.overplot_lines[self._ws_title]:
-                    self._slice_plotter.overplot_lines[self._ws_title].pop(lines[line][0])
                 self._slice_plotter.add_overplot_line(self._ws_title, *lines[line])
-                self.update_legend()
+        self.update_legend()
+        self._canvas.draw()
 
     def get_line_data(self, target):
         line_options = {}
@@ -325,6 +329,25 @@ class SlicePlot(object):
 
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
+
+    def disconnect(self, plot_figure):
+        plot_figure.actionInteractive_Cuts.triggered.disconnect()
+        plot_figure.actionSave_Cut.triggered.disconnect()
+        plot_figure.actionS_Q_E.triggered.disconnect()
+        plot_figure.actionChi_Q_E.triggered.disconnect()
+        plot_figure.actionChi_Q_E_magnetic.triggered.disconnect()
+        plot_figure.actionD2sigma_dOmega_dE.triggered.disconnect()
+        plot_figure.actionSymmetrised_S_Q_E.triggered.disconnect()
+        plot_figure.actionGDOS.triggered.disconnect()
+        plot_figure.actionHydrogen.triggered.disconnect()
+        plot_figure.actionDeuterium.triggered.disconnect()
+        plot_figure.actionHelium.triggered.disconnect()
+        plot_figure.actionArbitrary_nuclei.triggered.disconnect()
+        plot_figure.actionAluminium.triggered.disconnect()
+        plot_figure.actionCopper.triggered.disconnect()
+        plot_figure.actionNiobium.triggered.disconnect()
+        plot_figure.actionTantalum.triggered.disconnect()
+        plot_figure.actionCIF_file.triggered.disconnect()
 
     @property
     def colorbar_label(self):

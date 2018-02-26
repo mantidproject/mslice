@@ -135,6 +135,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line.set_linestyle('-')  # make visible
             line.set_label(label)  # add to legend
             line.set_markersize(6) # show markers - 6.0 is default size
+            if line not in plt.gca().get_children():
+                plt.gca().add_artist(line)
         else:
             momentum_axis = self.slice_cache[workspace]['momentum_axis']
             if recoil:
