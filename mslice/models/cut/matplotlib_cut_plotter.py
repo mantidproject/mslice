@@ -15,15 +15,10 @@ class MatplotlibCutPlotter(CutPlotter):
 
     def plot_cut(self, selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
                  intensity_end, plot_over):
-        if self.background is None:
-            self._create_cut()
         x, y, e = self._cut_algorithm.compute_cut_xye(selected_workspace, cut_axis, integration_start, integration_end,
                                                       norm_to_one)
         integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
         legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
-        # Note that we cannot cache the reference to canvas and axes here because under the keep/make current mechanism
-        # there is no one-to-one link between any particular CutPlotter and any CutPlot (or mpl canvas) object
-        plt.gcf().canvas.restore_region(self.background)
         self.plot_cut_from_xye(x, y, e, cut_axis.units, selected_workspace, plot_over, legend)
         plt.ylim(intensity_start, intensity_end)
 
@@ -35,11 +30,18 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.xlabel(self._getDisplayName(x_units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
         plt.ylabel(INTENSITY_LABEL, picker=picker)
         plt.autoscale()
+        # Note that we cannot cache the reference to canvas and axes here because under the keep/make current mechanism
+        # there is no one-to-one link between any particular CutPlotter and any CutPlot (or mpl canvas) object
         plt.gcf().canvas.manager.add_cut_plot(self)
         if not plot_over:
             plt.gcf().canvas.manager.update_grid()
-        plt.gcf().canvas.draw()
-        plt.gca().draw_artist(plt.gcf().canvas.figure.get_children()[1])
+        if self.background is None:
+            self._create_cut()
+        plt.gcf().canvas.restore_region(self.background)
+        try:
+            plt.gca().draw_artist(plt.gcf().canvas.figure.get_children()[1])
+        except AttributeError:
+            plt.gcf().canvas.draw()
         plt.gcf().canvas.blit(plt.gcf().canvas.figure.gca().clipbox)
 
     def _create_cut(self):
