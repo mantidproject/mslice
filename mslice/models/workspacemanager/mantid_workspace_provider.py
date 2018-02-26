@@ -8,7 +8,7 @@ It uses mantid to perform the workspace operations
 from __future__ import (absolute_import, division, print_function)
 from six import string_types
 
-from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
+from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale, SaveAscii,
                               RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
 
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
@@ -182,6 +182,14 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             SaveMD(InputWorkspace=workspace, Filename=path)
         else:
             SaveNexus(InputWorkspace=workspace, Filename=path)
+
+    def save_ascii(self, workspace, path):
+        workspace_handle = self.get_workspace_handle(workspace)
+        SaveAscii(InputWorkspace=workspace, Filename=path)
+
+    def save_matlab(self, workspace, path):
+        workspace_handle = self.get_workspace_handle(workspace)
+        SaveAscii(InputWorkspace=workspace, Filename=path)
 
     def is_pixel_workspace(self, workspace_name):
         from mantid.api import IMDEventWorkspace

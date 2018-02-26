@@ -146,8 +146,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         paths = QFileDialog.getOpenFileNames()
         return paths[0] if isinstance(paths, tuple) else [str(filename) for filename in paths]
 
-    def get_directory_to_save_workspaces(self):
-        return QFileDialog.getExistingDirectory()
+    def get_directory_to_save_workspaces(self, multiple_files):
+        return QFileDialog.getExistingDirectory() if multiple_files else QFileDialog.getSaveFileName(
+            self, filter="Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat)")
 
     def get_workspace_new_name(self):
         name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")

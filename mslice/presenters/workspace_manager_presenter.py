@@ -58,24 +58,35 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         else:
             return True
 
-    def _save_selected_workspace(self):
+    def _save_selected_workspace(self): #TODO: messy, please clean up
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_workspace()
             return
-        save_directory = self._workspace_manager_view.get_directory_to_save_workspaces()
+        save_directory = self._workspace_manager_view.get_directory_to_save_workspaces(len(selected_workspaces) > 1)
         if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
             return
-        for workspace in selected_workspaces:
-            filename = workspace
-            if not filename.endswith('.nxs'):
-                filename += '.nxs'
-            path = os.path.join(str(save_directory), filename)
-            try:
-                self._workspace_provider.save_nexus(workspace, path)
-            except RuntimeError:
-                self._workspace_manager_view.error_unable_to_save()
+        print(save_directory)
+        save_method = self._workspace_provider.save_nexus
+        if save_directory.endswith('.txt'):
+            save_method = self._workspace_provider.save_ascii
+        elif save_directory.endswith('.mat'):
+            save_method = self._workspace_provider.save_matlab
+        else: # multiple workspaces selected
+            for workspace in selected_workspaces:
+                filename = workspace
+                if not filename.endswith('.nxs'):
+                    filename += '.nxs'
+                path = os.path.join(str(save_directory), filename)
+                try:
+                    save_method(workspace, path)
+                except RuntimeError:
+                    self._workspace_manager_view.error_unable_to_save()
+        try:
+            save_method(selected_workspaces[0], save_directory)
+        except RuntimeError:
+            self._workspace_manager_view.error_unable_to_save()
 
     def _remove_selected_workspaces(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
