@@ -14,6 +14,7 @@ from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 import numpy as np
 from scipy import constants
+from scipy.io import savemat
 
 from mslice.presenters.slice_plotter_presenter import Axis
 from .workspace_provider import WorkspaceProvider
@@ -201,22 +202,35 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = ws_name[:ws_name.find('_cut')]
 
         dim = workspace.getDimension(0)
-        start = dim.getMinimum()
-        end = dim.getMaximum()
-        step = dim.getBinWidth()
         units = dim.getUnits()
 
-        x = np.arange(start, end, step)
-        y = workspace.getSignalArray()
-        e = np.sqrt(workspace.getErrorSquaredArray())
+        x, y, e = self.get_md_histo_xye(workspace)
         header = 'MSlice Cut of workspace "%s" along "%s" between %s and %s' % (ws_name, units, int_start, int_end)
-        print(x.shape, y.shape, e.shape)
         out_data = np.c_[x, y, e]
         np.savetxt(str(output_path), out_data, fmt='%12.9e', header=header)
 
     def save_matlab(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
-        SaveAscii(InputWorkspace=workspace, Filename=path)
+        if isinstance(workspace_handle, IMDEventWorkspace):
+            raise RuntimeError("Cannot save MDEventWorkspace as Matlab file")
+        elif isinstance(workspace_handle, IMDHistoWorkspace):
+            x, y, e = self.get_md_histo_xye(workspace_handle)
+        else:
+            x = workspace_handle.x()
+            y = workspace_handle.y()
+            e = workspace_handle.e()
+        mdict = {'x': x, 'y': y, 'e': e}
+        savemat(path, mdict=mdict)
+
+    def get_md_histo_xye(self, histo_ws):
+        dim = histo_ws.getDimension(0)
+        start = dim.getMinimum()
+        end = dim.getMaximum()
+        step = dim.getBinWidth()
+        x = np.arange(start, end, step)
+        y = histo_ws.getSignalArray()
+        e = np.sqrt(histo_ws.getErrorSquaredArray())
+        return x, y, e
 
     def is_pixel_workspace(self, workspace_name):
         from mantid.api import IMDEventWorkspace

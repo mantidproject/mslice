@@ -67,7 +67,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
             return
-        print(save_directory)
         save_method = self._workspace_provider.save_nexus
         if save_directory.endswith('.txt'):
             save_method = self._workspace_provider.save_ascii
