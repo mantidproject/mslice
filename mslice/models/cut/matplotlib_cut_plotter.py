@@ -40,9 +40,9 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.gcf().canvas.restore_region(self.background)
         try:
             plt.gca().draw_artist(plt.gcf().canvas.figure.get_children()[1])
+            plt.gcf().canvas.blit(plt.gcf().canvas.figure.gca().clipbox)
         except AttributeError:
             plt.gcf().canvas.draw()
-        plt.gcf().canvas.blit(plt.gcf().canvas.figure.gca().clipbox)
 
     def _create_cut(self):
         # don't include axis ticks in the saved background
