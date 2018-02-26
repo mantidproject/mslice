@@ -55,8 +55,8 @@ class SlicePlotTest(unittest.TestCase):
         action1 = PropertyMock()
         type(self.slice_plot).action1 = action1
         self.slice_plot.reset_info_checkboxes()
-        self.slice_plot.action0.setChecked.assert_called_once_with(False)
-        self.slice_plot.action1.setChecked.assert_not_called()
+        self.plot_figure.action0.setChecked.assert_called_once_with(False)
+        self.plot_figure.action1.setChecked.assert_not_called()
 
     def test_lines_redrawn(self):
         self.slice_plot._ws_title = 'some_title'

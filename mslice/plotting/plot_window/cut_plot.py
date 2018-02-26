@@ -21,9 +21,15 @@ class CutPlot(object):
         self._legends_visible = []
         self._legend_dict = {}
         self._lines = self.line_containers()
+        self.setup_connections(plot_figure)
+
+    def setup_connections(self, plot_figure):
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
         plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
+
+    def disconnect(self, plot_figure):
+        plot_figure.actionSave_Cut.triggered.disconnect()
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
