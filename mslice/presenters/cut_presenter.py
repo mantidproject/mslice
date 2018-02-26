@@ -82,7 +82,6 @@ class CutPresenter(PresenterUtility):
 
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
-        self._cut_plotter.set_icut(False)
         self._main_presenter.change_ws_tab(2)
 
     def _save_cut_to_workspace(self, params, _):
