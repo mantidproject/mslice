@@ -134,6 +134,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line = self.overplot_lines[workspace][key]
             line.set_linestyle('-')  # make visible
             line.set_label(label)  # add to legend
+            if line not in plt.gca().get_children():
+                plt.gca().add_artist(line)
         else:
             momentum_axis = self.slice_cache[workspace]['momentum_axis']
             if recoil:

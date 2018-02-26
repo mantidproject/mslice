@@ -77,9 +77,17 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.show()  # is not a good idea in non interactive mode
 
     def add_slice_plot(self, slice_plotter):
+        if self._plot_handler is None:
+            self.move_window(-self.width() / 2, 0)
+        else:
+            self._plot_handler.disconnect(self)
         self._plot_handler = SlicePlot(self, self.canvas, slice_plotter)
 
     def add_cut_plot(self, cut_plotter):
+        if self._plot_handler is None:
+            self.move_window(self.width() / 2, 0)
+        else:
+            self._plot_handler.disconnect(self)
         self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
 
     def is_icut(self, is_icut):
