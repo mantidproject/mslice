@@ -119,7 +119,6 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         #Create a view that reports multiple workspaces are selected on calls to get_workspace_selected
         path_to_save_to = r'A:\file\path'
         self.view.get_workspace_selected = mock.Mock(return_value=['file1','file2'])
-        result_paths = [join(path_to_save_to, 'file1.nxs'), join(path_to_save_to, 'file2.nxs')]
         self.view.get_save_directory = mock.Mock(return_value=(path_to_save_to, None, '.nxs'))
         self.workspace_provider.save_workspace = mock.Mock(side_effect=[True,RuntimeError])
 
