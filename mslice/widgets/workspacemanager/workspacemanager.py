@@ -16,6 +16,7 @@ from .subtract_input_box import SubtractInputBox
 TAB_2D = 0
 TAB_EVENT = 1
 TAB_HISTO = 2
+TAB_NONPSD = 3
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
@@ -175,6 +176,11 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return self._presenter
 
     def list_item_changed(self):
+        if self.sender() == self.listWorkspaces2D:
+            if all([self._presenter.get_workspace_provider().is_PSD(ws) for ws in self.get_workspace_selected()]):
+                self.tab_changed.emit(TAB_2D)
+            else:
+                self.tab_changed.emit(TAB_NONPSD)
         self._presenter.notify(Command.SelectionChanged)
 
     def error_unable_to_save(self):

@@ -28,6 +28,8 @@ class AlgWorkspaceOps(object):
             axis.step = (axis.end - axis.start)/100
 
     def get_available_axis(self, workspace):
+        if not self._workspace_provider.is_PSD(workspace):
+            return ['|Q|', 'Degrees', 'DeltaE']
         dim_names = []
         if isinstance(workspace, string_types):
             workspace = self._workspace_provider.get_workspace_handle(workspace)

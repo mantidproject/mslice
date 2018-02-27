@@ -12,6 +12,7 @@ from mslice.widgets.cut.command import Command as cut_command
 TAB_2D = 0
 TAB_EVENT = 1
 TAB_HISTO = 2
+TAB_NONPSD = 3
 TAB_SLICE = 1
 TAB_CUT = 2
 TAB_POWDER = 0
@@ -31,11 +32,13 @@ class MainWindow(MainView, QMainWindow):
         self.tabs = [self.wgtSlice, self.wgtCut, self.wgtPowder]
         self.tabs_to_show = {TAB_2D: [TAB_POWDER],
                              TAB_EVENT: [TAB_SLICE, TAB_CUT],
-                             TAB_HISTO: []}
+                             TAB_HISTO: [],
+                             TAB_NONPSD: [TAB_SLICE, TAB_CUT]}
 
         self.buttons_to_enable = {TAB_2D: [self.btnAdd, self.btnSubtract],
                                   TAB_EVENT: [self.btnMerge],
-                                  TAB_HISTO: [self.btnPlot, self.btnOverplot]}
+                                  TAB_HISTO: [self.btnPlot, self.btnOverplot],
+                                  TAB_NONPSD: [self.btnAdd, self.btnSubtract]}
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()

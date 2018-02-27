@@ -28,6 +28,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         self._EfDefined = {}
         self._limits = {}
         self._cutParameters = {}
+        self._isPSD = {}
 
     def get_workspace_names(self):
         return AnalysisDataService.getObjectNames()
@@ -38,6 +39,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             del self._EfDefined[workspace]
         if workspace in self._limits:
             del self._limits[workspace]
+        if workspace in self._isPSD:
+            del self._isPSD[workspace]
         return ws
 
     def get_limits(self, workspace, axis):
@@ -53,6 +56,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             minimum = dim.getMinimum()
             maximum = dim.getMaximum()
             return minimum, maximum, (maximum - minimum) / 100.
+
+    def is_PSD(self, workspace):
+        return self._isPSD[workspace] if (workspace in self._isPSD) else None
 
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""
@@ -124,6 +130,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         else:
             theta = [ws_handle.detectorTwoTheta(ws_handle.getDetector(i)) for i in range(num_hist)]
             round_fac = 100
+        self._isPSD[self.get_workspace_name(ws_handle)] = not all(x < y for x, y in zip(theta, theta[1:]))
         # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
         thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
         return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff>0)])])
@@ -139,6 +146,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws = RenameWorkspace(InputWorkspace=selected_workspace, OutputWorkspace=new_name)
         if selected_workspace in self._limits:
             self._limits[new_name] = self._limits.pop(selected_workspace)
+        if selected_workspace in self._isPSD:
+            self._isPSD[new_name] = self._isPSD.pop(selected_workspace)
         if selected_workspace in self._EfDefined:
             self._EfDefined[new_name] = self._EfDefined.pop(selected_workspace)
         if selected_workspace in self._cutParameters:
@@ -267,6 +276,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self._EfDefined[new_workspace] = self._EfDefined[old_workspace]
         if old_workspace in self._limits:
             self._limits[new_workspace] = self._limits[old_workspace]
+        if old_workspace in self._isPSD:
+            self._isPSD[new_workspace] = self._isPSD[old_workspace]
 
     def getComment(self, workspace):
         if hasattr(workspace, 'getComment'):

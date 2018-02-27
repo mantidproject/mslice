@@ -84,7 +84,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         for workspace in selected_workspaces:
             self._workspace_provider.delete_workspace(workspace)
-        self.update_displayed_workspaces()
+            self.update_displayed_workspaces()
 
     def _rename_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
