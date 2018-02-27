@@ -304,6 +304,10 @@ class SlicePlot(object):
 
     def interactive_cuts(self):
         if not self.icut:
+            if self.plot_figure.actionZoom_In.isChecked():
+                self.plot_figure.actionZoom_In.setChecked(False)
+                self.plot_figure.actionZoom_In.triggered.emit(False)  # turn off zoom
+            self.plot_figure.actionZoom_In.setEnabled(False)
             self.plot_figure.picking_connected(False)
             self.plot_figure.actionKeep.trigger()
             self.plot_figure.actionKeep.setEnabled(False)
@@ -311,6 +315,7 @@ class SlicePlot(object):
             self.plot_figure.actionSave_Cut.setVisible(True)
             self._canvas.setCursor(Qt.CrossCursor)
         else:
+            self.plot_figure.actionZoom_In.setEnabled(True)
             self.plot_figure.picking_connected(True)
             self.plot_figure.actionKeep.setEnabled(True)
             self.plot_figure.actionMakeCurrent.setEnabled(True)
