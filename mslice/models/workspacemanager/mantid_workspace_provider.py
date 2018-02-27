@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 from six import string_types
 
-from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale, SaveAscii,
+from mantid.simpleapi import (AnalysisDataService, CreateMDHistoWorkspace, DeleteWorkspace, Load, Scale, SaveAscii,
                               RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
 
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
@@ -180,14 +180,15 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def save_workspace(self, workspaces, path, save_name, extension):
         if extension == '.nxs':
-            save_method = self._workspace_provider.save_nexus
+            save_method = self.save_nexus
         elif extension == '.txt':
-            save_method = self._workspace_provider.save_ascii
+            save_method = self.save_ascii
         elif extension == '.mat':
-            save_method = self._workspace_provider.save_matlab
+            save_method = self.save_matlab
         else:
             raise RuntimeError("unrecognised file extension")
         for workspace in workspaces:
+            save_as = save_name if save_name != None else str(workspace)
             filename = save_name + extension
             path = os.path.join(str(path), filename)
             save_method(workspace, path)
@@ -235,6 +236,18 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             e = workspace_handle.e()
         mdict = {'x': x, 'y': y, 'e': e}
         savemat(path, mdict=mdict)
+
+    def load_from_ascii(self, file_path, ws_name):
+        file = open(file_path, 'r')
+        header = file.readline()
+        if not header.startswith("# MSlice Cut"):
+            raise ValueError
+        x, y, e = np.loadtxt(file).transpose()
+        extents = str(np.min(x)) + ',' + str(np.max(x))
+        nbins = len(x)
+        units = header[header.find('along "'):header.find('" between')]
+        CreateMDHistoWorkspace(SignalInput=y, ErrorInput=e, Dimensionality=1, Extents=extents, NumberOfBins=nbins,
+                               Names='Dim1', Units=units, OutputWorkspace=ws_name)
 
     def get_md_histo_xye(self, histo_ws):
         dim = histo_ws.getDimension(0)

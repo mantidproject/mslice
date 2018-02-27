@@ -62,12 +62,13 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_workspace()
             return
-        save_directory, ex = self._workspace_manager_view.get_directory_to_save_workspaces(len(selected_workspaces) > 1)
+        save_directory, save_name, ex = self._workspace_manager_view.get_directory_to_save_workspaces(
+            len(selected_workspaces) > 1)
         if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
             return
         try:
-            self._workspace_provider.save_workspace(selected_workspaces, save_directory, ex)
+            self._workspace_provider.save_workspace(selected_workspaces, save_directory, save_name, ex)
         except RuntimeError:
             self._workspace_manager_view.error_unable_to_save()
 

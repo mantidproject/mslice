@@ -33,7 +33,10 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 not_loaded.append(ws_name)
             else:
                 try:
-                    self._workspace_provider.load(filename=file_paths[i], output_workspace=ws_name)
+                    if file_paths[i].endswith('.txt'):
+                        self._workspace_provider.load_from_ascii(file_paths[i], ws_name)
+                    else:
+                        self._workspace_provider.load(filename=file_paths[i], output_workspace=ws_name)
                 except ValueError as e:
                     self._view.error_loading_workspace(e)
                 except RuntimeError:
