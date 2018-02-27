@@ -55,7 +55,6 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
             Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi)
             self._workspace_provider.set_efixed(ws_name, Ef)
 
-
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
             return self._view.confirm_overwrite_workspace()

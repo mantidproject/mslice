@@ -189,8 +189,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             raise RuntimeError("unrecognised file extension")
         for workspace in workspaces:
             save_as = save_name if save_name != None else str(workspace)
-            filename = save_name + extension
-            path = os.path.join(str(path), filename)
+            path = os.path.join(str(path), save_name)
             save_method(workspace, path)
 
     def save_nexus(self, workspace, path):
