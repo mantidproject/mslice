@@ -77,12 +77,12 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         workspace_to_save = 'file1'
         result_path = join(path_to_save_to, workspace_to_save + '.nxs')
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
-        self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
+        self.view.get_save_directory = mock.Mock(return_value=path_to_save_to)
 
         self.presenter.notify(Command.SaveSelectedWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_workspace_selected.assert_called_once_with()
-        self.view.get_directory_to_save_workspaces.assert_called_once_with()
+        self.view.get_save_directory.assert_called_once_with()
         self.workspace_provider.save_nexus.assert_called_once_with(workspace_to_save, result_path)
 
     def test_save_workspace_multiple_selected(self):
@@ -91,12 +91,12 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         path_to_save_to = r'A:\file\path'
         self.view.get_workspace_selected = mock.Mock(return_value=['file1','file2'])
         result_paths = [join(path_to_save_to, 'file1.nxs'), join(path_to_save_to, 'file2.nxs')]
-        self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
+        self.view.get_save_directory = mock.Mock(return_value=path_to_save_to)
         self.workspace_provider.save_nexus = mock.Mock(side_effect=[True,RuntimeError])
 
         self.presenter.notify(Command.SaveSelectedWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()
-        self.view.get_directory_to_save_workspaces.assert_called_once_with()
+        self.view.get_save_directory.assert_called_once_with()
         calls = [call('file1', result_paths[0]), call('file2', result_paths[1])]
         self.workspace_provider.save_nexus.assert_has_calls(calls)
         self.view.error_unable_to_save.assert_called_once_with()
@@ -119,12 +119,12 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         path_to_save_to = "" # view returns empty string to indicate operation cancelled
         workspace_to_save = 'file1'
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
-        self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
+        self.view.get_save_directory = mock.Mock(return_value=path_to_save_to)
 
         self.presenter.notify(Command.SaveSelectedWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_workspace_selected.assert_called_once_with()
-        self.view.get_directory_to_save_workspaces.assert_called_once_with()
+        self.view.get_save_directory.assert_called_once_with()
         self.view.error_invalid_save_path.assert_called_once()
         self.workspace_provider.save_nexus.assert_not_called()
 

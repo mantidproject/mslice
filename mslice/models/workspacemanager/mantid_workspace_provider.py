@@ -230,9 +230,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         elif isinstance(workspace_handle, IMDHistoWorkspace):
             x, y, e = self.get_md_histo_xye(workspace_handle)
         else:
-            x = workspace_handle.x()
-            y = workspace_handle.y()
-            e = workspace_handle.e()
+            x = workspace_handle.extractX()
+            y = workspace_handle.extractY()
+            e = workspace_handle.extractE()
         mdict = {'x': x, 'y': y, 'e': e}
         savemat(path, mdict=mdict)
 

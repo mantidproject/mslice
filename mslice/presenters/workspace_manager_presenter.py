@@ -23,8 +23,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def notify(self, command):
         self._clear_displayed_error()
         self._workspace_manager_view.busy.emit(True)
-        if command == Command.SaveSelectedWorkspace:
-            self._save_selected_workspace()
+        if command == Command.SaveSelectedWorkspaceNexus:
+            self._save_selected_workspace('.nxs')
+        elif command == Command.SaveSelectedWorkspaceAscii:
+            self._save_selected_workspace('.txt')
+        elif command == Command.SaveSelectedWorkspaceMatlab:
+            self._save_selected_workspace('.mat')
         elif command == Command.RemoveSelectedWorkspaces:
             self._remove_selected_workspaces()
         elif command == Command.RenameWorkspace:
@@ -57,18 +61,25 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         else:
             return True
 
-    def _save_selected_workspace(self):
+    def _save_selected_workspace(self, extension=None):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_workspace()
             return
-        save_directory, save_name, ex = self._workspace_manager_view.get_directory_to_save_workspaces(
-            len(selected_workspaces) > 1)
+
+        try:
+            save_directory, save_name, extension = self._workspace_manager_view.get_save_directory(
+                len(selected_workspaces) > 1, extension)
+        except RuntimeError as e:
+            if e.message == "dialog cancelled":
+                return
+            else: raise RuntimeError(e)
+
         if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
             return
         try:
-            self._workspace_provider.save_workspace(selected_workspaces, save_directory, save_name, ex)
+            self._workspace_provider.save_workspace(selected_workspaces, save_directory, save_name, extension)
         except RuntimeError:
             self._workspace_manager_view.error_unable_to_save()
 

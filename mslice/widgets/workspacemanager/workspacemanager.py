@@ -17,6 +17,8 @@ from .subtract_input_box import SubtractInputBox
 TAB_2D = 0
 TAB_EVENT = 1
 TAB_HISTO = 2
+ext_to_qtfilter = {'.nxs':'Nexus (*.nxs)', '.txt':'Ascii (*.txt)', '.mat':'Matlab (*.mat)'}
+
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
@@ -148,18 +150,27 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return paths[0] if isinstance(paths, tuple) else [str(filename) for filename in paths]
 
 
-    def get_directory_to_save_workspaces(self, multiple_files):
+    def get_save_directory(self, multiple_files, default_ext=None):
         '''
         Show file dialog so user can choose where to save.
         :param multiple_files: boolean - whether more than one file is being saved
+        :param default_ext: file extension that is selected by default
         :return: path to save directory, name to save the file as, file format extension
         '''
         if multiple_files:
             return QFileDialog.getExistingDirectory(), None, '.nxs'
         else:
-            path = QFileDialog.getSaveFileName(self, filter="Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat)")
-            ext = path[path.rfind('.'):]
-            return os.path.dirname(path), os.path.basename(path), ext
+            file_dialog = QFileDialog()
+            file_dialog.setAcceptMode(QFileDialog.AcceptSave)
+            file_dialog.setNameFilter("Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat)")
+            if default_ext:
+                file_dialog.selectNameFilter(ext_to_qtfilter[default_ext])
+            if(file_dialog.exec_()):
+                path = file_dialog.selectedFiles()[0] + file_dialog.selectedFilter()[-5:-1]
+                ext = path[path.rfind('.'):]
+                return os.path.dirname(path), os.path.basename(path), ext
+            else:
+                raise RuntimeError("dialog cancelled")
 
     def get_workspace_new_name(self):
         name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
