@@ -21,13 +21,32 @@ class CutPlot(object):
         self._legends_visible = []
         self._legend_dict = {}
         self._lines = self.line_containers()
+        self.setup_connections(plot_figure)
+
+    def setup_connections(self, plot_figure):
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
+        plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
+
+    def disconnect(self, plot_figure):
+        plot_figure.actionSave_Cut.triggered.disconnect()
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
         if new_config:
             self._canvas.draw()
+
+    def is_icut(self, is_icut):
+        self.plot_figure.actionSave_Cut.setVisible(is_icut)
+        self.plot_figure.actionPlotOptions.setVisible(not is_icut)
+        self.plot_figure.actionToggleLegends.setVisible(not is_icut)
+        self.plot_figure.actionKeep.setVisible(not is_icut)
+        self.plot_figure.actionMakeCurrent.setVisible(not is_icut)
+        self.plot_figure.show()
+
+    def save_icut(self):
+        icut = self._cut_plotter.get_icut()
+        icut.save_cut()
 
     def object_clicked(self, target):
         if isinstance(target, Legend):

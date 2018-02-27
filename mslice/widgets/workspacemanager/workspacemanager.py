@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 
+from mslice.util.qt import QT_VERSION
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog
 
@@ -96,6 +97,20 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
                     ws_list.takeItem(index)
                     return
 
+    def add_workspace_dialog(self):
+        items = []
+        current_list = self.current_list()
+        for i in range(current_list.count()):
+            item = current_list.item(i).text()
+            items.append(item)
+        dialog = QInputDialog()
+        dialog.setWindowTitle("Add Workspace")
+        dialog.setLabelText("Choose a workspace to add:")
+        dialog.setOptions(QInputDialog.UseListViewForComboBoxItems)
+        dialog.setComboBoxItems(items)
+        dialog.exec_()
+        return dialog.textValue()
+
     def subtraction_input(self):
         sub_input = SubtractInputBox(self.listWorkspaces2D, self)
         if sub_input.exec_():
@@ -109,10 +124,16 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def set_workspace_selected(self, index):
         current_list = self.current_list()
-        for item_index in range(current_list.count()):
-            current_list.setItemSelected(current_list.item(item_index), False)
-        for this_index in (index if hasattr(index, "__iter__") else [index]):
-            current_list.setItemSelected(current_list.item(this_index), True)
+        if QT_VERSION.startswith('5'):
+            for item_index in range(current_list.count()):
+                current_list.item(item_index).setSelected(False)
+            for this_index in (index if hasattr(index, "__iter__") else [index]):
+                current_list.item(this_index).setSelected(True)
+        else:
+            for item_index in range(current_list.count()):
+                current_list.setItemSelected(current_list.item(item_index), False)
+            for this_index in (index if hasattr(index, "__iter__") else [index]):
+                current_list.setItemSelected(current_list.item(this_index), True)
 
     def get_workspace_index(self, ws_name):
         current_list = self.current_list()
@@ -123,7 +144,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def get_workspace_to_load_path(self):
         paths = QFileDialog.getOpenFileNames()
-        return [str(filename) for filename in paths]
+        return paths[0] if isinstance(paths, tuple) else [str(filename) for filename in paths]
 
     def get_directory_to_save_workspaces(self):
         return QFileDialog.getExistingDirectory()

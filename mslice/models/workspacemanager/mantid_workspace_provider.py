@@ -6,8 +6,11 @@ It uses mantid to perform the workspace operations
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
+from six import string_types
+
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
-                              RenameWorkspace, SaveNexus, SaveMD, MergeMD, Minus)
+                              RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
+
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 import numpy as np
 from scipy import constants
@@ -61,7 +64,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""
-        ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
+        ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(ws_name)
         try:
             [self._get_ws_EFixed(ws_h, ws_h.getDetector(i).getID()) for i in range(ws_h.getNumberHistograms())]
@@ -71,7 +74,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def _processLoadedWSLimits(self, workspace):
         """ Processes an (angle-deltaE) workspace to get the limits and step size in angle, energy and |Q| """
-        ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
+        ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(workspace)
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
         efix = self.get_EFixed(ws_h)
@@ -148,6 +151,9 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         self._limits[new_name][ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
         return ws
 
+    def add_workspace_runs(self, selected_ws):
+        MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=selected_ws[0] + '_sum')
+
     def subtract(self, workspaces, background_ws, ssf):
         bg_ws = self.get_workspace_handle(str(background_ws))
         scaled_bg_ws = Scale(bg_ws, ssf)
@@ -177,11 +183,11 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         # if passed a workspace handle return the handle
         if isinstance(workspace_name, Workspace):
             return workspace_name
-        return AnalysisDataService[workspace_name]
+        return AnalysisDataService[str(workspace_name)]
 
     def get_workspace_name(self, workspace):
         """Returns the name of a workspace given the workspace handle"""
-        if isinstance(workspace, str):
+        if isinstance(workspace, string_types):
             return workspace
         return workspace.name()
 
@@ -240,11 +246,11 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return prev
 
     def has_efixed(self, workspace):
-        return self._EfDefined[workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)]
+        return self._EfDefined[workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)]
 
     def set_efixed(self, workspace, Ef):
         """Sets (overides) the fixed energy for all detectors (spectra) of this workspace"""
-        ws_name = workspace if isinstance(workspace, str) else self.get_workspace_name(workspace)
+        ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
         ws_handle = self.get_workspace_handle(ws_name)
         for idx in range(ws_handle.getNumberHistograms()):
             ws_handle.setEFixed(ws_handle.getDetector(idx).getID(), Ef)

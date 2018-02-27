@@ -33,6 +33,12 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_almost_equal(self.test_ws_2d.dataY(0), [1] * 20)
         self.assertFalse('scaled_bg_ws' in self.ws_provider.get_workspace_names())
 
+    def test_add_workspace(self):
+        self.ws_provider.add_workspace_runs(['test_ws_2d', 'test_ws_2d'])
+        result = self.ws_provider.get_workspace_handle('test_ws_2d_sum')
+        np.testing.assert_array_almost_equal(result.dataY(0), [2.0] * 20)
+        np.testing.assert_array_almost_equal(self.test_ws_2d.dataY(0), [1] * 20)
+
     def test_process_EFixed(self):
         self.ws_provider._processEfixed('test_ws_2d')
         self.assertTrue(self.ws_provider._EfDefined['test_ws_2d'])

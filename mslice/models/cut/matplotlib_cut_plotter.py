@@ -10,6 +10,8 @@ picker=3
 class MatplotlibCutPlotter(CutPlotter):
     def __init__(self, cut_algorithm):
         self._cut_algorithm = cut_algorithm
+        self.background = None
+        self.icut = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
                  intensity_end, plot_over):
@@ -28,10 +30,46 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.xlabel(self._getDisplayName(x_units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
         plt.ylabel(INTENSITY_LABEL, picker=picker)
         plt.autoscale()
+        # Note that we cannot cache the reference to canvas and axes here because under the keep/make current mechanism
+        # there is no one-to-one link between any particular CutPlotter and any CutPlot (or mpl canvas) object
         plt.gcf().canvas.manager.add_cut_plot(self)
         if not plot_over:
             plt.gcf().canvas.manager.update_grid()
-        plt.draw_all()
+        if self.background is None:
+            self._create_cut()
+        plt.gcf().canvas.restore_region(self.background)
+        try:
+            plt.gca().draw_artist(plt.gcf().canvas.figure.get_children()[1])
+            plt.gcf().canvas.blit(plt.gcf().canvas.figure.gca().clipbox)
+        except AttributeError:
+            plt.gcf().canvas.draw()
+
+    def _create_cut(self):
+        # don't include axis ticks in the saved background
+        plt.gcf().canvas.figure.gca().xaxis.set_visible(False)
+        plt.gcf().canvas.figure.gca().yaxis.set_visible(False)
+        plt.gcf().canvas.draw()
+        self.background = plt.gcf().canvas.copy_from_bbox(plt.gcf().canvas.figure.bbox)
+
+        plt.gcf().canvas.figure.gca().xaxis.set_visible(True)
+        plt.gcf().canvas.figure.gca().yaxis.set_visible(True)
+        plt.gcf().canvas.manager.add_cut_plot(self)
+        plt.gcf().canvas.draw()
+
+    def set_icut(self, icut):
+        if hasattr(icut, 'plot_cut'):
+            plt.gcf().canvas.manager.is_icut(True)
+            self.icut = icut
+        else:
+            plt.gcf().canvas.manager.is_icut(icut)
+            if not icut:
+                self.icut = None
+
+    def get_icut(self):
+        return self.icut
+
+    def save_cut(self, params):
+        self._cut_algorithm.compute_cut(*params)
 
     def _getDisplayName(self, axisUnits, comment=None):
         if 'DeltaE' in axisUnits:

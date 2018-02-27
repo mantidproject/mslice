@@ -10,11 +10,13 @@ picker=5
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
+
     def __init__(self, slice_algorithm):
         self._slice_algorithm = slice_algorithm
         self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
         if not MPL_COMPAT:
             self._colormaps.insert(0, 'viridis')
+        self.listener = None
         self.slice_cache = {}
         self._sample_temp_fields = []
         self.overplot_lines = {}
@@ -26,7 +28,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
                                                                     smoothing, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._cache_slice(plot_data, selected_ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis)
-        self.overplot_lines[selected_ws] = {}
+        if selected_ws not in self.overplot_lines:
+            self.overplot_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
         plt.gcf().canvas.manager.add_slice_plot(self)
@@ -76,6 +79,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
         plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)
+        plt.gca().get_xaxis().set_units(x_axis.units)
+        plt.gca().get_yaxis().set_units(y_axis.units)
 
     def show_scattering_function(self, workspace):
         slice_cache = self.slice_cache[workspace]
@@ -129,10 +134,13 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line = self.overplot_lines[workspace][key]
             line.set_linestyle('-')  # make visible
             line.set_label(label)  # add to legend
+            line.set_markersize(6) # show markers - 6.0 is default size
+            if line not in plt.gca().get_children():
+                plt.gca().add_artist(line)
         else:
             momentum_axis = self.slice_cache[workspace]['momentum_axis']
             if recoil:
-                x, y = self._slice_algorithm.compute_recoil_line(momentum_axis, key)
+                x, y = self._slice_algorithm.compute_recoil_line(workspace, momentum_axis, key)
             else:
                 x, y = self._slice_algorithm.compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
             color = overplot_colors[key] if key in overplot_colors else 'c'
@@ -148,12 +156,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line = self.overplot_lines[workspace][key]
             line.set_linestyle('')
             line.set_label('')
+            line.set_markersize(0)
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
 
     def update_sample_temperature(self, workspace):
         temp = self._slice_algorithm.sample_temperature(workspace, self._sample_temp_fields)
+        self.slice_cache[workspace]['sample_temp'] = temp
+
+    def set_sample_temperature(self, workspace, temp):
         self.slice_cache[workspace]['sample_temp'] = temp
 
     def compute_boltzmann_dist(self, workspace):
@@ -204,6 +216,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def get_recoil_label(self, key):
         return recoil_labels[key]
+
+    def update_displayed_workspaces(self):
+        self.listener.update_workspaces()
 
     def set_workspace_provider(self, workspace_provider):
         self._slice_algorithm.set_workspace_provider(workspace_provider)

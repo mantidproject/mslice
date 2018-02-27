@@ -7,6 +7,7 @@ import six
 from mslice.util.qt import QT_VERSION
 from mslice.util.qt.QtCore import Qt
 from mslice.util.qt import QtWidgets
+import qtawesome as qta
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
@@ -48,6 +49,8 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.setCentralWidget(self.canvas)
 
         self._plot_handler = None
+        self.picking = None
+
         # Need flags here as matplotlib provides no way to access the grid state
         self._xgrid = False
         self._ygrid = False
@@ -55,9 +58,10 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.actionKeep.triggered.connect(self._report_as_kept_to_manager)
         self.actionMakeCurrent.triggered.connect(self._report_as_current_to_manager)
 
-        self.actionDataCursor.toggled.connect(self.toggle_data_cursor)
         self.stock_toolbar = NavigationToolbar2QT(self.canvas, self)
+        self.stock_toolbar.message.connect(self.statusbar.showMessage)
         self.stock_toolbar.hide()
+        self.set_icons()
 
         self.actionZoom_In.triggered.connect(self.stock_toolbar.zoom)
         self.actionZoom_Out.triggered.connect(self.stock_toolbar.back)
@@ -65,16 +69,35 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.action_Print_Plot.triggered.connect(self.print_plot)
         self.actionPlotOptions.triggered.connect(self._plot_options)
         self.actionToggleLegends.triggered.connect(self._toggle_legend)
+        self.actionInteractive_Cuts.setVisible(False)
+        self.actionSave_Cut.setVisible(False)
         self.canvas.mpl_connect('button_press_event', self.plot_clicked)
-        self.canvas.mpl_connect('pick_event', self.object_clicked)
+        self.picking_connected(True)
 
         self.show()  # is not a good idea in non interactive mode
 
     def add_slice_plot(self, slice_plotter):
+        if self._plot_handler is None:
+            self.move_window(-self.width() / 2, 0)
+        else:
+            self._plot_handler.disconnect(self)
         self._plot_handler = SlicePlot(self, self.canvas, slice_plotter)
 
     def add_cut_plot(self, cut_plotter):
+        if self._plot_handler is None:
+            self.move_window(self.width() / 2, 0)
+        else:
+            self._plot_handler.disconnect(self)
         self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
+
+    def is_icut(self, is_icut):
+        self._plot_handler.is_icut(is_icut)
+
+    def picking_connected(self, connect):
+        if connect:
+            self.picking = self.canvas.mpl_connect('pick_event', self.object_clicked)
+        else:
+            self.canvas.mpl_disconnect(self.picking)
 
     def _toggle_legend(self):
         axes = self.canvas.figure.gca()
@@ -91,15 +114,6 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
     def object_clicked(self, event):
         if event.mouseevent.dblclick or event.mouseevent.button == 3:
             self._plot_handler.object_clicked(event.artist)
-
-    def toggle_data_cursor(self):
-        if self.actionDataCursor.isChecked():
-            self.stock_toolbar.message.connect(self.statusbar.showMessage)
-            self.canvas.setCursor(Qt.CrossCursor)
-
-        else:
-            self.stock_toolbar.message.disconnect()
-            self.canvas.setCursor(Qt.ArrowCursor)
 
     def _display_status(self, status):
         if status == "kept":
@@ -125,11 +139,28 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
 
+    def set_icons(self):
+        self.action_save_image.setIcon(qta.icon('fa.save'))
+        self.action_Print_Plot.setIcon(qta.icon('fa.print'))
+        self.actionZoom_In.setIcon(qta.icon('fa.search-plus'))
+        self.actionZoom_Out.setIcon(qta.icon('fa.search-minus'))
+        self.actionPlotOptions.setIcon(qta.icon('fa.cog'))
+
+    def error_box(self, message):
+        error_box = QtWidgets.QMessageBox(self)
+        error_box.setWindowTitle("Error")
+        error_box.setIcon(QtWidgets.QMessageBox.Warning)
+        error_box.setText(message)
+        error_box.show()
+
     def update_grid(self):
         if self._xgrid:
             self.canvas.figure.gca().grid(True, axis='x')
         if self._ygrid:
             self.canvas.figure.gca().grid(True, axis='y')
+
+    def move_window(self, x, y):
+        self.move(self.pos().x() + x, self.pos().y() + y)
 
     def get_window_title(self):
         return six.text_type(self.windowTitle())

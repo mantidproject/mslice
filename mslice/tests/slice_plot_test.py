@@ -55,5 +55,13 @@ class SlicePlotTest(unittest.TestCase):
         action1 = PropertyMock()
         type(self.slice_plot).action1 = action1
         self.slice_plot.reset_info_checkboxes()
-        self.slice_plot.action0.setChecked.assert_called_once_with(False)
-        self.slice_plot.action1.setChecked.assert_not_called()
+        self.plot_figure.action0.setChecked.assert_called_once_with(False)
+        self.plot_figure.action1.setChecked.assert_not_called()
+
+    def test_lines_redrawn(self):
+        self.slice_plot._ws_title = 'some_title'
+        self.slice_plot.toggle_overplot_line(self.slice_plot.plot_figure.actionHelium, 4, True, True)
+        new_slice_plot = SlicePlot(self.plot_figure, self.canvas, self.slice_plotter)
+
+        self.assertTrue(new_slice_plot.plot_figure.actionHelium.checked)
+        self.slice_plotter.add_overplot_line.assert_any_call(self.plot_figure.title, 4, True, '')

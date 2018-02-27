@@ -20,9 +20,6 @@ try:
     from qtconsole.rich_jupyter_widget import RichJupyterWidget as RichIPythonWidget
     from qtconsole.inprocess import QtInProcessKernelManager
 except ImportError:
-    # fix for bug with old ipython versions
-    import mslice.external.ipython as _ # noqa
-
     from IPython.qt.console.rich_ipython_widget import RichIPythonWidget
     from IPython.qt.inprocess import QtInProcessKernelManager
 

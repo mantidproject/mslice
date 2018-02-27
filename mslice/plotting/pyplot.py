@@ -2,6 +2,7 @@
 # matplotlib version 1.5.2
 # flake8 warnings are disabled for this file
 from __future__ import (absolute_import, division, print_function)
+from six import string_types
 from .figuremanager import FigureManager, activate_category
 from .script_generation import script_log
 from ._pyplot_decorators import draw_colorbar
@@ -30,7 +31,7 @@ import numpy as np
 # Handles older matplotlib than 1.5
 if MPL_COMPAT:
     def _string_to_bool(val):
-        if isinstance(val, str):
+        if isinstance(val, string_types):
              return 'on' in val.lower()
         return val
 else:
