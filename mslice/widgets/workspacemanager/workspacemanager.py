@@ -158,7 +158,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         :return: path to save directory, name to save the file as, file format extension
         '''
         if multiple_files:
-            return QFileDialog.getExistingDirectory(), None, '.nxs'
+            return QFileDialog.getExistingDirectory(), None, default_ext
         else:
             file_dialog = QFileDialog()
             file_dialog.setAcceptMode(QFileDialog.AcceptSave)

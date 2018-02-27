@@ -179,27 +179,33 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self.delete_workspace(scaled_bg_ws)
 
     def save_workspace(self, workspaces, path, save_name, extension):
+        '''
+        :param workspaces: list of workspaces to save
+        :param path: directory to save to
+        :param save_name: name to save the file as (plus file extension). Pass none to use workspace name
+        :param extension: file extension (such as .txt)
+        '''
         if extension == '.nxs':
-            save_method = self.save_nexus
+            save_method = self._save_nexus
         elif extension == '.txt':
-            save_method = self.save_ascii
+            save_method = self._save_ascii
         elif extension == '.mat':
-            save_method = self.save_matlab
+            save_method = self._save_matlab
         else:
             raise RuntimeError("unrecognised file extension")
         for workspace in workspaces:
-            save_as = save_name if save_name is not None else str(workspace)
-            path = os.path.join(str(path), save_as)
-            save_method(workspace, path)
+            save_as = save_name if save_name is not None else str(workspace) + extension
+            full_path = os.path.join(str(path), save_as)
+            save_method(workspace, full_path)
 
-    def save_nexus(self, workspace, path):
+    def _save_nexus(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace) or isinstance(workspace_handle, IMDHistoWorkspace):
             SaveMD(InputWorkspace=workspace, Filename=path)
         else:
             SaveNexus(InputWorkspace=workspace, Filename=path)
 
-    def save_ascii(self, workspace, path):
+    def _save_ascii(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace):
             raise RuntimeError("Cannot save MDEventWorkspace as ascii")
@@ -223,7 +229,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         out_data = np.c_[x, y, e]
         np.savetxt(str(output_path), out_data, fmt='%12.9e', header=header)
 
-    def save_matlab(self, workspace, path):
+    def _save_matlab(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace):
             raise RuntimeError("Cannot save MDEventWorkspace as Matlab file")
