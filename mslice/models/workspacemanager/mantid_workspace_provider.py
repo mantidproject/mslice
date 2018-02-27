@@ -18,6 +18,8 @@ from scipy import constants
 from scipy.io import savemat
 
 from .workspace_provider import WorkspaceProvider
+from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
+from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
 
 # -----------------------------------------------------------------------------
 # Classes and functions
@@ -208,7 +210,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def _save_ascii(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace):
-            raise RuntimeError("Cannot save MDEventWorkspace as ascii")
+            workspace = self.get_slice_MDHisto(workspace)
+            workspace_handle = self.get_workspace_handle(workspace)
         elif isinstance(workspace_handle, IMDHistoWorkspace):
             self._save_cut_to_ascii(workspace_handle, workspace, path)
         else:
@@ -232,7 +235,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def _save_matlab(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace):
-            raise RuntimeError("Cannot save MDEventWorkspace as Matlab file")
+            workspace = self.get_slice_MDHisto(workspace)
+            workspace_handle = self.get_workspace_handle(workspace)
         elif isinstance(workspace_handle, IMDHistoWorkspace):
             x, y, e = self.get_md_histo_xye(workspace_handle)
         else:
@@ -253,6 +257,15 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         units = header[header.find('along "'):header.find('" between')]
         CreateMDHistoWorkspace(SignalInput=y, ErrorInput=e, Dimensionality=1, Extents=extents, NumberOfBins=nbins,
                                Names='Dim1', Units=units, OutputWorkspace=ws_name)
+
+    def get_slice_MDHisto(self, workspace):
+        try:
+            self.get_workspace_handle('__' + workspace)
+        except KeyError:
+            slice_alg = MantidSliceAlgorithm()
+            slice_alg.compute_slice()
+            # need parameters
+            # insert magic from ws_limits here once defaults can be obtained from slice
 
     def get_md_histo_xye(self, histo_ws):
         dim = histo_ws.getDimension(0)
