@@ -18,6 +18,10 @@ from .workspace_provider import WorkspaceProvider
 # Classes and functions
 # -----------------------------------------------------------------------------
 
+# Defines some conversion factors
+E2q = 2. * constants.m_n / (constants.hbar ** 2)  # Energy to (neutron momentum)^2 (==2m_n/hbar^2)
+meV2J = constants.e / 1000.  # meV to Joules
+m2A = 1.e10  # metres to Angstrom
 
 class MantidWorkspaceProvider(WorkspaceProvider):
     def __init__(self):
@@ -49,7 +53,11 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
             minimum = dim.getMinimum()
             maximum = dim.getMaximum()
-            return minimum, maximum, (maximum - minimum) / 100.
+            if axis == 'MomentumTransfer':
+                step = (maximum - minimum) / 100
+            elif axis == 'DeltaE':
+                step = (maximum - minimum) / 100
+            return minimum, maximum, step
 
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""
@@ -70,41 +78,23 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         if efix is None:
             self._limits[ws_name] = {}
             return
-        en = ws_h.getAxis(0).extractValues()
-        # Defines some conversion factors
-        E2q = 2. * constants.m_n / (constants.hbar ** 2)  # Energy to (neutron momentum)^2 (==2m_n/hbar^2)
-        meV2J = constants.e / 1000.                       # meV to Joules
-        m2A = 1.e10                                       # metres to Angstrom
         if ws_name not in self._limits:
             self._limits[ws_name] = {}
-        theta = self._get_theta_for_limits(ws_h)
+        # if not (isinstance(ws_h, IMDHistoWorkspace) or isinstance(ws_h, IMDEventWorkspace)):
+        self.process_limits(ws_h, ws_name, efix)
+
+    def process_limits(self, ws, ws_name, efix):
+        en = ws.getAxis(0).extractValues()
+        theta = self._get_theta_for_limits(ws)
         # Use |Q| at elastic line to get minimum and step size
         qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
         # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
-        emax = -np.min(en) if (str(ws_h.getEMode()) == 'Direct') else np.max(en)
+        emax = -np.min(en) if (str(ws.getEMode()) == 'Direct') else np.max(en)
         qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
         self._limits[ws_name]['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep]
         self._limits[ws_name]['|Q|'] = self._limits[ws_name]['MomentumTransfer']  # ConvertToMD renames it(!)
         self._limits[ws_name]['Degrees'] = theta * 180 / np.pi
         self._limits[ws_name]['DeltaE'] = [np.min(en), np.max(en), np.mean(np.diff(en))]
-
-    def get_EFixed(self, ws_handle):
-        try:
-            efix = self._get_ws_EFixed(ws_handle, ws_handle.getDetector(0).getID())
-        except RuntimeError:  # Efixed not defined
-            # This could occur for malformed NXSPE without the instrument name set.
-            # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
-            if ws_handle.run().hasProperty('Ei'):
-                efix = ws_handle.run().getProperty('Ei').value
-            else:
-                return None
-        except AttributeError:  # Wrong workspace type (e.g. cut)
-            return None
-        # Checks that loaded data is in energy transfer.
-        enAxis = ws_handle.getAxis(0)
-        if 'DeltaE' not in enAxis.getUnit().unitID():
-            return None
-        return efix
 
     def _get_theta_for_limits(self, ws_handle):
         # Don't parse all spectra in cases where there are a lot to save time.
@@ -197,10 +187,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_EMode(self, workspace):
         """Returns the energy analysis mode (direct or indirect of a workspace)"""
-        if isinstance(workspace, str):
-            workspace_handle = self.get_workspace_handle(workspace)
-        else:
-            workspace_handle = workspace
+        workspace_handle = self.get_workspace_handle(workspace)
         emode = str(self._get_ws_EMode(workspace_handle))
         if emode == 'Elastic':
             # Work-around for older versions of Mantid which does not set instrument name
@@ -210,29 +197,45 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return emode
 
     def _get_ws_EMode(self, ws_handle):
-        if isinstance(ws_handle, IMDHistoWorkspace) or isinstance(ws_handle, IMDEventWorkspace):
-            def get_emode(e):
-                ws_handle.getExperimentInfo(e).getEMode()
-            return self._get_exp_info_using(ws_handle, get_emode, "Workspace contains different EModes")
-        else:
-            return ws_handle.getEMode()
+        try:
+            emode = ws_handle.getEMode()
+        except AttributeError: # workspace is not matrix workspace
+            try:
+                emode = self._get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEMode())
+            except ValueError:
+                raise ValueError("Workspace contains different EModes")
+        return emode
 
-    def _get_ws_EFixed(self, ws_handle, detector):
-        if isinstance(ws_handle, IMDHistoWorkspace) or isinstance(ws_handle, IMDEventWorkspace):
-            def get_efixed(e):
-                ws_handle.getExperimentInfo(e).getEFixed(detector)
-            return self._get_exp_info_using(ws_handle, get_efixed, "Workspace contains different EFixed values")
-        else:
-            return ws_handle.getEFixed(detector)
+    def get_EFixed(self, ws_handle):
+        try:
+            efix = self._get_ws_EFixed(ws_handle)
+        except RuntimeError:  # Efixed not defined
+            # This could occur for malformed NXSPE without the instrument name set.
+            # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
+            if ws_handle.run().hasProperty('Ei'):
+                efix = ws_handle.run().getProperty('Ei').value
+            else:
+                efix = None
+        return efix
 
-    def _get_exp_info_using(self, ws_handle, get_exp_info, error_string):
+    def _get_ws_EFixed(self, ws_handle):
+        try:
+            efixed = ws_handle.getEFixed(1)
+        except AttributeError: # workspace is not matrix workspace
+            try:
+                efixed = self._get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEFixed(1))
+            except ValueError:
+                raise ValueError("Workspace contains different EFixed values")
+        return efixed
+
+    def _get_exp_info_using(self, ws_handle, get_exp_info):
         """get data from MultipleExperimentInfo. Returns None if ExperimentInfo is not found"""
         prev = None
         for exp in range(ws_handle.getNumExperimentInfo()):
             exp_value = get_exp_info(exp)
             if prev is not None:
                 if exp_value != prev:
-                    raise ValueError(error_string)
+                    raise ValueError
             prev = exp_value
         return prev
 
