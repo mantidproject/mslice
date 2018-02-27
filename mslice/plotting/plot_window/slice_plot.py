@@ -1,6 +1,5 @@
 from functools import partial
 import six
-import os.path
 
 from mslice.util.qt import QtWidgets
 from mslice.util.qt.QtCore import Qt

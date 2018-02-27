@@ -73,7 +73,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         except RuntimeError as e:
             if e.message == "dialog cancelled":
                 return
-            else: raise RuntimeError(e)
+            else:
+                raise RuntimeError(e)
 
         if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
