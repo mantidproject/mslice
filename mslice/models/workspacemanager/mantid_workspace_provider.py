@@ -45,21 +45,17 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return ws
 
     def get_limits(self, workspace, axis):
-        """Determines the limits of the data and minimum step size"""
         if workspace not in self._limits:
             self._processLoadedWSLimits(workspace)
-        # If we cannot get the step size from the data, use the old 1/100 steps.
         if axis in self._limits[workspace]:
             return self._limits[workspace][axis]
         else:
+            # If we cannot get the step size from the data, use the old 1/100 steps.
             ws_h = self.get_workspace_handle(workspace)
             dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
             minimum = dim.getMinimum()
             maximum = dim.getMaximum()
-            if axis == 'MomentumTransfer':
-                step = (maximum - minimum) / 100
-            elif axis == 'DeltaE':
-                step = (maximum - minimum) / 100
+            step = (maximum - minimum) / 100
             return minimum, maximum, step
 
     def _processEfixed(self, workspace):
@@ -67,7 +63,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(ws_name)
         try:
-            [self._get_ws_EFixed(ws_h, ws_h.getDetector(i).getID()) for i in range(ws_h.getNumberHistograms())]
+            self._get_ws_EFixed(ws_h)
             self._EfDefined[ws_name] = True
         except RuntimeError:
             self._EfDefined[ws_name] = False
@@ -77,27 +73,45 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(workspace)
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
-        efix = self.get_EFixed(ws_h)
-        if efix is None:
-            self._limits[ws_name] = {}
-            return
         if ws_name not in self._limits:
             self._limits[ws_name] = {}
-        # if not (isinstance(ws_h, IMDHistoWorkspace) or isinstance(ws_h, IMDEventWorkspace)):
-        self.process_limits(ws_h, ws_name, efix)
+        efix = self.get_EFixed(ws_h)
+        if efix is None:
+            return
+        if isinstance(ws_h, IMDEventWorkspace):
+            self.process_limits_event(ws_h, ws_name, efix)
+        else:
+            self.process_limits(ws_h, ws_name, efix)
 
     def process_limits(self, ws, ws_name, efix):
         en = ws.getAxis(0).extractValues()
         theta = self._get_theta_for_limits(ws)
-        # Use |Q| at elastic line to get minimum and step size
-        qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
         # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
         emax = -np.min(en) if (str(ws.getEMode()) == 'Direct') else np.max(en)
+        qmin, qmax, qstep = self.get_q_limits(theta, emax, efix)
+        self.set_limits(ws_name, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
+
+    def process_limits_event(self, ws, ws_name, efix):
+        e_dim = ws.getDimension(ws.getDimensionIndexByName('DeltaE'))
+        emin  = e_dim.getMinimum()
+        emax = e_dim.getMaximum()
+        theta, ntheta = self._get_theta_for_limits_event(ws)
+        estep = (emax - emin) / (ws.getNEvents() / ntheta) # *approximation* of original number of histograms
+        emax_1 = -emin if (str(self.get_EMode(ws)) == 'Direct') else emax
+        qmin, qmax, qstep = self.get_q_limits(theta, emax_1, efix)
+        self.set_limits(ws_name, qmin, qmax, qstep, theta, emin, emax, estep)
+
+
+    def get_q_limits(self, theta, emax, efix):
+        qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
         qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
+        return qmin, qmax, qstep
+
+    def set_limits(self, ws_name, qmin, qmax, qstep, theta, emin, emax, estep):
         self._limits[ws_name]['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep]
         self._limits[ws_name]['|Q|'] = self._limits[ws_name]['MomentumTransfer']  # ConvertToMD renames it(!)
         self._limits[ws_name]['Degrees'] = theta * 180 / np.pi
-        self._limits[ws_name]['DeltaE'] = [np.min(en), np.max(en), np.mean(np.diff(en))]
+        self._limits[ws_name]['DeltaE'] = [emin, emax, estep]
 
     def _get_theta_for_limits(self, ws_handle):
         # Don't parse all spectra in cases where there are a lot to save time.
@@ -117,6 +131,22 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
         thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
         return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff>0)])])
+
+    def _get_theta_for_limits_event(self, ws):
+        spectrum_info = ws.getExperimentInfo(0).spectrumInfo()
+        theta = []
+        i = 0
+        while True:
+            try:
+                if not spectrum_info.isMonitor(i):
+                    theta.append(spectrum_info.twoTheta(i))
+                i += 1
+            except IndexError:
+                break
+        theta = np.unique(np.around(theta, 3))
+        round_fac = 100
+        thdiff = np.diff(np.round(np.sort(theta) * round_fac) / round_fac)
+        return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff > 0)])]), len(theta)
 
     def load(self, filename, output_workspace):
         ws = Load(Filename=filename, OutputWorkspace=output_workspace)
@@ -213,15 +243,18 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return emode
 
     def get_EFixed(self, ws_handle):
+        efix=None
         try:
             efix = self._get_ws_EFixed(ws_handle)
         except RuntimeError:  # Efixed not defined
             # This could occur for malformed NXSPE without the instrument name set.
             # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
-            if ws_handle.run().hasProperty('Ei'):
-                efix = ws_handle.run().getProperty('Ei').value
-            else:
-                efix = None
+            try:
+                if ws_handle.run().hasProperty('Ei'):
+                    efix = ws_handle.run().getProperty('Ei').value
+            except AttributeError:
+                if ws_handle.getExperimentInfo(0).run().hasProperty('Ei'):
+                    efix = ws_handle.getExperimentInfo(0).run().getProperty('Ei').value
         return efix
 
     def _get_ws_EFixed(self, ws_handle):
