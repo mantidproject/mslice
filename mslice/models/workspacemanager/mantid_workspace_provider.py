@@ -95,12 +95,31 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         e_dim = ws.getDimension(ws.getDimensionIndexByName('DeltaE'))
         emin  = e_dim.getMinimum()
         emax = e_dim.getMaximum()
-        theta, ntheta = self._get_theta_for_limits_event(ws)
-        estep = (emax - emin) / (ws.getNEvents() / ntheta) # *approximation* of original number of histograms
+        theta = self._get_theta_for_limits_event(ws)
+        estep = self._original_step_size(ws)
         emax_1 = -emin if (str(self.get_EMode(ws)) == 'Direct') else emax
         qmin, qmax, qstep = self.get_q_limits(theta, emax_1, efix)
+        qstep = qstep / 3 # mirrors powder projection which also divides step by 3
         self.set_limits(ws_name, qmin, qmax, qstep, theta, emin, emax, estep)
 
+    def _original_step_size(self, workspace):
+        rebin_history = self._get_algorithm_history("Rebin", workspace.getHistory())
+        params_history = self._get_property_from_history("Params", rebin_history)
+        return float(params_history.value().split(',')[1])
+
+    def _get_algorithm_history(self, name, workspace_history):
+        histories = workspace_history.getAlgorithmHistories()
+
+        for history in reversed(histories):
+            if history.name() == name:
+                return history
+        return None
+
+    def _get_property_from_history(self, name, history):
+        for property in history.getProperties():
+            if property.name() == name:
+                return property
+        return None
 
     def get_q_limits(self, theta, emax, efix):
         qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
@@ -112,6 +131,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         self._limits[ws_name]['|Q|'] = self._limits[ws_name]['MomentumTransfer']  # ConvertToMD renames it(!)
         self._limits[ws_name]['Degrees'] = theta * 180 / np.pi
         self._limits[ws_name]['DeltaE'] = [emin, emax, estep]
+        print(self._limits[ws_name])
 
     def _get_theta_for_limits(self, ws_handle):
         # Don't parse all spectra in cases where there are a lot to save time.
@@ -143,10 +163,10 @@ class MantidWorkspaceProvider(WorkspaceProvider):
                 i += 1
             except IndexError:
                 break
-        theta = np.unique(np.around(theta, 3))
+        theta = np.unique(theta)
         round_fac = 100
         thdiff = np.diff(np.round(np.sort(theta) * round_fac) / round_fac)
-        return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff > 0)])]), len(theta)
+        return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff > 0)])])
 
     def load(self, filename, output_workspace):
         ws = Load(Filename=filename, OutputWorkspace=output_workspace)
