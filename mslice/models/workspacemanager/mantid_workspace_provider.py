@@ -258,7 +258,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def get_slice_MDHisto(self, workspace, ws_name):
         from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
         try:
-           return self.get_workspace_handle('__' + ws_name)
+            return self.get_workspace_handle('__' + ws_name)
         except KeyError:
             slice_alg = MantidSliceAlgorithm()
             x_axis = self.get_axis_from_dimension(workspace, ws_name, 0)
