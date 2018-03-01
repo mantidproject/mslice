@@ -89,7 +89,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
         emax = -np.min(en) if (str(ws.getEMode()) == 'Direct') else np.max(en)
         qmin, qmax, qstep = self.get_q_limits(theta, emax, efix)
-        qstep = qstep / 3 # Use a step size a bit smaller than angular spacing so user can rebin if they want...
         self.set_limits(ws_name, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
 
     def process_limits_event(self, ws, ws_name, efix):
@@ -100,7 +99,6 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         estep = self._original_step_size(ws)
         emax_1 = -emin if (str(self.get_EMode(ws)) == 'Direct') else emax
         qmin, qmax, qstep = self.get_q_limits(theta, emax_1, efix)
-        qstep = qstep / 3  # Use a step size a bit smaller than angular spacing so user can rebin if they want...
         self.set_limits(ws_name, qmin, qmax, qstep, theta, emin, emax, estep)
 
     def _original_step_size(self, workspace):
@@ -128,11 +126,11 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return qmin, qmax, qstep
 
     def set_limits(self, ws_name, qmin, qmax, qstep, theta, emin, emax, estep):
-        self._limits[ws_name]['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep]
+        # Use a step size a bit smaller than angular spacing ( / 3) so user can rebin if they want...
+        self._limits[ws_name]['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep / 3]
         self._limits[ws_name]['|Q|'] = self._limits[ws_name]['MomentumTransfer']  # ConvertToMD renames it(!)
         self._limits[ws_name]['Degrees'] = theta * 180 / np.pi
         self._limits[ws_name]['DeltaE'] = [emin, emax, estep]
-        print(self._limits[ws_name])
 
     def _get_theta_for_limits(self, ws_handle):
         # Don't parse all spectra in cases where there are a lot to save time.
