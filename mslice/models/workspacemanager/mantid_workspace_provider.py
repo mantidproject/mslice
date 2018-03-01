@@ -18,8 +18,7 @@ from scipy import constants
 from scipy.io import savemat
 
 from .workspace_provider import WorkspaceProvider
-from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
-from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
+from mslice.presenters.slice_plotter_presenter import Axis
 
 # -----------------------------------------------------------------------------
 # Classes and functions
@@ -210,9 +209,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def _save_ascii(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace):
-            workspace = self.get_slice_MDHisto(workspace)
-            workspace_handle = self.get_workspace_handle(workspace)
-        elif isinstance(workspace_handle, IMDHistoWorkspace):
+            workspace_handle = self.get_slice_MDHisto(workspace_handle, workspace)
+        if isinstance(workspace_handle, IMDHistoWorkspace):
             self._save_cut_to_ascii(workspace_handle, workspace, path)
         else:
             SaveAscii(InputWorkspace=workspace, Filename=path)
@@ -235,9 +233,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def _save_matlab(self, workspace, path):
         workspace_handle = self.get_workspace_handle(workspace)
         if isinstance(workspace_handle, IMDEventWorkspace):
-            workspace = self.get_slice_MDHisto(workspace)
-            workspace_handle = self.get_workspace_handle(workspace)
-        elif isinstance(workspace_handle, IMDHistoWorkspace):
+            workspace_handle = self.get_slice_MDHisto(workspace_handle, workspace)
+        if isinstance(workspace_handle, IMDHistoWorkspace):
             x, y, e = self.get_md_histo_xye(workspace_handle)
         else:
             x = workspace_handle.extractX()
@@ -258,14 +255,22 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         CreateMDHistoWorkspace(SignalInput=y, ErrorInput=e, Dimensionality=1, Extents=extents, NumberOfBins=nbins,
                                Names='Dim1', Units=units, OutputWorkspace=ws_name)
 
-    def get_slice_MDHisto(self, workspace):
+    def get_slice_MDHisto(self, workspace, ws_name):
+        from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
         try:
-            self.get_workspace_handle('__' + workspace)
+           return self.get_workspace_handle('__' + ws_name)
         except KeyError:
             slice_alg = MantidSliceAlgorithm()
-            slice_alg.compute_slice()
-            # need parameters
-            # insert magic from ws_limits here once defaults can be obtained from slice
+            x_axis = self.get_axis_from_dimension(workspace, ws_name, 0)
+            y_axis = self.get_axis_from_dimension(workspace, ws_name, 1)
+            slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
+            return self.get_workspace_handle('__' + ws_name)
+
+
+    def get_axis_from_dimension(self, workspace, ws_name, id):
+        dim = workspace.getDimension(id).getName()
+        min, max, step = self._limits[ws_name][dim]
+        return Axis(dim, min, max, step)
 
     def get_md_histo_xye(self, histo_ws):
         dim = histo_ws.getDimension(0)

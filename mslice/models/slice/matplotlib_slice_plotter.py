@@ -26,7 +26,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
                    colourmap):
         sample_temp = self._slice_algorithm.sample_temperature(selected_ws, self._sample_temp_fields)
         plot_data, boundaries = self._slice_algorithm.compute_slice(selected_ws, x_axis, y_axis,
-                                                                    smoothing, norm_to_one)
+                                                                    norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._cache_slice(plot_data, selected_ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis)
         if selected_ws not in self.overplot_lines:
