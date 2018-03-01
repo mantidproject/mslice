@@ -8,8 +8,6 @@ import os.path as path
 import matplotlib.colors as colors
 from matplotlib.lines import Line2D
 
-from mantid.simpleapi import AnalysisDataService
-
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
 from .interactive_cut import InteractiveCut
@@ -255,15 +253,19 @@ class SlicePlot(object):
         return True
 
     def ask_sample_temperature_field(self, ws_name):
-        ws = AnalysisDataService[ws_name]
+        ws = self._slice_plotter.workspace_provider.get_workspace_handle(ws_name)
+        try:
+            keys = ws.run().keys()
+        except AttributeError:
+            keys = ws.getExperimentInfo(0).run().keys()
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
                                                              'Sample Temperature not found. Select the sample ' +
                                                              'temperature field or enter a value in Kelvin:',
-                                                             ws.run().keys())
+                                                             keys)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
-            return str(temp_field), temp_field in ws.run().keys()
+            return str(temp_field), temp_field in keys
 
     def _update_lines(self):
         """ Updates the powder/recoil overplots lines when intensity type changes """

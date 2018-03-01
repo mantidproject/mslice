@@ -109,6 +109,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
                 sample_temp = ws.run().getLogData(field_name).value
             except RuntimeError:
                 pass
+            except AttributeError:
+                sample_temp = ws.getExperimentInfo(0).run().getLogData(field_name).value
         try:
             float(sample_temp)
         except (ValueError, TypeError):
