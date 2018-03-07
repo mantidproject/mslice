@@ -132,7 +132,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return sample_temp
 
     def compute_recoil_line(self, ws_name, axis, relative_mass=1):
-        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
+        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
         x_axis = np.arange(axis.start, axis.end, axis.step)
         if axis.units == 'MomentumTransfer':
             momentum_transfer = x_axis
@@ -140,7 +140,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
                 (constants.elementary_charge / 1000)
         elif axis.units == 'Degrees':
             tth = x_axis * np.pi / 180.
-            if 'Direct' in self._workspace_provider.get_EMode(self._workspace_provider.get_parent_by_name(ws_name)):
+            if 'Direct' in self._workspace_provider.get_EMode(self._workspace_provider.get_workspace_handle(ws_name)):
                 line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass + 1 - np.cos(tth))
             else:
                 line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass - 1 + np.cos(tth))
