@@ -10,6 +10,11 @@ from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 
+def output_workspace_name(selected_workspace, integration_start, integration_end):
+    return selected_workspace + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
+        integration_end) + ")"
+
+
 class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
@@ -49,7 +54,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         return x, plot_data, errors
 
     def compute_cut(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
-        input_workspace_name = selected_workspace
+        out_ws_name = output_workspace_name(selected_workspace, integration_start, integration_end)
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         self._fill_in_missing_input(cut_axis, selected_workspace)
         n_steps = self._get_number_of_steps(cut_axis)
@@ -58,9 +63,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
 
-        output_ws_name = input_workspace_name + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
-            integration_end) + ")"
-        cut = BinMD(selected_workspace, OutputWorkspace=output_ws_name, AxisAligned="1",
+        cut = BinMD(selected_workspace, OutputWorkspace=out_ws_name, AxisAligned="1",
                     AlignedDim1=integration_binning, AlignedDim0=cut_binning)
         if is_norm:
             self._normalize_workspace(cut)

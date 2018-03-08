@@ -33,7 +33,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self.overplot_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
         plt.gcf().canvas.set_window_title(selected_ws)
-        plt.gcf().canvas.manager.add_slice_plot(self)
+        plt.gcf().canvas.manager.add_slice_plot(self, selected_ws)
         plt.gcf().canvas.manager.update_grid()
         plt.draw_all()
 

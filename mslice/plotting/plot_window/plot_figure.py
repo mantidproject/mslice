@@ -78,19 +78,19 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
 
         self.show()  # is not a good idea in non interactive mode
 
-    def add_slice_plot(self, slice_plotter):
+    def add_slice_plot(self, slice_plotter, workspace):
         if self._plot_handler is None:
             self.move_window(-self.width() / 2, 0)
         else:
             self._plot_handler.disconnect(self)
-        self._plot_handler = SlicePlot(self, self.canvas, slice_plotter)
+        self._plot_handler = SlicePlot(self, self.canvas, slice_plotter, workspace)
 
-    def add_cut_plot(self, cut_plotter):
+    def add_cut_plot(self, cut_plotter, workspace):
         if self._plot_handler is None:
             self.move_window(self.width() / 2, 0)
         else:
             self._plot_handler.disconnect(self)
-        self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
+        self._plot_handler = CutPlot(self, self.canvas, cut_plotter, workspace)
 
     def is_icut(self, is_icut):
         self._plot_handler.is_icut(is_icut)
@@ -142,13 +142,15 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
             painter.end()
 
     def save_plot(self):
-        file_path, save_name, ext = get_save_directory(multiple_files=False, save_as_image=True)
-        title = self._plot_handler.title
+        file_path, save_name, ext = get_save_directory(save_as_image=True)
+        workspace = self._plot_handler.ws_name
         try:
-            self._plot_handler.workspace_provider().save_workspace(title, file_path, save_name, ext)
+            self._plot_handler.workspace_provider().save_workspace([workspace], file_path, save_name, ext)
         except RuntimeError as e:
             if e.message == "unrecognised file extension":
                 self.save_image(os.path.join(file_path, save_name))
+            elif e.message == "dialog cancelled":
+                pass
             else:
                 raise RuntimeError(e)
 
