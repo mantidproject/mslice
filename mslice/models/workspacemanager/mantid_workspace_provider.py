@@ -262,7 +262,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return emode
 
     def get_EFixed(self, ws_handle):
-        efix=None
+        efix = np.nan
         try:
             efix = self._get_ws_EFixed(ws_handle)
         except RuntimeError:  # Efixed not defined
@@ -278,7 +278,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def _get_ws_EFixed(self, ws_handle):
         try:
-            efixed = ws_handle.getEFixed(1)
+            efixed = ws_handle.getEFixed(ws_handle.getDetector(0).getID())
         except AttributeError: # workspace is not matrix workspace
             try:
                 efixed = self._get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEFixed(1))
