@@ -9,10 +9,10 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 from six import string_types
 
-from mantid.simpleapi import (AnalysisDataService, CreateMDHistoWorkspace, DeleteWorkspace, Load, Scale, SaveAscii,
-                              RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
+from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
+                              RenameWorkspace, MergeMD, MergeRuns, Minus)
 
-from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
+from mantid.api import IMDEventWorkspace, Workspace
 from .file_io import save_ascii, save_matlab, save_nexus
 import numpy as np
 from scipy import constants
