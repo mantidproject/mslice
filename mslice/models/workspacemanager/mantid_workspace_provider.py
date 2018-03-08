@@ -13,9 +13,9 @@ from mantid.simpleapi import (AnalysisDataService, CreateMDHistoWorkspace, Delet
                               RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
 
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
+from .file_io import save_ascii, save_matlab, save_nexus
 import numpy as np
 from scipy import constants
-from scipy.io import savemat
 
 from .workspace_provider import WorkspaceProvider
 
@@ -33,6 +33,13 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_workspace_names(self):
         return AnalysisDataService.getObjectNames()
+
+    def get_workspace_handle(self, workspace_name):
+        """"Return handle to workspace given workspace_name_as_string"""
+        # if passed a workspace handle return the handle
+        if isinstance(workspace_name, Workspace):
+            return workspace_name
+        return AnalysisDataService[str(workspace_name)]
 
     def delete_workspace(self, workspace):
         ws = DeleteWorkspace(Workspace=workspace)
@@ -186,95 +193,23 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         :param extension: file extension (such as .txt)
         '''
         if extension == '.nxs':
-            save_method = self._save_nexus
+            save_method = save_nexus
         elif extension == '.txt':
-            save_method = self._save_ascii
+            save_method = save_ascii
         elif extension == '.mat':
-            save_method = self._save_matlab
+            save_method = save_matlab
         else:
             raise RuntimeError("unrecognised file extension")
         for workspace in workspaces:
             save_as = save_name if save_name is not None else str(workspace) + extension
             full_path = os.path.join(str(path), save_as)
+            workspace = self.get_workspace_handle(workspace)
             save_method(workspace, full_path)
-
-    def _save_nexus(self, workspace, path):
-        workspace_handle = self.get_workspace_handle(workspace)
-        if isinstance(workspace_handle, IMDEventWorkspace) or isinstance(workspace_handle, IMDHistoWorkspace):
-            SaveMD(InputWorkspace=workspace, Filename=path)
-        else:
-            SaveNexus(InputWorkspace=workspace, Filename=path)
-
-    def _save_ascii(self, workspace, path):
-        workspace_handle = self.get_workspace_handle(workspace)
-        if isinstance(workspace_handle, IMDEventWorkspace):
-            raise RuntimeError("Cannot save MDEventWorkspace as ascii")
-        elif isinstance(workspace_handle, IMDHistoWorkspace):
-            self._save_cut_to_ascii(workspace_handle, workspace, path)
-        else:
-            SaveAscii(InputWorkspace=workspace, Filename=path)
-
-    def _save_cut_to_ascii(self, workspace, ws_name, output_path):
-        # get integration ranges from the name
-        int_ranges = ws_name[ws_name.find('('):]
-        int_start = int_ranges[1:int_ranges.find(',')]
-        int_end = int_ranges[int_ranges.find(',')+1:-1]
-        ws_name = ws_name[:ws_name.find('_cut')]
-
-        dim = workspace.getDimension(0)
-        units = dim.getUnits()
-
-        x, y, e = self.get_md_histo_xye(workspace)
-        header = 'MSlice Cut of workspace "%s" along "%s" between %s and %s' % (ws_name, units, int_start, int_end)
-        out_data = np.c_[x, y, e]
-        np.savetxt(str(output_path), out_data, fmt='%12.9e', header=header)
-
-    def _save_matlab(self, workspace, path):
-        workspace_handle = self.get_workspace_handle(workspace)
-        if isinstance(workspace_handle, IMDEventWorkspace):
-            raise RuntimeError("Cannot save MDEventWorkspace as Matlab file")
-        elif isinstance(workspace_handle, IMDHistoWorkspace):
-            x, y, e = self.get_md_histo_xye(workspace_handle)
-        else:
-            x = workspace_handle.extractX()
-            y = workspace_handle.extractY()
-            e = workspace_handle.extractE()
-        mdict = {'x': x, 'y': y, 'e': e}
-        savemat(path, mdict=mdict)
-
-    def load_from_ascii(self, file_path, ws_name):
-        file = open(file_path, 'r')
-        header = file.readline()
-        if not header.startswith("# MSlice Cut"):
-            raise ValueError
-        x, y, e = np.loadtxt(file).transpose()
-        extents = str(np.min(x)) + ',' + str(np.max(x))
-        nbins = len(x)
-        units = header[header.find('along "'):header.find('" between')]
-        CreateMDHistoWorkspace(SignalInput=y, ErrorInput=e, Dimensionality=1, Extents=extents, NumberOfBins=nbins,
-                               Names='Dim1', Units=units, OutputWorkspace=ws_name)
-
-    def get_md_histo_xye(self, histo_ws):
-        dim = histo_ws.getDimension(0)
-        start = dim.getMinimum()
-        end = dim.getMaximum()
-        step = dim.getBinWidth()
-        x = np.arange(start, end, step)
-        y = histo_ws.getSignalArray()
-        e = np.sqrt(histo_ws.getErrorSquaredArray())
-        return x, y, e
 
     def is_pixel_workspace(self, workspace_name):
         from mantid.api import IMDEventWorkspace
         workspace = self.get_workspace_handle(workspace_name)
         return isinstance(workspace, IMDEventWorkspace)
-
-    def get_workspace_handle(self, workspace_name):
-        """"Return handle to workspace given workspace_name_as_string"""
-        # if passed a workspace handle return the handle
-        if isinstance(workspace_name, Workspace):
-            return workspace_name
-        return AnalysisDataService[str(workspace_name)]
 
     def get_parent_by_name(self, ws_name):
         if not isinstance(ws_name, string_types):

@@ -2,9 +2,11 @@ from __future__ import (absolute_import, division, print_function)
 from six import string_types
 
 from mslice.widgets.workspacemanager.command import Command
+from mslice.models.workspacemanager.file_io import get_save_directory
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
+
 
 
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
@@ -68,8 +70,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
 
         try:
-            save_directory, save_name, extension = self._workspace_manager_view.get_save_directory(
-                len(selected_workspaces) > 1, extension)
+            save_directory, save_name, extension = get_save_directory(len(selected_workspaces) > 1, extension)
         except RuntimeError as e:
             if e.message == "dialog cancelled":
                 return

@@ -4,6 +4,7 @@ import os
 
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
+from mslice.models.workspacemanager.file_io import load_from_ascii
 
 class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
 
@@ -34,7 +35,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
             else:
                 try:
                     if file_paths[i].endswith('.txt'):
-                        self._workspace_provider.load_from_ascii(file_paths[i], ws_name)
+                        load_from_ascii(file_paths[i], ws_name)
                     else:
                         self._workspace_provider.load(filename=file_paths[i], output_workspace=ws_name)
                 except ValueError as e:
