@@ -81,7 +81,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False,
-                                                             default_ext='.nxs')
+                                              default_ext='.nxs')
         self.workspace_provider.save_workspace.assert_called_once_with(
             [workspace_to_save], path_to_save_to, 'file1', '.nxs')
 
