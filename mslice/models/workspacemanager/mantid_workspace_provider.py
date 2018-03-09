@@ -9,78 +9,24 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 from six import string_types
 
-from mantid.simpleapi import (AnalysisDataService, CreateMDHistoWorkspace, DeleteWorkspace, Load, Scale, SaveAscii,
-                              RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
+from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
+                              RenameWorkspace, MergeMD, MergeRuns, Minus)
 
-from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
+from mantid.api import IMDEventWorkspace, Workspace
+from .file_io import save_ascii, save_matlab, save_nexus
 import numpy as np
 from scipy import constants
-from scipy.io import savemat
 
 from .workspace_provider import WorkspaceProvider
-from mslice.presenters.slice_plotter_presenter import Axis
 
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
 
-def _output_data_to_ascii(output_path, out_data, header):
-    np.savetxt(str(output_path), out_data, fmt='%12.9e', header=header)
-
-
-def _get_mdhisto_xye(histo_ws):
-    dim = histo_ws.getDimension(0)
-    start = dim.getMinimum()
-    end = dim.getMaximum()
-    step = dim.getBinWidth()
-    x = np.arange(start, end, step)
-    y = histo_ws.getSignalArray()
-    e = np.sqrt(histo_ws.getErrorSquaredArray())
-    return x, y, e
-
-
-def _get_slice_mdhisto_xye(histo_ws):
-    dim_sz = [histo_ws.getDimension(i).getNBins() for i in range(histo_ws.getNumDims())]
-    nz_dim = [i for i, v in enumerate(dim_sz) if v > 1]
-    numdim = len(nz_dim)
-    x = []
-    for i in nz_dim:
-        dim = histo_ws.getDimension(i)
-        start = dim.getMinimum()
-        end = dim.getMaximum()
-        nshape = [1] * numdim
-        nshape[i] = dim_sz[i]
-        x.append(np.reshape(np.linspace(start, end, dim_sz[i]), tuple(nshape)))
-    y = histo_ws.getSignalArray()
-    e = np.sqrt(histo_ws.getErrorSquaredArray())
-    nbins = np.prod(dim_sz)
-    x = [np.reshape(x0, nbins) for x0 in np.broadcast_arrays(*x)]
-    y = np.reshape(y, nbins)
-    e = np.reshape(e, nbins)
-    return x, y, e
-
-
-def _save_cut_to_ascii(workspace, ws_name, output_path):
-    # get integration ranges from the name
-    int_ranges = ws_name[ws_name.find('('):]
-    int_start = int_ranges[1:int_ranges.find(',')]
-    int_end = int_ranges[int_ranges.find(',')+1:-1]
-    ws_name = ws_name[:ws_name.find('_cut')]
-
-    dim = workspace.getDimension(0)
-    units = dim.getUnits()
-
-    x, y, e = _get_mdhisto_xye(workspace)
-    header = 'MSlice Cut of workspace "%s" along "%s" between %s and %s' % (ws_name, units, int_start, int_end)
-    out_data = np.c_[x, y, e]
-    _output_data_to_ascii(output_path, out_data, header)
-
-
-def _save_slice_to_ascii(workspace, output_path):
-    header = 'MSlice Slice of workspace "%s"' % (workspace.name())
-    x, y, e = _get_slice_mdhisto_xye(workspace)
-    out_data = np.column_stack(tuple(x+[y, e]))
-    _output_data_to_ascii(output_path, out_data, header)
+# Defines some conversion factors
+E2q = 2. * constants.m_n / (constants.hbar ** 2)  # Energy to (neutron momentum)^2 (==2m_n/hbar^2)
+meV2J = constants.e / 1000.  # meV to Joules
+m2A = 1.e10  # metres to Angstrom
 
 
 class MantidWorkspaceProvider(WorkspaceProvider):
@@ -93,6 +39,13 @@ class MantidWorkspaceProvider(WorkspaceProvider):
     def get_workspace_names(self):
         return AnalysisDataService.getObjectNames()
 
+    def get_workspace_handle(self, workspace_name):
+        """"Return handle to workspace given workspace_name_as_string"""
+        # if passed a workspace handle return the handle
+        if isinstance(workspace_name, Workspace):
+            return workspace_name
+        return AnalysisDataService[str(workspace_name)]
+
     def delete_workspace(self, workspace):
         ws = DeleteWorkspace(Workspace=workspace)
         if workspace in self._EfDefined:
@@ -102,25 +55,25 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return ws
 
     def get_limits(self, workspace, axis):
-        """Determines the limits of the data and minimum step size"""
         if workspace not in self._limits:
             self._processLoadedWSLimits(workspace)
-        # If we cannot get the step size from the data, use the old 1/100 steps.
         if axis in self._limits[workspace]:
             return self._limits[workspace][axis]
         else:
+            # If we cannot get the step size from the data, use the old 1/100 steps.
             ws_h = self.get_workspace_handle(workspace)
             dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
             minimum = dim.getMinimum()
             maximum = dim.getMaximum()
-            return minimum, maximum, (maximum - minimum) / 100.
+            step = (maximum - minimum) / 100
+            return minimum, maximum, step
 
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""
         ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(ws_name)
         try:
-            [self._get_ws_EFixed(ws_h, ws_h.getDetector(i).getID()) for i in range(ws_h.getNumberHistograms())]
+            self._get_ws_EFixed(ws_h)
             self._EfDefined[ws_name] = True
         except RuntimeError:
             self._EfDefined[ws_name] = False
@@ -130,48 +83,67 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(workspace)
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
-        efix = self.get_EFixed(ws_h)
-        if efix is None:
-            self._limits[ws_name] = {}
-            return
-        en = ws_h.getAxis(0).extractValues()
-        # Defines some conversion factors
-        E2q = 2. * constants.m_n / (constants.hbar ** 2)  # Energy to (neutron momentum)^2 (==2m_n/hbar^2)
-        meV2J = constants.e / 1000.                       # meV to Joules
-        m2A = 1.e10                                       # metres to Angstrom
         if ws_name not in self._limits:
             self._limits[ws_name] = {}
-        theta = self._get_theta_for_limits(ws_h)
-        # Use |Q| at elastic line to get minimum and step size
-        qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
+        efix = self.get_EFixed(ws_h)
+        if efix is None:
+            return
+        if isinstance(ws_h, IMDEventWorkspace):
+            self.process_limits_event(ws_h, ws_name, efix)
+        else:
+            self.process_limits(ws_h, ws_name, efix)
+
+    def process_limits(self, ws, ws_name, efix):
+        en = ws.getAxis(0).extractValues()
+        theta = self._get_theta_for_limits(ws)
         # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
-        emax = -np.min(en) if (str(ws_h.getEMode()) == 'Direct') else np.max(en)
+        emax = -np.min(en) if (str(ws.getEMode()) == 'Direct') else np.max(en)
+        qmin, qmax, qstep = self.get_q_limits(theta, emax, efix)
+        self.set_limits(ws_name, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
+
+    def process_limits_event(self, ws, ws_name, efix):
+        e_dim = ws.getDimension(ws.getDimensionIndexByName('DeltaE'))
+        emin  = e_dim.getMinimum()
+        emax = e_dim.getMaximum()
+        theta = self._get_theta_for_limits_event(ws)
+        estep = self._original_step_size(ws)
+        emax_1 = -emin if (str(self.get_EMode(ws)) == 'Direct') else emax
+        qmin, qmax, qstep = self.get_q_limits(theta, emax_1, efix)
+        self.set_limits(ws_name, qmin, qmax, qstep, theta, emin, emax, estep)
+
+    def _original_step_size(self, workspace):
+        rebin_history = self._get_algorithm_history("Rebin", workspace.getHistory())
+        params_history = self._get_property_from_history("Params", rebin_history)
+        return float(params_history.value().split(',')[1])
+
+    def _get_algorithm_history(self, name, workspace_history):
+        histories = workspace_history.getAlgorithmHistories()
+
+        for history in reversed(histories):
+            if history.name() == name:
+                return history
+        return None
+
+    def _get_property_from_history(self, name, history):
+        for property in history.getProperties():
+            if property.name() == name:
+                return property
+        return None
+
+    def get_q_limits(self, theta, emax, efix):
+        qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
         qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
-        self._limits[ws_name]['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep]
+        return qmin, qmax, qstep
+
+    def set_limits(self, ws_name, qmin, qmax, qstep, theta, emin, emax, estep):
+        # Use a step size a bit smaller than angular spacing ( / 3) so user can rebin if they want...
+        self._limits[ws_name]['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep / 3]
         self._limits[ws_name]['|Q|'] = self._limits[ws_name]['MomentumTransfer']  # ConvertToMD renames it(!)
         self._limits[ws_name]['Degrees'] = theta * 180 / np.pi
-        self._limits[ws_name]['DeltaE'] = [np.min(en), np.max(en), np.mean(np.diff(en))]
-
-    def get_EFixed(self, ws_handle):
-        try:
-            efix = self._get_ws_EFixed(ws_handle, ws_handle.getDetector(0).getID())
-        except RuntimeError:  # Efixed not defined
-            # This could occur for malformed NXSPE without the instrument name set.
-            # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
-            if ws_handle.run().hasProperty('Ei'):
-                efix = ws_handle.run().getProperty('Ei').value
-            else:
-                return None
-        except AttributeError:  # Wrong workspace type (e.g. cut)
-            return None
-        # Checks that loaded data is in energy transfer.
-        enAxis = ws_handle.getAxis(0)
-        if 'DeltaE' not in enAxis.getUnit().unitID():
-            return None
-        return efix
+        self._limits[ws_name]['DeltaE'] = [emin, emax, estep]
 
     def _get_theta_for_limits(self, ws_handle):
-        # Don't parse all spectra in cases where there are alot to save time.
+        # Don't parse all spectra in cases where there are a lot to save time.
         num_hist = ws_handle.getNumberHistograms()
         if num_hist > 1000:
             n_segments = 5
@@ -188,6 +160,22 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
         thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
         return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff>0)])])
+
+    def _get_theta_for_limits_event(self, ws):
+        spectrum_info = ws.getExperimentInfo(0).spectrumInfo()
+        theta = []
+        i = 0
+        while True:
+            try:
+                if not spectrum_info.isMonitor(i):
+                    theta.append(spectrum_info.twoTheta(i))
+                i += 1
+            except IndexError:
+                break
+        theta = np.unique(theta)
+        round_fac = 100
+        thdiff = np.diff(np.round(np.sort(theta) * round_fac) / round_fac)
+        return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff > 0)])])
 
     def load(self, filename, output_workspace):
         ws = Load(Filename=filename, OutputWorkspace=output_workspace)
@@ -245,96 +233,23 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         :param extension: file extension (such as .txt)
         '''
         if extension == '.nxs':
-            save_method = self._save_nexus
+            save_method = save_nexus
         elif extension == '.txt':
-            save_method = self._save_ascii
+            save_method = save_ascii
         elif extension == '.mat':
-            save_method = self._save_matlab
+            save_method = save_matlab
         else:
             raise RuntimeError("unrecognised file extension")
         for workspace in workspaces:
             save_as = save_name if save_name is not None else str(workspace) + extension
             full_path = os.path.join(str(path), save_as)
+            workspace = self.get_workspace_handle(workspace)
             save_method(workspace, full_path)
-
-    def _save_nexus(self, workspace, path):
-        workspace_handle = self.get_workspace_handle(workspace)
-        if isinstance(workspace_handle, IMDEventWorkspace) or isinstance(workspace_handle, IMDHistoWorkspace):
-            SaveMD(InputWorkspace=workspace, Filename=path)
-        else:
-            SaveNexus(InputWorkspace=workspace, Filename=path)
-
-    def _save_ascii(self, workspace, path):
-        workspace_handle = self.get_workspace_handle(workspace)
-        if isinstance(workspace_handle, IMDEventWorkspace):
-            workspace_handle = self._get_slice_mdhisto(workspace_handle, workspace)
-            _save_slice_to_ascii(workspace_handle, path)
-        elif isinstance(workspace_handle, IMDHistoWorkspace):
-            _save_cut_to_ascii(workspace_handle, workspace, path)
-        else:
-            SaveAscii(InputWorkspace=workspace, Filename=path)
-
-    def _save_matlab(self, workspace, path):
-        workspace_handle = self.get_workspace_handle(workspace)
-        if isinstance(workspace_handle, IMDEventWorkspace):
-            workspace_handle = self._get_slice_mdhisto(workspace_handle, workspace)
-            x, y, e  = _get_slice_mdhisto_xye(workspace_handle)
-        elif isinstance(workspace_handle, IMDHistoWorkspace):
-            x, y, e = _get_mdhisto_xye(workspace_handle)
-        else:
-            x = workspace_handle.extractX()
-            y = workspace_handle.extractY()
-            e = workspace_handle.extractE()
-        savemat(path, mdict={'x': x, 'y': y, 'e': e})
-
-    def load_from_ascii(self, file_path, ws_name):
-        file = open(file_path, 'r')
-        header = file.readline()
-        if not header.startswith("# MSlice Cut"):
-            raise ValueError
-        x, y, e = np.loadtxt(file).transpose()
-        extents = str(np.min(x)) + ',' + str(np.max(x))
-        nbins = len(x)
-        units = header[header.find('along "'):header.find('" between')]
-        CreateMDHistoWorkspace(SignalInput=y, ErrorInput=e, Dimensionality=1, Extents=extents, NumberOfBins=nbins,
-                               Names='Dim1', Units=units, OutputWorkspace=ws_name)
-
-    def _get_slice_mdhisto(self, workspace, ws_name):
-        from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-        try:
-            return self.get_workspace_handle('__' + ws_name)
-        except KeyError:
-            slice_alg = MantidSliceAlgorithm()
-            x_axis = self.get_axis_from_dimension(workspace, ws_name, 0)
-            y_axis = self.get_axis_from_dimension(workspace, ws_name, 1)
-            slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
-            return self.get_workspace_handle('__' + ws_name)
-
-    def get_axis_from_dimension(self, workspace, ws_name, id):
-        dim = workspace.getDimension(id).getName()
-        min, max, step = self._limits[ws_name][dim]
-        return Axis(dim, min, max, step)
 
     def is_pixel_workspace(self, workspace_name):
         from mantid.api import IMDEventWorkspace
         workspace = self.get_workspace_handle(workspace_name)
         return isinstance(workspace, IMDEventWorkspace)
-
-    def get_workspace_handle(self, workspace_name):
-        """"Return handle to workspace given workspace_name_as_string"""
-        # if passed a workspace handle return the handle
-        if isinstance(workspace_name, Workspace):
-            return workspace_name
-        return AnalysisDataService[str(workspace_name)]
-
-    def get_parent_by_name(self, ws_name):
-        if not isinstance(ws_name, string_types):
-            ws_name = str(ws_name)
-        suffixes = ('_QE', '_EQ', '_ETh', '_ThE')
-        if ws_name.endswith(suffixes):
-            return self.get_workspace_handle(ws_name.rsplit('_', 1)[0])
-        else:
-            return self.get_workspace_handle(ws_name)
 
     def get_workspace_name(self, workspace):
         """Returns the name of a workspace given the workspace handle"""
@@ -344,10 +259,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_EMode(self, workspace):
         """Returns the energy analysis mode (direct or indirect of a workspace)"""
-        if isinstance(workspace, string_types):
-            workspace_handle = self.get_workspace_handle(workspace)
-        else:
-            workspace_handle = workspace
+        workspace_handle = self.get_workspace_handle(workspace)
         emode = str(self._get_ws_EMode(workspace_handle))
         if emode == 'Elastic':
             # Work-around for older versions of Mantid which does not set instrument name
@@ -357,29 +269,48 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return emode
 
     def _get_ws_EMode(self, ws_handle):
-        if isinstance(ws_handle, IMDHistoWorkspace) or isinstance(ws_handle, IMDEventWorkspace):
-            def get_emode(e):
-                ws_handle.getExperimentInfo(e).getEMode()
-            return self._get_exp_info_using(ws_handle, get_emode, "Workspace contains different EModes")
-        else:
-            return ws_handle.getEMode()
+        try:
+            emode = ws_handle.getEMode()
+        except AttributeError: # workspace is not matrix workspace
+            try:
+                emode = self._get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEMode())
+            except ValueError:
+                raise ValueError("Workspace contains different EModes")
+        return emode
 
-    def _get_ws_EFixed(self, ws_handle, detector):
-        if isinstance(ws_handle, IMDHistoWorkspace) or isinstance(ws_handle, IMDEventWorkspace):
-            def get_efixed(e):
-                ws_handle.getExperimentInfo(e).getEFixed(detector)
-            return self._get_exp_info_using(ws_handle, get_efixed, "Workspace contains different EFixed values")
-        else:
-            return ws_handle.getEFixed(detector)
+    def get_EFixed(self, ws_handle):
+        efix=None
+        try:
+            efix = self._get_ws_EFixed(ws_handle)
+        except RuntimeError:  # Efixed not defined
+            # This could occur for malformed NXSPE without the instrument name set.
+            # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
+            try:
+                if ws_handle.run().hasProperty('Ei'):
+                    efix = ws_handle.run().getProperty('Ei').value
+            except AttributeError:
+                if ws_handle.getExperimentInfo(0).run().hasProperty('Ei'):
+                    efix = ws_handle.getExperimentInfo(0).run().getProperty('Ei').value
+        return efix
 
-    def _get_exp_info_using(self, ws_handle, get_exp_info, error_string):
+    def _get_ws_EFixed(self, ws_handle):
+        try:
+            efixed = ws_handle.getEFixed(1)
+        except AttributeError: # workspace is not matrix workspace
+            try:
+                efixed = self._get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEFixed(1))
+            except ValueError:
+                raise ValueError("Workspace contains different EFixed values")
+        return efixed
+
+    def _get_exp_info_using(self, ws_handle, get_exp_info):
         """get data from MultipleExperimentInfo. Returns None if ExperimentInfo is not found"""
         prev = None
         for exp in range(ws_handle.getNumExperimentInfo()):
             exp_value = get_exp_info(exp)
             if prev is not None:
                 if exp_value != prev:
-                    raise ValueError(error_string)
+                    raise ValueError
             prev = exp_value
         return prev
 

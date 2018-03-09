@@ -12,8 +12,9 @@ import qtawesome as qta
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
-from mslice.util.qt import load_ui
 from mslice.plotting.plot_window.base_plot_window import BasePlotWindow
+from mslice.util.qt import load_ui
+from mslice.models.workspacemanager.file_io import get_save_directory
 
 # The FigureCanvas & Toolbar are QWidgets so we must import it from the mpl backend that matches
 # the version of Qt we are running with
@@ -77,19 +78,19 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
 
         self.show()  # is not a good idea in non interactive mode
 
-    def add_slice_plot(self, slice_plotter):
+    def add_slice_plot(self, slice_plotter, workspace):
         if self._plot_handler is None:
             self.move_window(-self.width() / 2, 0)
         else:
             self._plot_handler.disconnect(self)
-        self._plot_handler = SlicePlot(self, self.canvas, slice_plotter)
+        self._plot_handler = SlicePlot(self, self.canvas, slice_plotter, workspace)
 
-    def add_cut_plot(self, cut_plotter):
+    def add_cut_plot(self, cut_plotter, workspace):
         if self._plot_handler is None:
             self.move_window(self.width() / 2, 0)
         else:
             self._plot_handler.disconnect(self)
-        self._plot_handler = CutPlot(self, self.canvas, cut_plotter)
+        self._plot_handler = CutPlot(self, self.canvas, cut_plotter, workspace)
 
     def is_icut(self, is_icut):
         self._plot_handler.is_icut(is_icut)
@@ -141,17 +142,15 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
             painter.end()
 
     def save_plot(self):
-        file_path = QtWidgets.QFileDialog.getSaveFileName(
-            self, filter="Image (*.png);; PDF (*.pdf);; Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat)")
-        ext = file_path[file_path.rfind('.'):]
-        save_name = os.path.basename(file_path)
-        file_path = os.path.dirname(file_path)
-        title = self._plot_handler._ws_title
+        file_path, save_name, ext = get_save_directory(save_as_image=True)
+        workspace = self._plot_handler.ws_name
         try:
-            self._plot_handler.workspace_provider().save_workspace(title, file_path, save_name, ext)
+            self._plot_handler.workspace_provider().save_workspace([workspace], file_path, save_name, ext)
         except RuntimeError as e:
             if e.message == "unrecognised file extension":
                 self.save_image(os.path.join(file_path, save_name))
+            elif e.message == "dialog cancelled":
+                pass
             else:
                 raise RuntimeError(e)
 
