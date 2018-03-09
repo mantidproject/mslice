@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 import os.path
-from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
+from mantid.api import IMDHistoWorkspace
 from mantid.simpleapi import CreateMDHistoWorkspace, SaveMD, SaveNexus, SaveAscii
 from mslice.util.qt.QtWidgets import QFileDialog
 
@@ -39,26 +39,26 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
             raise RuntimeError("dialog cancelled")
 
 
-def save_nexus(workspace, path):
-    if isinstance(workspace, IMDEventWorkspace) or isinstance(workspace, IMDHistoWorkspace):
+def save_nexus(workspace, path, is_slice):
+    if is_slice:
+        SaveMD(InputWorkspace=workspace.name()[2:], Filename=path)
+    elif isinstance(workspace, IMDHistoWorkspace):
         SaveMD(InputWorkspace=workspace.name(), Filename=path)
     else:
         SaveNexus(InputWorkspace=workspace.name(), Filename=path)
 
 
-def save_ascii(workspace, path):
-    if isinstance(workspace, IMDEventWorkspace):
-        workspace_handle = _get_slice_mdhisto(workspace, workspace.name())
-        _save_slice_to_ascii(workspace_handle, path)
+def save_ascii(workspace, path, is_slice):
+    if is_slice:
+        _save_slice_to_ascii(workspace, path)
     elif isinstance(workspace, IMDHistoWorkspace):
         _save_cut_to_ascii(workspace, workspace.name(), path)
     else:
         SaveAscii(InputWorkspace=workspace, Filename=path)
 
 
-def save_matlab(workspace, path):
-    if isinstance(workspace, IMDEventWorkspace):
-        orkspace_handle = _get_slice_mdhisto(workspace, workspace.name())
+def save_matlab(workspace, path, is_slice):
+    if is_slice:
         x, y, e = _get_slice_mdhisto_xye(workspace)
     elif isinstance(workspace, IMDHistoWorkspace):
         x, y, e = _get_md_histo_xye(workspace)
@@ -137,22 +137,6 @@ def _get_slice_mdhisto_xye(histo_ws):
     e = np.reshape(e, nbins)
     return x, y, e
 
-
-def _get_slice_mdhisto(self, workspace, ws_name):
-    from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-    try:
-        return self.get_workspace_handle('__' + ws_name)
-    except KeyError:
-        slice_alg = MantidSliceAlgorithm()
-        x_axis = self.get_axis_from_dimension(workspace, ws_name, 0)
-        y_axis = self.get_axis_from_dimension(workspace, ws_name, 1)
-        slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
-        return self.get_workspace_handle('__' + ws_name)
-
-def get_axis_from_dimension(self, workspace, ws_name, id):
-    dim = workspace.getDimension(id).getName()
-    min, max, step = self._limits[ws_name][dim]
-    return Axis(dim, min, max, step)
 
 
 def _output_data_to_ascii(output_path, out_data, header):

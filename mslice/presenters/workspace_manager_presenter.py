@@ -82,7 +82,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_invalid_save_path()
             return
         try:
-            self._workspace_provider.save_workspace(selected_workspaces, save_directory, save_name, extension)
+            self._workspace_provider.save_workspaces(selected_workspaces, save_directory, save_name, extension)
         except RuntimeError:
             self._workspace_manager_view.error_unable_to_save()
 

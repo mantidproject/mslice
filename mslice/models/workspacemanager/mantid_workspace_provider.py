@@ -13,6 +13,7 @@ from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
                               RenameWorkspace, MergeMD, MergeRuns, Minus)
 
 from mantid.api import IMDEventWorkspace, Workspace
+from mslice.presenters.slice_plotter_presenter import Axis
 from .file_io import save_ascii, save_matlab, save_nexus
 import numpy as np
 from scipy import constants
@@ -36,15 +37,15 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         self._limits = {}
         self._cutParameters = {}
 
-    def get_workspace_names(self):
-        return AnalysisDataService.getObjectNames()
-
     def get_workspace_handle(self, workspace_name):
         """"Return handle to workspace given workspace_name_as_string"""
         # if passed a workspace handle return the handle
         if isinstance(workspace_name, Workspace):
             return workspace_name
         return AnalysisDataService[str(workspace_name)]
+
+    def get_workspace_names(self):
+        return AnalysisDataService.getObjectNames()
 
     def delete_workspace(self, workspace):
         ws = DeleteWorkspace(Workspace=workspace)
@@ -225,7 +226,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         finally:
             self.delete_workspace(scaled_bg_ws)
 
-    def save_workspace(self, workspaces, path, save_name, extension):
+    def save_workspaces(self, workspaces, path, save_name, extension):
         '''
         :param workspaces: list of workspaces to save
         :param path: directory to save to
@@ -241,13 +242,37 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         else:
             raise RuntimeError("unrecognised file extension")
         for workspace in workspaces:
-            save_as = save_name if save_name is not None else str(workspace) + extension
-            full_path = os.path.join(str(path), save_as)
-            workspace = self.get_workspace_handle(workspace)
-            save_method(workspace, full_path)
+            self._save_single_ws(workspace, save_name, save_method, path, extension)
+
+    def _save_single_ws(self, workspace, save_name, save_method, path, extension):
+        slice = False
+        save_as = save_name if save_name is not None else str(workspace) + extension
+        full_path = os.path.join(str(path), save_as)
+        workspace = self.get_workspace_handle(workspace)
+        if self.is_pixel_workspace(workspace):
+            slice = True
+            workspace = self._get_slice_mdhisto(workspace, workspace.name())
+        save_method(workspace, full_path, slice)
+
+    def _get_slice_mdhisto(self, workspace, ws_name):
+        from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
+        try:
+            return self.get_workspace_handle('__' + ws_name)
+        except KeyError:
+            slice_alg = MantidSliceAlgorithm()
+            ws_name = workspace.name()
+            x_axis = self.get_axis_from_dimension(workspace, ws_name, 0)
+            y_axis = self.get_axis_from_dimension(workspace, ws_name, 1)
+            slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
+            return self.get_workspace_handle('__' + ws_name)
+
+    def get_axis_from_dimension(self, workspace, ws_name, id):
+        dim = workspace.getDimension(id).getName()
+        min, max, step = self._limits[ws_name][dim]
+        return Axis(dim, min, max, step)
+
 
     def is_pixel_workspace(self, workspace_name):
-        from mantid.api import IMDEventWorkspace
         workspace = self.get_workspace_handle(workspace_name)
         return isinstance(workspace, IMDEventWorkspace)
 
