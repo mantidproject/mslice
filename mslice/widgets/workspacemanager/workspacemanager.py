@@ -59,7 +59,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         self.tabWidget.setCurrentIndex(tab)
 
     def highlight_tab(self, tab):
-        self.tabWidget.setTabText(tab, self.tabWidget.tabText(tab) + '*')
+        tab_text = self.tabWidget.tabText(tab)
+        if not tab_text.endswith('*'):
+            self.tabWidget.setTabText(tab, tab_text + '*')
 
     def _btn_clicked(self):
         sender = self.sender()
