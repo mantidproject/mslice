@@ -109,7 +109,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return chi_magnetic
 
     def compute_d2sigma(self, scattering_data, workspace, e_axis):
-        Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(workspace))
+        Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(workspace))
         if Ei is None:
             return None
         ki = np.sqrt(Ei) * E_TO_K
@@ -133,14 +133,15 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return gdos
 
     def sample_temperature(self, ws_name, sample_temp_fields):
-        ws = self._workspace_provider.get_parent_by_name(ws_name)
-        # mantid drops log data during projection, need unprojected workspace.
+        ws = self._workspace_provider.get_workspace_handle(ws_name)
         sample_temp = None
         for field_name in sample_temp_fields:
             try:
                 sample_temp = ws.run().getLogData(field_name).value
             except RuntimeError:
                 pass
+            except AttributeError:
+                sample_temp = ws.getExperimentInfo(0).run().getLogData(field_name).value
         try:
             float(sample_temp)
         except (ValueError, TypeError):
@@ -162,7 +163,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return sample_temp
 
     def compute_recoil_line(self, ws_name, axis, relative_mass=1):
-        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
+        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
         x_axis = np.arange(axis.start, axis.end, axis.step)
         if axis.units == 'MomentumTransfer':
             momentum_transfer = x_axis
@@ -170,7 +171,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
                 (constants.elementary_charge / 1000)
         elif axis.units == 'Degrees':
             tth = x_axis * np.pi / 180.
-            if 'Direct' in self._workspace_provider.get_EMode(self._workspace_provider.get_parent_by_name(ws_name)):
+            if 'Direct' in self._workspace_provider.get_EMode(self._workspace_provider.get_workspace_handle(ws_name)):
                 line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass + 1 - np.cos(tth))
             else:
                 line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass - 1 + np.cos(tth))
@@ -179,7 +180,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return x_axis, line
 
     def compute_powder_line(self, ws_name, axis, element, cif_file=False):
-        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_parent_by_name(ws_name))
+        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
         if axis.units == 'MomentumTransfer':
             x0 = self._compute_powder_line_momentum(ws_name, axis, element, cif_file)
         elif axis.units == 'Degrees':
@@ -200,7 +201,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
 
     def _crystal_structure(self, ws_name, element, cif_file):
         if cif_file:
-            ws = self._workspace_provider.get_parent_by_name(ws_name)
+            ws = self._workspace_provider.get_workspace_handle(ws_name)
             LoadCIF(ws, cif_file)
             return ws.sample().getCrystalStructure()
         else:

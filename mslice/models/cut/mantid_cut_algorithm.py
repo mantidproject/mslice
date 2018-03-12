@@ -1,13 +1,18 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
 
-from mantid.simpleapi import BinMD, SofQW3, Rebin2D, ConvertSpectrumAxis, Transpose, CreateMDHistoWorkspace
+from mantid.simpleapi import BinMD, SofQW3, Rebin2D, ConvertSpectrumAxis, CreateMDHistoWorkspace
 from mantid.dataobjects import Workspace2D
 from mantid.api import MDNormalization, IMDEventWorkspace, IMDHistoWorkspace, WorkspaceUnitValidator
 
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
+
+
+def output_workspace_name(selected_workspace, integration_start, integration_end):
+    return selected_workspace + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
+        integration_end) + ")"
 
 
 class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
@@ -51,26 +56,24 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
 
     def compute_cut(self, selected_workspace, cut_axis, integration_axis, is_norm):
         input_workspace_name = selected_workspace
+        out_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
         selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         integration_start = integration_axis.start
         integration_end = integration_axis.end
         integration_units = integration_axis.units
 
-        output_ws_name = input_workspace_name + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
-            integration_end) + ")"
-
         if self._workspace_provider.is_PSD(input_workspace_name):
-            cut = self._compute_cut_PSD(input_workspace_name, output_ws_name, selected_workspace, cut_axis,
+            cut = self._compute_cut_PSD(input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                                         integration_start, integration_end)
         else:
-            cut = self._compute_cut_nonPSD(input_workspace_name, output_ws_name, selected_workspace, cut_axis,
+            cut = self._compute_cut_nonPSD(input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                                            integration_start, integration_end, integration_units)
 
         if is_norm:
             self._normalize_workspace(cut)
         return cut
 
-    def _compute_cut_PSD(self, input_workspace_name, output_ws_name, selected_workspace, cut_axis,
+    def _compute_cut_PSD(self, input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                          integration_start, integration_end):
         self._fill_in_missing_input(cut_axis, selected_workspace)
         n_steps = self._get_number_of_steps(cut_axis)
@@ -78,11 +81,12 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
 
         cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
-        cut = BinMD(selected_workspace, OutputWorkspace=output_ws_name, AxisAligned="1",
+
+        cut = BinMD(selected_workspace, OutputWorkspace=out_ws_name, AxisAligned="1",
                     AlignedDim1=integration_binning, AlignedDim0=cut_binning)
         return cut
 
-    def _compute_cut_nonPSD(self, input_workspace_name, output_ws_name, selected_workspace, cut_axis,
+    def _compute_cut_nonPSD(self, input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                             integration_start, integration_end, integration_units):
         cut_binning = " ,".join(map(str, (cut_axis.start, cut_axis.step, cut_axis.end)))
         int_binning = " ,".join(map(str, (integration_start, integration_end - integration_start, integration_end)))
@@ -90,39 +94,39 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         if self._converted_nonpsd and self._converted_nonpsd[0] != input_workspace_name:
             self._converted_nonpsd = None
         if cut_axis.units == '|Q|':
-            SofQW3(selected_workspace, OutputWorkspace=output_ws_name, EMode=emode,
+            SofQW3(selected_workspace, OutputWorkspace=out_ws_name, EMode=emode,
                    QAxisBinning=cut_binning, EAxisBinning=int_binning)
             idx = 1
             unit = 'MomentumTransfer'
             name = '|Q|'
         elif cut_axis.units == 'Degrees':
             if not self._converted_nonpsd:
-                self._converted_nonpsd = (input_workspace_name, 
-                                          ConvertSpectrumAxis(selected_workspace, Target='theta', 
+                self._converted_nonpsd = (input_workspace_name,
+                                          ConvertSpectrumAxis(selected_workspace, Target='theta',
                                                               OutputWorkspace='__convToTheta', StoreInADS=False))
-            Rebin2D(self._converted_nonpsd[1], OutputWorkspace=output_ws_name, Axis1Binning=int_binning, Axis2Binning=cut_binning)
+            Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=int_binning, Axis2Binning=cut_binning)
             idx = 1
             unit = 'Degrees'
             name = 'Theta'
         elif integration_units == '|Q|':
-            SofQW3(selected_workspace, OutputWorkspace=output_ws_name, EMode=emode,
+            SofQW3(selected_workspace, OutputWorkspace=out_ws_name, EMode=emode,
                    QAxisBinning=int_binning, EAxisBinning=cut_binning)
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
         else:
             if not self._converted_nonpsd:
-                self._converted_nonpsd = (input_workspace_name, 
-                                          ConvertSpectrumAxis(selected_workspace, Target='theta', 
+                self._converted_nonpsd = (input_workspace_name,
+                                          ConvertSpectrumAxis(selected_workspace, Target='theta',
                                                               OutputWorkspace='__convToTheta', StoreInADS=False))
-            Rebin2D(self._converted_nonpsd[1], OutputWorkspace=output_ws_name, Axis1Binning=cut_binning, Axis2Binning=int_binning)
+            Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=cut_binning, Axis2Binning=int_binning)
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
-        ws_out = self._workspace_provider.get_workspace_handle(output_ws_name)
+        ws_out = self._workspace_provider.get_workspace_handle(out_ws_name)
         xdim = ws_out.getDimension(idx)
         extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
-        cut = CreateMDHistoWorkspace(OutputWorkspace=output_ws_name, SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(),
+        cut = CreateMDHistoWorkspace(OutputWorkspace=out_ws_name, SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(),
                                      Dimensionality=1, Extents=extents, NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
         return cut
 

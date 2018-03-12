@@ -17,7 +17,7 @@ class WorkspaceView(object):
     def get_workspace_to_load_path(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    def get_workspace_to_save_filepath(self):
+    def get_save_directory(self, multiple_files, default_ext=None):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def get_workspace_new_name(self):

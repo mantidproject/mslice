@@ -1,7 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel
-
+from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QMenu
 
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui
@@ -56,6 +55,7 @@ class MainWindow(MainView, QMainWindow):
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.wgtWorkspacemanager.nonpsd.connect(self.switch_nonpsd_mode)
+        self.setup_save()
         self.btnSave.clicked.connect(self.button_save)
         self.btnAdd.clicked.connect(self.button_add)
         self.btnRename.clicked.connect(self.button_rename)
@@ -78,6 +78,13 @@ class MainWindow(MainView, QMainWindow):
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
         self.actionQuit.triggered.connect(self.close)
+
+    def setup_save(self):
+        menu = QMenu()
+        menu.addAction("Nexus (*.nxs)", lambda: self.button_save('Nexus'))
+        menu.addAction("ASCII (*.txt)", lambda: self.button_save('Ascii'))
+        menu.addAction("Matlab (*.mat)", lambda: self.button_save('Matlab'))
+        self.btnSave.setMenu(menu)
 
     def change_main_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)
@@ -115,8 +122,8 @@ class MainWindow(MainView, QMainWindow):
     def button_subtract(self):
         self.workspace_presenter.notify(ws_command.Subtract)
 
-    def button_save(self):
-        self.workspace_presenter.notify(ws_command.SaveSelectedWorkspace)
+    def button_save(self, file_type):
+        self.workspace_presenter.notify(getattr(ws_command, 'SaveSelectedWorkspace' + file_type))
 
     def button_add(self):
         self.workspace_presenter.notify(ws_command.Add)

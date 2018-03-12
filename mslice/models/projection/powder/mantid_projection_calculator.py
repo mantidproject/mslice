@@ -56,8 +56,6 @@ class MantidProjectionCalculator(ProjectionCalculator):
         # Otherwise first run SofQW3 to rebin it in |Q| properly before calling ConvertToMD with CopyToMD
         else:
             limits = self._workspace_provider.get_limits(input_workspace, 'MomentumTransfer')
-            # Use a step size a bit smaller than angular spacing so user can rebin if they really want...
-            limits[2] = limits[2] / 3.
             limits = ','.join([str(limits[i]) for i in [0, 2, 1]])
             SofQW3(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, QAxisBinning=limits, Emode=emode)
             retval = ConvertToMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, QDimensions='CopyToMD',

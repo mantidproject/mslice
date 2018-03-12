@@ -1,9 +1,8 @@
 from __future__ import (absolute_import, division, print_function)
-from os.path import join
 import unittest
 
 import mock
-from mock import call
+from mock import call, patch
 
 from mslice.models.workspacemanager.workspace_provider import WorkspaceProvider
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
@@ -69,64 +68,96 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.error_select_one_workspace.assert_called_once_with()
         self.workspace_provider.rename_workspace.assert_not_called()
 
-    def test_save_workspace(self):
+    @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
+    def test_save_workspace(self, save_dir_mock):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
         # to save to on calls to get_workspace_to_save_filepath
         path_to_save_to = r'A:\file\path'
         workspace_to_save = 'file1'
-        result_path = join(path_to_save_to, workspace_to_save + '.nxs')
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
-        self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
+        save_dir_mock.return_value=(path_to_save_to, workspace_to_save, '.nxs')
 
-        self.presenter.notify(Command.SaveSelectedWorkspace)
+        self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
         self.view.get_workspace_selected.assert_called_once_with()
-        self.view.get_workspace_selected.assert_called_once_with()
-        self.view.get_directory_to_save_workspaces.assert_called_once_with()
-        self.workspace_provider.save_nexus.assert_called_once_with(workspace_to_save, result_path)
+        save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False,
+                                              default_ext='.nxs')
+        self.workspace_provider.save_workspace.assert_called_once_with(
+            [workspace_to_save], path_to_save_to, 'file1', '.nxs')
 
-    def test_save_workspace_multiple_selected(self):
+    @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
+    def test_save_ascii_workspace(self, save_dir_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
+        # to save to on calls to get_workspace_to_save_filepath
+        path_to_save_to = r'A:\file\path'
+        workspace_to_save = 'file1'
+        self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
+        save_dir_mock.return_value = (path_to_save_to, workspace_to_save, '.txt')
+        self.presenter.notify(Command.SaveSelectedWorkspaceAscii)
+        save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False, default_ext='.txt')
+        self.view.get_workspace_selected.assert_called_once_with()
+        self.workspace_provider.save_workspace.assert_called_once_with(
+            [workspace_to_save], path_to_save_to, 'file1', '.txt')
+
+    @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
+    def test_save_matlab_workspace(self, save_dir_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
+        # to save to on calls to get_workspace_to_save_filepath
+        path_to_save_to = r'A:\file\path'
+        workspace_to_save = 'file1'
+        self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
+        save_dir_mock.return_value=(path_to_save_to, workspace_to_save, '.mat')
+
+        self.presenter.notify(Command.SaveSelectedWorkspaceMatlab)
+        self.view.get_workspace_selected.assert_called_once_with()
+        save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False, default_ext='.mat')
+        self.workspace_provider.save_workspace.assert_called_once_with(
+            [workspace_to_save], path_to_save_to, 'file1', '.mat')
+
+    @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
+    def test_save_workspace_multiple_selected(self, save_dir_mock):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         #Create a view that reports multiple workspaces are selected on calls to get_workspace_selected
         path_to_save_to = r'A:\file\path'
         self.view.get_workspace_selected = mock.Mock(return_value=['file1','file2'])
-        result_paths = [join(path_to_save_to, 'file1.nxs'), join(path_to_save_to, 'file2.nxs')]
-        self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
-        self.workspace_provider.save_nexus = mock.Mock(side_effect=[True,RuntimeError])
+        save_dir_mock.return_value=(path_to_save_to, None, '.nxs')
+        self.workspace_provider.save_workspace = mock.Mock(side_effect=[True,RuntimeError])
 
-        self.presenter.notify(Command.SaveSelectedWorkspace)
+        self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
         self.view.get_workspace_selected.assert_called_once_with()
-        self.view.get_directory_to_save_workspaces.assert_called_once_with()
-        calls = [call('file1', result_paths[0]), call('file2', result_paths[1])]
-        self.workspace_provider.save_nexus.assert_has_calls(calls)
-        self.view.error_unable_to_save.assert_called_once_with()
+        save_dir_mock.assert_called_once_with(multiple_files=True, save_as_image=False, default_ext='.nxs')
+        self.workspace_provider.save_workspace.assert_called_with(['file1', 'file2'], path_to_save_to, None, '.nxs')
 
-    def test_save_workspace_non_selected_prompt_user(self):
+    @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
+    def test_save_workspace_non_selected_prompt_user(self, save_dir_mock):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         #Create a view that reports no workspaces arw selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=[])
 
-        self.presenter.notify(Command.SaveSelectedWorkspace)
+        self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.error_select_one_workspace.assert_called_once_with()
-        self.view.get_workspace_to_save_filepath.assert_not_called()
-        self.workspace_provider.save_nexus.assert_not_called()
+        save_dir_mock.assert_not_called()
+        self.workspace_provider.save_workspace.assert_not_called()
 
-    def test_save_workspace_cancelled(self):
+    @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
+    def test_save_workspace_cancelled(self, save_dir_mock):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
         # to save to on calls to get_workspace_to_save_filepath
         path_to_save_to = "" # view returns empty string to indicate operation cancelled
         workspace_to_save = 'file1'
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
-        self.view.get_directory_to_save_workspaces = mock.Mock(return_value=path_to_save_to)
+        save_dir_mock.return_value=(path_to_save_to, workspace_to_save, '.nxs')
 
-        self.presenter.notify(Command.SaveSelectedWorkspace)
+        self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_workspace_selected.assert_called_once_with()
-        self.view.get_directory_to_save_workspaces.assert_called_once_with()
+        save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False, default_ext='.nxs')
         self.view.error_invalid_save_path.assert_called_once()
-        self.workspace_provider.save_nexus.assert_not_called()
+        self.workspace_provider.save_workspace.assert_not_called()
 
     def test_remove_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
@@ -212,16 +243,16 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_index.assert_called_once_with('ws')
         self.view.set_workspace_selected.assert_called_once_with([0])
 
-    def xtest_combine_workspace_single_ws(self):
+    def test_combine_workspace_single_ws(self):
         # Checks that it will fail if only one workspace is selected.
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
         selected_workspaces = ['ws1']
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
-        self.view.add_workspace_dialog = mock.Mock(return_value=['ws2'])
+        self.view.add_workspace_dialog = mock.Mock(return_value='ws2')
         self.presenter.notify(Command.CombineWorkspace)
         self.view.get_workspace_selected.assert_called_once_with()
-        self.view.error_select_more_than_one_workspaces.assert_called_once_with()
-        self.workspace_provider.combine_workspace.assert_not_called()
+        self.view.add_workspace_dialog.assert_called_once()
+        self.workspace_provider.combine_workspace.assert_called_once_with(['ws1', 'ws2'], 'ws1_combined')
 
     def test_combine_workspace_wrong_type(self):
         # Checks that it will fail if one of the workspace is not a MDEventWorkspace

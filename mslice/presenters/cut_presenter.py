@@ -85,7 +85,7 @@ class CutPresenter(PresenterUtility):
 
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
-        self._main_presenter.change_ws_tab(2)
+        self._main_presenter.highlight_ws_tab(2)
 
     def _save_cut_to_workspace(self, params, _):
         cut_params = params[:4]
@@ -247,4 +247,4 @@ class CutPresenter(PresenterUtility):
         pass
 
     def set_workspace_provider(self, workspace_provider):
-        self._cut_algorithm.set_workspace_provider(workspace_provider)
+        self._cut_plotter.set_workspace_provider(workspace_provider)

@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
 from mslice.app import MPL_COMPAT
 from .cut_plotter import CutPlotter
+from .mantid_cut_algorithm import output_workspace_name
 
 INTENSITY_LABEL = 'Signal/#Events'
 picker=3
@@ -10,20 +11,21 @@ picker=3
 class MatplotlibCutPlotter(CutPlotter):
     def __init__(self, cut_algorithm):
         self._cut_algorithm = cut_algorithm
+        self.workspace_provider = None
         self.background = None
         self.icut = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
                  intensity_end, plot_over):
         x, y, e = self._cut_algorithm.compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one)
-        
+        output_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
         integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis) \
             if integration_axis.units == "" else  integration_axis.units
         legend = self._generate_legend(selected_workspace, integrated_dim, integration_axis.start, integration_axis.end)
-        self.plot_cut_from_xye(x, y, e, cut_axis.units, selected_workspace, plot_over, legend)
+        self.plot_cut_from_xye(x, y, e, cut_axis.units, selected_workspace, plot_over, output_ws_name, legend)
         plt.ylim(intensity_start, intensity_end)
 
-    def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, plot_over, legend=None):
+    def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, plot_over, cut_ws_name=None, legend=None):
         legend = selected_workspace if legend is None else legend
         plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o', picker=picker)
         leg = plt.legend(fontsize='medium')
@@ -31,13 +33,10 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.xlabel(self._getDisplayName(x_units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
         plt.ylabel(INTENSITY_LABEL, picker=picker)
         plt.autoscale()
-        # Note that we cannot cache the reference to canvas and axes here because under the keep/make current mechanism
-        # there is no one-to-one link between any particular CutPlotter and any CutPlot (or mpl canvas) object
-        plt.gcf().canvas.manager.add_cut_plot(self)
         if not plot_over:
             plt.gcf().canvas.manager.update_grid()
         if self.background is None:
-            self._create_cut()
+            self._create_cut(cut_ws_name if cut_ws_name is not None else selected_workspace)
         plt.gcf().canvas.restore_region(self.background)
         try:
             plt.gca().draw_artist(plt.gcf().canvas.figure.get_children()[1])
@@ -45,7 +44,7 @@ class MatplotlibCutPlotter(CutPlotter):
         except AttributeError:
             plt.gcf().canvas.draw()
 
-    def _create_cut(self):
+    def _create_cut(self, workspace):
         # don't include axis ticks in the saved background
         plt.gcf().canvas.figure.gca().xaxis.set_visible(False)
         plt.gcf().canvas.figure.gca().yaxis.set_visible(False)
@@ -54,7 +53,7 @@ class MatplotlibCutPlotter(CutPlotter):
 
         plt.gcf().canvas.figure.gca().xaxis.set_visible(True)
         plt.gcf().canvas.figure.gca().yaxis.set_visible(True)
-        plt.gcf().canvas.manager.add_cut_plot(self)
+        plt.gcf().canvas.manager.add_cut_plot(self, workspace)
         plt.gcf().canvas.draw()
 
     def set_icut(self, icut):
@@ -94,3 +93,7 @@ class MatplotlibCutPlotter(CutPlotter):
         integrated_dim = mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
         return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
             "%.2f" % integration_end
+
+    def set_workspace_provider(self, workspace_provider):
+        self.workspace_provider = workspace_provider
+        self._cut_algorithm.set_workspace_provider(workspace_provider)

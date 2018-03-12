@@ -1,13 +1,11 @@
-from __future__ import (absolute_import, division, print_function)
 
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 
 from mslice.util.qt import QT_VERSION
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog
-
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
+from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
@@ -17,6 +15,7 @@ TAB_2D = 0
 TAB_EVENT = 1
 TAB_HISTO = 2
 TAB_NONPSD = 3
+
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
@@ -46,6 +45,8 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def tab_changed_method(self, tab_index):
         self.clear_selection()
+        if self.tabWidget.tabText(tab_index)[-1:] == "*":
+            self.tabWidget.setTabText(tab_index, self.tabWidget.tabText(tab_index)[:-1])
         self.tab_changed.emit(tab_index)
 
     def clear_selection(self):
@@ -57,6 +58,11 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def change_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)
+
+    def highlight_tab(self, tab):
+        tab_text = self.tabWidget.tabText(tab)
+        if not tab_text.endswith('*'):
+            self.tabWidget.setTabText(tab, tab_text + '*')
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -147,9 +153,6 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
     def get_workspace_to_load_path(self):
         paths = QFileDialog.getOpenFileNames()
         return paths[0] if isinstance(paths, tuple) else [str(filename) for filename in paths]
-
-    def get_directory_to_save_workspaces(self):
-        return QFileDialog.getExistingDirectory()
 
     def get_workspace_new_name(self):
         name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")

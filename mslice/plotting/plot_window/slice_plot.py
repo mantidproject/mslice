@@ -8,8 +8,6 @@ import os.path as path
 import matplotlib.colors as colors
 from matplotlib.lines import Line2D
 
-from mantid.simpleapi import AnalysisDataService
-
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
 from .interactive_cut import InteractiveCut
@@ -18,11 +16,11 @@ from .plot_options import SlicePlotOptions
 
 class SlicePlot(object):
 
-    def __init__(self, plot_figure, canvas, slice_plotter):
+    def __init__(self, plot_figure, canvas, slice_plotter, workspace):
         self.plot_figure = plot_figure
         self._canvas = canvas
         self._slice_plotter = slice_plotter
-        self._ws_title = plot_figure.title
+        self.ws_name = workspace
         self._arbitrary_nuclei = None
         self._cif_file = None
         self._cif_path = None
@@ -135,7 +133,7 @@ class SlicePlot(object):
         mappable.set_clim((vmin, vmax))
 
     def reset_info_checkboxes(self):
-        for key, line in six.iteritems(self._slice_plotter.overplot_lines[self._ws_title]):
+        for key, line in six.iteritems(self._slice_plotter.overplot_lines[self.ws_name]):
             if str(line.get_linestyle()) == 'None':
                 if isinstance(key, int):
                     key = self._slice_plotter.get_recoil_label(key)
@@ -144,9 +142,9 @@ class SlicePlot(object):
 
     def toggle_overplot_line(self, action, key, recoil, checked, cif_file=None):
         if checked:
-            self._slice_plotter.add_overplot_line(self._ws_title, key, recoil, cif_file)
+            self._slice_plotter.add_overplot_line(self.ws_name, key, recoil, cif_file)
         else:
-            self._slice_plotter.hide_overplot_line(self._ws_title, key)
+            self._slice_plotter.hide_overplot_line(self.ws_name, key)
         self.update_legend()
         self._canvas.draw()
 
@@ -216,7 +214,7 @@ class SlicePlot(object):
                 if not self._run_temp_dependent(slice_plotter_method, previous):
                     return
             else:
-                slice_plotter_method(self._ws_title)
+                slice_plotter_method(self.ws_name)
             self.change_axis_scale(self.colorbar_range, cbar_log)
             self.x_range = x_range
             self.y_range = y_range
@@ -229,16 +227,16 @@ class SlicePlot(object):
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         try:
-            slice_plotter_method(self._ws_title)
+            slice_plotter_method(self.ws_name)
         except ValueError:  # sample temperature not yet set
             try:
-                temp_value, field = self.ask_sample_temperature_field(str(self._ws_title))
+                temp_value, field = self.ask_sample_temperature_field(str(self.ws_name))
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.intensity_selection(previous)
                 return False
             if field:
                 self._slice_plotter.add_sample_temperature_field(temp_value)
-                self._slice_plotter.update_sample_temperature(self._ws_title)
+                self._slice_plotter.update_sample_temperature(self.ws_name)
             else:
                 try:
                     temp_value = float(temp_value)
@@ -250,21 +248,24 @@ class SlicePlot(object):
                     self.intensity_selection(previous)
                     return False
                 else:
-                    self._slice_plotter.set_sample_temperature(self._ws_title, temp_value)
-            slice_plotter_method(self._ws_title)
+                    self._slice_plotter.set_sample_temperature(self.ws_name, temp_value)
+            slice_plotter_method(self.ws_name)
         return True
 
     def ask_sample_temperature_field(self, ws_name):
-        ws_name = ws_name[:ws_name.rfind("_")]
-        ws = AnalysisDataService[ws_name]
+        ws = self._slice_plotter.workspace_provider.get_workspace_handle(ws_name)
+        try:
+            keys = ws.run().keys()
+        except AttributeError:
+            keys = ws.getExperimentInfo(0).run().keys()
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
                                                              'Sample Temperature not found. Select the sample ' +
                                                              'temperature field or enter a value in Kelvin:',
-                                                             ws.run().keys())
+                                                             keys)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
-            return str(temp_field), temp_field in ws.run().keys()
+            return str(temp_field), temp_field in keys
 
     def _update_lines(self):
         """ Updates the powder/recoil overplots lines when intensity type changes """
@@ -279,7 +280,7 @@ class SlicePlot(object):
                  self.plot_figure.actionCIF_file:[self._cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
-                self._slice_plotter.add_overplot_line(self._ws_title, *lines[line])
+                self._slice_plotter.add_overplot_line(self.ws_name, *lines[line])
         self.update_legend()
         self._canvas.draw()
 
@@ -327,7 +328,7 @@ class SlicePlot(object):
             self.icut.clear()
             self.icut = None
         else:
-            self.icut = InteractiveCut(self, self._canvas, self._ws_title)
+            self.icut = InteractiveCut(self, self._canvas, self.ws_name)
             self.icut.set_workspace_provider(self._slice_plotter.get_workspace_provider())
 
     def save_icut(self):
@@ -335,6 +336,9 @@ class SlicePlot(object):
 
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
+
+    def workspace_provider(self):
+        return self._slice_plotter.workspace_provider
 
     def disconnect(self, plot_figure):
         plot_figure.actionInteractive_Cuts.triggered.disconnect()

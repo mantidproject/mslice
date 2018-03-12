@@ -1,11 +1,12 @@
 from __future__ import (absolute_import, division, print_function)
 from six import string_types
-import os.path
 
 from mslice.widgets.workspacemanager.command import Command
+from mslice.models.workspacemanager.file_io import get_save_directory
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
+
 
 
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
@@ -24,8 +25,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def notify(self, command):
         self._clear_displayed_error()
         self._workspace_manager_view.busy.emit(True)
-        if command == Command.SaveSelectedWorkspace:
-            self._save_selected_workspace()
+        if command == Command.SaveSelectedWorkspaceNexus:
+            self._save_selected_workspace('.nxs')
+        elif command == Command.SaveSelectedWorkspaceAscii:
+            self._save_selected_workspace('.txt')
+        elif command == Command.SaveSelectedWorkspaceMatlab:
+            self._save_selected_workspace('.mat')
         elif command == Command.RemoveSelectedWorkspaces:
             self._remove_selected_workspaces()
         elif command == Command.RenameWorkspace:
@@ -52,30 +57,37 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def change_tab(self, tab):
         self._workspace_manager_view.change_tab(tab)
 
+    def highlight_tab(self, tab):
+        self._workspace_manager_view.highlight_tab(tab)
+
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
             return self._workspace_manager_view.confirm_overwrite_workspace()
         else:
             return True
 
-    def _save_selected_workspace(self):
+    def _save_selected_workspace(self, extension=None):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_workspace()
             return
-        save_directory = self._workspace_manager_view.get_directory_to_save_workspaces()
+
+        try:
+            save_directory, save_name, extension = get_save_directory(multiple_files=len(selected_workspaces) > 1,
+                                                                      save_as_image=False, default_ext=extension)
+        except RuntimeError as e:
+            if e.message == "dialog cancelled":
+                return
+            else:
+                raise RuntimeError(e)
+
         if not save_directory:
             self._workspace_manager_view.error_invalid_save_path()
             return
-        for workspace in selected_workspaces:
-            filename = workspace
-            if not filename.endswith('.nxs'):
-                filename += '.nxs'
-            path = os.path.join(str(save_directory), filename)
-            try:
-                self._workspace_provider.save_nexus(workspace, path)
-            except RuntimeError:
-                self._workspace_manager_view.error_unable_to_save()
+        try:
+            self._workspace_provider.save_workspace(selected_workspaces, save_directory, save_name, extension)
+        except RuntimeError:
+            self._workspace_manager_view.error_unable_to_save()
 
     def _remove_selected_workspaces(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
