@@ -57,6 +57,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def change_tab(self, tab):
         self._workspace_manager_view.change_tab(tab)
 
+    def highlight_tab(self, tab):
+        self._workspace_manager_view.highlight_tab(tab)
+
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
             return self._workspace_manager_view.confirm_overwrite_workspace()

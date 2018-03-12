@@ -43,6 +43,8 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def tab_changed_method(self, tab_index):
         self.clear_selection()
+        if self.tabWidget.tabText(tab_index)[-1:] == "*":
+            self.tabWidget.setTabText(tab_index, self.tabWidget.tabText(tab_index)[:-1])
         self.tab_changed.emit(tab_index)
 
     def clear_selection(self):
@@ -54,6 +56,11 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def change_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)
+
+    def highlight_tab(self, tab):
+        tab_text = self.tabWidget.tabText(tab)
+        if not tab_text.endswith('*'):
+            self.tabWidget.setTabText(tab, tab_text + '*')
 
     def _btn_clicked(self):
         sender = self.sender()
