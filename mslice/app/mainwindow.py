@@ -55,6 +55,7 @@ class MainWindow(MainView, QMainWindow):
         self.cut_presenter.set_workspace_provider(workspace_provider)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
+        self.wgtWorkspacemanager.nonpsd.connect(self.switch_nonpsd_mode)
         self.btnSave.clicked.connect(self.button_save)
         self.btnAdd.clicked.connect(self.button_add)
         self.btnRename.clicked.connect(self.button_rename)
@@ -84,6 +85,10 @@ class MainWindow(MainView, QMainWindow):
     def ws_tab_changed(self, tab):
         self.enable_widget_tabs(tab)
         self.enable_buttons(tab)
+
+    def switch_nonpsd_mode(self, nonpsd):
+        self.wgtCut.enable_integration_axis(nonpsd)
+        self.wgtSlice.enable_units_choice(nonpsd)
 
     def enable_widget_tabs(self, workspace_tab):
         '''enables correct powder/slice/cut tabs based on workspace tab'''

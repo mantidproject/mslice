@@ -217,8 +217,14 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def get_recoil_label(self, key):
         return recoil_labels[key]
 
+    def is_sliceable(self, workspace):
+        return self._slice_algorithm.is_sliceable(workspace)
+
     def update_displayed_workspaces(self):
         self.listener.update_workspaces()
 
     def set_workspace_provider(self, workspace_provider):
         self._slice_algorithm.set_workspace_provider(workspace_provider)
+
+    def get_workspace_provider(self):
+        return self._slice_algorithm.get_workspace_provider()

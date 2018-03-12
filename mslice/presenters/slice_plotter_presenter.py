@@ -141,7 +141,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def workspace_selection_changed(self):
         workspace_selection = self._get_main_presenter().get_selected_workspaces()
-        if len(workspace_selection) != 1:
+        if len(workspace_selection) != 1 or not self._slice_plotter.is_sliceable(workspace_selection[0]):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
             return

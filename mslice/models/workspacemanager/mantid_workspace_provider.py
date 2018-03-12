@@ -58,7 +58,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return minimum, maximum, (maximum - minimum) / 100.
 
     def is_PSD(self, workspace):
-        return self._isPSD[workspace] if (workspace in self._isPSD) else None
+        ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
+        return self._isPSD[ws_name] if (ws_name in self._isPSD) else None
 
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""

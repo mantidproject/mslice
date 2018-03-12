@@ -328,6 +328,7 @@ class SlicePlot(object):
             self.icut = None
         else:
             self.icut = InteractiveCut(self, self._canvas, self._ws_title)
+            self.icut.set_workspace_provider(self._slice_plotter.get_workspace_provider())
 
     def save_icut(self):
         self.icut.save_cut()

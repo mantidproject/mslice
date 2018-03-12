@@ -11,6 +11,9 @@ class AlgWorkspaceOps(object):
     def set_workspace_provider(self, workspace_provider):
         self._workspace_provider = workspace_provider
 
+    def get_workspace_provider(self):
+        return self._workspace_provider
+
     def getComment(self, workspace):
         return self._workspace_provider.getComment(workspace)
 

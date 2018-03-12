@@ -3,7 +3,8 @@ from six import string_types
 import numpy as np
 
 from mantid.simpleapi import BinMD, LoadCIF, SofQW3, ConvertSpectrumAxis, Rebin2D
-from mantid.api import IMDEventWorkspace, MDNormalization
+from mantid.api import IMDEventWorkspace, MDNormalization, WorkspaceUnitValidator
+from mantid.dataobjects import Workspace2D
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
@@ -224,3 +225,11 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def _norm_to_one(self, data):
         data_range = np.nanmax(data) - np.nanmin(data)
         return (data - np.nanmin(data))/data_range
+
+    def is_sliceable(self, workspace):
+        workspace = self._workspace_provider.get_workspace_handle(workspace)
+        if isinstance(workspace, IMDEventWorkspace):
+            return True
+        else:
+            validator = WorkspaceUnitValidator('DeltaE')
+            return isinstance(workspace, Workspace2D) and validator.isValid(workspace) == ''

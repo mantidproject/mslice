@@ -29,8 +29,8 @@ class InteractiveCut(object):
     def plot_cut(self, x1, x2, y1, y2):
         if x2 > x1 and y2 > y1:
             ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
-            self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_start, integration_end,
-                                       False, None, None, False)
+            integration_axis = Axis('', integration_start, integration_end, 0)
+            self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_axis, False, None, None, False)
 
     def get_cut_parameters(self, pos1, pos2):
         start = pos1[not self.horizontal]
@@ -61,6 +61,9 @@ class InteractiveCut(object):
 
     def update_workspaces(self):
         self.slice_plot.update_workspaces()
+
+    def set_workspace_provider(self, workspace_provider):
+        self._cut_algorithm.set_workspace_provider(workspace_provider)
 
     def clear(self):
         self._cut_plotter.set_icut(False)

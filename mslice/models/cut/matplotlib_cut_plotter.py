@@ -13,12 +13,13 @@ class MatplotlibCutPlotter(CutPlotter):
         self.background = None
         self.icut = None
 
-    def plot_cut(self, selected_workspace, cut_axis, integration_start, integration_end, norm_to_one, intensity_start,
+    def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
                  intensity_end, plot_over):
-        x, y, e = self._cut_algorithm.compute_cut_xye(selected_workspace, cut_axis, integration_start, integration_end,
-                                                      norm_to_one)
-        integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis)
-        legend = self._generate_legend(selected_workspace, integrated_dim, integration_start, integration_end)
+        x, y, e = self._cut_algorithm.compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one)
+        
+        integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis) \
+            if integration_axis.units == "" else  integration_axis.units
+        legend = self._generate_legend(selected_workspace, integrated_dim, integration_axis.start, integration_axis.end)
         self.plot_cut_from_xye(x, y, e, cut_axis.units, selected_workspace, plot_over, legend)
         plt.ylim(intensity_start, intensity_end)
 

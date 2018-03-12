@@ -169,6 +169,27 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_16">
+       <property name="text">
+        <string>e</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="cmbSliceUnits">
+       <item>
+        <property name="text">
+         <string>meV</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>cm-1</string>
+        </property>
+       </item>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>

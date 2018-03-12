@@ -38,6 +38,7 @@ class SliceWidget(SlicePlotterView, QWidget):
         self._minimumStep = {}
         self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))
         self.lneSliceYStep.editingFinished.connect(lambda: self._step_edited('y', self.lneSliceYStep))
+        self.enable_units_choice(False)
 
     def get_presenter(self):
         return self._presenter
@@ -64,6 +65,17 @@ class SliceWidget(SlicePlotterView, QWidget):
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def enable_units_choice(self, enabled):
+        if enabled:
+            self.cmbSliceUnits.show()
+            self.label_16.show()
+        else:
+            self.cmbSliceUnits.hide()
+            self.label_16.hide()
+
+    def get_units(self):
+        return self.cmbSliceUnits.currentText()
 
     def get_slice_x_axis(self):
         return str(self.cmbSliceXAxis.currentText())
