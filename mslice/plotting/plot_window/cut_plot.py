@@ -12,7 +12,7 @@ from .plot_options import CutPlotOptions
 
 class CutPlot(object):
 
-    def __init__(self, plot_figure, canvas, cut_plotter):
+    def __init__(self, plot_figure, canvas, cut_plotter, workspace):
         self.plot_figure = plot_figure
         self._canvas = canvas
         self._cut_plotter = cut_plotter
@@ -20,6 +20,7 @@ class CutPlot(object):
         self._legends_shown = True
         self._legends_visible = []
         self._legend_dict = {}
+        self.ws_name = workspace
         self._lines = self.line_containers()
         self.setup_connections(plot_figure)
 
@@ -239,6 +240,9 @@ class CutPlot(object):
                     labels_to_show.append(line_data[i]['label'])
                 self._legends_visible[i] = line_data[i]['legend']
         axes.legend(handles_to_show, labels_to_show, fontsize='medium').draggable()  # add new legends
+
+    def workspace_provider(self):
+        return self._cut_plotter.workspace_provider
 
     def set_line_visible(self, line_index, visible):
         self._lines_visible[line_index] = visible

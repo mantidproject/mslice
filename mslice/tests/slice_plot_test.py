@@ -13,7 +13,7 @@ class SlicePlotTest(unittest.TestCase):
         self.slice_plotter = MagicMock()
         self.axes = MagicMock()
         self.canvas.figure.gca = MagicMock(return_value=self.axes)
-        self.slice_plot = SlicePlot(self.plot_figure, self.canvas, self.slice_plotter)
+        self.slice_plot = SlicePlot(self.plot_figure, self.canvas, self.slice_plotter, "workspace")
 
     def test_change_logarithmic(self):
         image = MagicMock()
@@ -42,7 +42,6 @@ class SlicePlotTest(unittest.TestCase):
         image.set_clim.assert_called_once_with((0, 15))
 
     def test_reset_checkboxes(self):
-        self.slice_plot._ws_title = 'title'
         line1 = MagicMock()
         line2 = MagicMock()
         line1.get_linestyle = MagicMock(return_value='None')
@@ -59,9 +58,8 @@ class SlicePlotTest(unittest.TestCase):
         self.plot_figure.action1.setChecked.assert_not_called()
 
     def test_lines_redrawn(self):
-        self.slice_plot._ws_title = 'some_title'
         self.slice_plot.toggle_overplot_line(self.slice_plot.plot_figure.actionHelium, 4, True, True)
-        new_slice_plot = SlicePlot(self.plot_figure, self.canvas, self.slice_plotter)
+        new_slice_plot = SlicePlot(self.plot_figure, self.canvas, self.slice_plotter, "workspace")
 
         self.assertTrue(new_slice_plot.plot_figure.actionHelium.checked)
-        self.slice_plotter.add_overplot_line.assert_any_call(self.plot_figure.title, 4, True, '')
+        self.slice_plotter.add_overplot_line.assert_any_call('workspace', 4, True, '')

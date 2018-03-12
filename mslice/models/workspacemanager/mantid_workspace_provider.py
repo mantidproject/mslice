@@ -6,12 +6,14 @@ It uses mantid to perform the workspace operations
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
+import os.path
 from six import string_types
 
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
-                              RenameWorkspace, SaveNexus, SaveMD, MergeMD, MergeRuns, Minus)
+                              RenameWorkspace, MergeMD, MergeRuns, Minus)
 
-from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
+from mantid.api import IMDEventWorkspace, Workspace
+from .file_io import save_ascii, save_matlab, save_nexus
 import numpy as np
 from scipy import constants
 
@@ -35,6 +37,13 @@ class MantidWorkspaceProvider(WorkspaceProvider):
 
     def get_workspace_names(self):
         return AnalysisDataService.getObjectNames()
+
+    def get_workspace_handle(self, workspace_name):
+        """"Return handle to workspace given workspace_name_as_string"""
+        # if passed a workspace handle return the handle
+        if isinstance(workspace_name, Workspace):
+            return workspace_name
+        return AnalysisDataService[str(workspace_name)]
 
     def delete_workspace(self, workspace):
         ws = DeleteWorkspace(Workspace=workspace)
@@ -215,24 +224,31 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         finally:
             self.delete_workspace(scaled_bg_ws)
 
-    def save_nexus(self, workspace, path):
-        workspace_handle = self.get_workspace_handle(workspace)
-        if isinstance(workspace_handle, IMDEventWorkspace) or isinstance(workspace_handle, IMDHistoWorkspace):
-            SaveMD(InputWorkspace=workspace, Filename=path)
+    def save_workspace(self, workspaces, path, save_name, extension):
+        '''
+        :param workspaces: list of workspaces to save
+        :param path: directory to save to
+        :param save_name: name to save the file as (plus file extension). Pass none to use workspace name
+        :param extension: file extension (such as .txt)
+        '''
+        if extension == '.nxs':
+            save_method = save_nexus
+        elif extension == '.txt':
+            save_method = save_ascii
+        elif extension == '.mat':
+            save_method = save_matlab
         else:
-            SaveNexus(InputWorkspace=workspace, Filename=path)
+            raise RuntimeError("unrecognised file extension")
+        for workspace in workspaces:
+            save_as = save_name if save_name is not None else str(workspace) + extension
+            full_path = os.path.join(str(path), save_as)
+            workspace = self.get_workspace_handle(workspace)
+            save_method(workspace, full_path)
 
     def is_pixel_workspace(self, workspace_name):
         from mantid.api import IMDEventWorkspace
         workspace = self.get_workspace_handle(workspace_name)
         return isinstance(workspace, IMDEventWorkspace)
-
-    def get_workspace_handle(self, workspace_name):
-        """"Return handle to workspace given workspace_name_as_string"""
-        # if passed a workspace handle return the handle
-        if isinstance(workspace_name, Workspace):
-            return workspace_name
-        return AnalysisDataService[str(workspace_name)]
 
     def get_workspace_name(self, workspace):
         """Returns the name of a workspace given the workspace handle"""

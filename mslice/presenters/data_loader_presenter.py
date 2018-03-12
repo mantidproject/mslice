@@ -4,6 +4,7 @@ import os
 
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
+from mslice.models.workspacemanager.file_io import load_from_ascii
 
 class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
 
@@ -33,7 +34,10 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 not_loaded.append(ws_name)
             else:
                 try:
-                    self._workspace_provider.load(filename=file_paths[i], output_workspace=ws_name)
+                    if file_paths[i].endswith('.txt'):
+                        load_from_ascii(file_paths[i], ws_name)
+                    else:
+                        self._workspace_provider.load(filename=file_paths[i], output_workspace=ws_name)
                 except ValueError as e:
                     self._view.error_loading_workspace(e)
                 except RuntimeError:
@@ -51,7 +55,6 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 ws_name):
             Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi)
             self._workspace_provider.set_efixed(ws_name, Ef)
-
 
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():
