@@ -24,7 +24,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
-    def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one):
+    def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         assert isinstance(workspace, IMDEventWorkspace)
         self._fill_in_missing_input(x_axis, workspace)
@@ -37,7 +37,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         y_dim = workspace.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
-        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
+        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
+                          OutputWorkspace='__' + selected_workspace)
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:
@@ -47,7 +48,6 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
                 plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)
-        self._workspace_provider.delete_workspace(thisslice)
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
         if norm_to_one:
             plot_data = self._norm_to_one(plot_data)

@@ -37,7 +37,7 @@ class WorkspaceProvider(object):
         pass
 
     @abc.abstractmethod
-    def save_workspace(self, workspaces, path, save_name, extension):
+    def save_workspaces(self, workspaces, path, save_name, extension):
         pass
 
     def is_pixel_workspace(self, workspace_name):
