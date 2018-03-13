@@ -89,6 +89,11 @@ def _save_cut_to_ascii(workspace, ws_name, output_path):
 def _save_slice_to_ascii(workspace, output_path):
     header = 'MSlice Slice of workspace "%s"' % (workspace.name())
     x, y, e = _get_slice_mdhisto_xye(workspace)
+    dim_sz = [workspace.getDimension(i).getNBins() for i in range(workspace.getNumDims())]
+    nbins = np.prod(dim_sz)
+    x = [np.reshape(x0, nbins) for x0 in np.broadcast_arrays(*x)]
+    y = np.reshape(y, nbins)
+    e = np.reshape(e, nbins)
     out_data = np.column_stack(tuple(x+[y, e]))
     _output_data_to_ascii(output_path, out_data, header)
 
@@ -131,12 +136,7 @@ def _get_slice_mdhisto_xye(histo_ws):
         x.append(np.reshape(np.linspace(start, end, dim_sz[i]), tuple(nshape)))
     y = histo_ws.getSignalArray()
     e = np.sqrt(histo_ws.getErrorSquaredArray())
-    nbins = np.prod(dim_sz)
-    x = [np.reshape(x0, nbins) for x0 in np.broadcast_arrays(*x)]
-    y = np.reshape(y, nbins)
-    e = np.reshape(e, nbins)
     return x, y, e
-
 
 
 def _output_data_to_ascii(output_path, out_data, header):
