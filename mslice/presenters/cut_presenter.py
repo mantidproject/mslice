@@ -242,9 +242,5 @@ class CutPresenter(PresenterUtility):
         self._cut_view.set_minimum_step(min_step)
         self._cut_view.update_integration_axis()
 
-
-    def _integration_axis_changed(self):
-        pass
-
     def set_workspace_provider(self, workspace_provider):
         self._cut_plotter.set_workspace_provider(workspace_provider)

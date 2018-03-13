@@ -165,7 +165,6 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def compute_recoil_line(self, ws_name, axis, relative_mass=1):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
         x_axis = np.arange(axis.start, axis.end, axis.step)
-        print(axis)
         if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
             momentum_transfer = x_axis
             line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
