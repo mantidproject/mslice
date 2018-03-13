@@ -45,6 +45,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 else:
                     self.check_efixed(ws_name, multi)
                     self._main_presenter.show_workspace_manager_tab()
+                    self._main_presenter.show_tab_for_workspace(self._workspace_provider.get_workspace_handle(ws_name))
         self._report_load_errors(ws_names, not_opened, not_loaded)
         self._main_presenter.update_displayed_workspaces()
         self._view.busy.emit(False)

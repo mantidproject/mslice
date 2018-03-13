@@ -82,7 +82,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False,
                                               default_ext='.nxs')
-        self.workspace_provider.save_workspace.assert_called_once_with(
+        self.workspace_provider.save_workspaces.assert_called_once_with(
             [workspace_to_save], path_to_save_to, 'file1', '.nxs')
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
@@ -97,7 +97,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.SaveSelectedWorkspaceAscii)
         save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False, default_ext='.txt')
         self.view.get_workspace_selected.assert_called_once_with()
-        self.workspace_provider.save_workspace.assert_called_once_with(
+        self.workspace_provider.save_workspaces.assert_called_once_with(
             [workspace_to_save], path_to_save_to, 'file1', '.txt')
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
@@ -113,7 +113,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.SaveSelectedWorkspaceMatlab)
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False, default_ext='.mat')
-        self.workspace_provider.save_workspace.assert_called_once_with(
+        self.workspace_provider.save_workspaces.assert_called_once_with(
             [workspace_to_save], path_to_save_to, 'file1', '.mat')
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
@@ -123,12 +123,12 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         path_to_save_to = r'A:\file\path'
         self.view.get_workspace_selected = mock.Mock(return_value=['file1','file2'])
         save_dir_mock.return_value=(path_to_save_to, None, '.nxs')
-        self.workspace_provider.save_workspace = mock.Mock(side_effect=[True,RuntimeError])
+        self.workspace_provider.save_workspaces = mock.Mock(side_effect=[True, RuntimeError])
 
         self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(multiple_files=True, save_as_image=False, default_ext='.nxs')
-        self.workspace_provider.save_workspace.assert_called_with(['file1', 'file2'], path_to_save_to, None, '.nxs')
+        self.workspace_provider.save_workspaces.assert_called_with(['file1', 'file2'], path_to_save_to, None, '.nxs')
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     def test_save_workspace_non_selected_prompt_user(self, save_dir_mock):
@@ -140,7 +140,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.error_select_one_workspace.assert_called_once_with()
         save_dir_mock.assert_not_called()
-        self.workspace_provider.save_workspace.assert_not_called()
+        self.workspace_provider.save_workspaces.assert_not_called()
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     def test_save_workspace_cancelled(self, save_dir_mock):
@@ -157,7 +157,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False, default_ext='.nxs')
         self.view.error_invalid_save_path.assert_called_once()
-        self.workspace_provider.save_workspace.assert_not_called()
+        self.workspace_provider.save_workspaces.assert_not_called()
 
     def test_remove_workspace(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)

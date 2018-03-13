@@ -25,7 +25,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def __init__(self):
         self._workspace_provider = MantidWorkspaceProvider()
 
-    def compute_slice(self, selected_workspace, x_axis, y_axis, smoothing, norm_to_one):
+    def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
         if self._workspace_provider.is_PSD(selected_workspace):
             plot_data = self._compute_slice_PSD(workspace, x_axis, y_axis, smoothing, norm_to_one)
@@ -51,7 +51,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         y_dim = workspace.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
-        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning)
+        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
+                          OutputWorkspace='__' + selected_workspace)
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:

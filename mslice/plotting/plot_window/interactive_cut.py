@@ -66,7 +66,7 @@ class InteractiveCut(object):
         self._cut_algorithm.set_workspace_provider(workspace_provider)
 
     def clear(self):
-        self._cut_plotter.set_icut(False)
+        self._cut_plotter.set_icut(None)
         self.rect.set_active(False)
         for event in self.connect_event:
             self._canvas.mpl_disconnect(event)
