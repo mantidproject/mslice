@@ -16,6 +16,9 @@ class CutView:
     def get_cut_axis_step(self):
         pass
 
+    def get_integration_axis(self):
+        pass
+
     def get_integration_start(self):
         pass
 
@@ -38,6 +41,9 @@ class CutView:
         pass
 
     def get_presenter(self):
+        pass
+
+    def update_integration_axis(self):
         pass
 
     def set_cut_axis(self, axis_name):

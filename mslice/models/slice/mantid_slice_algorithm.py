@@ -74,7 +74,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         ebin = '%f, %f, %f' % (axes[e_axis].start, axes[e_axis].step, axes[e_axis].end)
         qbin = '%f, %f, %f' % (axes[q_axis].start, axes[q_axis].step, axes[q_axis].end)
         if axes[q_axis].units == '|Q|':
-            thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin, 
+            thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin,
                                EMode=self._workspace_provider.get_EMode(workspace))
         else:
             thisslice = ConvertSpectrumAxis(InputWorkspace=workspace, Target='Theta')
@@ -165,7 +165,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def compute_recoil_line(self, ws_name, axis, relative_mass=1):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
         x_axis = np.arange(axis.start, axis.end, axis.step)
-        if axis.units == 'MomentumTransfer':
+        print(axis)
+        if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
             momentum_transfer = x_axis
             line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
                 (constants.elementary_charge / 1000)
@@ -181,7 +182,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
 
     def compute_powder_line(self, ws_name, axis, element, cif_file=False):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
-        if axis.units == 'MomentumTransfer':
+        if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
             x0 = self._compute_powder_line_momentum(ws_name, axis, element, cif_file)
         elif axis.units == 'Degrees':
             x0 = self._compute_powder_line_degrees(ws_name, axis, element, efixed, cif_file)

@@ -67,11 +67,12 @@ class SliceWidget(SlicePlotterView, QWidget):
 
     def _change_axes(self, axis, idx):
         """Makes sure u1 and u2 are always different, and updates default limits/steps values."""
-        num_items = self.cmbSliceXAxis.count()
-        if num_items < 2:
-            return
         curr_axis = axis - 1
         other_axis = axis % 2
+        axes_handle = [self.cmbSliceXAxis, self.cmbSliceYAxis]
+        num_items = axes_handle[other_axis].count()
+        if num_items < 2:
+            return
         axes = [self.cmbSliceXAxis.currentText(), self.cmbSliceYAxis.currentText()]
         index = [self.cmbSliceXAxis.currentIndex(), self.cmbSliceYAxis.currentIndex()]
         axes_set = [self.cmbSliceXAxis.setCurrentIndex, self.cmbSliceYAxis.setCurrentIndex]
@@ -85,8 +86,10 @@ class SliceWidget(SlicePlotterView, QWidget):
 
     def enable_units_choice(self, enabled):
         if enabled:
-            self.cmbSliceUnits.show()
-            self.label_16.show()
+            # TODO implement conversion from meV to cm-1
+            pass
+            #self.cmbSliceUnits.show()
+            #self.label_16.show()
         else:
             self.cmbSliceUnits.hide()
             self.label_16.hide()

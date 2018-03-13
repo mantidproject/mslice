@@ -96,6 +96,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
             retval = TransformMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, Scaling=scale)
             retval = RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=output_workspace+'_cm')
             retval.setComment('MSlice_in_wavenumber')
+            output_workspace += '_cm'
         elif units != MEV_LABEL:
             raise NotImplementedError("Unit %s not recognised. Only 'meV' and 'cm-1' implemented." % (units))
         self._workspace_provider.propagate_properties(input_workspace, output_workspace)

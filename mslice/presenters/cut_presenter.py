@@ -72,7 +72,7 @@ class CutPresenter(PresenterUtility):
         cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
         index = 0
         while cut_start != cut_end:
-            params = params[:2] + (Axis(params[2].unit, cut_start, cut_end, 0.)) + params[3:]
+            params = params[:2] + (Axis(params[2].units, cut_start, cut_end, 0.),) + params[3:]
             output_method(params, plot_over)
             index += 1
             cut_start, cut_end = cut_end, min(cut_end + width, integration_end)

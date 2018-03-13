@@ -111,6 +111,7 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_cut_axis_start = mock.Mock(return_value=axis.start)
         self.view.get_cut_axis_end = mock.Mock(return_value=axis.end)
         self.view.get_cut_axis.step = mock.Mock(return_value=axis.step)
+        self.view.get_integration_axis = mock.Mock(return_value=integrated_axis)
         self.view.get_integration_start = mock.Mock(return_value=integration_start)
         self.view.get_integration_end = mock.Mock(return_value=integration_end)
         self.view.get_intensity_start = mock.Mock(return_value=intensity_start)
@@ -218,12 +219,13 @@ class CutPresenterTest(unittest.TestCase):
         is_norm = True
         workspace = "workspace"
         integrated_axis = 'integrated axis'
+        integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
 
         cut_presenter.notify(Command.Plot)
         self.cut_plotter.plot_cut.assert_called_with(selected_workspace=workspace, cut_axis=processed_axis,
-                                                     integration_start=integration_start, integration_end=integration_end,
+                                                     integration_axis=integration_axis,
                                                      norm_to_one=is_norm, intensity_start=intensity_start,
                                                      intensity_end=intensity_end, plot_over=False)
 
@@ -240,11 +242,12 @@ class CutPresenterTest(unittest.TestCase):
         is_norm = True
         workspace = "workspace"
         integrated_axis = 'integrated axis'
+        integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
         cut_presenter.notify(Command.PlotOver)
         self.cut_plotter.plot_cut.assert_called_with(selected_workspace=workspace, cut_axis=processed_axis,
-                                                     integration_start=integration_start, integration_end=integration_end,
+                                                     integration_axis=integration_axis,
                                                      norm_to_one=is_norm, intensity_start=None,
                                                      intensity_end=intensity_end, plot_over=True)
 
@@ -261,12 +264,12 @@ class CutPresenterTest(unittest.TestCase):
         is_norm = True
         workspace = "workspace"
         integrated_axis = 'integrated axis'
+        integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
         self.cut_algorithm.compute_cut_xye = mock.Mock(return_value=('x', 'y', 'e'))
         cut_presenter.notify(Command.SaveToWorkspace)
-        self.cut_plotter.save_cut.assert_called_with((workspace, processed_axis, integration_start,
-                                                      integration_end, is_norm))
+        self.cut_plotter.save_cut.assert_called_with((workspace, processed_axis, integration_axis, is_norm))
         self.cut_plotter.plot_cut.assert_not_called()
 
     def test_plot_multiple_cuts_with_width(self):
@@ -282,19 +285,22 @@ class CutPresenterTest(unittest.TestCase):
         is_norm = True
         workspace = "workspace"
         integrated_axis = 'integrated axis'
+        integration_axis1 = Axis('integrated axis', 3, 5, 0)
+        integration_axis2 = Axis('integrated axis', 5, 7, 0)
+        integration_axis3 = Axis('integrated axis', 7, 8, 0)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
 
         cut_presenter.notify(Command.Plot)
         call_list = [
-            call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=3,
-                 integration_end=5,norm_to_one=is_norm,intensity_start=intensity_start,
+            call(selected_workspace=workspace, cut_axis=processed_axis, integration_axis=integration_axis1,
+                 norm_to_one=is_norm, intensity_start=intensity_start,
                  intensity_end=intensity_end, plot_over=False),
-            call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=5,
-                 integration_end=7,norm_to_one=is_norm,intensity_start=intensity_start,
+            call(selected_workspace=workspace, cut_axis=processed_axis, integration_axis=integration_axis2,
+                 norm_to_one=is_norm, intensity_start=intensity_start,
                  intensity_end=intensity_end, plot_over=True),
-            call(selected_workspace=workspace, cut_axis=processed_axis,integration_start=7,
-                 integration_end=8,norm_to_one=is_norm,intensity_start=intensity_start,
+            call(selected_workspace=workspace, cut_axis=processed_axis, integration_axis=integration_axis3,
+                 norm_to_one=is_norm, intensity_start=intensity_start,
                  intensity_end=intensity_end, plot_over=True)
         ]
         self.cut_plotter.plot_cut.assert_has_calls(call_list)
@@ -312,18 +318,17 @@ class CutPresenterTest(unittest.TestCase):
         is_norm = True
         selected_workspaces = ["ws1", "ws2"]
         integrated_axis = 'integrated axis'
+        integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, selected_workspaces, integrated_axis)
         self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
         cut_presenter.notify(Command.Plot)
         call_list = [
             call(selected_workspace=selected_workspaces[0], cut_axis=processed_axis,
-                 integration_start=integration_start, integration_end=integration_end,
-                 norm_to_one=is_norm, intensity_start=intensity_start,
+                 integration_axis=integration_axis, norm_to_one=is_norm, intensity_start=intensity_start,
                  intensity_end=intensity_end, plot_over=False),
             call(selected_workspace=selected_workspaces[1], cut_axis=processed_axis,
-                 integration_start=integration_start, integration_end=integration_end,
-                 norm_to_one=is_norm, intensity_start=intensity_start,
+                 integration_axis=integration_axis, norm_to_one=is_norm, intensity_start=intensity_start,
                  intensity_end=intensity_end, plot_over=True),
         ]
         self.cut_plotter.plot_cut.assert_has_calls(call_list)
