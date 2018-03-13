@@ -32,3 +32,7 @@ class MainPresenterInterface(object):
     @abc.abstractmethod
     def change_ws_tab(self, tab):
         pass
+
+    @abc.abstractmethod
+    def highlight_ws_tab(self, tab):
+        pass

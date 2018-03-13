@@ -99,7 +99,8 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         try:
             self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
                                            norm_to_one, colourmap)
-
+        except RuntimeError as e:
+            self._slice_view.error(e.args[0])
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
             # will break if matplotlib change exception eror message
@@ -151,9 +152,13 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         axis = self._slice_plotter.get_available_axis(workspace_selection)
         self._slice_view.populate_slice_x_options(axis)
         self._slice_view.populate_slice_y_options(axis[::-1])
+        self.populate_slice_params()
+
+    def populate_slice_params(self):
+        workspace_selection = self._get_main_presenter().get_selected_workspaces()[0]
         try:
-            x_min, x_max, x_step = self._slice_plotter.get_axis_range(workspace_selection,self._slice_view.get_slice_x_axis())
-            y_min, y_max, y_step = self._slice_plotter.get_axis_range(workspace_selection,self._slice_view.get_slice_y_axis())
+            x_min, x_max, x_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_x_axis())
+            y_min, y_max, y_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_y_axis())
         except (KeyError, RuntimeError):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()

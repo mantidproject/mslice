@@ -12,8 +12,8 @@ from six import string_types
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
                               RenameWorkspace, MergeMD, MergeRuns, Minus)
 
-from mantid.api import IMDEventWorkspace, Workspace
 from mslice.presenters.slice_plotter_presenter import Axis
+from mantid.api import IMDEventWorkspace, MatrixWorkspace, Workspace
 from .file_io import save_ascii, save_matlab, save_nexus
 import numpy as np
 from scipy import constants
@@ -91,7 +91,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return
         if isinstance(ws_h, IMDEventWorkspace):
             self.process_limits_event(ws_h, ws_name, efix)
-        else:
+        elif isinstance(ws_h, MatrixWorkspace):
             self.process_limits(ws_h, ws_name, efix)
 
     def process_limits(self, ws, ws_name, efix):
@@ -304,7 +304,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         return emode
 
     def get_EFixed(self, ws_handle):
-        efix=None
+        efix = np.nan
         try:
             efix = self._get_ws_EFixed(ws_handle)
         except RuntimeError:  # Efixed not defined
@@ -316,11 +316,14 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             except AttributeError:
                 if ws_handle.getExperimentInfo(0).run().hasProperty('Ei'):
                     efix = ws_handle.getExperimentInfo(0).run().getProperty('Ei').value
-        return efix
+        if efix is not None and not np.isnan(efix):  # error if none is passed to isnan
+            return efix
+        else:
+            return None
 
     def _get_ws_EFixed(self, ws_handle):
         try:
-            efixed = ws_handle.getEFixed(1)
+            efixed = ws_handle.getEFixed(ws_handle.getDetector(0).getID())
         except AttributeError: # workspace is not matrix workspace
             try:
                 efixed = self._get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEFixed(1))
