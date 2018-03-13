@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 from .interfaces.main_presenter import MainPresenterInterface
+from mantid.api import IMDHistoWorkspace, IMDEventWorkspace
 import collections
 
 
@@ -18,6 +19,14 @@ class MainPresenter(MainPresenterInterface):
 
     def show_workspace_manager_tab(self):
         self._mainView.change_main_tab(1)
+
+    def show_tab_for_workspace(self, ws):
+        tab = 0
+        if isinstance(ws, IMDHistoWorkspace):
+            tab = 2
+        elif isinstance(ws, IMDEventWorkspace):
+            tab = 1
+        self.change_ws_tab(tab)
 
     def set_selected_workspaces(self, workspace_list):
         self._workspace_presenter.set_selected_workspaces(workspace_list)
