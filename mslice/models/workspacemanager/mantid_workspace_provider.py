@@ -12,7 +12,7 @@ from six import string_types
 from mantid.simpleapi import (AnalysisDataService, DeleteWorkspace, Load, Scale,
                               RenameWorkspace, MergeMD, MergeRuns, Minus)
 
-from mantid.api import IMDEventWorkspace, Workspace
+from mantid.api import IMDEventWorkspace, MatrixWorkspace, Workspace
 from .file_io import save_ascii, save_matlab, save_nexus
 import numpy as np
 from scipy import constants
@@ -89,7 +89,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return
         if isinstance(ws_h, IMDEventWorkspace):
             self.process_limits_event(ws_h, ws_name, efix)
-        else:
+        elif isinstance(ws_h, MatrixWorkspace):
             self.process_limits(ws_h, ws_name, efix)
 
     def process_limits(self, ws, ws_name, efix):
