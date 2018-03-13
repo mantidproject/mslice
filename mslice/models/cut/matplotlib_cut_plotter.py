@@ -57,13 +57,14 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.gcf().canvas.draw()
 
     def set_icut(self, icut):
-        if not icut:
-            self.icut = None
-        elif hasattr(icut, 'plot_cut'):
-            plt.gcf().canvas.manager.is_icut(True)
-            self.icut = icut
+        if icut:
+            if hasattr(icut, 'plot_cut'):
+                plt.gcf().canvas.manager.is_icut(True)
+                self.icut = icut
+            else:
+                plt.gcf().canvas.manager.is_icut(icut)
         else:
-            plt.gcf().canvas.manager.is_icut(icut)
+            self.icut = None
 
     def get_icut(self):
         return self.icut
