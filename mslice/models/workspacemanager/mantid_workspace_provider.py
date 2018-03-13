@@ -290,7 +290,10 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             except AttributeError:
                 if ws_handle.getExperimentInfo(0).run().hasProperty('Ei'):
                     efix = ws_handle.getExperimentInfo(0).run().getProperty('Ei').value
-        return efix if not np.isnan(efix) else None
+        if efix is not None and not np.isnan(efix):  # error if none is passed to isnan
+            return efix
+        else:
+            return None
 
     def _get_ws_EFixed(self, ws_handle):
         try:
