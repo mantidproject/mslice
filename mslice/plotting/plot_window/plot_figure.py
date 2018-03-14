@@ -164,6 +164,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.actionZoom_In.setIcon(qta.icon('fa.search-plus'))
         self.actionZoom_Out.setIcon(qta.icon('fa.search-minus'))
         self.actionPlotOptions.setIcon(qta.icon('fa.cog'))
+        self.actionFlip_Axis.setIcon(qta.icon('fa.retweet'))
 
     def error_box(self, message):
         error_box = QtWidgets.QMessageBox(self)

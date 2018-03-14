@@ -78,3 +78,7 @@ class InteractiveCut(object):
         for event in self.connect_event:
             self._canvas.mpl_disconnect(event)
         self._canvas.draw()
+
+    def flip_axis(self):
+        self.horizontal = not self.horizontal
+        self.plot_cut(*self.rect.extents)

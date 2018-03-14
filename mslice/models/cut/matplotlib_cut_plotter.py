@@ -66,6 +66,7 @@ class MatplotlibCutPlotter(CutPlotter):
                 plt.gcf().canvas.manager.is_icut(icut)
         else:
             self.icut = None
+            plt.gcf().canvas.manager.is_icut(False)
 
     def get_icut(self):
         return self.icut

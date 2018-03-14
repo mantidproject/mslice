@@ -28,6 +28,8 @@ class CutPlot(object):
         plot_figure.menuIntensity.setDisabled(True)
         plot_figure.menuInformation.setDisabled(True)
         plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
+        plot_figure.actionFlip_Axis.setVisible(False)
+        plot_figure.actionFlip_Axis.triggered.connect(self.flip_icut)
 
     def disconnect(self, plot_figure):
         plot_figure.actionSave_Cut.triggered.disconnect()
@@ -43,11 +45,16 @@ class CutPlot(object):
         self.plot_figure.actionToggleLegends.setVisible(not is_icut)
         self.plot_figure.actionKeep.setVisible(not is_icut)
         self.plot_figure.actionMakeCurrent.setVisible(not is_icut)
+        self.plot_figure.actionFlip_Axis.setVisible(is_icut)
         self.plot_figure.show()
 
     def save_icut(self):
         icut = self._cut_plotter.get_icut()
         icut.save_cut()
+
+    def flip_icut(self):
+        icut = self._cut_plotter.get_icut()
+        icut.flip_axis()
 
     def object_clicked(self, target):
         if isinstance(target, Legend):

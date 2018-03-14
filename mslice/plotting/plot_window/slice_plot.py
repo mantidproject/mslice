@@ -35,6 +35,8 @@ class SlicePlot(object):
         plot_figure.actionInteractive_Cuts.setVisible(True)
         plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
         plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
+        plot_figure.actionFlip_Axis.setVisible(False)
+        plot_figure.actionFlip_Axis.triggered.connect(self.flip_icut)
 
         plot_figure.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionS_Q_E,
                                                           self._slice_plotter.show_scattering_function, False))
@@ -313,6 +315,7 @@ class SlicePlot(object):
             self.plot_figure.actionKeep.setEnabled(False)
             self.plot_figure.actionMakeCurrent.setEnabled(False)
             self.plot_figure.actionSave_Cut.setVisible(True)
+            self.plot_figure.actionFlip_Axis.setVisible(True)
             self._canvas.setCursor(Qt.CrossCursor)
         else:
             self.plot_figure.actionZoom_In.setEnabled(True)
@@ -320,6 +323,7 @@ class SlicePlot(object):
             self.plot_figure.actionKeep.setEnabled(True)
             self.plot_figure.actionMakeCurrent.setEnabled(True)
             self.plot_figure.actionSave_Cut.setVisible(False)
+            self.plot_figure.actionFlip_Axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
         self.toggle_icut()
 
@@ -333,6 +337,9 @@ class SlicePlot(object):
 
     def save_icut(self):
         self.icut.save_cut()
+
+    def flip_icut(self):
+        self.icut.flip_axis()
 
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
