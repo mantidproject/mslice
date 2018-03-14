@@ -11,6 +11,7 @@ from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.util.qt import load_ui
 from .inputdialog import EfInputDialog
 
+MSLICE_EXTENSIONS = ['*.nxs', '*.nxspe', '*.txt', '*.xye']
 
 class DataLoaderWidget(QWidget): # and some view interface
 
@@ -25,6 +26,8 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.directory = QDir(os.path.expanduser('~'))
         path = self.directory.absolutePath()
         self.file_system.setRootPath(path)
+        self.file_system.setNameFilters(MSLICE_EXTENSIONS)
+        self.file_system.setNameFilterDisables(False)
         self.table_view.setModel(self.file_system)
         self.table_view.setRootIndex(self.file_system.index(path))
         self.txtpath.setText(path)
