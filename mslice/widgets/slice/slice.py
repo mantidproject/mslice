@@ -60,7 +60,7 @@ class SliceWidget(SlicePlotterView, QWidget):
             if value == 0:
                 lineEdit.setText(str(self._minimumStep[idx]))
                 self._display_error('Setting step size to default.')
-            elif value < (self._minimumStep[idx] / 10000.):
+            elif value < (self._minimumStep[idx] / 100.):
                 self._display_error('Step size too small!')
                 return False
         return True

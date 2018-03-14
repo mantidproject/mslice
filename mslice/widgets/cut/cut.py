@@ -46,7 +46,8 @@ class CutWidget(CutView, QWidget):
     def _btn_clicked(self):
         sender = self.sender()
         command = self._command_lookup[sender]
-        self._presenter.notify(command)
+        if self._step_edited():
+            self._presenter.notify(command)
 
     def _step_edited(self):
         """Checks that user inputted step size is not too small."""
@@ -59,7 +60,7 @@ class CutWidget(CutView, QWidget):
             if value == 0:
                 self.lneCutStep.setText('%.5f' % (self._minimumStep))
                 self._display_error('Setting step size to default.')
-            elif value < (self._minimumStep / 10000.):
+            elif value < (self._minimumStep / 100.):
                 self._display_error('Step size too small!')
                 return False
         return True
