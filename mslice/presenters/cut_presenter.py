@@ -93,7 +93,7 @@ class CutPresenter(PresenterUtility):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         for workspace in selected_workspaces:
             x, y, e, units = self._cut_algorithm.get_arrays_from_workspace(workspace)
-            self._cut_plotter.plot_cut_from_xye(x, y, e, units, workspace, plot_over)
+            self._cut_plotter.plot_cut_from_xye(x, y, e, units, workspace, plot_over=plot_over)
             plot_over = True  # plot over if multiple workspaces selected
 
     def _parse_step(self):
