@@ -5,12 +5,13 @@ import os
 from functools import partial
 
 from mslice.util.qt.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView, QMessageBox
-from mslice.util.qt.QtCore import Signal, QDir
+from mslice.util.qt.QtCore import Signal, QDir, Qt
 
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.util.qt import load_ui
 from .inputdialog import EfInputDialog
 
+MSLICE_EXTENSIONS = ['*.nxs', '*.nxspe', '*.txt', '*.xye']
 
 class DataLoaderWidget(QWidget): # and some view interface
 
@@ -25,6 +26,8 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.directory = QDir(os.path.expanduser('~'))
         path = self.directory.absolutePath()
         self.file_system.setRootPath(path)
+        self.file_system.setNameFilters(MSLICE_EXTENSIONS)
+        self.file_system.setNameFilterDisables(False)
         self.table_view.setModel(self.file_system)
         self.table_view.setRootIndex(self.file_system.index(path))
         self.txtpath.setText(path)
@@ -36,7 +39,7 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.btnload.setEnabled(False)
         self.btnmerge.setEnabled(False)
 
-        self.table_view.doubleClicked.connect(self.enter_dir)
+        self.table_view.activated.connect(self.activated)
         self.table_view.clicked.connect(self.validate_selection)
         self.txtpath.editingFinished.connect(self.refresh)
         self.btnback.clicked.connect(self.back)
@@ -45,9 +48,21 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.btnload.clicked.connect(partial(self.load, False))
         self.btnmerge.clicked.connect(partial(self.load, True))
 
-    def enter_dir(self, file_clicked):
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Backspace:
+            self.back()
+        else:
+            event.accept()
+
+    def activated(self, file_clicked):
         file_clicked = file_clicked.sibling(file_clicked.row(), 0) # so clicking anywhere on row gives filename
-        self.directory.cd(self.file_system.fileName(file_clicked))
+        if self.file_system.isDir(file_clicked):
+            self.enter_dir(self.file_system.fileName(file_clicked))
+        else:
+            self.load(False)
+
+    def enter_dir(self, directory):
+        self.directory.cd(directory)
         self._update_from_path()
 
     def refresh(self):
