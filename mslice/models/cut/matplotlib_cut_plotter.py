@@ -27,7 +27,6 @@ class MatplotlibCutPlotter(CutPlotter):
 
     def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, intensity_range=None, plot_over=False,
                           cut_ws_name=None, legend=None):
-        
         legend = selected_workspace if legend is None else legend
         plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o', picker=picker)
         plt.ylim(*intensity_range) if intensity_range is not None else plt.autoscale()
