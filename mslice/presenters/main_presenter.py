@@ -30,6 +30,7 @@ class MainPresenter(MainPresenterInterface):
         elif isinstance(ws, IMDEventWorkspace):
             tab = 1
         self.change_ws_tab(tab)
+        self._workspace_presenter.set_selected_workspaces([ws])
 
     def set_selected_workspaces(self, workspace_list):
         self._workspace_presenter.set_selected_workspaces(workspace_list)

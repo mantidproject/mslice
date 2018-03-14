@@ -123,4 +123,4 @@ class DataLoaderTest(unittest.TestCase):
         self.workspace_provider.load.assert_called_once_with(filename=path_nexus, output_workspace='nexus')
         load_ascii_mock.assert_called_once_with(path_ascii, 'ascii')
         self.main_presenter.show_workspace_manager_tab.assert_called()
-        self.main_presenter.update_displayed_workspaces.assert_called_once()
+        self.main_presenter.update_displayed_workspaces.assert_called()
