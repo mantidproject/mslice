@@ -29,7 +29,8 @@ class InteractiveCut(object):
     def plot_cut(self, x1, x2, y1, y2):
         if x2 > x1 and y2 > y1:
             ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
-            integration_axis = Axis('', integration_start, integration_end, 0)
+            other_axis = self._cut_algorithm.get_other_axis(str(self._ws_title), ax)
+            integration_axis = Axis(other_axis, integration_start, integration_end, 0)
             self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_axis, False, None, None, False)
 
     def get_cut_parameters(self, pos1, pos2):
