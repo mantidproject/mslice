@@ -39,7 +39,8 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.btnload.setEnabled(False)
         self.btnmerge.setEnabled(False)
 
-        self.table_view.doubleClicked.connect(self.enter_dir)
+        self.table_view.doubleClicked.connect(self.doubleClicked)
+        self.table_view.activated.connect(self.doubleClicked)
         self.table_view.clicked.connect(self.validate_selection)
         self.txtpath.editingFinished.connect(self.refresh)
         self.btnback.clicked.connect(self.back)
@@ -48,9 +49,15 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.btnload.clicked.connect(partial(self.load, False))
         self.btnmerge.clicked.connect(partial(self.load, True))
 
-    def enter_dir(self, file_clicked):
+    def doubleClicked(self, file_clicked):
         file_clicked = file_clicked.sibling(file_clicked.row(), 0) # so clicking anywhere on row gives filename
-        self.directory.cd(self.file_system.fileName(file_clicked))
+        if self.file_system.isDir(file_clicked):
+            self.enter_dir(self.file_system.fileName(file_clicked))
+        else:
+            self.load(False)
+
+    def enter_dir(self, directory):
+        self.directory.cd(directory)
         self._update_from_path()
 
     def refresh(self):
