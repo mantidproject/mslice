@@ -146,7 +146,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         file_path, save_name, ext = get_save_directory(save_as_image=True)
         workspace = self._plot_handler.ws_name
         try:
-            self._plot_handler.workspace_provider().save_workspaces([workspace], file_path, save_name, ext)
+            self._plot_handler.workspace_provider().save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
             if e.message == "unrecognised file extension":
                 self.save_image(os.path.join(file_path, save_name))

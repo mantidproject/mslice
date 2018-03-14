@@ -236,7 +236,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         finally:
             self.delete_workspace(scaled_bg_ws)
 
-    def save_workspaces(self, workspaces, path, save_name, extension):
+    def save_workspaces(self, workspaces, path, save_name, extension, slice_nonpsd=False):
         '''
         :param workspaces: list of workspaces to save
         :param path: directory to save to
@@ -252,14 +252,14 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         else:
             raise RuntimeError("unrecognised file extension")
         for workspace in workspaces:
-            self._save_single_ws(workspace, save_name, save_method, path, extension)
+            self._save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd)
 
-    def _save_single_ws(self, workspace, save_name, save_method, path, extension):
+    def _save_single_ws(self, workspace, save_name, save_method, path, extension, slice_nonpsd):
         slice = False
         save_as = save_name if save_name is not None else str(workspace) + extension
         full_path = os.path.join(str(path), save_as)
         workspace = self.get_workspace_handle(workspace)
-        if self.is_pixel_workspace(workspace):
+        if self.is_pixel_workspace(workspace) or (slice_nonpsd and not self.is_PSD(workspace)):
             slice = True
             workspace = self._get_slice_mdhisto(workspace, workspace.name())
         save_method(workspace, full_path, slice)
