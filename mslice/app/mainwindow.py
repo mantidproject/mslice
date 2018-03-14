@@ -11,6 +11,7 @@ from mslice.widgets.cut.command import Command as cut_command
 TAB_2D = 0
 TAB_EVENT = 1
 TAB_HISTO = 2
+TAB_NONPSD = 3
 TAB_SLICE = 1
 TAB_CUT = 2
 TAB_POWDER = 0
@@ -30,11 +31,13 @@ class MainWindow(MainView, QMainWindow):
         self.tabs = [self.wgtSlice, self.wgtCut, self.wgtPowder]
         self.tabs_to_show = {TAB_2D: [TAB_POWDER],
                              TAB_EVENT: [TAB_SLICE, TAB_CUT],
-                             TAB_HISTO: []}
+                             TAB_HISTO: [],
+                             TAB_NONPSD: [TAB_SLICE, TAB_CUT]}
 
         self.buttons_to_enable = {TAB_2D: [self.btnAdd, self.btnSubtract],
                                   TAB_EVENT: [self.btnMerge],
-                                  TAB_HISTO: [self.btnPlot, self.btnOverplot]}
+                                  TAB_HISTO: [self.btnPlot, self.btnOverplot],
+                                  TAB_NONPSD: [self.btnAdd, self.btnSubtract]}
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
@@ -51,6 +54,7 @@ class MainWindow(MainView, QMainWindow):
         self.cut_presenter.set_workspace_provider(workspace_provider)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
+        self.wgtWorkspacemanager.nonpsd.connect(self.switch_nonpsd_mode)
         self.setup_save()
         self.btnSave.clicked.connect(self.button_save)
         self.btnAdd.clicked.connect(self.button_add)
@@ -88,6 +92,10 @@ class MainWindow(MainView, QMainWindow):
     def ws_tab_changed(self, tab):
         self.enable_widget_tabs(tab)
         self.enable_buttons(tab)
+
+    def switch_nonpsd_mode(self, nonpsd):
+        self.wgtCut.enable_integration_axis(nonpsd)
+        self.wgtSlice.enable_units_choice(nonpsd)
 
     def enable_widget_tabs(self, workspace_tab):
         '''enables correct powder/slice/cut tabs based on workspace tab'''

@@ -17,13 +17,19 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
     def set_workspace_provider(self, workspace_provider):
         self._workspace_provider = workspace_provider
 
-    def load_workspace(self, file_paths, merge):
+    def load_workspace(self, file_paths, merge=False):
+        '''
+        Loads one or more workspaces.
+        :param file_paths: list of paths to files to load
+        :param merge: boolean - whether to combine files into a single workspace
+        '''
         self._view.busy.emit(True)
         ws_names = [os.path.splitext(os.path.basename(base))[0] for base in file_paths]
         if merge:
             ws_names = [ws_names[0] + '_merged']
             file_paths = ['+'.join(file_paths)]
         self._load_ws(file_paths, ws_names)
+        self._view.busy.emit(False)
 
     def _load_ws(self, file_paths, ws_names):
         not_loaded = []
@@ -48,7 +54,6 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                     self._main_presenter.update_displayed_workspaces()
                     self._main_presenter.show_tab_for_workspace(self._workspace_provider.get_workspace_handle(ws_name))
         self._report_load_errors(ws_names, not_opened, not_loaded)
-        self._view.busy.emit(False)
 
     def check_efixed(self, ws_name, multi=False):
         '''checks if a newly loaded workspace has efixed set'''

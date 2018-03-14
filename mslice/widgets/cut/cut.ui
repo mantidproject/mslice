@@ -60,13 +60,6 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Integrating</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="2">
       <widget class="QLabel" name="label_258">
        <property name="text">
@@ -179,6 +172,23 @@
       <widget class="QCheckBox" name="rdoCutNormToOne">
        <property name="text">
         <string>Norm to 1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QStackedWidget" name="integrationStack">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Integrating</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="cmbIntegrationAxis"/>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_250">
+       <property name="text">
+        <string>over</string>
        </property>
       </widget>
      </item>

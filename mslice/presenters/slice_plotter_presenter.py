@@ -142,7 +142,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def workspace_selection_changed(self):
         workspace_selection = self._get_main_presenter().get_selected_workspaces()
-        if len(workspace_selection) != 1:
+        if len(workspace_selection) != 1 or not self._slice_plotter.is_sliceable(workspace_selection[0]):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
             return
@@ -155,14 +155,15 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         self.populate_slice_params()
 
     def populate_slice_params(self):
-        workspace_selection = self._get_main_presenter().get_selected_workspaces()[0]
         try:
+            workspace_selection = self._get_main_presenter().get_selected_workspaces()[0]
             x_min, x_max, x_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_x_axis())
             y_min, y_max, y_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_y_axis())
-        except (KeyError, RuntimeError):
+        except (KeyError, RuntimeError, IndexError):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
             return
+        self._slice_view.enable()
         self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
         self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])
 

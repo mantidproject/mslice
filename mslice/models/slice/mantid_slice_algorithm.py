@@ -2,8 +2,9 @@ from __future__ import (absolute_import, division, print_function)
 from six import string_types
 import numpy as np
 
-from mantid.simpleapi import BinMD, LoadCIF
-from mantid.api import IMDEventWorkspace, MDNormalization
+from mantid.simpleapi import BinMD, LoadCIF, SofQW3, ConvertSpectrumAxis, Rebin2D
+from mantid.api import IMDEventWorkspace, MDNormalization, WorkspaceUnitValidator
+from mantid.dataobjects import Workspace2D
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
@@ -26,6 +27,19 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
+        if self._workspace_provider.is_PSD(selected_workspace):
+            plot_data = self._compute_slice_PSD(workspace, x_axis, y_axis, norm_to_one)
+        else:
+            plot_data = self._compute_slice_nonPSD(workspace, x_axis, y_axis, norm_to_one)
+        # rot90 switches the x and y axis to to plot what user expected.
+        plot_data = np.rot90(plot_data)
+        boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
+        if norm_to_one:
+            plot_data = self._norm_to_one(plot_data)
+        plot = [plot_data] + [None]*5
+        return plot, boundaries
+
+    def _compute_slice_PSD(self, workspace, x_axis, y_axis, norm_to_one):
         assert isinstance(workspace, IMDEventWorkspace)
         self._fill_in_missing_input(x_axis, workspace)
         self._fill_in_missing_input(y_axis, workspace)
@@ -38,7 +52,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
         thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
-                          OutputWorkspace='__' + selected_workspace)
+                          OutputWorkspace='__' + self._workspace_provider.get_workspace_name(workspace))
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:
@@ -46,13 +60,33 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
                 plot_data[np.where(thisslice.getNumEventsArray() == 0)] = np.nan
             else:
                 plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
-        # rot90 switches the x and y axis to to plot what user expected.
-        plot_data = np.rot90(plot_data)
-        boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
-        if norm_to_one:
-            plot_data = self._norm_to_one(plot_data)
-        plot = [plot_data] + [None]*5
-        return plot, boundaries
+        return plot_data
+
+    def _compute_slice_nonPSD(self, workspace, x_axis, y_axis, norm_to_one):
+        ws_name = self._workspace_provider.get_workspace_name(workspace)
+        axes = [x_axis, y_axis]
+        if x_axis.units == 'DeltaE':
+            e_axis = 0
+        elif y_axis.units == 'DeltaE':
+            e_axis = 1
+        else:
+            raise RuntimeError('Cannot calculate slices without an energy axis')
+        q_axis = (e_axis + 1) % 2
+        ebin = '%f, %f, %f' % (axes[e_axis].start, axes[e_axis].step, axes[e_axis].end)
+        qbin = '%f, %f, %f' % (axes[q_axis].start, axes[q_axis].step, axes[q_axis].end)
+        if axes[q_axis].units == '|Q|':
+            thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin,
+                               EMode=self._workspace_provider.get_EMode(workspace),
+                               OutputWorkspace='__' + ws_name)
+        else:
+            thisslice = ConvertSpectrumAxis(InputWorkspace=workspace, Target='Theta')
+            thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin,
+                                OutputWorkspace='__' + ws_name)
+        plot_data = thisslice.extractY()
+        self._workspace_provider.propagate_properties(ws_name, '__' + ws_name)
+        if e_axis == 0:
+            plot_data = np.transpose(plot_data)
+        return plot_data
 
     def compute_boltzmann_dist(self, sample_temp, e_axis):
         '''calculates exp(-E/kBT), a common factor in intensity corrections'''
@@ -134,7 +168,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def compute_recoil_line(self, ws_name, axis, relative_mass=1):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
         x_axis = np.arange(axis.start, axis.end, axis.step)
-        if axis.units == 'MomentumTransfer':
+        if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
             momentum_transfer = x_axis
             line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
                 (constants.elementary_charge / 1000)
@@ -150,7 +184,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
 
     def compute_powder_line(self, ws_name, axis, element, cif_file=False):
         efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
-        if axis.units == 'MomentumTransfer':
+        if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
             x0 = self._compute_powder_line_momentum(ws_name, axis, element, cif_file)
         elif axis.units == 'Degrees':
             x0 = self._compute_powder_line_degrees(ws_name, axis, element, efixed, cif_file)
@@ -195,3 +229,11 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def _norm_to_one(self, data):
         data_range = np.nanmax(data) - np.nanmin(data)
         return (data - np.nanmin(data))/data_range
+
+    def is_sliceable(self, workspace):
+        workspace = self._workspace_provider.get_workspace_handle(workspace)
+        if isinstance(workspace, IMDEventWorkspace):
+            return True
+        else:
+            validator = WorkspaceUnitValidator('DeltaE')
+            return isinstance(workspace, Workspace2D) and validator.isValid(workspace) == ''

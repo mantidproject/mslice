@@ -40,7 +40,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def _cache_slice(self, plot_data, ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis):
         self.slice_cache[ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'colourmap': colourmap,
                                 'norm': norm, 'sample_temp': sample_temp, 'boltzmann_dist': None}
-        if x_axis.units == 'MomentumTransfer' or x_axis.units == 'Degrees':
+        if x_axis.units == 'MomentumTransfer' or x_axis.units == 'Degrees' or x_axis.units == '|Q|':
             self.slice_cache[ws]['momentum_axis'] = x_axis
             self.slice_cache[ws]['energy_axis'] = y_axis
             self.slice_cache[ws]['rotated'] = False
@@ -218,9 +218,15 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def get_recoil_label(self, key):
         return recoil_labels[key]
 
+    def is_sliceable(self, workspace):
+        return self._slice_algorithm.is_sliceable(workspace)
+
     def update_displayed_workspaces(self):
         self.listener.update_workspaces()
 
     def set_workspace_provider(self, workspace_provider):
         self.workspace_provider = workspace_provider
         self._slice_algorithm.set_workspace_provider(workspace_provider)
+
+    def get_workspace_provider(self):
+        return self._slice_algorithm.get_workspace_provider()

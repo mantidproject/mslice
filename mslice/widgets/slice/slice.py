@@ -38,6 +38,7 @@ class SliceWidget(SlicePlotterView, QWidget):
         self._minimumStep = {}
         self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))
         self.lneSliceYStep.editingFinished.connect(lambda: self._step_edited('y', self.lneSliceYStep))
+        self.enable_units_choice(False)
         self.cmbSliceXAxis.currentIndexChanged.connect(lambda ind: self._change_axes(1, ind))
         self.cmbSliceYAxis.currentIndexChanged.connect(lambda ind: self._change_axes(2, ind))
 
@@ -59,18 +60,19 @@ class SliceWidget(SlicePlotterView, QWidget):
             if value == 0:
                 lineEdit.setText(str(self._minimumStep[idx]))
                 self._display_error('Setting step size to default.')
-            elif value < (self._minimumStep[idx] / 10000.):
+            elif value < (self._minimumStep[idx] / 100.):
                 self._display_error('Step size too small!')
                 return False
         return True
 
     def _change_axes(self, axis, idx):
         """Makes sure u1 and u2 are always different, and updates default limits/steps values."""
-        num_items = self.cmbSliceXAxis.count()
-        if num_items < 2:
-            return
         curr_axis = axis - 1
         other_axis = axis % 2
+        axes_handle = [self.cmbSliceXAxis, self.cmbSliceYAxis]
+        num_items = axes_handle[other_axis].count()
+        if num_items < 2:
+            return
         axes = [self.cmbSliceXAxis.currentText(), self.cmbSliceYAxis.currentText()]
         index = [self.cmbSliceXAxis.currentIndex(), self.cmbSliceYAxis.currentIndex()]
         axes_set = [self.cmbSliceXAxis.setCurrentIndex, self.cmbSliceYAxis.setCurrentIndex]
@@ -81,6 +83,19 @@ class SliceWidget(SlicePlotterView, QWidget):
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def enable_units_choice(self, enabled):
+        if enabled:
+            # TODO implement conversion from meV to cm-1
+            pass
+            #self.cmbSliceUnits.show()
+            #self.label_16.show()
+        else:
+            self.cmbSliceUnits.hide()
+            self.label_16.hide()
+
+    def get_units(self):
+        return self.cmbSliceUnits.currentText()
 
     def get_slice_x_axis(self):
         return str(self.cmbSliceXAxis.currentText())

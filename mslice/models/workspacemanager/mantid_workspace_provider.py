@@ -36,6 +36,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         self._EfDefined = {}
         self._limits = {}
         self._cutParameters = {}
+        self._isPSD = {}
 
     def get_workspace_handle(self, workspace_name):
         """"Return handle to workspace given workspace_name_as_string"""
@@ -53,6 +54,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             del self._EfDefined[workspace]
         if workspace in self._limits:
             del self._limits[workspace]
+        if workspace in self._isPSD:
+            del self._isPSD[workspace]
         return ws
 
     def get_limits(self, workspace, axis):
@@ -68,6 +71,10 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             maximum = dim.getMaximum()
             step = (maximum - minimum) / 100
             return minimum, maximum, step
+
+    def is_PSD(self, workspace):
+        ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
+        return self._isPSD[ws_name] if (ws_name in self._isPSD) else None
 
     def _processEfixed(self, workspace):
         """Checks whether the fixed energy is defined for this workspace"""
@@ -158,6 +165,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         else:
             theta = [ws_handle.detectorTwoTheta(ws_handle.getDetector(i)) for i in range(num_hist)]
             round_fac = 100
+        self._isPSD[self.get_workspace_name(ws_handle)] = not all(x < y for x, y in zip(theta, theta[1:]))
         # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
         thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
         return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff>0)])])
@@ -189,6 +197,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws = RenameWorkspace(InputWorkspace=selected_workspace, OutputWorkspace=new_name)
         if selected_workspace in self._limits:
             self._limits[new_name] = self._limits.pop(selected_workspace)
+        if selected_workspace in self._isPSD:
+            self._isPSD[new_name] = self._isPSD.pop(selected_workspace)
         if selected_workspace in self._EfDefined:
             self._EfDefined[new_name] = self._EfDefined.pop(selected_workspace)
         if selected_workspace in self._cutParameters:
@@ -226,7 +236,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         finally:
             self.delete_workspace(scaled_bg_ws)
 
-    def save_workspaces(self, workspaces, path, save_name, extension):
+    def save_workspaces(self, workspaces, path, save_name, extension, slice_nonpsd=False):
         '''
         :param workspaces: list of workspaces to save
         :param path: directory to save to
@@ -242,14 +252,14 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         else:
             raise RuntimeError("unrecognised file extension")
         for workspace in workspaces:
-            self._save_single_ws(workspace, save_name, save_method, path, extension)
+            self._save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd)
 
-    def _save_single_ws(self, workspace, save_name, save_method, path, extension):
+    def _save_single_ws(self, workspace, save_name, save_method, path, extension, slice_nonpsd):
         slice = False
         save_as = save_name if save_name is not None else str(workspace) + extension
         full_path = os.path.join(str(path), save_as)
         workspace = self.get_workspace_handle(workspace)
-        if self.is_pixel_workspace(workspace):
+        if self.is_pixel_workspace(workspace) or (slice_nonpsd and not self.is_PSD(workspace)):
             slice = True
             workspace = self._get_slice_mdhisto(workspace, workspace.name())
         save_method(workspace, full_path, slice)
@@ -358,6 +368,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             self._EfDefined[new_workspace] = self._EfDefined[old_workspace]
         if old_workspace in self._limits:
             self._limits[new_workspace] = self._limits[old_workspace]
+        if old_workspace in self._isPSD:
+            self._isPSD[new_workspace] = self._isPSD[old_workspace]
 
     def getComment(self, workspace):
         if hasattr(workspace, 'getComment'):
