@@ -41,6 +41,8 @@ class CutPresenter(PresenterUtility):
             self._cut(output_method=self._save_cut_to_workspace)
         elif command == Command.AxisChanged:
             self._cut_axis_changed()
+        elif command == Command.IntegrationAxisChanged:
+            self._integration_axis_changed()
         self._cut_view.busy.emit(False)
 
     def _cut(self, output_method, plot_over=False):
@@ -65,11 +67,12 @@ class CutPresenter(PresenterUtility):
 
     def _plot_with_width(self, params, output_method, width, plot_over):
         """This function handles the width parameter."""
-        integration_start, integration_end = params[2:4]
+        integration_start = params[2].start
+        integration_end = params[2].end
         cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
         index = 0
         while cut_start != cut_end:
-            params = params[:2] + (cut_start, cut_end) + params[4:]
+            params = params[:2] + (Axis(params[2].units, cut_start, cut_end, 0.),) + params[3:]
             output_method(params, plot_over)
             index += 1
             cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
@@ -85,7 +88,7 @@ class CutPresenter(PresenterUtility):
         self._main_presenter.highlight_ws_tab(2)
 
     def _save_cut_to_workspace(self, params, _):
-        cut_params = params[:5]
+        cut_params = params[:4]
         self._cut_plotter.save_cut(cut_params)
         self._main_presenter.update_displayed_workspaces()
 
@@ -128,16 +131,16 @@ class CutPresenter(PresenterUtility):
             self._cut_view.error_invalid_cut_axis_parameters()
             raise ValueError("Invalid cut axis parameters")
 
-        integration_start = self._cut_view.get_integration_start()
-        integration_end = self._cut_view.get_integration_end()
+        integration_axis = Axis(self._cut_view.get_integration_axis(), self._cut_view.get_integration_start(),
+                                self._cut_view.get_integration_end(), 0.)
         try:
-            integration_start = float(integration_start)
-            integration_end = float(integration_end)
+            integration_axis.start = float(integration_axis.start)
+            integration_axis.end = float(integration_axis.end)
         except ValueError:
             self._cut_view.error_invalid_integration_parameters()
             raise ValueError("Invalid integration parameters")
 
-        if None not in (integration_start, integration_end) and integration_start >= integration_end:
+        if None not in (integration_axis.start, integration_axis.end) and integration_axis.start >= integration_axis.end:
             self._cut_view.error_invalid_integration_parameters()
             raise ValueError("Integration start >= Integration End")
 
@@ -160,8 +163,7 @@ class CutPresenter(PresenterUtility):
                 raise ValueError("Invalid width")
         else:
             width = None
-        return cut_axis, integration_start, integration_end, norm_to_one, intensity_start, \
-            intensity_end, width
+        return cut_axis, integration_axis, norm_to_one, intensity_start, intensity_end, width
 
     def _set_minimum_step(self, workspace, axis):
         """Gets axes limits from workspace_provider and then sets the minimumStep dictionary with those values"""
@@ -238,6 +240,7 @@ class CutPresenter(PresenterUtility):
                 self._cut_view.populate_input_fields(saved_parameters)
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)
+        self._cut_view.update_integration_axis()
 
     def set_workspace_provider(self, workspace_provider):
         self._cut_plotter.set_workspace_provider(workspace_provider)

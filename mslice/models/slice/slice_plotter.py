@@ -33,3 +33,6 @@ class SlicePlotter():
 
     def update_sample_temperature(self, workspace):
         pass
+
+    def is_sliceable(self, workspace):
+        pass

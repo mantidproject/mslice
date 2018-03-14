@@ -182,7 +182,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         delete_calls = [call(workspace1), call(workspace2), call(workspace3)]
         self.workspace_provider.delete_workspace.assert_has_calls(delete_calls, any_order= True)
-        self.view.display_loaded_workspaces.assert_called_once()
+        self.view.display_loaded_workspaces.assert_called()
 
     def test_remove_workspace_non_selected_prompt_user(self):
         self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)

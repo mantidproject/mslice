@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 import os.path
-from mantid.api import IMDHistoWorkspace
+from mantid.api import IMDHistoWorkspace, MDNormalization
 from mantid.simpleapi import CreateMDHistoWorkspace, SaveMD, SaveNexus, SaveAscii
 from mslice.util.qt.QtWidgets import QFileDialog
 
@@ -42,30 +42,38 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 
 
 def save_nexus(workspace, path, is_slice):
-    if is_slice:
-        SaveMD(InputWorkspace=workspace.name()[2:], Filename=path)
-    elif isinstance(workspace, IMDHistoWorkspace):
-        SaveMD(InputWorkspace=workspace.name(), Filename=path)
+    if isinstance(workspace, IMDHistoWorkspace):
+        if is_slice:
+            SaveMD(InputWorkspace=workspace.name()[2:], Filename=path)
+        else:
+            SaveMD(InputWorkspace=workspace.name(), Filename=path)
     else:
         SaveNexus(InputWorkspace=workspace.name(), Filename=path)
 
 
 def save_ascii(workspace, path, is_slice):
-    if is_slice:
-        _save_slice_to_ascii(workspace, path)
-    elif isinstance(workspace, IMDHistoWorkspace):
-        _save_cut_to_ascii(workspace, workspace.name(), path)
+    if isinstance(workspace, IMDHistoWorkspace):
+        if is_slice:
+            _save_slice_to_ascii(workspace, path)
+        else:
+            _save_cut_to_ascii(workspace, workspace.name(), path)
     else:
         SaveAscii(InputWorkspace=workspace, Filename=path)
 
 
 def save_matlab(workspace, path, is_slice):
-    if is_slice:
-        x, y, e = _get_slice_mdhisto_xye(workspace)
-    elif isinstance(workspace, IMDHistoWorkspace):
-        x, y, e = _get_md_histo_xye(workspace)
+    if isinstance(workspace, IMDHistoWorkspace):
+        if is_slice:
+            x, y, e = _get_slice_mdhisto_xye(workspace)
+        else:
+            x, y, e = _get_md_histo_xye(workspace)
     else:
-        x = workspace.extractX()
+        if is_slice:
+            x = []
+            for dim in [workspace.getDimension(i) for i in range(2)]:
+                x.append(np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins()))
+        else:
+            x = workspace.extractX()
         y = workspace.extractY()
         e = workspace.extractE()
     mdict = {'x': x, 'y': y, 'e': e}
@@ -117,10 +125,14 @@ def _get_md_histo_xye(histo_ws):
     dim = histo_ws.getDimension(0)
     start = dim.getMinimum()
     end = dim.getMaximum()
-    step = dim.getBinWidth()
-    x = np.arange(start, end, step)
+    nbin = dim.getNBins()
+    x = np.linspace(start, end, nbin)
     y = histo_ws.getSignalArray()
     e = np.sqrt(histo_ws.getErrorSquaredArray())
+    if histo_ws.displayNormalization() == MDNormalization.NumEventsNormalization:
+        num_events = histo_ws.getNumEventsArray()
+        y = y / num_events
+        e = e / num_events
     return x, y, e
 
 
@@ -138,6 +150,10 @@ def _get_slice_mdhisto_xye(histo_ws):
         x.append(np.reshape(np.linspace(start, end, dim_sz[i]), tuple(nshape)))
     y = histo_ws.getSignalArray()
     e = np.sqrt(histo_ws.getErrorSquaredArray())
+    if histo_ws.displayNormalization() == MDNormalization.NumEventsNormalization:
+        num_events = histo_ws.getNumEventsArray()
+        y = y / num_events
+        e = e / num_events
     return x, y, e
 
 

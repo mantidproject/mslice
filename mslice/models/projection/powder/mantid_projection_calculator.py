@@ -80,6 +80,8 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def calculate_projection(self, input_workspace, axis1, axis2, units):
         """Calculate the projection workspace AND return a python handle to it"""
+        if not self._workspace_provider.is_PSD(input_workspace):
+            raise RuntimeError('Cannot calculate projections for non-PSD workspaces')
         emode = self.get_emode(input_workspace)
         # Calculates the projection - can have Q-E or 2theta-E or their transpose.
         if (axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL) or (axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL):
@@ -94,6 +96,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
             retval = TransformMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, Scaling=scale)
             retval = RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=output_workspace+'_cm')
             retval.setComment('MSlice_in_wavenumber')
+            output_workspace += '_cm'
         elif units != MEV_LABEL:
             raise NotImplementedError("Unit %s not recognised. Only 'meV' and 'cm-1' implemented." % (units))
         self._workspace_provider.propagate_properties(input_workspace, output_workspace)

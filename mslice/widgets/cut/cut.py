@@ -41,11 +41,13 @@ class CutWidget(CutView, QWidget):
         self.cmbCutAxis.currentIndexChanged.connect(self.axis_changed)
         self._minimumStep = None
         self.lneCutStep.editingFinished.connect(self._step_edited)
+        self.enable_integration_axis(False)
 
     def _btn_clicked(self):
         sender = self.sender()
         command = self._command_lookup[sender]
-        self._presenter.notify(command)
+        if self._step_edited():
+            self._presenter.notify(command)
 
     def _step_edited(self):
         """Checks that user inputted step size is not too small."""
@@ -58,7 +60,7 @@ class CutWidget(CutView, QWidget):
             if value == 0:
                 self.lneCutStep.setText('%.5f' % (self._minimumStep))
                 self._display_error('Setting step size to default.')
-            elif value < (self._minimumStep / 10000.):
+            elif value < (self._minimumStep / 100.):
                 self._display_error('Step size too small!')
                 return False
         return True
@@ -68,6 +70,14 @@ class CutWidget(CutView, QWidget):
 
     def axis_changed(self, _changed_index):
         self._presenter.notify(Command.AxisChanged)
+
+    def enable_integration_axis(self, enabled):
+        if enabled:
+            self.integrationStack.setCurrentIndex(1)
+            self.label_250.show()
+        else:
+            self.integrationStack.setCurrentIndex(0)
+            self.label_250.hide()
 
     def get_presenter(self):
         return self._presenter
@@ -83,6 +93,9 @@ class CutWidget(CutView, QWidget):
 
     def get_cut_axis_end(self):
         return str(self.lneCutEnd.text())
+
+    def get_integration_axis(self):
+        return str(self.cmbIntegrationAxis.currentText())
 
     def get_integration_start(self):
         return str(self.lneCutIntegrationStart.text())
@@ -112,6 +125,14 @@ class CutWidget(CutView, QWidget):
             self.cmbCutAxis.setCurrentIndex(index[0])
             self.cmbCutAxis.blockSignals(False)
 
+    def update_integration_axis(self):
+        # For non-PSD mode only. Assumes that if we have 3 options for the cut axis we are in non-PSD mode
+        # (e.g. will have to change code for single crystal).
+        if self.cmbCutAxis.count() == 3:
+            # Assumes the axes are in order: ['|Q|', 'Degrees', 'DeltaE']
+            axis_name = ['|Q|', 'Degrees'] if self.cmbCutAxis.currentIndex() == 2 else ['DeltaE']
+            self.populate_integration_axis_options(axis_name)
+
     def set_minimum_step(self, value):
         self._minimumStep = value
 
@@ -124,6 +145,14 @@ class CutWidget(CutView, QWidget):
         for option in options:
             self.cmbCutAxis.addItem(option)
         self.cmbCutAxis.blockSignals(False)
+        self.update_integration_axis()
+
+    def populate_integration_axis_options(self, options):
+        self.cmbIntegrationAxis.blockSignals(True)
+        self.cmbIntegrationAxis.clear()
+        for option in options:
+            self.cmbIntegrationAxis.addItem(option)
+        self.cmbIntegrationAxis.blockSignals(False)
 
     def populate_cut_params(self, cut_start=None, cut_end=None, cut_step=None):
         if cut_start is not None:
