@@ -15,16 +15,23 @@ class InteractiveCut(object):
         self.connect_event = [None, None, None]
         self._cut_algorithm = MantidCutAlgorithm()
         self._cut_plotter = MatplotlibCutPlotter(self._cut_algorithm)
+        self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
                                       button=[1,3], spancoords='pixels', interactive=True)
         self._canvas.draw()
 
     def plot_from_mouse_event(self, eclick, erelease):
-        self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - eclick.y)
+        # Make axis orientation sticky, until user selects entirely new rectangle.
+        rect_pos = [eclick.x, eclick.y, erelease.x, erelease.y,
+                    abs(erelease.x - eclick.x), abs(erelease.y - eclick.y)]
+        rectangle_changed = all([abs(rect_pos[i] - self._rect_pos_cache[i]) > 0.1 for i in range(6)])
+        if rectangle_changed:
+            self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - eclick.y)
         self.plot_cut(eclick.xdata, erelease.xdata, eclick.ydata, erelease.ydata)
         self._cut_plotter.set_icut(self)
         self.connect_event[2] = self._canvas.mpl_connect('button_press_event', self.clicked)
+        self._rect_pos_cache = rect_pos
 
     def plot_cut(self, x1, x2, y1, y2):
         if x2 > x1 and y2 > y1:
