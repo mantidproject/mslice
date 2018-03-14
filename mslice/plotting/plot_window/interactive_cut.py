@@ -21,7 +21,7 @@ class InteractiveCut(object):
         self._canvas.draw()
 
     def plot_from_mouse_event(self, eclick, erelease):
-        self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - erelease.y)
+        self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - eclick.y)
         self.plot_cut(eclick.xdata, erelease.xdata, eclick.ydata, erelease.ydata)
         self._cut_plotter.set_icut(self)
         self.connect_event[2] = self._canvas.mpl_connect('button_press_event', self.clicked)
