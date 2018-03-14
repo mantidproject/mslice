@@ -350,6 +350,7 @@ class SlicePlot(object):
     def disconnect(self, plot_figure):
         plot_figure.actionInteractive_Cuts.triggered.disconnect()
         plot_figure.actionSave_Cut.triggered.disconnect()
+        plot_figure.actionFlip_Axis.triggered.disconnect()
         plot_figure.actionS_Q_E.triggered.disconnect()
         plot_figure.actionChi_Q_E.triggered.disconnect()
         plot_figure.actionChi_Q_E_magnetic.triggered.disconnect()
