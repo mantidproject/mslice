@@ -36,10 +36,9 @@ class InteractiveCut(object):
     def get_cut_parameters(self, pos1, pos2):
         start = pos1[not self.horizontal]
         end = pos2[not self.horizontal]
-        # hard code step for now. When sliceMD is fixed, can get minimum step with cut_algorithm.get_axis_range()
-        step = 0.02
         units = self._canvas.figure.gca().get_xaxis().units if self.horizontal else \
             self._canvas.figure.gca().get_yaxis().units
+        step = self.slice_plot.workspace_provider().get_limits(self._ws_title, units)[2]
         ax = Axis(units, start, end, step)
         integration_start = pos1[self.horizontal]
         integration_end = pos2[self.horizontal]
