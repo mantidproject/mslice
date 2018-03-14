@@ -33,6 +33,7 @@ class CutPlot(object):
 
     def disconnect(self, plot_figure):
         plot_figure.actionSave_Cut.triggered.disconnect()
+        plot_figure.actionFlip_Axis.triggered.disconnect()
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
