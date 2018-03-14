@@ -36,3 +36,11 @@ class MainPresenterInterface(object):
     @abc.abstractmethod
     def highlight_ws_tab(self, tab):
         pass
+
+    @abc.abstractmethod
+    def show_workspace_manager_tab(self):
+        pass
+
+    @abc.abstractmethod
+    def show_tab_for_workspace(self, ws):
+        pass
