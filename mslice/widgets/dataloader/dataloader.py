@@ -5,7 +5,7 @@ import os
 from functools import partial
 
 from mslice.util.qt.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView, QMessageBox
-from mslice.util.qt.QtCore import Signal, QDir
+from mslice.util.qt.QtCore import Signal, QDir, Qt
 
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.util.qt import load_ui
@@ -48,6 +48,12 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.btnhome.clicked.connect(self.go_to_home)
         self.btnload.clicked.connect(partial(self.load, False))
         self.btnmerge.clicked.connect(partial(self.load, True))
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Backspace:
+            self.back()
+        else:
+            event.accept()
 
     def doubleClicked(self, file_clicked):
         file_clicked = file_clicked.sibling(file_clicked.row(), 0) # so clicking anywhere on row gives filename
