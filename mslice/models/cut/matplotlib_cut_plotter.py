@@ -12,7 +12,6 @@ class MatplotlibCutPlotter(CutPlotter):
     def __init__(self, cut_algorithm):
         self._cut_algorithm = cut_algorithm
         self.workspace_provider = None
-        self.background = None
         self.icut = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
@@ -37,9 +36,9 @@ class MatplotlibCutPlotter(CutPlotter):
         if not plot_over:
             plt.gcf().canvas.set_window_title('Cut: ' + selected_workspace)
             plt.gcf().canvas.manager.update_grid()
-        if self.background is None:
+        if not plt.gcf().canvas.manager.has_plot_handler():
             self._create_cut(cut_ws_name if cut_ws_name is not None else selected_workspace)
-        plt.gcf().canvas.restore_region(self.background)
+        plt.gcf().canvas.restore_region(plt.gcf().canvas.manager.get_cut_background())
         try:
             plt.gca().draw_artist(plt.gcf().canvas.figure.get_children()[1])
             plt.gcf().canvas.blit(plt.gcf().canvas.figure.gca().clipbox)
@@ -47,16 +46,17 @@ class MatplotlibCutPlotter(CutPlotter):
             plt.gcf().canvas.draw()
 
     def _create_cut(self, workspace):
+        canvas = plt.gcf().canvas
+        canvas.manager.add_cut_plot(self, workspace)
         # don't include axis ticks in the saved background
-        plt.gcf().canvas.figure.gca().xaxis.set_visible(False)
-        plt.gcf().canvas.figure.gca().yaxis.set_visible(False)
-        plt.gcf().canvas.draw()
-        self.background = plt.gcf().canvas.copy_from_bbox(plt.gcf().canvas.figure.bbox)
+        canvas.figure.gca().xaxis.set_visible(False)
+        canvas.figure.gca().yaxis.set_visible(False)
+        canvas.draw()
+        canvas.manager.set_cut_background(canvas.copy_from_bbox(plt.gcf().canvas.figure.bbox))
 
-        plt.gcf().canvas.figure.gca().xaxis.set_visible(True)
-        plt.gcf().canvas.figure.gca().yaxis.set_visible(True)
-        plt.gcf().canvas.manager.add_cut_plot(self, workspace)
-        plt.gcf().canvas.draw()
+        canvas.figure.gca().xaxis.set_visible(True)
+        canvas.figure.gca().yaxis.set_visible(True)
+        canvas.draw()
 
     def set_icut(self, icut):
         if icut is not None:

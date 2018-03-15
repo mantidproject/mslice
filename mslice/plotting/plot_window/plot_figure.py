@@ -92,6 +92,15 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
             self._plot_handler.disconnect(self)
         self._plot_handler = CutPlot(self, self.canvas, cut_plotter, workspace)
 
+    def has_plot_handler(self):
+        return self._plot_handler is not None
+
+    def set_cut_background(self, background):
+        self._plot_handler.background = background
+
+    def get_cut_background(self):
+        return self._plot_handler.background
+
     def is_icut(self, is_icut):
         if self._plot_handler is not None:
             self._plot_handler.is_icut(is_icut)
