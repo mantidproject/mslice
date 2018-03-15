@@ -167,6 +167,9 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
         self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])
 
+    def invalidate_slice_cache(self):
+        self._slice_plotter.slice_cache.clear()
+
     def update_workspaces(self):
         self._main_presenter.update_displayed_workspaces()
 

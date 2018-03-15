@@ -90,21 +90,44 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             plot_data = np.transpose(plot_data)
         return plot_data
 
-    def compute_boltzmann_dist(self, sample_temp, e_axis):
-        '''calculates exp(-E/kBT), a common factor in intensity corrections'''
-        if sample_temp is None:
-            return None
-        kBT = sample_temp * KB_MEV
-        energy_transfer = np.linspace(e_axis.end, e_axis.start, self._get_number_of_steps(e_axis))
-        return np.exp(-energy_transfer / kBT)
+    def axis_values(self, axis, reverse=False):
+        """
+        Compute a set of bins for the given axis values
+        :param axis: Axis object defining axis details
+        :param reverse: If true then the axis should have values in decreasing order
+        :return: A new numpy array containing the axis values
+        """
+        if reverse:
+            values = np.linspace(axis.end, axis.start, self._get_number_of_steps(axis))
+        else:
+            values = np.linspace(axis.start, axis.end, self._get_number_of_steps(axis))
+        return values
 
-    def compute_chi(self, scattering_data, boltzmann_dist, e_axis):
-        energy_transfer = np.linspace(e_axis.end, e_axis.start, self._get_number_of_steps(e_axis))
+    def compute_boltzmann_dist(self, sample_temp, delta_e):
+        '''calculates exp(-E/kBT), a common factor in intensity corrections'''
+        kBT = sample_temp * KB_MEV
+        return np.exp(-delta_e / kBT)
+
+    def compute_chi(self, scattering_data, sample_temp, e_axis, data_rotated):
+        """
+        :param scattering_data: Scattering data in axes selected by user
+        :param sample_temp: The sample temperature in Kelvin
+        :param e_axis: Axis object defining axis details
+        :param data_rotated: If true then it is assumed that the X axis=energy otherwise
+        it is assumed Y-axis=energy
+        :return: The dynamic susceptibility of the data
+        """
+        energy_transfer = self.axis_values(e_axis, reverse=not data_rotated)
         signs = np.sign(energy_transfer)
         signs[signs == 0] = 1
-        chi = (signs + (boltzmann_dist * -signs))[:, None]
-        chi = np.pi * chi * scattering_data
-        return chi
+        boltzmann_dist =  self.compute_boltzmann_dist(sample_temp, energy_transfer)
+        chi = np.pi * (signs + (boltzmann_dist * -signs))
+        if data_rotated:
+            chi = chi[None, :]
+        else:
+            chi = chi[:, None]
+
+        return chi * scattering_data
 
     def compute_chi_magnetic(self, chi):
         if chi is None:
@@ -113,28 +136,60 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         chi_magnetic = chi / 291
         return chi_magnetic
 
-    def compute_d2sigma(self, scattering_data, workspace, e_axis):
+    def compute_d2sigma(self, scattering_data, workspace, e_axis, data_rotated):
+        """
+        :param scattering_data: Scattering data in axes selected by user
+        :param workspace: A reference to the workspace
+        :param e_axis: Axis object defining axis details
+        :param data_rotated: If true then it is assumed that the X axis=energy otherwise
+        it is assumed Y-axis=energy
+        :return: d2sigma
+        """
         Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(workspace))
         if Ei is None:
             return None
         ki = np.sqrt(Ei) * E_TO_K
-        energy_transfer = np.linspace(e_axis.end, e_axis.start, self._get_number_of_steps(e_axis))
-        kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)[:, None]
-        d2sigma = scattering_data * kf / ki
-        return d2sigma
+        energy_transfer = self.axis_values(e_axis, reverse=not data_rotated)
+        kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)
+        if data_rotated:
+            kf = kf[None, :]
+        else:
+            kf = kf[:, None]
 
-    def compute_symmetrised(self, scattering_data, boltzmann_dist, e_axis):
-        energy_transfer = np.arange(e_axis.end, 0, -e_axis.step)
-        negatives = scattering_data[len(energy_transfer):] * boltzmann_dist[len(energy_transfer):,None]
-        return np.concatenate((scattering_data[:len(energy_transfer)], negatives))
+        return scattering_data * kf / ki
 
-    def compute_gdos(self, scattering_data, boltzmann_dist, q_axis, e_axis):
-        energy_transfer = np.linspace(e_axis.end, e_axis.start, self._get_number_of_steps(e_axis))
-        momentum_transfer = np.linspace(q_axis.start, q_axis.end, self._get_number_of_steps(q_axis))
+    def compute_symmetrised(self, scattering_data, sample_temp, e_axis, data_rotated):
+        energy_transfer = self.axis_values(e_axis, reverse=not data_rotated)
+        negative_de = energy_transfer[energy_transfer < 0]
+        negative_de_len = len(negative_de)
+        boltzmann_dist = self.compute_boltzmann_dist(sample_temp, negative_de)
+        if data_rotated:
+            # xaxis=dE
+            lhs = scattering_data[:, :negative_de_len] * boltzmann_dist
+            rhs = scattering_data[:, negative_de_len:]
+            return np.concatenate((lhs, rhs), 1)
+        else:
+            rhs = scattering_data[-negative_de_len:, :] * boltzmann_dist[:, None]
+            lhs = scattering_data[:-negative_de_len, :]
+            return np.concatenate((lhs, rhs))
+
+
+    def compute_gdos(self, scattering_data, sample_temp, q_axis, e_axis, data_rotated):
+        energy_transfer = self.axis_values(e_axis, reverse=not data_rotated)
+        momentum_transfer = self.axis_values(q_axis, reverse=data_rotated)
         momentum_transfer = np.square(momentum_transfer, out=momentum_transfer)
-        gdos = scattering_data / momentum_transfer
-        gdos *= energy_transfer[:,None]
-        gdos *= (1 - boltzmann_dist)[:,None]
+        boltzmann_dist = self.compute_boltzmann_dist(sample_temp, energy_transfer)
+        if data_rotated:
+            scattering_rotated = np.swapaxes(scattering_data, 0, 1)
+            gdos = scattering_rotated / momentum_transfer
+            gdos = np.swapaxes(gdos, 0, 1)
+            gdos *= energy_transfer
+            gdos *= (1 - boltzmann_dist)[None, :]
+        else:
+            gdos = scattering_data / momentum_transfer
+            gdos *= energy_transfer[:, None]
+            gdos *= (1 - boltzmann_dist)[:, None]
+
         return gdos
 
     def sample_temperature(self, ws_name, sample_temp_fields):
