@@ -91,11 +91,11 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         ws_name = workspace if isinstance(workspace, string_types) else self.get_workspace_name(workspace)
         ws_h = self.get_workspace_handle(workspace)
         # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
-        if ws_name not in self._limits:
-            self._limits[ws_name] = {}
         efix = self.get_EFixed(ws_h)
         if efix is None:
             return
+        if ws_name not in self._limits:
+            self._limits[ws_name] = {}
         if isinstance(ws_h, IMDEventWorkspace):
             self.process_limits_event(ws_h, ws_name, efix)
         elif isinstance(ws_h, MatrixWorkspace):
