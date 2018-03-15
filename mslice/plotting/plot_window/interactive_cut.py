@@ -64,7 +64,10 @@ class InteractiveCut(object):
     def save_cut(self):
         x1, x2, y1, y2 = self.rect.extents
         ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
-        self._cut_plotter.save_cut((str(self._ws_title), ax, integration_start, integration_end, False))
+        units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
+            self._canvas.figure.gca().get_xaxis().units
+        integration_axis = Axis(units, integration_start, integration_end, 0)
+        self._cut_plotter.save_cut((str(self._ws_title), ax, integration_axis, False))
         self.update_workspaces()
 
     def update_workspaces(self):
