@@ -12,7 +12,6 @@ class MatplotlibCutPlotter(CutPlotter):
     def __init__(self, cut_algorithm):
         self._cut_algorithm = cut_algorithm
         self.workspace_provider = None
-        self.background = None
         self.icut = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
