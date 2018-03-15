@@ -51,8 +51,10 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         y_dim = workspace.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
+        ws_name = self._workspace_provider.get_workspace_name(workspace)
         thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
-                          OutputWorkspace='__' + self._workspace_provider.get_workspace_name(workspace))
+                          OutputWorkspace='__' + ws_name)
+        self._workspace_provider.propagate_properties(ws_name, '__' + ws_name)
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:

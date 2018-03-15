@@ -154,6 +154,9 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
                 pass
             else:
                 raise RuntimeError(e)
+        except KeyError:   # Could be case of interactive cuts when the workspace has not been saved yet
+            workspace = self._plot_handler.save_icut()
+            self._plot_handler.workspace_provider().save_workspaces([workspace], file_path, save_name, ext)
 
     def save_image(self, path):
         self.canvas.figure.savefig(path)
@@ -164,6 +167,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.actionZoom_In.setIcon(qta.icon('fa.search-plus'))
         self.actionZoom_Out.setIcon(qta.icon('fa.search-minus'))
         self.actionPlotOptions.setIcon(qta.icon('fa.cog'))
+        self.actionFlip_Axis.setIcon(qta.icon('fa.retweet'))
 
     def error_box(self, message):
         error_box = QtWidgets.QMessageBox(self)

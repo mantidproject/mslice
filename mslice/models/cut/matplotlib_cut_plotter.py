@@ -67,12 +67,13 @@ class MatplotlibCutPlotter(CutPlotter):
                 plt.gcf().canvas.manager.is_icut(icut)
         else:
             self.icut = None
+            plt.gcf().canvas.manager.is_icut(False)
 
     def get_icut(self):
         return self.icut
 
     def save_cut(self, params):
-        self._cut_algorithm.compute_cut(*params)
+        return self._cut_algorithm.compute_cut(*params)
 
     def _getDisplayName(self, axisUnits, comment=None):
         if 'DeltaE' in axisUnits:

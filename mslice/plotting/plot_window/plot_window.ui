@@ -89,6 +89,7 @@
    <addaction name="actionPlotOptions"/>
    <addaction name="actionInteractive_Cuts"/>
    <addaction name="actionSave_Cut"/>
+   <addaction name="actionFlip_Axis"/>
   </widget>
   <action name="action_save_image">
    <property name="text">
@@ -307,6 +308,11 @@
   <action name="actionSave_Cut">
    <property name="text">
     <string>Save Cut</string>
+   </property>
+  </action>
+  <action name="actionFlip_Axis">
+   <property name="text">
+    <string>Flip Integration Axis</string>
    </property>
   </action>
  </widget>
