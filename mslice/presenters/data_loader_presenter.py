@@ -13,6 +13,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         self._view = data_loader_view
         self._main_presenter = None
         self._workspace_provider = None
+        self._EfCache = None
 
     def set_workspace_provider(self, workspace_provider):
         self._workspace_provider = workspace_provider
@@ -35,6 +36,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         not_loaded = []
         not_opened = []
         multi = len(ws_names) > 1
+        allChecked = False
         for i, ws_name in enumerate(ws_names):
             if not self._confirm_workspace_overwrite(ws_name):
                 not_loaded.append(ws_name)
@@ -49,7 +51,10 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 except RuntimeError:
                     not_opened.append(ws_name)
                 else:
-                    self.check_efixed(ws_name, multi)
+                    if not allChecked:
+                        allChecked = self.check_efixed(ws_name, multi)
+                    else:
+                        self._workspace_provider.set_efixed(ws_name, self._EfCache)
                     self._main_presenter.show_workspace_manager_tab()
                     self._main_presenter.update_displayed_workspaces()
                     self._main_presenter.show_tab_for_workspace(self._workspace_provider.get_workspace_handle(ws_name))
@@ -59,8 +64,10 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         '''checks if a newly loaded workspace has efixed set'''
         if self._workspace_provider.get_EMode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(
                 ws_name):
-            Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi)
+            Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi, self._EfCache)
+            self._EfCache = Ef
             self._workspace_provider.set_efixed(ws_name, Ef)
+            return allChecked
 
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():

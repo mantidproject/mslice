@@ -35,7 +35,7 @@ class DataLoaderTest(unittest.TestCase):
 
         self.presenter.load_workspace([path_to_nexus])
         self.workspace_provider.load.assert_called_with(filename=path_to_nexus, output_workspace=workspace_name)
-        self.view.get_workspace_efixed.assert_called_with(workspace_name, False)
+        self.view.get_workspace_efixed.assert_called_with(workspace_name, False, None)
         self.workspace_provider.set_efixed.assert_called_once_with(workspace_name, 1.845)
         self.main_presenter.show_workspace_manager_tab.assert_called_once()
         self.main_presenter.show_tab_for_workspace.assert_called_once()
