@@ -52,6 +52,8 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
 
         self._plot_handler = None
         self.picking = None
+        self.arbitrary_nuclei = None
+        self.cif_file = None
 
         # Need flags here as matplotlib provides no way to access the grid state
         self._xgrid = False
