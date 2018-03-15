@@ -171,7 +171,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         else:
             rhs = scattering_data[-negative_de_len:, :] * boltzmann_dist[:, None]
             lhs = scattering_data[:-negative_de_len, :]
-            return np.concatenate((rhs, lhs))
+            return np.concatenate((lhs, rhs))
 
 
     def compute_gdos(self, scattering_data, sample_temp, q_axis, e_axis, data_rotated):
