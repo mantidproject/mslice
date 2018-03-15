@@ -259,7 +259,8 @@ class MantidWorkspaceProvider(WorkspaceProvider):
         save_as = save_name if save_name is not None else str(workspace) + extension
         full_path = os.path.join(str(path), save_as)
         workspace = self.get_workspace_handle(workspace)
-        if self.is_pixel_workspace(workspace) or (slice_nonpsd and not self.is_PSD(workspace)):
+        non_psd_slice = slice_nonpsd and not self.is_PSD(workspace) and isinstance(workspace, MatrixWorkspace)
+        if self.is_pixel_workspace(workspace) or non_psd_slice:
             slice = True
             workspace = self._get_slice_mdhisto(workspace, workspace.name())
         save_method(workspace, full_path, slice)
@@ -270,6 +271,7 @@ class MantidWorkspaceProvider(WorkspaceProvider):
             return self.get_workspace_handle('__' + ws_name)
         except KeyError:
             slice_alg = MantidSliceAlgorithm()
+            slice_alg.set_workspace_provider(self)
             ws_name = workspace.name()
             x_axis = self.get_axis_from_dimension(workspace, ws_name, 0)
             y_axis = self.get_axis_from_dimension(workspace, ws_name, 1)
