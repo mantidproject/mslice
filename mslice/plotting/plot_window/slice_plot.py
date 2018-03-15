@@ -21,8 +21,6 @@ class SlicePlot(object):
         self._canvas = canvas
         self._slice_plotter = slice_plotter
         self.ws_name = workspace
-        self._arbitrary_nuclei = None
-        self._cif_file = None
         self._cif_path = None
         self._quick_presenter = None
         self._legend_dict = {}
@@ -153,20 +151,22 @@ class SlicePlot(object):
     def arbitrary_recoil_line(self):
         checked = self.plot_figure.actionArbitrary_nuclei.isChecked()
         if checked:
-            self._arbitrary_nuclei, confirm = QtWidgets.QInputDialog.getInt(self.plot_figure, 'Arbitrary Nuclei', 'Enter relative mass:')
+            self.plot_figure.arbitrary_nuclei, confirm = QtWidgets.QInputDialog.getInt(
+                self.plot_figure, 'Arbitrary Nuclei', 'Enter relative mass:')
             if not confirm:
                 return
-        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei, self._arbitrary_nuclei, True, checked)
+        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei,
+                                  self.plot_figure.arbitrary_nuclei, True, checked)
 
     def cif_file_powder_line(self, checked):
         if checked:
             cif_path = QtWidgets.QFileDialog().getOpenFileName(self.plot_figure, 'Open CIF file', '/home', 'Files (*.cif)')
             cif_path = str(cif_path[0]) if isinstance(cif_path, tuple) else str(cif_path)
             key = path.basename(cif_path).rsplit('.')[0]
-            self._cif_file = key
+            self.plot_figure.cif_file = key
             self._cif_path = cif_path
         else:
-            key = self._cif_file
+            key = self.plot_figure.cif_file
             cif_path = None
         if key:
             self.toggle_overplot_line(self.plot_figure.actionCIF_file, key, False,
@@ -274,12 +274,12 @@ class SlicePlot(object):
         lines = {self.plot_figure.actionHydrogen:[1, True, ''],
                  self.plot_figure.actionDeuterium:[2, True, ''],
                  self.plot_figure.actionHelium:[4, True, ''],
-                 self.plot_figure.actionArbitrary_nuclei:[self._arbitrary_nuclei, True, ''],
+                 self.plot_figure.actionArbitrary_nuclei:[self.plot_figure.arbitrary_nuclei, True, ''],
                  self.plot_figure.actionAluminium:['Aluminium', False, ''],
                  self.plot_figure.actionCopper:['Copper', False, ''],
                  self.plot_figure.actionNiobium:['Niobium', False, ''],
                  self.plot_figure.actionTantalum:['Tantalum', False, ''],
-                 self.plot_figure.actionCIF_file:[self._cif_file, False, self._cif_path]}
+                 self.plot_figure.actionCIF_file:[self.plot_figure.cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
                 self._slice_plotter.add_overplot_line(self.ws_name, *lines[line])
