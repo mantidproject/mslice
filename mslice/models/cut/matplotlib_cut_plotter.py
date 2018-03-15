@@ -35,6 +35,7 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.xlabel(self._getDisplayName(x_units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
         plt.ylabel(INTENSITY_LABEL, picker=picker)
         if not plot_over:
+            plt.gcf().canvas.set_window_title('Cut: ' + selected_workspace)
             plt.gcf().canvas.manager.update_grid()
         if self.background is None:
             self._create_cut(cut_ws_name if cut_ws_name is not None else selected_workspace)
