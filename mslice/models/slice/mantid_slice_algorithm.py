@@ -98,7 +98,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         :return: A new numpy array containing the axis values
         """
         if reverse:
-            values = np.linspace(axis.end, axis.end, self._get_number_of_steps(axis))
+            values = np.linspace(axis.end, axis.start, self._get_number_of_steps(axis))
         else:
             values = np.linspace(axis.start, axis.end, self._get_number_of_steps(axis))
         return values
