@@ -111,8 +111,8 @@ class DataLoaderWidget(QWidget): # and some view interface
             selected[i] = str(os.path.join(self.directory.absolutePath(), self.file_system.fileName(selected[i])))
         return selected
 
-    def get_workspace_efixed(self, workspace, hasMultipleWS=False):
-        Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, None)
+    def get_workspace_efixed(self, workspace, hasMultipleWS=False, default_value=None):
+        Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, default_value)
         if not success:
             raise ValueError('Fixed final energy not given')
         return Ef, applyToAll

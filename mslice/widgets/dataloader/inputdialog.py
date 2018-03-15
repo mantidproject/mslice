@@ -25,10 +25,12 @@ class EfInputDialog(QDialog):
         return self.efspin.value(), self.allchk.isChecked()
 
     @staticmethod
-    def getEf(workspace, hasMultipleWS=False, parent = None):
+    def getEf(workspace, hasMultipleWS=False, default_value = None, parent = None):
         """Static method to get an Ef"""
         dialog = EfInputDialog(parent)
         dialog.text.setText('Input Fixed Final Energy in meV for %s:' % (workspace))
+        if default_value:
+            dialog.efspin.setValue(default_value)
         if hasMultipleWS:
             dialog.showCheck()
         result = dialog.exec_()
