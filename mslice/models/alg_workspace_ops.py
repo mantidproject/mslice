@@ -1,9 +1,10 @@
 from six import string_types
+import numpy as np
 
 class AlgWorkspaceOps(object):
 
     def _get_number_of_steps(self, axis):
-        return int(max(1, (axis.end - axis.start)/axis.step))
+        return int(np.ceil(max(1, (axis.end - axis.start)/axis.step)))
 
     def get_axis_range(self, workspace, dimension_name):
         return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
