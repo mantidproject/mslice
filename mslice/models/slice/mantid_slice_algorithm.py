@@ -165,13 +165,14 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         boltzmann_dist = self.compute_boltzmann_dist(sample_temp, negative_de)
         if data_rotated:
             # xaxis=dE
-            rhs = scattering_data[:, :negative_de_len] * boltzmann_dist
-            lhs = scattering_data[:, negative_de_len:]
+            lhs = scattering_data[:, :negative_de_len] * boltzmann_dist
+            rhs = scattering_data[:, negative_de_len:]
+            return np.concatenate((lhs, rhs), 1)
         else:
-            rhs = scattering_data[:negative_de_len, :] * boltzmann_dist[:, None]
-            lhs = scattering_data[negative_de_len:, :]
+            rhs = scattering_data[-negative_de_len:, :] * boltzmann_dist[:, None]
+            lhs = scattering_data[:-negative_de_len, :]
+            return np.concatenate((rhs, lhs))
 
-        return np.concatenate(lhs, rhs)
 
     def compute_gdos(self, scattering_data, sample_temp, q_axis, e_axis, data_rotated):
         energy_transfer = self.axis_values(e_axis, reverse=not data_rotated)
