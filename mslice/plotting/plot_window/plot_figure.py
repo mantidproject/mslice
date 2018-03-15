@@ -154,6 +154,9 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
                 pass
             else:
                 raise RuntimeError(e)
+        except KeyError:   # Could be case of interactive cuts when the workspace has not been saved yet
+            workspace = self._plot_handler.save_icut()
+            self._plot_handler.workspace_provider().save_workspaces([workspace], file_path, save_name, ext)
 
     def save_image(self, path):
         self.canvas.figure.savefig(path)

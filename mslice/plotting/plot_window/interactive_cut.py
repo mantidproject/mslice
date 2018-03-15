@@ -67,8 +67,9 @@ class InteractiveCut(object):
         units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
             self._canvas.figure.gca().get_xaxis().units
         integration_axis = Axis(units, integration_start, integration_end, 0)
-        self._cut_plotter.save_cut((str(self._ws_title), ax, integration_axis, False))
+        output_ws = self._cut_plotter.save_cut((str(self._ws_title), ax, integration_axis, False))
         self.update_workspaces()
+        return self.slice_plot.workspace_provider().get_workspace_name(output_ws)
 
     def update_workspaces(self):
         self.slice_plot.update_workspaces()

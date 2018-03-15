@@ -51,7 +51,7 @@ class CutPlot(object):
 
     def save_icut(self):
         icut = self._cut_plotter.get_icut()
-        icut.save_cut()
+        return icut.save_cut()
 
     def flip_icut(self):
         icut = self._cut_plotter.get_icut()
