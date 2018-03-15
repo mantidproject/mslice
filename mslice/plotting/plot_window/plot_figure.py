@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 import six
 from mslice.util.qt import QT_VERSION
 from mslice.util.qt.QtCore import Qt
-from mslice.util.qt import QtWidgets
+from mslice.util.qt import QtWidgets, QtGui
 import qtawesome as qta
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
@@ -135,10 +135,10 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         printer.setOrientation(QtWidgets.QPrinter.Landscape) #  landscape by default
         print_dialog = QtWidgets.QPrintDialog(printer)
         if print_dialog.exec_():
-            pixmap_image = QtWidgets.QPixmap.grabWidget(self.canvas)
+            pixmap_image = QtGui.QPixmap.grabWidget(self.canvas)
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
-            painter = QtWidgets.QPainter(printer)
+            painter = QtGui.QPainter(printer)
             painter.drawPixmap(0,0,pixmap_image)
             painter.end()
 
