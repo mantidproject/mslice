@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from mock import patch, Mock, MagicMock
+import numpy as np
 from os.path import join
 from tempfile import gettempdir
 import unittest
@@ -8,12 +9,11 @@ import unittest
 from mantid.simpleapi import CreateMDHistoWorkspace
 
 from mslice.models.cut.mantid_cut_algorithm import output_workspace_name
-from mslice.models.workspacemanager.file_io import *
-from mslice.models.workspacemanager.file_io import _save_cut_to_ascii, _save_slice_to_ascii
+from mslice.models.workspacemanager.file_io import _save_cut_to_ascii, _save_slice_to_ascii, get_save_directory
 
 
 class FileIOTest(unittest.TestCase):
-    
+
     def setUp(self):
         self.mock_dialog = MagicMock()
         self.tempdir = gettempdir()
