@@ -86,7 +86,7 @@ class FileIOTest(unittest.TestCase):
         _save_cut_to_ascii(ws, ws_name, "some_path")
         output_method.assert_called_once()
         self.assertEqual(output_method.call_args[0][0], 'some_path')
-        np.testing.assert_array_equal(output_method.call_args[0][1], [[-1, 1, 4], [2, 2, 5]])
+        np.testing.assert_array_equal(output_method.call_args[0][1], [[-1, 1, 4], [5, 2, 5]])
 
     @patch('mslice.models.workspacemanager.file_io._output_data_to_ascii')
     def test_save_slice_to_ascii(self, output_method):
