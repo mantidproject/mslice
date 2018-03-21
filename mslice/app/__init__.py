@@ -22,7 +22,6 @@ def check_mpl():
 def main():
     """Start the application.
     """
-    check_mpl()
     qapp_ref = QApplication([])
     show_gui()
     return qapp_ref.exec_()
@@ -32,6 +31,7 @@ def show_gui():
     If this is the first call then an instance of the Windows is cached to ensure it
     survives for the duration of the application
     """
+    check_mpl()
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow
