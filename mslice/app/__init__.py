@@ -7,17 +7,6 @@ from mslice.util.qt.QtWidgets import QApplication
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
-MPL_COMPAT = False
-
-def check_mpl():
-    from distutils.version import LooseVersion
-    import matplotlib
-    if LooseVersion(matplotlib.__version__) < LooseVersion("1.5.0"):
-        import warnings
-        warnings.warn('A version of Matplotlib older than 1.5.0 has been detected.')
-        warnings.warn('Some features of MSlice may not work correctly.')
-        global MPL_COMPAT
-        MPL_COMPAT = True
 
 def main():
     """Start the application.
@@ -31,7 +20,6 @@ def show_gui():
     If this is the first call then an instance of the Windows is cached to ensure it
     survives for the duration of the application
     """
-    check_mpl()
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow

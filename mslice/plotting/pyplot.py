@@ -6,7 +6,7 @@ from six import string_types
 from .figuremanager import FigureManager, activate_category
 from .script_generation import script_log
 from ._pyplot_decorators import draw_colorbar
-from mslice.app import MPL_COMPAT
+from mslice.util import MPL_COMPAT
 
 # imports from matplotlit.pyplot
 import matplotlib
