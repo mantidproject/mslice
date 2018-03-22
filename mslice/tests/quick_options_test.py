@@ -54,11 +54,11 @@ class QuickOptionsTest(unittest.TestCase):
         assert type(self.presenter) is QuickLinePresenter
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
-            {'shown': None, 'color': 'red', 'label': unicode('label1'), 'style': '-', 'width': '3',
+            {'shown': None, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
              'marker': 'o', 'legend': None})
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_data(target),
-                             {'shown': None, 'color': 'blue', 'label': unicode('label2'),
+                             {'shown': None, 'color': 'blue', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': None})
 
     @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
@@ -79,11 +79,11 @@ class QuickOptionsTest(unittest.TestCase):
         assert type(self.presenter) is QuickLinePresenter
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
-            {'shown': True, 'color': 'red', 'label': unicode('label1'), 'style': '-', 'width': '3',
+            {'shown': True, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
              'marker': 'o', 'legend': True})
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_data(model.get_line_index(target)),
-                             {'shown': True, 'color': 'blue', 'label': unicode('label2'),
+                             {'shown': True, 'color': 'blue', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': True})
 
     @patch.object(QuickAxisOptions, '__init__', lambda v, w, x, y, z: None)
