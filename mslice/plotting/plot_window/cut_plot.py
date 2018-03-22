@@ -68,6 +68,11 @@ class CutPlot(object):
         self._canvas.draw()
 
     def get_line_index(self, line):
+        '''
+        Checks if line index is cached, and if not finds the index by iterating over the axes' containers.
+        :param line: Line to find the index of
+        :return: Index of line
+        '''
         try:
             container = self._lines[line]
         except KeyError:
@@ -182,10 +187,10 @@ class CutPlot(object):
         return v
 
     def line_containers(self):
+        '''build dictionary of lines and their containers'''
         line_containers = {}
         containers = self._canvas.figure.gca().containers
-        for index in range(len(containers)):
-            container = containers[index]
+        for container in containers:
             line = container.get_children()[0]
             line_containers[line] = container
         return line_containers

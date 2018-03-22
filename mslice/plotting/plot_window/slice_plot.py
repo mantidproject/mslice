@@ -153,10 +153,9 @@ class SlicePlot(object):
         if checked:
             self.plot_figure.arbitrary_nuclei, confirm = QtWidgets.QInputDialog.getInt(
                 self.plot_figure, 'Arbitrary Nuclei', 'Enter relative mass:')
-            if not confirm:
-                return
-        self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei,
-                                  self.plot_figure.arbitrary_nuclei, True, checked)
+            if confirm:
+                self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei,
+                                          self.plot_figure.arbitrary_nuclei, True, checked)
 
     def cif_file_powder_line(self, checked):
         if checked:
@@ -194,20 +193,25 @@ class SlicePlot(object):
         else:
             axes.legend_ = None  # remove legend
 
-    def intensity_selection(self, selected):
-        '''Ticks selected and un-ticks other intensity options. Returns previous selection'''
+    def _reset_intensity(self):
         options = self.plot_figure.menuIntensity.actions()
-        previous = None
         for op in options:
-            if op.isChecked() and op is not selected:
-                previous = op
             op.setChecked(False)
-        selected.setChecked(True)
-        return previous
+
+    def selected_intensity(self):
+        options = self.plot_figure.menuIntensity.actions()
+        for op in options:
+            if op.isChecked():
+                return op
+
+    def set_intensity(self, intensity):
+        self._reset_intensity()
+        intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
         if action.isChecked():
-            previous = self.intensity_selection(action)
+            previous = self.selected_intensity()
+            self.set_intensity(action)
             cbar_log = self.colorbar_log
             x_range = self.x_range
             y_range = self.y_range
@@ -234,7 +238,7 @@ class SlicePlot(object):
             try:
                 temp_value, field = self.ask_sample_temperature_field(str(self.ws_name))
             except RuntimeError:  # if cancel is clicked, go back to previous selection
-                self.intensity_selection(previous)
+                self.set_intensity(previous)
                 return False
             if field:
                 self._slice_plotter.add_sample_temperature_field(temp_value)
@@ -247,7 +251,7 @@ class SlicePlot(object):
                 except ValueError:
                     self.plot_figure.error_box("Invalid value entered for sample temperature. Enter a value in Kelvin \
                                                or a sample log field.")
-                    self.intensity_selection(previous)
+                    self.set_intensity(previous)
                     return False
                 else:
                     self._slice_plotter.set_sample_temperature(self.ws_name, temp_value)
