@@ -30,4 +30,3 @@ def generate_legend(workspace_name, integrated_dim, integration_start, integrati
     integrated_dim = mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
     return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
         "%.2f" % integration_end
-
