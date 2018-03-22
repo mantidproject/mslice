@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
-from mslice.app import MPL_COMPAT
+from mslice.util import MPL_COMPAT
 
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
 overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
