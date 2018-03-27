@@ -1,33 +1,32 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>3. Taking Slices &mdash; MSlice 0.2 documentation</title>
-    
+    <title>3. Taking Slices &#8212; MSlice 0.2 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
         VERSION:     '0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="MSlice 0.2 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="2. Taking Cuts" href="cutting.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,17 +35,18 @@
         <li class="right" >
           <a href="cutting.html" title="2. Taking Cuts"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">MSlice 0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">MSlice 0.2 documentation</a> &#187;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">3. Taking Slices</a><ul>
-<li><a class="reference internal" href="#from-the-gui">3.1. From The GUI</a></li>
-<li><a class="reference internal" href="#from-the-command-line">3.2. From the  Command Line</a></li>
-<li><a class="reference internal" href="#example">3.3. Example</a></li>
+<li><a class="reference internal" href="#slicing-from-the-gui">3.1. Slicing from the GUI</a></li>
+<li><a class="reference internal" href="#overplotting-recoil-and-powder-lines">3.2. Overplotting recoil and powder lines</a></li>
+<li><a class="reference internal" href="#converting-intensity-information-in-displayed-data">3.3. Converting intensity information in displayed data</a></li>
+<li><a class="reference internal" href="#saving-slices-to-file">3.4. Saving slices to file</a></li>
 </ul>
 </li>
 </ul>
@@ -54,22 +54,21 @@
   <h4>Previous topic</h4>
   <p class="topless"><a href="cutting.html"
                         title="previous chapter">2. Taking Cuts</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/slicing.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/slicing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -78,71 +77,83 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="taking-slices">
 <h1>3. Taking Slices<a class="headerlink" href="#taking-slices" title="Permalink to this headline">¶</a></h1>
-<p>This page provides a more in depth explanation of slicing in MSlice.</p>
-<div class="section" id="from-the-gui">
-<h2>3.1. From The GUI<a class="headerlink" href="#from-the-gui" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><dl class="first docutils">
-<dt>Click on a projection workspace in the <strong>Workspace Manager</strong> to select it.When a sliceable <em>Workspace</em> is selected</dt>
-<dd><p class="first last">in the <strong>Workspace Manager</strong> tab the <strong>Slice</strong> tab is automatically populated with suggested values.</p>
-</dd>
-</dl>
-</li>
-</ol>
-<img alt="_images/slice_parameters1.png" src="_images/slice_parameters1.png" />
-<ol class="arabic simple">
-<li>After changing the parameters as desired click on the display button.</li>
-</ol>
+<p>This page provides a more in depth explanation of slicing in <em>MSlice</em>.</p>
+<div class="section" id="slicing-from-the-gui">
+<span id="id1"></span><h2>3.1. Slicing from the GUI<a class="headerlink" href="#slicing-from-the-gui" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/calculate_projection.png" src="_images/calculate_projection.png" />
+<p>Depending on the loaded data type (see <a class="reference internal" href="quickstart.html#psd-and-non-psd-modes"><span class="std std-ref">PSD and non-PSD modes</span></a>), the <code class="docutils literal"><span class="pre">Slice</span></code> tab in the <code class="docutils literal"><span class="pre">Workspace</span> <span class="pre">Manager</span></code>
+may be disabled. If this is the case, your data is in <strong>PSD</strong> mode and you have to first convert it to an <code class="docutils literal"><span class="pre">MD</span> <span class="pre">Event</span></code>
+type workspace for MSlice to make slices and cuts. In the <code class="docutils literal"><span class="pre">Powder</span></code> tab shown above, select the desired axes (either
+<em>Momentum Transfer</em> vs <em>Energy Transfer</em> or <em>Scattering Angle</em> vs <em>Energy Transfer</em>) and click <code class="docutils literal"><span class="pre">Calculate</span> <span class="pre">Projection</span></code>.
+<em>MSlice</em> will then switch focus to the <code class="docutils literal"><span class="pre">MD</span> <span class="pre">Event</span></code> workspace produced by this step and enable the <code class="docutils literal"><span class="pre">Slice</span></code> and <code class="docutils literal"><span class="pre">Cut</span></code>
+tabs. The reason for this intemediate step is to reorganise the large volume pixel data into a form which can be quickly and
+efficiently rebinned into 2D slices and 1D cuts. <em>MSlice</em> uses the Mantid <a class="reference external" href="http://docs.mantidproject.org/nightly/algorithms/BinMD-v1.html">BinMD</a> algorithm to rebin the data for slices and cuts.
+For smaller volume <strong>Non-PSD</strong> mode data, <em>MSlice</em> uses less efficient algorithms (<a class="reference external" href="http://docs.mantidproject.org/nightly/algorithms/Rebin2D-v1.html">Rebin2D</a> and <a class="reference external" href="http://docs.mantidproject.org/nightly/algorithms/SofQWNormalisedPolygon-v1.html">SofQWNormalisedPolygon</a>) to rebin the loaded data directly.
+Another reason for this division depending on the data type is that <code class="docutils literal"><span class="pre">BinMD</span></code> only performs a centre-point rebinning,
+whereas the other (strictly 2D) algorithms perform the usual fractional weighted binning which is more accurate for
+non-pixellated data.</p>
+<img alt="_images/data_tab.png" src="_images/data_tab.png" />
+<p>Once the <code class="docutils literal"><span class="pre">Slice</span></code> tab is enabled (either by selecting an <code class="docutils literal"><span class="pre">MD</span> <span class="pre">Event</span></code> type workspace or a <strong>Non-PSD</strong> mode workspace),
+you can plot a 2D slice using the default parameters (axes limits and step sizes) obtained from the data by clicking
+<code class="docutils literal"><span class="pre">Display</span></code>. You can also change the binning parameters before displaying the slice, or you can normalise the displayed data
+such that the maximum intensity is unity by checking the <code class="docutils literal"><span class="pre">Norm</span> <span class="pre">to</span> <span class="pre">1</span></code> checkbox.</p>
+<img alt="_images/slice_options.png" src="_images/slice_options.png" />
+<p>Like with cuts (see <a class="reference internal" href="cutting.html#cutting-from-the-gui"><span class="std std-ref">Cutting from the GUI</span></a>), double-clicking on the axes or their titles allows you to change the
+limits of the plots of the text of the titles. Clicking on the cog icon will bring up an <code class="docutils literal"><span class="pre">Options</span></code> dialog which allows you
+to change all these properties simultaneously.</p>
 </div>
-<div class="section" id="from-the-command-line">
-<h2>3.2. From the  Command Line<a class="headerlink" href="#from-the-command-line" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><em>&lt;Docstrings from cli.get_slice and cli.plot_slice should go here&gt;</em></div></blockquote>
+<div class="section" id="overplotting-recoil-and-powder-lines">
+<h2>3.2. Overplotting recoil and powder lines<a class="headerlink" href="#overplotting-recoil-and-powder-lines" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="_images/recoil.png"><img alt="_images/recoil.png" src="_images/recoil.png" style="width: 484.2px; height: 377.4px;" /></a>
+<a class="reference internal image-reference" href="_images/powder_lines.png"><img alt="_images/powder_lines.png" src="_images/powder_lines.png" style="width: 484.2px; height: 377.4px;" /></a>
+<p>To help with a “first look” data analysis, <em>MSlice</em> can overplot on the 2D slices the recoil lines of light nuclei
+(Hydrogen <sup>1</sup>H, Deuterium <sup>2</sup>H, Helium and <sup>4</sup>He are implemented but a user defined Z is also
+available), and the positions of powder reflections from common sample environment materials (Aluminium, Copper,
+Niobium and Tantalum). These functionalities may be accessed from the <code class="docutils literal"><span class="pre">Information</span></code> menu option as shown above.</p>
+<p>Powder reflections from an arbitrary crystallographic information format (CIF) file can also be
+plotted but note that we use the <a class="reference external" href="https://pypi.python.org/pypi/PyCifRW/4.3">PyCifRW</a> package to read CIF files and that
+some files generated by FullProf or GSAS may not be readable. In these cases, please load the files in <a class="reference external" href="http://jp-minerals.org/vesta/en">Vesta</a> or <a class="reference external" href="http://openbabel.org">OpenBabel</a> and resave them.</p>
 </div>
-<div class="section" id="example">
-<h2>3.3. Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>First lets load some data and get the projections ready.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">cli</span>
-<span class="n">ws</span> <span class="o">=</span> <span class="n">cli</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s">&#39;MAR21335_Ei60.00meV.nxs&#39;</span><span class="p">)</span>
-<span class="n">projection</span> <span class="o">=</span> <span class="n">cli</span><span class="o">.</span><span class="n">get_projection</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s">&#39;DelatE&#39;</span><span class="p">)</span>
-</pre></div>
+<div class="section" id="converting-intensity-information-in-displayed-data">
+<h2>3.3. Converting intensity information in displayed data<a class="headerlink" href="#converting-intensity-information-in-displayed-data" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="_images/intensity_chi.png"><img alt="_images/intensity_chi.png" src="_images/intensity_chi.png" style="width: 645.6px; height: 503.20000000000005px;" /></a>
+<p>In addition to displaying the data as <img class="math" src="_images/math/af385cf70e9aa29bed9ee6fc11c442d61c12f402.png" alt="S(Q, \omega)" style="vertical-align: -4px"/>, the slice figure window can also display the data with
+the Bose factor corrected, as the dynamical susceptibility <img class="math" src="_images/math/95152d2cc63c76ef40a7e26a0dd17b1cc243a273.png" alt="\chi''(Q, \omega)" style="vertical-align: -4px"/> or as the density of states.
+For these options, the sample temperature must be given. This can either be specified as a log key, if the sample
+temperature is logged in the datafile, or a user inputted value (just type into the dropdown combobox). If a log key is
+given, <em>MSlice</em> will compute the mean temperature from the log series.</p>
+<p>The different options are related to the default <img class="math" src="_images/math/af385cf70e9aa29bed9ee6fc11c442d61c12f402.png" alt="S(Q, \omega)" style="vertical-align: -4px"/> view by:</p>
+<ul class="simple">
+<li>The dynamical susceptibility, <img class="math" src="_images/math/712f23e4c927da223d484b917179c261a7395613.png" alt="\chi''(Q, \omega) = \pi \frac{S(Q, \omega)}{&lt;n+\frac{1}{2}\pm\frac{1}{2}&gt;}" style="vertical-align: -12px"/></li>
+<li>The magnetic dynamical susceptibility
+<img class="math" src="_images/math/547a12e58b1f936d57193bd4c088e36b757dde06.png" alt="\chi''_{\mathrm{mag}}(Q, \omega) = \frac{\pi}{(g_n r_e)^2} \frac{S(Q, \omega)}{&lt;n+\frac{1}{2}\pm\frac{1}{2}&gt;}" style="vertical-align: -12px"/></li>
+<li>The cross-section, <img class="math" src="_images/math/4188a021b1d246fb147cb509c68ce382436237a0.png" alt="\frac{d^2\sigma}{d\Omega dE} = \frac{k_i}{k_f} S(Q, \omega)" style="vertical-align: -10px"/></li>
+<li>A “symmetrised” <img class="math" src="_images/math/af385cf70e9aa29bed9ee6fc11c442d61c12f402.png" alt="S(Q, \omega)" style="vertical-align: -4px"/> where the intensities for the neutron energy gain (negative energy) side is
+multiplied by the <img class="math" src="_images/math/462b686a3a0406bc09b13450b3914b2926aac6d0.png" alt="\exp(|E|/k_BT)" style="vertical-align: -5px"/> factor.</li>
+<li>The general (neutron weighted) density of states defined by <img class="math" src="_images/math/6adb0adcec887bb30ec1a8d3bcdc21dec26f376f.png" alt="S(Q, \omega) \frac{E}{Q^2} (1-\exp(-E/k_BT))" style="vertical-align: -9px"/></li>
+</ul>
+<p>Where <img class="math" src="_images/math/0e1ce5d91321b4c08ba61fdb9f100ec92ac37fc8.png" alt="&lt;n+\frac{1}{2}\pm\frac{1}{2}&gt;" style="vertical-align: -6px"/> is the boson population factor for neutron energy loss (boson creation,
+positive sign) or neutron energy gain (boson anihilation, negative sign). In particular the code uses:</p>
+<ul class="simple">
+<li><img class="math" src="_images/math/28f7027e481bac2997f44f2069f23a4aee1295c9.png" alt="\frac{1}{&lt;n+1&gt;} = 1 - \exp(-|E|/k_BT)" style="vertical-align: -7px"/></li>
+<li><img class="math" src="_images/math/ce1f1f3bbeb0752ffe411888b617d00bea129290.png" alt="\frac{1}{&lt;n&gt;} = \exp(|E|/k_BT)-1" style="vertical-align: -7px"/></li>
+</ul>
+<p><img class="math" src="_images/math/9dbc1582078677d6e14f7ca5e002ec95203aeee0.png" alt="g_n" style="vertical-align: -4px"/> is the neutron g-factor, and <img class="math" src="_images/math/d5c61aa796ee7b0624b4c6e82a9c1d35d9b550b7.png" alt="r_e" style="vertical-align: -3px"/> is the classical electron radius, with <img class="math" src="_images/math/e65ba3aefcfb8dcb3d7a3d166f61feb71d34c2b1.png" alt="(g_n r_e)^2" style="vertical-align: -4px"/> = 291
+milibarn being the total magnetic cross-section for a moment of <img class="math" src="_images/math/a09ce62a68eda8222e02feee9b7c54aa51eaef68.png" alt="1~\mu_B" style="vertical-align: -4px"/>.</p>
 </div>
-<p>Plotting a simple slice that spans all of the data</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Specifying the axis</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Specifying the axis with binning parameters,</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|,0,10,.5&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE,-20,20,1&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Specifiying the binning parameters for a single axis</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE,-20,20,100&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Specifying the intensity range</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|,0,10,.1&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE,-20,20,.5&#39;</span><span class="p">,</span> <span class="n">intensity_min</span><span class="o">=.</span><span class="mi">2</span><span class="p">,</span> <span class="n">intensity_max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Normalizing the intensity</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="s">&#39;|Q|,0,10,.1&#39;</span><span class="p">,</span> <span class="s">&#39;DeltaE,-20,20,.5&#39;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt>Setting the colormap</dt>
-<dd>Any valid matplotib colormap object or colormap name maybe passed a a value of the <tt class="docutils literal"><span class="pre">colormap</span></tt> parameter in
-<tt class="docutils literal"><span class="pre">plot_slice</span></tt></dd>
-</dl>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cli</span><span class="o">.</span><span class="n">plot_slice</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s">&#39;coolwarm&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="section" id="saving-slices-to-file">
+<h2>3.4. Saving slices to file<a class="headerlink" href="#saving-slices-to-file" title="Permalink to this headline">¶</a></h2>
+<p>The data in a slice may be saved using the floppy icon in the slice figure window to Nexus (<code class="docutils literal"><span class="pre">.nxs</span></code>), Matlab (<code class="docutils literal"><span class="pre">.mat</span></code>)
+or ASCII text (<code class="docutils literal"><span class="pre">.txt</span></code> or <code class="docutils literal"><span class="pre">.xye</span></code> in a four-column <code class="docutils literal"><span class="pre">x</span></code> (x-coordinate), <code class="docutils literal"><span class="pre">y</span></code> (y-coordinate), <code class="docutils literal"><span class="pre">s</span></code> (signal), <code class="docutils literal"><span class="pre">e</span></code>
+(uncertainty) format). For <strong>PSD</strong> mode, the same information can be saved using the <code class="docutils literal"><span class="pre">Save</span></code> button in the <code class="docutils literal"><span class="pre">MD</span> <span class="pre">Event</span></code>
+tab. For <strong>Non-PSD</strong> mode data the equivalent <code class="docutils literal"><span class="pre">Save</span></code> button in the <code class="docutils literal"><span class="pre">2D</span></code> tab will save the original (loaded) data
+in spectrum number versus energy transfer rather than the units of the slice. Thus for <strong>Non-PSD</strong> mode you must use
+the floppy disk icon in the slice figure window to save the data. In addition, you can save an image of the slice to
+<code class="docutils literal"><span class="pre">.png</span></code> or <code class="docutils literal"><span class="pre">.pdf</span></code> formats.</p>
 </div>
 </div>
 
@@ -152,7 +163,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -161,12 +172,12 @@
         <li class="right" >
           <a href="cutting.html" title="2. Taking Cuts"
              >previous</a> |</li>
-        <li><a href="index.html">MSlice 0.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">MSlice 0.2 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2016, Mantid Project.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Mantid Project.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>
