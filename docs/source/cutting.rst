@@ -1,91 +1,69 @@
 Taking Cuts
 ===========
-    This page provides a more detailed explanation on taking cuts in MSlice
 
-From the GUI
-------------
-The cut tab will by default be diabled. When you click on a cuttable workspace it will be enabled.
+This page provides a more detailed explanation on taking cuts in MSlice.
 
-**To plot a Single Cut**
+.. _Cutting_from_the_GUI:
 
-1. Click on a projection workspace in the *Workspace Manager* to select it.
+Cutting from the GUI
+--------------------
 
-2. Switch to Cut tab
+The cut tab will be disabled by default, and enabled when you click on a cuttable workspace. This is either a loaded
+**non-PSD** dataset (see :ref:`PSD_and_non-PSD_modes`), or a **PSD** dataset for which you have done a ``Calculate
+Projection`` (converted to an ``MD Event`` type workspace).
 
-3. Fill in the mandatory values for the integration axis and the integration range
+.. image:: images/cutting/cut_panel.png
 
-.. image:: images/cutting/mandatory_values.png
+To plot a single cut, fill in values for the cut axis, labelled ``along``, its limits (``from`` and ``to``), and the step
+size. For **non-PSD** datasets you also have to select the axes ``over`` which to integrate, and the integration range.
+One of the cut or integration axis must be *energy transfer* in this case. For **PSD** dataset, the ``Calculate Projection``
+step specifies the two axes already. The axis which is not selected to plot ``along`` is implicitly used as the integration
+axis.
 
-4. Optionally Specify the range for the intensity to shown and tick the the `Norm to 1` checkbox to normalize the
-   cuts to 1.
+If you type ``0`` in or leave the ``step`` input box empty, the default step size, determined from the data will be used.
+You must specify values for the cut limits and integration range, however.
 
-5. Click on the **Plot** button to plot the cut.
+Multiple cuts can be plotted from the same dataset simultaneously by specifying an integration ``width``. This will produce
+cuts between the specified integration minimum and maximum with the specified width, with the last cut being the remainder.
+For example, if ``from`` is ``0`` and ``to`` is ``10`` and ``width`` is ``3``, clicking ``Plot`` will overplot 4 cuts which
+integrate over [0,3], [3,6], [6,9] and [9,10] respectively.
 
-.. image:: images/cutting/single_cut.png
+Cuts with the same range from multiple datasets can be plotted by first selecting multiple workspaces in the left panel.
 
-**To Plot Multiple Equal From one workspace**
+Clicking on the ``Norm to 1`` check box will cause the resulting cut data to be normalised such that the maximum of the data
+of each cut is unity.
 
-1. Click on a projection workspace in the *Workspace Manager* to select it.
+The ``Plot Over`` button allows you to overplot data on the same figure window without first clearing the current data. Note
+that no check is made about whether the cuts makes sense (e.g. it is possible to plot a *Q* cut over an energy cut or vice
+versa).
 
-2. Switch to Cut tab
+Finally, the cut figures have the same ``Keep`` / ``Make Current`` window management system introduced in the original
+Matlab MSlice as the slices. Clicking ``Plot`` will send data to the **Current** figure window, clearing whatever was
+previously plotted there. Clicking ``Plot Over`` sends data to the **Current** figure window but plotting over data already
+there. If you wish to have a fresh plot but to keep the data in a particular plot figure window, click ``Keep``. To make
+a **Kept** figure **Current** again (for example to use ``Plot Over``), click ``Make Current``. 
+See :ref:`Keep_/_Make_Current` for more details.
 
-3. Fill in the mandatory values for the integration axis and the integration range
+.. image:: images/cutting/cut_options.png
+   :scale: 80 %
 
-4. Specify the `width` parameter. When the the width parameter is set then cuts the values in `integration from` and
-    `Integration to ` will specify the range of the data to processed. The range specified will be divided into sections of
-    `width` and each section plotted individual. For instance setting the integration from `0` to `40` with width `10` will produce
-    4 individual cuts, one with the ranges : from 0 to 10, from 10 to 20, from 20 to 30, from 30 to 40.
+You can edit the axes limits, scale and titles by double-clicking on the relevant axis in the plot window. Clicking on each
+plot line will also allow you to change its colour and symbol. These functionalities are also accessible from the options
+button (the cog symbol) in the plot figure toolbar. 
 
-.. image:: images/cutting/width_parameters_set.png
+Saving cuts
+-----------
 
-4. Optionally Specify the range for the intensity to shown and tick the the `Norm to 1` checkbox to normalize the
-   cuts to 1.
+Each time you click ``Plot`` or ``Plot Over`` an ``MD Histo`` type workspace is created, and can be accessed from the
+corresponding tab. This workspace can be saved to Nexus (``nxs``), Matlab (``mat``) or ASCII (``txt`` or ``xye``) formats.
+*MSlice* is able to load previously saved Nexus or ASCII cuts from file, but you may only then plot or overplot these cuts
+(further manipulation of the cuts is not allowed, although you may normalise the intensity to unity for the plots). 
+The ASCII format is a simple three column ``x`` - ``y`` - ``e`` type format. For ``mat`` files, three vectors ``x``
+(coordinate), ``y`` (signal) and ``e`` (uncertainties) are saved.
 
-5. Click on the **Plot** button to plot the cut.
+From the plot figure window, you can also save the workspace data to the same formats (``nxs``, ``mat`` and ``txt``). In
+addition you can also save the figure as an image, either in ``png`` or ``pdf`` formats.
 
-
-.. image:: images/cutting/width_cuts.png
-
-**To add cuts to an existing plot**
-1. Click on a projection workspace in the *Workspace Manager* to select it.
-
-2. Switch to Cut tab
-
-3. Fill in cut parameters (You can specify width to add multiple cuts to a plot at once).
-
-4. Make sure the cut window you you want to plot is the current cut window (if it is not click on the make current button
-   on it).
-
-5. Click on the **Plot Over** button to add the cut to the plot.
-
-.. image:: images/cutting/multiple_cuts_in_one_window.png
-
-
-N.B. If you plot multiple cuts to the same window (using **plot over** or **width**) and ``Norm to One``  each cut will
-still be normalized independently (e.g. The ratio between corresponding points on  the different cuts will not be conserved).
-
-**Save cuts to workspaces**
-
-1. Click on a projection workspace in the *Workspace Manager* to select it.
-
-2. Switch to Cut tab
-
-3. Fill in cut parameters (You can specify width to add multiple cuts to a plot at once).
-
-4. Click on the **Save to workspaces** button to add the cut to the plot.
-
-5. The new cuts should now appear in the **Workspace Manager**
-
-.. image:: images/cutting/cuts_saved_to_workspace.png
-
-**Interacting with saved cuts**
-
-  Clicking on a saved cut will make the cut tab show the parameters the cut was taken with.
-
-  .. image:: images/cutting/cut_tab_show_params.png
-
-  You cannot edit these values, However, you still can set an intensity range for the plot. If the cut was not normalized
-  to one then you can normalized it if you wish. You cannot revert a normalized cut to its previous state
-
-  To plot the cut click on **Plot**/**Plot Over** or alternatively to save the cut to a workspace click on the **Save**
-  button in the **Workspace Manager**
+In order to save a cut from an :ref:`Interactive_Cuts`, you can click the ``Save`` icon (floppy disk) direct on the cut
+window, or first click the ``Save Cut`` button to create an ``MD Histo`` type workspacce and then use the ``Save`` button on
+that tab.
