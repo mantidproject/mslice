@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
+from mslice.app.mainwindow import ShowBusy
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -28,22 +29,22 @@ class CutPresenter(PresenterUtility):
     @require_main_presenter
     def notify(self, command):
         self._clear_displayed_error(self._cut_view)
-        self._cut_view.busy.emit(True)
-        if command == Command.Plot:
-            self._cut(output_method=self._plot_and_save_to_workspace)
-        elif command == Command.PlotOver:
-            self._cut(output_method=self._plot_and_save_to_workspace, plot_over=True)
-        elif command == Command.PlotFromWorkspace:
-            self._plot_cut_from_workspace(plot_over=False)
-        elif command == Command.PlotOverFromWorkspace:
-            self._plot_cut_from_workspace(plot_over=True)
-        elif command == Command.SaveToWorkspace:
-            self._cut(output_method=self._save_cut_to_workspace)
-        elif command == Command.AxisChanged:
-            self._cut_axis_changed()
-        elif command == Command.IntegrationAxisChanged:
-            self._integration_axis_changed()
-        self._cut_view.busy.emit(False)
+        with ShowBusy(self._cut_view):
+            if command == Command.Plot:
+                self._cut(output_method=self._plot_and_save_to_workspace)
+            elif command == Command.PlotOver:
+                self._cut(output_method=self._plot_and_save_to_workspace, plot_over=True)
+            elif command == Command.PlotFromWorkspace:
+                self._plot_cut_from_workspace(plot_over=False)
+            elif command == Command.PlotOverFromWorkspace:
+                self._plot_cut_from_workspace(plot_over=True)
+            elif command == Command.SaveToWorkspace:
+                self._cut(output_method=self._save_cut_to_workspace)
+            elif command == Command.AxisChanged:
+                self._cut_axis_changed()
+            elif command == Command.IntegrationAxisChanged:
+                self._integration_axis_changed()
+
 
     def _cut(self, output_method, plot_over=False):
         selected_workspaces = self._main_presenter.get_selected_workspaces()

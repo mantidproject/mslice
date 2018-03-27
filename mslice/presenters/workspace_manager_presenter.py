@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from six import string_types
 
+from mslice.app.mainwindow import ShowBusy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.models.workspacemanager.file_io import get_save_directory
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
@@ -24,28 +25,27 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def notify(self, command):
         self._clear_displayed_error()
-        self._workspace_manager_view.busy.emit(True)
-        if command == Command.SaveSelectedWorkspaceNexus:
-            self._save_selected_workspace('.nxs')
-        elif command == Command.SaveSelectedWorkspaceAscii:
-            self._save_selected_workspace('.txt')
-        elif command == Command.SaveSelectedWorkspaceMatlab:
-            self._save_selected_workspace('.mat')
-        elif command == Command.RemoveSelectedWorkspaces:
-            self._remove_selected_workspaces()
-        elif command == Command.RenameWorkspace:
-            self._rename_workspace()
-        elif command == Command.CombineWorkspace:
-            self._combine_workspace()
-        elif command == Command.SelectionChanged:
-            self._broadcast_selected_workspaces()
-        elif command == Command.Add:
-            self._add_workspaces()
-        elif command  == Command.Subtract:
-            self._subtract_workspace()
-        else:
-            raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
-        self._workspace_manager_view.busy.emit(False)
+        with ShowBusy(self._workspace_manager_view):
+            if command == Command.SaveSelectedWorkspaceNexus:
+                self._save_selected_workspace('.nxs')
+            elif command == Command.SaveSelectedWorkspaceAscii:
+                self._save_selected_workspace('.txt')
+            elif command == Command.SaveSelectedWorkspaceMatlab:
+                self._save_selected_workspace('.mat')
+            elif command == Command.RemoveSelectedWorkspaces:
+                self._remove_selected_workspaces()
+            elif command == Command.RenameWorkspace:
+                self._rename_workspace()
+            elif command == Command.CombineWorkspace:
+                self._combine_workspace()
+            elif command == Command.SelectionChanged:
+                self._broadcast_selected_workspaces()
+            elif command == Command.Add:
+                self._add_workspaces()
+            elif command  == Command.Subtract:
+                self._subtract_workspace()
+            else:
+                raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
 
     def _broadcast_selected_workspaces(self):
         self._get_main_presenter().notify_workspace_selection_changed()
