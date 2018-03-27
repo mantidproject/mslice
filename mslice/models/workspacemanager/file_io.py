@@ -93,7 +93,7 @@ def _save_cut_to_ascii(workspace, ws_name, output_path):
     x, y, e = _get_md_histo_xye(workspace)
     header = 'MSlice Cut of workspace "%s" along "%s" between %s and %s' % (ws_name, units, int_start, int_end)
     out_data = np.c_[x, y, e]
-    np.savetxt(str(output_path), out_data, fmt='%12.9e', header=header)
+    _output_data_to_ascii(output_path, out_data, header)
 
 
 def _save_slice_to_ascii(workspace, output_path):
