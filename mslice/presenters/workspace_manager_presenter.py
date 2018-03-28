@@ -15,6 +15,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view = workspace_view
         self._workspace_provider = workspace_provider
         self._main_presenter = None
+        self._psd = True
 
     def register_master(self, main_presenter):
         assert (isinstance(main_presenter, MainPresenterInterface))
@@ -62,11 +63,14 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view.highlight_tab(tab)
 
     def workspace_selection_changed(self):
-        if self._workspace_manager_view.current_list() == self._workspace_manager_view.listWorkspaces2D:
-            if all([self.get_workspace_provider().is_PSD(ws) for ws in self._workspace_manager_view.get_workspace_selected()]):
+        if self._workspace_manager_view.current_tab() == TAB_2D:
+            psd = all([self.get_workspace_provider().is_PSD(ws) for ws in self._workspace_manager_view.get_workspace_selected()])
+            if psd and not self._psd:
                 self._workspace_manager_view.tab_changed.emit(TAB_2D)
-            else:
+                self._psd = True
+            elif not psd and self._psd:
                 self._workspace_manager_view.tab_changed.emit(TAB_NONPSD)
+                self._psd = False
 
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():

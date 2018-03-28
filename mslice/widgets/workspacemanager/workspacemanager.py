@@ -26,6 +26,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         self.button_mappings = {}
         self._main_window = None
         self.onscreen_workspaces = []
+        self.tab = None
         self.tab_to_list = {TAB_2D: self.listWorkspaces2D,
                             TAB_EVENT: self.listWorkspacesEvent,
                             TAB_HISTO: self.listWorkspacesHisto}
@@ -40,6 +41,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def tab_changed_method(self, tab_index):
         self.clear_selection()
+        self.tab = tab_index
         if self.tabWidget.tabText(tab_index)[-1:] == "*":
             self.tabWidget.setTabText(tab_index, self.tabWidget.tabText(tab_index)[:-1])
         self.tab_changed.emit(tab_index)
@@ -50,6 +52,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def current_list(self):
         return self.tab_to_list[self.tabWidget.currentIndex()]
+
+    def current_tab(self):
+        return self.tab if self.tab is not None else self.tabWidget.currentIndex()
 
     def change_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)
