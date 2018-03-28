@@ -183,7 +183,8 @@ class CutPresenter(PresenterUtility):
                 self._previous_cut = None
                 self._previous_axis = None
         workspace_selection = self._main_presenter.get_selected_workspaces()
-        if len(workspace_selection) < 1: # if no workspace is selected
+        if len(workspace_selection) == 0 or not all([self._cut_algorithm.is_cuttable(ws)
+                                                     for ws in workspace_selection]):
             self._cut_view.clear_input_fields()
             self._cut_view.disable()
             self._previous_cut = None
