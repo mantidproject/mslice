@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from six import string_types
 
 from mslice.widgets.workspacemanager.command import Command
+from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
@@ -63,11 +64,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def workspace_selection_changed(self):
         if self._workspace_manager_view.current_list() == self._workspace_manager_view.listWorkspaces2D:
             if all([self.get_workspace_provider().is_PSD(ws) for ws in self._workspace_manager_view.get_workspace_selected()]):
-                self._workspace_manager_view.tab_changed.emit(0)
-                self._workspace_manager_view.nonpsd.emit(False)
+                self._workspace_manager_view.tab_changed.emit(TAB_2D)
             else:
-                self._workspace_manager_view.tab_changed.emit(3)
-                self._workspace_manager_view.nonpsd.emit(True)
+                self._workspace_manager_view.tab_changed.emit(TAB_NONPSD)
 
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():

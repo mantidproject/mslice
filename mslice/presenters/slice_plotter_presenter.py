@@ -146,9 +146,11 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
             return
+        non_psd = all([not self._slice_plotter.workspace_provider.is_PSD(ws) for ws in workspace_selection])
         workspace_selection = workspace_selection[0]
 
         self._slice_view.enable()
+        self._slice_view.enable_units_choice(non_psd)
         axis = self._slice_plotter.get_available_axis(workspace_selection)
         self._slice_view.populate_slice_x_options(axis)
         self._slice_view.populate_slice_y_options(axis[::-1])

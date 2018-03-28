@@ -189,6 +189,8 @@ class CutPresenter(PresenterUtility):
             self._previous_cut = None
             self._previous_axis = None
         else:
+            non_psd = all([not self._cut_plotter.workspace_provider.is_PSD(ws) for ws in workspace_selection])
+            self._cut_view.enable_integration_axis(non_psd)
             self._populate_fields_using_workspace(workspace_selection[0])
 
     def _populate_fields_using_workspace(self, workspace, plotting=False):

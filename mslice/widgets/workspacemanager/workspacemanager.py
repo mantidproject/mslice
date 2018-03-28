@@ -10,11 +10,7 @@ from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
 from .subtract_input_box import SubtractInputBox
-
-TAB_2D = 0
-TAB_EVENT = 1
-TAB_HISTO = 2
-TAB_NONPSD = 3
+from . import TAB_2D, TAB_EVENT, TAB_HISTO
 
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
@@ -23,7 +19,6 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
     error_occurred = Signal('QString')
     tab_changed = Signal(int)
     busy = Signal(bool)
-    nonpsd = Signal(bool)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
