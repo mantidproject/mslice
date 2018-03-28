@@ -219,6 +219,7 @@ class CutPresenter(PresenterUtility):
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
             self._cut_view.set_cut_axis(current_axis)
+            self._cut_view.update_integration_axis()
             if not plotting and saved_parameters is not None:
                 self._cut_view.populate_input_fields(saved_parameters)
             self._previous_cut = workspace
