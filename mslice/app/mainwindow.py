@@ -99,7 +99,6 @@ class MainWindow(MainView, QMainWindow):
 
     def enable_widget_tabs(self, workspace_tab):
         '''enables correct powder/slice/cut tabs based on workspace tab'''
-        self.btnMerge.setEnabled(workspace_tab == TAB_EVENT)
         self.tabWidget_2.show()
         tab_to_show = self.tabs_to_show[workspace_tab]
         for tab_index in range(3):

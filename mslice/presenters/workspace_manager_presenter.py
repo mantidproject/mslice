@@ -8,7 +8,6 @@ from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
 
 
-
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def __init__(self, workspace_view, workspace_provider):
         # TODO add validation checks
@@ -48,6 +47,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view.busy.emit(False)
 
     def _broadcast_selected_workspaces(self):
+        self.workspace_selection_changed()
         self._get_main_presenter().notify_workspace_selection_changed()
 
     @require_main_presenter
@@ -59,6 +59,15 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def highlight_tab(self, tab):
         self._workspace_manager_view.highlight_tab(tab)
+
+    def workspace_selection_changed(self):
+        if self._workspace_manager_view.current_list() == self._workspace_manager_view.listWorkspaces2D:
+            if all([self.get_workspace_provider().is_PSD(ws) for ws in self._workspace_manager_view.get_workspace_selected()]):
+                self._workspace_manager_view.tab_changed.emit(0)
+                self._workspace_manager_view.nonpsd.emit(False)
+            else:
+                self._workspace_manager_view.tab_changed.emit(3)
+                self._workspace_manager_view.nonpsd.emit(True)
 
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():

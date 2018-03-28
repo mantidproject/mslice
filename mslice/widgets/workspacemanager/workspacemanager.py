@@ -180,13 +180,6 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return self._presenter
 
     def list_item_changed(self):
-        if self.sender() == self.listWorkspaces2D:
-            if all([self._presenter.get_workspace_provider().is_PSD(ws) for ws in self.get_workspace_selected()]):
-                self.tab_changed.emit(TAB_2D)
-                self.nonpsd.emit(False)
-            else:
-                self.tab_changed.emit(TAB_NONPSD)
-                self.nonpsd.emit(True)
         self._presenter.notify(Command.SelectionChanged)
 
     def error_unable_to_save(self):

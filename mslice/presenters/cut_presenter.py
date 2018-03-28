@@ -183,13 +183,13 @@ class CutPresenter(PresenterUtility):
                 self._previous_cut = None
                 self._previous_axis = None
         workspace_selection = self._main_presenter.get_selected_workspaces()
-        if len(workspace_selection) < 1:
+        if len(workspace_selection) < 1: # if no workspace is selected
             self._cut_view.clear_input_fields()
             self._cut_view.disable()
             self._previous_cut = None
             self._previous_axis = None
-            return
-        self._populate_fields_using_workspace(workspace_selection[0])
+        else:
+            self._populate_fields_using_workspace(workspace_selection[0])
 
     def _populate_fields_using_workspace(self, workspace, plotting=False):
         if self._cut_algorithm.is_cuttable(workspace):
