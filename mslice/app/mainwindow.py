@@ -5,13 +5,10 @@ from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QMenu
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.util.qt import load_ui
 from mslice.views.mainview import MainView
+from mslice.widgets.workspacemanager import TAB_2D, TAB_EVENT, TAB_HISTO, TAB_NONPSD
 from mslice.widgets.workspacemanager.command import Command as ws_command
 from mslice.widgets.cut.command import Command as cut_command
 
-TAB_2D = 0
-TAB_EVENT = 1
-TAB_HISTO = 2
-TAB_NONPSD = 3
 TAB_SLICE = 1
 TAB_CUT = 2
 TAB_POWDER = 0
@@ -54,7 +51,6 @@ class MainWindow(MainView, QMainWindow):
         self.cut_presenter.set_workspace_provider(workspace_provider)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
-        self.wgtWorkspacemanager.nonpsd.connect(self.switch_nonpsd_mode)
         self.setup_save()
         self.btnSave.clicked.connect(self.button_save)
         self.btnAdd.clicked.connect(self.button_add)
@@ -93,13 +89,8 @@ class MainWindow(MainView, QMainWindow):
         self.enable_widget_tabs(tab)
         self.enable_buttons(tab)
 
-    def switch_nonpsd_mode(self, nonpsd):
-        self.wgtCut.enable_integration_axis(nonpsd)
-        self.wgtSlice.enable_units_choice(nonpsd)
-
     def enable_widget_tabs(self, workspace_tab):
         '''enables correct powder/slice/cut tabs based on workspace tab'''
-        self.btnMerge.setEnabled(workspace_tab == TAB_EVENT)
         self.tabWidget_2.show()
         tab_to_show = self.tabs_to_show[workspace_tab]
         for tab_index in range(3):

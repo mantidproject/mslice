@@ -183,13 +183,16 @@ class CutPresenter(PresenterUtility):
                 self._previous_cut = None
                 self._previous_axis = None
         workspace_selection = self._main_presenter.get_selected_workspaces()
-        if len(workspace_selection) < 1:
+        if len(workspace_selection) == 0 or not all([self._cut_algorithm.is_cuttable(ws)
+                                                     for ws in workspace_selection]):
             self._cut_view.clear_input_fields()
             self._cut_view.disable()
             self._previous_cut = None
             self._previous_axis = None
-            return
-        self._populate_fields_using_workspace(workspace_selection[0])
+        else:
+            non_psd = all([not self._cut_plotter.workspace_provider.is_PSD(ws) for ws in workspace_selection])
+            self._cut_view.enable_integration_axis(non_psd)
+            self._populate_fields_using_workspace(workspace_selection[0])
 
     def _populate_fields_using_workspace(self, workspace, plotting=False):
         if self._cut_algorithm.is_cuttable(workspace):
@@ -217,6 +220,7 @@ class CutPresenter(PresenterUtility):
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
             self._cut_view.set_cut_axis(current_axis)
+            self._cut_view.update_integration_axis()
             if not plotting and saved_parameters is not None:
                 self._cut_view.populate_input_fields(saved_parameters)
             self._previous_cut = workspace

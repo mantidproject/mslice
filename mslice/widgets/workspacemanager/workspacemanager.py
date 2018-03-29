@@ -10,11 +10,7 @@ from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
 from .command import Command
 from .subtract_input_box import SubtractInputBox
-
-TAB_2D = 0
-TAB_EVENT = 1
-TAB_HISTO = 2
-TAB_NONPSD = 3
+from . import TAB_2D, TAB_EVENT, TAB_HISTO
 
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
@@ -23,7 +19,6 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
     error_occurred = Signal('QString')
     tab_changed = Signal(int)
     busy = Signal(bool)
-    nonpsd = Signal(bool)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -31,6 +26,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         self.button_mappings = {}
         self._main_window = None
         self.onscreen_workspaces = []
+        self.tab = None
         self.tab_to_list = {TAB_2D: self.listWorkspaces2D,
                             TAB_EVENT: self.listWorkspacesEvent,
                             TAB_HISTO: self.listWorkspacesHisto}
@@ -45,6 +41,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def tab_changed_method(self, tab_index):
         self.clear_selection()
+        self.tab = tab_index
         if self.tabWidget.tabText(tab_index)[-1:] == "*":
             self.tabWidget.setTabText(tab_index, self.tabWidget.tabText(tab_index)[:-1])
         self.tab_changed.emit(tab_index)
@@ -55,6 +52,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def current_list(self):
         return self.tab_to_list[self.tabWidget.currentIndex()]
+
+    def current_tab(self):
+        return self.tab if self.tab is not None else self.tabWidget.currentIndex()
 
     def change_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)
@@ -180,13 +180,6 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return self._presenter
 
     def list_item_changed(self):
-        if self.sender() == self.listWorkspaces2D:
-            if all([self._presenter.get_workspace_provider().is_PSD(ws) for ws in self.get_workspace_selected()]):
-                self.tab_changed.emit(TAB_2D)
-                self.nonpsd.emit(False)
-            else:
-                self.tab_changed.emit(TAB_NONPSD)
-                self.nonpsd.emit(True)
         self._presenter.notify(Command.SelectionChanged)
 
     def error_unable_to_save(self):
