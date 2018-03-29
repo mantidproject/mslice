@@ -85,6 +85,9 @@ class CutView:
     def populate_integration_params(self, integration_start=None, integration_end=None):
         pass
 
+    def enable_integration_axis(self, enabled):
+        pass
+
     def enable(self):
         pass
 

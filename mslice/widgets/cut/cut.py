@@ -145,7 +145,6 @@ class CutWidget(CutView, QWidget):
         for option in options:
             self.cmbCutAxis.addItem(option)
         self.cmbCutAxis.blockSignals(False)
-        self.update_integration_axis()
 
     def populate_integration_axis_options(self, options):
         self.cmbIntegrationAxis.blockSignals(True)

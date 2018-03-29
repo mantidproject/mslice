@@ -89,6 +89,9 @@ class SlicePlotterView:
     def populate_slice_y_params(self, y_start, y_end, y_step):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def enable_units_choice(self, enabled):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def clear_input_fields(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 

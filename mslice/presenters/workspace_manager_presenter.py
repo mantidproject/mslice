@@ -2,11 +2,11 @@ from __future__ import (absolute_import, division, print_function)
 from six import string_types
 
 from mslice.widgets.workspacemanager.command import Command
+from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
-
 
 
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
@@ -15,6 +15,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view = workspace_view
         self._workspace_provider = workspace_provider
         self._main_presenter = None
+        self._psd = True
 
     def register_master(self, main_presenter):
         assert (isinstance(main_presenter, MainPresenterInterface))
@@ -48,6 +49,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view.busy.emit(False)
 
     def _broadcast_selected_workspaces(self):
+        self.workspace_selection_changed()
         self._get_main_presenter().notify_workspace_selection_changed()
 
     @require_main_presenter
@@ -59,6 +61,16 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def highlight_tab(self, tab):
         self._workspace_manager_view.highlight_tab(tab)
+
+    def workspace_selection_changed(self):
+        if self._workspace_manager_view.current_tab() == TAB_2D:
+            psd = all([self.get_workspace_provider().is_PSD(ws) for ws in self._workspace_manager_view.get_workspace_selected()])
+            if psd and not self._psd:
+                self._workspace_manager_view.tab_changed.emit(TAB_2D)
+                self._psd = True
+            elif not psd and self._psd:
+                self._workspace_manager_view.tab_changed.emit(TAB_NONPSD)
+                self._psd = False
 
     def _confirm_workspace_overwrite(self, ws_name):
         if ws_name in self._workspace_provider.get_workspace_names():

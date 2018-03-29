@@ -145,14 +145,16 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         if len(workspace_selection) != 1 or not self._slice_plotter.is_sliceable(workspace_selection[0]):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
-            return
-        workspace_selection = workspace_selection[0]
+        else:
+            non_psd = all([not self._slice_plotter.workspace_provider.is_PSD(ws) for ws in workspace_selection])
+            workspace_selection = workspace_selection[0]
 
-        self._slice_view.enable()
-        axis = self._slice_plotter.get_available_axis(workspace_selection)
-        self._slice_view.populate_slice_x_options(axis)
-        self._slice_view.populate_slice_y_options(axis[::-1])
-        self.populate_slice_params()
+            self._slice_view.enable()
+            self._slice_view.enable_units_choice(non_psd)
+            axis = self._slice_plotter.get_available_axis(workspace_selection)
+            self._slice_view.populate_slice_x_options(axis)
+            self._slice_view.populate_slice_y_options(axis[::-1])
+            self.populate_slice_params()
 
     def populate_slice_params(self):
         try:
@@ -162,10 +164,10 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         except (KeyError, RuntimeError, IndexError):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
-            return
-        self._slice_view.enable()
-        self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
-        self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])
+        else:
+            self._slice_view.enable()
+            self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
+            self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])
 
     def invalidate_slice_cache(self):
         self._slice_plotter.slice_cache.clear()

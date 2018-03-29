@@ -8,6 +8,7 @@
 # Classes and functions
 # -----------------------------------------------------------------------------
 
+
 class Command(object):
     SaveSelectedWorkspaceNexus = 1
     RemoveSelectedWorkspaces = 2
