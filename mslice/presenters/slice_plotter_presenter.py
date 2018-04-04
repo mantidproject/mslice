@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from .busy import show_busy
 from mslice.models.slice.slice_plotter import SlicePlotter
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.slice_plotter_view import SlicePlotterView
@@ -48,12 +49,11 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def notify(self, command):
         self._clear_displayed_error(self._slice_view)
-        self._slice_view.busy.emit(True)
-        if command == Command.DisplaySlice:
-            self._display_slice()
-        else:
-            raise ValueError("Slice Plotter Presenter received an unrecognised command")
-        self._slice_view.busy.emit(False)
+        with show_busy(self._slice_view):
+            if command == Command.DisplaySlice:
+                self._display_slice()
+            else:
+                raise ValueError("Slice Plotter Presenter received an unrecognised command")
 
     def _display_slice(self):
         selected_workspaces = self._get_main_presenter().get_selected_workspaces()

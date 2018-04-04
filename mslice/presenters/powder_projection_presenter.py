@@ -1,4 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
+
+from .busy import show_busy
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.powder_projection_view import PowderView
@@ -27,16 +29,15 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
 
     def notify(self, command):
         self._clear_displayed_error(self._powder_view)
-        self._powder_view.busy.emit(True)
-        if command == Command.CalculatePowderProjection:
-            self._calculate_powder_projection()
-        elif command == Command.U1Changed:
-            self._axis_changed(1)
-        elif command == Command.U2Changed:
-            self._axis_changed(2)
-        else:
-            raise ValueError("Powder Projection Presenter received an unrecognised command")
-        self._powder_view.busy.emit(False)
+        with show_busy(self._powder_view):
+            if command == Command.CalculatePowderProjection:
+                self._calculate_powder_projection()
+            elif command == Command.U1Changed:
+                self._axis_changed(1)
+            elif command == Command.U2Changed:
+                self._axis_changed(2)
+            else:
+                raise ValueError("Powder Projection Presenter received an unrecognised command")
 
     def _calculate_powder_projection(self):
         selected_workspaces = self._get_main_presenter().get_selected_workspaces()
