@@ -169,15 +169,3 @@ class MainWindow(MainView, QMainWindow):
         else:
             return
         QApplication.processEvents()
-
-
-class ShowBusy():
-
-    def __init__(self, view):
-        self.view = view
-
-    def __enter__(self):
-        self.view.busy.emit(True)
-
-    def __exit__(self, *args):
-        self.view.busy.emit(False)

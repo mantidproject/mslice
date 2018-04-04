@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.app.mainwindow import ShowBusy
+from .busy import show_busy
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.powder_projection_view import PowderView
@@ -29,7 +29,7 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
 
     def notify(self, command):
         self._clear_displayed_error(self._powder_view)
-        with ShowBusy(self._powder_view):
+        with show_busy(self._powder_view):
             if command == Command.CalculatePowderProjection:
                 self._calculate_powder_projection()
             elif command == Command.U1Changed:

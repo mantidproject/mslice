@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from six import string_types
 
-from mslice.app.mainwindow import ShowBusy
+from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.models.workspacemanager.file_io import get_save_directory
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
@@ -25,7 +25,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def notify(self, command):
         self._clear_displayed_error()
-        with ShowBusy(self._workspace_manager_view):
+        with show_busy(self._workspace_manager_view):
             if command == Command.SaveSelectedWorkspaceNexus:
                 self._save_selected_workspace('.nxs')
             elif command == Command.SaveSelectedWorkspaceAscii:

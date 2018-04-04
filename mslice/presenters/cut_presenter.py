@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.app.mainwindow import ShowBusy
+from .busy import show_busy
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -29,7 +29,7 @@ class CutPresenter(PresenterUtility):
     @require_main_presenter
     def notify(self, command):
         self._clear_displayed_error(self._cut_view)
-        with ShowBusy(self._cut_view):
+        with show_busy(self._cut_view):
             if command == Command.Plot:
                 self._cut(output_method=self._plot_and_save_to_workspace)
             elif command == Command.PlotOver:

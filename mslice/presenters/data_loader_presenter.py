@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 
-from mslice.app.mainwindow import ShowBusy
+from .busy import show_busy
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.models.workspacemanager.file_io import load_from_ascii
@@ -26,7 +26,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         :param file_paths: list of paths to files to load
         :param merge: boolean - whether to combine files into a single workspace
         '''
-        with ShowBusy(self._view):
+        with show_busy(self._view):
             ws_names = [os.path.splitext(os.path.basename(base))[0] for base in file_paths]
             if merge:
                 ws_names = [ws_names[0] + '_merged']

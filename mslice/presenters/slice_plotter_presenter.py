@@ -1,5 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
-from mslice.app.mainwindow import ShowBusy
+from .busy import show_busy
 from mslice.models.slice.slice_plotter import SlicePlotter
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.slice_plotter_view import SlicePlotterView
@@ -49,7 +49,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def notify(self, command):
         self._clear_displayed_error(self._slice_view)
-        with ShowBusy(self._slice_view):
+        with show_busy(self._slice_view):
             if command == Command.DisplaySlice:
                 self._display_slice()
             else:
