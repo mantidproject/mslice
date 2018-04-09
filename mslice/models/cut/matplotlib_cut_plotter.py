@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
 from .cut_plotter import CutPlotter
 from .mantid_cut_algorithm import output_workspace_name
-from ..labels import get_display_name, generate_legend, INTENSITY_LABEL
+from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
 
 picker=3
 
@@ -30,7 +30,7 @@ class MatplotlibCutPlotter(CutPlotter):
         leg = plt.legend(fontsize='medium')
         leg.draggable()
         plt.xlabel(get_display_name(x_units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
-        plt.ylabel(INTENSITY_LABEL, picker=picker)
+        plt.ylabel(CUT_INTENSITY_LABEL, picker=picker)
         if not plot_over:
             plt.gcf().canvas.set_window_title('Cut: ' + selected_workspace)
             plt.gcf().canvas.manager.update_grid()

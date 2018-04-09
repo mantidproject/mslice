@@ -3,7 +3,7 @@
 from __future__ import (absolute_import, division, print_function)
 from mslice.util import MPL_COMPAT
 
-INTENSITY_LABEL = 'Signal/#Events'
+CUT_INTENSITY_LABEL = 'Signal/#Events'
 recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
 
 
