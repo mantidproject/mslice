@@ -3,8 +3,8 @@ from matplotlib.colors import Normalize
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.util import MPL_COMPAT
+from ..labels import get_display_name, recoil_labels
 
-recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
 overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
 picker=5
 
@@ -49,21 +49,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self.slice_cache[ws]['energy_axis'] = x_axis
             self.slice_cache[ws]['rotated'] = True
 
-
-    def _getDisplayName(self, axisUnits, comment=None):
-        if 'DeltaE' in axisUnits:
-            # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX
-            if MPL_COMPAT:
-                return 'Energy Transfer ' + ('(cm-1)' if (comment and 'wavenumber' in comment) else '(meV)')
-            else:
-                return 'Energy Transfer ' + ('(cm$^{-1}$)' if (comment and 'wavenumber' in comment) else '(meV)')
-        elif 'MomentumTransfer' in axisUnits or '|Q|' in axisUnits:
-            return '|Q| (recip. Ang.)' if MPL_COMPAT else '$|Q|$ ($\mathrm{\AA}^{-1}$)'
-        elif 'Degrees' in axisUnits:
-            return 'Scattering Angle (degrees)' if MPL_COMPAT else r'Scattering Angle 2$\theta$ ($^{\circ}$)'
-        else:
-            return axisUnits
-
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
         plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                    interpolation='none', hold=False)
@@ -75,8 +60,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_axis = momentum_axis
             y_axis = energy_axis
         comment = self._slice_algorithm.getComment(str(workspace_name))
-        plt.xlabel(self._getDisplayName(x_axis.units, comment), picker=picker)
-        plt.ylabel(self._getDisplayName(y_axis.units, comment), picker=picker)
+        plt.xlabel(get_display_name(x_axis.units, comment), picker=picker)
+        plt.ylabel(get_display_name(y_axis.units, comment), picker=picker)
         plt.xlim(x_axis.start)
         plt.ylim(y_axis.start)
         plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)

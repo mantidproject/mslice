@@ -1,12 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
-from mslice.util import MPL_COMPAT
 from .cut_plotter import CutPlotter
 from .mantid_cut_algorithm import output_workspace_name
+from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
 
-INTENSITY_LABEL = 'Signal/#Events'
 picker=3
-
 
 class MatplotlibCutPlotter(CutPlotter):
     def __init__(self, cut_algorithm):
@@ -20,7 +18,7 @@ class MatplotlibCutPlotter(CutPlotter):
         output_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
         integrated_dim = self._cut_algorithm.get_other_axis(selected_workspace, cut_axis) \
             if integration_axis.units == "" else  integration_axis.units
-        legend = self._generate_legend(selected_workspace, integrated_dim, integration_axis.start, integration_axis.end)
+        legend = generate_legend(selected_workspace, integrated_dim, integration_axis.start, integration_axis.end)
         self.plot_cut_from_xye(x, y, e, cut_axis.units, selected_workspace, (intensity_start, intensity_end),
                                plot_over, output_ws_name, legend)
 
@@ -31,8 +29,8 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.ylim(*intensity_range) if intensity_range is not None else plt.autoscale()
         leg = plt.legend(fontsize='medium')
         leg.draggable()
-        plt.xlabel(self._getDisplayName(x_units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
-        plt.ylabel(INTENSITY_LABEL, picker=picker)
+        plt.xlabel(get_display_name(x_units, self._cut_algorithm.getComment(selected_workspace)), picker=picker)
+        plt.ylabel(CUT_INTENSITY_LABEL, picker=picker)
         if not plot_over:
             plt.gcf().canvas.set_window_title('Cut: ' + selected_workspace)
             plt.gcf().canvas.manager.update_grid()
@@ -75,28 +73,6 @@ class MatplotlibCutPlotter(CutPlotter):
     def save_cut(self, params):
         return self._cut_algorithm.compute_cut(*params)
 
-    def _getDisplayName(self, axisUnits, comment=None):
-        if 'DeltaE' in axisUnits:
-            # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX
-            if MPL_COMPAT:
-                return 'Energy Transfer ' + ('(cm-1)' if (comment and 'wavenumber' in comment) else '(meV)')
-            else:
-                return 'Energy Transfer ' + ('(cm$^{-1}$)' if (comment and 'wavenumber' in comment) else '(meV)')
-        elif 'MomentumTransfer' in axisUnits or '|Q|' in axisUnits:
-            return '|Q| (recip. Ang.)' if MPL_COMPAT else '$|Q|$ ($\mathrm{\AA}^{-1}$)'
-        elif 'Degrees' in axisUnits:
-            return 'Scattering Angle (degrees)' if MPL_COMPAT else r'Scattering Angle 2$\theta$ ($^{\circ}$)'
-        else:
-            return axisUnits
-
-    def _generate_legend(self, workspace_name, integrated_dim, integration_start, integration_end):
-        if MPL_COMPAT:
-            mappings = {'DeltaE':'E', 'MomentumTransfer':'|Q|', 'Degrees':r'2Theta'}
-        else:
-            mappings = {'DeltaE':'E', 'MomentumTransfer':'|Q|', 'Degrees':r'2$\theta$'}
-        integrated_dim = mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
-        return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
-            "%.2f" % integration_end
 
     def set_workspace_provider(self, workspace_provider):
         self.workspace_provider = workspace_provider
