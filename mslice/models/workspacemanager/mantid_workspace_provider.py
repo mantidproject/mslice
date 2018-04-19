@@ -13,7 +13,6 @@ from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 from mantid.simpleapi import (DeleteWorkspace, Load, Scale, RenameWorkspace, 
                               MergeMD, MergeRuns, Minus)
 
-from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -33,6 +32,21 @@ m2A = 1.e10  # metres to Angstrom
 
 loaded_workspaces = {}
 
+class Axis(object):
+    def __init__(self, units, start, end, step):
+        self.units = units
+        self.start = start
+        self.end = end
+        self.step = step
+
+    def __eq__(self, other):
+        # This is required for Unit testing
+        return self.units == other.units and self.start == other.start and self.end == other.end \
+            and self.step == other.step and isinstance(other, Axis)
+
+    def __repr__(self):
+        info = (self.units, self.start, self.end, self.step)
+        return "Axis(" + " ,".join(map(repr, info)) + ")"
 
 def get_workspace_handle(workspace_name):
     """"Return handle to workspace given workspace_name_as_string"""

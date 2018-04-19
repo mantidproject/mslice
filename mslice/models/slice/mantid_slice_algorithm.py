@@ -4,12 +4,14 @@ import numpy as np
 
 from mantid.simpleapi import BinMD, LoadCIF, SofQW3, ConvertSpectrumAxis, Rebin2D
 from mantid.api import IMDEventWorkspace, MDNormalization, WorkspaceUnitValidator
-from mantid.dataobjects import Workspace2D
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
+from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces
+from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.workspace import Workspace
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 E_TO_K = np.sqrt(2 * constants.neutron_mass * constants.elementary_charge / 1000) / constants.hbar
@@ -285,9 +287,9 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return (data - np.nanmin(data))/data_range
 
     def is_sliceable(self, workspace):
-        workspace = self._workspace_provider.get_workspace_handle(workspace)
-        if isinstance(workspace, IMDEventWorkspace):
+        ws = loaded_workspaces[workspace]
+        if isinstance(ws, PixelWorkspace):
             return True
         else:
             validator = WorkspaceUnitValidator('DeltaE')
-            return isinstance(workspace, Workspace2D) and validator.isValid(workspace) == ''
+            return isinstance(ws, Workspace) and validator.isValid(ws.raw_ws) == ''

@@ -7,7 +7,7 @@ class AlgWorkspaceOps(object):
         return int(np.ceil(max(1, (axis.end - axis.start)/axis.step)))
 
     def get_axis_range(self, workspace, dimension_name):
-        return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
+        return tuple(workspace.limits[dimension_name])
 
     def set_workspace_provider(self, workspace_provider):
         self._workspace_provider = workspace_provider
@@ -32,11 +32,9 @@ class AlgWorkspaceOps(object):
             axis.step = (axis.end - axis.start)/100
 
     def get_available_axis(self, workspace):
-        if not self._workspace_provider.is_PSD(workspace):
+        if not workspace.is_PSD:
             return ['|Q|', 'Degrees', 'DeltaE']
         dim_names = []
-        if isinstance(workspace, string_types):
-            workspace = self._workspace_provider.get_workspace_handle(workspace)
-        for i in range(workspace.getNumDims()):
-            dim_names.append(workspace.getDimension(i).getName())
+        for i in range(workspace.raw_ws.getNumDims()):
+            dim_names.append(workspace.raw_ws.getDimension(i).getName())
         return dim_names
