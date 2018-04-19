@@ -30,7 +30,7 @@ E2q = 2. * constants.m_n / (constants.hbar ** 2)  # Energy to (neutron momentum)
 meV2J = constants.e / 1000.  # meV to Joules
 m2A = 1.e10  # metres to Angstrom
 
-loaded_workspaces = {}
+_loaded_workspaces = {}
 
 class Axis(object):
     def __init__(self, units, start, end, step):
@@ -53,10 +53,10 @@ def get_workspace_handle(workspace_name):
     # if passed a workspace handle return the handle
     if isinstance(workspace_name, Workspace):
         return workspace_name
-    return loaded_workspaces[workspace_name]
+    return _loaded_workspaces[workspace_name]
 
 def get_workspace_names():
-    return loaded_workspaces.keys()
+    return _loaded_workspaces.keys()
 
 def delete_workspace(workspace):
     ws = DeleteWorkspace(Workspace=workspace)
@@ -197,7 +197,7 @@ def load(filename, output_workspace):
     if wrapped.e_mode == 'Indirect':
         _processEfixed(wrapped)
     _processLoadedWSLimits(wrapped)
-    loaded_workspaces[output_workspace] = wrapped
+    _loaded_workspaces[output_workspace] = wrapped
     return wrapped
 
 def wrap_workspace(raw_ws):

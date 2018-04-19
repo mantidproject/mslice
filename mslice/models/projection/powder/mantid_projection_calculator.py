@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import uuid
 from mantid.simpleapi import ConvertToMD, SliceMD, TransformMD, ConvertSpectrumAxis, PreprocessDetectorsToMD
 from mantid.simpleapi import RenameWorkspace, DeleteWorkspace, SofQW3
-from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces, propagate_properties
+from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle, propagate_properties
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 
 # unit labels
@@ -41,7 +41,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def _calcQEproj(self, input_workspace_name, emode, axis1, axis2):
         """ Carries out either the Q-E or E-Q projections """
-        input_workspace = loaded_workspaces[input_workspace_name]
+        input_workspace = get_workspace_handle(input_workspace_name)
         output_workspace = input_workspace + ('_QE' if axis1 == MOD_Q_LABEL else '_EQ')
         # For indirect geometry and large datafiles (likely to be using a 1-to-1 mapping use ConvertToMD('|Q|')
         numSpectra = input_workspace.raw_ws.getNumberHistograms()
@@ -63,7 +63,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def _calcThetaEproj(self, input_workspace_name, emode, axis1, axis2):
         """ Carries out either the 2Theta-E or E-2Theta projections """
-        input_workspace = loaded_workspaces[input_workspace_name]
+        input_workspace = get_workspace_handle(input_workspace_name)
         output_workspace = input_workspace_name + ('_ThE' if axis1 == THETA_LABEL else '_ETh')
         ConvertSpectrumAxis(InputWorkspace=input_workspace, OutputWorkspace=output_workspace, Target='Theta')
         # Work-around for a bug in ConvertToMD.
@@ -78,7 +78,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
     def calculate_projection(self, input_workspace_name, axis1, axis2, units):
         """Calculate the projection workspace AND return a python handle to it"""
-        input_workspace = loaded_workspaces[input_workspace_name]
+        input_workspace = get_workspace_handle(input_workspace_name)
         if not input_workspace.is_PSD:
             raise RuntimeError('Cannot calculate projections for non-PSD workspaces')
         emode = input_workspace.e_mode
@@ -102,7 +102,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
         return retval
 
     def validate_workspace(self, ws):
-        workspace = loaded_workspaces[ws]
+        workspace = get_workspace_handle(ws)
         try:
             axes = [workspace.raw_ws.getAxis(0), workspace.raw_ws.getAxis(1)]
             if not all([ax.isSpectra() or ax.getUnit().unitID() == 'DeltaE' for ax in axes]):

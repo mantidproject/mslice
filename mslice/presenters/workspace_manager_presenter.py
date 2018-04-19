@@ -5,7 +5,8 @@ from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces, get_workspace_name
+from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, get_workspace_name,
+                                                                      get_workspace_names)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -64,7 +65,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def workspace_selection_changed(self):
         if self._workspace_manager_view.current_tab() == TAB_2D:
-            psd = all([loaded_workspaces[ws].is_PSD for ws in self._workspace_manager_view.get_workspace_selected()])
+            psd = all([get_workspace_handle(ws).is_PSD for ws in self._workspace_manager_view.get_workspace_selected()])
             if psd and not self._psd:
                 self._workspace_manager_view.tab_changed.emit(TAB_2D)
                 self._psd = True
@@ -189,7 +190,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         This function must be called by the main presenter if any other
         presenter does any operation that changes the name or type of any existing workspace or creates or removes a
         workspace"""
-        self._workspace_manager_view.display_loaded_workspaces(loaded_workspaces.keys())
+        self._workspace_manager_view.display_loaded_workspaces(get_workspace_names())
 
     def _clear_displayed_error(self):
         self._workspace_manager_view.clear_displayed_error()

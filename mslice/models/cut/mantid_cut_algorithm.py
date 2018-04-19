@@ -7,7 +7,7 @@ from mantid.api import MDNormalization, IMDEventWorkspace, IMDHistoWorkspace, Wo
 
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces
+from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle
 
 
 def output_workspace_name(selected_workspace, integration_start, integration_end):
@@ -152,7 +152,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         return all_axis[0]
 
     def is_cuttable(self, workspace):
-        workspace = loaded_workspaces[workspace]
+        workspace = get_workspace_handle(workspace)
         try:
             is2D = workspace.getNumDims() == 2
         except AttributeError:

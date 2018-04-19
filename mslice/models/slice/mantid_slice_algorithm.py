@@ -9,7 +9,7 @@ from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces
+from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
@@ -287,7 +287,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return (data - np.nanmin(data))/data_range
 
     def is_sliceable(self, workspace):
-        ws = loaded_workspaces[workspace]
+        ws = get_workspace_handle(workspace)
         if isinstance(ws, PixelWorkspace):
             return True
         else:

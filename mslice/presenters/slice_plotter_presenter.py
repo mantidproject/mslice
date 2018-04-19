@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
 from mslice.models.slice.slice_plotter import SlicePlotter
-from mslice.models.workspacemanager.mantid_workspace_provider import Axis, loaded_workspaces
+from mslice.models.workspacemanager.mantid_workspace_provider import Axis, get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.slice_plotter_view import SlicePlotterView
 from mslice.widgets.slice.command import Command
@@ -129,19 +129,19 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
         else:
-            non_psd = all([not loaded_workspaces[ws].is_PSD for ws in workspace_selection])
+            non_psd = all([not get_workspace_handle(ws).is_PSD for ws in workspace_selection])
             workspace_selection = workspace_selection[0]
 
             self._slice_view.enable()
             self._slice_view.enable_units_choice(non_psd)
-            axis = self._slice_plotter.get_available_axis(loaded_workspaces[workspace_selection])
+            axis = self._slice_plotter.get_available_axis(get_workspace_handle(workspace_selection))
             self._slice_view.populate_slice_x_options(axis)
             self._slice_view.populate_slice_y_options(axis[::-1])
             self.populate_slice_params()
 
     def populate_slice_params(self):
         try:
-            workspace_selection = loaded_workspaces[self._get_main_presenter().get_selected_workspaces()[0]]
+            workspace_selection = get_workspace_handle(self._get_main_presenter().get_selected_workspaces()[0])
             x_min, x_max, x_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_x_axis())
             y_min, y_max, y_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_y_axis())
         except (KeyError, RuntimeError, IndexError):

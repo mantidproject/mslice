@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 import os
 
 from .busy import show_busy
-from mslice.models.workspacemanager.mantid_workspace_provider import load, loaded_workspaces, get_workspace_names
+from mslice.models.workspacemanager.mantid_workspace_provider import load, get_workspace_handle, get_workspace_names
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.models.workspacemanager.file_io import load_from_ascii
@@ -52,15 +52,15 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                     if not allChecked:
                         allChecked = self.check_efixed(ws_name, multi)
                     else:
-                        loaded_workspaces[ws_name].e_fixed = self._EfCache
+                        get_workspace_handle(ws_name).e_fixed = self._EfCache
                     self._main_presenter.show_workspace_manager_tab()
                     self._main_presenter.update_displayed_workspaces()
-                    self._main_presenter.show_tab_for_workspace(loaded_workspaces[ws_name])
+                    self._main_presenter.show_tab_for_workspace(get_workspace_handle(ws_name))
         self._report_load_errors(ws_names, not_opened, not_loaded)
 
     def check_efixed(self, ws_name, multi=False):
         '''checks if a newly loaded workspace has efixed set'''
-        ws = loaded_workspaces[ws_name]
+        ws = get_workspace_handle(ws_name)
         if ws.e_mode == 'Indirect' and not ws.ef_defined:
             Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi, self._EfCache)
             self._EfCache = Ef
