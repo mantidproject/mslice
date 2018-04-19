@@ -5,6 +5,7 @@ from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
+from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -183,16 +184,13 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 index_list.append(get_index(get_name(item)))
         self._workspace_manager_view.set_workspace_selected(index_list)
 
-    def get_workspace_provider(self):
-        return self._workspace_provider
-
     def update_displayed_workspaces(self):
         """Update the workspaces shown to user.
 
         This function must be called by the main presenter if any other
         presenter does any operation that changes the name or type of any existing workspace or creates or removes a
         workspace"""
-        self._workspace_manager_view.display_loaded_workspaces(self._workspace_provider.get_workspace_names())
+        self._workspace_manager_view.display_loaded_workspaces(loaded_workspaces.keys())
 
     def _clear_displayed_error(self):
         self._workspace_manager_view.clear_displayed_error()

@@ -21,9 +21,5 @@ class WorkspaceManagerPresenterInterface(object):
         pass
 
     @abc.abstractmethod
-    def get_workspace_provider(self):
-        pass
-
-    @abc.abstractmethod
     def update_displayed_workspaces(self):
         pass
