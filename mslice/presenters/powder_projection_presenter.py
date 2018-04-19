@@ -83,7 +83,6 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         try:
             for workspace in workspace_selection:
                 self._projection_calculator.validate_workspace(workspace)
-                self._projection_calculator.get_emode(workspace)
         except TypeError as e:
             self._powder_view.disable_calculate_projections(True)
             self._powder_view.display_projection_error(str(e))
