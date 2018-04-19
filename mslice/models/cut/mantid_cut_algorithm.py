@@ -7,7 +7,6 @@ from mantid.api import MDNormalization, IMDEventWorkspace, IMDHistoWorkspace, Wo
 
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 
 def output_workspace_name(selected_workspace, integration_start, integration_end):
@@ -17,7 +16,6 @@ def output_workspace_name(selected_workspace, integration_start, integration_end
 
 class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
     def __init__(self):
-        self._workspace_provider = MantidWorkspaceProvider()
         self._converted_nonpsd = None   # Cache for ConvertSpectrumAxis for non-PSD data.
 
     def compute_cut_xye(self, selected_workspace, cut_axis, integration_axis, is_norm):

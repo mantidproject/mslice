@@ -4,7 +4,6 @@ from mantid.simpleapi import ConvertToMD, SliceMD, TransformMD, ConvertSpectrumA
 from mantid.simpleapi import RenameWorkspace, DeleteWorkspace, SofQW3
 
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 # unit labels
 MOD_Q_LABEL = '|Q|'
@@ -14,8 +13,6 @@ MEV_LABEL = 'meV'
 WAVENUMBER_LABEL = 'cm-1'
 
 class MantidProjectionCalculator(ProjectionCalculator):
-    def __init__(self):
-        self._workspace_provider = MantidWorkspaceProvider()
 
     def available_axes(self):
         return [MOD_Q_LABEL, THETA_LABEL, DELTA_E_LABEL]

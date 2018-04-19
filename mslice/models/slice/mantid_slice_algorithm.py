@@ -10,7 +10,6 @@ from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 E_TO_K = np.sqrt(2 * constants.neutron_mass * constants.elementary_charge / 1000) / constants.hbar
@@ -22,8 +21,6 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
 
 
 class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
-    def __init__(self):
-        self._workspace_provider = MantidWorkspaceProvider()
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = self._workspace_provider.get_workspace_handle(selected_workspace)

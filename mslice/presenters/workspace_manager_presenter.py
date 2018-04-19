@@ -11,10 +11,9 @@ from .validation_decorators import require_main_presenter
 
 
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
-    def __init__(self, workspace_view, workspace_provider):
+    def __init__(self, workspace_view):
         # TODO add validation checks
         self._workspace_manager_view = workspace_view
-        self._workspace_provider = workspace_provider
         self._main_presenter = None
         self._psd = True
 
