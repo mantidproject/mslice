@@ -180,9 +180,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         momentum_transfer = np.square(momentum_transfer, out=momentum_transfer)
         boltzmann_dist = self.compute_boltzmann_dist(sample_temp, energy_transfer)
         if data_rotated:
-            scattering_rotated = np.swapaxes(scattering_data, 0, 1)
-            gdos = scattering_rotated / momentum_transfer
-            gdos = np.swapaxes(gdos, 0, 1)
+            gdos = scattering_data / momentum_transfer[:,None]
             gdos *= energy_transfer
             gdos *= (1 - boltzmann_dist)[None, :]
         else:
