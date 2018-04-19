@@ -41,7 +41,7 @@ def get_workspace_handle(workspace_name):
         return workspace_name
     return loaded_workspaces[workspace_name]
 
-def get_workspace_names(self):
+def get_workspace_names():
     return loaded_workspaces.keys()
 
 def delete_workspace(workspace):
@@ -95,7 +95,7 @@ def process_limits(ws, efix):
     en = ws.raw_ws.getAxis(0).extractValues()
     theta = _get_theta_for_limits(ws)
     # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
-    emax = -np.min(en) if (str(ws.getEMode()) == 'Direct') else np.max(en)
+    emax = -np.min(en) if (str(ws.e_mode == 'Direct')) else np.max(en)
     qmin, qmax, qstep = get_q_limits(theta, emax, efix)
     set_limits(ws, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
 
@@ -294,16 +294,15 @@ def get_workspace_name(workspace):
     """Returns the name of a workspace given the workspace handle"""
     if isinstance(workspace, string_types):
         return workspace
-    return workspace.name()
+    return workspace.raw_ws.name()
 
 def get_EMode(workspace):
     """Returns the energy analysis mode (direct or indirect of a workspace)"""
-    workspace_handle = get_workspace_handle(workspace)
-    emode = str(_get_ws_EMode(workspace_handle))
+    emode = str(_get_ws_EMode(workspace))
     if emode == 'Elastic':
         # Work-around for older versions of Mantid which does not set instrument name
         # in NXSPE files, so LoadNXSPE does not know if it is direct or indirect data
-        ei_log = workspace_handle.run().getProperty('Ei').value
+        ei_log = workspace.run().getProperty('Ei').value
         emode = 'Indirect' if np.isnan(ei_log) else 'Direct'
     return emode
 

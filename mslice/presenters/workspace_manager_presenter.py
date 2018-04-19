@@ -5,7 +5,7 @@ from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces
+from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces, get_workspace_name
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -64,7 +64,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def workspace_selection_changed(self):
         if self._workspace_manager_view.current_tab() == TAB_2D:
-            psd = all([self.get_workspace_provider().is_PSD(ws) for ws in self._workspace_manager_view.get_workspace_selected()])
+            psd = all([loaded_workspaces[ws].is_PSD for ws in self._workspace_manager_view.get_workspace_selected()])
             if psd and not self._psd:
                 self._workspace_manager_view.tab_changed.emit(TAB_2D)
                 self._psd = True
@@ -173,7 +173,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def set_selected_workspaces(self, workspace_list):
         get_index = self._workspace_manager_view.get_workspace_index
-        get_name = self._workspace_provider.get_workspace_name
         index_list = []
         for item in workspace_list:
             if isinstance(item, string_types):
@@ -181,7 +180,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             elif isinstance(item, int):
                 index_list.append(item)
             else:
-                index_list.append(get_index(get_name(item)))
+                index_list.append(get_index(get_workspace_name(item)))
         self._workspace_manager_view.set_workspace_selected(index_list)
 
     def update_displayed_workspaces(self):

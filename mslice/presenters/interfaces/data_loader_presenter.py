@@ -9,10 +9,6 @@ class DataLoaderPresenterInterface(object):
         pass
 
     @abc.abstractmethod
-    def set_workspace_provider(self, workspace_provider):
-        pass
-
-    @abc.abstractmethod
     def load_workspace(self, file_paths, merge):
         pass
 

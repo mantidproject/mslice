@@ -1,12 +1,15 @@
 
-from mantid.api import IMDEventWorkspace, IMDHistoWorkspace, Workspace
 
 from mslice.util.qt import QT_VERSION
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog
+from mslice.models.workspacemanager.mantid_workspace_provider import loaded_workspaces
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView
+from mslice.workspace.workspace import Workspace
+from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 from .command import Command
 from .subtract_input_box import SubtractInputBox
 from . import TAB_2D, TAB_EVENT, TAB_HISTO
@@ -74,10 +77,10 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
     def add_workspace(self, workspace):
         item = QListWidgetItem(workspace)
         self.onscreen_workspaces.append(workspace)
-        workspace = self._presenter.get_workspace_provider().get_workspace_handle(workspace)
-        if isinstance(workspace, IMDEventWorkspace):
+        workspace = loaded_workspaces[workspace]
+        if isinstance(workspace, PixelWorkspace):
             self.listWorkspacesEvent.addItem(item)
-        elif isinstance(workspace, IMDHistoWorkspace):
+        elif isinstance(workspace, HistogramWorkspace):
             self.listWorkspacesHisto.addItem(item)
         elif isinstance(workspace, Workspace):
             self.listWorkspaces2D.addItem(item)
