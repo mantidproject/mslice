@@ -13,9 +13,6 @@ class SlicePlotter():
     def get_axis_range(self, workspace, dimension_name):
         pass
 
-    def set_workspace_provider(self, workspace_provider):
-        pass
-
     def sample_temperature(self, ws_name):
         pass
 

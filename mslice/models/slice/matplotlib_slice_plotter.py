@@ -20,7 +20,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.slice_cache = {}
         self._sample_temp_fields = []
         self.overplot_lines = {}
-        self.workspace_provider = None
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
@@ -209,10 +208,3 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def update_displayed_workspaces(self):
         self.listener.update_workspaces()
-
-    def set_workspace_provider(self, workspace_provider):
-        self.workspace_provider = workspace_provider
-        self._slice_algorithm.set_workspace_provider(workspace_provider)
-
-    def get_workspace_provider(self):
-        return self._slice_algorithm.get_workspace_provider()

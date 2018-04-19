@@ -12,7 +12,7 @@ from mantid.kernel.funcinspect import lhs_info as _lhs_info
 from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F401
 
 # Helper tools
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider as _MantidWorkspaceProvider
+from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle
 from mslice.presenters.slice_plotter_presenter import Axis as _Axis
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
@@ -27,7 +27,6 @@ from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 # Module constants
 # -----------------------------------------------------------------------------
 
-_WORKSPACE_PROVIDER = _MantidWorkspaceProvider()
 _POWDER_PROJECTION_MODEL = _MantidProjectionCalculator()
 _SLICE_ALGORITHM = _MantidSliceAlgorithm()
 _SLICE_MODEL = _MatplotlibSlicePlotter(_SLICE_ALGORITHM)
@@ -118,7 +117,7 @@ def get_slice(input_workspace, x=None, y=None, ret_val='both', normalize=False):
     normalize -- if set to True the slice will be normalize to one.
 
     """
-    input_workspace = _WORKSPACE_PROVIDER.get_workspace_handle(input_workspace)
+    input_workspace = get_workspace_handle(input_workspace)
     assert isinstance(input_workspace, _IMDWorkspace)
     x_axis = _process_axis(x, 0, input_workspace)
     y_axis = _process_axis(y, 1, input_workspace)
@@ -157,7 +156,7 @@ def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_mi
 
     """
 
-    input_workspace = _WORKSPACE_PROVIDER.get_workspace_handle(input_workspace)
+    input_workspace = get_workspace_handle(input_workspace)
     assert isinstance(input_workspace, _IMDWorkspace)
 
     x_axis = _process_axis(x, 0, input_workspace)

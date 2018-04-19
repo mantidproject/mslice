@@ -9,7 +9,6 @@ picker=3
 class MatplotlibCutPlotter(CutPlotter):
     def __init__(self, cut_algorithm):
         self._cut_algorithm = cut_algorithm
-        self.workspace_provider = None
         self.icut = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
@@ -72,8 +71,3 @@ class MatplotlibCutPlotter(CutPlotter):
 
     def save_cut(self, params):
         return self._cut_algorithm.compute_cut(*params)
-
-
-    def set_workspace_provider(self, workspace_provider):
-        self.workspace_provider = workspace_provider
-        self._cut_algorithm.set_workspace_provider(workspace_provider)

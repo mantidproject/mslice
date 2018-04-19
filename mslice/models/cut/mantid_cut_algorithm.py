@@ -7,7 +7,8 @@ from mantid.api import MDNormalization, IMDEventWorkspace, IMDHistoWorkspace, Wo
 
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, delete_workspace,
+                                                                      getCutParameters, setCutParameters, isAxisSaved)
 
 
 def output_workspace_name(selected_workspace, integration_start, integration_end):
@@ -48,20 +49,20 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         x = np.linspace(cut_axis.start, cut_axis.end, plot_data.size)
         # If the cut already existed in the ADS before this function was called then do not delete it
         if cut_computed:
-            self._workspace_provider.delete_workspace(cut)
+            delete_workspace(cut)
         if copy_created:
-            self._workspace_provider.delete_workspace(copy_name)
+            delete_workspace(copy_name)
         return x, plot_data, errors
 
     def compute_cut(self, selected_workspace, cut_axis, integration_axis, is_norm):
         input_workspace_name = selected_workspace
         out_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
-        selected_workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
+        selected_workspace = get_workspace_handle(selected_workspace)
         integration_start = integration_axis.start
         integration_end = integration_axis.end
         integration_units = integration_axis.units
 
-        if self._workspace_provider.is_PSD(input_workspace_name):
+        if selected_workspace.is_PSD:
             cut = self._compute_cut_PSD(input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                                         integration_start, integration_end)
         else:
@@ -89,7 +90,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
                             integration_start, integration_end, integration_units):
         cut_binning = " ,".join(map(str, (cut_axis.start, cut_axis.step, cut_axis.end)))
         int_binning = " ,".join(map(str, (integration_start, integration_end - integration_start, integration_end)))
-        emode = self._workspace_provider.get_EMode(input_workspace_name)
+        emode = get_workspace_handle(input_workspace_name).e_mode
         if self._converted_nonpsd and self._converted_nonpsd[0] != input_workspace_name:
             self._converted_nonpsd = None
         if cut_axis.units == '|Q|':
@@ -122,7 +123,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
-        ws_out = self._workspace_provider.get_workspace_handle(out_ws_name)
+        ws_out = get_workspace_handle(out_ws_name)
         xdim = ws_out.getDimension(idx)
         extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
         cut = CreateMDHistoWorkspace(OutputWorkspace=out_ws_name, SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(),
@@ -130,7 +131,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         return cut
 
     def get_arrays_from_workspace(self, workspace):
-        mantid_ws = self._workspace_provider.get_workspace_handle(workspace)
+        mantid_ws = get_workspace_handle(workspace)
         dim = mantid_ws.getDimension(0)
         x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
         with np.errstate(invalid='ignore'):
@@ -166,13 +167,13 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
             return isinstance(workspace, Workspace2D) and validator.isValid(workspace) == ''
 
     def set_saved_cut_parameters(self, workspace, axis, parameters):
-        self._workspace_provider.setCutParameters(workspace, axis, parameters)
+        setCutParameters(workspace, axis, parameters)
 
     def get_saved_cut_parameters(self, workspace, axis=None):
-        return self._workspace_provider.getCutParameters(workspace, axis)
+        return getCutParameters(workspace, axis)
 
     def is_axis_saved(self, workspace, axis):
-        return self._workspace_provider.isAxisSaved(workspace, axis)
+        return isAxisSaved(workspace, axis)
 
     def _num_events_normalized_array(self, workspace):
         assert isinstance(workspace, IMDHistoWorkspace)

@@ -157,6 +157,3 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def update_workspaces(self):
         self._main_presenter.update_displayed_workspaces()
-
-    def set_workspace_provider(self, workspace_provider):
-        self._slice_plotter.set_workspace_provider(workspace_provider)

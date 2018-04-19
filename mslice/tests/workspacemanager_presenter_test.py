@@ -4,7 +4,6 @@ import unittest
 import mock
 from mock import call, patch
 
-from mslice.models.workspacemanager.workspace_provider import WorkspaceProvider
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.views.mainview import MainView
@@ -16,23 +15,22 @@ from mslice.widgets.workspacemanager.command import Command
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):
     def setUp(self):
-        self.workspace_provider = mock.create_autospec(spec=WorkspaceProvider)
         self.view = mock.create_autospec(spec=WorkspaceView)
         self.mainview = mock.create_autospec(MainView)
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
 
     def test_register_master_success(self):
-        workspace_presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        workspace_presenter = WorkspaceManagerPresenter(self.view)
         workspace_presenter.register_master(self.main_presenter)
         self.main_presenter.register_workspace_selector.assert_called_once_with(workspace_presenter)
 
     def test_register_master_invalid_master_fail(self):
-        workspace_presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        workspace_presenter = WorkspaceManagerPresenter(self.view)
         self.assertRaises(AssertionError ,workspace_presenter.register_master, 3)
 
     def test_rename_workspace(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that will return a single selected workspace on call to get_workspace_selected and supply a
         # name on call to get_workspace_new_name
         old_workspace_name = 'file1'
@@ -48,7 +46,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called_once()
 
     def test_rename_workspace_multiple_workspace_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports multiple selected workspaces on calls to get_workspace_selected
         selected_workspaces = ['ws1', 'ws2']
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
@@ -59,7 +57,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.rename_workspace.assert_not_called()
 
     def test_rename_workspace_non_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports that no workspaces are selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=[])
 
@@ -70,7 +68,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     def test_save_workspace(self, save_dir_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
         # to save to on calls to get_workspace_to_save_filepath
         path_to_save_to = r'A:\file\path'
@@ -87,7 +85,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     def test_save_ascii_workspace(self, save_dir_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
         # to save to on calls to get_workspace_to_save_filepath
         path_to_save_to = r'A:\file\path'
@@ -102,7 +100,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     def test_save_matlab_workspace(self, save_dir_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
         # to save to on calls to get_workspace_to_save_filepath
         path_to_save_to = r'A:\file\path'
@@ -118,7 +116,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     def test_save_workspace_multiple_selected(self, save_dir_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         #Create a view that reports multiple workspaces are selected on calls to get_workspace_selected
         path_to_save_to = r'A:\file\path'
         self.view.get_workspace_selected = mock.Mock(return_value=['file1','file2'])
@@ -132,7 +130,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     def test_save_workspace_non_selected_prompt_user(self, save_dir_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         #Create a view that reports no workspaces arw selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=[])
 
@@ -144,7 +142,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     def test_save_workspace_cancelled(self, save_dir_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that report a single selected workspace on calls to get_workspace_selected and supplies a path
         # to save to on calls to get_workspace_to_save_filepath
         path_to_save_to = "" # view returns empty string to indicate operation cancelled
@@ -160,7 +158,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.workspace_provider.save_workspaces.assert_not_called()
 
     def test_remove_workspace(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a workspace that reports a single selected workspace on calls to get_workspace_selected
         workspace_to_be_removed = 'file1'
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_be_removed])
@@ -171,7 +169,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called_once()
 
     def test_remove_multiple_workspaces(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports 3 selected workspaces on calls to get_workspace_selected
         workspace1 = 'file1'
         workspace2 = 'file2'
@@ -185,7 +183,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_called()
 
     def test_remove_workspace_non_selected_prompt_user(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports no workspace selected on calls to get_workspace_selected
         self.view.get_workspace_selected = mock.Mock(return_value=[])
 
@@ -196,18 +194,18 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.display_loaded_workspaces.assert_not_called()
 
     def test_broadcast_success(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         self.presenter.register_master(self.main_presenter)
         self.presenter.notify(Command.SelectionChanged)
         self.main_presenter.notify_workspace_selection_changed()
 
     def test_call_presenter_with_unknown_command(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         unknown_command = 10
         self.assertRaises(ValueError,self.presenter.notify, unknown_command)
 
     def test_notify_presenter_clears_error(self):
-        presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        presenter = WorkspaceManagerPresenter(self.view)
         presenter.register_master(self.main_presenter)
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
@@ -220,14 +218,14 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             self.view.reset_mock()
 
     def test_set_selected_workspace_index(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         self.view.get_workspace_index = mock.Mock()
         self.workspace_provider.get_workspace_name = mock.Mock()
         self.presenter.set_selected_workspaces([1])
         self.view.set_workspace_selected.assert_called_once_with([1])
 
     def test_set_selected_workspace_name(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         self.view.get_workspace_index = mock.Mock(return_value=0)
         self.workspace_provider.get_workspace_name = mock.Mock()
         self.presenter.set_selected_workspaces(['ws'])
@@ -235,7 +233,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.set_workspace_selected.assert_called_once_with([0])
 
     def test_set_selected_workspace_handle(self):
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         self.view.get_workspace_index = mock.Mock(return_value=0)
         self.workspace_provider.get_workspace_name = mock.Mock(return_value='ws')
         self.presenter.set_selected_workspaces([mock.Mock()])
@@ -245,7 +243,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_combine_workspace_single_ws(self):
         # Checks that it will fail if only one workspace is selected.
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         selected_workspaces = ['ws1']
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
         self.view.add_workspace_dialog = mock.Mock(return_value='ws2')
@@ -256,7 +254,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_combine_workspace_wrong_type(self):
         # Checks that it will fail if one of the workspace is not a MDEventWorkspace
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         selected_workspaces = ['ws1', 'ws2']
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
         self.workspace_provider.is_pixel_workspace = mock.Mock(side_effect=[True, False])
@@ -268,7 +266,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_combine_workspace(self):
         # Now checks it suceeds otherwise
-        self.presenter = WorkspaceManagerPresenter(self.view, self.workspace_provider)
+        self.presenter = WorkspaceManagerPresenter(self.view)
         selected_workspaces = ['ws1', 'ws2']
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
         self.workspace_provider.is_pixel_workspace = mock.Mock(side_effect=[True, True])

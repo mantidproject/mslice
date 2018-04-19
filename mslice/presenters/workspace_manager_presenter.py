@@ -6,7 +6,10 @@ from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
 from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, get_workspace_name,
-                                                                      get_workspace_names)
+                                                                      get_workspace_names, save_workspaces,
+                                                                      delete_workspace, rename_workspace, subtract,
+                                                                      is_pixel_workspace, combine_workspace,
+                                                                      add_workspace_runs)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -74,7 +77,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._psd = False
 
     def _confirm_workspace_overwrite(self, ws_name):
-        if ws_name in self._workspace_provider.get_workspace_names():
+        if ws_name in get_workspace_names():
             return self._workspace_manager_view.confirm_overwrite_workspace()
         else:
             return True
@@ -98,7 +101,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_invalid_save_path()
             return
         try:
-            self._workspace_provider.save_workspaces(selected_workspaces, save_directory, save_name, extension)
+            save_workspaces(selected_workspaces, save_directory, save_name, extension)
         except RuntimeError:
             self._workspace_manager_view.error_unable_to_save()
 
@@ -108,7 +111,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
         for workspace in selected_workspaces:
-            self._workspace_provider.delete_workspace(workspace)
+            delete_workspace(workspace)
             self.update_displayed_workspaces()
 
     def _rename_workspace(self):
@@ -121,7 +124,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         selected_workspace = selected_workspaces[0]
         new_name = self._workspace_manager_view.get_workspace_new_name()
-        self._workspace_provider.rename_workspace(selected_workspace, new_name)
+        rename_workspace(selected_workspace, new_name)
         self.update_displayed_workspaces()
 
     def _combine_workspace(self):
@@ -132,8 +135,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         elif len(selected_workspaces) == 1:
             selected_workspaces.append(str(self._workspace_manager_view.add_workspace_dialog()))
         new_workspace = selected_workspaces[0] + '_combined'
-        if all([self._workspace_provider.is_pixel_workspace(workspace) for workspace in selected_workspaces]):
-            self._workspace_provider.combine_workspace(selected_workspaces, new_workspace)
+        if all([is_pixel_workspace(workspace) for workspace in selected_workspaces]):
+            combine_workspace(selected_workspaces, new_workspace)
         else:
             self._workspace_manager_view.error_select_more_than_one_workspaces()
             return
@@ -148,7 +151,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if len(selected_ws) == 1:
             selected_ws.append(self._workspace_manager_view.add_workspace_dialog())
         try:
-            self._workspace_provider.add_workspace_runs(selected_ws)
+            add_workspace_runs(selected_ws)
         except ValueError as e:
             self._workspace_manager_view._display_error(str(e))
         self.update_displayed_workspaces()
@@ -163,7 +166,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         except RuntimeError:
             return
         try:
-            self._workspace_provider.subtract(selected_workspaces, background_ws, ssf)
+            subtract(selected_workspaces, background_ws, ssf)
         except ValueError as e:
             self._workspace_manager_view._display_error(str(e))
         self.update_displayed_workspaces()

@@ -287,7 +287,6 @@ def _get_slice_mdhisto(workspace, ws_name):
         return get_workspace_handle('__' + ws_name)
     except KeyError:
         slice_alg = MantidSliceAlgorithm()
-        slice_alg.set_workspace_provider(self)
         ws_name = workspace.name()
         x_axis = get_axis_from_dimension(workspace, ws_name, 0)
         y_axis = get_axis_from_dimension(workspace, ws_name, 1)

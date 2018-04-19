@@ -1,5 +1,6 @@
 from six import string_types
 import numpy as np
+from mslice.models.workspacemanager.mantid_workspace_provider import getComment
 
 class AlgWorkspaceOps(object):
 
@@ -9,14 +10,8 @@ class AlgWorkspaceOps(object):
     def get_axis_range(self, workspace, dimension_name):
         return tuple(workspace.limits[dimension_name])
 
-    def set_workspace_provider(self, workspace_provider):
-        self._workspace_provider = workspace_provider
-
-    def get_workspace_provider(self):
-        return self._workspace_provider
-
     def getComment(self, workspace):
-        return self._workspace_provider.getComment(workspace)
+        return getComment(workspace)
 
     def _fill_in_missing_input(self,axis,workspace):
         dim = workspace.getDimensionIndexByName(axis.units)
