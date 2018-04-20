@@ -59,14 +59,9 @@ def get_workspace_names():
     return _loaded_workspaces.keys()
 
 def delete_workspace(workspace):
-    ws = DeleteWorkspace(Workspace=workspace)
-    if workspace in _EfDefined:
-        del _EfDefined[workspace]
-    if workspace in _limits:
-        del _limits[workspace]
-    if workspace in _isPSD:
-        del _isPSD[workspace]
-    return ws
+    workspace = get_workspace_handle(workspace)
+    del _loaded_workspaces[get_workspace_name(workspace)]
+    del workspace
 
 def get_limits(workspace, axis):
     if workspace.limits is None:
@@ -393,26 +388,3 @@ def getComment(workspace):
         return workspace.getComment()
     ws_handle = get_workspace_handle(workspace)
     return ws_handle.raw_ws.getComment()
-
-def setCutParameters(workspace, axis, parameters):
-    if workspace not in _cutParameters:
-        _cutParameters[workspace] = dict()
-    _cutParameters[workspace][axis] = parameters
-    _cutParameters[workspace]['previous_axis'] = axis
-
-def getCutParameters(workspace, axis=None):
-    if workspace in _cutParameters:
-        if axis is not None:
-            if axis in _cutParameters[workspace]:
-                return _cutParameters[workspace][axis], axis
-            else:
-                return None, None
-        else:
-            prev_axis = _cutParameters[workspace]['previous_axis']
-            return _cutParameters[workspace][prev_axis], prev_axis
-    return None, None
-
-def isAxisSaved(workspace, axis):
-    if workspace in _cutParameters:
-        return True if axis in _cutParameters[workspace] else False
-    return False

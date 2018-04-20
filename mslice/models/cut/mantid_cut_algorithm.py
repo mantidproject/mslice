@@ -2,13 +2,16 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 
 from mantid.simpleapi import BinMD, SofQW3, Rebin2D, ConvertSpectrumAxis, CreateMDHistoWorkspace
-from mantid.dataobjects import Workspace2D
-from mantid.api import MDNormalization, IMDEventWorkspace, IMDHistoWorkspace, WorkspaceUnitValidator
+from mantid.api import MDNormalization, IMDHistoWorkspace, WorkspaceUnitValidator
 
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, delete_workspace,
-                                                                      getCutParameters, setCutParameters, isAxisSaved)
+                                                                      wrap_workspace)
+
+from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.workspace import Workspace as Workspace2D
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
 def output_workspace_name(selected_workspace, integration_start, integration_end):
@@ -39,11 +42,11 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         plot_data = self._num_events_normalized_array(cut)
         plot_data = plot_data.squeeze()
         with np.errstate(invalid='ignore'):
-            if cut.displayNormalization() == MDNormalization.NoNormalization:
-                errors = np.sqrt(cut.getErrorSquaredArray())
-                errors[np.where(cut.getNumEventsArray() == 0)] = np.nan
+            if cut.raw_ws.displayNormalization() == MDNormalization.NoNormalization:
+                errors = np.sqrt(cut.get_variance())
+                errors[np.where(cut.raw_ws.getNumEventsArray() == 0)] = np.nan
             else:
-                errors = np.sqrt(cut.getErrorSquaredArray()) / cut.getNumEventsArray()
+                errors = np.sqrt(cut.get_variance()) / cut.raw_ws.getNumEventsArray()
         errors = errors.squeeze()
 
         x = np.linspace(cut_axis.start, cut_axis.end, plot_data.size)
@@ -84,7 +87,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
 
         cut = BinMD(selected_workspace, OutputWorkspace=out_ws_name, AxisAligned="1",
                     AlignedDim1=integration_binning, AlignedDim0=cut_binning)
-        return cut
+        return wrap_workspace(cut)
 
     def _compute_cut_nonPSD(self, input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                             integration_start, integration_end, integration_units):
@@ -94,7 +97,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         if self._converted_nonpsd and self._converted_nonpsd[0] != input_workspace_name:
             self._converted_nonpsd = None
         if cut_axis.units == '|Q|':
-            SofQW3(selected_workspace, OutputWorkspace=out_ws_name, EMode=emode,
+            ws_out = SofQW3(selected_workspace.raw_ws, OutputWorkspace=out_ws_name, EMode=emode,
                    QAxisBinning=cut_binning, EAxisBinning=int_binning)
             idx = 1
             unit = 'MomentumTransfer'
@@ -102,14 +105,14 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         elif cut_axis.units == 'Degrees':
             if not self._converted_nonpsd:
                 self._converted_nonpsd = (input_workspace_name,
-                                          ConvertSpectrumAxis(selected_workspace, Target='theta',
+                                          ConvertSpectrumAxis(selected_workspace.raw_ws, Target='theta',
                                                               OutputWorkspace='__convToTheta', StoreInADS=False))
-            Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=int_binning, Axis2Binning=cut_binning)
+            ws_out = Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=int_binning, Axis2Binning=cut_binning)
             idx = 1
             unit = 'Degrees'
             name = 'Theta'
         elif integration_units == '|Q|':
-            SofQW3(selected_workspace, OutputWorkspace=out_ws_name, EMode=emode,
+            ws_out = SofQW3(selected_workspace.raw_ws, OutputWorkspace=out_ws_name, EMode=emode,
                    QAxisBinning=int_binning, EAxisBinning=cut_binning)
             idx = 0
             unit = 'DeltaE'
@@ -117,18 +120,17 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         else:
             if not self._converted_nonpsd:
                 self._converted_nonpsd = (input_workspace_name,
-                                          ConvertSpectrumAxis(selected_workspace, Target='theta',
+                                          ConvertSpectrumAxis(selected_workspace.raw_ws, Target='theta',
                                                               OutputWorkspace='__convToTheta', StoreInADS=False))
-            Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=cut_binning, Axis2Binning=int_binning)
+            ws_out = Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=cut_binning, Axis2Binning=int_binning)
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
-        ws_out = get_workspace_handle(out_ws_name)
         xdim = ws_out.getDimension(idx)
         extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
         cut = CreateMDHistoWorkspace(OutputWorkspace=out_ws_name, SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(),
                                      Dimensionality=1, Extents=extents, NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
-        return cut
+        return wrap_workspace(cut)
 
     def get_arrays_from_workspace(self, workspace):
         mantid_ws = get_workspace_handle(workspace)
@@ -155,28 +157,34 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
     def is_cuttable(self, workspace):
         workspace = get_workspace_handle(workspace)
         try:
-            is2D = workspace.getNumDims() == 2
+            is2D = workspace.raw_ws.getNumDims() == 2
         except AttributeError:
             is2D = False
         if not is2D:
             return False
-        if isinstance(workspace, IMDEventWorkspace):
+        if isinstance(workspace, PixelWorkspace):
             return True
         else:
             validator = WorkspaceUnitValidator('DeltaE')
-            return isinstance(workspace, Workspace2D) and validator.isValid(workspace) == ''
+            return isinstance(workspace, Workspace2D) and validator.isValid(workspace.raw_ws) == ''
 
     def set_saved_cut_parameters(self, workspace, axis, parameters):
-        setCutParameters(workspace, axis, parameters)
+        workspace = get_workspace_handle(workspace)
+        workspace.set_cut_params(axis, parameters)
 
-    def get_saved_cut_parameters(self, workspace, axis=None):
-        return getCutParameters(workspace, axis)
+    def get_saved_cut_parameters(self, workspace, axis='previous_axis'):
+        try:
+            return get_workspace_handle(workspace).cut_params[axis], axis
+        except KeyError:
+            return None, None
 
     def is_axis_saved(self, workspace, axis):
-        return isAxisSaved(workspace, axis)
+        workspace = get_workspace_handle(workspace)
+        return workspace.is_axis_saved(axis)
 
     def _num_events_normalized_array(self, workspace):
-        assert isinstance(workspace, IMDHistoWorkspace)
+        assert isinstance(workspace, HistogramWorkspace)
+        workspace = workspace.raw_ws
         with np.errstate(invalid='ignore'):
             if workspace.displayNormalization() == MDNormalization.NoNormalization:
                 data = np.array(workspace.getSignalArray())
@@ -188,9 +196,9 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
 
     def _infer_missing_parameters(self, workspace, cut_axis):
         """Infer Missing parameters. This will come in handy at the CLI"""
-        assert isinstance(workspace, IMDEventWorkspace)
-        dim = workspace.getDimensionIndexByName(cut_axis.units)
-        dim = workspace.getDimension(dim)
+        assert isinstance(workspace, PixelWorkspace)
+        dim = workspace.raw_ws.getDimensionIndexByName(cut_axis.units)
+        dim = workspace.raw_ws.getDimension(dim)
         if cut_axis.start is None:
             cut_axis.start = dim.getMinimum()
         if cut_axis.end is None:
@@ -199,24 +207,24 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
             cut_axis.step = (cut_axis.end - cut_axis.start)/100
 
     def _normalize_workspace(self, workspace):
-        assert isinstance(workspace, IMDHistoWorkspace)
-        num_events = workspace.getNumEventsArray()
+        assert isinstance(workspace, HistogramWorkspace)
+        num_events = workspace.raw_ws.getNumEventsArray()
         average_event_intensity = self._num_events_normalized_array(workspace)
         average_event_range = average_event_intensity.max() - average_event_intensity.min()
 
         normed_average_event_intensity = (average_event_intensity - average_event_intensity.min())/average_event_range
-        if workspace.displayNormalization() == MDNormalization.NoNormalization:
+        if workspace.raw_ws.displayNormalization() == MDNormalization.NoNormalization:
             new_data = normed_average_event_intensity
         else:
             new_data = normed_average_event_intensity * num_events
         new_data = np.array(new_data)
 
         new_data = np.nan_to_num(new_data)
-        workspace.setSignalArray(new_data)
+        workspace.raw_ws.setSignalArray(new_data)
 
-        errors = workspace.getErrorSquaredArray() / (average_event_range**2)
-        workspace.setErrorSquaredArray(errors)
-        workspace.setComment("Normalized By MSlice")
+        errors = workspace.get_variance() / (average_event_range**2)
+        workspace.raw_ws.setErrorSquaredArray(errors)
+        workspace.raw_ws.setComment("Normalized By MSlice")
 
     def _was_previously_normalized(self, workspace):
         return workspace.getComment() == "Normalized By MSlice"

@@ -14,9 +14,9 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
         else:
             raise TypeError('Workspace expected matrixWorkspace, got %s' % mantid_ws.__class__.__name__)
 
+        self._cut_params = {}
         self.ef_defined = None
         self.limits = {}
-        self.cut_parameters = None
         self.is_PSD = None
         self.e_mode = None
         self.e_fixed = None

@@ -14,6 +14,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
             self._raw_ws = mantid_ws
         else:
             raise TypeError('HistogramWorkspace expected IMDHistoWorkspace, got %s' % mantid_ws.__class__.__name__)
+        self._cut_params = {}
 
     def rewrap(self, ws):
         return HistogramWorkspace(ws)
