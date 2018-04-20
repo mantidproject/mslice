@@ -2,12 +2,12 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 
 from mantid.simpleapi import BinMD, SofQW3, Rebin2D, ConvertSpectrumAxis, CreateMDHistoWorkspace
-from mantid.api import MDNormalization, IMDHistoWorkspace, WorkspaceUnitValidator
+from mantid.api import MDNormalization, WorkspaceUnitValidator
 
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, delete_workspace,
-                                                                      wrap_workspace)
+                                                                      wrap_workspace, workspace_exists)
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
@@ -169,12 +169,16 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
             return isinstance(workspace, Workspace2D) and validator.isValid(workspace.raw_ws) == ''
 
     def set_saved_cut_parameters(self, workspace, axis, parameters):
-        workspace = get_workspace_handle(workspace)
-        workspace.set_cut_params(axis, parameters)
+        if workspace_exists(workspace):
+            workspace = get_workspace_handle(workspace)
+            workspace.set_cut_params(axis, parameters)
 
-    def get_saved_cut_parameters(self, workspace, axis='previous_axis'):
+    def get_saved_cut_parameters(self, workspace, axis=None):
         try:
-            return get_workspace_handle(workspace).cut_params[axis], axis
+            workspace = get_workspace_handle(workspace)
+            if axis is None:
+                axis = workspace.cut_params['previous_axis']
+            return workspace.cut_params[axis], axis
         except KeyError:
             return None, None
 

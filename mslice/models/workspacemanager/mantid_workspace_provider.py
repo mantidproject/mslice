@@ -17,7 +17,6 @@ from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from .file_io import save_ascii, save_matlab, save_nexus
 import numpy as np
 from scipy import constants
 
@@ -56,12 +55,21 @@ def get_workspace_handle(workspace_name):
     return _loaded_workspaces[workspace_name]
 
 def get_workspace_names():
-    return _loaded_workspaces.keys()
+    return [key for key in _loaded_workspaces.keys() if key[:2] != '__']
+
+def get_workspace_name(workspace):
+    """Returns the name of a workspace given the workspace handle"""
+    if isinstance(workspace, string_types):
+        return workspace
+    return workspace.raw_ws.name()
 
 def delete_workspace(workspace):
     workspace = get_workspace_handle(workspace)
     del _loaded_workspaces[get_workspace_name(workspace)]
     del workspace
+
+def workspace_exists(ws_name):
+    return True if ws_name in _loaded_workspaces.keys() else False
 
 def get_limits(workspace, axis):
     if workspace.limits is None:
@@ -76,10 +84,6 @@ def get_limits(workspace, axis):
         maximum = dim.getMaximum()
         step = (maximum - minimum) / 100
         return minimum, maximum, step
-
-def is_PSD(workspace):
-    ws_name = workspace if isinstance(workspace, string_types) else get_workspace_name(workspace)
-    return _isPSD[ws_name] if (ws_name in _isPSD) else None
 
 def _processEfixed(workspace):
     """Checks whether the fixed energy is defined for this workspace"""
@@ -125,7 +129,6 @@ def _original_step_size(workspace):
 
 def _get_algorithm_history(name, workspace_history):
     histories = workspace_history.getAlgorithmHistories()
-
     for history in reversed(histories):
         if history.name() == name:
             return history
@@ -206,16 +209,11 @@ def wrap_workspace(raw_ws):
 
 
 def rename_workspace(selected_workspace, new_name):
-    ws = RenameWorkspace(InputWorkspace=selected_workspace, OutputWorkspace=new_name)
-    if selected_workspace in _limits:
-        _limits[new_name] = _limits.pop(selected_workspace)
-    if selected_workspace in _isPSD:
-        _isPSD[new_name] = _isPSD.pop(selected_workspace)
-    if selected_workspace in _EfDefined:
-        _EfDefined[new_name] = _EfDefined.pop(selected_workspace)
-    if selected_workspace in _cutParameters:
-        _cutParameters[new_name] = _cutParameters.pop(selected_workspace)
-    return ws
+    workspace = get_workspace_handle(selected_workspace)
+    del _loaded_workspaces[workspace.raw_ws.name()]
+    RenameWorkspace(InputWorkspace=workspace.raw_ws, OutputWorkspace=new_name)
+    _loaded_workspaces[new_name] = workspace
+    return workspace
 
 def combine_workspace(selected_workspaces, new_name):
     ws = MergeMD(InputWorkspaces=selected_workspaces, OutputWorkspace=new_name)
@@ -255,6 +253,7 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
     :param save_name: name to save the file as (plus file extension). Pass none to use workspace name
     :param extension: file extension (such as .txt)
     '''
+    from .file_io import save_ascii, save_matlab, save_nexus
     if extension == '.nxs':
         save_method = save_nexus
     elif extension == '.txt':
@@ -271,7 +270,7 @@ def _save_single_ws(workspace, save_name, save_method, path, extension, slice_no
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
     workspace = get_workspace_handle(workspace)
-    non_psd_slice = slice_nonpsd and not is_PSD(workspace) and isinstance(workspace, MatrixWorkspace)
+    non_psd_slice = slice_nonpsd and not workspace.is_PSD and isinstance(workspace, MatrixWorkspace)
     if is_pixel_workspace(workspace) or non_psd_slice:
         slice = True
         workspace = _get_slice_mdhisto(workspace, workspace.name())
@@ -283,27 +282,21 @@ def _get_slice_mdhisto(workspace, ws_name):
         return get_workspace_handle('__' + ws_name)
     except KeyError:
         slice_alg = MantidSliceAlgorithm()
-        ws_name = workspace.name()
+        ws_name = get_workspace_name(workspace)
         x_axis = get_axis_from_dimension(workspace, ws_name, 0)
         y_axis = get_axis_from_dimension(workspace, ws_name, 1)
         slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
         return get_workspace_handle('__' + ws_name)
 
 def get_axis_from_dimension(workspace, ws_name, id):
-    dim = workspace.getDimension(id).getName()
-    min, max, step = _limits[ws_name][dim]
+    dim = workspace.raw_ws.getDimension(id).getName()
+    min, max, step = workspace.limits[dim]
     return Axis(dim, min, max, step)
 
 
 def is_pixel_workspace(workspace_name):
     workspace = get_workspace_handle(workspace_name)
-    return isinstance(workspace, IMDEventWorkspace)
-
-def get_workspace_name(workspace):
-    """Returns the name of a workspace given the workspace handle"""
-    if isinstance(workspace, string_types):
-        return workspace
-    return workspace.raw_ws.name()
+    return isinstance(workspace, PixelWorkspace)
 
 def get_EMode(workspace):
     """Returns the energy analysis mode (direct or indirect of a workspace)"""
