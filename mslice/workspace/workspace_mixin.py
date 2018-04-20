@@ -85,6 +85,10 @@ class WorkspaceMixin(object):
                 return False
         return True
 
+    @property
+    def raw_ws(self):
+        return self._raw_ws
+
     def __add__(self, other):
         return self._binary_op(operator.add, other)
 

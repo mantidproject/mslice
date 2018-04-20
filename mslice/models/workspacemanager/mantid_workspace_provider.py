@@ -197,16 +197,17 @@ def load(filename, output_workspace):
     if wrapped.e_mode == 'Indirect':
         _processEfixed(wrapped)
     _processLoadedWSLimits(wrapped)
-    _loaded_workspaces[output_workspace] = wrapped
     return wrapped
 
 def wrap_workspace(raw_ws):
     if isinstance(raw_ws, IMDEventWorkspace):
-        return PixelWorkspace(raw_ws)
+        wrapped = PixelWorkspace(raw_ws)
     elif isinstance(raw_ws, IMDHistoWorkspace):
-        return HistogramWorkspace(raw_ws)
+        wrapped = HistogramWorkspace(raw_ws)
     else:
-        return MatrixWorkspace(raw_ws)
+        wrapped = MatrixWorkspace(raw_ws)
+    _loaded_workspaces[raw_ws.name()] = wrapped
+    return wrapped
 
 
 def rename_workspace(selected_workspace, new_name):
@@ -385,12 +386,13 @@ def propagate_properties(old_workspace, new_workspace):
     new_ws.e_mode = old_workspace.e_mode
     new_ws.limits = old_workspace.limits
     new_ws.is_PSD = old_workspace.is_PSD
+    return new_ws
 
 def getComment(workspace):
     if hasattr(workspace, 'getComment'):
         return workspace.getComment()
     ws_handle = get_workspace_handle(workspace)
-    return ws_handle.getComment()
+    return ws_handle.raw_ws.getComment()
 
 def setCutParameters(workspace, axis, parameters):
     if workspace not in _cutParameters:

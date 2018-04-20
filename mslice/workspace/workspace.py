@@ -23,7 +23,3 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
 
     def rewrap(self, mantid_ws):
         return Workspace(mantid_ws)
-
-    @property
-    def raw_ws(self):
-        return self._raw_ws

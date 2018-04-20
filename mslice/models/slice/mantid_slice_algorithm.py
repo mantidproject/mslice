@@ -3,7 +3,7 @@ from six import string_types
 import numpy as np
 
 from mantid.simpleapi import BinMD, LoadCIF, SofQW3, ConvertSpectrumAxis, Rebin2D
-from mantid.api import IMDEventWorkspace, MDNormalization, WorkspaceUnitValidator
+from mantid.api import MDNormalization, WorkspaceUnitValidator
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
@@ -40,21 +40,22 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return plot, boundaries
 
     def _compute_slice_PSD(self, workspace, x_axis, y_axis, norm_to_one):
-        assert isinstance(workspace, IMDEventWorkspace)
-        self._fill_in_missing_input(x_axis, workspace)
-        self._fill_in_missing_input(y_axis, workspace)
+        assert isinstance(workspace, PixelWorkspace)
+        raw_ws = workspace.raw_ws
+        self._fill_in_missing_input(x_axis, raw_ws)
+        self._fill_in_missing_input(y_axis, raw_ws)
         n_x_bins = self._get_number_of_steps(x_axis)
         n_y_bins = self._get_number_of_steps(y_axis)
-        x_dim_id = workspace.getDimensionIndexByName(x_axis.units)
-        y_dim_id = workspace.getDimensionIndexByName(y_axis.units)
-        x_dim = workspace.getDimension(x_dim_id)
-        y_dim = workspace.getDimension(y_dim_id)
+        x_dim_id = raw_ws.getDimensionIndexByName(x_axis.units)
+        y_dim_id = raw_ws.getDimensionIndexByName(y_axis.units)
+        x_dim = raw_ws.getDimension(x_dim_id)
+        y_dim = raw_ws.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
         ws_name = get_workspace_name(workspace)
-        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
+        thisslice = BinMD(InputWorkspace=raw_ws, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
                           OutputWorkspace='__' + ws_name)
-        propagate_properties(ws_name, '__' + ws_name)
+        propagate_properties(workspace, thisslice)
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:
@@ -77,14 +78,14 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         ebin = '%f, %f, %f' % (axes[e_axis].start, axes[e_axis].step, axes[e_axis].end)
         qbin = '%f, %f, %f' % (axes[q_axis].start, axes[q_axis].step, axes[q_axis].end)
         if axes[q_axis].units == '|Q|':
-            thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin,
+            thisslice = SofQW3(InputWorkspace=workspace.raw_ws, QAxisBinning=qbin, EAxisBinning=ebin,
                                EMode=workspace.e_mode, OutputWorkspace='__' + ws_name)
         else:
-            thisslice = ConvertSpectrumAxis(InputWorkspace=workspace, Target='Theta')
+            thisslice = ConvertSpectrumAxis(InputWorkspace=workspace.raw_ws, Target='Theta')
             thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin,
                                 OutputWorkspace='__' + ws_name)
         plot_data = thisslice.extractY()
-        propagate_properties(ws_name, '__' + ws_name)
+        propagate_properties(workspace, thisslice)
         if e_axis == 0:
             plot_data = np.transpose(plot_data)
         return plot_data
