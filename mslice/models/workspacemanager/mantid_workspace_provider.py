@@ -223,12 +223,12 @@ def combine_workspace(selected_workspaces, new_name):
     step1 = []
     step2 = []
     for input_workspace in selected_workspaces:
-        step1.append(get_limits(input_workspace, ax1.name)[2])
-        step2.append(get_limits(input_workspace, ax2.name)[2])
-    if new_name not in _limits.keys():
-        _limits[new_name] = {}
-    _limits[new_name][ax1.name] = [ax1.getMinimum(), ax1.getMaximum(), np.max(step1)]
-    _limits[new_name][ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
+        in_ws = get_workspace_handle(input_workspace)
+        step1.append(get_limits(in_ws, ax1.name)[2])
+        step2.append(get_limits(in_ws, ax2.name)[2])
+    ws = wrap_workspace(ws)
+    ws.limits[ax1.name] = [ax1.getMinimum(), ax1.getMaximum(), np.max(step1)]
+    ws.limits[ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
     return ws
 
 def add_workspace_runs(selected_ws):

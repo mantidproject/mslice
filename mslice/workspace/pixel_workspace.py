@@ -22,6 +22,10 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
             raise TypeError("PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got %s"
                             % mantid_ws.__class__.__name__)
         self._cut_params = {}
+        self.limits = {}
+        self.is_PSD = None
+        self.e_mode = None
+        self.e_fixed = None
 
     def rewrap(self, ws):
         return PixelWorkspace(ws)
