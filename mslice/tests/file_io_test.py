@@ -82,8 +82,8 @@ class FileIOTest(unittest.TestCase):
     def test_save_cut_to_ascii(self, output_method):
         ws_name = output_workspace_name("workspace", -1.5, 2)
         raw_ws = CreateMDHistoWorkspace(SignalInput=[1, 2], ErrorInput=[4, 5], Dimensionality=1, Extents=[-1, 5],
-                                    NumberOfBins=2, Names='Dim1', Units="units", OutputWorkspace=ws_name,
-                                    StoreInADS=False)
+                                        NumberOfBins=2, Names='Dim1', Units="units", OutputWorkspace=ws_name,
+                                        StoreInADS=False)
         ws = HistogramWorkspace(raw_ws)
         _save_cut_to_ascii(ws, ws_name, "some_path")
         output_method.assert_called_once()
@@ -93,8 +93,8 @@ class FileIOTest(unittest.TestCase):
     @patch('mslice.models.workspacemanager.file_io._output_data_to_ascii')
     def test_save_slice_to_ascii(self, output_method):
         raw_ws = CreateMDHistoWorkspace(SignalInput=[1, 2, 3, 4], ErrorInput=[3, 4, 5, 6], Dimensionality=2,
-                                    Extents=[-10, 10, -10, 10], NumberOfBins='2,2', Names='Dim1,Dim2',
-                                    Units="units1,units2", OutputWorkspace='workspace', StoreInADS=False)
+                                        Extents=[-10, 10, -10, 10], NumberOfBins='2,2', Names='Dim1,Dim2',
+                                        Units="units1,units2", OutputWorkspace='workspace', StoreInADS=False)
         ws = HistogramWorkspace(raw_ws)
         _save_slice_to_ascii(ws, "path1")
         output_method.assert_called_once()
