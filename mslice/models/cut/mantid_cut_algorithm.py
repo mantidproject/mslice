@@ -98,7 +98,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
             self._converted_nonpsd = None
         if cut_axis.units == '|Q|':
             ws_out = SofQW3(selected_workspace.raw_ws, OutputWorkspace=out_ws_name, EMode=emode,
-                   QAxisBinning=cut_binning, EAxisBinning=int_binning)
+                            QAxisBinning=cut_binning, EAxisBinning=int_binning)
             idx = 1
             unit = 'MomentumTransfer'
             name = '|Q|'
@@ -113,7 +113,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
             name = 'Theta'
         elif integration_units == '|Q|':
             ws_out = SofQW3(selected_workspace.raw_ws, OutputWorkspace=out_ws_name, EMode=emode,
-                   QAxisBinning=int_binning, EAxisBinning=cut_binning)
+                            QAxisBinning=int_binning, EAxisBinning=cut_binning)
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
@@ -133,7 +133,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         return wrap_workspace(cut)
 
     def get_arrays_from_workspace(self, workspace):
-        mantid_ws = get_workspace_handle(workspace)
+        mantid_ws = get_workspace_handle(workspace).raw_ws
         dim = mantid_ws.getDimension(0)
         x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
         with np.errstate(invalid='ignore'):

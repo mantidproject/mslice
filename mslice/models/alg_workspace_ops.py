@@ -1,4 +1,3 @@
-from six import string_types
 import numpy as np
 from mslice.models.workspacemanager.mantid_workspace_provider import getComment, get_workspace_handle
 

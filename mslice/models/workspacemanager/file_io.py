@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 import os.path
-from mantid.api import IMDHistoWorkspace, MDNormalization
+from mantid.api import MDNormalization
 from mantid.simpleapi import CreateMDHistoWorkspace, SaveMD, SaveNexus, SaveAscii
 from mslice.util.qt.QtWidgets import QFileDialog
 from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle

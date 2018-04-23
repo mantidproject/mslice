@@ -10,7 +10,7 @@ import os.path
 from six import string_types
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 
-from mantid.simpleapi import (DeleteWorkspace, Load, Scale, RenameWorkspace, 
+from mantid.simpleapi import (Load, Scale, RenameWorkspace,
                               MergeMD, MergeRuns, Minus)
 
 from mslice.workspace.base import WorkspaceBase as Workspace
@@ -31,6 +31,7 @@ m2A = 1.e10  # metres to Angstrom
 
 _loaded_workspaces = {}
 
+
 class Axis(object):
     def __init__(self, units, start, end, step):
         self.units = units
@@ -47,6 +48,7 @@ class Axis(object):
         info = (self.units, self.start, self.end, self.step)
         return "Axis(" + " ,".join(map(repr, info)) + ")"
 
+
 def get_workspace_handle(workspace_name):
     """"Return handle to workspace given workspace_name_as_string"""
     # if passed a workspace handle return the handle
@@ -54,8 +56,10 @@ def get_workspace_handle(workspace_name):
         return workspace_name
     return _loaded_workspaces[workspace_name]
 
+
 def get_workspace_names():
     return [key for key in _loaded_workspaces.keys() if key[:2] != '__']
+
 
 def get_workspace_name(workspace):
     """Returns the name of a workspace given the workspace handle"""
@@ -63,13 +67,16 @@ def get_workspace_name(workspace):
         return workspace
     return workspace.raw_ws.name()
 
+
 def delete_workspace(workspace):
     workspace = get_workspace_handle(workspace)
     del _loaded_workspaces[get_workspace_name(workspace)]
     del workspace
 
+
 def workspace_exists(ws_name):
     return True if ws_name in _loaded_workspaces.keys() else False
+
 
 def get_limits(workspace, axis):
     if workspace.limits is None:
@@ -85,6 +92,7 @@ def get_limits(workspace, axis):
         step = (maximum - minimum) / 100
         return minimum, maximum, step
 
+
 def _processEfixed(workspace):
     """Checks whether the fixed energy is defined for this workspace"""
     try:
@@ -92,6 +100,7 @@ def _processEfixed(workspace):
         workspace.ef_defined = True
     except RuntimeError:
         workspace.ef_defined = False
+
 
 def _processLoadedWSLimits(workspace):
     """ Processes an (angle-deltaE) workspace to get the limits and step size in angle, energy and |Q| """
@@ -104,6 +113,7 @@ def _processLoadedWSLimits(workspace):
     elif isinstance(workspace, MatrixWorkspace):
         process_limits(workspace)
 
+
 def process_limits(ws):
     en = ws.raw_ws.getAxis(0).extractValues()
     theta = _get_theta_for_limits(ws)
@@ -112,9 +122,10 @@ def process_limits(ws):
     qmin, qmax, qstep = get_q_limits(theta, emax, ws.e_fixed)
     set_limits(ws, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
 
+
 def process_limits_event(ws):
     e_dim = ws.raw_ws.getDimension(ws.raw_ws.getDimensionIndexByName('DeltaE'))
-    emin  = e_dim.getMinimum()
+    emin = e_dim.getMinimum()
     emax = e_dim.getMaximum()
     theta = _get_theta_for_limits_event(ws)
     estep = _original_step_size(ws)
@@ -122,10 +133,12 @@ def process_limits_event(ws):
     qmin, qmax, qstep = get_q_limits(theta, emax_1, ws.e_fixed)
     set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep)
 
+
 def _original_step_size(workspace):
     rebin_history = _get_algorithm_history("Rebin", workspace.raw_ws.getHistory())
     params_history = _get_property_from_history("Params", rebin_history)
     return float(params_history.value().split(',')[1])
+
 
 def _get_algorithm_history(name, workspace_history):
     histories = workspace_history.getAlgorithmHistories()
@@ -134,16 +147,19 @@ def _get_algorithm_history(name, workspace_history):
             return history
     return None
 
+
 def _get_property_from_history(name, history):
     for property in history.getProperties():
         if property.name() == name:
             return property
     return None
 
+
 def get_q_limits(theta, emax, efix):
     qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
     qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
     return qmin, qmax, qstep
+
 
 def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
     # Use a step size a bit smaller than angular spacing ( / 3) so user can rebin if they want...
@@ -151,6 +167,7 @@ def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
     ws.limits['|Q|'] = ws.limits['MomentumTransfer']  # ConvertToMD renames it(!)
     ws.limits['Degrees'] = theta * 180 / np.pi
     ws.limits['DeltaE'] = [emin, emax, estep]
+
 
 def _get_theta_for_limits(ws):
     # Don't parse all spectra in cases where there are a lot to save time.
@@ -170,7 +187,8 @@ def _get_theta_for_limits(ws):
     ws.is_PSD = not all(x < y for x, y in zip(theta, theta[1:]))
     # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
     thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
-    return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff>0)])])
+    return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff > 0)])])
+
 
 def _get_theta_for_limits_event(ws):
     spectrum_info = ws.raw_ws.getExperimentInfo(0).spectrumInfo()
@@ -188,6 +206,7 @@ def _get_theta_for_limits_event(ws):
     thdiff = np.diff(np.round(np.sort(theta) * round_fac) / round_fac)
     return np.array([np.min(theta), np.max(theta), np.min(thdiff[np.where(thdiff > 0)])])
 
+
 def load(filename, output_workspace):
     ws = Load(Filename=filename, OutputWorkspace=output_workspace)
     wrapped = wrap_workspace(ws)
@@ -196,6 +215,7 @@ def load(filename, output_workspace):
         _processEfixed(wrapped)
     _processLoadedWSLimits(wrapped)
     return wrapped
+
 
 def wrap_workspace(raw_ws):
     if isinstance(raw_ws, IMDEventWorkspace):
@@ -215,6 +235,7 @@ def rename_workspace(selected_workspace, new_name):
     _loaded_workspaces[new_name] = workspace
     return workspace
 
+
 def combine_workspace(selected_workspaces, new_name):
     ws = MergeMD(InputWorkspaces=selected_workspaces, OutputWorkspace=new_name)
     # Use precalculated step size, otherwise get limits directly from workspace
@@ -231,9 +252,11 @@ def combine_workspace(selected_workspaces, new_name):
     ws.limits[ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
     return ws
 
+
 def add_workspace_runs(selected_ws):
     sum_ws = MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=selected_ws[0] + '_sum')
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
+
 
 def subtract(workspaces, background_ws, ssf):
     bg_ws = get_workspace_handle(str(background_ws)).raw_ws
@@ -241,8 +264,8 @@ def subtract(workspaces, background_ws, ssf):
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result_ws = Minus(LHSWorkspace=ws.raw_ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
-            propagate_properties(ws, result_ws)
+            result = Minus(LHSWorkspace=ws.raw_ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
+            propagate_properties(ws, result)
     except ValueError as e:
         raise ValueError(e)
 
@@ -253,6 +276,7 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
     :param path: directory to save to
     :param save_name: name to save the file as (plus file extension). Pass none to use workspace name
     :param extension: file extension (such as .txt)
+    :param slice_nonpsd: whether the selection is in non_psd mode
     '''
     from .file_io import save_ascii, save_matlab, save_nexus
     if extension == '.nxs':
@@ -266,6 +290,7 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
     for workspace in workspaces:
         _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd)
 
+
 def _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd):
     slice = False
     save_as = save_name if save_name is not None else str(workspace) + extension
@@ -276,6 +301,7 @@ def _save_single_ws(workspace, save_name, save_method, path, extension, slice_no
         slice = True
         workspace = _get_slice_mdhisto(workspace, get_workspace_name(workspace))
     save_method(workspace, full_path, slice)
+
 
 def _get_slice_mdhisto(workspace, ws_name):
     from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
@@ -288,6 +314,7 @@ def _get_slice_mdhisto(workspace, ws_name):
         slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
         return get_workspace_handle('__' + ws_name)
 
+
 def get_axis_from_dimension(workspace, ws_name, id):
     dim = workspace.raw_ws.getDimension(id).getName()
     min, max, step = workspace.limits[dim]
@@ -298,6 +325,7 @@ def is_pixel_workspace(workspace_name):
     workspace = get_workspace_handle(workspace_name)
     return isinstance(workspace, PixelWorkspace)
 
+
 def get_EMode(workspace):
     """Returns the energy analysis mode (direct or indirect of a workspace)"""
     emode = str(_get_ws_EMode(workspace))
@@ -307,6 +335,7 @@ def get_EMode(workspace):
         ei_log = workspace.run().getProperty('Ei').value
         emode = 'Indirect' if np.isnan(ei_log) else 'Direct'
     return emode
+
 
 def _get_ws_EMode(ws_handle):
     try:
@@ -348,6 +377,7 @@ def _get_ws_EFixed(raw_ws):
             raise ValueError("Workspace contains different EFixed values")
     return efixed
 
+
 def _get_exp_info_using(raw_ws, get_exp_info):
     """get data from MultipleExperimentInfo. Returns None if ExperimentInfo is not found"""
     prev = None
@@ -359,15 +389,6 @@ def _get_exp_info_using(raw_ws, get_exp_info):
         prev = exp_value
     return prev
 
-def has_efixed(workspace):
-    return _EfDefined[workspace if isinstance(workspace, string_types) else get_workspace_name(workspace)]
-
-def set_efixed(workspace, Ef):
-    """Sets (overides) the fixed energy for all detectors (spectra) of this workspace"""
-    ws_name = workspace if isinstance(workspace, string_types) else get_workspace_name(workspace)
-    ws_handle = get_workspace_handle(ws_name)
-    for idx in range(ws_handle.getNumberHistograms()):
-        ws_handle.setEFixed(ws_handle.getDetector(idx).getID(), Ef)
 
 def propagate_properties(old_workspace, new_workspace):
     """Propagates MSlice only properties of workspaces, e.g. limits"""
@@ -377,6 +398,7 @@ def propagate_properties(old_workspace, new_workspace):
     new_ws.limits = old_workspace.limits
     new_ws.is_PSD = old_workspace.is_PSD
     return new_ws
+
 
 def getComment(workspace):
     if hasattr(workspace, 'getComment'):
