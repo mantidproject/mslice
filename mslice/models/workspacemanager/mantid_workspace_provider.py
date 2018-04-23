@@ -232,19 +232,20 @@ def combine_workspace(selected_workspaces, new_name):
     return ws
 
 def add_workspace_runs(selected_ws):
-    MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=selected_ws[0] + '_sum')
+    sum_ws = MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=selected_ws[0] + '_sum')
+    propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 def subtract(workspaces, background_ws, ssf):
-    bg_ws = get_workspace_handle(str(background_ws))
-    scaled_bg_ws = Scale(bg_ws, ssf)
+    bg_ws = get_workspace_handle(str(background_ws)).raw_ws
+    scaled_bg_ws = Scale(bg_ws, ssf, StoreInADS=False)
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            Minus(LHSWorkspace=ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
+            result_ws = Minus(LHSWorkspace=ws.raw_ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
+            propagate_properties(ws, result_ws)
     except ValueError as e:
         raise ValueError(e)
-    finally:
-        delete_workspace(scaled_bg_ws)
+
 
 def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
     '''
@@ -273,7 +274,7 @@ def _save_single_ws(workspace, save_name, save_method, path, extension, slice_no
     non_psd_slice = slice_nonpsd and not workspace.is_PSD and isinstance(workspace, MatrixWorkspace)
     if is_pixel_workspace(workspace) or non_psd_slice:
         slice = True
-        workspace = _get_slice_mdhisto(workspace, workspace.name())
+        workspace = _get_slice_mdhisto(workspace, get_workspace_name(workspace))
     save_method(workspace, full_path, slice)
 
 def _get_slice_mdhisto(workspace, ws_name):
@@ -282,7 +283,6 @@ def _get_slice_mdhisto(workspace, ws_name):
         return get_workspace_handle('__' + ws_name)
     except KeyError:
         slice_alg = MantidSliceAlgorithm()
-        ws_name = get_workspace_name(workspace)
         x_axis = get_axis_from_dimension(workspace, ws_name, 0)
         y_axis = get_axis_from_dimension(workspace, ws_name, 1)
         slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
