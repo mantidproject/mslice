@@ -261,7 +261,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
 
     def _crystal_structure(self, ws_name, element, cif_file):
         if cif_file:
-            ws = get_workspace_handle(ws_name)
+            ws = get_workspace_handle(ws_name).raw_ws
             LoadCIF(ws, cif_file)
             return ws.sample().getCrystalStructure()
         else:

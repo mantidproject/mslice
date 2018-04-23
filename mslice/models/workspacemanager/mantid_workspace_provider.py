@@ -88,7 +88,7 @@ def get_limits(workspace, axis):
 def _processEfixed(workspace):
     """Checks whether the fixed energy is defined for this workspace"""
     try:
-        _get_ws_EFixed(workspace.raw_ws)
+        workspace.e_fixed = _get_ws_EFixed(workspace.raw_ws)
         workspace.ef_defined = True
     except RuntimeError:
         workspace.ef_defined = False
@@ -96,30 +96,30 @@ def _processEfixed(workspace):
 def _processLoadedWSLimits(workspace):
     """ Processes an (angle-deltaE) workspace to get the limits and step size in angle, energy and |Q| """
     # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
-    efix = get_EFixed(workspace.raw_ws)
-    if efix is None:
+    workspace.e_fixed = get_EFixed(workspace.raw_ws)
+    if workspace.e_fixed is None:
         return
     if isinstance(workspace, PixelWorkspace):
-        process_limits_event(workspace, efix)
+        process_limits_event(workspace)
     elif isinstance(workspace, MatrixWorkspace):
-        process_limits(workspace, efix)
+        process_limits(workspace)
 
-def process_limits(ws, efix):
+def process_limits(ws):
     en = ws.raw_ws.getAxis(0).extractValues()
     theta = _get_theta_for_limits(ws)
     # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
     emax = -np.min(en) if (str(ws.e_mode == 'Direct')) else np.max(en)
-    qmin, qmax, qstep = get_q_limits(theta, emax, efix)
+    qmin, qmax, qstep = get_q_limits(theta, emax, ws.e_fixed)
     set_limits(ws, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
 
-def process_limits_event(ws, efix):
+def process_limits_event(ws):
     e_dim = ws.raw_ws.getDimension(ws.raw_ws.getDimensionIndexByName('DeltaE'))
     emin  = e_dim.getMinimum()
     emax = e_dim.getMaximum()
     theta = _get_theta_for_limits_event(ws)
     estep = _original_step_size(ws)
     emax_1 = -emin if (str(ws.e_mode == 'Direct')) else emax
-    qmin, qmax, qstep = get_q_limits(theta, emax_1, efix)
+    qmin, qmax, qstep = get_q_limits(theta, emax_1, ws.e_fixed)
     set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep)
 
 def _original_step_size(workspace):
@@ -318,38 +318,40 @@ def _get_ws_EMode(ws_handle):
             raise ValueError("Workspace contains different EModes")
     return emode
 
-def get_EFixed(ws_handle):
+
+def get_EFixed(raw_ws):
     efix = np.nan
     try:
-        efix = _get_ws_EFixed(ws_handle)
+        efix = _get_ws_EFixed(raw_ws)
     except RuntimeError:  # Efixed not defined
         # This could occur for malformed NXSPE without the instrument name set.
         # LoadNXSPE then sets EMode to 'Elastic' and getEFixed fails.
         try:
-            if ws_handle.run().hasProperty('Ei'):
-                efix = ws_handle.run().getProperty('Ei').value
+            if raw_ws.run().hasProperty('Ei'):
+                efix = raw_ws.run().getProperty('Ei').value
         except AttributeError:
-            if ws_handle.getExperimentInfo(0).run().hasProperty('Ei'):
-                efix = ws_handle.getExperimentInfo(0).run().getProperty('Ei').value
+            if raw_ws.getExperimentInfo(0).run().hasProperty('Ei'):
+                efix = raw_ws.getExperimentInfo(0).run().getProperty('Ei').value
     if efix is not None and not np.isnan(efix):  # error if none is passed to isnan
         return efix
     else:
         return None
 
-def _get_ws_EFixed(ws_handle):
+
+def _get_ws_EFixed(raw_ws):
     try:
-        efixed = ws_handle.getEFixed(ws_handle.getDetector(0).getID())
+        efixed = raw_ws.getEFixed(raw_ws.getDetector(0).getID())
     except AttributeError: # workspace is not matrix workspace
         try:
-            efixed = _get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEFixed(1))
+            efixed = _get_exp_info_using(raw_ws, lambda e: raw_ws.getExperimentInfo(e).getEFixed(1))
         except ValueError:
             raise ValueError("Workspace contains different EFixed values")
     return efixed
 
-def _get_exp_info_using(ws_handle, get_exp_info):
+def _get_exp_info_using(raw_ws, get_exp_info):
     """get data from MultipleExperimentInfo. Returns None if ExperimentInfo is not found"""
     prev = None
-    for exp in range(ws_handle.getNumExperimentInfo()):
+    for exp in range(raw_ws.getNumExperimentInfo()):
         exp_value = get_exp_info(exp)
         if prev is not None:
             if exp_value != prev:

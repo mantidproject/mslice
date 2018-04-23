@@ -90,7 +90,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def show_d2sigma(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        if cached_slice['plot_data'][2] is None:
+        if cached_slice['plot_data'][3] is None:
             self.compute_d2sigma(workspace)
         self._show_plot(workspace, cached_slice['plot_data'][3], cached_slice['boundaries'], cached_slice['colourmap'],
                         cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
@@ -110,7 +110,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
                         cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
 
     def add_overplot_line(self, workspace, key, recoil, extra_info):
-        if recoil: # key is relative mass
+        if recoil:  # key is relative mass
             label = recoil_labels[key] if key in recoil_labels else \
                 'Relative mass ' + str(key)
         else:  # key is element name
@@ -119,7 +119,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line = self.overplot_lines[workspace][key]
             line.set_linestyle('-')  # make visible
             line.set_label(label)  # add to legend
-            line.set_markersize(6) # show markers - 6.0 is default size
+            line.set_markersize(6)  # show markers - 6.0 is default size
             if line not in plt.gca().get_children():
                 plt.gca().add_artist(line)
         else:
