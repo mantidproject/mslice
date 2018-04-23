@@ -10,8 +10,8 @@ from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.widgets.dataloader.dataloader import DataLoaderWidget
 
-class DataLoaderTest(unittest.TestCase):
 
+class DataLoaderTest(unittest.TestCase):
 
     def setUp(self):
         self.view = mock.create_autospec(spec=DataLoaderWidget)
@@ -57,11 +57,8 @@ class DataLoaderTest(unittest.TestCase):
         ws_name2 = 'file2'
         ws_name3 = 'file3'
         # Make the third workspace something not in current workspace list, so don't need ask overwrite
-        get_ws_names_mock.return_value=[ws_name1, ws_name2, '']
-        ws_mock = mock.Mock()
-        get_ws_handle_mock.return_value = ws_mock
-        e_mode = PropertyMock(return_value='Direct')
-        type(ws_mock).e_mode = e_mode
+        get_ws_names_mock.return_value = [ws_name1, ws_name2, '']
+        get_ws_handle_mock.e_mode.return_value = 'Direct'
         # Makes the first file not load because of a name collision
         self.view.confirm_overwrite_workspace = mock.Mock(side_effect=[False, True, True])
         # Makes the second file fail to load, to check if it raise the correct error
@@ -81,11 +78,8 @@ class DataLoaderTest(unittest.TestCase):
         tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
         path = join(tempdir, 'file.nxs')
         ws_name = 'file'
-        get_ws_names_mock.return_value=[ws_name]
-        ws_mock = mock.Mock()
-        get_ws_handle_mock.return_value = ws_mock
-        e_mode = PropertyMock(return_value='Direct')
-        type(ws_mock).e_mode = e_mode
+        get_ws_names_mock.return_value = [ws_name]
+        get_ws_handle_mock.e_mode.return_value = 'Direct'
         self.view.confirm_overwrite_workspace = mock.Mock(return_value=False)
 
         self.presenter.load_workspace([path])
@@ -115,8 +109,8 @@ class DataLoaderTest(unittest.TestCase):
         ws_mock = mock.Mock()
         get_ws_handle_mock.return_value = ws_mock
         self.presenter.load_workspace([path1, path2, path3], True)
-        load_mock.assert_called_once_with(filename=path1 + '+' + path2 +'+' + path3,
-                                                             output_workspace='file1_merged')
+        load_mock.assert_called_once_with(filename=path1 + '+' + path2 + '+' + path3,
+                                          output_workspace='file1_merged')
 
     @patch('mslice.presenters.data_loader_presenter.load_from_ascii')
     @patch('mslice.presenters.data_loader_presenter.get_workspace_handle')
@@ -124,10 +118,7 @@ class DataLoaderTest(unittest.TestCase):
     def test_load_ascii(self, load_mock, get_ws_handle_mock, load_ascii_mock):
         tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
         path = join(tempdir, 'abc.txt')
-        ws_mock = mock.Mock()
-        get_ws_handle_mock.return_value = ws_mock
-        e_mode = PropertyMock(return_value='Direct')
-        type(ws_mock).e_mode = e_mode
+        get_ws_handle_mock.return_value.e_mode = 'Direct'
 
         self.presenter.load_workspace([path])
         load_ascii_mock.assert_called_once_with(path, 'abc')
@@ -144,10 +135,7 @@ class DataLoaderTest(unittest.TestCase):
         tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
         path_ascii = join(tempdir, 'ascii.txt')
         path_nexus = join(tempdir, 'nexus.nxs')
-        ws_mock = mock.Mock()
-        get_ws_handle_mock.return_value = ws_mock
-        e_mode = PropertyMock(return_value='Direct')
-        type(ws_mock).e_mode = e_mode
+        get_ws_handle_mock.return_value.e_mode = 'Direct'
 
         self.presenter.load_workspace([path_ascii, path_nexus])
         load_mock.assert_called_once_with(filename=path_nexus, output_workspace='nexus')
