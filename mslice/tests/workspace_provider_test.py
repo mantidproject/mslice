@@ -39,6 +39,9 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_almost_equal(result.dataY(0), [2.0] * 20)
         np.testing.assert_array_almost_equal(self.test_ws_2d.dataY(0), [1] * 20)
 
+    def test_combine_workspace(self):
+        assert(False) #TODO
+
     def test_process_EFixed(self):
         self.ws_provider._processEfixed('test_ws_2d')
         self.assertTrue(self.ws_provider._EfDefined['test_ws_2d'])

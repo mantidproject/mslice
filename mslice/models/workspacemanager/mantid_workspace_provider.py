@@ -85,7 +85,7 @@ def get_limits(workspace, axis):
         return workspace.limits[axis]
     else:
         # If we cannot get the step size from the data, use the old 1/100 steps.
-        ws_h = get_workspace_handle(workspace)
+        ws_h = get_workspace_handle(workspace).raw_ws
         dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
         minimum = dim.getMinimum()
         maximum = dim.getMaximum()
