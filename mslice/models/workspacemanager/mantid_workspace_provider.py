@@ -79,13 +79,14 @@ def workspace_exists(ws_name):
 
 
 def get_limits(workspace, axis):
-    if workspace.limits is None:
+    workspace = get_workspace_handle(workspace)
+    if workspace.limits is None or len(workspace.limits) == 0:
         _processLoadedWSLimits(workspace)
     if axis in workspace.limits:
         return workspace.limits[axis]
     else:
         # If we cannot get the step size from the data, use the old 1/100 steps.
-        ws_h = get_workspace_handle(workspace).raw_ws
+        ws_h = workspace.raw_ws
         dim = ws_h.getDimension(ws_h.getDimensionIndexByName(axis))
         minimum = dim.getMinimum()
         maximum = dim.getMaximum()
@@ -237,14 +238,14 @@ def rename_workspace(selected_workspace, new_name):
 
 
 def combine_workspace(selected_workspaces, new_name):
-    ws = MergeMD(InputWorkspaces=selected_workspaces, OutputWorkspace=new_name)
+    workspaces = [get_workspace_handle(ws).raw_ws for ws in selected_workspaces]
+    ws = MergeMD(InputWorkspaces=workspaces, OutputWorkspace=new_name)
     # Use precalculated step size, otherwise get limits directly from workspace
     ax1 = ws.getDimension(0)
     ax2 = ws.getDimension(1)
     step1 = []
     step2 = []
-    for input_workspace in selected_workspaces:
-        in_ws = get_workspace_handle(input_workspace)
+    for in_ws in selected_workspaces:
         step1.append(get_limits(in_ws, ax1.name)[2])
         step2.append(get_limits(in_ws, ax2.name)[2])
     ws = wrap_workspace(ws)
