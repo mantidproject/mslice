@@ -9,8 +9,9 @@ from __future__ import (absolute_import, division, print_function)
 from mantid.api import IMDWorkspace as _IMDWorkspace
 from mantid.api import Workspace as _Workspace
 from mantid.kernel.funcinspect import lhs_info as _lhs_info
-from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F401
+from mantid.simpleapi import mtd, ConvertUnits, RenameWorkspace # noqa: F401
 
+from mslice.app import MAIN_WINDOW
 # Helper tools
 from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider as _MantidWorkspaceProvider
 from mslice.presenters.slice_plotter_presenter import Axis as _Axis
@@ -73,6 +74,14 @@ def _string_to_axis(string):
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
+
+def load(path):
+    """ Load a workspace from a file.
+
+    Keyword Arguments:
+        path -- full path to input file (string)
+    """
+    MAIN_WINDOW.dataloader_presenter.load_workspace([path])
 
 def get_projection(input_workspace, axis1, axis2, units='meV'):
     """ Calculate projections of workspace.
