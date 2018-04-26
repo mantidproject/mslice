@@ -86,7 +86,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
 
         cut = BinMD(selected_workspace, OutputWorkspace=out_ws_name, AxisAligned="1",
-                    AlignedDim1=integration_binning, AlignedDim0=cut_binning)
+                    AlignedDim1=integration_binning, AlignedDim0=cut_binning, StoreInADS=False)
         return wrap_workspace(cut)
 
     def _compute_cut_nonPSD(self, input_workspace_name, out_ws_name, selected_workspace, cut_axis,
@@ -98,7 +98,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
             self._converted_nonpsd = None
         if cut_axis.units == '|Q|':
             ws_out = SofQW3(selected_workspace.raw_ws, OutputWorkspace=out_ws_name, EMode=emode,
-                            QAxisBinning=cut_binning, EAxisBinning=int_binning)
+                            QAxisBinning=cut_binning, EAxisBinning=int_binning, StoreInADS=False)
             idx = 1
             unit = 'MomentumTransfer'
             name = '|Q|'
@@ -107,13 +107,14 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
                 self._converted_nonpsd = (input_workspace_name,
                                           ConvertSpectrumAxis(selected_workspace.raw_ws, Target='theta',
                                                               OutputWorkspace='__convToTheta', StoreInADS=False))
-            ws_out = Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=int_binning, Axis2Binning=cut_binning)
+            ws_out = Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=int_binning,
+                             Axis2Binning=cut_binning, StoreInADS=False)
             idx = 1
             unit = 'Degrees'
             name = 'Theta'
         elif integration_units == '|Q|':
             ws_out = SofQW3(selected_workspace.raw_ws, OutputWorkspace=out_ws_name, EMode=emode,
-                            QAxisBinning=int_binning, EAxisBinning=cut_binning)
+                            QAxisBinning=int_binning, EAxisBinning=cut_binning, StoreInADS=False)
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
@@ -122,14 +123,16 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
                 self._converted_nonpsd = (input_workspace_name,
                                           ConvertSpectrumAxis(selected_workspace.raw_ws, Target='theta',
                                                               OutputWorkspace='__convToTheta', StoreInADS=False))
-            ws_out = Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=cut_binning, Axis2Binning=int_binning)
+            ws_out = Rebin2D(self._converted_nonpsd[1], OutputWorkspace=out_ws_name, Axis1Binning=cut_binning,
+                             Axis2Binning=int_binning, StoreInADS=False)
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
         xdim = ws_out.getDimension(idx)
         extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
-        cut = CreateMDHistoWorkspace(OutputWorkspace=out_ws_name, SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(),
-                                     Dimensionality=1, Extents=extents, NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
+        cut = CreateMDHistoWorkspace(OutputWorkspace=out_ws_name, SignalInput=ws_out.extractY(),
+                                     ErrorInput=ws_out.extractE(), Dimensionality=1, Extents=extents,
+                                     NumberOfBins=xdim.getNBins(), Names=name, Units=unit, StoreInADS=False)
         return wrap_workspace(cut)
 
     def get_arrays_from_workspace(self, workspace):

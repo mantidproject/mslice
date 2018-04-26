@@ -31,7 +31,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
         dim1 = dim1.getName() + ',' + str(dim1.getMinimum()) + ',' +\
             str(dim1.getMaximum()) + ',' + str(dim1.getNBins())
         return SliceMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, AlignedDim0=dim0,
-                       AlignedDim1=dim1)
+                       AlignedDim1=dim1, StoreInADS=False)
 
     def _getDetWS(self, input_workspace):
         """ Precalculates the detector workspace for ConvertToMD - workaround for bug for indirect geometry """
@@ -47,16 +47,17 @@ class MantidProjectionCalculator(ProjectionCalculator):
         numSpectra = input_workspace.raw_ws.getNumberHistograms()
         if emode == 'Indirect' or numSpectra > 1000:
             retval = ConvertToMD(InputWorkspace=input_workspace.raw_ws, OutputWorkspace=output_workspace, QDimensions=MOD_Q_LABEL,
-                                 PreprocDetectorsWS='-', dEAnalysisMode=emode)
+                                 PreprocDetectorsWS='-', dEAnalysisMode=emode, StoreInADS=False)
             if axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL:
                 retval = self._flip_axes(output_workspace)
         # Otherwise first run SofQW3 to rebin it in |Q| properly before calling ConvertToMD with CopyToMD
         else:
             limits = input_workspace.limits['Momentum Transfer']
             limits = ','.join([str(limits[i]) for i in [0, 2, 1]])
-            SofQW3(InputWorkspace=input_workspace.raw_ws, OutputWorkspace=output_workspace, QAxisBinning=limits, Emode=emode)
+            SofQW3(InputWorkspace=input_workspace.raw_ws, OutputWorkspace=output_workspace, QAxisBinning=limits,
+                   Emode=emode, StoreInADS=False)
             retval = ConvertToMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, QDimensions='CopyToMD',
-                                 PreprocDetectorsWS='-', dEAnalysisMode=emode)
+                                 PreprocDetectorsWS='-', dEAnalysisMode=emode, StoreInADS=False)
             if axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL:
                 retval = self._flip_axes(retval)
         return retval, output_workspace
@@ -65,11 +66,12 @@ class MantidProjectionCalculator(ProjectionCalculator):
         """ Carries out either the 2Theta-E or E-2Theta projections """
         input_workspace = get_workspace_handle(input_workspace_name)
         output_workspace = input_workspace_name + ('_ThE' if axis1 == THETA_LABEL else '_ETh')
-        ConvertSpectrumAxis(InputWorkspace=input_workspace.raw_ws, OutputWorkspace=output_workspace, Target='Theta')
+        ConvertSpectrumAxis(InputWorkspace=input_workspace.raw_ws, OutputWorkspace=output_workspace,
+                            Target='Theta', StoreInADS=False)
         # Work-around for a bug in ConvertToMD.
         wsdet = self._getDetWS(input_workspace) if emode == 'Indirect' else '-'
         retval = ConvertToMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, QDimensions='CopyToMD',
-                             PreprocDetectorsWS=wsdet, dEAnalysisMode=emode)
+                             PreprocDetectorsWS=wsdet, dEAnalysisMode=emode, StoreInADS=False)
         if emode == 'Indirect':
             DeleteWorkspace(wsdet)
         if axis1 == THETA_LABEL and axis2 == DELTA_E_LABEL:
@@ -92,8 +94,8 @@ class MantidProjectionCalculator(ProjectionCalculator):
         # Now scale the energy axis if required - ConvertToMD always gives DeltaE in meV
         if units == WAVENUMBER_LABEL:
             scale = [1, 8.06554] if axis2 == DELTA_E_LABEL else [8.06544, 1]
-            new_ws = TransformMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, Scaling=scale)
-            new_ws = RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=output_workspace+'_cm')
+            new_ws = TransformMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, Scaling=scale, StoreInADS=False)
+            new_ws = RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=output_workspace+'_cm', StoreInADS=False)
             new_ws.setComment('MSlice_in_wavenumber')
             output_workspace += '_cm'
         elif units != MEV_LABEL:

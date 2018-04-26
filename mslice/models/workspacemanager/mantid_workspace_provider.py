@@ -209,7 +209,7 @@ def _get_theta_for_limits_event(ws):
 
 
 def load(filename, output_workspace):
-    ws = Load(Filename=filename, OutputWorkspace=output_workspace)
+    ws = Load(Filename=filename, OutputWorkspace=output_workspace, StoreInADS=False)
     wrapped = wrap_workspace(ws)
     wrapped.e_mode = get_EMode(ws)
     if wrapped.e_mode == 'Indirect':
@@ -232,14 +232,14 @@ def wrap_workspace(raw_ws):
 def rename_workspace(selected_workspace, new_name):
     workspace = get_workspace_handle(selected_workspace)
     del _loaded_workspaces[workspace.raw_ws.name()]
-    RenameWorkspace(InputWorkspace=workspace.raw_ws, OutputWorkspace=new_name)
+    RenameWorkspace(InputWorkspace=workspace.raw_ws, OutputWorkspace=new_name, StoreInADS=False)
     _loaded_workspaces[new_name] = workspace
     return workspace
 
 
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws).raw_ws for ws in selected_workspaces]
-    ws = MergeMD(InputWorkspaces=workspaces, OutputWorkspace=new_name)
+    ws = MergeMD(InputWorkspaces=workspaces, OutputWorkspace=new_name, StoreInADS=False)
     # Use precalculated step size, otherwise get limits directly from workspace
     ax1 = ws.getDimension(0)
     ax2 = ws.getDimension(1)
@@ -255,7 +255,7 @@ def combine_workspace(selected_workspaces, new_name):
 
 
 def add_workspace_runs(selected_ws):
-    sum_ws = MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=selected_ws[0] + '_sum')
+    sum_ws = MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=selected_ws[0] + '_sum', StoreInADS=False)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
@@ -265,7 +265,8 @@ def subtract(workspaces, background_ws, ssf):
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result = Minus(LHSWorkspace=ws.raw_ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
+            result = Minus(LHSWorkspace=ws.raw_ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted',
+                           StoreInADS=False)
             propagate_properties(ws, result)
     except ValueError as e:
         raise ValueError(e)

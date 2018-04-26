@@ -21,15 +21,16 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         x = np.linspace(0, 99, 100)
         y = x * 1
         e = y * 0 + 2
-        cls.m_workspace = wrap_workspace(CreateWorkspace(x, y, e, OutputWorkspace="m_ws"))
+        cls.m_workspace = wrap_workspace(CreateWorkspace(x, y, e, OutputWorkspace="m_ws", StoreInADS=False))
 
         sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
-                                                  UnitX='DeltaE', OutputWorkspace='ws1')
-        AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
+                                                  UnitX='DeltaE', OutputWorkspace='ws1', StoreInADS=False)
+        AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
         cls.px_workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="ws1", QDimensions='|Q|',
                                        dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
-                                       SplitInto='50,50')
-        cls.px_workspace_clone = CloneWorkspace(InputWorkspace=cls.px_workspace, OutputWorkspace='ws2')
+                                       SplitInto='50,50', StoreInADS=False)
+        cls.px_workspace_clone = CloneWorkspace(InputWorkspace=cls.px_workspace, OutputWorkspace='ws2',
+                                                StoreInADS=False)
         cls.px_workspace = wrap_workspace(cls.px_workspace)
         cls.px_workspace_clone = wrap_workspace(cls.px_workspace_clone)
 
