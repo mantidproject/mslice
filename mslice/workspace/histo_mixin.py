@@ -34,8 +34,9 @@ class HistoMixin(object):
         max = np.amax(other)
         size = other.size
         ws = CreateMDHistoWorkspace(Dimensionality=1, Extents='' + str(min) + ',' + str(max),
-                           SignalInput=other, ErrorInput=other, NumberOfBins=str(size),
-                           Names=self._raw_ws.getDimension(0).getName(), Units='MomentumTransfer', StoreInADS=False)
+                                    SignalInput=other, ErrorInput=other, NumberOfBins=str(size),
+                                    Names=self._raw_ws.getDimension(0).getName(), Units='MomentumTransfer',
+                                    StoreInADS=False)
         try:
             replicated = ReplicateMD(ShapeWorkspace=self._raw_ws, DataWorkspace=ws, StoreInADS=False)
         except RuntimeError:

@@ -21,7 +21,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         x = np.linspace(0, 99, 100)
         y = x * 1
         e = y * 0 + 2
-        cls.m_workspace = wrap_workspace(CreateWorkspace(x, y, e, OutputWorkspace="m_ws", StoreInADS=False))
+        cls.m_workspace = wrap_workspace(CreateWorkspace(x, y, e, OutputWorkspace="m_ws", StoreInADS=False), 'm_ws')
 
         sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
                                                   UnitX='DeltaE', OutputWorkspace='ws1', StoreInADS=False)
@@ -31,8 +31,8 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
                                        SplitInto='50,50', StoreInADS=False)
         cls.px_workspace_clone = CloneWorkspace(InputWorkspace=cls.px_workspace, OutputWorkspace='ws2',
                                                 StoreInADS=False)
-        cls.px_workspace = wrap_workspace(cls.px_workspace)
-        cls.px_workspace_clone = wrap_workspace(cls.px_workspace_clone)
+        cls.px_workspace = wrap_workspace(cls.px_workspace, 'ws1')
+        cls.px_workspace_clone = wrap_workspace(cls.px_workspace_clone, 'ws2')
 
     def setUp(self):
         self.view = mock.create_autospec(spec=WorkspaceView)
@@ -190,7 +190,8 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def test_remove_workspace(self, delete_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a workspace that reports a single selected workspace on calls to get_workspace_selected
-        workspace_to_be_removed = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1'))
+        workspace_to_be_removed = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1'),
+                                                 'file1')
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_be_removed])
         self.view.display_loaded_workspaces = mock.Mock()
 
@@ -203,8 +204,8 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def test_remove_multiple_workspaces(self, delete_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports 3 selected workspaces on calls to get_workspace_selected
-        workspace1 = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1'))
-        workspace2 = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file2'))
+        workspace1 = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1'), 'file1')
+        workspace2 = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file2'), 'file2')
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace1, workspace2])
 
         self.presenter.notify(Command.RemoveSelectedWorkspaces)

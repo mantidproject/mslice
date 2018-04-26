@@ -87,7 +87,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
 
         cut = BinMD(selected_workspace, OutputWorkspace=out_ws_name, AxisAligned="1",
                     AlignedDim1=integration_binning, AlignedDim0=cut_binning, StoreInADS=False)
-        return wrap_workspace(cut)
+        return wrap_workspace(cut, out_ws_name)
 
     def _compute_cut_nonPSD(self, input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                             integration_start, integration_end, integration_units):
@@ -133,7 +133,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         cut = CreateMDHistoWorkspace(OutputWorkspace=out_ws_name, SignalInput=ws_out.extractY(),
                                      ErrorInput=ws_out.extractE(), Dimensionality=1, Extents=extents,
                                      NumberOfBins=xdim.getNBins(), Names=name, Units=unit, StoreInADS=False)
-        return wrap_workspace(cut)
+        return wrap_workspace(cut, out_ws_name)
 
     def get_arrays_from_workspace(self, workspace):
         mantid_ws = get_workspace_handle(workspace).raw_ws

@@ -95,12 +95,11 @@ class MantidProjectionCalculator(ProjectionCalculator):
         if units == WAVENUMBER_LABEL:
             scale = [1, 8.06554] if axis2 == DELTA_E_LABEL else [8.06544, 1]
             new_ws = TransformMD(InputWorkspace=output_workspace, OutputWorkspace=output_workspace, Scaling=scale, StoreInADS=False)
-            new_ws = RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=output_workspace+'_cm', StoreInADS=False)
             new_ws.setComment('MSlice_in_wavenumber')
             output_workspace += '_cm'
         elif units != MEV_LABEL:
             raise NotImplementedError("Unit %s not recognised. Only 'meV' and 'cm-1' implemented." % (units))
-        return propagate_properties(input_workspace, new_ws)
+        return propagate_properties(input_workspace, new_ws, output_workspace)
 
     def validate_workspace(self, ws):
         workspace = get_workspace_handle(ws)

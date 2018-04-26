@@ -55,7 +55,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         ws_name = get_workspace_name(workspace)
         thisslice = BinMD(InputWorkspace=raw_ws, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
                           OutputWorkspace='__' + ws_name, StoreInADS=False)
-        propagate_properties(workspace, thisslice)
+        propagate_properties(workspace, thisslice, '__' + ws_name)
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:
@@ -85,7 +85,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin,
                                 OutputWorkspace='__' + ws_name, StoreInADS=False)
         plot_data = thisslice.extractY()
-        propagate_properties(workspace, thisslice)
+        propagate_properties(workspace, thisslice, '__' + ws_name)
         if e_axis == 0:
             plot_data = np.transpose(plot_data)
         return plot_data
