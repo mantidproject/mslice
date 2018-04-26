@@ -6,6 +6,8 @@
 
 # Mantid Tools imported for convenience
 from __future__ import (absolute_import, division, print_function)
+
+import os.path as ospath
 from mantid.api import IMDWorkspace as _IMDWorkspace
 from mantid.api import Workspace as _Workspace
 from mantid.kernel.funcinspect import lhs_info as _lhs_info
@@ -81,7 +83,12 @@ def load(path):
     Keyword Arguments:
         path -- full path to input file (string)
     """
+    if not isinstance(path, str):
+        raise RuntimeError('path given to load must be a string')
+    if not ospath.exists(path):
+        raise RuntimeError('could not find the path %s' % path)
     MAIN_WINDOW.dataloader_presenter.load_workspace([path])
+
 
 def get_projection(input_workspace, axis1, axis2, units='meV'):
     """ Calculate projections of workspace.
