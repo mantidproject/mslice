@@ -73,7 +73,7 @@ def get_workspace_name(workspace):
     """Returns the name of a workspace given the workspace handle"""
     if isinstance(workspace, string_types):
         return workspace
-    return workspace.raw_ws.name()
+    return workspace.name
 
 
 def delete_workspace(workspace):
@@ -218,36 +218,35 @@ def _get_theta_for_limits_event(ws):
 
 def load(filename, output_workspace):
     wrapped = run_alg('Load', output_name=output_workspace, Filename=filename, OutputWorkspace=output_workspace)
-    # wrapped = wrap_workspace(ws)
-    wrapped.e_mode = get_EMode(ws)
+    wrapped.e_mode = get_EMode(wrapped.raw_ws)
     if wrapped.e_mode == 'Indirect':
         _processEfixed(wrapped)
     _processLoadedWSLimits(wrapped)
     return wrapped
 
 
-def wrap_workspace(raw_ws):
+def wrap_workspace(raw_ws, name):
     if isinstance(raw_ws, IMDEventWorkspace):
-        wrapped = PixelWorkspace(raw_ws)
+        wrapped = PixelWorkspace(raw_ws, name)
     elif isinstance(raw_ws, IMDHistoWorkspace):
-        wrapped = HistogramWorkspace(raw_ws)
+        wrapped = HistogramWorkspace(raw_ws, name)
     else:
-        wrapped = MatrixWorkspace(raw_ws)
-    _loaded_workspaces[raw_ws.name()] = wrapped
+        wrapped = MatrixWorkspace(raw_ws, name)
+    _loaded_workspaces[name] = wrapped
     return wrapped
 
 
 def rename_workspace(selected_workspace, new_name):
     workspace = get_workspace_handle(selected_workspace)
     del _loaded_workspaces[workspace.raw_ws.name()]
-    RenameWorkspace(InputWorkspace=workspace.raw_ws, OutputWorkspace=new_name)
+    RenameWorkspace(InputWorkspace=workspace.raw_ws, OutputWorkspace=new_name, StoreInADS=False)
     _loaded_workspaces[new_name] = workspace
     return workspace
 
 
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws).raw_ws for ws in selected_workspaces]
-    ws = MergeMD(InputWorkspaces=workspaces, OutputWorkspace=new_name)
+    ws = MergeMD(InputWorkspaces=workspaces, OutputWorkspace=new_name, StoreInADS=False)
     # Use precalculated step size, otherwise get limits directly from workspace
     ax1 = ws.getDimension(0)
     ax2 = ws.getDimension(1)
@@ -256,15 +255,16 @@ def combine_workspace(selected_workspaces, new_name):
     for in_ws in selected_workspaces:
         step1.append(get_limits(in_ws, ax1.name)[2])
         step2.append(get_limits(in_ws, ax2.name)[2])
-    ws = wrap_workspace(ws)
+    ws = wrap_workspace(ws, new_name)
     ws.limits[ax1.name] = [ax1.getMinimum(), ax1.getMaximum(), np.max(step1)]
     ws.limits[ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
     return ws
 
 
 def add_workspace_runs(selected_ws):
-    sum_ws = MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=selected_ws[0] + '_sum')
-    propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
+    out_ws_name = selected_ws[0] + '_sum'
+    sum_ws = MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=out_ws_name, StoreInADS=False)
+    propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws, out_ws_name)
 
 
 def subtract(workspaces, background_ws, ssf):
@@ -273,8 +273,9 @@ def subtract(workspaces, background_ws, ssf):
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result = Minus(LHSWorkspace=ws.raw_ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted')
-            propagate_properties(ws, result)
+            result = Minus(LHSWorkspace=ws.raw_ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted',
+                           StoreInADS=False)
+            propagate_properties(ws, result, ws_name + '_subtracted')
     except ValueError as e:
         raise ValueError(e)
 
@@ -399,12 +400,13 @@ def _get_exp_info_using(raw_ws, get_exp_info):
     return prev
 
 
-def propagate_properties(old_workspace, new_workspace):
+def propagate_properties(old_workspace, new_workspace, new_ws_name):
     """Propagates MSlice only properties of workspaces, e.g. limits"""
     new_workspace.ef_defined = old_workspace.ef_defined
     new_workspace.e_mode = old_workspace.e_mode
     new_workspace.limits = old_workspace.limits
     new_workspace.is_PSD = old_workspace.is_PSD
+
 
 
 def getComment(workspace):

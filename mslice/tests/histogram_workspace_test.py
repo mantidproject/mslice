@@ -16,7 +16,8 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         cls.workspace = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
                                                                   SignalInput=signal, ErrorInput=error,
                                                                   NumberOfBins='10,10', Names='Dim1,Dim2',
-                                                                  Units='U,U', OutputWorkspace='testHistoWorkspace'))
+                                                                  Units='U,U', OutputWorkspace='testHistoWorkspace',
+                                                                  StoreInADS=False))
 
     def test_invalid_workspace(self):
         self.assertRaises(TypeError, lambda: HistogramWorkspace(4))

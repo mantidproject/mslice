@@ -120,7 +120,7 @@ def load_from_ascii(file_path, ws_name):
     nbins = len(x)
     units = header[header.find('along "'):header.find('" between')]
     CreateMDHistoWorkspace(SignalInput=y, ErrorInput=e, Dimensionality=1, Extents=extents, NumberOfBins=nbins,
-                           Names='Dim1', Units=units, OutputWorkspace=ws_name)
+                           Names='Dim1', Units=units, OutputWorkspace=ws_name, StoreInADS=False)
 
 
 def _get_md_histo_xye(histo_ws):

@@ -54,8 +54,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
         ws_name = get_workspace_name(workspace)
         thisslice = BinMD(InputWorkspace=raw_ws, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
-                          OutputWorkspace='__' + ws_name)
-        propagate_properties(workspace, thisslice)
+                          OutputWorkspace='__' + ws_name, StoreInADS=False)
+        propagate_properties(workspace, thisslice, '__' + ws_name)
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:
@@ -79,13 +79,13 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         qbin = '%f, %f, %f' % (axes[q_axis].start, axes[q_axis].step, axes[q_axis].end)
         if axes[q_axis].units == '|Q|':
             thisslice = SofQW3(InputWorkspace=workspace.raw_ws, QAxisBinning=qbin, EAxisBinning=ebin,
-                               EMode=workspace.e_mode, OutputWorkspace='__' + ws_name)
+                               EMode=workspace.e_mode, OutputWorkspace='__' + ws_name, StoreInADS=False)
         else:
-            thisslice = ConvertSpectrumAxis(InputWorkspace=workspace.raw_ws, Target='Theta')
+            thisslice = ConvertSpectrumAxis(InputWorkspace=workspace.raw_ws, Target='Theta', StoreInADS=False)
             thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin,
-                                OutputWorkspace='__' + ws_name)
+                                OutputWorkspace='__' + ws_name, StoreInADS=False)
         plot_data = thisslice.extractY()
-        propagate_properties(workspace, thisslice)
+        propagate_properties(workspace, thisslice, '__' + ws_name)
         if e_axis == 0:
             plot_data = np.transpose(plot_data)
         return plot_data
@@ -260,7 +260,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def _crystal_structure(self, ws_name, element, cif_file):
         if cif_file:
             ws = get_workspace_handle(ws_name).raw_ws
-            LoadCIF(ws, cif_file)
+            LoadCIF(ws, cif_file, StoreInADS=False)
             return ws.sample().getCrystalStructure()
         else:
             return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
