@@ -42,7 +42,7 @@ class PixelMixin(object):
         Note this wraps the result in HistogramWorkspace object, which is then passed
          to PixelWorkspace constructor in Workspace._binary_op.
         """
-        return HistogramWorkspace(self.get_histo_ws()._binary_op_array(operator, other))
+        return HistogramWorkspace(self.get_histo_ws()._binary_op_array(operator, other), self.name)
 
     def __pow__(self, other):
         return self.rewrap(self.get_histo_ws().__pow__(other))
