@@ -56,7 +56,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
             retval = run_alg('SofQW3', output_name=output_workspace, store=False, InputWorkspace=input_workspace.raw_ws,
                              QAxisBinning=limits, Emode=emode)
             retval = run_alg('ConvertToMD', output_name=output_workspace, InputWorkspace=retval, QDimensions='CopyToMD',
-                                 PreprocDetectorsWS='-', dEAnalysisMode=emode)
+                             PreprocDetectorsWS='-', dEAnalysisMode=emode)
             if axis1 == MOD_Q_LABEL and axis2 == DELTA_E_LABEL:
                 retval = self._flip_axes(retval)
         return retval, output_workspace

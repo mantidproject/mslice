@@ -6,7 +6,7 @@ from mantid.api import MDNormalization, WorkspaceUnitValidator
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, delete_workspace,
-                                                                      wrap_workspace, workspace_exists, run_alg)
+                                                                      workspace_exists, run_alg)
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
@@ -85,7 +85,7 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
 
         return run_alg('BinMD', output_name=out_ws_name, InputWorkspace=selected_workspace, AxisAligned="1",
-                    AlignedDim1=integration_binning, AlignedDim0=cut_binning)
+                       AlignedDim1=integration_binning, AlignedDim0=cut_binning)
 
     def _compute_cut_nonPSD(self, input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                             integration_start, integration_end, integration_units):
@@ -132,8 +132,8 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         xdim = ws_out.getDimension(idx)
         extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
         return run_alg('CreateMDHistoWorkspace', output_name=out_ws_name, SignalInput=ws_out.extractY(),
-                                     ErrorInput=ws_out.extractE(), Dimensionality=1, Extents=extents,
-                                     NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
+                       ErrorInput=ws_out.extractE(), Dimensionality=1, Extents=extents,
+                       NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
 
     def get_arrays_from_workspace(self, workspace):
         mantid_ws = get_workspace_handle(workspace).raw_ws
