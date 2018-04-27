@@ -190,7 +190,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return gdos
 
     def sample_temperature(self, ws_name, sample_temp_fields):
-        ws = get_workspace_handle(ws_name)
+        ws = get_workspace_handle(ws_name).raw_ws
         sample_temp = None
         for field_name in sample_temp_fields:
             try:
