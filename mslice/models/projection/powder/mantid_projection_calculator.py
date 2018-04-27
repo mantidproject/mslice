@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.util.mantid import run_algorithm
 from ...labels import DELTA_E_LABEL, MEV_LABEL, MOD_Q_LABEL, WAVENUMBER_LABEL, THETA_LABEL
