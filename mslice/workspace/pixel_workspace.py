@@ -29,4 +29,4 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
         self.e_fixed = None
 
     def rewrap(self, ws):
-        return PixelWorkspace(ws)
+        return PixelWorkspace(ws, self.name)

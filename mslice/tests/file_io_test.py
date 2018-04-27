@@ -82,9 +82,8 @@ class FileIOTest(unittest.TestCase):
     def test_save_cut_to_ascii(self, output_method):
         ws_name = output_workspace_name("workspace", -1.5, 2)
         raw_ws = CreateMDHistoWorkspace(SignalInput=[1, 2], ErrorInput=[4, 5], Dimensionality=1, Extents=[-1, 5],
-                                        NumberOfBins=2, Names='Dim1', Units="units", OutputWorkspace=ws_name,
-                                        StoreInADS=False)
-        ws = HistogramWorkspace(raw_ws)
+                                        NumberOfBins=2, Names='Dim1', Units="units", OutputWorkspace=ws_name)
+        ws = HistogramWorkspace(raw_ws, ws_name)
         _save_cut_to_ascii(ws, ws_name, "some_path")
         output_method.assert_called_once()
         self.assertEqual(output_method.call_args[0][0], 'some_path')
@@ -94,8 +93,8 @@ class FileIOTest(unittest.TestCase):
     def test_save_slice_to_ascii(self, output_method):
         raw_ws = CreateMDHistoWorkspace(SignalInput=[1, 2, 3, 4], ErrorInput=[3, 4, 5, 6], Dimensionality=2,
                                         Extents=[-10, 10, -10, 10], NumberOfBins='2,2', Names='Dim1,Dim2',
-                                        Units="units1,units2", OutputWorkspace='workspace', StoreInADS=False)
-        ws = HistogramWorkspace(raw_ws)
+                                        Units="units1,units2", OutputWorkspace='workspace')
+        ws = HistogramWorkspace(raw_ws, 'workspace')
         _save_slice_to_ascii(ws, "path1")
         output_method.assert_called_once()
         self.assertEqual(output_method.call_args[0][0], 'path1')

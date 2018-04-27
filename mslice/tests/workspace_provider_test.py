@@ -14,12 +14,12 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def setUp(self):
         self.test_ws_2d = wrap_workspace(CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
-                                                                   UnitX='DeltaE', OutputWorkspace='test_ws_2d',
-                                                                   StoreInADS=False), 'test_ws_2d')
-        AddSampleLog(self.test_ws_2d.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
+                                                                   UnitX='DeltaE',
+                                                                   OutputWorkspace='test_ws_2d'), 'test_ws_2d')
+        AddSampleLog(self.test_ws_2d.raw_ws, LogName='Ei', LogText='3.', LogType='Number')
         self.test_ws_md = ConvertToMD(InputWorkspace=self.test_ws_2d.raw_ws, OutputWorkspace="test_ws_md", QDimensions='|Q|',
                                       dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
-                                      SplitInto='50,50', StoreInADS=False)
+                                      SplitInto='50,50')
         self.test_ws_md = wrap_workspace(self.test_ws_md, 'test_ws_md')
         self.test_ws_md.ef_defined = False
         self.test_ws_md.limits = {'DeltaE': [0, 2, 1]}
@@ -64,7 +64,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def test_propagate_properties(self):
         ws_2 = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-1, 1, 20],
-                                                    UnitX='DeltaE', OutputWorkspace='test_ws_2', StoreInADS=False)
+                                                    UnitX='DeltaE', OutputWorkspace='test_ws_2')
         ws_2 = propagate_properties(self.test_ws_md, ws_2, 'test_ws_2')
         delete_workspace('test_ws_md')
         self.assertFalse(ws_2.ef_defined)

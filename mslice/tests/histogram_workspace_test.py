@@ -17,10 +17,10 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
                                                                   SignalInput=signal, ErrorInput=error,
                                                                   NumberOfBins='10,10', Names='Dim1,Dim2',
                                                                   Units='U,U', OutputWorkspace='testHistoWorkspace',
-                                                                  StoreInADS=False))
+                                                                  ), 'testHistoWorkspace')
 
     def test_invalid_workspace(self):
-        self.assertRaises(TypeError, lambda: HistogramWorkspace(4))
+        self.assertRaises(TypeError, lambda: HistogramWorkspace(4, 'name'))
 
     def test_get_coordinates(self):
         expected = np.linspace(0, 100, 10)

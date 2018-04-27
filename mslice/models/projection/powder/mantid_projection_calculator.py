@@ -30,7 +30,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
         dim1 = dim1.getName() + ',' + str(dim1.getMinimum()) + ',' +\
             str(dim1.getMaximum()) + ',' + str(dim1.getNBins())
         return run_alg('SliceMD', output_name=output_workspace, store=False, InputWorkspace=output_workspace,
-                       AlignedDim0=dim0, AlignedDim1=dim1, StoreInADS=False)
+                       AlignedDim0=dim0, AlignedDim1=dim1)
 
     def _getDetWS(self, input_workspace):
         """ Precalculates the detector workspace for ConvertToMD - workaround for bug for indirect geometry """

@@ -18,4 +18,4 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         self._cut_params = {}
 
     def rewrap(self, ws):
-        return HistogramWorkspace(ws)
+        return HistogramWorkspace(ws, self.name)

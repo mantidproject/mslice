@@ -22,4 +22,4 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
         self.e_fixed = None
 
     def rewrap(self, mantid_ws):
-        return Workspace(mantid_ws)
+        return Workspace(mantid_ws, self.name)

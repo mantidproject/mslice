@@ -19,7 +19,7 @@ class PixelMixin(object):
             histo_workspace = BinMD(InputWorkspace=self._raw_ws, OutputWorkspace=str(self),
                                     AlignedDim0=dim_values[0], AlignedDim1=dim_values[1],
                                     AlignedDim2=dim_values[2], AlignedDim3=dim_values[3],
-                                    AlignedDim4=dim_values[4], AlignedDim5=dim_values[5], StoreInADS=False)
+                                    AlignedDim4=dim_values[4], AlignedDim5=dim_values[5])
             self._histo_ws = HistogramWorkspace(histo_workspace)
         return self._histo_ws
 

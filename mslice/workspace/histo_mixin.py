@@ -38,7 +38,7 @@ class HistoMixin(object):
                                     Names=self._raw_ws.getDimension(0).getName(), Units='MomentumTransfer',
                                     StoreInADS=False)
         try:
-            replicated = ReplicateMD(ShapeWorkspace=self._raw_ws, DataWorkspace=ws, StoreInADS=False)
+            replicated = ReplicateMD(ShapeWorkspace=self._raw_ws, DataWorkspace=ws)
         except RuntimeError:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
         # return operator(self._raw_ws, replicated)
