@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 import uuid
-from mantid.simpleapi import DeleteWorkspace
 from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle, propagate_properties, run_alg
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 
@@ -71,8 +70,6 @@ class MantidProjectionCalculator(ProjectionCalculator):
         wsdet = self._getDetWS(input_workspace) if emode == 'Indirect' else '-'
         retval = run_alg('ConvertToMD', output_name=output_workspace, InputWorkspace=output_workspace,
                          QDimensions='CopyToMD', PreprocDetectorsWS=wsdet, dEAnalysisMode=emode)
-        if emode == 'Indirect':
-            DeleteWorkspace(wsdet)
         if axis1 == THETA_LABEL and axis2 == DELTA_E_LABEL:
             retval = self._flip_axes(output_workspace)
         return retval, output_workspace

@@ -62,7 +62,7 @@ def run_alg(alg_name, output_name=None, store=True, **kwargs):
     if output_name is not None:
         kwargs['OutputWorkspace'] = output_name
 
-    ws = getattr(mantid_algs, alg_name)(**kwargs)
+    ws = getattr(mantid_algs, alg_name)(StoreInADS=False, **kwargs)
 
     if store:
         ws = wrap_workspace(ws, output_name)
