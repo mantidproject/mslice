@@ -2,8 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 from mock import patch
 import unittest
-from mantid.simpleapi import CreateSimulationWorkspace, AddSampleLog, ConvertToMD, CloneWorkspace
-from mslice.models.workspacemanager.mantid_workspace_provider import (wrap_workspace, delete_workspace,
+from mslice.models.workspacemanager.mantid_workspace_provider import (delete_workspace,
                                                                       get_workspace_names, subtract,
                                                                       get_workspace_handle, add_workspace_runs,
                                                                       combine_workspace, rename_workspace,
@@ -62,7 +61,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def test_propagate_properties(self):
         ws_2 = run_alg('CreateSimulationWorkspace', output_name='test_ws_2', Instrument='MAR', BinParams=[-1, 1, 20],
-                                                    UnitX='DeltaE')
+                       UnitX='DeltaE')
         propagate_properties(self.test_ws_md, ws_2)
         delete_workspace('test_ws_md')
         self.assertFalse(ws_2.ef_defined)
