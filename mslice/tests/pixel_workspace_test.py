@@ -12,12 +12,12 @@ class PixelWorkspaceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):  # create (non-zero) test data
         sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
-                                                  UnitX='DeltaE', OutputWorkspace='simws', StoreInADS=False)
-        AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
+                                                  UnitX='DeltaE', OutputWorkspace='simws')
+        AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
         cls.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="convert_ws", QDimensions='|Q|',
                                     dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
-                                    SplitInto='50,50', StoreInADS=False)
-        cls.workspace = PixelWorkspace(cls.workspace)
+                                    SplitInto='50,50')
+        cls.workspace = PixelWorkspace(cls.workspace, 'convert_ws')
 
     def test_invalid_workspace(self):
         self.assertRaises(TypeError, lambda: PixelWorkspace(4))

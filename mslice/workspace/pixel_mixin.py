@@ -19,8 +19,8 @@ class PixelMixin(object):
             histo_workspace = BinMD(InputWorkspace=self._raw_ws, OutputWorkspace=str(self),
                                     AlignedDim0=dim_values[0], AlignedDim1=dim_values[1],
                                     AlignedDim2=dim_values[2], AlignedDim3=dim_values[3],
-                                    AlignedDim4=dim_values[4], AlignedDim5=dim_values[5], StoreInADS=False)
-            self._histo_ws = HistogramWorkspace(histo_workspace)
+                                    AlignedDim4=dim_values[4], AlignedDim5=dim_values[5])
+            self._histo_ws = HistogramWorkspace(histo_workspace, self.name)
         return self._histo_ws
 
     def get_signal(self):
@@ -42,7 +42,7 @@ class PixelMixin(object):
         Note this wraps the result in HistogramWorkspace object, which is then passed
          to PixelWorkspace constructor in Workspace._binary_op.
         """
-        return HistogramWorkspace(self.get_histo_ws()._binary_op_array(operator, other))
+        return HistogramWorkspace(self.get_histo_ws()._binary_op_array(operator, other), self.name)
 
     def __pow__(self, other):
         return self.rewrap(self.get_histo_ws().__pow__(other))

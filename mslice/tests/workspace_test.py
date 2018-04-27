@@ -59,7 +59,7 @@ class WorkspaceTest(BaseWorkspaceTest):
         x = np.linspace(0, 99, 100)
         y = x * 1
         e = y * 0 + 2
-        cls.workspace = Workspace(CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace", StoreInADS=False))
+        cls.workspace = Workspace(CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace"), 'testBaseWorkspace')
 
     def test_invalid_workspace(self):
         self.assertRaises(TypeError, lambda: Workspace(4))

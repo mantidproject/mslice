@@ -252,8 +252,8 @@ def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws).raw_ws for ws in selected_workspaces]
     ws = run_alg('MergeMD', output_name=new_name, InputWorkspaces=workspaces)
     # Use precalculated step size, otherwise get limits directly from workspace
-    ax1 = ws.getDimension(0)
-    ax2 = ws.getDimension(1)
+    ax1 = ws.raw_ws.getDimension(0)
+    ax2 = ws.raw_ws.getDimension(1)
     step1 = []
     step2 = []
     for in_ws in selected_workspaces:
@@ -272,7 +272,7 @@ def add_workspace_runs(selected_ws):
 
 def subtract(workspaces, background_ws, ssf):
     bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = run_alg('Scale', output_name='scaled_bg_ws', Store=False, InputWorkspace=bg_ws, Factor=ssf,
+    scaled_bg_ws = run_alg('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf,
                            StoreInADS=False)
     try:
         for ws_name in workspaces:
