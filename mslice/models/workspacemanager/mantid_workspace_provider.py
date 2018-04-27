@@ -10,8 +10,6 @@ import os.path
 from six import string_types
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 
-from mantid.simpleapi import (Load, Scale, RenameWorkspace,
-                              MergeMD, MergeRuns, Minus)
 import mantid.simpleapi as mantid_algs
 
 from mslice.workspace.base import WorkspaceBase as Workspace
@@ -58,8 +56,14 @@ def get_workspace_handle(workspace_name):
     return _loaded_workspaces[workspace_name]
 
 
-def run_alg(alg_name, output_name, store=True, **kwargs):
+def run_alg(alg_name, output_name=None, store=True, **kwargs):
+    if 'InputWorkspace' in kwargs.keys() and isinstance(kwargs['InputWorkspace'], Workspace):
+        kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
+    if output_name is not None:
+        kwargs['OutputWorkspace'] = output_name
+
     ws = getattr(mantid_algs, alg_name)(**kwargs)
+
     if store:
         ws = wrap_workspace(ws, output_name)
     return ws
@@ -217,7 +221,7 @@ def _get_theta_for_limits_event(ws):
 
 
 def load(filename, output_workspace):
-    wrapped = run_alg('Load', output_name=output_workspace, Filename=filename, OutputWorkspace=output_workspace)
+    wrapped = run_alg('Load', output_name=output_workspace, Filename=filename)
     wrapped.e_mode = get_EMode(wrapped.raw_ws)
     if wrapped.e_mode == 'Indirect':
         _processEfixed(wrapped)
@@ -239,14 +243,14 @@ def wrap_workspace(raw_ws, name):
 def rename_workspace(selected_workspace, new_name):
     workspace = get_workspace_handle(selected_workspace)
     del _loaded_workspaces[workspace.raw_ws.name()]
-    RenameWorkspace(InputWorkspace=workspace.raw_ws, OutputWorkspace=new_name, StoreInADS=False)
+    run_alg('RenameWorkspace', output_name=new_name, InputWorkspace=workspace)
     _loaded_workspaces[new_name] = workspace
     return workspace
 
 
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws).raw_ws for ws in selected_workspaces]
-    ws = MergeMD(InputWorkspaces=workspaces, OutputWorkspace=new_name, StoreInADS=False)
+    ws = run_alg('MergeMD', output_name=new_name, InputWorkspaces=workspaces)
     # Use precalculated step size, otherwise get limits directly from workspace
     ax1 = ws.getDimension(0)
     ax2 = ws.getDimension(1)
@@ -255,7 +259,6 @@ def combine_workspace(selected_workspaces, new_name):
     for in_ws in selected_workspaces:
         step1.append(get_limits(in_ws, ax1.name)[2])
         step2.append(get_limits(in_ws, ax2.name)[2])
-    ws = wrap_workspace(ws, new_name)
     ws.limits[ax1.name] = [ax1.getMinimum(), ax1.getMaximum(), np.max(step1)]
     ws.limits[ax2.name] = [ax2.getMinimum(), ax2.getMaximum(), np.max(step2)]
     return ws
@@ -263,19 +266,20 @@ def combine_workspace(selected_workspaces, new_name):
 
 def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
-    sum_ws = MergeRuns(InputWorkspaces=selected_ws, OutputWorkspace=out_ws_name, StoreInADS=False)
-    propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws, out_ws_name)
+    sum_ws = run_alg('MergeRuns', output_name=out_ws_name, InputWorkspaces=selected_ws)
+    propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
     bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = Scale(bg_ws, ssf, StoreInADS=False)
+    scaled_bg_ws = run_alg('Scale', output_name='scaled_bg_ws', Store=False, InputWorkspace=bg_ws, Factor=ssf,
+                           StoreInADS=False)
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result = Minus(LHSWorkspace=ws.raw_ws, RHSWorkspace=scaled_bg_ws, OutputWorkspace=ws_name + '_subtracted',
-                           StoreInADS=False)
-            propagate_properties(ws, result, ws_name + '_subtracted')
+            result = run_alg('Minus', output_name=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
+                             RHSWorkspace=scaled_bg_ws)
+            propagate_properties(ws, result)
     except ValueError as e:
         raise ValueError(e)
 
@@ -400,7 +404,7 @@ def _get_exp_info_using(raw_ws, get_exp_info):
     return prev
 
 
-def propagate_properties(old_workspace, new_workspace, new_ws_name):
+def propagate_properties(old_workspace, new_workspace):
     """Propagates MSlice only properties of workspaces, e.g. limits"""
     new_workspace.ef_defined = old_workspace.ef_defined
     new_workspace.e_mode = old_workspace.e_mode

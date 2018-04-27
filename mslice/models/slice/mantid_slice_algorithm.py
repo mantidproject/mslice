@@ -2,7 +2,6 @@ from __future__ import (absolute_import, division, print_function)
 from six import string_types
 import numpy as np
 
-from mantid.simpleapi import BinMD, LoadCIF, SofQW3, ConvertSpectrumAxis, Rebin2D
 from mantid.api import MDNormalization, WorkspaceUnitValidator
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
@@ -10,7 +9,7 @@ from scipy import constants
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, get_workspace_name,
-                                                                      propagate_properties)
+                                                                      propagate_properties, run_alg)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
@@ -53,9 +52,9 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
         ws_name = get_workspace_name(workspace)
-        thisslice = BinMD(InputWorkspace=raw_ws, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
-                          OutputWorkspace='__' + ws_name, StoreInADS=False)
-        propagate_properties(workspace, thisslice, '__' + ws_name)
+        thisslice = run_alg('BinMD', output_name='__' + ws_name, InputWorkspace=raw_ws, AxisAligned="1",
+                            AlignedDim0=xbinning, AlignedDim1=ybinning)
+        propagate_properties(workspace, thisslice)
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:
@@ -78,14 +77,14 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         ebin = '%f, %f, %f' % (axes[e_axis].start, axes[e_axis].step, axes[e_axis].end)
         qbin = '%f, %f, %f' % (axes[q_axis].start, axes[q_axis].step, axes[q_axis].end)
         if axes[q_axis].units == '|Q|':
-            thisslice = SofQW3(InputWorkspace=workspace.raw_ws, QAxisBinning=qbin, EAxisBinning=ebin,
-                               EMode=workspace.e_mode, OutputWorkspace='__' + ws_name, StoreInADS=False)
+            thisslice = run_alg('SofQW3', output_name='__' + ws_name, store=False, InputWorkspace=workspace,
+                                QAxisBinning=qbin, EAxisBinning=ebin, EMode=workspace.e_mode)
         else:
-            thisslice = ConvertSpectrumAxis(InputWorkspace=workspace.raw_ws, Target='Theta', StoreInADS=False)
-            thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin,
-                                OutputWorkspace='__' + ws_name, StoreInADS=False)
+            thisslice = run_alg('ConvertSpectrumAxis', store=False, InputWorkspace=workspace, Target='Theta')
+            thisslice = run_alg('Rebin2D', output_name='__' + ws_name, InputWorkspace=thisslice, Axis1Binning=ebin,
+                                Axis2Binning=qbin)
         plot_data = thisslice.extractY()
-        propagate_properties(workspace, thisslice, '__' + ws_name)
+        propagate_properties(workspace, thisslice)
         if e_axis == 0:
             plot_data = np.transpose(plot_data)
         return plot_data
@@ -260,7 +259,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def _crystal_structure(self, ws_name, element, cif_file):
         if cif_file:
             ws = get_workspace_handle(ws_name).raw_ws
-            LoadCIF(ws, cif_file, StoreInADS=False)
+            run_alg('LoadCIF', store=False, InputWorkspace=ws, InputFile=cif_file)
             return ws.sample().getCrystalStructure()
         else:
             return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],

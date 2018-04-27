@@ -1,9 +1,8 @@
 from __future__ import (absolute_import, division, print_function)
 import os.path
 from mantid.api import MDNormalization
-from mantid.simpleapi import CreateMDHistoWorkspace, SaveMD, SaveNexus, SaveAscii
 from mslice.util.qt.QtWidgets import QFileDialog
-from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle, run_alg
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 import numpy as np
@@ -46,21 +45,21 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 def save_nexus(workspace, path, is_slice):
     if isinstance(workspace, HistogramWorkspace):
         if is_slice:
-            SaveMD(InputWorkspace=get_workspace_handle(workspace.raw_ws.name()[2:]), Filename=path)
+            run_alg('SaveMD', InputWorkspace=get_workspace_handle(workspace.name[2:]), Filename=path)
         else:
-            SaveMD(InputWorkspace=workspace.raw_ws, Filename=path)
+            run_alg('SaveMD', InputWorkspace=workspace, Filename=path)
     else:
-        SaveNexus(InputWorkspace=workspace.raw_ws, Filename=path)
+        run_alg('SaveNexus', InputWorkspace=workspace, Filename=path)
 
 
 def save_ascii(workspace, path, is_slice):
     if isinstance(workspace, HistogramWorkspace):
         if is_slice:
-            _save_slice_to_ascii(workspace.raw_ws, path)
+            _save_slice_to_ascii(workspace, path)
         else:
-            _save_cut_to_ascii(workspace.raw_ws, workspace.raw_ws.name(), path)
+            _save_cut_to_ascii(workspace, workspace.name, path)
     else:
-        SaveAscii(InputWorkspace=workspace.raw_ws, Filename=path)
+        run_alg('SaveAscii', InputWorkspace=workspace, Filename=path)
 
 
 def save_matlab(workspace, path, is_slice):
@@ -99,7 +98,7 @@ def _save_cut_to_ascii(workspace, ws_name, output_path):
 
 
 def _save_slice_to_ascii(workspace, output_path):
-    header = 'MSlice Slice of workspace "%s"' % (workspace.raw_ws.name())
+    header = 'MSlice Slice of workspace "%s"' % (workspace.name)
     x, y, e = _get_slice_mdhisto_xye(workspace.raw_ws)
     dim_sz = [workspace.raw_ws.getDimension(i).getNBins() for i in range(workspace.raw_ws.getNumDims())]
     nbins = np.prod(dim_sz)
@@ -119,8 +118,8 @@ def load_from_ascii(file_path, ws_name):
     extents = str(np.min(x)) + ',' + str(np.max(x))
     nbins = len(x)
     units = header[header.find('along "'):header.find('" between')]
-    CreateMDHistoWorkspace(SignalInput=y, ErrorInput=e, Dimensionality=1, Extents=extents, NumberOfBins=nbins,
-                           Names='Dim1', Units=units, OutputWorkspace=ws_name, StoreInADS=False)
+    run_alg('CreateMDHistoWorkspace', output_name=ws_name, SignalInput=y, ErrorInput=e, Dimensionality=1,
+            Extents=extents, NumberOfBins=nbins, Names='Dim1', Units=units)
 
 
 def _get_md_histo_xye(histo_ws):
