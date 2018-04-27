@@ -46,8 +46,8 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                         load(filename=file_paths[i], output_workspace=ws_name)
                 except ValueError as e:
                     self._view.error_loading_workspace(e)
-                except RuntimeError:
-                    not_opened.append(ws_name)
+                # except RuntimeError:
+                #     not_opened.append(ws_name)
                 else:
                     if not allChecked:
                         allChecked = self.check_efixed(ws_name, multi)

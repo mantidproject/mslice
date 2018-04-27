@@ -12,6 +12,7 @@ from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 
 from mantid.simpleapi import (Load, Scale, RenameWorkspace,
                               MergeMD, MergeRuns, Minus)
+import mantid.simpleapi as mantid_algs
 
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -55,6 +56,13 @@ def get_workspace_handle(workspace_name):
     if isinstance(workspace_name, Workspace):
         return workspace_name
     return _loaded_workspaces[workspace_name]
+
+
+def run_alg(alg_name, output_name, store=True, **kwargs):
+    ws = getattr(mantid_algs, alg_name)(**kwargs)
+    if store:
+        ws = wrap_workspace(ws, output_name)
+    return ws
 
 
 def get_workspace_names():
@@ -209,8 +217,8 @@ def _get_theta_for_limits_event(ws):
 
 
 def load(filename, output_workspace):
-    ws = Load(Filename=filename, OutputWorkspace=output_workspace)
-    wrapped = wrap_workspace(ws)
+    wrapped = run_alg('Load', output_name=output_workspace, Filename=filename, OutputWorkspace=output_workspace)
+    # wrapped = wrap_workspace(ws)
     wrapped.e_mode = get_EMode(ws)
     if wrapped.e_mode == 'Indirect':
         _processEfixed(wrapped)
@@ -393,12 +401,10 @@ def _get_exp_info_using(raw_ws, get_exp_info):
 
 def propagate_properties(old_workspace, new_workspace):
     """Propagates MSlice only properties of workspaces, e.g. limits"""
-    new_ws = wrap_workspace(new_workspace)
-    new_ws.ef_defined = old_workspace.ef_defined
-    new_ws.e_mode = old_workspace.e_mode
-    new_ws.limits = old_workspace.limits
-    new_ws.is_PSD = old_workspace.is_PSD
-    return new_ws
+    new_workspace.ef_defined = old_workspace.ef_defined
+    new_workspace.e_mode = old_workspace.e_mode
+    new_workspace.limits = old_workspace.limits
+    new_workspace.is_PSD = old_workspace.is_PSD
 
 
 def getComment(workspace):
