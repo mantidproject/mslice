@@ -30,7 +30,6 @@ m2A = 1.e10  # metres to Angstrom
 
 _loaded_workspaces = {}
 
-
 class Axis(object):
     def __init__(self, units, start, end, step):
         self.units = units
@@ -57,12 +56,16 @@ def get_workspace_handle(workspace_name):
 
 
 def run_alg(alg_name, output_name=None, store=True, **kwargs):
+    return run_algorithm(getattr(mantid_algs, alg_name), output_name, store, **kwargs)
+
+
+def run_algorithm(algorithm, output_name=None, store=True, **kwargs):
     if isinstance(kwargs.get('InputWorkspace'), Workspace):
         kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
     if output_name is not None:
         kwargs['OutputWorkspace'] = output_name
 
-    ws = getattr(mantid_algs, alg_name)(**kwargs)
+    ws = algorithm(**kwargs)
 
     if store:
         ws = wrap_workspace(ws, output_name)

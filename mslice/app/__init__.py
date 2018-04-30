@@ -2,7 +2,10 @@
 and entry points.
 """
 
+from mantid.api import AlgorithmFactory
 from mslice.util.qt.QtWidgets import QApplication
+from mantid.simpleapi import _translate
+from mslice.models.projection.powder.make_projection import MakeProjection
 
 
 # Module-level reference to keep main window alive after show_gui has returned
@@ -20,6 +23,8 @@ def show_gui():
     If this is the first call then an instance of the Windows is cached to ensure it
     survives for the duration of the application
     """
+    AlgorithmFactory.subscribe(MakeProjection)
+    _translate()
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow
