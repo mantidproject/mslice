@@ -232,6 +232,3 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         errors = workspace.get_variance() / (average_event_range**2)
         workspace.raw_ws.setErrorSquaredArray(errors)
         workspace.raw_ws.setComment("Normalized By MSlice")
-
-    def _was_previously_normalized(self, workspace):
-        return workspace.getComment() == "Normalized By MSlice"

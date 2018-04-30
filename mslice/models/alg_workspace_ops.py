@@ -1,5 +1,5 @@
 import numpy as np
-from mslice.models.workspacemanager.mantid_workspace_provider import getComment, get_workspace_handle
+from mslice.models.workspacemanager.mantid_workspace_provider import get_comment, get_workspace_handle
 
 class AlgWorkspaceOps(object):
 
@@ -10,8 +10,8 @@ class AlgWorkspaceOps(object):
         workspace = get_workspace_handle(workspace)
         return tuple(workspace.limits[dimension_name])
 
-    def getComment(self, workspace):
-        return getComment(workspace)
+    def get_comment(self, workspace):
+        return get_comment(workspace)
 
     def _fill_in_missing_input(self,axis,workspace):
         dim = workspace.getDimensionIndexByName(axis.units)
