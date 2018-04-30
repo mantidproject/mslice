@@ -55,6 +55,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         thisslice = run_alg('BinMD', output_name='__' + ws_name, InputWorkspace=raw_ws, AxisAligned="1",
                             AlignedDim0=xbinning, AlignedDim1=ybinning)
         propagate_properties(workspace, thisslice)
+        thisslice = thisslice.raw_ws
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:
