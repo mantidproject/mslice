@@ -7,7 +7,7 @@ It uses mantid to perform the workspace operations
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 import os.path
-from six import string_types
+from six import string_types, iterkeys
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 
 import mantid.simpleapi as mantid_algs
@@ -57,7 +57,7 @@ def get_workspace_handle(workspace_name):
 
 
 def run_alg(alg_name, output_name=None, store=True, **kwargs):
-    if 'InputWorkspace' in kwargs.keys() and isinstance(kwargs['InputWorkspace'], Workspace):
+    if isinstance(kwargs.get('InputWorkspace'), Workspace):
         kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
     if output_name is not None:
         kwargs['OutputWorkspace'] = output_name
@@ -70,7 +70,7 @@ def run_alg(alg_name, output_name=None, store=True, **kwargs):
 
 
 def get_workspace_names():
-    return [key for key in _loaded_workspaces.keys() if key[:2] != '__']
+    return [key for key in iterkeys(_loaded_workspaces) if key[:2] != '__']
 
 
 def get_workspace_name(workspace):
@@ -87,7 +87,7 @@ def delete_workspace(workspace):
 
 
 def workspace_exists(ws_name):
-    return True if ws_name in _loaded_workspaces.keys() else False
+    return ws_name in _loaded_workspaces
 
 
 def get_limits(workspace, axis):
@@ -412,8 +412,7 @@ def propagate_properties(old_workspace, new_workspace):
     new_workspace.is_PSD = old_workspace.is_PSD
 
 
-
-def getComment(workspace):
+def get_comment(workspace):
     if hasattr(workspace, 'getComment'):
         return workspace.getComment()
     ws_handle = get_workspace_handle(workspace)

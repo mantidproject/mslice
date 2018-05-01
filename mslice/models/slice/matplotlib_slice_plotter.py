@@ -3,6 +3,7 @@ from matplotlib.colors import Normalize
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.util import MPL_COMPAT
+from mslice.models.workspacemanager.mantid_workspace_provider import get_comment
 from ..labels import get_display_name, recoil_labels
 
 overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
@@ -58,7 +59,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             x_axis = momentum_axis
             y_axis = energy_axis
-        comment = self._slice_algorithm.getComment(str(workspace_name))
+        comment = get_comment(str(workspace_name))
         plt.xlabel(get_display_name(x_axis.units, comment), picker=picker)
         plt.ylabel(get_display_name(y_axis.units, comment), picker=picker)
         plt.xlim(x_axis.start)
