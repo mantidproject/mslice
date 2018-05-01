@@ -4,8 +4,8 @@ from mock import patch
 import numpy as np
 import unittest
 
+from mslice.models.axis import Axis
 from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-from mslice.presenters.slice_plotter_presenter import Axis
 
 
 def invert_axes(matrix):

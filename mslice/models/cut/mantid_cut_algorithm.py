@@ -5,8 +5,8 @@ from mantid.api import MDNormalization, WorkspaceUnitValidator
 
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, delete_workspace,
-                                                                      workspace_exists, run_alg)
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, delete_workspace,
+                                                               workspace_exists, run_alg)
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
