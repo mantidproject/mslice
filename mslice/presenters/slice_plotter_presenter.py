@@ -1,7 +1,8 @@
 from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
+from mslice.models.axis import Axis
 from mslice.models.slice.slice_plotter import SlicePlotter
-from mslice.models.workspacemanager.mantid_workspace_provider import Axis, get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.slice_plotter_view import SlicePlotterView
 from mslice.widgets.slice.command import Command

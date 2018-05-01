@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 import os
 
 from .busy import show_busy
-from mslice.models.workspacemanager.mantid_workspace_provider import load, get_workspace_handle, get_workspace_names
+from mslice.models.workspacemanager.workspace_provider import load, get_workspace_handle, get_workspace_names
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.models.workspacemanager.file_io import load_from_ascii

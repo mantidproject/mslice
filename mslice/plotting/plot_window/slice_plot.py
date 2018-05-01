@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
-from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from .interactive_cut import InteractiveCut
 from .plot_options import SlicePlotOptions
 
