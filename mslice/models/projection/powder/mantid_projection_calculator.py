@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import uuid
 from mantid.simpleapi import DeleteWorkspace
-from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle, propagate_properties, run_alg
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, propagate_properties, run_alg
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 
 # unit labels

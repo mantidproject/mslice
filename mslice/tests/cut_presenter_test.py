@@ -6,12 +6,11 @@ import warnings
 
 from six import string_types
 
+from mslice.models.axis import Axis
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
-from mslice.models.workspacemanager.workspace_provider import WorkspaceProvider
 from mslice.presenters.cut_presenter import CutPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
-from mslice.presenters.slice_plotter_presenter import Axis
 from mslice.widgets.cut.command import Command
 from mslice.views.cut_view import CutView
 
@@ -72,8 +71,6 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
         self.cut_algorithm.set_cut_axis = mock.Mock
         self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
-        self.cut_plotter.workspace_provider = mock.create_autospec(WorkspaceProvider)
-        self.cut_plotter.workspace_provider.is_PSD = mock.Mock(return_value=True)
         ws_mock = mock.Mock()
         ws_mock.is_PSD = False
         get_ws_handle_mock.return_value = ws_mock
@@ -106,8 +103,6 @@ class CutPresenterTest(unittest.TestCase):
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
         self.cut_algorithm.is_cuttable = mock.Mock(return_value=False)
         self.cut_algorithm.is_cut = mock.Mock(return_value=False)
-        self.cut_plotter.workspace_provider = mock.create_autospec(WorkspaceProvider)
-        self.cut_plotter.workspace_provider.is_PSD = mock.Mock(return_value=True)
         cut_presenter.workspace_selection_changed()
         self.view.clear_input_fields.assert_called_with()
         self.view.disable.assert_called_with()
@@ -392,8 +387,6 @@ class CutPresenterTest(unittest.TestCase):
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
         self.cut_algorithm.is_cuttable = mock.Mock(return_value=True)
-        self.cut_plotter.workspace_provider = mock.create_autospec(WorkspaceProvider)
-        self.cut_plotter.workspace_provider.is_PSD = mock.Mock(return_value=True)
         available_dimensions = ["dim1", "dim2"]
         self.cut_algorithm.get_available_axis = mock.Mock(return_value=available_dimensions)
         self.cut_algorithm.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
