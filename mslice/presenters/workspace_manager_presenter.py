@@ -5,11 +5,11 @@ from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, get_workspace_name,
-                                                                      get_workspace_names, save_workspaces,
-                                                                      delete_workspace, rename_workspace, subtract,
-                                                                      is_pixel_workspace, combine_workspace,
-                                                                      add_workspace_runs)
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
+                                                               get_workspace_names, save_workspaces,
+                                                               delete_workspace, rename_workspace, subtract,
+                                                               is_pixel_workspace, combine_workspace,
+                                                               add_workspace_runs)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter

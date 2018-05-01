@@ -2,12 +2,12 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 from mock import patch
 import unittest
-from mslice.models.workspacemanager.mantid_workspace_provider import (delete_workspace,
-                                                                      get_workspace_names, subtract,
-                                                                      get_workspace_handle, add_workspace_runs,
-                                                                      combine_workspace, rename_workspace,
-                                                                      propagate_properties, get_limits, run_alg)
-from mslice.models.workspacemanager.mantid_workspace_provider import _processEfixed
+from mslice.models.workspacemanager.workspace_provider import (delete_workspace,
+                                                               get_workspace_names, subtract,
+                                                               get_workspace_handle, add_workspace_runs,
+                                                               combine_workspace, rename_workspace,
+                                                               propagate_properties, get_limits, run_alg)
+from mslice.models.workspacemanager.workspace_provider import _processEfixed
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
 
@@ -39,7 +39,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [2.0] * 20)
         np.testing.assert_array_almost_equal(self.test_ws_2d.raw_ws.dataY(0), [1] * 20)
 
-    @patch('mslice.models.workspacemanager.mantid_workspace_provider._original_step_size')
+    @patch('mslice.models.workspacemanager.workspace_provider._original_step_size')
     def test_combine_workspace(self, step_mock):
         ws_2 = run_alg('CloneWorkspace', output_name='ws_2', InputWorkspace=self.test_ws_md)
         step_mock.return_value = 1
@@ -73,7 +73,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.assertEqual(limits[1], 2)
         self.assertEqual(limits[2], 1)
 
-    @patch('mslice.models.workspacemanager.mantid_workspace_provider._original_step_size')
+    @patch('mslice.models.workspacemanager.workspace_provider._original_step_size')
     def test_get_limits_100_steps(self, step_mock):
         self.test_ws_md.limits = {}
         step_mock.return_value = 1

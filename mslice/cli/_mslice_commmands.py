@@ -12,7 +12,7 @@ from mantid.kernel.funcinspect import lhs_info as _lhs_info
 from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F401
 
 # Helper tools
-from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.slice_plotter_presenter import Axis as _Axis
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator

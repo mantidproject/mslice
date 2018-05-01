@@ -1,9 +1,9 @@
 from matplotlib.widgets import RectangleSelector
 
-from mslice.presenters.slice_plotter_presenter import Axis
+from mslice.models.axis import Axis
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
-from mslice.models.workspacemanager.mantid_workspace_provider import (get_workspace_handle, get_limits,
-                                                                      get_workspace_name)
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_limits,
+                                                               get_workspace_name)
 
 
 class InteractiveCut(object):
