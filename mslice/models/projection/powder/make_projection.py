@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 import uuid
-from mantid.api import *
+from mantid.api import PythonAlgorithm, MatrixWorkspaceProperty, IMDEventWorkspaceProperty
 from mantid.kernel import FloatArrayProperty, Direction, StringMandatoryValidator
 from mantid.simpleapi import (DeleteWorkspace, TransformMD, SliceMD, PreprocessDetectorsToMD, ConvertToMD, SofQW3,
                               ConvertSpectrumAxis)
@@ -77,7 +77,7 @@ class MakeProjection(PythonAlgorithm):
             limits = self.getProperty('Limits').value
             limits = ','.join([str(limits[i]) for i in [0, 2, 1]])
             retval = SofQW3(InputWorkspace=input_workspace,
-                             QAxisBinning=limits, Emode=emode)
+                            QAxisBinning=limits, Emode=emode)
             retval = ConvertToMD(InputWorkspace=retval, QDimensions='CopyToMD', PreprocDetectorsWS='-', dEAnalysisMode=emode)
             if axis1 == MOD_Q_LABEL:
                 retval = self._flip_axes(retval)
@@ -95,4 +95,3 @@ class MakeProjection(PythonAlgorithm):
         if axis1 == THETA_LABEL:
             retval = self._flip_axes(retval)
         return retval
-

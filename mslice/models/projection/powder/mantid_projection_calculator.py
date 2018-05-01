@@ -44,8 +44,8 @@ class MantidProjectionCalculator(ProjectionCalculator):
         if units == WAVENUMBER_LABEL:
             output_workspace_name += '_cm'
 
-        new_ws = run_algorithm(s_api.MakeProjection, output_name=output_workspace_name, InputWorkspace=workspace, Axis1=axis1,
-                         Axis2=axis2, Units=units, EMode=workspace.e_mode, Limits=workspace.limits['MomentumTransfer'],
-                         ProjectionType=projection_type)
+        new_ws = run_algorithm(s_api.MakeProjection, output_name=output_workspace_name, InputWorkspace=workspace,
+                               Axis1=axis1, Axis2=axis2, Units=units, EMode=workspace.e_mode,
+                               Limits=workspace.limits['MomentumTransfer'], ProjectionType=projection_type)
         propagate_properties(workspace, new_ws)
         return new_ws
