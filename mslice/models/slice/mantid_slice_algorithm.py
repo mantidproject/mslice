@@ -28,8 +28,9 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = get_workspace_handle(selected_workspace)
-        slice =  run_algorithm(s_api.Slice, output_name = '__' + workspace.name, InputWorkspace=workspace, XAxis=x_axis,
-                               YAxis=y_axis, PSD=workspace.is_PSD, EMode=workspace.e_mode, NormToOne=norm_to_one)
+        slice =  run_algorithm(s_api.Slice, output_name = '__' + workspace.name, InputWorkspace=workspace,
+                               XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
+                               EMode=workspace.e_mode, NormToOne=norm_to_one)
         plot_data = self.plot_data_from_slice(workspace, slice, x_axis, workspace.is_PSD)
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)

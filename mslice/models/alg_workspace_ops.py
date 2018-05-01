@@ -13,7 +13,7 @@ class AlgWorkspaceOps(object):
     def get_comment(self, workspace):
         return get_comment(workspace)
 
-    def _fill_in_missing_input(self,axis,workspace):
+    def _fill_in_missing_input(self, axis, workspace):
         dim = workspace.getDimensionIndexByName(axis.units)
         dim = workspace.getDimension(dim)
 

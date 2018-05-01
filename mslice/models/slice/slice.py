@@ -1,49 +1,53 @@
 from mantid.api import PythonAlgorithm, WorkspaceProperty, IMDEventWorkspace
 from mantid.kernel import Direction, StringMandatoryValidator, PropertyManagerProperty
 from mantid.simpleapi import BinMD, Rebin2D, ConvertSpectrumAxis, SofQW3
+from mslice.models.alg_workspace_ops import AlgWorkspaceOps
+from mslice.models.axis import Axis
 
 
-class Slice(PythonAlgorithm):
+class Slice(AlgWorkspaceOps, PythonAlgorithm):
 
     def PyInit(self):
         self.declareProperty(WorkspaceProperty('InputWorkspace', "", direction=Direction.Input))
-        self.declareProperty('XAxis', '')
-        self.declareProperty('YAxis', '')
+        self.declareProperty(PropertyManagerProperty('XAxis', {}, direction=Direction.Input),
+                             doc='MSlice Axis object as a dictionary')
+        self.declareProperty(PropertyManagerProperty('YAxis', {}, direction=Direction.Input),
+                             doc='MSlice Axis object as a dictionary')
         self.declareProperty('EMode', 'Direct', StringMandatoryValidator())
         self.declareProperty('PSD', False)
         self.declareProperty('NormToOne', False)
         self.declareProperty(WorkspaceProperty('OutputWorkspace', '', direction=Direction.Output))
 
     def PyExec(self):
-        workspace = self.getProperty('InputWorkspace')
-        x_axis = self.getProperty('XAxis')
-        y_axis = self.getProperty('YAxis')
+        workspace = self.getProperty('InputWorkspace').value
+        x_dict = self.getProperty('XAxis').value
+        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value)
+        y_dict = self.getProperty('YAxis').value
+        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value)
         norm_to_one = self.getProperty('NormToOne')
         if self.getProperty('PSD').value:
             slice = self._compute_slice_PSD(workspace, x_axis, y_axis, norm_to_one)
         else:
-            e_mode = self.getProperty('EMode')
+            e_mode = self.getProperty('EMode').value
             slice = self._compute_slice_nonPSD(workspace, x_axis, y_axis, e_mode, norm_to_one)
         self.setProperty('OutputWorkspace', slice)
-
 
     def category(self):
         return 'MSlice'
 
     def _compute_slice_PSD(self, workspace, x_axis, y_axis, norm_to_one):
         assert isinstance(workspace, IMDEventWorkspace)
-        raw_ws = workspace.raw_ws
-        self._fill_in_missing_input(x_axis, raw_ws)
-        self._fill_in_missing_input(y_axis, raw_ws)
+        self._fill_in_missing_input(x_axis, workspace)
+        self._fill_in_missing_input(y_axis, workspace)
         n_x_bins = self._get_number_of_steps(x_axis)
         n_y_bins = self._get_number_of_steps(y_axis)
-        x_dim_id = raw_ws.getDimensionIndexByName(x_axis.units)
-        y_dim_id = raw_ws.getDimensionIndexByName(y_axis.units)
-        x_dim = raw_ws.getDimension(x_dim_id)
-        y_dim = raw_ws.getDimension(y_dim_id)
+        x_dim_id = workspace.getDimensionIndexByName(x_axis.units)
+        y_dim_id = workspace.getDimensionIndexByName(y_axis.units)
+        x_dim = workspace.getDimension(x_dim_id)
+        y_dim = workspace.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
-        return BinMD(InputWorkspace=raw_ws, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
+        return BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
                      StoreInADS=False)
 
     def _compute_slice_nonPSD(self, workspace, x_axis, y_axis, e_mode, norm_to_one):
