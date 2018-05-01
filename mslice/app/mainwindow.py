@@ -44,12 +44,6 @@ class MainWindow(MainView, QMainWindow):
         self._presenter = MainPresenter(self, self.workspace_presenter, dataloader_presenter,
                                         slice_presenter, powder_presenter, self.cut_presenter)
 
-        workspace_provider = self.workspace_presenter.get_workspace_provider()
-        dataloader_presenter.set_workspace_provider(workspace_provider)
-        powder_presenter.set_workspace_provider(workspace_provider)
-        slice_presenter.set_workspace_provider(workspace_provider)
-        self.cut_presenter.set_workspace_provider(workspace_provider)
-
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.setup_save()
         self.btnSave.clicked.connect(self.button_save)

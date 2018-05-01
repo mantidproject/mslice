@@ -75,15 +75,11 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         if axes[curr_axis] != self._available_axes[-1] and axes[other_axis] != self._available_axes[-1]:
             axes_set[other_axis](self._available_axes[-1])
 
-    def set_workspace_provider(self, workspace_provider):
-        self._projection_calculator.set_workspace_provider(workspace_provider)
-
     def workspace_selection_changed(self):
         workspace_selection = self._main_presenter.get_selected_workspaces()
         try:
             for workspace in workspace_selection:
                 self._projection_calculator.validate_workspace(workspace)
-                self._projection_calculator.get_emode(workspace)
         except TypeError as e:
             self._powder_view.disable_calculate_projections(True)
             self._powder_view.display_projection_error(str(e))

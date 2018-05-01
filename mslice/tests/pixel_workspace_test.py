@@ -17,7 +17,7 @@ class PixelWorkspaceTest(unittest.TestCase):
         cls.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="convert_ws", QDimensions='|Q|',
                                     dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                     SplitInto='50,50')
-        cls.workspace = PixelWorkspace(cls.workspace)
+        cls.workspace = PixelWorkspace(cls.workspace, 'convert_ws')
 
     def test_invalid_workspace(self):
         self.assertRaises(TypeError, lambda: PixelWorkspace(4))

@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
 from .workspace_mixin import run_child_alg
+from mantid.simpleapi import CreateMDHistoWorkspace, ReplicateMD
 
 
 class HistoMixin(object):
@@ -32,11 +33,12 @@ class HistoMixin(object):
         min = np.amin(other)
         max = np.amax(other)
         size = other.size
-        ws = run_child_alg('CreateMDHistoWorkspace', Dimensionality=1, Extents='' + str(min) + ',' + str(max),
-                           SignalInput=other, ErrorInput=other, NumberOfBins=str(size),
-                           Names=self._raw_ws.getDimension(0).getName(), Units='MomentumTransfer')
+        ws = CreateMDHistoWorkspace(Dimensionality=1, Extents='' + str(min) + ',' + str(max),
+                                    SignalInput=other, ErrorInput=other, NumberOfBins=str(size),
+                                    Names=self._raw_ws.getDimension(0).getName(), Units='MomentumTransfer',
+                                    StoreInADS=False)
         try:
-            replicated = run_child_alg('ReplicateMD', ShapeWorkspace=self._raw_ws, DataWorkspace=ws)
+            replicated = ReplicateMD(ShapeWorkspace=self._raw_ws, DataWorkspace=ws)
         except RuntimeError:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
         # return operator(self._raw_ws, replicated)

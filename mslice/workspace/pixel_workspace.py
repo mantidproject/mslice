@@ -11,7 +11,7 @@ from mantid.api import IMDEventWorkspace
 class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
     """workspace wrapper for MDEventWorkspace. Converts to HistogramWorkspace internally."""
 
-    def __init__(self, mantid_ws):
+    def __init__(self, mantid_ws, name):
         """Can be initialized with either MDEventWorkspace or HistogramWorkspace wrapper"""
         if isinstance(mantid_ws, IMDEventWorkspace):
             self._raw_ws = mantid_ws
@@ -21,6 +21,12 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
         else:
             raise TypeError("PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got %s"
                             % mantid_ws.__class__.__name__)
+        self.name = name
+        self._cut_params = {}
+        self.limits = {}
+        self.is_PSD = None
+        self.e_mode = None
+        self.e_fixed = None
 
     def rewrap(self, ws):
-        return PixelWorkspace(ws)
+        return PixelWorkspace(ws, self.name)

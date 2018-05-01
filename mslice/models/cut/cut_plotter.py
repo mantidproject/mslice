@@ -1,6 +1,5 @@
 class CutPlotter(object):
     def __init__(self, _cut_algorithm):
-        self.workspace_provider = None
         raise Exception('This class is an interface')
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,

@@ -14,9 +14,5 @@ class PowderProjectionPresenterInterface(object):
         pass
 
     @abc.abstractmethod
-    def set_workspace_provider(self, workspace_provider):
-        pass
-
-    @abc.abstractmethod
     def workspace_selection_changed(self):
         pass
