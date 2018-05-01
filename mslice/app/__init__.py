@@ -6,6 +6,7 @@ from mantid.api import AlgorithmFactory
 from mslice.util.qt.QtWidgets import QApplication
 from mantid.simpleapi import _translate
 from mslice.models.projection.powder.make_projection import MakeProjection
+from mslice.models.slice.slice import Slice
 
 
 # Module-level reference to keep main window alive after show_gui has returned
@@ -24,6 +25,7 @@ def show_gui():
     survives for the duration of the application
     """
     AlgorithmFactory.subscribe(MakeProjection)
+    AlgorithmFactory.subscribe(Slice)
     _translate()
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
