@@ -16,4 +16,3 @@ class Axis(object):
     def __repr__(self):
         info = (self.units, self.start, self.end, self.step)
         return "Axis(" + " ,".join(map(repr, info)) + ")"
-
