@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
 from .cut_plotter import CutPlotter
 from .mantid_cut_algorithm import output_workspace_name
-from mslice.models.workspacemanager.workspace_provider import get_comment
+from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
 
 picker=3

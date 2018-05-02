@@ -15,7 +15,7 @@ from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.plotting.plot_window.base_plot_window import BasePlotWindow
 from mslice.util.qt import load_ui
 from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.workspace_provider import save_workspaces
+from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
 
 # The FigureCanvas & Toolbar are QWidgets so we must import it from the mpl backend that matches
 # the version of Qt we are running with
