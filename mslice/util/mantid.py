@@ -11,6 +11,7 @@ from mslice.workspace.base import WorkspaceBase as Workspace
 
 def initialize_mantid():
     AlgorithmFactory.subscribe(MakeProjection)
+    AlgorithmFactory.subscribe(Slice)
     s_api._create_algorithm_function('MakeProjection', 1, MakeProjection())
     s_api._create_algorithm_function('Slice', 1, Slice())
 
