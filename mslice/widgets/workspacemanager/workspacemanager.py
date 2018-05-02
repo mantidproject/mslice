@@ -3,7 +3,7 @@
 from mslice.util.qt import QT_VERSION
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog
-from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.util.qt import load_ui
 from mslice.views.workspace_view import WorkspaceView

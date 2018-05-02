@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 from mantid.api import MDNormalization
 from mslice.util.qt.QtWidgets import QFileDialog
-from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle, run_alg
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, run_alg
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 import numpy as np

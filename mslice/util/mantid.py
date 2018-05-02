@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory
-from mslice.models.workspacemanager.mantid_workspace_provider import _loaded_workspaces
+from mslice.models.workspacemanager.workspace_provider import _add_workspace
 from mslice.models.projection.powder.make_projection import MakeProjection
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as Workspace

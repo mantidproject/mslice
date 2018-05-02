@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.models.workspacemanager.mantid_workspace_provider import get_workspace_handle, propagate_properties, run_algorithm
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, propagate_properties, run_algorithm
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 import mantid.simpleapi as s_api
 from ...labels import DELTA_E_LABEL, MEV_LABEL, MOD_Q_LABEL, WAVENUMBER_LABEL, THETA_LABEL
