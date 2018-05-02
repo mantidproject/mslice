@@ -8,14 +8,11 @@ It uses mantid to perform the workspace operations
 from __future__ import (absolute_import, division, print_function)
 import os.path
 from six import string_types, iterkeys
-from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
-
-import mantid.simpleapi as mantid_algs
 
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
-from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.util.mantid import run_alg
 import numpy as np
 from scipy import constants
 
@@ -55,21 +52,8 @@ def get_workspace_handle(workspace_name):
     return _loaded_workspaces[workspace_name]
 
 
-def run_alg(alg_name, output_name=None, store=True, **kwargs):
-    return run_algorithm(getattr(mantid_algs, alg_name), output_name, store, **kwargs)
-
-
-def run_algorithm(algorithm, output_name=None, store=True, **kwargs):
-    if isinstance(kwargs.get('InputWorkspace'), Workspace):
-        kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
-    if output_name is not None:
-        kwargs['OutputWorkspace'] = output_name
-
-    ws = algorithm(**kwargs)
-
-    if store:
-        ws = wrap_workspace(ws, output_name)
-    return ws
+def _add_workspace(workspace, name):
+    _loaded_workspaces[name] = workspace
 
 
 def get_workspace_names():
@@ -224,24 +208,12 @@ def _get_theta_for_limits_event(ws):
 
 
 def load(filename, output_workspace):
-    wrapped = run_alg('Load', output_name=output_workspace, Filename=filename)
-    wrapped.e_mode = get_EMode(wrapped.raw_ws)
-    if wrapped.e_mode == 'Indirect':
-        _processEfixed(wrapped)
-    _processLoadedWSLimits(wrapped)
-    return wrapped
-
-
-def wrap_workspace(raw_ws, name):
-    if isinstance(raw_ws, IMDEventWorkspace):
-        wrapped = PixelWorkspace(raw_ws, name)
-    elif isinstance(raw_ws, IMDHistoWorkspace):
-        wrapped = HistogramWorkspace(raw_ws, name)
-    else:
-        wrapped = MatrixWorkspace(raw_ws, name)
-    _loaded_workspaces[name] = wrapped
-    return wrapped
-
+    workspace = run_alg('Load', output_name=output_workspace, Filename=filename)
+    workspace.e_mode = get_EMode(workspace.raw_ws)
+    if workspace.e_mode == 'Indirect':
+        _processEfixed(workspace)
+    _processLoadedWSLimits(workspace)
+    return workspace
 
 def rename_workspace(selected_workspace, new_name):
     workspace = get_workspace_handle(selected_workspace)
