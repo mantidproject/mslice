@@ -15,7 +15,7 @@ from mantid.simpleapi import mtd, ConvertUnits, RenameWorkspace # noqa: F401
 from mslice.app import MAIN_WINDOW
 from mslice.workspace.base import WorkspaceBase as Workspace
 # Helper tools
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
 from mslice.presenters.slice_plotter_presenter import Axis as _Axis
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
@@ -90,30 +90,6 @@ def load(path):
     return get_workspace_handle(ospath.basename(path).split('.')[0])
 
 
-def get_projection(input_workspace, axis1, axis2, units='meV'):
-    """ Calculate projections of workspace.
-
-    Keyword Arguments:
-        input_workspace -- Workspace to project, can be either python handle to workspace or a string containing the
-        workspace name.
-        axis1 -- The first axis of projection (string)
-        axis2 -- The second axis of the projection (string)
-        units -- The energy units (string) [default: 'meV']
-
-    """
-    if isinstance(input_workspace, _Workspace):
-        input_workspace = input_workspace.getName()
-    output_workspace = _POWDER_PROJECTION_MODEL.calculate_projection(input_workspace=input_workspace, axis1=axis1,
-                                                                     axis2=axis2, units=units)
-    try:
-        names = _lhs_info('names')
-    except RuntimeError:
-        names = [output_workspace.getName()]
-    if len(names) > 1:
-        raise Exception('Too many left hand side arguments, %s' % str(names))
-    RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=names[0])
-    return output_workspace
-
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
     """ Calculate projections of workspace.
 
@@ -127,7 +103,11 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
        """
     if isinstance(InputWorkspace, Workspace):
         InputWorkspace = InputWorkspace.name
-    #TODO: more error catching?
+    if not isinstance(InputWorkspace, str):
+        raise TypeError('InputWorkspace must be a workspace or a workspace name')
+    if not workspace_exists(InputWorkspace):
+        raise TypeError('InputWorkspace %s could not be found.' % InputWorkspace)
+
     proj_ws = MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
     MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
     return proj_ws
