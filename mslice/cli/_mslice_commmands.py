@@ -9,11 +9,11 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
 from mantid.api import IMDWorkspace as _IMDWorkspace
-from mantid.api import Workspace as _Workspace
 from mantid.kernel.funcinspect import lhs_info as _lhs_info
 from mantid.simpleapi import mtd, ConvertUnits, RenameWorkspace # noqa: F401
 
 from mslice.app import MAIN_WINDOW
+from mslice.workspace.base import WorkspaceBase as Workspace
 # Helper tools
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.slice_plotter_presenter import Axis as _Axis
@@ -87,6 +87,7 @@ def load(path):
     if not ospath.exists(path):
         raise RuntimeError('could not find the path %s' % path)
     MAIN_WINDOW.dataloader_presenter.load_workspace([path])
+    return get_workspace_handle(ospath.basename(path).split('.')[0])
 
 
 def get_projection(input_workspace, axis1, axis2, units='meV'):
@@ -112,6 +113,25 @@ def get_projection(input_workspace, axis1, axis2, units='meV'):
         raise Exception('Too many left hand side arguments, %s' % str(names))
     RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=names[0])
     return output_workspace
+
+def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
+    """ Calculate projections of workspace.
+
+       Keyword Arguments:
+           InputWorkspace -- Workspace to project, can be either python handle to workspace or a string containing the
+           workspace name.
+           Axis1 -- The first axis of projection (string)
+           Axis2 -- The second axis of the projection (string)
+           Units -- The energy units (string) [default: 'meV']
+
+       """
+    if isinstance(InputWorkspace, Workspace):
+        InputWorkspace = InputWorkspace.name
+    #TODO: more error catching?
+    proj_ws = MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
+    MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
+    return proj_ws
+
 
 def get_slice(input_workspace, x=None, y=None, ret_val='both', normalize=False):
     """ Get Slice from workspace as numpy array.
