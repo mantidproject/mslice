@@ -28,4 +28,3 @@ def run_algorithm(algorithm, output_name=None, store=True, **kwargs):
         ws = wrap_workspace(ws, output_name)
         add_workspace(ws, output_name)
     return ws
-
