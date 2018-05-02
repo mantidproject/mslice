@@ -8,8 +8,8 @@ from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
-                                                               propagate_properties, run_alg)
+from mslice.models.workspacemanager.workspace_algorithms import (propagate_properties, run_alg)
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
