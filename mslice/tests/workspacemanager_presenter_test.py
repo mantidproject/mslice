@@ -10,7 +10,7 @@ from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresen
 from mslice.views.mainview import MainView
 from mslice.views.workspace_view import WorkspaceView
 from mslice.widgets.workspacemanager.command import Command
-from mslice.models.workspacemanager.workspace_algorithms import wrap_workspace
+from mslice.workspace import wrap_workspace
 from mantid.simpleapi import AddSampleLog, CreateWorkspace, CreateSimulationWorkspace, ConvertToMD, CloneWorkspace
 
 
@@ -274,8 +274,10 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.set_workspace_selected.assert_called_once_with([0])
 
     @patch('mslice.presenters.workspace_manager_presenter.combine_workspace')
-    def test_combine_workspace_single_ws(self, combine_ws_mock):
+    @patch('mslice.presenters.workspace_manager_presenter.is_pixel_workspace')
+    def test_combine_workspace_single_ws(self, is_pixel_ws_mock, combine_ws_mock):
         # Checks that it will fail if only one workspace is selected.
+        is_pixel_ws_mock.return_value = True
         self.presenter = WorkspaceManagerPresenter(self.view)
         selected_workspaces = ['ws1']
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
@@ -299,8 +301,10 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         assert(self.view.error_select_more_than_one_workspaces.called)
 
     @patch('mslice.presenters.workspace_manager_presenter.combine_workspace')
-    def test_combine_workspace(self, combine_ws_mock):
+    @patch('mslice.presenters.workspace_manager_presenter.is_pixel_workspace')
+    def test_combine_workspace(self, is_pixel_ws_mock, combine_ws_mock):
         # Now checks it succeeds otherwise
+        is_pixel_ws_mock.return_value = True
         self.presenter = WorkspaceManagerPresenter(self.view)
         selected_workspaces = ['ws1', 'ws2']
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)

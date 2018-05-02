@@ -40,7 +40,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [2.0] * 20)
         np.testing.assert_array_almost_equal(self.test_ws_2d.raw_ws.dataY(0), [1] * 20)
 
-    @patch('mslice.models.workspacemanager.workspace_provider._original_step_size')
+    @patch('mslice.models.workspacemanager.workspace_algorithms._original_step_size')
     def test_combine_workspace(self, step_mock):
         ws_2 = run_alg('CloneWorkspace', output_name='ws_2', InputWorkspace=self.test_ws_md)
         step_mock.return_value = 1
@@ -74,7 +74,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.assertEqual(limits[1], 2)
         self.assertEqual(limits[2], 1)
 
-    @patch('mslice.models.workspacemanager.workspace_provider._original_step_size')
+    @patch('mslice.models.workspacemanager.workspace_algorithms._original_step_size')
     def test_get_limits_100_steps(self, step_mock):
         self.test_ws_md.limits = {}
         step_mock.return_value = 1
