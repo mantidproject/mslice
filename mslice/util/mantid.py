@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory
-from mslice.models.workspacemanager.workspace_provider import _add_workspace
+from mslice.models.workspacemanager.workspace_provider import add_workspace
 from mslice.models.projection.powder.make_projection import MakeProjection
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as Workspace
@@ -10,7 +10,7 @@ from mslice.workspace.base import WorkspaceBase as Workspace
 
 def initialize_mantid():
     AlgorithmFactory.subscribe(MakeProjection)
-    s_api._create_algorithm_function('MakeProjection', 1, MakeProjection)
+    s_api._create_algorithm_function('MakeProjection', 1, MakeProjection())
 
 
 def run_alg(alg_name, output_name=None, store=True, **kwargs):
@@ -26,6 +26,6 @@ def run_algorithm(algorithm, output_name=None, store=True, **kwargs):
 
     if store:
         ws = wrap_workspace(ws, output_name)
-        _add_workspace(ws, output_name)
+        add_workspace(ws, output_name)
     return ws
 

@@ -2,12 +2,13 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 from mock import patch
 import unittest
-from mslice.models.workspacemanager.workspace_provider import (delete_workspace,
-                                                               get_workspace_names, subtract,
-                                                               get_workspace_handle, add_workspace_runs,
-                                                               combine_workspace, rename_workspace,
-                                                               propagate_properties, get_limits, run_alg)
-from mslice.models.workspacemanager.workspace_provider import _processEfixed
+from mslice.models.workspacemanager.workspace_algorithms import (subtract,
+                                                                 add_workspace_runs,
+                                                                 combine_workspace, rename_workspace,
+                                                                 propagate_properties, get_limits, run_alg)
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_names, \
+    delete_workspace
+from mslice.models.workspacemanager.workspace_algorithms import _processEfixed
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
 

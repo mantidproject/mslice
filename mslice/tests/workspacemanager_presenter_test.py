@@ -10,7 +10,7 @@ from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresen
 from mslice.views.mainview import MainView
 from mslice.views.workspace_view import WorkspaceView
 from mslice.widgets.workspacemanager.command import Command
-from mslice.models.workspacemanager.workspace_provider import wrap_workspace
+from mslice.models.workspacemanager.workspace_algorithms import wrap_workspace
 from mantid.simpleapi import AddSampleLog, CreateWorkspace, CreateSimulationWorkspace, ConvertToMD, CloneWorkspace
 
 
