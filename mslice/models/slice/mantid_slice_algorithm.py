@@ -3,7 +3,6 @@ from six import string_types
 import numpy as np
 
 from mantid.api import MDNormalization, WorkspaceUnitValidator
-import mantid.simpleapi as s_api
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
@@ -11,8 +10,9 @@ from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
 
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.util.mantid import run_algorithm, run_alg
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
+from mslice.util.mantid import run_algorithm
+
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
@@ -29,7 +29,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = get_workspace_handle(selected_workspace)
-        slice =  run_algorithm(s_api.Slice, output_name = '__' + workspace.name, InputWorkspace=workspace,
+        slice =  run_algorithm('Slice', output_name = '__' + workspace.name, InputWorkspace=workspace,
                                XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
                                EMode=workspace.e_mode, NormToOne=norm_to_one)
         plot_data = self.plot_data_from_slice(workspace, slice, x_axis, workspace.is_PSD)
@@ -236,7 +236,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def _crystal_structure(self, ws_name, element, cif_file):
         if cif_file:
             ws = get_workspace_handle(ws_name).raw_ws
-            run_alg('LoadCIF', store=False, InputWorkspace=ws, InputFile=cif_file)
+            run_algorithm('LoadCIF', store=False, InputWorkspace=ws, InputFile=cif_file)
             return ws.sample().getCrystalStructure()
         else:
             return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
