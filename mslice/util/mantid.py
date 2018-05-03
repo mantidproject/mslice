@@ -13,16 +13,13 @@ def initialize_mantid():
     s_api._create_algorithm_function('MakeProjection', 1, MakeProjection())
 
 
-def run_alg(alg_name, output_name=None, store=True, **kwargs):
-    return run_algorithm(getattr(s_api, alg_name), output_name, store, **kwargs)
-
-def run_algorithm(algorithm, output_name=None, store=True, **kwargs):
+def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
     if isinstance(kwargs.get('InputWorkspace'), Workspace):
         kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
     if output_name is not None:
         kwargs['OutputWorkspace'] = output_name
 
-    ws = algorithm(**kwargs)
+    ws = getattr(s_api, alg_name)(**kwargs)
 
     if store:
         ws = wrap_workspace(ws, output_name)

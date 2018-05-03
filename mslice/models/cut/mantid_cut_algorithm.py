@@ -4,10 +4,10 @@ import numpy as np
 from mantid.api import MDNormalization, WorkspaceUnitValidator
 
 from .cut_algorithm import CutAlgorithm
-from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
-from mslice.models.workspacemanager.workspace_algorithms import (run_alg)
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, delete_workspace, workspace_exists
 
+from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, delete_workspace, workspace_exists
+from mslice.util.mantid import run_algorithm
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
 from mslice.workspace.histogram_workspace import HistogramWorkspace
@@ -79,8 +79,8 @@ class MantidCutAlgorithm(CutAlgorithm):
         integration_binning = integration_axis.units + "," + str(integration_axis.start) + "," + \
                               str(integration_axis.end) + ",1"
 
-        return run_alg('BinMD', output_name=out_ws_name, InputWorkspace=selected_workspace, AxisAligned="1",
-                       AlignedDim1=integration_binning, AlignedDim0=cut_binning)
+        return run_algorithm('BinMD', output_name=out_ws_name, InputWorkspace=selected_workspace, AxisAligned="1",
+                             AlignedDim1=integration_binning, AlignedDim0=cut_binning)
 
     def _compute_cut_nonPSD(self, input_workspace_name, out_ws_name, selected_workspace, cut_axis, integration_axis):
         cut_binning = " ,".join(map(str, (cut_axis.start, cut_axis.step, cut_axis.end)))
@@ -108,25 +108,27 @@ class MantidCutAlgorithm(CutAlgorithm):
                                             selected_workspace)
         xdim = ws_out.getDimension(idx)
         extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
-        return run_alg('CreateMDHistoWorkspace', output_name=out_ws_name, SignalInput=ws_out.extractY(),
-                       ErrorInput=ws_out.extractE(), Dimensionality=1, Extents=extents,
-                       NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
+        return run_algorithm('CreateMDHistoWorkspace', output_name=out_ws_name, SignalInput=ws_out.extractY(),
+                             ErrorInput=ws_out.extractE(), Dimensionality=1, Extents=extents,
+                             NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
 
     def _cut_nonPSD_theta(self, cut_binning, int_binning, input_workspace_name, out_ws_name, selected_workspace):
         if self._converted_nonpsd and self._converted_nonpsd[0] != input_workspace_name:
             self._converted_nonpsd = None
         if not self._converted_nonpsd:
             self._converted_nonpsd = (input_workspace_name,
-                                      run_alg('ConvertSpectrumAxis', output_name='__convToTheta', store=False,
-                                              InputWorkspace=selected_workspace, Target='theta'))
-        ws_out = run_alg('Rebin2D', output_name=out_ws_name, store=False, InputWorkspace=self._converted_nonpsd[1],
-                         Axis1Binning=int_binning, Axis2Binning=cut_binning)
+                                      run_algorithm('ConvertSpectrumAxis', output_name='__convToTheta', store=False,
+                                                    InputWorkspace=selected_workspace, Target='theta'))
+
+        ws_out = run_algorithm('Rebin2D', output_name=out_ws_name, store=False,
+                               InputWorkspace=self._converted_nonpsd[1], Axis1Binning=int_binning,
+                               Axis2Binning=cut_binning)
         return ws_out
 
     def _cut_nonPSD_momentum(self, q_binning, e_binning, emode, out_ws_name, selected_workspace):
-        ws_out = run_alg('SofQW3', output_name=out_ws_name, store=False, InputWorkspace=selected_workspace,
-                         OutputWorkspace=out_ws_name, EMode=emode, QAxisBinning=q_binning,
-                         EAxisBinning=e_binning)
+        ws_out = run_algorithm('SofQW3', output_name=out_ws_name, store=False, InputWorkspace=selected_workspace,
+                               OutputWorkspace=out_ws_name, EMode=emode, QAxisBinning=q_binning,
+                               EAxisBinning=e_binning)
         return ws_out
 
     def get_arrays_from_workspace(self, workspace):
