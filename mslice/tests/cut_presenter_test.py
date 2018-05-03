@@ -394,9 +394,9 @@ class CutPresenterTest(unittest.TestCase):
         ws_mock.is_PSD = False
         get_ws_handle_mock.return_value = ws_mock
         cut_presenter.workspace_selection_changed()
-        self.cut_algorithm.get_axis_range.assert_any_call(workspace, available_dimensions[0])
-        self.cut_algorithm.get_axis_range.assert_any_call(workspace, available_dimensions[1])
-        self.cut_algorithm.get_axis_range = mock.Mock(side_effect=KeyError)
+        self.get_axis_range.assert_any_call(workspace, available_dimensions[0])
+        self.get_axis_range.assert_any_call(workspace, available_dimensions[1])
+        self.get_axis_range = mock.Mock(side_effect=KeyError)
 
         cut_presenter.workspace_selection_changed()
         self.view.set_minimum_step.assert_called_with(None)

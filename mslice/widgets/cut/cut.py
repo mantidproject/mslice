@@ -59,13 +59,13 @@ class CutWidget(CutView, QWidget):
                 self.error_invalid_cut_step_parameter()
             if value == 0:
                 self.lneCutStep.setText('%.5f' % (self._minimumStep))
-                self._display_error('Setting step size to default.')
+                self.display_error('Setting step size to default.')
             elif value < (self._minimumStep / 100.):
-                self._display_error('Step size too small!')
+                self.display_error('Step size too small!')
                 return False
         return True
 
-    def _display_error(self, error_string):
+    def display_error(self, error_string):
         self.error_occurred.emit(error_string)
 
     def axis_changed(self, _changed_index):
@@ -78,6 +78,9 @@ class CutWidget(CutView, QWidget):
         else:
             self.integrationStack.setCurrentIndex(0)
             self.label_250.hide()
+
+    def integration_axis_shown(self):
+        return self.integration_axis.current_index == 1
 
     def get_presenter(self):
         return self._presenter
@@ -95,7 +98,10 @@ class CutWidget(CutView, QWidget):
         return str(self.lneCutEnd.text())
 
     def get_integration_axis(self):
-        return str(self.cmbIntegrationAxis.currentText())
+        if self.integration_axis_shown:
+            return str(self.cmbIntegrationAxis.currentText())
+        else:
+            return None
 
     def get_integration_start(self):
         return str(self.lneCutIntegrationStart.text())
@@ -125,14 +131,6 @@ class CutWidget(CutView, QWidget):
             self.cmbCutAxis.setCurrentIndex(index[0])
             self.cmbCutAxis.blockSignals(False)
 
-    def update_integration_axis(self):
-        # For non-PSD mode only. Assumes that if we have 3 options for the cut axis we are in non-PSD mode
-        # (e.g. will have to change code for single crystal).
-        if self.cmbCutAxis.count() == 3:
-            # Assumes the axes are in order: ['|Q|', 'Degrees', 'DeltaE']
-            axis_name = ['|Q|', 'Degrees'] if self.cmbCutAxis.currentIndex() == 2 else ['DeltaE']
-            self.populate_integration_axis_options(axis_name)
-
     def set_minimum_step(self, value):
         self._minimumStep = value
 
@@ -151,6 +149,7 @@ class CutWidget(CutView, QWidget):
         self.cmbIntegrationAxis.clear()
         for option in options:
             self.cmbIntegrationAxis.addItem(option)
+        self.cmbIntegrationAxis.setEnabled(len(options) > 1)
         self.cmbIntegrationAxis.blockSignals(False)
 
     def populate_cut_params(self, cut_start=None, cut_end=None, cut_step=None):
@@ -260,27 +259,3 @@ class CutWidget(CutView, QWidget):
     def force_normalization(self):
         self.rdoCutNormToOne.setEnabled(False)
         self.rdoCutNormToOne.setChecked(True)
-
-    def error_invalid_width(self):
-        self._display_error("Invalid value for cut width")
-
-    def error_current_selection_invalid(self):
-        self._display_error("Cutting for the current workspace selection is not supported")
-
-    def error_select_a_workspace(self):
-        self._display_error("Please select a workspace to cut")
-
-    def error_invalid_cut_axis_parameters(self):
-        self._display_error("Invalid cut axis parameters")
-
-    def error_invalid_cut_step_parameter(self):
-        self._display_error("Invalid cut step parameter. Using default.")
-
-    def error_invalid_integration_parameters(self):
-        self._display_error("Invalid parameters for integration")
-
-    def error_invalid_intensity_parameters(self):
-        self._display_error("Invalid intensity range")
-
-    def clear_displayed_error(self):
-        self._display_error("")

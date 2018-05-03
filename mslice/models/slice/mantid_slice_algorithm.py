@@ -7,7 +7,7 @@ from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionCon
 from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
-from mslice.models.alg_workspace_ops import AlgWorkspaceOps
+from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import (propagate_properties, run_alg)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -22,7 +22,7 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
                      'Tantalum': ['3.3013 3.3013 3.3013', 'I m -3 m', 'Ta 0 0 0 1.0 0.05']}
 
 
-class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
+class MantidSliceAlgorithm(SliceAlgorithm):
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = get_workspace_handle(selected_workspace)
@@ -41,10 +41,10 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
     def _compute_slice_PSD(self, workspace, x_axis, y_axis, norm_to_one):
         assert isinstance(workspace, PixelWorkspace)
         raw_ws = workspace.raw_ws
-        self._fill_in_missing_input(x_axis, raw_ws)
-        self._fill_in_missing_input(y_axis, raw_ws)
-        n_x_bins = self._get_number_of_steps(x_axis)
-        n_y_bins = self._get_number_of_steps(y_axis)
+        fill_in_missing_input(x_axis, raw_ws)
+        fill_in_missing_input(y_axis, raw_ws)
+        n_x_bins = get_number_of_steps(x_axis)
+        n_y_bins = get_number_of_steps(y_axis)
         x_dim_id = raw_ws.getDimensionIndexByName(x_axis.units)
         y_dim_id = raw_ws.getDimensionIndexByName(y_axis.units)
         x_dim = raw_ws.getDimension(x_dim_id)

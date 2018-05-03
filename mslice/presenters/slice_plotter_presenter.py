@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
+from mslice.models.alg_workspace_ops import get_available_axis, get_axis_range
 from mslice.models.axis import Axis
 from mslice.models.slice.slice_plotter import SlicePlotter
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -135,7 +136,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
             self._slice_view.enable()
             self._slice_view.enable_units_choice(non_psd)
-            axis = self._slice_plotter.get_available_axis(get_workspace_handle(workspace_selection))
+            axis = get_available_axis(get_workspace_handle(workspace_selection))
             self._slice_view.populate_slice_x_options(axis)
             self._slice_view.populate_slice_y_options(axis[::-1])
             self.populate_slice_params()
@@ -143,8 +144,8 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
     def populate_slice_params(self):
         try:
             workspace_selection = get_workspace_handle(self._get_main_presenter().get_selected_workspaces()[0])
-            x_min, x_max, x_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_x_axis())
-            y_min, y_max, y_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_y_axis())
+            x_min, x_max, x_step = get_axis_range(workspace_selection, self._slice_view.get_slice_x_axis())
+            y_min, y_max, y_step = get_axis_range(workspace_selection, self._slice_view.get_slice_y_axis())
         except (KeyError, RuntimeError, IndexError):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
