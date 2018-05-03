@@ -1,10 +1,12 @@
 from __future__ import (absolute_import, division, print_function)
 
 from .busy import show_busy
+from mslice.models.axis import Axis
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
-from mslice.presenters.slice_plotter_presenter import Axis
+
 from mslice.views.cut_view import CutView
 from mslice.widgets.cut.command import Command
 from .validation_decorators import require_main_presenter
@@ -167,7 +169,7 @@ class CutPresenter(PresenterUtility):
         return cut_axis, integration_axis, norm_to_one, intensity_start, intensity_end, width
 
     def _set_minimum_step(self, workspace, axis):
-        """Gets axes limits from workspace_provider and then sets the minimumStep dictionary with those values"""
+        """Gets axes limits and then sets the minimumStep dictionary with those values"""
         for ax in axis:
             try:
                 self._minimumStep[ax] = self._cut_algorithm.get_axis_range(workspace, ax)[2]
@@ -191,7 +193,7 @@ class CutPresenter(PresenterUtility):
             self._previous_cut = None
             self._previous_axis = None
         else:
-            non_psd = all([not self._cut_plotter.workspace_provider.is_PSD(ws) for ws in workspace_selection])
+            non_psd = all([not get_workspace_handle(ws).is_PSD for ws in workspace_selection])
             self._cut_view.enable_integration_axis(non_psd)
             self._populate_fields_using_workspace(workspace_selection[0])
 
@@ -246,6 +248,3 @@ class CutPresenter(PresenterUtility):
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)
         self._cut_view.update_integration_axis()
-
-    def set_workspace_provider(self, workspace_provider):
-        self._cut_plotter.set_workspace_provider(workspace_provider)

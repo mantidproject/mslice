@@ -1,7 +1,9 @@
 from matplotlib.widgets import RectangleSelector
 
-from mslice.presenters.slice_plotter_presenter import Axis
+from mslice.models.axis import Axis
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
+from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
 
 
 class InteractiveCut(object):
@@ -46,7 +48,7 @@ class InteractiveCut(object):
         end = pos2[not self.horizontal]
         units = self._canvas.figure.gca().get_xaxis().units if self.horizontal else \
             self._canvas.figure.gca().get_yaxis().units
-        step = self.slice_plot.workspace_provider().get_limits(self._ws_title, units)[2]
+        step = get_limits(get_workspace_handle(self._ws_title), units)[2]
         ax = Axis(units, start, end, step)
         integration_start = pos1[self.horizontal]
         integration_end = pos2[self.horizontal]
@@ -69,14 +71,10 @@ class InteractiveCut(object):
         integration_axis = Axis(units, integration_start, integration_end, 0)
         output_ws = self._cut_plotter.save_cut((str(self._ws_title), ax, integration_axis, False))
         self.update_workspaces()
-        return self.slice_plot.workspace_provider().get_workspace_name(output_ws)
+        return get_workspace_name(output_ws)
 
     def update_workspaces(self):
         self.slice_plot.update_workspaces()
-
-    def set_workspace_provider(self, workspace_provider):
-        self._cut_algorithm.set_workspace_provider(workspace_provider)
-        self._cut_plotter.set_workspace_provider(workspace_provider)
 
     def clear(self):
         self._cut_plotter.set_icut(None)

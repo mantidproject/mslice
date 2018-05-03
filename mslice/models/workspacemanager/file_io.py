@@ -1,8 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
 import os.path
-from mantid.api import IMDHistoWorkspace, MDNormalization
-from mantid.simpleapi import CreateMDHistoWorkspace, SaveMD, SaveNexus, SaveAscii
+from mantid.api import MDNormalization
 from mslice.util.qt.QtWidgets import QFileDialog
+from mslice.models.workspacemanager.workspace_algorithms import run_algorithm
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 import numpy as np
 from scipy.io import savemat
@@ -42,40 +44,40 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 
 
 def save_nexus(workspace, path, is_slice):
-    if isinstance(workspace, IMDHistoWorkspace):
+    if isinstance(workspace, HistogramWorkspace):
         if is_slice:
-            SaveMD(InputWorkspace=workspace.name()[2:], Filename=path)
+            run_algorithm('SaveMD', InputWorkspace=get_workspace_handle(workspace.name[2:]), Filename=path)
         else:
-            SaveMD(InputWorkspace=workspace.name(), Filename=path)
+            run_algorithm('SaveMD', InputWorkspace=workspace, Filename=path)
     else:
-        SaveNexus(InputWorkspace=workspace.name(), Filename=path)
+        run_algorithm('SaveNexus', InputWorkspace=workspace, Filename=path)
 
 
 def save_ascii(workspace, path, is_slice):
-    if isinstance(workspace, IMDHistoWorkspace):
+    if isinstance(workspace, HistogramWorkspace):
         if is_slice:
             _save_slice_to_ascii(workspace, path)
         else:
-            _save_cut_to_ascii(workspace, workspace.name(), path)
+            _save_cut_to_ascii(workspace, workspace.name, path)
     else:
-        SaveAscii(InputWorkspace=workspace, Filename=path)
+        run_algorithm('SaveAscii', InputWorkspace=workspace, Filename=path)
 
 
 def save_matlab(workspace, path, is_slice):
-    if isinstance(workspace, IMDHistoWorkspace):
+    if isinstance(workspace, HistogramWorkspace):
         if is_slice:
-            x, y, e = _get_slice_mdhisto_xye(workspace)
+            x, y, e = _get_slice_mdhisto_xye(workspace.raw_ws)
         else:
-            x, y, e = _get_md_histo_xye(workspace)
+            x, y, e = _get_md_histo_xye(workspace.raw_ws)
     else:
         if is_slice:
             x = []
-            for dim in [workspace.getDimension(i) for i in range(2)]:
+            for dim in [workspace.raw_ws.getDimension(i) for i in range(2)]:
                 x.append(np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins()))
         else:
-            x = workspace.extractX()
-        y = workspace.extractY()
-        e = workspace.extractE()
+            x = workspace.raw_ws.extractX()
+        y = workspace.raw_ws.extractY()
+        e = workspace.raw_ws.extractE()
     mdict = {'x': x, 'y': y, 'e': e}
     savemat(path, mdict=mdict)
 
@@ -87,19 +89,19 @@ def _save_cut_to_ascii(workspace, ws_name, output_path):
     int_end = int_ranges[int_ranges.find(',')+1:-1]
     ws_name = ws_name[:ws_name.find('_cut')]
 
-    dim = workspace.getDimension(0)
+    dim = workspace.raw_ws.getDimension(0)
     units = dim.getUnits()
 
-    x, y, e = _get_md_histo_xye(workspace)
+    x, y, e = _get_md_histo_xye(workspace.raw_ws)
     header = 'MSlice Cut of workspace "%s" along "%s" between %s and %s' % (ws_name, units, int_start, int_end)
     out_data = np.c_[x, y, e]
     _output_data_to_ascii(output_path, out_data, header)
 
 
 def _save_slice_to_ascii(workspace, output_path):
-    header = 'MSlice Slice of workspace "%s"' % (workspace.name())
-    x, y, e = _get_slice_mdhisto_xye(workspace)
-    dim_sz = [workspace.getDimension(i).getNBins() for i in range(workspace.getNumDims())]
+    header = 'MSlice Slice of workspace "%s"' % (workspace.name)
+    x, y, e = _get_slice_mdhisto_xye(workspace.raw_ws)
+    dim_sz = [workspace.raw_ws.getDimension(i).getNBins() for i in range(workspace.raw_ws.getNumDims())]
     nbins = np.prod(dim_sz)
     x = [np.reshape(x0, nbins) for x0 in np.broadcast_arrays(*x)]
     y = np.reshape(y, nbins)
@@ -117,8 +119,8 @@ def load_from_ascii(file_path, ws_name):
     extents = str(np.min(x)) + ',' + str(np.max(x))
     nbins = len(x)
     units = header[header.find('along "'):header.find('" between')]
-    CreateMDHistoWorkspace(SignalInput=y, ErrorInput=e, Dimensionality=1, Extents=extents, NumberOfBins=nbins,
-                           Names='Dim1', Units=units, OutputWorkspace=ws_name)
+    run_algorithm('CreateMDHistoWorkspace', output_name=ws_name, SignalInput=y, ErrorInput=e, Dimensionality=1,
+                  Extents=extents, NumberOfBins=nbins, Names='Dim1', Units=units)
 
 
 def _get_md_histo_xye(histo_ws):

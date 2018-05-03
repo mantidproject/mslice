@@ -16,7 +16,3 @@ class SlicePlotterPresenterInterface(object):
     @abc.abstractmethod
     def workspace_selection_changed(self):
         pass
-
-    @abc.abstractmethod
-    def set_workspace_provider(self, workspace_provider):
-        pass

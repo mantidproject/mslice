@@ -3,6 +3,7 @@ from matplotlib.colors import Normalize
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.util import MPL_COMPAT
+from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from ..labels import get_display_name, recoil_labels
 
 overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
@@ -20,7 +21,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.slice_cache = {}
         self._sample_temp_fields = []
         self.overplot_lines = {}
-        self.workspace_provider = None
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
@@ -59,7 +59,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             x_axis = momentum_axis
             y_axis = energy_axis
-        comment = self._slice_algorithm.getComment(str(workspace_name))
+        comment = get_comment(str(workspace_name))
         plt.xlabel(get_display_name(x_axis.units, comment), picker=picker)
         plt.ylabel(get_display_name(y_axis.units, comment), picker=picker)
         plt.xlim(x_axis.start)
@@ -91,7 +91,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def show_d2sigma(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        if cached_slice['plot_data'][2] is None:
+        if cached_slice['plot_data'][3] is None:
             self.compute_d2sigma(workspace)
         self._show_plot(workspace, cached_slice['plot_data'][3], cached_slice['boundaries'], cached_slice['colourmap'],
                         cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
@@ -111,7 +111,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
                         cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
 
     def add_overplot_line(self, workspace, key, recoil, extra_info):
-        if recoil: # key is relative mass
+        if recoil:  # key is relative mass
             label = recoil_labels[key] if key in recoil_labels else \
                 'Relative mass ' + str(key)
         else:  # key is element name
@@ -120,7 +120,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             line = self.overplot_lines[workspace][key]
             line.set_linestyle('-')  # make visible
             line.set_label(label)  # add to legend
-            line.set_markersize(6) # show markers - 6.0 is default size
+            line.set_markersize(6)  # show markers - 6.0 is default size
             if line not in plt.gca().get_children():
                 plt.gca().add_artist(line)
         else:
@@ -209,10 +209,3 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def update_displayed_workspaces(self):
         self.listener.update_workspaces()
-
-    def set_workspace_provider(self, workspace_provider):
-        self.workspace_provider = workspace_provider
-        self._slice_algorithm.set_workspace_provider(workspace_provider)
-
-    def get_workspace_provider(self):
-        return self._slice_algorithm.get_workspace_provider()

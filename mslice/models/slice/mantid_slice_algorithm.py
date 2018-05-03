@@ -2,15 +2,16 @@ from __future__ import (absolute_import, division, print_function)
 from six import string_types
 import numpy as np
 
-from mantid.simpleapi import BinMD, LoadCIF, SofQW3, ConvertSpectrumAxis, Rebin2D
-from mantid.api import IMDEventWorkspace, MDNormalization, WorkspaceUnitValidator
-from mantid.dataobjects import Workspace2D
+from mantid.api import MDNormalization, WorkspaceUnitValidator
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.mantid_workspace_provider import MantidWorkspaceProvider
+from mslice.models.workspacemanager.workspace_algorithms import (propagate_properties, run_algorithm)
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
+from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.workspace import Workspace
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 E_TO_K = np.sqrt(2 * constants.neutron_mass * constants.elementary_charge / 1000) / constants.hbar
@@ -22,12 +23,10 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
 
 
 class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
-    def __init__(self):
-        self._workspace_provider = MantidWorkspaceProvider()
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
-        workspace = self._workspace_provider.get_workspace_handle(selected_workspace)
-        if self._workspace_provider.is_PSD(selected_workspace):
+        workspace = get_workspace_handle(selected_workspace)
+        if workspace.is_PSD:
             plot_data = self._compute_slice_PSD(workspace, x_axis, y_axis, norm_to_one)
         else:
             plot_data = self._compute_slice_nonPSD(workspace, x_axis, y_axis, norm_to_one)
@@ -40,21 +39,23 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return plot, boundaries
 
     def _compute_slice_PSD(self, workspace, x_axis, y_axis, norm_to_one):
-        assert isinstance(workspace, IMDEventWorkspace)
-        self._fill_in_missing_input(x_axis, workspace)
-        self._fill_in_missing_input(y_axis, workspace)
+        assert isinstance(workspace, PixelWorkspace)
+        raw_ws = workspace.raw_ws
+        self._fill_in_missing_input(x_axis, raw_ws)
+        self._fill_in_missing_input(y_axis, raw_ws)
         n_x_bins = self._get_number_of_steps(x_axis)
         n_y_bins = self._get_number_of_steps(y_axis)
-        x_dim_id = workspace.getDimensionIndexByName(x_axis.units)
-        y_dim_id = workspace.getDimensionIndexByName(y_axis.units)
-        x_dim = workspace.getDimension(x_dim_id)
-        y_dim = workspace.getDimension(y_dim_id)
+        x_dim_id = raw_ws.getDimensionIndexByName(x_axis.units)
+        y_dim_id = raw_ws.getDimensionIndexByName(y_axis.units)
+        x_dim = raw_ws.getDimension(x_dim_id)
+        y_dim = raw_ws.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
-        ws_name = self._workspace_provider.get_workspace_name(workspace)
-        thisslice = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
-                          OutputWorkspace='__' + ws_name)
-        self._workspace_provider.propagate_properties(ws_name, '__' + ws_name)
+        ws_name = get_workspace_name(workspace)
+        thisslice = run_algorithm('BinMD', output_name='__' + ws_name, InputWorkspace=raw_ws, AxisAligned="1",
+                                  AlignedDim0=xbinning, AlignedDim1=ybinning)
+        propagate_properties(workspace, thisslice)
+        thisslice = thisslice.raw_ws
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
             if thisslice.displayNormalization() == MDNormalization.NoNormalization:
@@ -65,7 +66,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return plot_data
 
     def _compute_slice_nonPSD(self, workspace, x_axis, y_axis, norm_to_one):
-        ws_name = self._workspace_provider.get_workspace_name(workspace)
+        ws_name = get_workspace_name(workspace)
         axes = [x_axis, y_axis]
         if x_axis.units == 'DeltaE':
             e_axis = 0
@@ -77,15 +78,14 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         ebin = '%f, %f, %f' % (axes[e_axis].start, axes[e_axis].step, axes[e_axis].end)
         qbin = '%f, %f, %f' % (axes[q_axis].start, axes[q_axis].step, axes[q_axis].end)
         if axes[q_axis].units == '|Q|':
-            thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin,
-                               EMode=self._workspace_provider.get_EMode(workspace),
-                               OutputWorkspace='__' + ws_name)
+            thisslice = run_algorithm('SofQW3', output_name='__' + ws_name, store=False, InputWorkspace=workspace,
+                                      QAxisBinning=qbin, EAxisBinning=ebin, EMode=workspace.e_mode)
         else:
-            thisslice = ConvertSpectrumAxis(InputWorkspace=workspace, Target='Theta')
-            thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin,
-                                OutputWorkspace='__' + ws_name)
+            thisslice = run_algorithm('ConvertSpectrumAxis', store=False, InputWorkspace=workspace, Target='Theta')
+            thisslice = run_algorithm('Rebin2D', output_name='__' + ws_name, InputWorkspace=thisslice, Axis1Binning=ebin,
+                                      Axis2Binning=qbin)
         plot_data = thisslice.extractY()
-        self._workspace_provider.propagate_properties(ws_name, '__' + ws_name)
+        propagate_properties(workspace, thisslice)
         if e_axis == 0:
             plot_data = np.transpose(plot_data)
         return plot_data
@@ -145,7 +145,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         it is assumed Y-axis=energy
         :return: d2sigma
         """
-        Ei = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(workspace))
+        Ei = get_workspace_handle(workspace).e_fixed
         if Ei is None:
             return None
         ki = np.sqrt(Ei) * E_TO_K
@@ -191,7 +191,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return gdos
 
     def sample_temperature(self, ws_name, sample_temp_fields):
-        ws = self._workspace_provider.get_workspace_handle(ws_name)
+        ws = get_workspace_handle(ws_name).raw_ws
         sample_temp = None
         for field_name in sample_temp_fields:
             try:
@@ -221,7 +221,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return sample_temp
 
     def compute_recoil_line(self, ws_name, axis, relative_mass=1):
-        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
+        efixed = get_workspace_handle(ws_name).e_fixed
         x_axis = np.arange(axis.start, axis.end, axis.step)
         if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
             momentum_transfer = x_axis
@@ -229,7 +229,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
                 (constants.elementary_charge / 1000)
         elif axis.units == 'Degrees':
             tth = x_axis * np.pi / 180.
-            if 'Direct' in self._workspace_provider.get_EMode(self._workspace_provider.get_workspace_handle(ws_name)):
+            if 'Direct' in get_workspace_handle(ws_name).e_mode:
                 line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass + 1 - np.cos(tth))
             else:
                 line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass - 1 + np.cos(tth))
@@ -238,7 +238,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return x_axis, line
 
     def compute_powder_line(self, ws_name, axis, element, cif_file=False):
-        efixed = self._workspace_provider.get_EFixed(self._workspace_provider.get_workspace_handle(ws_name))
+        efixed = get_workspace_handle(ws_name).e_fixed
         if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
             x0 = self._compute_powder_line_momentum(ws_name, axis, element, cif_file)
         elif axis.units == 'Degrees':
@@ -259,8 +259,8 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
 
     def _crystal_structure(self, ws_name, element, cif_file):
         if cif_file:
-            ws = self._workspace_provider.get_workspace_handle(ws_name)
-            LoadCIF(ws, cif_file)
+            ws = get_workspace_handle(ws_name).raw_ws
+            run_algorithm('LoadCIF', store=False, InputWorkspace=ws, InputFile=cif_file)
             return ws.sample().getCrystalStructure()
         else:
             return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
@@ -286,9 +286,9 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         return (data - np.nanmin(data))/data_range
 
     def is_sliceable(self, workspace):
-        workspace = self._workspace_provider.get_workspace_handle(workspace)
-        if isinstance(workspace, IMDEventWorkspace):
+        ws = get_workspace_handle(workspace)
+        if isinstance(ws, PixelWorkspace):
             return True
         else:
             validator = WorkspaceUnitValidator('DeltaE')
-            return isinstance(workspace, Workspace2D) and validator.isValid(workspace) == ''
+            return isinstance(ws, Workspace) and validator.isValid(ws.raw_ws) == ''

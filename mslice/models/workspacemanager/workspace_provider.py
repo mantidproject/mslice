@@ -1,62 +1,41 @@
-"""Defines the interface to an object responsible for performing operations on
-workspaces
-"""
-# -----------------------------------------------------------------------------
-# Imports
-# -----------------------------------------------------------------------------
+from six import iterkeys, string_types
 
-import abc
-from six import add_metaclass
+from mslice.workspace.base import WorkspaceBase as Workspace
 
-# -----------------------------------------------------------------------------
-# Classes and functions
-# -----------------------------------------------------------------------------
+_loaded_workspaces = {}
+
+def get_workspace_handle(workspace_name):
+    """"Return handle to workspace given workspace_name_as_string"""
+    # if passed a workspace handle return the handle
+    if isinstance(workspace_name, Workspace):
+        return workspace_name
+    return _loaded_workspaces[workspace_name]
 
 
-@add_metaclass(abc.ABCMeta)
-class WorkspaceProvider(object):
+def add_workspace(workspace, name):
+    _loaded_workspaces[name] = workspace
 
-    @abc.abstractmethod
-    def get_workspace_names(self):
-        pass
 
-    @abc.abstractmethod
-    def delete_workspace(self, workspace):
-        pass
+def remove_workspace(workspace):
+    del _loaded_workspaces[get_workspace_name(workspace)]
 
-    @abc.abstractmethod
-    def load(self, filename, output_workspace):
-        pass
 
-    @abc.abstractmethod
-    def rename_workspace(self, selected_workspace, new_name):
-        pass
+def get_workspace_names():
+    return [key for key in iterkeys(_loaded_workspaces) if key[:2] != '__']
 
-    @abc.abstractmethod
-    def combine_workspace(self, selected_workspace, new_name):
-        pass
 
-    @abc.abstractmethod
-    def save_workspaces(self, workspaces, path, save_name, extension):
-        pass
+def get_workspace_name(workspace):
+    """Returns the name of a workspace given the workspace handle"""
+    if isinstance(workspace, string_types):
+        return workspace
+    return workspace.name
 
-    def is_pixel_workspace(self, workspace_name):
-        pass
 
-    def get_workspace_handle(self, workspace_name):
-        pass
+def delete_workspace(workspace):
+    workspace = get_workspace_handle(workspace)
+    remove_workspace(workspace)
+    del workspace
 
-    def get_workspace_name(self, workspace_handle):
-        pass
 
-    def getComment(self, workspace):
-        pass
-
-    def setCutParameters(self, workspace, axis, parameters):
-        pass
-
-    def getCutParameters(self, workspace, axis=None):
-        pass
-
-    def isAxisSaved(self, workspace, axis):
-        pass
+def workspace_exists(ws_name):
+    return ws_name in _loaded_workspaces

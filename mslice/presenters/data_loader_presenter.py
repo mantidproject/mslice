@@ -3,6 +3,8 @@ from __future__ import (absolute_import, division, print_function)
 import os
 
 from .busy import show_busy
+from mslice.models.workspacemanager.workspace_algorithms import load
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_names
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.models.workspacemanager.file_io import load_from_ascii
@@ -10,15 +12,10 @@ from mslice.models.workspacemanager.file_io import load_from_ascii
 
 class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
 
-
     def __init__(self, data_loader_view):
         self._view = data_loader_view
         self._main_presenter = None
-        self._workspace_provider = None
         self._EfCache = None
-
-    def set_workspace_provider(self, workspace_provider):
-        self._workspace_provider = workspace_provider
 
     def load_workspace(self, file_paths, merge=False):
         '''
@@ -47,7 +44,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                     if file_paths[i].endswith('.txt'):
                         load_from_ascii(file_paths[i], ws_name)
                     else:
-                        self._workspace_provider.load(filename=file_paths[i], output_workspace=ws_name)
+                        load(filename=file_paths[i], output_workspace=ws_name)
                 except ValueError as e:
                     self._view.error_loading_workspace(e)
                 except RuntimeError:
@@ -56,23 +53,23 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                     if not allChecked:
                         allChecked = self.check_efixed(ws_name, multi)
                     else:
-                        self._workspace_provider.set_efixed(ws_name, self._EfCache)
+                        get_workspace_handle(ws_name).e_fixed = self._EfCache
                     self._main_presenter.show_workspace_manager_tab()
                     self._main_presenter.update_displayed_workspaces()
-                    self._main_presenter.show_tab_for_workspace(self._workspace_provider.get_workspace_handle(ws_name))
+                    self._main_presenter.show_tab_for_workspace(get_workspace_handle(ws_name))
         self._report_load_errors(ws_names, not_opened, not_loaded)
 
     def check_efixed(self, ws_name, multi=False):
         '''checks if a newly loaded workspace has efixed set'''
-        if self._workspace_provider.get_EMode(ws_name) == 'Indirect' and not self._workspace_provider.has_efixed(
-                ws_name):
+        ws = get_workspace_handle(ws_name)
+        if ws.e_mode == 'Indirect' and not ws.ef_defined:
             Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi, self._EfCache)
             self._EfCache = Ef
-            self._workspace_provider.set_efixed(ws_name, Ef)
+            ws.e_fixed = Ef
             return allChecked
 
     def _confirm_workspace_overwrite(self, ws_name):
-        if ws_name in self._workspace_provider.get_workspace_names():
+        if ws_name in get_workspace_names():
             return self._view.confirm_overwrite_workspace()
         else:
             return True

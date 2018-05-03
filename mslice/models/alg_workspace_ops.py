@@ -1,5 +1,7 @@
-from six import string_types
 import numpy as np
+from mslice.models.workspacemanager.workspace_algorithms import get_comment
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+
 
 class AlgWorkspaceOps(object):
 
@@ -7,16 +9,11 @@ class AlgWorkspaceOps(object):
         return int(np.ceil(max(1, (axis.end - axis.start)/axis.step)))
 
     def get_axis_range(self, workspace, dimension_name):
-        return tuple(self._workspace_provider.get_limits(workspace, dimension_name))
+        workspace = get_workspace_handle(workspace)
+        return tuple(workspace.limits[dimension_name])
 
-    def set_workspace_provider(self, workspace_provider):
-        self._workspace_provider = workspace_provider
-
-    def get_workspace_provider(self):
-        return self._workspace_provider
-
-    def getComment(self, workspace):
-        return self._workspace_provider.getComment(workspace)
+    def get_comment(self, workspace):
+        return get_comment(workspace)
 
     def _fill_in_missing_input(self,axis,workspace):
         dim = workspace.getDimensionIndexByName(axis.units)
@@ -32,11 +29,10 @@ class AlgWorkspaceOps(object):
             axis.step = (axis.end - axis.start)/100
 
     def get_available_axis(self, workspace):
-        if not self._workspace_provider.is_PSD(workspace):
+        workspace = get_workspace_handle(workspace)
+        if not workspace.is_PSD:
             return ['|Q|', 'Degrees', 'DeltaE']
         dim_names = []
-        if isinstance(workspace, string_types):
-            workspace = self._workspace_provider.get_workspace_handle(workspace)
-        for i in range(workspace.getNumDims()):
-            dim_names.append(workspace.getDimension(i).getName())
+        for i in range(workspace.raw_ws.getNumDims()):
+            dim_names.append(workspace.raw_ws.getDimension(i).getName())
         return dim_names

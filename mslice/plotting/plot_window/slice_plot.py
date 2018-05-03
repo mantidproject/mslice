@@ -10,6 +10,7 @@ from matplotlib.lines import Line2D
 
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from .interactive_cut import InteractiveCut
 from .plot_options import SlicePlotOptions
 
@@ -259,11 +260,11 @@ class SlicePlot(object):
         return True
 
     def ask_sample_temperature_field(self, ws_name):
-        ws = self._slice_plotter.workspace_provider.get_workspace_handle(ws_name)
+        ws = get_workspace_handle(ws_name)
         try:
-            keys = ws.run().keys()
+            keys = ws.raw_ws.run().keys()
         except AttributeError:
-            keys = ws.getExperimentInfo(0).run().keys()
+            keys = ws.raw_ws.getExperimentInfo(0).run().keys()
         temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
                                                              'Sample Temperature not found. Select the sample ' +
                                                              'temperature field or enter a value in Kelvin:',
@@ -337,7 +338,6 @@ class SlicePlot(object):
             self.icut = None
         else:
             self.icut = InteractiveCut(self, self._canvas, self.ws_name)
-            self.icut.set_workspace_provider(self._slice_plotter.get_workspace_provider())
 
     def save_icut(self):
         self.icut.save_cut()
@@ -347,9 +347,6 @@ class SlicePlot(object):
 
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
-
-    def workspace_provider(self):
-        return self._slice_plotter.workspace_provider
 
     def disconnect(self, plot_figure):
         plot_figure.actionInteractive_Cuts.triggered.disconnect()

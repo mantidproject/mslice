@@ -2,10 +2,10 @@ from __future__ import (absolute_import, division, print_function)
 import mock
 import unittest
 
+from mslice.models.axis import Axis
 from mslice.models.slice.slice_plotter import SlicePlotter
-from mslice.models.workspacemanager.workspace_provider import WorkspaceProvider
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
-from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter,Axis
+from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.views.slice_plotter_view import SlicePlotterView
 from mslice.widgets.slice.command import Command
 
@@ -120,7 +120,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.plot_slice.assert_not_called( )
+        assert(not self.slice_plotter.plot_slice.called)
         self.slice_view.error_invalid_x_params.assert_called_once_with()
 
     def test_plot_slice_x_start_bigger_than_x_stop_fail(self):
@@ -150,7 +150,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.plot_slice.assert_not_called( )
+        assert(not self.slice_plotter.plot_slice.called)
         self.slice_view.error_invalid_x_params.assert_called_once_with()
 
     def test_plot_slice_invalid_string_y_params_fail(self):
@@ -180,7 +180,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.plot_slice.assert_not_called( )
+        assert(not self.slice_plotter.plot_slice.called)
         self.slice_view.error_invalid_y_params.assert_called_once_with()
 
     def test_plot_slice_invalid_y_params_y_end_less_than_y_start_fail(self):
@@ -210,7 +210,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.plot_slice.assert_not_called( )
+        assert(not self.slice_plotter.plot_slice.called)
         self.slice_view.error_invalid_y_params.assert_called_once_with()
 
     def test_plot_slice_invalid_intensity_params_fail(self):
@@ -240,7 +240,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.plot_slice.assert_not_called( )
+        assert(not self.slice_plotter.plot_slice.called)
         self.slice_view.error_invalid_intensity_params.assert_called_once_with()
 
     def test_plot_slice_intensity_end_less_than_intensity_start_fail(self):
@@ -270,7 +270,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_plotter.plot_slice.assert_not_called( )
+        assert(not self.slice_plotter.plot_slice.called)
         self.slice_view.error_invalid_intensity_params.assert_called_once_with()
 
     def test_plot_slice_error_handling(self):
@@ -305,25 +305,26 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         # Test empty workspace, multiple workspaces
         self.main_presenter.get_selected_workspaces.return_value = []
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_view.error_select_one_workspace.assert_called()
+        assert(self.slice_view.error_select_one_workspace.called)
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace, selected_workspace]
+        self.slice_view.error_select_one_workspace.reset_mock()
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_view.error_select_one_workspace.assert_called()
+        assert(self.slice_view.error_select_one_workspace.called)
         # Test invalid axes
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
         self.slice_view.get_slice_y_axis.return_value = x.units
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_view.error_invalid_plot_parameters.assert_called()
+        assert(self.slice_view.error_invalid_plot_parameters.called)
         # Test invalid smoothing parameters
         self.slice_view.get_slice_y_axis.return_value = y.units
         self.slice_view.get_slice_smoothing.return_value = 'a'
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_view.error_invalid_smoothing_params.assert_called()
+        assert(self.slice_view.error_invalid_smoothing_params.called)
         # Simulate matplotlib error
         self.slice_view.get_slice_smoothing.return_value = smoothing
         self.slice_plotter.plot_slice = mock.Mock(side_effect=ValueError('minvalue must be less than or equal to maxvalue'))
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        self.slice_view.error_invalid_intensity_params.assert_called()
+        assert(self.slice_view.error_invalid_intensity_params.called)
         self.slice_plotter.plot_slice = mock.Mock(side_effect=ValueError('something bad'))
         self.assertRaises(ValueError, self.slice_plotter_presenter.notify, Command.DisplaySlice)
 
@@ -336,31 +337,33 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_plotter.get_available_axis = mock.Mock(return_value=axis)
 
         slice_plotter_presenter.workspace_selection_changed()
-        self.slice_view.clear_input_fields.assert_called()
+        assert(self.slice_view.clear_input_fields.called)
 
-    def test_workspace_selection_changed(self):
+    @mock.patch('mslice.presenters.slice_plotter_presenter.get_workspace_handle')
+    def test_workspace_selection_changed(self, get_ws_handle_mock):
         slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         slice_plotter_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
+        ws_mock = mock.Mock()
+        get_ws_handle_mock.return_value = ws_mock
         dims = ['dim1', 'dim2']
         self.slice_plotter.get_available_axis = mock.Mock(return_value=dims)
         self.slice_plotter.get_axis_range = mock.Mock(return_value=(0,1,0.1))
-        self.slice_plotter.workspace_provider = mock.create_autospec(WorkspaceProvider)
-        self.slice_plotter.workspace_provider.is_PSD = mock.Mock(return_value=True)
         slice_plotter_presenter.workspace_selection_changed()
-        self.slice_view.populate_slice_x_options.assert_called()
-        self.slice_view.populate_slice_y_options.assert_called()
-        self.slice_plotter.get_available_axis.assert_called()
-        self.slice_plotter.get_axis_range.assert_called()
+        assert(self.slice_view.populate_slice_x_options.called)
+        assert(self.slice_view.populate_slice_y_options.called)
+        assert(self.slice_plotter.get_available_axis.called)
+        assert(self.slice_plotter.get_axis_range.called)
         # Test error handling
         self.slice_plotter.get_axis_range = mock.Mock(side_effect=KeyError)
         slice_plotter_presenter.workspace_selection_changed()
-        self.slice_view.clear_input_fields.assert_called()
+        assert(self.slice_view.clear_input_fields.called)
 
     def test_notify_presenter_clears_error(self):
         presenter = SlicePlotterPresenter(self.slice_view, self.slice_plotter)
         presenter.register_master(self.main_presenter)
+        self.slice_view.clear_displayed_error = mock.Mock()
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
         # The actual subsequent procedure will fail, however this irrelevant to this. Hence the try, except blocks
         for command in [x for x in dir(Command) if x[0] != "_"]:

@@ -1,29 +1,13 @@
 from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
+from mslice.models.axis import Axis
 from mslice.models.slice.slice_plotter import SlicePlotter
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.slice_plotter_view import SlicePlotterView
 from mslice.widgets.slice.command import Command
 from .interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from .validation_decorators import require_main_presenter
-
-
-class Axis(object):
-    def __init__(self, units, start, end, step):
-        self.units = units
-        self.start = start
-        self.end = end
-        self.step = step
-
-    def __eq__(self, other):
-        # This is required for Unit testing
-        return self.units == other.units and self.start == other.start and self.end == other.end \
-            and self.step == other.step and isinstance(other, Axis)
-
-    def __repr__(self):
-        info = (self.units, self.start, self.end, self.step)
-        return "Axis(" + " ,".join(map(repr, info)) + ")"
-
 
 INVALID_PARAMS = 1
 INVALID_X_PARAMS = 2
@@ -146,19 +130,19 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
         else:
-            non_psd = all([not self._slice_plotter.workspace_provider.is_PSD(ws) for ws in workspace_selection])
+            non_psd = all([not get_workspace_handle(ws).is_PSD for ws in workspace_selection])
             workspace_selection = workspace_selection[0]
 
             self._slice_view.enable()
             self._slice_view.enable_units_choice(non_psd)
-            axis = self._slice_plotter.get_available_axis(workspace_selection)
+            axis = self._slice_plotter.get_available_axis(get_workspace_handle(workspace_selection))
             self._slice_view.populate_slice_x_options(axis)
             self._slice_view.populate_slice_y_options(axis[::-1])
             self.populate_slice_params()
 
     def populate_slice_params(self):
         try:
-            workspace_selection = self._get_main_presenter().get_selected_workspaces()[0]
+            workspace_selection = get_workspace_handle(self._get_main_presenter().get_selected_workspaces()[0])
             x_min, x_max, x_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_x_axis())
             y_min, y_max, y_step = self._slice_plotter.get_axis_range(workspace_selection, self._slice_view.get_slice_y_axis())
         except (KeyError, RuntimeError, IndexError):
@@ -174,6 +158,3 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def update_workspaces(self):
         self._main_presenter.update_displayed_workspaces()
-
-    def set_workspace_provider(self, workspace_provider):
-        self._slice_plotter.set_workspace_provider(workspace_provider)

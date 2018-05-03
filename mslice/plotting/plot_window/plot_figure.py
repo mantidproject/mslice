@@ -15,6 +15,7 @@ from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.plotting.plot_window.base_plot_window import BasePlotWindow
 from mslice.util.qt import load_ui
 from mslice.models.workspacemanager.file_io import get_save_directory
+from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
 
 # The FigureCanvas & Toolbar are QWidgets so we must import it from the mpl backend that matches
 # the version of Qt we are running with
@@ -157,7 +158,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         file_path, save_name, ext = get_save_directory(save_as_image=True)
         workspace = self._plot_handler.ws_name
         try:
-            self._plot_handler.workspace_provider().save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
+            save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
             if e.message == "unrecognised file extension":
                 self.save_image(os.path.join(file_path, save_name))
@@ -167,7 +168,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
                 raise RuntimeError(e)
         except KeyError:   # Could be case of interactive cuts when the workspace has not been saved yet
             workspace = self._plot_handler.save_icut()
-            self._plot_handler.workspace_provider().save_workspaces([workspace], file_path, save_name, ext)
+            save_workspaces([workspace], file_path, save_name, ext)
 
     def save_image(self, path):
         self.canvas.figure.savefig(path)
