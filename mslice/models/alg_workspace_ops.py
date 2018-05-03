@@ -1,5 +1,7 @@
 import numpy as np
-from mslice.models.workspacemanager.workspace_provider import get_comment, get_workspace_handle
+from mslice.models.workspacemanager.workspace_algorithms import get_comment
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+
 
 class AlgWorkspaceOps(object):
 

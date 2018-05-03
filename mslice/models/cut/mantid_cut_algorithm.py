@@ -5,8 +5,8 @@ from mantid.api import MDNormalization, WorkspaceUnitValidator
 
 from .cut_algorithm import CutAlgorithm
 from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, delete_workspace,
-                                                               workspace_exists, run_alg)
+from mslice.models.workspacemanager.workspace_algorithms import (run_algorithm)
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, delete_workspace, workspace_exists
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
@@ -84,8 +84,8 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         integration_binning = integration_axis + "," + str(integration_start) + "," + str(integration_end) + ",1"
 
-        return run_alg('BinMD', output_name=out_ws_name, InputWorkspace=selected_workspace, AxisAligned="1",
-                       AlignedDim1=integration_binning, AlignedDim0=cut_binning)
+        return run_algorithm('BinMD', output_name=out_ws_name, InputWorkspace=selected_workspace, AxisAligned="1",
+                             AlignedDim1=integration_binning, AlignedDim0=cut_binning)
 
     def _compute_cut_nonPSD(self, input_workspace_name, out_ws_name, selected_workspace, cut_axis,
                             integration_start, integration_end, integration_units):
@@ -95,45 +95,45 @@ class MantidCutAlgorithm(AlgWorkspaceOps, CutAlgorithm):
         if self._converted_nonpsd and self._converted_nonpsd[0] != input_workspace_name:
             self._converted_nonpsd = None
         if cut_axis.units == '|Q|':
-            ws_out = run_alg('SofQW3', output_name=out_ws_name, store=False, InputWorkspace=selected_workspace,
-                             OutputWorkspace=out_ws_name, EMode=emode, QAxisBinning=cut_binning,
-                             EAxisBinning=int_binning)
+            ws_out = run_algorithm('SofQW3', output_name=out_ws_name, store=False, InputWorkspace=selected_workspace,
+                                   OutputWorkspace=out_ws_name, EMode=emode, QAxisBinning=cut_binning,
+                                   EAxisBinning=int_binning)
             idx = 1
             unit = 'MomentumTransfer'
             name = '|Q|'
         elif cut_axis.units == 'Degrees':
             if not self._converted_nonpsd:
                 self._converted_nonpsd = (input_workspace_name,
-                                          run_alg('ConvertSpectrumAxis', output_name='__convToTheta', store=False,
-                                                  InputWorkspace=selected_workspace, Target='theta'))
-            ws_out = run_alg('Rebin2D', output_name=out_ws_name, store=False, InputWorkspace=self._converted_nonpsd[1],
-                             Axis1Binning=int_binning, Axis2Binning=cut_binning)
+                                          run_algorithm('ConvertSpectrumAxis', output_name='__convToTheta', store=False,
+                                                        InputWorkspace=selected_workspace, Target='theta'))
+            ws_out = run_algorithm('Rebin2D', output_name=out_ws_name, store=False, InputWorkspace=self._converted_nonpsd[1],
+                                   Axis1Binning=int_binning, Axis2Binning=cut_binning)
             idx = 1
             unit = 'Degrees'
             name = 'Theta'
         elif integration_units == '|Q|':
-            ws_out = run_alg('SofQW3', output_name=out_ws_name, store=False, InputWorkspace=selected_workspace,
-                             OutputWorkspace=out_ws_name, EMode=emode,QAxisBinning=int_binning,
-                             EAxisBinning=cut_binning)
+            ws_out = run_algorithm('SofQW3', output_name=out_ws_name, store=False, InputWorkspace=selected_workspace,
+                                   OutputWorkspace=out_ws_name, EMode=emode, QAxisBinning=int_binning,
+                                   EAxisBinning=cut_binning)
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
         else:
             if not self._converted_nonpsd:
                 self._converted_nonpsd = (input_workspace_name,
-                                          run_alg('ConvertSpectrumAxis', output_name='__convToTheta', store=False,
-                                                  InputWorkspace=selected_workspace, Target='theta',
-                                                  OutputWorkspace='__convToTheta'))
-            ws_out = run_alg('Rebin2D', output_name=out_ws_name, InputWorkspace=self._converted_nonpsd[1],
-                             Axis1Binning=cut_binning, Axis2Binning=int_binning)
+                                          run_algorithm('ConvertSpectrumAxis', output_name='__convToTheta', store=False,
+                                                        InputWorkspace=selected_workspace, Target='theta',
+                                                        OutputWorkspace='__convToTheta'))
+            ws_out = run_algorithm('Rebin2D', output_name=out_ws_name, InputWorkspace=self._converted_nonpsd[1],
+                                   Axis1Binning=cut_binning, Axis2Binning=int_binning)
             idx = 0
             unit = 'DeltaE'
             name = 'EnergyTransfer'
         xdim = ws_out.getDimension(idx)
         extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
-        return run_alg('CreateMDHistoWorkspace', output_name=out_ws_name, SignalInput=ws_out.extractY(),
-                       ErrorInput=ws_out.extractE(), Dimensionality=1, Extents=extents,
-                       NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
+        return run_algorithm('CreateMDHistoWorkspace', output_name=out_ws_name, SignalInput=ws_out.extractY(),
+                             ErrorInput=ws_out.extractE(), Dimensionality=1, Extents=extents,
+                             NumberOfBins=xdim.getNBins(), Names=name, Units=unit)
 
     def get_arrays_from_workspace(self, workspace):
         mantid_ws = get_workspace_handle(workspace).raw_ws
