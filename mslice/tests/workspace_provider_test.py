@@ -8,7 +8,7 @@ from mslice.models.workspacemanager.workspace_algorithms import (subtract,
                                                                  propagate_properties, get_limits, run_alg)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_names, \
     delete_workspace
-from mslice.models.workspacemanager.workspace_algorithms import _processEfixed
+from mslice.models.workspacemanager.workspace_algorithms import processEfixed
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
 
@@ -49,7 +49,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_almost_equal(combined.limits['|Q|'], [0.071989, 3.45243, 0.033804], 4)
 
     def test_process_EFixed(self):
-        _processEfixed(self.test_ws_2d)
+        processEfixed(self.test_ws_2d)
         self.assertTrue(self.test_ws_2d.ef_defined)
 
     def test_rename_workspace(self):

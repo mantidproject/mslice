@@ -1,6 +1,5 @@
-"""A concrete implementation of a WorkspaceProvider
-
-It uses mantid to perform the workspace operations
+"""
+Uses mantid algorithms to perform workspace operations
 """
 # -----------------------------------------------------------------------------
 # Imports
@@ -45,7 +44,7 @@ def get_limits(workspace, axis):
         return minimum, maximum, step
 
 
-def _processEfixed(workspace):
+def processEfixed(workspace):
     """Checks whether the fixed energy is defined for this workspace"""
     try:
         workspace.e_fixed = _get_ws_EFixed(workspace.raw_ws)
@@ -163,7 +162,7 @@ def load(filename, output_workspace):
     workspace = run_alg('Load', output_name=output_workspace, Filename=filename)
     workspace.e_mode = get_EMode(workspace.raw_ws)
     if workspace.e_mode == 'Indirect':
-        _processEfixed(workspace)
+        processEfixed(workspace)
     _processLoadedWSLimits(workspace)
     return workspace
 
