@@ -53,7 +53,7 @@ class CutPresenter(PresenterUtility):
             self._parse_step()
             parsed_params = self._parse_input()
         except ValueError as e:
-            self._cut_view.display_error(e.message)
+            self._cut_view.display_error(str(e))
             return
         for workspace in selected_workspaces:
             params = (workspace,) + parsed_params.unpack()
@@ -227,11 +227,13 @@ class CutParams(PresenterUtility):
     Groups parameters needed to cut and validates them
     '''
     def validate_axis(self, axis):
-        if axis.start >= axis.end:
-            raise ValueError()
+        # Note this checks for empty / invalid string in axis parameters
         axis.start = float(axis.start)
         axis.end = float(axis.end)
         axis.step = float(axis.step)
+
+        if axis.start >= axis.end:
+            raise ValueError()
         return axis
 
     def unpack(self):
