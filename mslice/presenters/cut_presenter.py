@@ -119,10 +119,10 @@ class CutPresenter(PresenterUtility):
         '''Gets values entered by user. Validation is performed by the CutParams object.'''
         cut_params = CutParams()
         cut_params.cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
-                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
+                                   self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
 
         cut_params.integration_axis = Axis(self._cut_view.get_integration_axis(), self._cut_view.get_integration_start(),
-                                self._cut_view.get_integration_end(), 0.)
+                                           self._cut_view.get_integration_end(), 0.)
 
         cut_params.intensity_start = self._cut_view.get_intensity_start()
         cut_params.intensity_end = self._cut_view.get_intensity_end()
@@ -221,7 +221,7 @@ class CutPresenter(PresenterUtility):
         self._cut_view.set_minimum_step(min_step)
         self.update_integration_axis()
 
-        
+
 class CutParams(PresenterUtility):
     '''
     Groups parameters needed to cut and validates them
@@ -241,7 +241,7 @@ class CutParams(PresenterUtility):
     @property
     def cut_axis(self):
         return self._cut_axis
-    
+
     @cut_axis.setter
     def cut_axis(self, axis):
         try:
@@ -303,4 +303,3 @@ class CutParams(PresenterUtility):
                 raise ValueError("Invalid width")
         else:
             self._width = None
-

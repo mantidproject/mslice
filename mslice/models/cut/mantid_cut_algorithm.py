@@ -77,7 +77,7 @@ class MantidCutAlgorithm(CutAlgorithm):
         n_steps = get_number_of_steps(cut_axis)
         cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
         integration_binning = integration_axis.units + "," + str(integration_axis.start) + "," + \
-                              str(integration_axis.end) + ",1"
+            str(integration_axis.end) + ",1"
 
         return run_algorithm('BinMD', output_name=out_ws_name, InputWorkspace=selected_workspace, AxisAligned="1",
                              AlignedDim1=integration_binning, AlignedDim0=cut_binning)

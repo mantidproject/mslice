@@ -37,4 +37,3 @@ def get_other_axis(workspace, axis):
     all_axis = get_available_axis(workspace)
     all_axis.remove(axis.units)
     return all_axis[0]
-
