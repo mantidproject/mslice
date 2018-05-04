@@ -112,7 +112,7 @@ class CutPresenter(PresenterUtility):
                 self._cut_view.populate_cut_params(self._cut_view.get_cut_axis_start(),
                                                    self._cut_view.get_cut_axis_end(),
                                                    "%0.5f" % step)
-                self._cut_view.error_invalid_cut_step_parameter()
+                self._cut_view.display_error("Invalid cut step parameter, using default.")
                 warnings.warn("Invalid cut step, using default value")
 
     def _parse_input(self):

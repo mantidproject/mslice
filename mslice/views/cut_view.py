@@ -55,28 +55,13 @@ class CutView:
     def get_minimum_step(self):
         pass
 
-    def error_select_a_workspace(self):
-        pass
-
-    def error_invalid_cut_axis_parameters(self):
-        pass
-
-    def error_invalid_integration_parameters(self):
-        pass
-
-    def error_invalid_intensity_parameters(self):
-        pass
-
-    def error_invalid_width(self):
-        pass
-
-    def error_current_selection_invalid(self):
-        pass
-
-    def error_invalid_cut_step_parameter(self):
+    def display_error(self, string):
         pass
 
     def populate_cut_axis_options(self,options):
+        pass
+
+    def populate_integration_axis_options(self,options):
         pass
 
     def populate_cut_params(self, cut_start=None, cut_end=None, cut_step=None):
