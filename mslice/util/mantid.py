@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory
 from mslice.models.workspacemanager.workspace_provider import add_workspace
+from mslice.models.cut.cut import Cut
 from mslice.models.projection.powder.make_projection import MakeProjection
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as Workspace
@@ -10,7 +11,9 @@ from mslice.workspace.base import WorkspaceBase as Workspace
 
 def initialize_mantid():
     AlgorithmFactory.subscribe(MakeProjection)
+    AlgorithmFactory.subscribe(Cut)
     s_api._create_algorithm_function('MakeProjection', 1, MakeProjection())
+    s_api._create_algorithm_function('Cut', 1, Cut())
 
 
 def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
