@@ -56,7 +56,7 @@ class CutWidget(CutView, QWidget):
                 value = float(self.lneCutStep.text())
             except ValueError:
                 value = 0
-                self.error_invalid_cut_step_parameter()
+                self.display_error('Invalid cut step parameter. Using default.')
             if value == 0:
                 self.lneCutStep.setText('%.5f' % (self._minimumStep))
                 self.display_error('Setting step size to default.')
