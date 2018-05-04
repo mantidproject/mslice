@@ -100,9 +100,9 @@ class MantidSliceAlgorithm(SliceAlgorithm):
         :return: A new numpy array containing the axis values
         """
         if reverse:
-            values = np.linspace(axis.end, axis.start, self._get_number_of_steps(axis))
+            values = np.linspace(axis.end, axis.start, get_number_of_steps(axis))
         else:
-            values = np.linspace(axis.start, axis.end, self._get_number_of_steps(axis))
+            values = np.linspace(axis.start, axis.end, get_number_of_steps(axis))
         return values
 
     def compute_boltzmann_dist(self, sample_temp, delta_e):
