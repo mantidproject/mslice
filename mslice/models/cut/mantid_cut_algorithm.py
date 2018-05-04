@@ -5,7 +5,7 @@ from mantid.api import MDNormalization, WorkspaceUnitValidator
 
 from .cut_algorithm import CutAlgorithm
 
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, delete_workspace, workspace_exists
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
 from mslice.util.mantid import run_algorithm
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
@@ -100,6 +100,3 @@ class MantidCutAlgorithm(CutAlgorithm):
             cut_axis.end = dim.getMaximum()
         if cut_axis.step is None:
             cut_axis.step = (cut_axis.end - cut_axis.start)/100
-
-
-

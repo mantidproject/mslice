@@ -13,7 +13,7 @@ class Cut(PythonAlgorithm):
     def PyInit(self):
         self.declareProperty(WorkspaceProperty('InputWorkspace', '', direction=Direction.Input))
         self.declareProperty(PropertyManagerProperty('CutAxis', {}, direction=Direction.Input),
-                            doc='MSlice Axis object as a dictionary')
+                             doc='MSlice Axis object as a dictionary')
         self.declareProperty(PropertyManagerProperty('IntegrationAxis', {}, direction=Direction.Input),
                              doc='MSlice Axis object as a dictionary')
         self.declareProperty('EMode', 'Direct', StringMandatoryValidator())
