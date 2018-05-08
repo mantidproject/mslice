@@ -22,7 +22,6 @@ s_api._create_algorithm_function('Cut', 1, Cut())
 
 
 def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
-    print(alg_name)
     if isinstance(kwargs.get('InputWorkspace'), Workspace):
         kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
     if output_name is not None:
