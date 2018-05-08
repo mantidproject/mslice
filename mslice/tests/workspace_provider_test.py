@@ -2,23 +2,24 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 from mock import patch
 import unittest
-from mslice.models.workspacemanager.mantid_workspace_provider import (delete_workspace,
-                                                                      get_workspace_names, subtract,
-                                                                      get_workspace_handle, add_workspace_runs,
-                                                                      combine_workspace, rename_workspace,
-                                                                      propagate_properties, get_limits, run_alg)
-from mslice.models.workspacemanager.mantid_workspace_provider import _processEfixed
+from mslice.models.workspacemanager.workspace_algorithms import (subtract,
+                                                                 add_workspace_runs,
+                                                                 combine_workspace, rename_workspace,
+                                                                 propagate_properties, get_limits, run_algorithm)
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_names, \
+    delete_workspace
+from mslice.models.workspacemanager.workspace_algorithms import processEfixed
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def setUp(self):
-        self.test_ws_2d = run_alg('CreateSimulationWorkspace', output_name='test_ws_2d', Instrument='MAR',
-                                  BinParams=[-10, 1, 10], UnitX='DeltaE')
-        run_alg('AddSampleLog', Workspace=self.test_ws_2d.raw_ws, store=False, LogName='Ei', LogText='3.',
-                LogType='Number')
-        self.test_ws_md = run_alg('ConvertToMD', output_name='test_ws_md', InputWorkspace=self.test_ws_2d,
-                                  QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
-                                  SplitInto='50,50')
+        self.test_ws_2d = run_algorithm('CreateSimulationWorkspace', output_name='test_ws_2d', Instrument='MAR',
+                                        BinParams=[-10, 1, 10], UnitX='DeltaE')
+        run_algorithm('AddSampleLog', Workspace=self.test_ws_2d.raw_ws, store=False, LogName='Ei', LogText='3.',
+                      LogType='Number')
+        self.test_ws_md = run_algorithm('ConvertToMD', output_name='test_ws_md', InputWorkspace=self.test_ws_2d,
+                                        QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
+                                        SplitInto='50,50')
         self.test_ws_md.ef_defined = False
         self.test_ws_md.limits = {'DeltaE': [0, 2, 1]}
 
@@ -39,16 +40,16 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [2.0] * 20)
         np.testing.assert_array_almost_equal(self.test_ws_2d.raw_ws.dataY(0), [1] * 20)
 
-    @patch('mslice.models.workspacemanager.mantid_workspace_provider._original_step_size')
+    @patch('mslice.models.workspacemanager.workspace_algorithms._original_step_size')
     def test_combine_workspace(self, step_mock):
-        ws_2 = run_alg('CloneWorkspace', output_name='ws_2', InputWorkspace=self.test_ws_md)
+        ws_2 = run_algorithm('CloneWorkspace', output_name='ws_2', InputWorkspace=self.test_ws_md)
         step_mock.return_value = 1
         combined = combine_workspace([self.test_ws_md, ws_2], 'combined')
         np.testing.assert_array_almost_equal(combined.limits['DeltaE'], [-10, 10, 1], 4)
         np.testing.assert_array_almost_equal(combined.limits['|Q|'], [0.071989, 3.45243, 0.033804], 4)
 
     def test_process_EFixed(self):
-        _processEfixed(self.test_ws_2d)
+        processEfixed(self.test_ws_2d)
         self.assertTrue(self.test_ws_2d.ef_defined)
 
     def test_rename_workspace(self):
@@ -60,8 +61,8 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.assertEqual(new_ws.limits['DeltaE'], [0, 2, 1])
 
     def test_propagate_properties(self):
-        ws_2 = run_alg('CreateSimulationWorkspace', output_name='test_ws_2', Instrument='MAR', BinParams=[-1, 1, 20],
-                       UnitX='DeltaE')
+        ws_2 = run_algorithm('CreateSimulationWorkspace', output_name='test_ws_2', Instrument='MAR', BinParams=[-1, 1, 20],
+                             UnitX='DeltaE')
         propagate_properties(self.test_ws_md, ws_2)
         delete_workspace('test_ws_md')
         self.assertFalse(ws_2.ef_defined)
@@ -73,7 +74,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.assertEqual(limits[1], 2)
         self.assertEqual(limits[2], 1)
 
-    @patch('mslice.models.workspacemanager.mantid_workspace_provider._original_step_size')
+    @patch('mslice.models.workspacemanager.workspace_algorithms._original_step_size')
     def test_get_limits_100_steps(self, step_mock):
         self.test_ws_md.limits = {}
         step_mock.return_value = 1

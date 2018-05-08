@@ -3,7 +3,7 @@ from matplotlib.colors import Normalize
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.util import MPL_COMPAT
-from mslice.models.workspacemanager.mantid_workspace_provider import get_comment
+from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from ..labels import get_display_name, recoil_labels
 
 overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}

@@ -2,10 +2,10 @@ from __future__ import (absolute_import, division, print_function)
 import mock
 import unittest
 
+from mslice.models.axis import Axis
 from mslice.models.slice.slice_plotter import SlicePlotter
-from mslice.models.workspacemanager.workspace_provider import WorkspaceProvider
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
-from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter,Axis
+from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.views.slice_plotter_view import SlicePlotterView
 from mslice.widgets.slice.command import Command
 
@@ -350,8 +350,6 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         dims = ['dim1', 'dim2']
         self.slice_plotter.get_available_axis = mock.Mock(return_value=dims)
         self.slice_plotter.get_axis_range = mock.Mock(return_value=(0,1,0.1))
-        self.slice_plotter.workspace_provider = mock.create_autospec(WorkspaceProvider)
-        self.slice_plotter.workspace_provider.is_PSD = mock.Mock(return_value=True)
         slice_plotter_presenter.workspace_selection_changed()
         assert(self.slice_view.populate_slice_x_options.called)
         assert(self.slice_view.populate_slice_y_options.called)

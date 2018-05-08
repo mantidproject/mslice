@@ -1,23 +1,22 @@
-"""A concrete implementation of a WorkspaceProvider
-
-It uses mantid to perform the workspace operations
+"""
+Uses mantid algorithms to perform workspace operations
 """
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
+
 import os.path
-from six import string_types, iterkeys
-from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
 
-import mantid.simpleapi as mantid_algs
-
-from mslice.workspace.base import WorkspaceBase as Workspace
-from mslice.workspace.workspace import Workspace as MatrixWorkspace
-from mslice.workspace.pixel_workspace import PixelWorkspace
-from mslice.workspace.histogram_workspace import HistogramWorkspace
 import numpy as np
 from scipy import constants
+
+from mslice.models.axis import Axis
+from mslice.util.mantid import run_algorithm
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
+                                                               remove_workspace, add_workspace)
+from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.workspace import Workspace as MatrixWorkspace
 
 # -----------------------------------------------------------------------------
 # Classes and functions
@@ -27,67 +26,6 @@ from scipy import constants
 E2q = 2. * constants.m_n / (constants.hbar ** 2)  # Energy to (neutron momentum)^2 (==2m_n/hbar^2)
 meV2J = constants.e / 1000.  # meV to Joules
 m2A = 1.e10  # metres to Angstrom
-
-_loaded_workspaces = {}
-
-
-class Axis(object):
-    def __init__(self, units, start, end, step):
-        self.units = units
-        self.start = start
-        self.end = end
-        self.step = step
-
-    def __eq__(self, other):
-        # This is required for Unit testing
-        return self.units == other.units and self.start == other.start and self.end == other.end \
-            and self.step == other.step and isinstance(other, Axis)
-
-    def __repr__(self):
-        info = (self.units, self.start, self.end, self.step)
-        return "Axis(" + " ,".join(map(repr, info)) + ")"
-
-
-def get_workspace_handle(workspace_name):
-    """"Return handle to workspace given workspace_name_as_string"""
-    # if passed a workspace handle return the handle
-    if isinstance(workspace_name, Workspace):
-        return workspace_name
-    return _loaded_workspaces[workspace_name]
-
-
-def run_alg(alg_name, output_name=None, store=True, **kwargs):
-    if isinstance(kwargs.get('InputWorkspace'), Workspace):
-        kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
-    if output_name is not None:
-        kwargs['OutputWorkspace'] = output_name
-
-    ws = getattr(mantid_algs, alg_name)(StoreInADS=False, **kwargs)
-
-    if store:
-        ws = wrap_workspace(ws, output_name)
-    return ws
-
-
-def get_workspace_names():
-    return [key for key in iterkeys(_loaded_workspaces) if key[:2] != '__']
-
-
-def get_workspace_name(workspace):
-    """Returns the name of a workspace given the workspace handle"""
-    if isinstance(workspace, string_types):
-        return workspace
-    return workspace.name
-
-
-def delete_workspace(workspace):
-    workspace = get_workspace_handle(workspace)
-    del _loaded_workspaces[get_workspace_name(workspace)]
-    del workspace
-
-
-def workspace_exists(ws_name):
-    return ws_name in _loaded_workspaces
 
 
 def get_limits(workspace, axis):
@@ -106,7 +44,7 @@ def get_limits(workspace, axis):
         return minimum, maximum, step
 
 
-def _processEfixed(workspace):
+def processEfixed(workspace):
     """Checks whether the fixed energy is defined for this workspace"""
     try:
         workspace.e_fixed = _get_ws_EFixed(workspace.raw_ws)
@@ -221,36 +159,25 @@ def _get_theta_for_limits_event(ws):
 
 
 def load(filename, output_workspace):
-    wrapped = run_alg('Load', output_name=output_workspace, Filename=filename)
-    wrapped.e_mode = get_EMode(wrapped.raw_ws)
-    if wrapped.e_mode == 'Indirect':
-        _processEfixed(wrapped)
-    _processLoadedWSLimits(wrapped)
-    return wrapped
-
-
-def wrap_workspace(raw_ws, name):
-    if isinstance(raw_ws, IMDEventWorkspace):
-        wrapped = PixelWorkspace(raw_ws, name)
-    elif isinstance(raw_ws, IMDHistoWorkspace):
-        wrapped = HistogramWorkspace(raw_ws, name)
-    else:
-        wrapped = MatrixWorkspace(raw_ws, name)
-    _loaded_workspaces[name] = wrapped
-    return wrapped
+    workspace = run_algorithm('Load', output_name=output_workspace, Filename=filename)
+    workspace.e_mode = get_EMode(workspace.raw_ws)
+    if workspace.e_mode == 'Indirect':
+        processEfixed(workspace)
+    _processLoadedWSLimits(workspace)
+    return workspace
 
 
 def rename_workspace(selected_workspace, new_name):
     workspace = get_workspace_handle(selected_workspace)
-    del _loaded_workspaces[workspace.raw_ws.name()]
-    run_alg('RenameWorkspace', output_name=new_name, InputWorkspace=workspace)
-    _loaded_workspaces[new_name] = workspace
+    remove_workspace(workspace)
+    run_algorithm('RenameWorkspace', output_name=new_name, InputWorkspace=workspace)
+    add_workspace(workspace, new_name)
     return workspace
 
 
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws).raw_ws for ws in selected_workspaces]
-    ws = run_alg('MergeMD', output_name=new_name, InputWorkspaces=workspaces)
+    ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspaces)
     # Use precalculated step size, otherwise get limits directly from workspace
     ax1 = ws.raw_ws.getDimension(0)
     ax2 = ws.raw_ws.getDimension(1)
@@ -266,19 +193,19 @@ def combine_workspace(selected_workspaces, new_name):
 
 def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
-    sum_ws = run_alg('MergeRuns', output_name=out_ws_name, InputWorkspaces=selected_ws)
+    sum_ws = run_algorithm('MergeRuns', output_name=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
     bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = run_alg('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf,
-                           StoreInADS=False)
+    scaled_bg_ws = run_algorithm('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf,
+                                 StoreInADS=False)
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result = run_alg('Minus', output_name=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
-                             RHSWorkspace=scaled_bg_ws)
+            result = run_algorithm('Minus', output_name=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
+                                   RHSWorkspace=scaled_bg_ws)
             propagate_properties(ws, result)
     except ValueError as e:
         raise ValueError(e)
