@@ -22,6 +22,7 @@ s_api._create_algorithm_function('Cut', 1, Cut())
 
 
 def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
+    print(alg_name)
     if isinstance(kwargs.get('InputWorkspace'), Workspace):
         kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
     if output_name is not None:
@@ -43,3 +44,4 @@ def add_to_ads(workspaces):
     yield
     for workspace in workspaces:
         AnalysisDataService.Instance().remove(workspace.name)
+
