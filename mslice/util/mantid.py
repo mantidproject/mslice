@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from contextlib import contextmanager
 from six import iteritems
 import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory, AnalysisDataService
@@ -14,6 +15,7 @@ def initialize_mantid():
 
 
 def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
+    print(alg_name)
     if isinstance(kwargs.get('InputWorkspace'), Workspace):
         kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
     if output_name is not None:
@@ -26,11 +28,12 @@ def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
         add_workspace(ws, output_name)
     return ws
 
-def run_ADS_dependent_algorithm(alg_name, output_name, input_workspace_dict):
+
+@contextmanager
+def add_to_ads(workspaces):
     '''Need to wrap some algorithm calls because they don't like input workspaces that aren't in the ADS...'''
-    for workspace in iteritems(input_workspace_dict):
-        AnalysisDataService.Instance().addOrReplace(*workspace)
-    ws = run_algorithm(alg_name, output_name=output_name, InputWorkspaces=input_workspace_dict.keys())
-    for workspace in input_workspace_dict.keys():
+    for workspace in workspaces:
+        AnalysisDataService.Instance().addOrReplace(workspace.name, workspace.raw_ws)
+    yield
+    for workspace in workspaces:
         AnalysisDataService.Instance().remove(str(workspace))
-    return ws
