@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 from contextlib import contextmanager
-from six import iteritems
 import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory, AnalysisDataService
 from mslice.models.workspacemanager.workspace_provider import add_workspace
