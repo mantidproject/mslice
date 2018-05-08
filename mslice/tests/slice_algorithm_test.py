@@ -6,7 +6,7 @@ import unittest
 
 from mslice.models.axis import Axis
 from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-
+from mslice.util.mantid import initialize_mantid, run_algorithm
 
 def invert_axes(matrix):
     return np.rot90(np.flipud(matrix))
@@ -16,6 +16,7 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        initialize_mantid()
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25)
         cls.scattering_rotated = np.rot90(cls.sim_scattering_data, k=3)
         cls.scattering_rotated = np.flipud(cls.scattering_rotated)
@@ -23,6 +24,17 @@ class SliceAlgorithmTest(unittest.TestCase):
         cls.e_axis = Axis('DeltaE', -10, 15, 1)
         cls.q_axis = Axis('|Q|', 0.1, 3.1, 0.1)
         cls.q_axis_degrees = Axis('Degrees', 3, 33, 1)
+
+        cls.test_ws = run_algorithm('CreateSampleWorkspace', output_name='test_ws', XUnit='DeltaE')
+        run_algorithm('AddSampleLog', Workspace=cls.test_ws.raw_ws, store=False, LogName='Ei', LogText='3.',
+                      LogType='Number')
+        cls.test_ws.e_mode = 'Direct'
+        cls.test_ws.e_fixed = 3
+
+    def test_slice(self):
+        plot, boundaries = self.slice_alg.compute_slice('test_ws', self.q_axis, self.e_axis, False)
+        self.assertEqual(np.shape(plot[0]), (25, 30))
+        np.testing.assert_array_equal(boundaries, [0.1, 3.1, -10, 15])
 
     def test_boltzmann_dist(self):
         e_axis = np.arange(self.e_axis.start, self.e_axis.end, self.e_axis.step)
