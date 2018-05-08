@@ -43,4 +43,3 @@ def add_to_ads(workspaces):
     yield
     for workspace in workspaces:
         AnalysisDataService.Instance().remove(workspace.name)
-
