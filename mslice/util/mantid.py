@@ -1,5 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
+
 from contextlib import contextmanager
+
 import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory, AnalysisDataService
 from mslice.models.workspacemanager.workspace_provider import add_workspace
@@ -41,3 +43,4 @@ def add_to_ads(workspaces):
     yield
     for workspace in workspaces:
         AnalysisDataService.Instance().remove(workspace.name)
+
