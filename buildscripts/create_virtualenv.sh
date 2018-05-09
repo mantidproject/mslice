@@ -6,7 +6,7 @@ python_exe=$1
 env_dir=$2
 
 # install virtualenv locally if it is not present
-$python_exe -c 'import virtualenv' > /dev/null 2>&1 || $python_exe -m pip install --user virtualenv
+$python_exe -c 'import virtualenv' > /dev/null 2>&1 || $python_exe -m easy_install --user virtualenv
 
 # check if the environment already exists
 if [ ! -d "$env_dir" ]
