@@ -20,10 +20,12 @@ trap onexit EXIT
 case "$py_ver" in
     py2)
         py_exe=/usr/bin/python
+        export PYTHONPATH=/opt/mantidnightly/bin
         export QT_API=pyqt
     ;;
     py3)
         py_exe=/usr/bin/python3
+        export PYTHONPATH=/opt/mantidnightly-python3/bin
     ;;
     *)
         echo "Unknown python version requested '$py_ver'"
@@ -50,8 +52,6 @@ sudo gdebi -n $(find "${mantid_deb_dir}" -name '*.deb' -type f -print)
 # use a virtual environment
 ${script_dir}/create_virtualenv.sh ${py_exe} ${venv_dir}
 source ${venv_dir}/bin/activate
-# add mantid to the Python path
-export PYTHONPATH=/opt/mantidnightly/bin
 
 # ------------------------------------------------------------------------------
 # installation
