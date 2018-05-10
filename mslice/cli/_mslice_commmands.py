@@ -85,7 +85,7 @@ def load(path):
     if not ospath.exists(path):
         raise RuntimeError('could not find the path %s' % path)
     MAIN_WINDOW.dataloader_presenter.load_workspace([path])
-    return get_workspace_handle(ospath.basename(path).split('.')[0])
+    return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
 
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
