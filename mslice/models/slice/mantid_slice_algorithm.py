@@ -7,8 +7,7 @@ from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionCon
 from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
-from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-
+from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid import run_algorithm
@@ -25,7 +24,7 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
                      'Tantalum': ['3.3013 3.3013 3.3013', 'I m -3 m', 'Ta 0 0 0 1.0 0.05']}
 
 
-class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
+class MantidSliceAlgorithm(SliceAlgorithm):
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = get_workspace_handle(selected_workspace)
@@ -40,6 +39,7 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
             plot_data = self._norm_to_one(plot_data)
         plot = [plot_data] + [None]*5
         return plot, boundaries
+
 
     def plot_data_from_slice(self, input_ws, slice_ws, x_axis, PSD):
         if PSD:
@@ -74,9 +74,9 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         :return: A new numpy array containing the axis values
         """
         if reverse:
-            values = np.linspace(axis.end, axis.start, self._get_number_of_steps(axis))
+            values = np.linspace(axis.end, axis.start, get_number_of_steps(axis))
         else:
-            values = np.linspace(axis.start, axis.end, self._get_number_of_steps(axis))
+            values = np.linspace(axis.start, axis.end, get_number_of_steps(axis))
         return values
 
     def compute_boltzmann_dist(self, sample_temp, delta_e):

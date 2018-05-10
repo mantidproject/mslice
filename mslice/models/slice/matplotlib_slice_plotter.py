@@ -195,12 +195,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def get_available_colormaps(self):
         return self._colormaps
 
-    def get_available_axis(self, selected_workspace):
-        return self._slice_algorithm.get_available_axis(selected_workspace)
-
-    def get_axis_range(self, workspace, dimension_name):
-        return self._slice_algorithm.get_axis_range(workspace, dimension_name)
-
     def get_recoil_label(self, key):
         return recoil_labels[key]
 
