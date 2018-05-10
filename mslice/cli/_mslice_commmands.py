@@ -9,8 +9,6 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
 from mantid.api import IMDWorkspace as _IMDWorkspace
-from mantid.kernel.funcinspect import lhs_info as _lhs_info
-from mantid.simpleapi import mtd, ConvertUnits, RenameWorkspace # noqa: F401
 
 from mslice.app import MAIN_WINDOW
 from mslice.workspace.base import WorkspaceBase as Workspace
@@ -197,7 +195,7 @@ def get_cut_xye(input_workspace, cut_axis, integration_start, integration_end, n
     integration_end -- The value to end the integration at
     normalize -- will normalize the cut data to one if set to true
     """
-    if isinstance(input_workspace, _Workspace):
+    if isinstance(input_workspace, Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
     x, y, e = _CUT_ALGORITHM.compute_cut_xye(input_workspace, cut_axis, integration_start, integration_end,
@@ -221,7 +219,7 @@ def plot_cut(input_workspace, cut_axis, integration_start, integration_end, inte
     integration_end -- The value to end the integration at
     normalize -- will normalize the cut data to one if set to true
     """
-    if isinstance(input_workspace, _Workspace):
+    if isinstance(input_workspace, Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
     _CUT_PLOTTER.plot_cut(input_workspace, cut_axis, integration_start, integration_end, normalize, intensity_start,
