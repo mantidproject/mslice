@@ -4,13 +4,16 @@ import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory
 from mslice.models.workspacemanager.workspace_provider import add_workspace
 from mslice.models.projection.powder.make_projection import MakeProjection
+from mslice.models.slice.slice import Slice
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as Workspace
 
 
 def initialize_mantid():
     AlgorithmFactory.subscribe(MakeProjection)
+    AlgorithmFactory.subscribe(Slice)
     s_api._create_algorithm_function('MakeProjection', 1, MakeProjection())
+    s_api._create_algorithm_function('Slice', 1, Slice())
 
 
 def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
