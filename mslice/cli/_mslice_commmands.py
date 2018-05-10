@@ -17,6 +17,7 @@ from mslice.app import MAIN_WINDOW
 from mslice.util.mantid import run_algorithm
 # Helper tools
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.alg_workspace_ops import get_axis_range, get_available_axis
 from mslice.models.axis import Axis
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
@@ -42,14 +43,18 @@ _CUT_PLOTTER = MatplotlibCutPlotter(_CUT_ALGORITHM)
 # -----------------------------------------------------------------------------
 
 def _process_axis(axis, fallback_index, input_workspace):
+    available_axes = get_available_axis(input_workspace)
     if axis is None:
-        axis = _SLICE_ALGORITHM.get_available_axis(input_workspace)[fallback_index]
+        axis = available_axes[fallback_index]
     # check to see if axis is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
     if ',' in axis:
         axis = _string_to_axis(axis)
+    elif axis in available_axes:
+        range = get_axis_range(input_workspace, axis)
+        range = map(float, range)
+        axis = Axis(units=axis, start=range[0], end=range[1], step=range[2])
     else:
-        axis = Axis(units=axis, start=None, end=None, step=None)
-        fill_in_missing_input(axis, input_workspace)
+        raise RuntimeError('Axis input not recognised.')
     return axis
 
 def _string_to_axis(string):
@@ -114,15 +119,15 @@ def get_projection(input_workspace, axis1, axis2, units='meV'):
     RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=names[0])
     return output_workspace
 
-def Slice(InputWorkspace, Axis1, Axis2, NormToOne=False):
+def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     """ Slices workspace.
 
        Keyword Arguments:
-       InputWorkspace -- The workspace to slice. Must be an MDWorkspace with 2 Dimensions. The parameter can be either a
-       python handle to the workspace to slice OR the workspaces name in the ADS (string)
+       InputWorkspace -- The workspace to slice. The parameter can be either a python handle to the workspace
+       OR the workspaces name as a string.
 
-       Axis1 -- The x axis of the slice. If not specified will default to Dimension 0 of the workspace
-       Axis2 -- The y axis of the slice. If not specified will default to Dimension 1 of the workspace
+       Axis1 -- The x axis of the slice. If not specified will default to |Q| (or Degrees).
+       Axis2 -- The y axis of the slice. If not specified will default to DeltaE
        Axis Format:-
            Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5'
            or just the name e.g. 'DeltaE'. That case the start and en will default to the range in the data.
@@ -132,12 +137,10 @@ def Slice(InputWorkspace, Axis1, Axis2, NormToOne=False):
        """
     workspace = get_workspace_handle(InputWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
-    y_axis = _process_axis(Axis2, 1, workspace)
+    y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
 
     return run_algorithm('Slice', InputWorkspace=workspace, XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), EMode=workspace.e_mode,
                          PSD=workspace.is_PSD, NormToOne = NormToOne)
-
-
 
 
 def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_min=None, intensity_max=None,
