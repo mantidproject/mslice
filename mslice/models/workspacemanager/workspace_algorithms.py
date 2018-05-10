@@ -170,14 +170,14 @@ def load(filename, output_workspace):
 def rename_workspace(selected_workspace, new_name):
     workspace = get_workspace_handle(selected_workspace)
     remove_workspace(workspace)
-    run_algorithm('RenameWorkspace', output_name=new_name, InputWorkspace=workspace)
     add_workspace(workspace, new_name)
     return workspace
 
 
 def combine_workspace(selected_workspaces, new_name):
-    workspaces = [get_workspace_handle(ws).raw_ws for ws in selected_workspaces]
-    ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspaces)
+    workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
+    with add_to_ads(workspaces):
+        ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspaces)
     # Use precalculated step size, otherwise get limits directly from workspace
     ax1 = ws.raw_ws.getDimension(0)
     ax2 = ws.raw_ws.getDimension(1)
@@ -201,8 +201,7 @@ def add_workspace_runs(selected_ws):
 
 def subtract(workspaces, background_ws, ssf):
     bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = run_algorithm('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf,
-                                 StoreInADS=False)
+    scaled_bg_ws = run_algorithm('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf)
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
