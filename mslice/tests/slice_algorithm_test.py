@@ -6,7 +6,7 @@ import unittest
 
 from mslice.models.axis import Axis
 from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-
+from mslice.util.mantid import initialize_mantid, run_algorithm
 
 def invert_axes(matrix):
     return np.rot90(np.flipud(matrix))
@@ -16,6 +16,7 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        initialize_mantid()
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25)
         cls.scattering_rotated = np.rot90(cls.sim_scattering_data, k=3)
         cls.scattering_rotated = np.flipud(cls.scattering_rotated)
@@ -24,10 +25,21 @@ class SliceAlgorithmTest(unittest.TestCase):
         cls.q_axis = Axis('|Q|', 0.1, 3.1, 0.1)
         cls.q_axis_degrees = Axis('Degrees', 3, 33, 1)
 
+        cls.test_ws = run_algorithm('CreateSampleWorkspace', output_name='test_ws', XUnit='DeltaE')
+        run_algorithm('AddSampleLog', Workspace=cls.test_ws.raw_ws, store=False, LogName='Ei', LogText='3.',
+                      LogType='Number')
+        cls.test_ws.e_mode = 'Direct'
+        cls.test_ws.e_fixed = 3
+
+    def test_slice(self):
+        plot, boundaries = self.slice_alg.compute_slice('test_ws', self.q_axis, self.e_axis, False)
+        self.assertEqual(np.shape(plot[0]), (25, 30))
+        np.testing.assert_array_equal(boundaries, [0.1, 3.1, -10, 15])
+
     def test_boltzmann_dist(self):
         e_axis = np.arange(self.e_axis.start, self.e_axis.end, self.e_axis.step)
         boltz = self.slice_alg.compute_boltzmann_dist(10, e_axis)
-        self.assertAlmostEqual(boltz[0], 109591.959, 3)
+        self.assertAlmostEqual(boltz[0], 109592.269, 3)
         self.assertAlmostEqual(boltz[10], 1.0, 3)
         self.assertAlmostEqual(boltz[20], 0.000009125, 9)
 
@@ -78,9 +90,9 @@ class SliceAlgorithmTest(unittest.TestCase):
         ws_handle_mock.return_value.e_fixed = 20
         x_axis, line = self.slice_alg.compute_recoil_line('ws_name', self.q_axis)
         self.assertEqual(len(line), 30)
-        self.assertAlmostEqual(line[0], 0.020721, 6)
-        self.assertAlmostEqual(line[10], 2.507271, 6)
-        self.assertAlmostEqual(line[29], 18.649123, 6)
+        self.assertAlmostEqual(line[0], 0.02072, 4)
+        self.assertAlmostEqual(line[10], 2.5073, 4)
+        self.assertAlmostEqual(line[29], 18.6491, 4)
 
     @patch('mslice.models.slice.mantid_slice_algorithm.get_workspace_handle')
     def test_recoil_line_mass(self, ws_handle_mock):
@@ -118,8 +130,8 @@ class SliceAlgorithmTest(unittest.TestCase):
         ws_handle_mock.return_value.e_fixed = 20
         x, y = self.slice_alg.compute_powder_line('ws_name', Axis('Degrees', 3, 93, 1), 'Copper')
         self.assertEqual(len(x), len(y))
-        self.assertAlmostEqual(x[0], 57.961394, 6)
-        self.assertAlmostEqual(x[4], 68.038257, 6)
+        self.assertAlmostEqual(x[0], 57.9614, 4)
+        self.assertAlmostEqual(x[4], 68.0383, 4)
         self.assertTrue(np.isnan(x[5]))
         self.assertEqual(y[0], 1)
         self.assertEqual(y[1], -1)
