@@ -178,11 +178,9 @@ def rename_workspace(selected_workspace, new_name):
 
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
-    workspace_names = [workspace.name for workspace in workspaces]
     with add_to_ads(workspaces):
-        ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspace_names)
-    propagate_properties(workspaces[0], ws)
-    # Set limits for result workspace. Use precalculated step size, otherwise get limits directly from Mantid workspace
+        ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspaces)
+    # Use precalculated step size, otherwise get limits directly from workspace
     ax1 = ws.raw_ws.getDimension(0)
     ax2 = ws.raw_ws.getDimension(1)
     step1 = []
