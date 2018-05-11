@@ -130,15 +130,17 @@ class MainWindow(MainView, QMainWindow):
         self.cut_presenter.notify(cut_command.PlotOverFromWorkspace)
 
     def init_ui(self):
-        ipython = IPythonWidget()
-        self.splitter.addWidget(ipython)
-        self.splitter.setSizes([500, 250])
-
+        self.setup_ipython()
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")
         self.busy_text.setStyleSheet("QLabel { color: black }")
         self.busy = False
+
+    def setup_ipython(self):
+        ipython = IPythonWidget()
+        self.splitter.addWidget(ipython)
+        self.splitter.setSizes([500, 250])
 
     def show_error(self, msg):
         """Show an error message on status bar. If msg ==""  the function will clear the displayed message """
