@@ -1,5 +1,4 @@
 import numpy as np
-from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 
 
@@ -12,10 +11,7 @@ class AlgWorkspaceOps(object):
         workspace = get_workspace_handle(workspace)
         return tuple(workspace.limits[dimension_name])
 
-    def get_comment(self, workspace):
-        return get_comment(workspace)
-
-    def _fill_in_missing_input(self,axis,workspace):
+    def _fill_in_missing_input(self, axis, workspace):
         dim = workspace.getDimensionIndexByName(axis.units)
         dim = workspace.getDimension(dim)
 
