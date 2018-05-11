@@ -12,11 +12,7 @@ import numpy as np
 from scipy import constants
 
 from mslice.models.axis import Axis
-<<<<<<< HEAD:mslice/models/workspacemanager/workspace_algorithms.py
-from mslice.util.mantid import run_algorithm
-=======
 from mslice.util.mantid import add_to_ads, run_algorithm
->>>>>>> 50b7e428a9b106d024b0bd30ea6535ba89214578:mslice/models/workspacemanager/workspace_algorithms.py
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
                                                                remove_workspace, add_workspace)
 from mslice.workspace.pixel_workspace import PixelWorkspace
