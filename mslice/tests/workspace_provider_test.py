@@ -21,6 +21,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
                                         QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                         SplitInto='50,50')
         self.test_ws_md.ef_defined = False
+        self.test_ws_md.is_PSD = True
         self.test_ws_md.limits = {'DeltaE': [0, 2, 1]}
 
     def test_delete_workspace(self):
@@ -47,6 +48,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         combined = combine_workspace([self.test_ws_md, ws_2], 'combined')
         np.testing.assert_array_almost_equal(combined.limits['DeltaE'], [-10, 10, 1], 4)
         np.testing.assert_array_almost_equal(combined.limits['|Q|'], [0.071989, 3.45243, 0.033804], 4)
+        self.assertTrue(combined.is_PSD)
 
     def test_process_EFixed(self):
         processEfixed(self.test_ws_2d)
