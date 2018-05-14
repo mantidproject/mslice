@@ -9,16 +9,14 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
 from mantid.api import IMDWorkspace as _IMDWorkspace
-from mantid.api import Workspace as _Workspace
-from mantid.kernel.funcinspect import lhs_info as _lhs_info
-from mantid.simpleapi import mtd, ConvertUnits, RenameWorkspace # noqa: F401
 
 from mslice.app import MAIN_WINDOW
 from mslice.util.mantid import run_algorithm
 # Helper tools
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axis
 from mslice.models.axis import Axis
+from mslice.workspace.base import WorkspaceBase as Workspace
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
 # Slicing
@@ -96,29 +94,29 @@ def load(path):
     MAIN_WINDOW.dataloader_presenter.load_workspace([path])
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
-def get_projection(input_workspace, axis1, axis2, units='meV'):
+
+def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
     """ Calculate projections of workspace.
 
-    Keyword Arguments:
-        input_workspace -- Workspace to project, can be either python handle to workspace or a string containing the
-        workspace name.
-        axis1 -- The first axis of projection (string)
-        axis2 -- The second axis of the projection (string)
-        units -- The energy units (string) [default: 'meV']
+       Keyword Arguments:
+           InputWorkspace -- Workspace to project, can be either python handle to workspace or a string containing the
+           workspace name.
+           Axis1 -- The first axis of projection (string)
+           Axis2 -- The second axis of the projection (string)
+           Units -- The energy units (string) [default: 'meV']
 
-    """
-    if isinstance(input_workspace, _Workspace):
-        input_workspace = input_workspace.getName()
-    output_workspace = _POWDER_PROJECTION_MODEL.calculate_projection(input_workspace=input_workspace, axis1=axis1,
-                                                                     axis2=axis2, units=units)
-    try:
-        names = _lhs_info('names')
-    except RuntimeError:
-        names = [output_workspace.getName()]
-    if len(names) > 1:
-        raise Exception('Too many left hand side arguments, %s' % str(names))
-    RenameWorkspace(InputWorkspace=output_workspace, OutputWorkspace=names[0])
-    return output_workspace
+       """
+    if isinstance(InputWorkspace, Workspace):
+        InputWorkspace = InputWorkspace.name
+    if not isinstance(InputWorkspace, str):
+        raise TypeError('InputWorkspace must be a workspace or a workspace name')
+    if not workspace_exists(InputWorkspace):
+        raise TypeError('InputWorkspace %s could not be found.' % InputWorkspace)
+
+    proj_ws = MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
+    MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
+    return proj_ws
+
 
 def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     """ Slices workspace.
@@ -191,7 +189,7 @@ def get_cut_xye(input_workspace, cut_axis, integration_start, integration_end, n
     integration_end -- The value to end the integration at
     normalize -- will normalize the cut data to one if set to true
     """
-    if isinstance(input_workspace, _Workspace):
+    if isinstance(input_workspace, Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
     x, y, e = _CUT_ALGORITHM.compute_cut_xye(input_workspace, cut_axis, integration_start, integration_end,
@@ -215,7 +213,7 @@ def plot_cut(input_workspace, cut_axis, integration_start, integration_end, inte
     integration_end -- The value to end the integration at
     normalize -- will normalize the cut data to one if set to true
     """
-    if isinstance(input_workspace, _Workspace):
+    if isinstance(input_workspace, Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
     _CUT_PLOTTER.plot_cut(input_workspace, cut_axis, integration_start, integration_end, normalize, intensity_start,
