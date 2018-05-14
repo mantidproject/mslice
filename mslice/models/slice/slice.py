@@ -1,11 +1,11 @@
 from mantid.api import PythonAlgorithm, WorkspaceProperty, IMDEventWorkspace
 from mantid.kernel import Direction, StringMandatoryValidator, PropertyManagerProperty
 from mantid.simpleapi import BinMD, Rebin2D, ConvertSpectrumAxis, SofQW3
-from mslice.models.alg_workspace_ops import AlgWorkspaceOps
+from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
 
 
-class Slice(AlgWorkspaceOps, PythonAlgorithm):
+class Slice(PythonAlgorithm):
 
     def PyInit(self):
         self.declareProperty(WorkspaceProperty('InputWorkspace', "", direction=Direction.Input))
@@ -37,10 +37,10 @@ class Slice(AlgWorkspaceOps, PythonAlgorithm):
 
     def _compute_slice_PSD(self, workspace, x_axis, y_axis, norm_to_one):
         assert isinstance(workspace, IMDEventWorkspace)
-        self._fill_in_missing_input(x_axis, workspace)
-        self._fill_in_missing_input(y_axis, workspace)
-        n_x_bins = self._get_number_of_steps(x_axis)
-        n_y_bins = self._get_number_of_steps(y_axis)
+        fill_in_missing_input(x_axis, workspace)
+        fill_in_missing_input(y_axis, workspace)
+        n_x_bins = get_number_of_steps(x_axis)
+        n_y_bins = get_number_of_steps(y_axis)
         x_dim_id = workspace.getDimensionIndexByName(x_axis.units)
         y_dim_id = workspace.getDimensionIndexByName(y_axis.units)
         x_dim = workspace.getDimension(x_dim_id)

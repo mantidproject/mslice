@@ -6,7 +6,7 @@ class Axis(object):
         self.step = step
 
     def to_dict(self):
-        return{'start': self.start, 'end': self.end, 'step': self.step, 'units': self.units}
+        return {'start': self.start, 'end': self.end, 'step': self.step, 'units': self.units}
 
     def __eq__(self, other):
         # This is required for Unit testing
