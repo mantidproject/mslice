@@ -1,12 +1,7 @@
 from __future__ import (absolute_import, division,
                         print_function)
 
-import inspect
-import threading
-import types
 import warnings
-
-from mslice.util.qt import QtWidgets
 
 # Ignore Jupyter/IPython deprecation warnings that we can't do anything about
 warnings.filterwarnings('ignore', category=DeprecationWarning, module='IPython.*')
