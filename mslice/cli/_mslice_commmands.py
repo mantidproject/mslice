@@ -54,7 +54,8 @@ def _process_axis(axis, fallback_index, input_workspace):
         range = map(float, range)
         axis = Axis(units=axis, start=range[0], end=range[1], step=range[2])
     else:
-        raise RuntimeError('Axis input not recognised.')
+        raise RuntimeError("Axis '%s' not recognised. Workspace has these axes: %s " %
+                           (axis, ', '.join(available_axes)))
     return axis
 
 def _string_to_axis(string):
