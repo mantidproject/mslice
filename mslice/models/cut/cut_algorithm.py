@@ -1,9 +1,9 @@
 
 class CutAlgorithm(object):
-    def compute_cut(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
+    def compute_cut(self, selected_workspace, cut_axis, integration_axis, is_norm):
         pass
 
-    def compute_cut_xye(self, selected_workspace, cut_axis, integration_start, integration_end, is_norm):
+    def compute_cut_xye(self, selected_workspace, cut_axis, integration_axis, is_norm):
         pass
 
     def get_arrays_from_workspace(self, workspace):

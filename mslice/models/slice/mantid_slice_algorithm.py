@@ -7,9 +7,11 @@ from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionCon
 from scipy import constants
 
 from .slice_algorithm import SliceAlgorithm
-from mslice.models.alg_workspace_ops import AlgWorkspaceOps
-from mslice.models.workspacemanager.workspace_algorithms import (propagate_properties, run_algorithm)
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
+from mslice.models.alg_workspace_ops import get_number_of_steps
+from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.util.mantid import run_algorithm
+
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
@@ -22,14 +24,14 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
                      'Tantalum': ['3.3013 3.3013 3.3013', 'I m -3 m', 'Ta 0 0 0 1.0 0.05']}
 
 
-class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
+class MantidSliceAlgorithm(SliceAlgorithm):
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = get_workspace_handle(selected_workspace)
-        if workspace.is_PSD:
-            plot_data = self._compute_slice_PSD(workspace, x_axis, y_axis, norm_to_one)
-        else:
-            plot_data = self._compute_slice_nonPSD(workspace, x_axis, y_axis, norm_to_one)
+        slice =  run_algorithm('Slice', output_name = '__' + workspace.name, InputWorkspace=workspace,
+                               XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
+                               EMode=workspace.e_mode, NormToOne=norm_to_one)
+        plot_data = self.plot_data_from_slice(workspace, slice, x_axis, workspace.is_PSD)
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)
         boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
@@ -38,55 +40,29 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         plot = [plot_data] + [None]*5
         return plot, boundaries
 
-    def _compute_slice_PSD(self, workspace, x_axis, y_axis, norm_to_one):
-        assert isinstance(workspace, PixelWorkspace)
-        raw_ws = workspace.raw_ws
-        self._fill_in_missing_input(x_axis, raw_ws)
-        self._fill_in_missing_input(y_axis, raw_ws)
-        n_x_bins = self._get_number_of_steps(x_axis)
-        n_y_bins = self._get_number_of_steps(y_axis)
-        x_dim_id = raw_ws.getDimensionIndexByName(x_axis.units)
-        y_dim_id = raw_ws.getDimensionIndexByName(y_axis.units)
-        x_dim = raw_ws.getDimension(x_dim_id)
-        y_dim = raw_ws.getDimension(y_dim_id)
-        xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
-        ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
-        ws_name = get_workspace_name(workspace)
-        thisslice = run_algorithm('BinMD', output_name='__' + ws_name, InputWorkspace=raw_ws, AxisAligned="1",
-                                  AlignedDim0=xbinning, AlignedDim1=ybinning)
-        propagate_properties(workspace, thisslice)
-        thisslice = thisslice.raw_ws
+
+    def plot_data_from_slice(self, input_ws, slice_ws, x_axis, PSD):
+        if PSD:
+            return self.get_plot_data_PSD(input_ws, slice_ws)
+        else:
+            return self.get_plot_data_nonPSD(input_ws, slice_ws, x_axis)
+
+    def get_plot_data_PSD(self, input_ws, slice_ws):
+        slice = slice_ws.raw_ws
         # perform number of events normalization
         with np.errstate(invalid='ignore'):
-            if thisslice.displayNormalization() == MDNormalization.NoNormalization:
-                plot_data = np.array(thisslice.getSignalArray())
-                plot_data[np.where(thisslice.getNumEventsArray() == 0)] = np.nan
+            if slice.displayNormalization() == MDNormalization.NoNormalization:
+                plot_data = np.array(slice.getSignalArray())
+                plot_data[np.where(slice.getNumEventsArray() == 0)] = np.nan
             else:
-                plot_data = thisslice.getSignalArray() / thisslice.getNumEventsArray()
+                plot_data = slice.getSignalArray() / slice.getNumEventsArray()
+        propagate_properties(input_ws, slice_ws)
         return plot_data
 
-    def _compute_slice_nonPSD(self, workspace, x_axis, y_axis, norm_to_one):
-        ws_name = get_workspace_name(workspace)
-        axes = [x_axis, y_axis]
+    def get_plot_data_nonPSD(self, input_ws, slice_ws, x_axis):
+        plot_data = slice_ws.raw_ws.extractY()
+        propagate_properties(input_ws, slice_ws)
         if x_axis.units == 'DeltaE':
-            e_axis = 0
-        elif y_axis.units == 'DeltaE':
-            e_axis = 1
-        else:
-            raise RuntimeError('Cannot calculate slices without an energy axis')
-        q_axis = (e_axis + 1) % 2
-        ebin = '%f, %f, %f' % (axes[e_axis].start, axes[e_axis].step, axes[e_axis].end)
-        qbin = '%f, %f, %f' % (axes[q_axis].start, axes[q_axis].step, axes[q_axis].end)
-        if axes[q_axis].units == '|Q|':
-            thisslice = run_algorithm('SofQW3', output_name='__' + ws_name, store=False, InputWorkspace=workspace,
-                                      QAxisBinning=qbin, EAxisBinning=ebin, EMode=workspace.e_mode)
-        else:
-            thisslice = run_algorithm('ConvertSpectrumAxis', store=False, InputWorkspace=workspace, Target='Theta')
-            thisslice = run_algorithm('Rebin2D', output_name='__' + ws_name, InputWorkspace=thisslice, Axis1Binning=ebin,
-                                      Axis2Binning=qbin)
-        plot_data = thisslice.extractY()
-        propagate_properties(workspace, thisslice)
-        if e_axis == 0:
             plot_data = np.transpose(plot_data)
         return plot_data
 
@@ -98,9 +74,9 @@ class MantidSliceAlgorithm(AlgWorkspaceOps, SliceAlgorithm):
         :return: A new numpy array containing the axis values
         """
         if reverse:
-            values = np.linspace(axis.end, axis.start, self._get_number_of_steps(axis))
+            values = np.linspace(axis.end, axis.start, get_number_of_steps(axis))
         else:
-            values = np.linspace(axis.start, axis.end, self._get_number_of_steps(axis))
+            values = np.linspace(axis.start, axis.end, get_number_of_steps(axis))
         return values
 
     def compute_boltzmann_dist(self, sample_temp, delta_e):

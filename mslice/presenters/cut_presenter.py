@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from .busy import show_busy
+from mslice.models.alg_workspace_ops import get_available_axis, get_axis_range
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_algorithm import CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
@@ -44,8 +45,6 @@ class CutPresenter(PresenterUtility):
                 self._cut(output_method=self._save_cut_to_workspace)
             elif command == Command.AxisChanged:
                 self._cut_axis_changed()
-            elif command == Command.IntegrationAxisChanged:
-                self._integration_axis_changed()
 
 
     def _cut(self, output_method, plot_over=False):
@@ -53,10 +52,11 @@ class CutPresenter(PresenterUtility):
         try:
             self._parse_step()
             parsed_params = self._parse_input()
-        except ValueError:
+        except ValueError as e:
+            self._cut_view.display_error(str(e))
             return
         for workspace in selected_workspaces:
-            params = (workspace,) + parsed_params
+            params = (workspace,) + parsed_params.unpack()
             self._run_cut_method(params, output_method, plot_over)
             plot_over = True # The first plot will respect which button the user pressed. The rest will over plot
 
@@ -112,67 +112,30 @@ class CutPresenter(PresenterUtility):
                 self._cut_view.populate_cut_params(self._cut_view.get_cut_axis_start(),
                                                    self._cut_view.get_cut_axis_end(),
                                                    "%0.5f" % step)
-                self._cut_view.error_invalid_cut_step_parameter()
+                self._cut_view.display_error("Invalid cut step parameter, using default.")
                 warnings.warn("Invalid cut step, using default value")
 
     def _parse_input(self):
-        # The messages of the raised exceptions are discarded. They are there for the sake of clarity/debugging
-        cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
-                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
-        if cut_axis.units == "":
-            self._cut_view.error_current_selection_invalid()
-            raise ValueError("Not supported")
-        try:
-            cut_axis.start = float(cut_axis.start)
-            cut_axis.end = float(cut_axis.end)
-            cut_axis.step = float(cut_axis.step)
-        except ValueError:
-            self._cut_view.error_invalid_cut_axis_parameters()
-            raise ValueError("Invalid Cut axis parameters")
+        '''Gets values entered by user. Validation is performed by the CutParams object.'''
+        cut_params = CutParams()
+        cut_params.cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
+                                   self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
 
-        if None not in (cut_axis.start, cut_axis.end) and cut_axis.start >= cut_axis.end:
-            self._cut_view.error_invalid_cut_axis_parameters()
-            raise ValueError("Invalid cut axis parameters")
+        cut_params.integration_axis = Axis(self._cut_view.get_integration_axis(), self._cut_view.get_integration_start(),
+                                           self._cut_view.get_integration_end(), 0.)
 
-        integration_axis = Axis(self._cut_view.get_integration_axis(), self._cut_view.get_integration_start(),
-                                self._cut_view.get_integration_end(), 0.)
-        try:
-            integration_axis.start = float(integration_axis.start)
-            integration_axis.end = float(integration_axis.end)
-        except ValueError:
-            self._cut_view.error_invalid_integration_parameters()
-            raise ValueError("Invalid integration parameters")
+        cut_params.intensity_start = self._cut_view.get_intensity_start()
+        cut_params.intensity_end = self._cut_view.get_intensity_end()
 
-        if None not in (integration_axis.start, integration_axis.end) and integration_axis.start >= integration_axis.end:
-            self._cut_view.error_invalid_integration_parameters()
-            raise ValueError("Integration start >= Integration End")
-
-        intensity_start = self._cut_view.get_intensity_start()
-        intensity_end = self._cut_view.get_intensity_end()
-        try:
-            intensity_start = self._to_float(intensity_start)
-            intensity_end = self._to_float(intensity_end)
-        except ValueError:
-            self._cut_view.error_invalid_intensity_parameters()
-            raise ValueError("Invalid intensity params")
-
-        norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
-        width = self._cut_view.get_integration_width()
-        if width.strip():
-            try:
-                width = float(width)
-            except ValueError:
-                self._cut_view.error_invalid_width()
-                raise ValueError("Invalid width")
-        else:
-            width = None
-        return cut_axis, integration_axis, norm_to_one, intensity_start, intensity_end, width
+        cut_params.norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
+        cut_params.width = self._cut_view.get_integration_width()
+        return cut_params
 
     def _set_minimum_step(self, workspace, axis):
         """Gets axes limits and then sets the minimumStep dictionary with those values"""
         for ax in axis:
             try:
-                self._minimumStep[ax] = self._cut_algorithm.get_axis_range(workspace, ax)[2]
+                self._minimumStep[ax] = get_axis_range(workspace, ax)[2]
             except (KeyError, RuntimeError):
                 self._minimumStep[ax] = None
         self._cut_view.set_minimum_step(self._minimumStep[axis[0]])
@@ -199,7 +162,7 @@ class CutPresenter(PresenterUtility):
 
     def _populate_fields_using_workspace(self, workspace, plotting=False):
         if self._cut_algorithm.is_cuttable(workspace):
-            axis = self._cut_algorithm.get_available_axis(workspace)
+            axis = get_available_axis(workspace)
             # There are three choices for which axes to select:
             #   1. If the current cut is of the same type (e.g. QE), and parameters for the current
             #      axis in the new cut has not been defined by the user, use the current axis
@@ -223,7 +186,7 @@ class CutPresenter(PresenterUtility):
             self._cut_view.populate_cut_axis_options(axis)
             self._cut_view.enable()
             self._cut_view.set_cut_axis(current_axis)
-            self._cut_view.update_integration_axis()
+            self.update_integration_axis()
             if not plotting and saved_parameters is not None:
                 self._cut_view.populate_input_fields(saved_parameters)
             self._previous_cut = workspace
@@ -234,6 +197,15 @@ class CutPresenter(PresenterUtility):
             self._cut_view.disable()
             self._previous_cut = None
             self._previous_axis = None
+
+    def update_integration_axis(self):
+        workspace = get_workspace_handle(self._main_presenter.get_selected_workspaces()[0])
+        axes = get_available_axis(workspace)
+        if self._cut_view.get_cut_axis() == 'DeltaE':
+            axes.remove('DeltaE')
+            self._cut_view.populate_integration_axis_options(axes)
+        else:
+            self._cut_view.populate_integration_axis_options(['DeltaE'])
 
     def _cut_axis_changed(self):
         if self._previous_axis is not None and not self._cut_view.is_fields_cleared():
@@ -247,4 +219,89 @@ class CutPresenter(PresenterUtility):
                 self._cut_view.populate_input_fields(saved_parameters)
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)
-        self._cut_view.update_integration_axis()
+        self.update_integration_axis()
+
+
+class CutParams(PresenterUtility):
+    '''
+    Groups parameters needed to cut and validates them
+    '''
+    def validate_axis(self, axis):
+        # Note this checks for empty / invalid string in axis parameters
+        axis.start = float(axis.start)
+        axis.end = float(axis.end)
+        axis.step = float(axis.step)
+
+        if axis.start >= axis.end:
+            raise ValueError()
+        return axis
+
+    def unpack(self):
+        return (self.cut_axis, self.integration_axis, self.norm_to_one, self.intensity_start,
+                self.intensity_end, self.width)
+
+    @property
+    def cut_axis(self):
+        return self._cut_axis
+
+    @cut_axis.setter
+    def cut_axis(self, axis):
+        try:
+            self._cut_axis = self.validate_axis(axis)
+        except ValueError:
+            raise ValueError('Invalid cut axis parameters')
+
+    @property
+    def integration_axis(self):
+        return self._integration_axis
+
+    @integration_axis.setter
+    def integration_axis(self, axis):
+        try:
+            self._integration_axis = self.validate_axis(axis)
+        except ValueError:
+            raise ValueError('Invalid integration axis parameters')
+
+    @property
+    def intensity_start(self):
+        return self._intensity_start
+
+    @intensity_start.setter
+    def intensity_start(self, int_start):
+        try:
+            self._intensity_start = self._to_float(int_start)
+        except ValueError:
+            raise ValueError('Invalid intensity parameters')
+
+    @property
+    def intensity_end(self):
+        return self._intensity_end
+
+    @intensity_end.setter
+    def intensity_end(self, int_end):
+        try:
+            self._intensity_end = self._to_float(int_end)
+        except ValueError:
+            raise ValueError('Invalid intensity parameters')
+
+    @property
+    def norm_to_one(self):
+        return self._norm_to_one
+
+    @norm_to_one.setter
+    def norm_to_one(self, value):
+        self._norm_to_one = value
+
+    @property
+    def width(self):
+        return self._width
+
+    @width.setter
+    def width(self, width_str):
+        if width_str.strip():
+            try:
+                self._width = float(width_str)
+            except ValueError:
+                raise ValueError("Invalid width")
+        else:
+            self._width = None
