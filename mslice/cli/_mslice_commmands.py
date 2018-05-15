@@ -17,6 +17,8 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axis
 from mslice.models.axis import Axis
 from mslice.workspace.base import WorkspaceBase as Workspace
+from mslice.workspace.workspace import Workspace as MatrixWorkspace
+from mslice.workspace.pixel_workspace import PixelWorkspace
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
 # Slicing
@@ -77,8 +79,13 @@ def _process_axis(axis, fallback_index, input_workspace, string_function=_string
     return axis
 
 
-
-
+def _validate_workspace(workspace)
+    if isinstance(workspace, Workspace):
+        workspace = workspace.name
+    if not isinstance(workspace, str):
+        raise TypeError('InputWorkspace must be a workspace or a workspace name')
+    if not workspace_exists(workspace):
+        raise TypeError('InputWorkspace %s could not be found.' % workspace)
 
 # -----------------------------------------------------------------------------
 # Command functions
@@ -109,12 +116,7 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
            Units -- The energy units (string) [default: 'meV']
 
        """
-    if isinstance(InputWorkspace, Workspace):
-        InputWorkspace = InputWorkspace.name
-    if not isinstance(InputWorkspace, str):
-        raise TypeError('InputWorkspace must be a workspace or a workspace name')
-    if not workspace_exists(InputWorkspace):
-        raise TypeError('InputWorkspace %s could not be found.' % InputWorkspace)
+    _validate_workspace(InputWorkspace)
 
     proj_ws = MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
     MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
@@ -137,7 +139,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
        NormToOne -- if true the slice will be normalized to one.
 
        """
-
+    _validate_workspace(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
@@ -162,7 +164,17 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     NormToOne -- if true the cut will be normalized to one.
 
     """
+    _validate_workspace(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
+    if workspace.PSD:
+        if isinstance(workspace, MatrixWorkspace):
+            raise RuntimeError("Incorrect workspace type - run MakeProjection first.")
+        if not isinstance(workspace, PixelWorkspace):
+            raise RuntimeError("Incorrect workspace type.")
+    else:
+        if not isinstance(workspace, MatrixWorkspace):
+            raise RuntimeError("Incorrect workspace type.")
+
     cut_axis = _process_axis(CutAxis, 0, workspace)
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
