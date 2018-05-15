@@ -45,12 +45,20 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         if not selected_workspaces or len(selected_workspaces) > 1:
             self._slice_view.error_select_one_workspace()
             return
-
+        status = None
         selected_workspace = selected_workspaces[0]
-        x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
-                      self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
-        y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
-                      self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
+        try:
+            x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
+                          self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
+        except ValueError:
+            self._slice_view.error_invalid_x_params()
+            return
+        try:
+            y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
+                          self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
+        except ValueError:
+            self._slice_view.error_invalid_y_params()
+            return
         status = self._process_axis(x_axis, y_axis)
         if status == INVALID_Y_PARAMS:
             self._slice_view.error_invalid_y_params()
@@ -103,19 +111,6 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
     def _process_axis(self, x, y):
         if x.units == y.units:
             return INVALID_PARAMS
-        try:
-            x.start = float(x.start)
-            x.step = float(x.step)
-            x.end = float(x.end)
-        except ValueError:
-            return INVALID_X_PARAMS
-
-        try:
-            y.start = float(y.start)
-            y.step = float(y.step)
-            y.end = float(y.end)
-        except ValueError:
-            return INVALID_Y_PARAMS
 
         if x.start and x.end:
             if x.start > x.end:
