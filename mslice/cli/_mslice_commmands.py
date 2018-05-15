@@ -79,7 +79,7 @@ def _process_axis(axis, fallback_index, input_workspace, string_function=_string
     return axis
 
 
-def _validate_workspace(workspace)
+def _validate_workspace(workspace):
     if isinstance(workspace, Workspace):
         workspace = workspace.name
     if not isinstance(workspace, str):
@@ -166,7 +166,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     """
     _validate_workspace(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
-    if workspace.PSD:
+    if workspace.is_PSD:
         if isinstance(workspace, MatrixWorkspace):
             raise RuntimeError("Incorrect workspace type - run MakeProjection first.")
         if not isinstance(workspace, PixelWorkspace):
