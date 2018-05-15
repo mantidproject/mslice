@@ -227,7 +227,7 @@ class CutParams(PresenterUtility):
     Groups parameters needed to cut and validates them
     '''
     def validate_axis(self, axis):
-         if axis.start >= axis.end:
+        if axis.start >= axis.end:
             raise ValueError()
 
     def unpack(self):
