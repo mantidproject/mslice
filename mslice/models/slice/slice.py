@@ -62,7 +62,9 @@ class Slice(PythonAlgorithm):
         if axes[q_axis].units == '|Q|':
             thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin, EMode=e_mode,
                                StoreInADS=False)
-        else:
+        elif axes[q_axis].units == '2Theta':
             thisslice = ConvertSpectrumAxis(InputWorkspace=workspace, Target='Theta', StoreInADS=False)
             thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin, StoreInADS=False)
+        else:
+            raise RuntimeError("axis %s not recognised, must be '|Q|' or '2Theta'" % axes[q_axis].units)
         return thisslice

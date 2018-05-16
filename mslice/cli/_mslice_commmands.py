@@ -82,7 +82,7 @@ def _string_to_axis(string):
 # Command functions
 # -----------------------------------------------------------------------------
 
-def load(path):
+def Load(path):
     """ Load a workspace from a file.
 
     Keyword Arguments:
