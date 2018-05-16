@@ -368,6 +368,9 @@ class SlicePlot(object):
         plot_figure.actionTantalum.triggered.disconnect()
         plot_figure.actionCIF_file.triggered.disconnect()
 
+    def close_event(self, event):
+        event.accept()
+
     @property
     def colorbar_label(self):
         return self._canvas.figure.get_axes()[1].get_ylabel()

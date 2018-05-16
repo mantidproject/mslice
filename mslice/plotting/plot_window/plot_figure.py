@@ -197,6 +197,9 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
     def move_window(self, x, y):
         self.move(self.pos().x() + x, self.pos().y() + y)
 
+    def closeEvent(self, event):
+        self._plot_handler.close_event(event)
+
     def get_window_title(self):
         return six.text_type(self.windowTitle())
 
