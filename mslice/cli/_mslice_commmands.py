@@ -23,16 +23,11 @@ from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm as _
 # Cutting
 from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm as _MantidCutAlgorithm
 from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.alg_workspace_ops import get_axis_range, get_available_axis
+from mslice.models.axis import Axis
 
-# -----------------------------------------------------------------------------
-# Module constants
-# -----------------------------------------------------------------------------
 
-_POWDER_PROJECTION_MODEL = _MantidProjectionCalculator()
-_SLICE_ALGORITHM = _MantidSliceAlgorithm()
-_SLICE_MODEL = _MatplotlibSlicePlotter(_SLICE_ALGORITHM)
-_CUT_ALGORITHM = _MantidCutAlgorithm()
-_CUT_PLOTTER = MatplotlibCutPlotter(_CUT_ALGORITHM)
 
 # -----------------------------------------------------------------------------
 # Convenience functions
