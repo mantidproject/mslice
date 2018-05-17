@@ -14,8 +14,8 @@ from scipy import constants
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
                                                                remove_workspace, add_workspace)
-from mslice.util.mantid.algorithm_wrapper import add_to_ads, run_algorithm
-from mslice.util.mantid.mantid_algorithms import Load
+from mslice.util.mantid.algorithm_wrapper import add_to_ads
+from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 
@@ -179,7 +179,7 @@ def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
     workspace_names = [workspace.name for workspace in workspaces]
     with add_to_ads(workspaces):
-        ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspace_names)
+        ws = MergeMD(OutputWorkspace=new_name, InputWorkspaces=workspace_names)
     propagate_properties(workspaces[0], ws)
     # Set limits for result workspace. Use precalculated step size, otherwise get limits directly from Mantid workspace
     ax1 = ws.raw_ws.getDimension(0)
@@ -198,18 +198,18 @@ def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
     workspaces = [get_workspace_handle(ws) for ws in selected_ws]
     with add_to_ads(workspaces):
-        sum_ws = run_algorithm('MergeRuns', output_name=out_ws_name, InputWorkspaces=selected_ws)
+        sum_ws = MergeRuns(OutputWorkspace=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
     bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = run_algorithm('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf)
+    scaled_bg_ws = Scale(OutputWorkspace='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf)
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result = run_algorithm('Minus', output_name=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
-                                   RHSWorkspace=scaled_bg_ws)
+            result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
+                           RHSWorkspace=scaled_bg_ws.raw_ws)
             propagate_properties(ws, result)
     except ValueError as e:
         raise ValueError(e)

@@ -10,8 +10,7 @@ from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.util.mantid.algorithm_wrapper import run_algorithm
-
+from mslice.util.mantid.mantid_algorithms import Slice, LoadCIF
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
@@ -28,9 +27,9 @@ class MantidSliceAlgorithm(SliceAlgorithm):
 
     def compute_slice(self, selected_workspace, x_axis, y_axis, norm_to_one):
         workspace = get_workspace_handle(selected_workspace)
-        slice =  run_algorithm('Slice', output_name = '__' + workspace.name, InputWorkspace=workspace,
-                               XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
-                               EMode=workspace.e_mode, NormToOne=norm_to_one)
+        slice = Slice(OutputWorkspace = '__' + workspace.name, InputWorkspace=workspace,
+                      XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
+                      EMode=workspace.e_mode, NormToOne=norm_to_one)
         plot_data = self.plot_data_from_slice(workspace, slice, x_axis, workspace.is_PSD)
         # rot90 switches the x and y axis to to plot what user expected.
         plot_data = np.rot90(plot_data)
@@ -236,7 +235,7 @@ class MantidSliceAlgorithm(SliceAlgorithm):
     def _crystal_structure(self, ws_name, element, cif_file):
         if cif_file:
             ws = get_workspace_handle(ws_name).raw_ws
-            run_algorithm('LoadCIF', store=False, InputWorkspace=ws, InputFile=cif_file)
+            LoadCIF(store=False, InputWorkspace=ws, InputFile=cif_file)
             return ws.sample().getCrystalStructure()
         else:
             return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],

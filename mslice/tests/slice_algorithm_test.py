@@ -6,7 +6,9 @@ import unittest
 
 from mslice.models.axis import Axis
 from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-from mslice.util.mantid.init_mantid import initialize_mantid, run_algorithm
+from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace, AddSampleLog
+from mslice.util.mantid.init_mantid import initialize_mantid
+
 
 def invert_axes(matrix):
     return np.rot90(np.flipud(matrix))
@@ -25,9 +27,9 @@ class SliceAlgorithmTest(unittest.TestCase):
         cls.q_axis = Axis('|Q|', 0.1, 3.1, 0.1)
         cls.q_axis_degrees = Axis('Degrees', 3, 33, 1)
 
-        cls.test_ws = run_algorithm('CreateSampleWorkspace', output_name='test_ws', XUnit='DeltaE')
-        run_algorithm('AddSampleLog', Workspace=cls.test_ws.raw_ws, store=False, LogName='Ei', LogText='3.',
-                      LogType='Number')
+        cls.test_ws = CreateSampleWorkspace(OutputWorkspace='test_ws', XUnit='DeltaE')
+        AddSampleLog(Workspace=cls.test_ws.raw_ws, store=False, LogName='Ei', LogText='3.',
+                     LogType='Number')
         cls.test_ws.e_mode = 'Direct'
         cls.test_ws.e_fixed = 3
 

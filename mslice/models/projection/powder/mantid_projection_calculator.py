@@ -2,9 +2,8 @@ from __future__ import (absolute_import, division, print_function)
 
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
-from mslice.util.mantid.algorithm_wrapper import run_algorithm
+from mslice.util.mantid.mantid_algorithms import MakeProjection
 from ...labels import DELTA_E_LABEL, MEV_LABEL, MOD_Q_LABEL, WAVENUMBER_LABEL, THETA_LABEL
 
 
@@ -47,8 +46,8 @@ class MantidProjectionCalculator(ProjectionCalculator):
         if units == WAVENUMBER_LABEL:
             output_workspace_name += '_cm'
 
-        new_ws = run_algorithm('MakeProjection', output_name=output_workspace_name, InputWorkspace=workspace,
-                               Axis1=axis1, Axis2=axis2, Units=units, EMode=workspace.e_mode,
-                               Limits=workspace.limits['MomentumTransfer'], ProjectionType=projection_type)
+        new_ws = MakeProjection(OutputWorkspace=output_workspace_name, InputWorkspace=workspace,
+                                Axis1=axis1, Axis2=axis2, Units=units, EMode=workspace.e_mode,
+                                Limits=workspace.limits['MomentumTransfer'], ProjectionType=projection_type)
         propagate_properties(workspace, new_ws)
         return new_ws
