@@ -12,11 +12,10 @@ import numpy as np
 from scipy import constants
 
 from mslice.models.axis import Axis
-
-from mslice.util.mantid import add_to_ads, run_algorithm
-
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
                                                                remove_workspace, add_workspace)
+from mslice.util.mantid.algorithm_wrapper import add_to_ads, run_algorithm
+from mslice.util.mantid.mantid_algorithms import Load
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 
@@ -161,7 +160,7 @@ def _get_theta_for_limits_event(ws):
 
 
 def load(filename, output_workspace):
-    workspace = run_algorithm('Load', output_name=output_workspace, Filename=filename)
+    workspace = Load(OutputWorkspace=output_workspace, Filename=filename)
     workspace.e_mode = get_EMode(workspace.raw_ws)
     if workspace.e_mode == 'Indirect':
         processEfixed(workspace)

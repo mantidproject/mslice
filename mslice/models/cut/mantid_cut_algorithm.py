@@ -6,7 +6,7 @@ from mantid.api import MDNormalization, WorkspaceUnitValidator
 from .cut_algorithm import CutAlgorithm
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
-from mslice.util.mantid import run_algorithm
+from mslice.util.mantid.algorithm_wrapper import run_algorithm
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
 from.cut_normalisation import _num_events_normalized_array

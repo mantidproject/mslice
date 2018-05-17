@@ -130,7 +130,6 @@ class MainWindow(MainView, QMainWindow):
         self.cut_presenter.notify(cut_command.PlotOverFromWorkspace)
 
     def init_ui(self):
-        self.setup_ipython()
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")

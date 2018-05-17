@@ -6,7 +6,7 @@ import unittest
 
 from mslice.models.axis import Axis
 from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-from mslice.util.mantid import initialize_mantid, run_algorithm
+from mslice.util.mantid.init_mantid import initialize_mantid, run_algorithm
 
 def invert_axes(matrix):
     return np.rot90(np.flipud(matrix))

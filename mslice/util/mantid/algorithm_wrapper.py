@@ -3,23 +3,11 @@ from __future__ import (absolute_import, division, print_function)
 from contextlib import contextmanager
 
 import mantid.simpleapi as s_api
-from mantid.api import AlgorithmFactory, AnalysisDataService
 from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle
+from mantid.api import AnalysisDataService
 
-from mslice.models.cut.cut import Cut
-from mslice.models.projection.powder.make_projection import MakeProjection
-from mslice.models.slice.slice import Slice
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as Workspace
-
-
-def initialize_mantid():
-    AlgorithmFactory.subscribe(MakeProjection)
-    AlgorithmFactory.subscribe(Slice)
-    AlgorithmFactory.subscribe(Cut)
-    s_api._create_algorithm_function('MakeProjection', 1, MakeProjection())
-    s_api._create_algorithm_function('Slice', 1, Slice())
-s_api._create_algorithm_function('Cut', 1, Cut())
 
 
 def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
@@ -48,11 +36,15 @@ def add_to_ads(workspaces):
 
 def run_algorithm_2(algorithm):
     def algorithm_wrapper(*args, **kwargs):
-        if isinstance(kwargs['InputWorkspace'], Workspace):
-            kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
-        elif isinstance(kwargs['InputWorkspace'], str):
-            kwargs['InputWorkspace'] = get_workspace_handle(kwargs['InputWorkspace']).raw_ws
-        output_name = kwargs['OutputWorkspace']
+        output_name = "help"
+        if 'InputWorkspace' in kwargs:
+            input_ws = kwargs['InputWorkspace']
+            if isinstance(input_ws, Workspace):
+                kwargs['InputWorkspace'] = input_ws.raw_ws
+            elif isinstance(kwargs['InputWorkspace'], str):
+                kwargs['InputWorkspace'] = get_workspace_handle(kwargs['InputWorkspace']).raw_ws
+        if 'OutputWorkspace' in kwargs:
+            output_name = kwargs['OutputWorkspace']
         store = kwargs.pop('store', True)
 
         result = algorithm(*args, **kwargs)
