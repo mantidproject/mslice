@@ -6,18 +6,19 @@ from mslice.models.workspacemanager.workspace_algorithms import (subtract,
                                                                  add_workspace_runs,
                                                                  combine_workspace, rename_workspace,
                                                                  propagate_properties, get_limits)
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_names, \
-    delete_workspace
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_names,
+                                                               delete_workspace)
 from mslice.models.workspacemanager.workspace_algorithms import processEfixed
-from mslice.util.mantid.mantid_algorithms import AddSampleLog, ConvertToMD, CloneWorkspace, CreateSimulationWorkspace
+from mslice.util.mantid.mantid_algorithms import ConvertToMD, CloneWorkspace, CreateSimulationWorkspace
+from mantid.simpleapi import AddSampleLog
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def setUp(self):
-        self.test_ws_2d = CreateSimulationWorkspace(output_name='test_ws_2d', Instrument='MAR',
+        self.test_ws_2d = CreateSimulationWorkspace(OutputWorkspace='test_ws_2d', Instrument='MAR',
                                                     BinParams=[-10, 1, 10], UnitX='DeltaE')
-        AddSampleLog(Workspace=self.test_ws_2d.raw_ws, store=False, LogName='Ei', LogText='3.',
-                     LogType='Number')
+        AddSampleLog(Workspace=self.test_ws_2d.raw_ws, LogName='Ei', LogText='3.',
+                     LogType='Number', StoreInADS=False)
         self.test_ws_md = ConvertToMD(OutputWorkspace='test_ws_md', InputWorkspace=self.test_ws_2d,
                                       QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                       SplitInto='50,50')
@@ -37,10 +38,11 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.assertFalse('scaled_bg_ws' in get_workspace_names())
 
     def test_add_workspace(self):
+        original_data = self.test_ws_2d.raw_ws.dataY(0)
         add_workspace_runs(['test_ws_2d', 'test_ws_2d'])
         result = get_workspace_handle('test_ws_2d_sum')
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [2.0] * 20)
-        np.testing.assert_array_almost_equal(self.test_ws_2d.raw_ws.dataY(0), [1] * 20)
+        np.testing.assert_array_almost_equal(original_data, [1] * 20)
 
     @patch('mslice.models.workspacemanager.workspace_algorithms._original_step_size')
     def test_combine_workspace(self, step_mock):

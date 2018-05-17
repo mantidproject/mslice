@@ -32,7 +32,7 @@ def wrap_algorithm(algorithm):
             output_name = kwargs['OutputWorkspace']
         store = kwargs.pop('store', True)
 
-        result = algorithm(*args, **kwargs)
+        result = algorithm(*args, StoreInADS=False, **kwargs)
 
         result = wrap_workspace(result, output_name)
         if store:
