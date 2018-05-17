@@ -267,6 +267,10 @@ class CutPlot(object):
             self._lines_visible[line_index] = True
             return True
 
+    def close_event(self, event):
+        self._canvas.figure.clf()
+        event.accept()
+
     @property
     def x_log(self):
         return 'log' in self._canvas.figure.gca().get_xscale()
