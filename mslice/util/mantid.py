@@ -4,7 +4,8 @@ from contextlib import contextmanager
 
 import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory, AnalysisDataService
-from mslice.models.workspacemanager.workspace_provider import add_workspace
+from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle
+
 from mslice.models.cut.cut import Cut
 from mslice.models.projection.powder.make_projection import MakeProjection
 from mslice.models.slice.slice import Slice
@@ -43,3 +44,26 @@ def add_to_ads(workspaces):
     yield
     for workspace in workspaces:
         AnalysisDataService.Instance().remove(workspace.name)
+
+
+def run_algorithm_2(algorithm):
+    def algorithm_wrapper(*args, **kwargs):
+        if isinstance(kwargs['InputWorkspace'], Workspace):
+            kwargs['InputWorkspace'] = kwargs['InputWorkspace'].raw_ws
+        elif isinstance(kwargs['InputWorkspace'], str):
+            kwargs['InputWorkspace'] = get_workspace_handle(kwargs['InputWorkspace']).raw_ws
+        output_name = kwargs['OutputWorkspace']
+        store = kwargs.pop('store', True)
+
+        result = algorithm(*args, **kwargs)
+
+        result = wrap_workspace(result, output_name)
+        if store:
+            add_workspace(result, output_name)
+        return result
+    return algorithm_wrapper
+
+@run_algorithm_2
+def Scale(**kwargs):
+    return getattr(s_api, 'Scale')(StoreInADS=False, **kwargs)
+

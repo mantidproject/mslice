@@ -12,6 +12,7 @@ from mantid.api import IMDWorkspace as _IMDWorkspace
 
 from mslice.app import MAIN_WINDOW
 from mslice.workspace.base import WorkspaceBase as Workspace
+from mslice.util.mantid import run_algorithm, Scale
 # Helper tools
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
 from mslice.presenters.slice_plotter_presenter import Axis as _Axis

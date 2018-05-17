@@ -37,4 +37,4 @@ class IPythonWidget(RichIPythonWidget):
 
         self.kernel_manager = kernel_manager
         self.kernel_client = kernel_client
-        self.execute('from mslice.cli import *')
+        # self.execute('from mslice.cli import *')
