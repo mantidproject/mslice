@@ -3,10 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 from mock import patch
 import numpy as np
 import unittest
-
-from mslice.models.axis import Axis
-from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace, AddSampleLog
+from mantid.simpleapi import AddSampleLog
 from mslice.util.mantid.init_mantid import initialize_mantid
 
 
@@ -19,6 +16,9 @@ class SliceAlgorithmTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         initialize_mantid()
+        from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
+        from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
+        from mslice.models.axis import Axis
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25)
         cls.scattering_rotated = np.rot90(cls.sim_scattering_data, k=3)
         cls.scattering_rotated = np.flipud(cls.scattering_rotated)
@@ -28,8 +28,8 @@ class SliceAlgorithmTest(unittest.TestCase):
         cls.q_axis_degrees = Axis('Degrees', 3, 33, 1)
 
         cls.test_ws = CreateSampleWorkspace(OutputWorkspace='test_ws', XUnit='DeltaE')
-        AddSampleLog(Workspace=cls.test_ws.raw_ws, store=False, LogName='Ei', LogText='3.',
-                     LogType='Number')
+        AddSampleLog(Workspace=cls.test_ws.raw_ws, LogName='Ei', LogText='3.',
+                     LogType='Number', StoreInADS=False)
         cls.test_ws.e_mode = 'Direct'
         cls.test_ws.e_fixed = 3
 
@@ -118,6 +118,7 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @patch('mslice.models.slice.mantid_slice_algorithm.get_workspace_handle')
     def test_powder_line(self, ws_handle_mock):
+        from mslice.models.axis import Axis
         ws_handle_mock.return_value.e_fixed = 20
         x, y = self.slice_alg.compute_powder_line('ws_name', Axis('|Q|', 0.1, 9.1, 0.1), 'Copper')
         self.assertEqual(len(x), len(y))
@@ -129,6 +130,7 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @patch('mslice.models.slice.mantid_slice_algorithm.get_workspace_handle')
     def test_powder_line_degrees(self, ws_handle_mock):
+        from mslice.models.axis import Axis
         ws_handle_mock.return_value.e_fixed = 20
         x, y = self.slice_alg.compute_powder_line('ws_name', Axis('Degrees', 3, 93, 1), 'Copper')
         self.assertEqual(len(x), len(y))

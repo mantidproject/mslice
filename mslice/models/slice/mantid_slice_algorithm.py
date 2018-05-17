@@ -10,7 +10,7 @@ from .slice_algorithm import SliceAlgorithm
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.util.mantid import mantid_algorithms
+import mslice.util.mantid.mantid_algorithms as mantid_algorithms
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
