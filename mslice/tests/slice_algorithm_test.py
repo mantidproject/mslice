@@ -6,7 +6,6 @@ import unittest
 from mantid.simpleapi import AddSampleLog
 from mslice.util.mantid.init_mantid import initialize_mantid
 
-
 def invert_axes(matrix):
     return np.rot90(np.flipud(matrix))
 
