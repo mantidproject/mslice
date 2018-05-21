@@ -16,8 +16,6 @@ class BasePlotWindow(object):
         self.number = number
         self._manager = manager
         self.canvas = None
-        self._script_log = []
-        self._import_aliases = {'plotting.pyplot': 'plt'} # the aliases used in script generation
 
     def set_as_kept(self):
         self._display_status("kept")
@@ -44,43 +42,3 @@ class BasePlotWindow(object):
 
     def get_figure(self):
         return self.canvas.figure
-
-    def script_log(self, source_module, function_name, call_args, call_kwargs):
-        self._script_log.append((source_module, function_name, call_args, call_kwargs))
-
-    def get_script(self):
-        script = ""
-        for library, alias in list(self._import_aliases.items()):
-            script += "import " + library + " as " + alias + "\n"
-        for log in self._script_log:
-            script += self._format_command(log) + "\n"
-        return script
-
-    def _format_command(self, command):
-        """Return a line of python code for a tuple in the log"""
-        output = ""
-        source_module, function_name, call_args, call_kwargs = command
-        if source_module in self._import_aliases:
-            source_module = self._import_aliases[source_module]
-
-        if source_module:
-            output += source_module + "."
-
-        output += function_name + '('
-
-        formatted_call_args = ", ".join(call_args)
-        output += formatted_call_args
-
-        call_kwargs = ["=".join(x) for x in list(call_kwargs.items())]
-        formatted_call_kwargs = ", ".join(call_kwargs)
-
-        if formatted_call_kwargs:
-            if formatted_call_args:
-                output += ", "
-            output += formatted_call_kwargs
-        output += ")"
-
-        return output
-
-    def _dump_script_to_console(self):
-        print(self.get_script())

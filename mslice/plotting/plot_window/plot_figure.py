@@ -79,7 +79,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
         self.canvas.mpl_connect('button_press_event', self.plot_clicked)
         self.picking_connected(True)
 
-        self.show()  # is not a good idea in non interactive mode
+        self.show()
 
     def add_slice_plot(self, slice_plotter, workspace):
         if self._plot_handler is None:
@@ -199,6 +199,7 @@ class PlotFigureManager(BasePlotWindow, PlotWindowUI, QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         self._plot_handler.close_event(event)
+        self._manager.figure_closed(self.number)
 
     def get_window_title(self):
         return six.text_type(self.windowTitle())
