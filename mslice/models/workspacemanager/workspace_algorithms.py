@@ -12,7 +12,7 @@ import numpy as np
 from scipy import constants
 
 from mslice.models.axis import Axis
-from mslice.util.mantid import run_algorithm
+from mslice.util.mantid import add_to_ads, run_algorithm
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
                                                                remove_workspace, add_workspace)
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -116,7 +116,7 @@ def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
     # Use a step size a bit smaller than angular spacing ( / 3) so user can rebin if they want...
     ws.limits['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep / 3]
     ws.limits['|Q|'] = ws.limits['MomentumTransfer']  # ConvertToMD renames it(!)
-    ws.limits['Degrees'] = theta * 180 / np.pi
+    ws.limits['2Theta'] = theta * 180 / np.pi
     ws.limits['DeltaE'] = [emin, emax, estep]
 
 
@@ -170,14 +170,15 @@ def load(filename, output_workspace):
 def rename_workspace(selected_workspace, new_name):
     workspace = get_workspace_handle(selected_workspace)
     remove_workspace(workspace)
-    run_algorithm('RenameWorkspace', output_name=new_name, InputWorkspace=workspace)
     add_workspace(workspace, new_name)
     return workspace
 
 
 def combine_workspace(selected_workspaces, new_name):
-    workspaces = [get_workspace_handle(ws).raw_ws for ws in selected_workspaces]
-    ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspaces)
+    workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
+    workspace_names = [workspace.name for workspace in workspaces]
+    with add_to_ads(workspaces):
+        ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspace_names)
     # Use precalculated step size, otherwise get limits directly from workspace
     ax1 = ws.raw_ws.getDimension(0)
     ax2 = ws.raw_ws.getDimension(1)
@@ -193,14 +194,15 @@ def combine_workspace(selected_workspaces, new_name):
 
 def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
-    sum_ws = run_algorithm('MergeRuns', output_name=out_ws_name, InputWorkspaces=selected_ws)
+    workspaces = [get_workspace_handle(ws) for ws in selected_ws]
+    with add_to_ads(workspaces):
+        sum_ws = run_algorithm('MergeRuns', output_name=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
     bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = run_algorithm('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf,
-                                 StoreInADS=False)
+    scaled_bg_ws = run_algorithm('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf)
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)

@@ -90,4 +90,4 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_equal(self.test_ws_2d.limits['DeltaE'], [-10, 10, 1])
         np.testing.assert_array_equal(self.test_ws_2d.limits['|Q|'], self.test_ws_2d.limits['MomentumTransfer'])
         np.testing.assert_almost_equal(self.test_ws_2d.limits['|Q|'], [0.05998867,  3.46446147,  0.00401079], 5)
-        np.testing.assert_almost_equal(self.test_ws_2d.limits['Degrees'], [3.43, 134.14, 0.5729578], 5)
+        np.testing.assert_almost_equal(self.test_ws_2d.limits['2Theta'], [3.43, 134.14, 0.5729578], 5)

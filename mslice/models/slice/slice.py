@@ -39,14 +39,23 @@ class Slice(PythonAlgorithm):
         assert isinstance(workspace, IMDEventWorkspace)
         n_x_bins = get_number_of_steps(x_axis)
         n_y_bins = get_number_of_steps(y_axis)
-        x_dim_id = workspace.getDimensionIndexByName(x_axis.units)
-        y_dim_id = workspace.getDimensionIndexByName(y_axis.units)
+        x_dim_id = self.dimension_index(workspace, x_axis)
+        y_dim_id = self.dimension_index(workspace, y_axis)
         x_dim = workspace.getDimension(x_dim_id)
         y_dim = workspace.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
         return BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
                      StoreInADS=False)
+
+    def dimension_index(self, workspace, axis):
+        try:
+            return workspace.getDimensionIndexByName(axis.units)
+        except RuntimeError:
+            if axis.units == '2Theta':
+                return workspace.getDimensionIndexByName('Degrees')
+            else:
+                raise
 
     def _compute_slice_nonPSD(self, workspace, x_axis, y_axis, e_mode, norm_to_one):
         axes = [x_axis, y_axis]
