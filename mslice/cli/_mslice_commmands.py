@@ -24,9 +24,6 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 # -----------------------------------------------------------------------------
 
 def _process_axis(axis, fallback_index, input_workspace):
-    # if axis is None:
-    #     axis = _SLICE_ALGORITHM.get_available_axis(input_workspace)[fallback_index]
-
     # check to see if axis is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
     if ',' in axis:
         axis = _string_to_axis(axis)

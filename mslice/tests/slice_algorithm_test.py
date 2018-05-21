@@ -3,8 +3,13 @@ from __future__ import (absolute_import, division, print_function)
 from mock import patch
 import numpy as np
 import unittest
-from mantid.simpleapi import AddSampleLog
-from mslice.util.mantid.init_mantid import initialize_mantid
+from mantid.api import AlgorithmFactory
+from mantid.simpleapi import AddSampleLog, _create_algorithm_function
+from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
+from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
+from mslice.models.axis import Axis
+from mslice.models.slice.slice import Slice
+from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 
 def invert_axes(matrix):
     return np.rot90(np.flipud(matrix))
@@ -14,10 +19,6 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        initialize_mantid()
-        from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
-        from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
-        from mslice.models.axis import Axis
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25)
         cls.scattering_rotated = np.rot90(cls.sim_scattering_data, k=3)
         cls.scattering_rotated = np.flipud(cls.scattering_rotated)
@@ -32,7 +33,12 @@ class SliceAlgorithmTest(unittest.TestCase):
         cls.test_ws.e_mode = 'Direct'
         cls.test_ws.e_fixed = 3
 
-    def test_slice(self):
+    @patch('mslice.models.slice.mantid_slice_algorithm.mantid_algorithms')
+    def test_slice(self, alg_mock):
+        # set up slice algorithm
+        AlgorithmFactory.subscribe(Slice)
+        alg_mock.Slice = wrap_algorithm(_create_algorithm_function('Slice', 1, Slice()))
+
         plot, boundaries = self.slice_alg.compute_slice('test_ws', self.q_axis, self.e_axis, False)
         self.assertEqual(np.shape(plot[0]), (25, 30))
         np.testing.assert_array_equal(boundaries, [0.1, 3.1, -10, 15])
