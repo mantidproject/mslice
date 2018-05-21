@@ -5,7 +5,9 @@ from mslice.models.cut.cut_functions import output_workspace_name, compute_cut_x
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
 
-picker=3
+
+PICKER_TOL_PTS = 3
+
 
 class MatplotlibCutPlotter(CutPlotter):
     def __init__(self):
@@ -23,23 +25,28 @@ class MatplotlibCutPlotter(CutPlotter):
     def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, intensity_range=None, plot_over=False,
                           cut_ws_name=None, legend=None):
         legend = selected_workspace if legend is None else legend
-        plt.errorbar(x, y, yerr=e, label=legend, hold=plot_over, marker='o', picker=picker)
-        plt.ylim(*intensity_range) if intensity_range is not None else plt.autoscale()
-        leg = plt.legend(fontsize='medium')
-        leg.draggable()
-        plt.xlabel(get_display_name(x_units, get_comment(selected_workspace)), picker=picker)
-        plt.ylabel(CUT_INTENSITY_LABEL, picker=picker)
+        cur_fig = plt.gcf()
+        cur_axes = cur_fig.gca()
         if not plot_over:
-            plt.gcf().canvas.set_window_title('Cut: ' + selected_workspace)
-            plt.gcf().canvas.manager.update_grid()
-        if not plt.gcf().canvas.manager.has_plot_handler():
+            cur_axes.cla()
+        cur_axes.errorbar(x, y, yerr=e, label=legend, marker='o', picker=PICKER_TOL_PTS)
+        cur_axes.set_ylim(*intensity_range) if intensity_range is not None else cur_axes.autoscale()
+        leg = cur_axes.legend(fontsize='medium')
+        leg.draggable()
+        cur_axes.set_xlabel(get_display_name(x_units, get_comment(selected_workspace)), picker=PICKER_TOL_PTS)
+        cur_axes.set_ylabel(CUT_INTENSITY_LABEL, picker=PICKER_TOL_PTS)
+        cur_canvas = cur_fig.canvas
+        if not plot_over:
+            cur_canvas.set_window_title('Cut: ' + selected_workspace)
+            cur_canvas.manager.update_grid()
+        if not cur_canvas.manager.has_plot_handler():
             self._create_cut(cut_ws_name if cut_ws_name is not None else selected_workspace)
-        plt.gcf().canvas.restore_region(plt.gcf().canvas.manager.get_cut_background())
+            cur_canvas.restore_region(cur_canvas.manager.get_cut_background())
         try:
-            plt.gca().draw_artist(plt.gcf().canvas.figure.get_children()[1])
-            plt.gcf().canvas.blit(plt.gcf().canvas.figure.gca().clipbox)
+            cur_axes.draw_artist(plt.gcf().canvas.figure.get_children()[1])
+            cur_canvas.blit(plt.gcf().canvas.figure.gca().clipbox)
         except AttributeError:
-            plt.gcf().canvas.draw()
+            cur_canvas.draw()
 
     def _create_cut(self, workspace):
         canvas = plt.gcf().canvas
