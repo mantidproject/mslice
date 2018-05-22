@@ -17,6 +17,8 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axis
 from mslice.models.axis import Axis
 from mslice.workspace.base import WorkspaceBase as Workspace
+from mslice.workspace.workspace import Workspace as MatrixWorkspace
+from mslice.workspace.pixel_workspace import PixelWorkspace
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
 # Slicing
@@ -40,13 +42,33 @@ _CUT_PLOTTER = MatplotlibCutPlotter(_CUT_ALGORITHM)
 # Convenience functions
 # -----------------------------------------------------------------------------
 
-def _process_axis(axis, fallback_index, input_workspace):
+
+def _string_to_axis(string):
+    axis = string.split(',')
+    if len(axis) != 4:
+        raise ValueError('axis should be specified in format <name>,<start>,<end>,<step_size>')
+    return Axis(axis[0], axis[1], axis[2], axis[3])
+
+
+def _string_to_integration_axis(string):
+    '''Allows step to be omitted and set to default value'''
+    axis_str = string.split(',')
+    if len(axis_str) < 3:
+        raise ValueError('axis should be specified in format <name>,<start>,<end>')
+    valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], 0)
+    try:
+        valid_axis.step = axis_str[3]
+    except IndexError:
+        valid_axis.step = valid_axis.end - valid_axis.start
+    return valid_axis
+
+def _process_axis(axis, fallback_index, input_workspace, string_function=_string_to_axis):
     available_axes = get_available_axis(input_workspace)
     if axis is None:
         axis = available_axes[fallback_index]
     # check to see if axis is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
     if ',' in axis:
-        axis = _string_to_axis(axis)
+        axis = string_function(axis)
     elif axis in available_axes:
         range = get_axis_range(input_workspace, axis)
         range = map(float, range)
@@ -56,26 +78,14 @@ def _process_axis(axis, fallback_index, input_workspace):
                            (axis, ', '.join(available_axes)))
     return axis
 
-def _string_to_axis(string):
-    axis = string.split(',')
-    if len(axis) != 4:
-        raise ValueError('axis should be specified in format <name>,<start>,<end>,<step_size>')
-    name = axis[0].strip()
-    try:
-        start = float(axis[1])
-    except ValueError:
-        raise ValueError("start '%s' is not a valid float"%axis[1])
-    try:
-        end = float(axis[2])
-    except ValueError:
-        raise ValueError("end '%s' is not a valid float"%axis[2])
 
-    try:
-        step = float(axis[3])
-    except ValueError:
-        raise ValueError("step '%s' is not a valid float"%axis[3])
-    return Axis(name, start, end, step)
-
+def _validate_workspace(workspace):
+    if isinstance(workspace, Workspace):
+        workspace = workspace.name
+    if not isinstance(workspace, str):
+        raise TypeError('InputWorkspace must be a workspace or a workspace name')
+    if not workspace_exists(workspace):
+        raise TypeError('InputWorkspace %s could not be found.' % workspace)
 
 # -----------------------------------------------------------------------------
 # Command functions
@@ -106,12 +116,7 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
            Units -- The energy units (string) [default: 'meV']
 
        """
-    if isinstance(InputWorkspace, Workspace):
-        InputWorkspace = InputWorkspace.name
-    if not isinstance(InputWorkspace, str):
-        raise TypeError('InputWorkspace must be a workspace or a workspace name')
-    if not workspace_exists(InputWorkspace):
-        raise TypeError('InputWorkspace %s could not be found.' % InputWorkspace)
+    _validate_workspace(InputWorkspace)
 
     proj_ws = MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
     MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
@@ -123,23 +128,59 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
 
        Keyword Arguments:
        InputWorkspace -- The workspace to slice. The parameter can be either a python handle to the workspace
-       OR the workspaces name as a string.
+       OR the workspace name as a string.
 
        Axis1 -- The x axis of the slice. If not specified will default to |Q| (or Degrees).
        Axis2 -- The y axis of the slice. If not specified will default to DeltaE
        Axis Format:-
            Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5'
-           or just the name e.g. 'DeltaE'. That case the start and en will default to the range in the data.
+           or just the name e.g. 'DeltaE'. In that case, the start and end will default to the range in the data.
 
-       NormToOne - if true the slice will be normalized to one.
+       NormToOne -- if true the slice will be normalized to one.
 
        """
+    _validate_workspace(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
 
     return run_algorithm('Slice', InputWorkspace=workspace, XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), EMode=workspace.e_mode,
                          PSD=workspace.is_PSD, NormToOne = NormToOne)
+
+def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
+    """ Cuts workspace.
+
+     Keyword Arguments:
+    InputWorkspace -- Workspace to cut. The parameter can be either a python handle to the workspace
+    OR the workspace name as a string.
+
+    CutAxis -- The x axis of the cut. If not specified will default to |Q| (or Degrees).
+    IntegrationAxis --  The integration axis of the cut. If not specified will default to DeltaE.
+    Axis Format:-
+           Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5' (step_size may be
+           omitted for the integration axis) or just the name e.g. 'DeltaE'. In that case, the start and end will
+           default to the range in the data.
+
+    NormToOne -- if true the cut will be normalized to one.
+
+    """
+    _validate_workspace(InputWorkspace)
+    workspace = get_workspace_handle(InputWorkspace)
+    if workspace.is_PSD:
+        if isinstance(workspace, MatrixWorkspace):
+            raise RuntimeError("Incorrect workspace type - run MakeProjection first.")
+        if not isinstance(workspace, PixelWorkspace):
+            raise RuntimeError("Incorrect workspace type.")
+    else:
+        if not isinstance(workspace, MatrixWorkspace):
+            raise RuntimeError("Incorrect workspace type.")
+
+    cut_axis = _process_axis(CutAxis, 0, workspace)
+    integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
+                                     workspace, string_function=_string_to_integration_axis)
+
+    return run_algorithm('Cut', InputWorkspace=workspace, CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
+                         EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=NormToOne)
 
 
 def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_min=None, intensity_max=None,

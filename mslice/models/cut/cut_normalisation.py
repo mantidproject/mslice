@@ -6,8 +6,8 @@ def _normalize_workspace(workspace):
     num_events = workspace.getNumEventsArray()
     average_event_intensity = _num_events_normalized_array(workspace)
     average_event_range = average_event_intensity.max() - average_event_intensity.min()
-
-    normed_average_event_intensity = (average_event_intensity - average_event_intensity.min())/average_event_range
+    with np.errstate(invalid='ignore'):
+        normed_average_event_intensity = (average_event_intensity - average_event_intensity.min())/average_event_range
     if workspace.displayNormalization() == MDNormalization.NoNormalization:
         new_data = normed_average_event_intensity
     else:
