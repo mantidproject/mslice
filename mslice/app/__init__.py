@@ -25,4 +25,5 @@ def show_gui():
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow
         MAIN_WINDOW = MainWindow()
+        # MAIN_WINDOW.setup_ipython()
     MAIN_WINDOW.show()

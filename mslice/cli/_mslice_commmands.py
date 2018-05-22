@@ -164,6 +164,3 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     return mantid_algorithms.Cut(InputWorkspace=workspace, CutAxis=cut_axis.to_dict(),
                                  IntegrationAxis=integration_axis.to_dict(), EMode=workspace.e_mode,
                                  PSD=workspace.is_PSD, NormToOne=NormToOne)
-
-
-
