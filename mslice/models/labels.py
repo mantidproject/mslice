@@ -23,7 +23,7 @@ def get_display_name(axisUnits, comment=None):
             return 'Energy Transfer ' + ('(cm$^{-1}$)' if (comment and 'wavenumber' in comment) else '(meV)')
     elif 'MomentumTransfer' in axisUnits or '|Q|' in axisUnits:
         return '|Q| (recip. Ang.)' if MPL_COMPAT else '$|Q|$ ($\mathrm{\AA}^{-1}$)'
-    elif 'Degrees' in axisUnits:
+    elif '2Theta' in axisUnits:
         return 'Scattering Angle (degrees)' if MPL_COMPAT else r'Scattering Angle 2$\theta$ ($^{\circ}$)'
     else:
         return axisUnits
