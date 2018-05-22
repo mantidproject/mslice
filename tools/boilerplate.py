@@ -43,7 +43,6 @@ AUTOGEN_MSG = """
 PLOT_TEMPLATE = AUTOGEN_MSG + """
 @_autogen_docstring(Axes.%(func)s)
 %(category)s
-%(autocolorbar)s
 def %(func)s(%(argspec)s):
     %(ax)s = gca()
     # Deprecated: allow callers to override the hold state
@@ -222,12 +221,10 @@ def boilerplate_gen():
             # color map
             if func in cmappable:
                 mappable = '    ' + cmappable[func] % locals()
-                category = '@activate_category(CurrentFigure, "2d")'
-                autocolorbar = '@draw_colorbar(gcf, colorbar)'
+                category = '@category(CATEGORY_2D)'
             else:
                 mappable = ''
-                category = '@activate_category(CurrentFigure, "1d")'
-                autocolorbar = ''
+                category = '@category(CATEGORY_1D)'
 
             # Get argspec of wrapped function
             base_func = getattr(Axes, func)

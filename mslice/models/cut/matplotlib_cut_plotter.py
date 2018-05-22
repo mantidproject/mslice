@@ -25,11 +25,11 @@ class MatplotlibCutPlotter(CutPlotter):
     def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, intensity_range=None, plot_over=False,
                           cut_ws_name=None, legend=None):
         legend = selected_workspace if legend is None else legend
+        if not plot_over:
+            plt.cla()
+        plt.errorbar(x, y, yerr=e, label=legend, marker='o', picker=PICKER_TOL_PTS)
         cur_fig = plt.gcf()
         cur_axes = cur_fig.gca()
-        if not plot_over:
-            cur_axes.cla()
-        cur_axes.errorbar(x, y, yerr=e, label=legend, marker='o', picker=PICKER_TOL_PTS)
         cur_axes.set_ylim(*intensity_range) if intensity_range is not None else cur_axes.autoscale()
         leg = cur_axes.legend(fontsize='medium')
         leg.draggable()

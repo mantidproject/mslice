@@ -4,7 +4,7 @@ from mock import call
 import unittest
 
 from mslice.plotting.currentfigure import CurrentFigure
-from mslice.plotting.currentfigure import activate_category
+from mslice.plotting.currentfigure import category
 
 
 class FigureManagerTest(unittest.TestCase):
@@ -51,7 +51,7 @@ class FigureManagerTest(unittest.TestCase):
         category = '1d'
         # The following line is equivalent to applying the decorator activate_category with the parameter category
         # to function FigureManager.get_active_figure
-        categorised_get_active_figure = activate_category(category)(CurrentFigure.get_active_figure)
+        categorised_get_active_figure = category(category)(CurrentFigure.get_active_figure)
         fig = categorised_get_active_figure()
         self.assertTrue(fig == mock_figures[0]) # Assert Figure object came from right place
         self.assertTrue(CurrentFigure.get_category(1) == category)
@@ -62,7 +62,7 @@ class FigureManagerTest(unittest.TestCase):
         mock_figures = [mock.Mock(), mock.Mock()]
         mock_figure_class.side_effect = mock_figures
         category = '1d'
-        categorised_get_active_figure = activate_category(category)(CurrentFigure.get_active_figure)
+        categorised_get_active_figure = category(category)(CurrentFigure.get_active_figure)
 
         fig1 = categorised_get_active_figure()
         fig2 = CurrentFigure.get_figure_number()
@@ -79,8 +79,8 @@ class FigureManagerTest(unittest.TestCase):
         mock_figure_class.side_effect = mock_figures
         cat1 = '1d'
         cat2 = '2d'
-        cat1_get_active_figure = activate_category(cat1)(CurrentFigure.get_active_figure)
-        cat2_get_active_figure = activate_category(cat2)(CurrentFigure.get_active_figure)
+        cat1_get_active_figure = category(cat1)(CurrentFigure.get_active_figure)
+        cat2_get_active_figure = category(cat2)(CurrentFigure.get_active_figure)
         # test is an arbitrary method just to make sure the correct figures are returned
         cat1_get_active_figure().test(1)
         cat2_get_active_figure().test(2)
@@ -128,8 +128,8 @@ class FigureManagerTest(unittest.TestCase):
         mock_figure_class.side_effect = mock_figures
         cat1 = '1d'
         cat2 = '2d'
-        cat1_get_active_figure = activate_category(cat1)(CurrentFigure.get_active_figure)
-        cat2_get_active_figure = activate_category(cat2)(CurrentFigure.get_active_figure)
+        cat1_get_active_figure = category(cat1)(CurrentFigure.get_active_figure)
+        cat2_get_active_figure = category(cat2)(CurrentFigure.get_active_figure)
 
         # test is an arbitrary method just to make sure the correct figures are returned
 
@@ -158,7 +158,7 @@ class FigureManagerTest(unittest.TestCase):
             mock_managers[i].attach_mock(mock_figures[i].set_as_current, 'fig_current')
         mock_figure_class.side_effect = mock_figures
         cat1 = '1d'
-        cat1_get_active_figure = activate_category(cat1)(CurrentFigure.get_active_figure)
+        cat1_get_active_figure = category(cat1)(CurrentFigure.get_active_figure)
         # test is an arbitrary method just to make sure the correct figures are returned
 
         cat1_get_active_figure().test(1)  # create a figure of category 1

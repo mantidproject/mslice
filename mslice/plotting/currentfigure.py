@@ -27,219 +27,248 @@ be added to the category of the command
 Currently there are only two categories ('1d' and '2d') hard coded into the manager.
 """
 from __future__ import (absolute_import, division, print_function)
+# system imports
+from functools import wraps
 
-from mslice.plotting.plot_window.plot_figure import PlotFigureManager
+# local imports
+from mslice.plotting.plot_window.plot_figure_manager import PlotFigureManager
+
+# Labels for each category
+CATEGORY_1D, CATEGORY_2D = "1d", "2d"
 
 
 class CurrentFigure(object):
-    """This is singleton static class to manage the current _figures
+    """Static class to manage a set of numbered figures.
+
+    It is never instantiated. It consists of attributes to
+    manage a set of "current" figures along with keeping
+    track of all created figures. Each current figure is expected
+    to be placed into a category such that a current figure for
+    a given category can be returned to be operated on separately
+    to the current figure for another category.
     """
     # if there is a current figure it should be both current and active
     _active_category = None
-    _category_current_figures = {"1d": None, "2d": None}  # Current _figures recieve decorated commands
-    _figures_by_category = {"1d": [], "2d": []}
+    _category_current_figures = {CATEGORY_1D: None, CATEGORY_2D: None}  # Current _figures receive decorated commands
+    _figures_by_category = {CATEGORY_1D: [], CATEGORY_2D: []}
     _unclassified_figures = []
-    _active_figure = None  # Will receive all commands that have a matching decorator or are undecorated
+    _active_figure = None
     _figures = {}
 
-    def __init__(self, *args, **kwargs):
-        raise Exception("This is a static class singleton. Do not Instantiate it")
+    @classmethod
+    def reset(cls):
+        """Reset all class variables to initial state. This function exists for testing purposes """
+        cls._active_category = None
+        cls._category_current_figures = {CATEGORY_1D: None, CATEGORY_2D: None}  # Current _figures are overplotted
+        cls._figures_by_category = {CATEGORY_1D: [], CATEGORY_2D: []}
+        cls._unclassified_figures = []
+        cls._active_figure = None
+        cls._figures = {}
 
-    @staticmethod
-    def _new_figure(fig_num=None):
-        if fig_num is None:
-            fig_num = 1
-            while any([fig_num == existing_fig_num for existing_fig_num in CurrentFigure._figures.keys()]):
-                fig_num += 1
-        new_fig = PlotFigureManager(fig_num, CurrentFigure)
-        CurrentFigure._figures[fig_num] = new_fig
-        CurrentFigure._active_figure = fig_num
-        CurrentFigure._unclassified_figures.append(fig_num)
-        return CurrentFigure._figures[fig_num], fig_num
+    @classmethod
+    def _new_figure(cls, num=None):
+        if num is None:
+            num = 1
+            while any([num == existing_fig_num for existing_fig_num in cls._figures.keys()]):
+                num += 1
+        new_fig = PlotFigureManager(num, CurrentFigure)
+        cls._figures[num] = new_fig
+        cls._active_figure = num
+        cls._unclassified_figures.append(num)
+        return cls._figures[num], num
 
-    @staticmethod
-    def get_figure_number(fig_num=None, create_if_not_found=True):
-        CurrentFigure._active_figure = fig_num
+    @classmethod
+    def get_figure_number(cls, num=None, create_if_not_found=True):
+        cls._active_figure = num
         try:
             # make the figure the current figure of its category
-            category = CurrentFigure.get_category(fig_num)
-            CurrentFigure._category_current_figures[category] = fig_num
+            category = cls.get_category(num)
+            cls._category_current_figures[category] = num
         except KeyError:
             # the figure is still uncategorised, Do nothing
             pass
 
-        figure = CurrentFigure._figures.get(fig_num, None)
+        figure = cls._figures.get(num, None)
         if figure or not create_if_not_found:
             return figure
         else:
             # return the figure discard the number
-            return CurrentFigure._new_figure(fig_num)[0]
+            return cls._new_figure(num)[0]
 
-    @staticmethod
-    def get_active_figure():
-        if CurrentFigure._active_category:
-            if CurrentFigure._active_figure in CurrentFigure._unclassified_figures:
-                CurrentFigure.assign_figure_to_category(CurrentFigure._active_figure, CurrentFigure._active_category,
-                                                        make_current=True)
-            elif CurrentFigure._category_current_figures[CurrentFigure._active_category] is None:
-                _, num = CurrentFigure._new_figure()
-                CurrentFigure.assign_figure_to_category(num, CurrentFigure._active_category, make_current=True)
-                CurrentFigure._active_figure = num
+    @classmethod
+    def get_active_figure(cls):
+        if cls._active_category:
+            if cls._active_figure in cls._unclassified_figures:
+                cls.assign_figure_to_category(cls._active_figure, cls._active_category,
+                                              make_current=True)
+            elif cls._category_current_figures[cls._active_category] is None:
+                _, num = cls._new_figure()
+                cls.assign_figure_to_category(num, cls._active_category, make_current=True)
+                cls._active_figure = num
             else:
-                CurrentFigure._active_figure = CurrentFigure._category_current_figures[CurrentFigure._active_category]
+                cls._active_figure = cls._category_current_figures[cls._active_category]
         else:
-            if CurrentFigure._active_figure is None:
-                fig, num = CurrentFigure._new_figure()
-                CurrentFigure._active_figure = num
+            if cls._active_figure is None:
+                fig, num = cls._new_figure()
+                cls._active_figure = num
 
-        return CurrentFigure._figures[CurrentFigure._active_figure]
+        return cls._figures[cls._active_figure]
 
-    @staticmethod
-    def _activate_category(category):
-        """Sets the active category to the supplied argument, do not call this function directly. Instead use supplied
-        Decorator below 'activate_category' """
-        CurrentFigure._active_category = category
+    @classmethod
+    def activate_category(cls, category):
+        """Sets the active category to the supplied argument. Do not call this function directly, instead use supplied
+        decorator below 'activate_category' """
+        cls._active_category = category
 
-    @staticmethod
-    def _deactivate_category():
-        """ Unsets the active category. do not call this function directly. Instead use supplied
-        Decorator below 'activate_category' """
-        CurrentFigure._active_category = None
+    @classmethod
+    def deactivate_category(cls):
+        """ Unsets the active category. Do not call this function directly, instead use supplied decorator
+        below 'activate_category' """
+        cls._active_category = None
 
-    @staticmethod
-    def assign_figure_to_category(fig_num, category, make_current=False):
-        if fig_num not in CurrentFigure._figures:
+    @classmethod
+    def assign_figure_to_category(cls, num, category, make_current=False):
+        if num not in cls._figures:
             raise ValueError("Figure does not exist")
 
-        if fig_num in CurrentFigure._unclassified_figures:
-            CurrentFigure._unclassified_figures.remove(fig_num)
+        if num in cls._unclassified_figures:
+            cls._unclassified_figures.remove(num)
 
-        for a_category in CurrentFigure._figures_by_category:
-            if fig_num in CurrentFigure._figures_by_category[a_category]:
-                CurrentFigure._figures_by_category[a_category].remove(fig_num)
-            if CurrentFigure._category_current_figures == fig_num:
-                CurrentFigure._category_current_figures = None
+        for a_category in cls._figures_by_category:
+            if num in cls._figures_by_category[a_category]:
+                cls._figures_by_category[a_category].remove(num)
+            if cls._category_current_figures == num:
+                cls._category_current_figures = None
 
-        CurrentFigure._figures_by_category[category].append(fig_num)
+        cls._figures_by_category[category].append(num)
         if make_current:
-            CurrentFigure._category_current_figures[category] = fig_num
-        CurrentFigure.broadcast()
+            cls._category_current_figures[category] = num
+        cls.broadcast()
 
-    @staticmethod
-    def figure_closed(figure_number):
+    @classmethod
+    def figure_closed(cls, num):
         """Figure is closed, remove all references to it from all internal list
 
         If it was the category current or global active figure then set that to None"""
-        if CurrentFigure._active_figure == figure_number:
-            CurrentFigure._active_figure = None
-        for a_category in CurrentFigure._figures_by_category:
-            if figure_number in CurrentFigure._figures_by_category[a_category]:
-                CurrentFigure._figures_by_category[a_category].remove(figure_number)
+        if cls._active_figure == num:
+            cls._active_figure = None
+        for a_category in cls._figures_by_category:
+            if num in cls._figures_by_category[a_category]:
+                cls._figures_by_category[a_category].remove(num)
 
-            if CurrentFigure._category_current_figures[a_category] == figure_number:
-                CurrentFigure._category_current_figures[a_category] = None
+            if cls._category_current_figures[a_category] == num:
+                cls._category_current_figures[a_category] = None
         try:
-            del CurrentFigure._figures[figure_number]
+            del cls._figures[num]
         except KeyError:
-            raise KeyError('The key "%s" does not exist. The figure cannot be closed' % figure_number)
+            raise KeyError('The key "%s" does not exist. The figure cannot be closed' % num)
 
-    @staticmethod
-    def get_category(figure_number):
+    @classmethod
+    def get_category(cls, num):
         """Return the category of the figure"""
-        for category,fig_list in list(CurrentFigure._figures_by_category.items()):
-            if figure_number in fig_list:
+        for category,fig_list in list(cls._figures_by_category.items()):
+            if num in fig_list:
                 figure_category = category
                 break
         else:
-            raise KeyError("Figure no. %i was not found in any category "%figure_number if figure_number else 0)
-            # in-line if handles the case figure_number is None
+            raise KeyError("Figure no. %i was not found in any category " % num if num else 0)
+            # in-line if handles the case num is None
         return figure_category
 
-    @staticmethod
-    def set_figure_as_kept(figure_number):
+    @classmethod
+    def set_figure_as_kept(cls, num):
         # kept figures are just lying around, not really managed much, until they report in as current again
-        if CurrentFigure._active_figure == figure_number:
-            CurrentFigure._active_figure = None
+        if cls._active_figure == num:
+            cls._active_figure = None
         try:
-            figure_category = CurrentFigure.get_category(figure_number)
+            figure_category = cls.get_category(num)
         except KeyError:
             figure_category = None
 
         if figure_category:
-            if CurrentFigure._category_current_figures[figure_category] == figure_number:
-                CurrentFigure._category_current_figures[figure_category] = None
+            if cls._category_current_figures[figure_category] == num:
+                cls._category_current_figures[figure_category] = None
 
-        CurrentFigure.broadcast(figure_category)
+        cls.broadcast(figure_category)
 
-    @staticmethod
-    def set_figure_as_current(figure_number):
+    @classmethod
+    def set_figure_as_current(cls, num):
         try:
-            figure_category = CurrentFigure.get_category(figure_number)
+            figure_category = cls.get_category(num)
         except KeyError:
             figure_category = None
         if figure_category:
-            CurrentFigure._category_current_figures[figure_category] = figure_number
-        CurrentFigure._active_figure = figure_number
-        CurrentFigure.broadcast(figure_category)
+            cls._category_current_figures[figure_category] = num
+        cls._active_figure = num
+        cls.broadcast(figure_category)
 
-    @staticmethod
-    def broadcast(category=None):
+    @classmethod
+    def broadcast(cls, category=None):
         """This method will broadcast to all figures in 'category' to update the displayed kept/current status"""
         if category is None:
-            broadcast_list = CurrentFigure._figures_by_category
+            broadcast_list = cls._figures_by_category
         else:
             broadcast_list = [category]
 
         for category in broadcast_list:
-            for figure_number in CurrentFigure._figures_by_category[category]:
+            for figure_number in cls._figures_by_category[category]:
 
-                if CurrentFigure._category_current_figures[category] == figure_number:
-                    CurrentFigure._figures[figure_number].set_as_current()
+                if cls._category_current_figures[category] == figure_number:
+                    cls._figures[figure_number].set_as_current()
 
                 else:
-                    CurrentFigure._figures[figure_number].set_as_kept()
+                    cls._figures[figure_number].set_as_kept()
 
-        for figure in CurrentFigure._unclassified_figures:
-            if figure == CurrentFigure._active_figure:
-                CurrentFigure._figures[figure].set_as_current()
+        for figure in cls._unclassified_figures:
+            if figure == cls._active_figure:
+                cls._figures[figure].set_as_current()
             else:
-                CurrentFigure._figures[figure].set_as_kept()
+                cls._figures[figure].set_as_kept()
 
-    @staticmethod
-    def all_figure_numbers():
+    @classmethod
+    def all_figure_numbers(cls):
         """An iterator over all figure numbers"""
-        return list(CurrentFigure._figures.keys())
+        return list(cls._figures.keys())
 
-    @staticmethod
-    def all_figures_numbers_in_category(category):
+    @classmethod
+    def all_figures_numbers_in_category(cls, category):
         """Return an iterator over all _figures numbers in a category"""
-        return iter(CurrentFigure._figures_by_category[category])
+        return iter(cls._figures_by_category[category])
 
-    @staticmethod
-    def unclassified_figures():
+    @classmethod
+    def unclassified_figures(cls):
         """Return an iterator over all unclassified _figures"""
-        return iter(CurrentFigure._unclassified_figures)
+        return iter(cls._unclassified_figures)
 
-    @staticmethod
-    def reset():
-        """Reset all class variables to initial state. This Function exists for testing purposes """
-        CurrentFigure._active_category = None
-        CurrentFigure._category_current_figures = {"1d": None, "2d": None}  # Current _figures are overplotted
-        CurrentFigure._figures_by_category = {"1d": [], "2d": []}
-        CurrentFigure._unclassified_figures = []
-        CurrentFigure._active_figure = None
-        CurrentFigure._figures = {}
-
-    @staticmethod
-    def all_figures():
+    @classmethod
+    def all_figures(cls):
         """Return an iterator over all figures"""
-        return list(CurrentFigure._figures.values())
+        return list(cls._figures.values())
 
-    @staticmethod
-    def number_of_figure(figure):
-        for key,value in list(CurrentFigure._figures.items()):
-            if value == figure:
+    @classmethod
+    def number_of_figure(cls, fig):
+        for key,value in list(cls._figures.items()):
+            if value == fig:
                 return key
-        raise ValueError('Figure %s was not recognised'%figure)
+        raise ValueError('Figure %s was not recognised' % fig)
 
 
+def setcategory(category):
+    """A decorator to mark a function as part of the given category. For details
+    of the category mechanism see the docstring on the currentfigure
+    module.
+
+    :param category: '1d' or '2d' to denote the category of the plot produced
+    """
+    def activate_impl(function):
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            try:
+                CurrentFigure.activate_category(category)
+                return_value = function(*args, **kwargs)
+            finally:
+                CurrentFigure.deactivate_category()
+            return return_value
+        return wrapper
+
+    return activate_impl

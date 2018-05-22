@@ -1,13 +1,14 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
-from .slice_plotter import SlicePlotter
-import mslice.plotting.pyplot as plt
-from mslice.util import MPL_COMPAT
+
+from mslice.models.cmap import allowed_cmaps
+from mslice.models.labels import get_display_name, recoil_labels
+from mslice.models.slice.slice_plotter import SlicePlotter
 from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
                                                  compute_chi_magnetic, compute_gdos, compute_d2sigma,
                                                  compute_powder_line, compute_chi, compute_symmetrised)
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
-from ..labels import get_display_name, recoil_labels
+import mslice.plotting.pyplot as plt
 
 overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
 picker=5
@@ -16,9 +17,6 @@ picker=5
 class MatplotlibSlicePlotter(SlicePlotter):
 
     def __init__(self):
-        self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
-        if not MPL_COMPAT:
-            self._colormaps.insert(0, 'viridis')
         self.listener = None
         self.slice_cache = {}
         self._sample_temp_fields = []
@@ -33,9 +31,10 @@ class MatplotlibSlicePlotter(SlicePlotter):
         if selected_ws not in self.overplot_lines:
             self.overplot_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
-        plt.gcf().canvas.set_window_title(selected_ws)
-        plt.gcf().canvas.manager.add_slice_plot(self, selected_ws)
-        plt.gcf().canvas.manager.update_grid()
+        fig_canvas = plt.gcf().canvas
+        fig_canvas.set_window_title(selected_ws)
+        fig_canvas.manager.add_slice_plot(self, selected_ws)
+        fig_canvas.manager.update_grid()
         plt.draw_all()
 
     def _cache_slice(self, plot_data, ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis):
@@ -51,9 +50,11 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self.slice_cache[ws]['rotated'] = True
 
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
-        plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
-                   interpolation='none', hold=False)
-        plt.title(workspace_name, picker=picker)
+        plt.clf()
+        image = plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
+                           interpolation='none')
+        plot_axes = plt.gca()
+        plot_axes.set_title(workspace_name, picker=picker)
         if self.slice_cache[workspace_name]['rotated']:
             x_axis = energy_axis
             y_axis = momentum_axis
@@ -61,13 +62,18 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_axis = momentum_axis
             y_axis = energy_axis
         comment = get_comment(str(workspace_name))
-        plt.xlabel(get_display_name(x_axis.units, comment), picker=picker)
-        plt.ylabel(get_display_name(y_axis.units, comment), picker=picker)
-        plt.xlim(x_axis.start)
-        plt.ylim(y_axis.start)
-        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)
-        plt.gca().get_xaxis().set_units(x_axis.units)
-        plt.gca().get_yaxis().set_units(y_axis.units)
+        # labels
+        plot_axes.set_xlabel(get_display_name(x_axis.units, comment), picker=picker)
+        plot_axes.set_ylabel(get_display_name(y_axis.units, comment), picker=picker)
+        plot_axes.set_xlim(x_axis.start)
+        plot_axes.set_ylim(y_axis.start)
+        plot_axes.get_xaxis().set_units(x_axis.units)
+        plot_axes.get_yaxis().set_units(y_axis.units)
+
+        # colorbar
+        cb = plt.colorbar(image, ax=plot_axes)
+        cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)
+        plt.gcf().canvas.draw_idle()
 
     def show_scattering_function(self, workspace):
         cached_slice = self.slice_cache[workspace]
@@ -192,7 +198,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
                                                     cached_slice['rotated'])
 
     def get_available_colormaps(self):
-        return self._colormaps
+        return allowed_cmaps()
 
     def get_recoil_label(self, key):
         return recoil_labels[key]
