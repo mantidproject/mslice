@@ -227,14 +227,8 @@ class CutParams(PresenterUtility):
     Groups parameters needed to cut and validates them
     '''
     def validate_axis(self, axis):
-        # Note this checks for empty / invalid string in axis parameters
-        axis.start = float(axis.start)
-        axis.end = float(axis.end)
-        axis.step = float(axis.step)
-
         if axis.start >= axis.end:
             raise ValueError()
-        return axis
 
     def unpack(self):
         return (self.cut_axis, self.integration_axis, self.norm_to_one, self.intensity_start,
@@ -247,7 +241,8 @@ class CutParams(PresenterUtility):
     @cut_axis.setter
     def cut_axis(self, axis):
         try:
-            self._cut_axis = self.validate_axis(axis)
+            self.validate_axis(axis)
+            self._cut_axis = axis
         except ValueError:
             raise ValueError('Invalid cut axis parameters')
 
@@ -258,7 +253,8 @@ class CutParams(PresenterUtility):
     @integration_axis.setter
     def integration_axis(self, axis):
         try:
-            self._integration_axis = self.validate_axis(axis)
+            self.validate_axis(axis)
+            self._integration_axis = axis
         except ValueError:
             raise ValueError('Invalid integration axis parameters')
 

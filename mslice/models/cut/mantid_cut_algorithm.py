@@ -22,14 +22,12 @@ class MantidCutAlgorithm(CutAlgorithm):
     def compute_cut_xye(self, selected_workspace, cut_axis, integration_axis, is_norm):
         ws_handle = get_workspace_handle(selected_workspace)
         out_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
-
         cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, InputWorkspace=ws_handle,
                                     CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
                                     EMode = ws_handle.e_mode, PSD=ws_handle.is_PSD, NormToOne=is_norm)
-
         plot_data = _num_events_normalized_array(cut.raw_ws)
         plot_data = plot_data.squeeze()
-        with np.errstate(invalid='ignore'):
+        with np.errstate(all='ignore'):
             if cut.raw_ws.displayNormalization() == MDNormalization.NoNormalization:
                 errors = np.sqrt(cut.get_variance())
                 errors[np.where(cut.raw_ws.getNumEventsArray() == 0)] = np.nan

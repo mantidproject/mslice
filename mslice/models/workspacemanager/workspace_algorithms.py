@@ -117,7 +117,7 @@ def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
     # Use a step size a bit smaller than angular spacing ( / 3) so user can rebin if they want...
     ws.limits['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep / 3]
     ws.limits['|Q|'] = ws.limits['MomentumTransfer']  # ConvertToMD renames it(!)
-    ws.limits['Degrees'] = theta * 180 / np.pi
+    ws.limits['2Theta'] = theta * 180 / np.pi
     ws.limits['DeltaE'] = [emin, emax, estep]
 
 

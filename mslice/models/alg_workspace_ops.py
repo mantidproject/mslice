@@ -27,10 +27,13 @@ def fill_in_missing_input(axis, workspace):
 def get_available_axis(workspace):
     workspace = get_workspace_handle(workspace)
     if not workspace.is_PSD:
-        return ['|Q|', 'Degrees', 'DeltaE']
+        return ['|Q|', '2Theta', 'DeltaE']
     dim_names = []
     for i in range(workspace.raw_ws.getNumDims()):
         dim_names.append(workspace.raw_ws.getDimension(i).getName())
+        if 'Degrees' in dim_names:
+            dim_names.remove('Degrees')
+            dim_names.append('2Theta')
     return dim_names
 
 def get_other_axis(workspace, axis):
