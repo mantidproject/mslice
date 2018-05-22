@@ -159,13 +159,8 @@ class CutPresenterTest(unittest.TestCase):
         cut_presenter.notify(Command.Plot)
         self.assertRaises(ValueError)
         # Bad cut axis
-        axis = Axis("units", "a", "100", "1")
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
-        cut_presenter.register_master(self.main_presenter)
-        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
-                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
-        cut_presenter.notify(Command.Plot)
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            Axis("units", "a", "100", "1")
         # Invalid axis range
         axis = Axis("units", "100", "0", "1")
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
@@ -410,7 +405,7 @@ class CutPresenterTest(unittest.TestCase):
     def test_invalid_step(self):
         cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
-        axis = Axis("units", "0", "100", "")
+        axis = Axis("units", "0", "100", 0)
         processed_axis = Axis("units", 0, 100, 0)
         integration_start = 3
         integration_end = 5
@@ -433,4 +428,4 @@ class CutPresenterTest(unittest.TestCase):
         self.view.get_minimum_step.assert_called_with()
         print(self.view.display_error.mock_calls)
         self.view.display_error.assert_any_call('Invalid cut step parameter, using default.')
-        self.view.populate_cut_params.assert_called_with("0", "100", "1.00000")
+        self.view.populate_cut_params.assert_called_with(0.0, 100.0, '1.00000')
