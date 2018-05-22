@@ -3,6 +3,9 @@ from matplotlib.colors import Normalize
 from .slice_plotter import SlicePlotter
 import mslice.plotting.pyplot as plt
 from mslice.util import MPL_COMPAT
+from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
+                                                 compute_chi_magnetic, compute_gdos, compute_d2sigma,
+                                                 compute_powder_line, compute_chi, compute_symmetrised)
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from ..labels import get_display_name, recoil_labels
 
@@ -12,8 +15,7 @@ picker=5
 
 class MatplotlibSlicePlotter(SlicePlotter):
 
-    def __init__(self, slice_algorithm):
-        self._slice_algorithm = slice_algorithm
+    def __init__(self):
         self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
         if not MPL_COMPAT:
             self._colormaps.insert(0, 'viridis')
@@ -24,9 +26,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
-        sample_temp = self._slice_algorithm.sample_temperature(selected_ws, self._sample_temp_fields)
-        plot_data, boundaries = self._slice_algorithm.compute_slice(selected_ws, x_axis, y_axis,
-                                                                    norm_to_one)
+        sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
+        plot_data, boundaries = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._cache_slice(plot_data, selected_ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis)
         if selected_ws not in self.overplot_lines:
@@ -126,9 +127,9 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             momentum_axis = self.slice_cache[workspace]['momentum_axis']
             if recoil:
-                x, y = self._slice_algorithm.compute_recoil_line(workspace, momentum_axis, key)
+                x, y = compute_recoil_line(workspace, momentum_axis, key)
             else:
-                x, y = self._slice_algorithm.compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
+                x, y = compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
             color = overplot_colors[key] if key in overplot_colors else 'c'
             if self.slice_cache[workspace]['rotated']:
                 self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label,
@@ -148,7 +149,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self._sample_temp_fields.append(field_name)
 
     def update_sample_temperature(self, workspace):
-        temp = self._slice_algorithm.sample_temperature(workspace, self._sample_temp_fields)
+        temp = sample_temperature(workspace, self._sample_temp_fields)
         self.slice_cache[workspace]['sample_temp'] = temp
 
     def set_sample_temperature(self, workspace, temp):
@@ -164,42 +165,37 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def compute_chi(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][1] = self._slice_algorithm.compute_chi(
-            cached_slice['plot_data'][0], self.sample_temperature(workspace),
-            cached_slice['energy_axis'], cached_slice['rotated'])
+        cached_slice['plot_data'][1] = compute_chi(cached_slice['plot_data'][0], self.sample_temperature(workspace),
+                                                   cached_slice['energy_axis'], cached_slice['rotated'])
 
     def compute_chi_magnetic(self, workspace):
         cached_slice = self.slice_cache[workspace]
         if cached_slice['plot_data'][1] is None:
             self.compute_chi(workspace)
-        cached_slice['plot_data'][2] = self._slice_algorithm.compute_chi_magnetic(
-            cached_slice['plot_data'][1])
+        cached_slice['plot_data'][2] = compute_chi_magnetic(cached_slice['plot_data'][1])
 
     def compute_d2sigma(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][3] = self._slice_algorithm.compute_d2sigma(
-            cached_slice['plot_data'][0], workspace, cached_slice['energy_axis'], cached_slice['rotated'])
+        cached_slice['plot_data'][3] = compute_d2sigma(cached_slice['plot_data'][0],
+                                                       workspace, cached_slice['energy_axis'], cached_slice['rotated'])
 
     def compute_symmetrised(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][4] = self._slice_algorithm.compute_symmetrised(
-            cached_slice['plot_data'][0], self.sample_temperature(workspace),
-            cached_slice['energy_axis'], cached_slice['rotated'])
+        cached_slice['plot_data'][4] = compute_symmetrised(cached_slice['plot_data'][0],
+                                                           self.sample_temperature(workspace),
+                                                           cached_slice['energy_axis'], cached_slice['rotated'])
 
     def compute_gdos(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][5] = self._slice_algorithm.compute_gdos(
-            cached_slice['plot_data'][0], self.sample_temperature(workspace),
-            cached_slice['momentum_axis'], cached_slice['energy_axis'], cached_slice['rotated'])
+        cached_slice['plot_data'][5] = compute_gdos(cached_slice['plot_data'][0], self.sample_temperature(workspace),
+                                                    cached_slice['momentum_axis'], cached_slice['energy_axis'],
+                                                    cached_slice['rotated'])
 
     def get_available_colormaps(self):
         return self._colormaps
 
     def get_recoil_label(self, key):
         return recoil_labels[key]
-
-    def is_sliceable(self, workspace):
-        return self._slice_algorithm.is_sliceable(workspace)
 
     def update_displayed_workspaces(self):
         self.listener.update_workspaces()

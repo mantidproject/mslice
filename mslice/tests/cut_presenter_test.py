@@ -7,7 +7,7 @@ import warnings
 from six import string_types
 
 from mslice.models.axis import Axis
-from mslice.models.cut.cut_algorithm import CutAlgorithm
+import mslice.models.cut.cut_functions as CutAlgorithm
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.models.alg_workspace_ops import get_available_axis
 from mslice.presenters.cut_presenter import CutPresenter
@@ -26,16 +26,16 @@ class CutPresenterTest(unittest.TestCase):
 
     def test_constructor_success(self):
         self.view.disable = mock.Mock()
-        CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        CutPresenter(self.view, self.cut_plotter)
         self.view.disable.assert_called()
 
     def test_register_master_success(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self.main_presenter.subscribe_to_workspace_selection_monitor.assert_called_with(cut_presenter)
 
     def test_workspace_selection_changed_multiple_workspaces(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self.main_presenter.get_selected_workspace = mock.Mock(return_value=['a', 'b'])
         for attribute in dir(CutView):
@@ -51,7 +51,7 @@ class CutPresenterTest(unittest.TestCase):
                     getattr(self.view, attribute).assert_not_called()
 
     def test_notify_presenter_clears_error(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self.view.clear_displayed_error = mock.Mock()
         # This unit test will verify that notifying cut presenter will cause the error to be cleared on the view.
@@ -64,7 +64,7 @@ class CutPresenterTest(unittest.TestCase):
     @patch('mslice.presenters.cut_presenter.get_workspace_handle')
     @patch('mslice.models.alg_workspace_ops.get_workspace_handle')
     def test_workspace_selection_changed_single_cuttable_workspace(self, get_ws_handle_mock, get_ws_handle_mock2):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
@@ -101,7 +101,7 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.set_saved_cut_parameters.assert_called_with(new_workspace, available_dimensions[0], fields)
 
     def test_workspace_selection_changed_single_noncut_workspace(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
@@ -134,7 +134,7 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_algorithm.get_available_axis = mock.Mock(return_value=[axis.units, integrated_axis])
 
     def test_cut_parse_input_errors(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         # Invalid workspace
         cut_presenter.notify(Command.Plot)
@@ -152,7 +152,7 @@ class CutPresenterTest(unittest.TestCase):
         integrated_axis = 'integrated axis'
         # Wrong units
         axis = Axis("", "0", "100", "1")
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
@@ -160,7 +160,7 @@ class CutPresenterTest(unittest.TestCase):
         self.assertRaises(ValueError)
         # Bad cut axis
         axis = Axis("units", "a", "100", "1")
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
@@ -168,7 +168,7 @@ class CutPresenterTest(unittest.TestCase):
         self.assertRaises(ValueError)
         # Invalid axis range
         axis = Axis("units", "100", "0", "1")
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
@@ -177,7 +177,7 @@ class CutPresenterTest(unittest.TestCase):
         axis = Axis("units", "0", "100", "1")
         # Bad integration
         integration_start = "a"
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
@@ -185,7 +185,7 @@ class CutPresenterTest(unittest.TestCase):
         self.assertRaises(ValueError)
         # Invalid integration range
         integration_start = 30
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
@@ -194,7 +194,7 @@ class CutPresenterTest(unittest.TestCase):
         integration_start = 3
         # Bad intensity
         intensity_start = "a"
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
@@ -202,7 +202,7 @@ class CutPresenterTest(unittest.TestCase):
         self.assertRaises(ValueError)
         # Invalid intensity range
         intensity_start = 100
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
@@ -211,7 +211,7 @@ class CutPresenterTest(unittest.TestCase):
         intensity_start = 11
         # Wrong width
         width = "a"
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
@@ -219,7 +219,7 @@ class CutPresenterTest(unittest.TestCase):
         self.assertRaises(ValueError)
 
     def test_plot_single_cut_success(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
         processed_axis = Axis("units", 0, 100, 1)
@@ -240,7 +240,7 @@ class CutPresenterTest(unittest.TestCase):
                                                      is_norm, intensity_start, intensity_end, plot_over=False)
 
     def test_plot_over_cut_fail(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
         processed_axis = Axis("units", 0, 100, 1)
@@ -260,7 +260,7 @@ class CutPresenterTest(unittest.TestCase):
                                                      is_norm, None, intensity_end, plot_over=True)
 
     def test_cut_single_save_to_workspace(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
         processed_axis = Axis("units", 0, 100, 1)
@@ -282,7 +282,7 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_plotter.plot_cut.assert_not_called()
 
     def test_plot_multiple_cuts_with_width(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
         processed_axis = Axis("units", 0.0, 100.0, 1.0)
@@ -312,7 +312,7 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_plotter.plot_cut.assert_has_calls(call_list)
 
     def test_plot_multiple_workspaces_cut(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
         processed_axis = Axis("units", 0, 100, 1)
@@ -340,7 +340,7 @@ class CutPresenterTest(unittest.TestCase):
     @patch('mslice.presenters.cut_presenter.get_workspace_handle')
     @patch('mslice.models.alg_workspace_ops.get_workspace_handle')
     def test_change_axis(self, get_ws_handle_mock, get_ws_handle_mock2):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         # Set up a mock workspace with two sets of cutable axes, then change to this ws
         workspace = 'workspace'
@@ -389,7 +389,7 @@ class CutPresenterTest(unittest.TestCase):
     @patch('mslice.models.alg_workspace_ops.get_workspace_handle')
     @patch('mslice.presenters.cut_presenter.get_axis_range')
     def test_cut_step_size(self, get_axis_range_mock, get_ws_handle_mock, get_ws_handle_mock2):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
@@ -408,7 +408,7 @@ class CutPresenterTest(unittest.TestCase):
         self.view.set_minimum_step.assert_called_with(None)
 
     def test_invalid_step(self):
-        cut_presenter = CutPresenter(self.view, self.cut_algorithm, self.cut_plotter)
+        cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "")
         processed_axis = Axis("units", 0, 100, 0)

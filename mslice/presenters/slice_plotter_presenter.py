@@ -3,6 +3,7 @@ from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axis, get_axis_range
 from mslice.models.axis import Axis
 from mslice.models.slice.slice_plotter import SlicePlotter
+from mslice.models.slice.slice_functions import is_sliceable
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.slice_plotter_view import SlicePlotterView
@@ -127,7 +128,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def workspace_selection_changed(self):
         workspace_selection = self._get_main_presenter().get_selected_workspaces()
-        if len(workspace_selection) != 1 or not self._slice_plotter.is_sliceable(workspace_selection[0]):
+        if len(workspace_selection) != 1 or not is_sliceable(workspace_selection[0]):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
         else:

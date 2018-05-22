@@ -1,7 +1,6 @@
 from matplotlib.widgets import RectangleSelector
 
 from mslice.models.axis import Axis
-from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
 
@@ -15,8 +14,7 @@ class InteractiveCut(object):
         self._ws_title = ws_title
         self.horizontal = None
         self.connect_event = [None, None, None]
-        self._cut_algorithm = MantidCutAlgorithm()
-        self._cut_plotter = MatplotlibCutPlotter(self._cut_algorithm)
+        self._cut_plotter = MatplotlibCutPlotter()
         self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,

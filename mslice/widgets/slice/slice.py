@@ -8,7 +8,6 @@ from __future__ import (absolute_import, division, print_function)
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
 
-from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
 from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.util.qt import load_ui
@@ -32,7 +31,7 @@ class SliceWidget(SlicePlotterView, QWidget):
         load_ui(__file__, 'slice.ui', self)
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
-        plotter = MatplotlibSlicePlotter(MantidSliceAlgorithm())
+        plotter = MatplotlibSlicePlotter()
         self._presenter = SlicePlotterPresenter(self, plotter)
         # Each time the fields are populated, set a minimum step size
         self._minimumStep = {}
