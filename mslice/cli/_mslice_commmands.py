@@ -11,10 +11,12 @@ import os.path as ospath
 from mantid.api import IMDWorkspace as _IMDWorkspace
 
 from mslice.app import MAIN_WINDOW
-from mslice.workspace.base import WorkspaceBase as Workspace
+from mslice.util.mantid import run_algorithm
 # Helper tools
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
-from mslice.presenters.slice_plotter_presenter import Axis as _Axis
+from mslice.models.alg_workspace_ops import get_axis_range, get_available_axis
+from mslice.models.axis import Axis
+from mslice.workspace.base import WorkspaceBase as Workspace
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
 # Slicing
@@ -39,14 +41,19 @@ _CUT_PLOTTER = MatplotlibCutPlotter(_CUT_ALGORITHM)
 # -----------------------------------------------------------------------------
 
 def _process_axis(axis, fallback_index, input_workspace):
+    available_axes = get_available_axis(input_workspace)
     if axis is None:
-        axis = _SLICE_ALGORITHM.get_available_axis(input_workspace)[fallback_index]
-
+        axis = available_axes[fallback_index]
     # check to see if axis is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
     if ',' in axis:
         axis = _string_to_axis(axis)
+    elif axis in available_axes:
+        range = get_axis_range(input_workspace, axis)
+        range = map(float, range)
+        axis = Axis(units=axis, start=range[0], end=range[1], step=range[2])
     else:
-        axis = _Axis(units=axis, start=None, end=None, step=None) # The model will fill in the rest
+        raise RuntimeError("Axis '%s' not recognised. Workspace has these axes: %s " %
+                           (axis, ', '.join(available_axes)))
     return axis
 
 def _string_to_axis(string):
@@ -67,14 +74,14 @@ def _string_to_axis(string):
         step = float(axis[3])
     except ValueError:
         raise ValueError("step '%s' is not a valid float"%axis[3])
-    return _Axis(name, start, end, step)
+    return Axis(name, start, end, step)
 
 
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
 
-def load(path):
+def Load(path):
     """ Load a workspace from a file.
 
     Keyword Arguments:
@@ -111,41 +118,28 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
     return proj_ws
 
 
-def get_slice(input_workspace, x=None, y=None, ret_val='both', normalize=False):
-    """ Get Slice from workspace as numpy array.
+def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
+    """ Slices workspace.
 
-    Keyword Arguments:
-    input_workspace -- The workspace to slice. Must be an MDWorkspace with 2 Dimensions. The parameter can be either a
-    python handle to the workspace to slice OR the workspaces name in the ADS (string)
+       Keyword Arguments:
+       InputWorkspace -- The workspace to slice. The parameter can be either a python handle to the workspace
+       OR the workspaces name as a string.
 
-    x -- The x axis of the slice. If not specified will default to Dimension 0 of the workspace
-    y -- The y axis of the slice. If not specified will default to Dimension 1 of the workspace
-    Axis Format:-
-        Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5'
-        or just the name e.g. 'DeltaE'. That case the start and en will default to the range in the data.
+       Axis1 -- The x axis of the slice. If not specified will default to |Q| (or Degrees).
+       Axis2 -- The y axis of the slice. If not specified will default to DeltaE
+       Axis Format:-
+           Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5'
+           or just the name e.g. 'DeltaE'. That case the start and en will default to the range in the data.
 
-    ret_val -- a string to specify the return value, if ret_val == 'slice' the function will return a single 2D numpy
-    array containing the slice data. if ret_value == 'extents' it will return a list containing the range of the slice
-    taken [xmin, xmax, ymin, ymax]. if ret_val == 'both' then it will return a tuple (<slice>, <extents>)
+       NormToOne - if true the slice will be normalized to one.
 
-    normalize -- if set to True the slice will be normalize to one.
+       """
+    workspace = get_workspace_handle(InputWorkspace)
+    x_axis = _process_axis(Axis1, 0, workspace)
+    y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
 
-    """
-    input_workspace = get_workspace_handle(input_workspace)
-    assert isinstance(input_workspace, _IMDWorkspace)
-    x_axis = _process_axis(x, 0, input_workspace)
-    y_axis = _process_axis(y, 1, input_workspace)
-
-    slice_array, extents = _SLICE_ALGORITHM.compute_slice(selected_workspace=input_workspace, x_axis=x_axis,
-                                                          smoothing=None, y_axis=y_axis, norm_to_one=normalize)
-    if ret_val == 'slice':
-        return slice_array
-    elif ret_val == 'extents':
-        return extents
-    elif ret_val == 'both':
-        return slice_array, extents
-    else:
-        raise ValueError("ret_val should be 'slice', 'extents' or 'both' and not '%s' " % ret_val)
+    return run_algorithm('Slice', InputWorkspace=workspace, XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), EMode=workspace.e_mode,
+                         PSD=workspace.is_PSD, NormToOne = NormToOne)
 
 
 def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_min=None, intensity_max=None,
