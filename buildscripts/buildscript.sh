@@ -49,6 +49,14 @@ echo "Install latest mantid build"
 # assume suoders allows us to do this
 sudo gdebi -n $(find "${mantid_deb_dir}" -name '*.deb' -type f -print)
 
+echo "Configuring mantid properties"
+userprops=~/.mantid/Mantid.user.properties
+rm -f $userprops
+# Turn off any auto updating on startup
+echo "UpdateInstrumentDefinitions.OnStartup = 0" > $userprops
+echo "usagereports.enabled = 0" >> $userprops
+echo "CheckMantidVersion.OnStartup = 0" >> $userprops
+
 # use a virtual environment
 ${script_dir}/create_virtualenv.sh ${py_exe} ${venv_dir}
 source ${venv_dir}/bin/activate
