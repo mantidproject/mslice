@@ -69,27 +69,6 @@ def is_cuttable(workspace):
         return isinstance(workspace, Workspace2D) and validator.isValid(workspace.raw_ws) == ''
 
 
-def set_saved_cut_parameters(workspace, axis, parameters):
-    if workspace_exists(workspace):
-        workspace = get_workspace_handle(workspace)
-        workspace.set_cut_params(axis, parameters)
-
-
-def get_saved_cut_parameters(workspace, axis=None):
-    try:
-        workspace = get_workspace_handle(workspace)
-        if axis is None:
-            axis = workspace.cut_params['previous_axis']
-        return workspace.cut_params[axis], axis
-    except KeyError:
-        return None, None
-
-
-def is_axis_saved(workspace, axis):
-    workspace = get_workspace_handle(workspace)
-    return workspace.is_axis_saved(axis)
-
-
 def _infer_missing_parameters(workspace, cut_axis):
     """Infer Missing parameters. This will come in handy at the CLI"""
     assert isinstance(workspace, PixelWorkspace)

@@ -85,7 +85,15 @@ class WorkspaceMixin(object):
                 return False
         return True
 
-    def set_cut_params(self, axis, params):
+    def get_saved_cut_parameters(self, axis=None):
+        try:
+            if axis is None:
+                axis = self._cut_params['previous_axis']
+            return self._cut_params[axis], axis
+        except KeyError:
+            return None, None
+
+    def set_saved_cut_parameters(self, axis, params):
         self._cut_params[axis] = params
         self._cut_params['previous_axis'] = axis
 
@@ -96,9 +104,6 @@ class WorkspaceMixin(object):
     def raw_ws(self):
         return self._raw_ws
 
-    @property
-    def cut_params(self):
-        return self._cut_params
 
     def __add__(self, other):
         return self._binary_op(operator.add, other)
