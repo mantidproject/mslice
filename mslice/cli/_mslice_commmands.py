@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
 
-from mslice.app import MAIN_WINDOW
+import mslice.app as app
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axis
@@ -83,7 +83,7 @@ def Load(path):
         raise RuntimeError('path given to load must be a string')
     if not ospath.exists(path):
         raise RuntimeError('could not find the path %s' % path)
-    MAIN_WINDOW.dataloader_presenter.load_workspace([path])
+    app.MAIN_WINDOW.dataloader_presenter.load_workspace([path])
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
 
@@ -100,8 +100,8 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
        """
     _validate_workspace(InputWorkspace)
 
-    proj_ws = MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
-    MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
+    proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
+    app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
     return proj_ws
 
 
