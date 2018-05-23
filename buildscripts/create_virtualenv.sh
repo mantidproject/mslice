@@ -13,7 +13,7 @@ if [ ! -d "$env_dir" ]
 then
   # Create the environment
   echo "Creating environment in ${env_dir}..."
-  ${python_exe} -m virtualenv --system-site-packages ${env_dir}
+  ${python_exe} -m virtualenv --python=${python_exe} --system-site-packages ${env_dir}
 else
   echo "Environment ${env_dir} already exists, doing nothing."
 fi
