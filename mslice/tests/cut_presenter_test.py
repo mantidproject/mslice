@@ -6,8 +6,6 @@ import warnings
 
 from six import string_types
 
-from mslice.tests.mock_modules.mock_workspace_provider import workspace_provider
-
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.models.alg_workspace_ops import get_available_axes
@@ -62,7 +60,10 @@ class CutPresenterTest(unittest.TestCase):
             self.view.reset_mock()
 
     @patch('mslice.presenters.cut_presenter.is_cuttable')
-    def test_workspace_selection_changed_single_cuttable_workspace(self, is_cuttable_mock):
+    @patch('mslice.presenters.cut_presenter.get_workspace_handle')
+    @patch('mslice.models.alg_workspace_ops.get_workspace_handle')
+    def test_workspace_selection_changed_single_cuttable_workspace(self, get_ws_handle_mock2, get_ws_handle_mock,
+                                                                   is_cuttable_mock):
         cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
@@ -74,7 +75,8 @@ class CutPresenterTest(unittest.TestCase):
         ws_mock.limits = {}
         ws_mock.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
 
-        workspace_provider.get_workspace_handle.return_value = ws_mock
+        get_ws_handle_mock.return_value = ws_mock
+        get_ws_handle_mock2.return_value = ws_mock
         available_dimensions = get_available_axes(workspace)
         cut_presenter.workspace_selection_changed()
         self.view.populate_cut_axis_options.assert_called_with(available_dimensions)
@@ -327,7 +329,9 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_plotter.plot_cut.assert_has_calls(call_list)
 
     @patch('mslice.presenters.cut_presenter.is_cuttable')
-    def test_change_axis(self, is_cuttable_mock):
+    @patch('mslice.presenters.cut_presenter.get_workspace_handle')
+    @patch('mslice.models.alg_workspace_ops.get_workspace_handle')
+    def test_change_axis(self, get_ws_handle_mock, get_ws_handle_mock2, is_cuttable_mock):
         cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         # Set up a mock workspace with two sets of cutable axes, then change to this ws
@@ -338,7 +342,8 @@ class CutPresenterTest(unittest.TestCase):
         ws_mock.is_PSD = False
         ws_mock.limits = {}
         ws_mock.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
-        workspace_provider.get_workspace_handle.return_value = ws_mock
+        get_ws_handle_mock.return_value = ws_mock
+        get_ws_handle_mock2.return_value = ws_mock
         cut_presenter.workspace_selection_changed()
         # Set up a set of input values for this cut, then simulate changing axes.
         fields1 = dict()
@@ -374,7 +379,9 @@ class CutPresenterTest(unittest.TestCase):
 
     @patch('mslice.presenters.cut_presenter.is_cuttable')
     @patch('mslice.presenters.cut_presenter.get_axis_range')
-    def test_cut_step_size(self, get_axis_range_mock, is_cuttable_mock):
+    @patch('mslice.presenters.cut_presenter.get_workspace_handle')
+    @patch('mslice.models.alg_workspace_ops.get_workspace_handle')
+    def test_cut_step_size(self, get_ws_handle_mock, get_ws_handle_mock2, get_axis_range_mock, is_cuttable_mock):
         cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
@@ -384,7 +391,8 @@ class CutPresenterTest(unittest.TestCase):
         ws_mock.is_PSD = False
         ws_mock.limits = {}
         ws_mock.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
-        workspace_provider.get_workspace_handle.return_value = ws_mock
+        get_ws_handle_mock.return_value = ws_mock
+        get_ws_handle_mock2.return_value = ws_mock
         cut_presenter.workspace_selection_changed()
         get_axis_range_mock.assert_any_call(ws_mock, '|Q|')
         get_axis_range_mock.assert_any_call(ws_mock, 'DeltaE')
