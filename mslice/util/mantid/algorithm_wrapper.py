@@ -21,13 +21,11 @@ def add_to_ads(workspaces):
 
 def wrap_algorithm(algorithm):
     def alg_wrapper(*args, **kwargs):
-        output_name = "help"
+        output_name = ''
         if 'InputWorkspace' in kwargs:
-            input_ws = kwargs['InputWorkspace']
-            if isinstance(input_ws, Workspace):
-                kwargs['InputWorkspace'] = input_ws.raw_ws
-            elif isinstance(kwargs['InputWorkspace'], str):
-                kwargs['InputWorkspace'] = get_workspace_handle(kwargs['InputWorkspace']).raw_ws
+            kwargs['InputWorkspace'] = _name_or_wrapper_to_workspace(kwargs['InputWorkspace'])
+        elif len(args) > 0:
+            args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
         if 'OutputWorkspace' in kwargs:
             output_name = kwargs['OutputWorkspace']
         store = kwargs.pop('store', True)
@@ -39,3 +37,11 @@ def wrap_algorithm(algorithm):
             add_workspace(result, output_name)
         return result
     return alg_wrapper
+
+def _name_or_wrapper_to_workspace(input_ws):
+    if isinstance(input_ws, Workspace):
+        return input_ws.raw_ws
+    elif isinstance(input_ws, str):
+        return get_workspace_handle(input_ws).raw_ws
+    else:
+        return input_ws
