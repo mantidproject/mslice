@@ -337,10 +337,10 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_plotter_presenter.workspace_selection_changed()
         assert(self.slice_view.clear_input_fields.called)
 
-    @mock.patch('mslice.presenters.slice_plotter_presenter.get_available_axis')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.get_available_axes')
     @mock.patch('mslice.presenters.slice_plotter_presenter.get_axis_range')
     @mock.patch('mslice.presenters.slice_plotter_presenter.is_sliceable')
-    def test_workspace_selection_changed(self, is_sliceable_mock, get_axis_range_mock, get_available_axis_mock):
+    def test_workspace_selection_changed(self, is_sliceable_mock, get_axis_range_mock, get_available_axes_mock):
         slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         slice_plotter_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
@@ -348,13 +348,13 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         ws_mock = mock.Mock()
         workspace_provider.get_workspace_handle.return_value = ws_mock
         dims = ['dim1', 'dim2']
-        get_available_axis_mock.return_value=dims
+        get_available_axes_mock.return_value=dims
         get_axis_range_mock.return_value = (0, 1, 0.1)
         is_sliceable_mock.return_value = True
         slice_plotter_presenter.workspace_selection_changed()
         assert(self.slice_view.populate_slice_x_options.called)
         assert(self.slice_view.populate_slice_y_options.called)
-        assert(get_available_axis_mock.called)
+        assert(get_available_axes_mock.called)
         assert(get_axis_range_mock.called)
         # Test error handling
         get_axis_range_mock.side_effect = KeyError
