@@ -11,26 +11,28 @@ mantid_deb_dir=$2
 
 venv_dir=$PWD/venv-${py_ver}
 
-function onexit {
-  rm -fr ${venv_dir}
-}
-trap onexit EXIT
-
 # determine python executable
 case "$py_ver" in
     py2)
         py_exe=/usr/bin/python
-        export PYTHONPATH=/opt/mantidnightly/bin
+        pkg_name=mantidnightly
         export QT_API=pyqt
     ;;
     py3)
         py_exe=/usr/bin/python3
-        export PYTHONPATH=/opt/mantidnightly-python3/bin
+        pkg_name=mantidnightly-python3
     ;;
     *)
         echo "Unknown python version requested '$py_ver'"
         exit 1
 esac
+
+function onexit {
+  deactivate
+  rm -fr ${venv_dir}
+  sudo dpkg --purge ${pkg_name}
+}
+trap onexit EXIT
 
 # ------------------------------------------------------------------------------
 # pre-installation
@@ -49,9 +51,19 @@ echo "Install latest mantid build"
 # assume suoders allows us to do this
 sudo gdebi -n $(find "${mantid_deb_dir}" -name '*.deb' -type f -print)
 
+echo "Configuring mantid properties"
+userprops=~/.mantid/Mantid.user.properties
+rm -f $userprops
+# Turn off any auto updating on startup
+echo "UpdateInstrumentDefinitions.OnStartup = 0" > $userprops
+echo "usagereports.enabled = 0" >> $userprops
+echo "CheckMantidVersion.OnStartup = 0" >> $userprops
+
 # use a virtual environment
 ${script_dir}/create_virtualenv.sh ${py_exe} ${venv_dir}
 source ${venv_dir}/bin/activate
+# ensure mantid is on the python path
+export PYTHONPATH=/opt/${pkg_name}/bin
 
 # ------------------------------------------------------------------------------
 # installation
