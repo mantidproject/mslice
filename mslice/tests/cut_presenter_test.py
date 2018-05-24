@@ -10,7 +10,7 @@ from mslice.tests.mock_modules.mock_workspace_provider import workspace_provider
 
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_plotter import CutPlotter
-from mslice.models.alg_workspace_ops import get_available_axis
+from mslice.models.alg_workspace_ops import get_available_axes
 from mslice.presenters.cut_presenter import CutPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.widgets.cut.command import Command
@@ -75,7 +75,7 @@ class CutPresenterTest(unittest.TestCase):
         ws_mock.get_saved_cut_parameters = mock.Mock(return_value=(None, None))
 
         workspace_provider.get_workspace_handle.return_value = ws_mock
-        available_dimensions = get_available_axis(workspace)
+        available_dimensions = get_available_axes(workspace)
         cut_presenter.workspace_selection_changed()
         self.view.populate_cut_axis_options.assert_called_with(available_dimensions)
         self.view.enable.assert_called_with()

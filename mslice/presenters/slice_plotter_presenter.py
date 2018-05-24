@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
-from mslice.models.alg_workspace_ops import get_available_axis, get_axis_range
+from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
 from mslice.models.slice.slice_plotter import SlicePlotter
 from mslice.models.slice.slice_functions import is_sliceable
@@ -137,7 +137,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
             self._slice_view.enable()
             self._slice_view.enable_units_choice(non_psd)
-            axis = get_available_axis(get_workspace_handle(workspace_selection))
+            axis = get_available_axes(get_workspace_handle(workspace_selection))
             self._slice_view.populate_slice_x_options(axis)
             self._slice_view.populate_slice_y_options(axis[::-1])
             self.populate_slice_params()

@@ -24,7 +24,7 @@ def fill_in_missing_input(axis, workspace):
         axis.step = (axis.end - axis.start)/100
 
 
-def get_available_axis(workspace):
+def get_available_axes(workspace):
     workspace = get_workspace_handle(workspace)
     if not workspace.is_PSD:
         return ['|Q|', 'Degrees', 'DeltaE']
@@ -34,6 +34,6 @@ def get_available_axis(workspace):
     return dim_names
 
 def get_other_axis(workspace, axis):
-    all_axis = get_available_axis(workspace)
+    all_axis = get_available_axes(workspace)
     all_axis.remove(axis.units)
     return all_axis[0]

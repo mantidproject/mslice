@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from .busy import show_busy
-from mslice.models.alg_workspace_ops import get_available_axis, get_axis_range
+from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_functions import (get_arrays_from_workspace, is_cuttable)
 from mslice.models.cut.cut_plotter import CutPlotter
@@ -158,42 +158,55 @@ class CutPresenter(PresenterUtility):
             self._populate_fields_using_workspace(workspace_selection[0])
 
     def _populate_fields_using_workspace(self, workspace_name, plotting=False):
+
         workspace = get_workspace_handle(workspace_name)
-        previous_cut_workspace = get_workspace_handle(self._previous_cut)
-        axis = get_available_axis(workspace_name)
+        axes = get_available_axes(workspace_name)
+
+        chosen_axis, saved_parameters = self._get_axis_to_populate_fields(workspace, axes)
+
+        self._cut_view.clear_input_fields()
+        self._cut_view.populate_cut_axis_options(axes)
+        self._cut_view.enable()
+        self._cut_view.set_cut_axis(chosen_axis)
+        self.update_integration_axis()
+        if not plotting and saved_parameters is not None:
+            self._cut_view.populate_input_fields(saved_parameters)
+        self._previous_cut = workspace
+        self._previous_axis = chosen_axis
+        self._set_minimum_step(workspace, axes)
+
+    def _get_axis_to_populate_fields(self, workspace, available_axes):
         # There are three choices for which axes to select:
         #   1. If the current cut is of the same type (e.g. QE), and parameters for the current
         #      axis in the new cut has not been defined by the user, use the current axis
         #   2. If the user has looked at this cut _and_ this axis before, use that
         #   3. Otherwise use the first available axis
-        this_cut_par, prev_selected_axis = workspace.get_saved_cut_parameters()
-        prev_cut_par, _ = previous_cut_workspace.get_saved_cut_parameters(self._previous_axis)
-        axis_is_same_as_prev = prev_cut_par is not None and axis == prev_cut_par['axes']
-        axis_in_dict = workspace.is_axis_saved(self._previous_axis)
-        if axis_is_same_as_prev and not axis_in_dict:
-            current_axis = self._cut_view.get_cut_axis()
-            saved_parameters = prev_cut_par
-        elif this_cut_par is not None:
-            current_axis = prev_selected_axis
-            saved_parameters = this_cut_par
-        else:
-            current_axis = axis[0]
-            saved_parameters = None
 
-        self._cut_view.clear_input_fields()
-        self._cut_view.populate_cut_axis_options(axis)
-        self._cut_view.enable()
-        self._cut_view.set_cut_axis(current_axis)
-        self.update_integration_axis()
-        if not plotting and saved_parameters is not None:
-            self._cut_view.populate_input_fields(saved_parameters)
-        self._previous_cut = workspace
-        self._previous_axis = current_axis
-        self._set_minimum_step(workspace, axis)
+        prev_cut_par = self._get_current_axis_parameters_if_chosen(workspace, available_axes)
+        if prev_cut_par:
+            chosen_axis = self._cut_view.get_cut_axis()
+            saved_parameters = prev_cut_par
+        else:
+            this_cut_par, prev_selected_axis = workspace.get_saved_cut_parameters()
+            if this_cut_par is not None:
+                chosen_axis = prev_selected_axis
+                saved_parameters = this_cut_par
+            else:
+                chosen_axis = available_axes[0]
+                saved_parameters = None
+        return chosen_axis, saved_parameters
+
+    def _get_current_axis_parameters_if_chosen(self, workspace, available_axes):
+        if self._previous_cut is not None:
+            previous_cut_workspace = get_workspace_handle(self._previous_cut)
+            prev_cut_par, _ = previous_cut_workspace.get_saved_cut_parameters(self._previous_axis)
+            if available_axes == prev_cut_par['axes'] and not workspace.is_axis_saved(self._previous_axis):
+                return prev_cut_par
+        return False
 
     def update_integration_axis(self):
         workspace = get_workspace_handle(self._main_presenter.get_selected_workspaces()[0])
-        axes = get_available_axis(workspace)
+        axes = get_available_axes(workspace)
         if self._cut_view.get_cut_axis() == 'DeltaE':
             axes.remove('DeltaE')
             self._cut_view.populate_integration_axis_options(axes)

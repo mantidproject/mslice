@@ -69,4 +69,5 @@ class MatplotlibCutPlotter(CutPlotter):
         return self.icut
 
     def save_cut(self, params):
-        return compute_cut(*params)
+        #TODO: fix this
+        pass
