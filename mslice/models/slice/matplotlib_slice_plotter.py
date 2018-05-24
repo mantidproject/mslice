@@ -74,6 +74,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         cb = plt.colorbar(image, ax=plot_axes)
         cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)
         plt.gcf().canvas.draw_idle()
+        plt.show()
 
     def show_scattering_function(self, workspace):
         cached_slice = self.slice_cache[workspace]

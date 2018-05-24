@@ -30,14 +30,12 @@ from __future__ import (absolute_import, division, print_function)
 # system imports
 from functools import wraps
 
-# local imports
-from mslice.plotting.plot_window.plot_figure_manager import PlotFigureManager
 
 # Labels for each category
 CATEGORY_1D, CATEGORY_2D = "1d", "2d"
 
 
-class CurrentFigure(object):
+class GlobalFigureManager(object):
     """Static class to manage a set of numbered figures.
 
     It is never instantiated. It consists of attributes to
@@ -67,11 +65,14 @@ class CurrentFigure(object):
 
     @classmethod
     def _new_figure(cls, num=None):
+        # local import to avoid circular dependency in figure_manager_test.py
+        # mock.patch can't patch a class where the module has already been imported
+        from mslice.plotting.plot_window.plot_figure_manager import PlotFigureManagerQT
         if num is None:
             num = 1
             while any([num == existing_fig_num for existing_fig_num in cls._figures.keys()]):
                 num += 1
-        new_fig = PlotFigureManager(num, CurrentFigure)
+        new_fig = PlotFigureManagerQT(num, GlobalFigureManager)
         cls._figures[num] = new_fig
         cls._active_figure = num
         cls._unclassified_figures.append(num)
@@ -214,16 +215,16 @@ class CurrentFigure(object):
             for figure_number in cls._figures_by_category[category]:
 
                 if cls._category_current_figures[category] == figure_number:
-                    cls._figures[figure_number].set_as_current()
+                    cls._figures[figure_number].flag_as_current()
 
                 else:
-                    cls._figures[figure_number].set_as_kept()
+                    cls._figures[figure_number].flag_as_kept()
 
         for figure in cls._unclassified_figures:
             if figure == cls._active_figure:
-                cls._figures[figure].set_as_current()
+                cls._figures[figure].flag_as_current()
             else:
-                cls._figures[figure].set_as_kept()
+                cls._figures[figure].flag_as_kept()
 
     @classmethod
     def all_figure_numbers(cls):
@@ -264,10 +265,10 @@ def setcategory(category):
         @wraps(function)
         def wrapper(*args, **kwargs):
             try:
-                CurrentFigure.activate_category(category)
+                GlobalFigureManager.activate_category(category)
                 return_value = function(*args, **kwargs)
             finally:
-                CurrentFigure.deactivate_category()
+                GlobalFigureManager.deactivate_category()
             return return_value
         return wrapper
 

@@ -5,7 +5,7 @@ Our pyplot-like api for mslice.
 
 Most functions are identical to matplotlib.pyplot. The differences come around
 due to the requirement of keep/make current and the requirement that cuts
-and slices be treated differently, see currentfigure.py.
+and slices be treated differently, see globalfiguremanager.py.
 """
 from __future__ import (absolute_import, division, print_function)
 
@@ -58,8 +58,8 @@ from matplotlib.ticker import TickHelper, Formatter, FixedFormatter, NullFormatt
         LinearLocator, LogLocator, AutoLocator, MultipleLocator,\
         MaxNLocator
 
-from mslice.plotting.currentfigure import setcategory
-from mslice.plotting.currentfigure import CATEGORY_1D, CATEGORY_2D, CurrentFigure
+from mslice.plotting.globalfiguremanager import setcategory
+from mslice.plotting.globalfiguremanager import CATEGORY_1D, CATEGORY_2D, GlobalFigureManager
 
 # Handles matplotlib older than 1.5
 try:
@@ -75,12 +75,12 @@ except ImportError:
 
 def draw_if_interactive():
     # We will always draw because mslice might be running without matplotlib interactive
-    for fig in CurrentFigure.all_figures():
+    for fig in GlobalFigureManager.all_figures():
         fig.canvas.draw()
 
 
 def draw_all():
-    for fig in CurrentFigure.all_figures():
+    for fig in GlobalFigureManager.all_figures():
         fig.canvas.draw_idle()
 
 
@@ -181,20 +181,9 @@ def findobj(o=None, match=None, include_self=True):
 
 def show(*args, **kw):
     """
-    Display a figure.
-    When running in ipython with its pylab mode, display all
-    figures and return to the ipython prompt.
-    In non-interactive mode, display all figures and block until
-    the figures have been closed; in interactive mode it has no
-    effect unless figures were created prior to a change from
-    non-interactive to interactive mode (not recommended).  In
-    that case it displays the figures but does not block.
-    A single experimental keyword argument, *block*, may be
-    set to True or False to override the blocking behavior
-    described above.
+    Display the current figure.
     """
-    global _show
-    return _show(*args, **kw)
+    return gcf().show(*args, **kw)
 
 
 def isinteractive():
@@ -226,7 +215,7 @@ def pause(interval):
     This function is experimental; its behavior may be changed or extended in a
     future release.
     """
-    manager = CurrentFigure.get_active()
+    manager = GlobalFigureManager.get_active()
     if manager is not None:
         canvas = manager.canvas
         if canvas.figure.stale:
@@ -367,7 +356,7 @@ def xkcd(scale=1, length=100, randomness=2):
 ## Figures ##
 
 def figure(num=None):
-    return CurrentFigure.get_figure_number(num).get_figure()
+    return GlobalFigureManager.get_figure_number(num).figure
 
 
 def _auto_draw_if_interactive(fig, val):
@@ -385,30 +374,30 @@ def _auto_draw_if_interactive(fig, val):
 
 def gcf():
     """Get a reference to the current figure."""
-    return CurrentFigure.get_active_figure().get_figure()
+    return GlobalFigureManager.get_active_figure().figure
 
 
 def fignum_exists(num):
-    return CurrentFigure.has_fignum(num) or num in get_figlabels()
+    return GlobalFigureManager.has_fignum(num) or num in get_figlabels()
 
 
 def get_fignums():
     """Return a list of existing figure numbers."""
-    return sorted(CurrentFigure.figs)
+    return sorted(GlobalFigureManager.figs)
 
 
 def get_figlabels():
     """Return a list of existing figure labels."""
-    figManagers = CurrentFigure.get_all_fig_managers()
+    figManagers = GlobalFigureManager.get_all_fig_managers()
     figManagers.sort(key=lambda m: m.num)
     return [m.canvas.figure.get_label() for m in figManagers]
 
 
 def get_current_fig_manager():
-    figManager = CurrentFigure.get_active()
+    figManager = GlobalFigureManager.get_active()
     if figManager is None:
         gcf()  # creates an active figure as a side effect
-        figManager = CurrentFigure.get_active()
+        figManager = GlobalFigureManager.get_active()
     return figManager
 
 
@@ -438,28 +427,28 @@ def close(*args):
     """
 
     if len(args) == 0:
-        figManager = CurrentFigure.get_active()
+        figManager = GlobalFigureManager.get_active()
         if figManager is None:
             return
         else:
-            CurrentFigure.destroy(figManager.num)
+            GlobalFigureManager.destroy(figManager.num)
     elif len(args) == 1:
         arg = args[0]
         if arg == 'all':
-            CurrentFigure.destroy_all()
+            GlobalFigureManager.destroy_all()
         elif isinstance(arg, int):
-            CurrentFigure.destroy(arg)
+            GlobalFigureManager.destroy(arg)
         elif hasattr(arg, 'int'):
             # if we are dealing with a type UUID, we
             # can use its integer representation
-            CurrentFigure.destroy(arg.int)
+            GlobalFigureManager.destroy(arg.int)
         elif isinstance(arg, str):
             allLabels = get_figlabels()
             if arg in allLabels:
                 num = get_fignums()[allLabels.index(arg)]
-                CurrentFigure.destroy(num)
+                GlobalFigureManager.destroy(num)
         elif isinstance(arg, Figure):
-            CurrentFigure.destroy_fig(arg)
+            GlobalFigureManager.destroy_fig(arg)
         else:
             raise TypeError('Unrecognized argument type %s to close'
                             % type(arg))
@@ -1121,7 +1110,7 @@ def subplot_tool(targetfig=None):
         targetfig = manager.canvas.figure
     else:
         # find the manager for this figure
-        for manager in CurrentFigure._figures:
+        for manager in GlobalFigureManager._figures:
             if manager.canvas.figure==targetfig: break
         else: raise RuntimeError('Could not find manager for targetfig')
 
@@ -1129,7 +1118,7 @@ def subplot_tool(targetfig=None):
     toolfig.subplots_adjust(top=0.9)
     ret =  SubplotTool(targetfig, toolfig)
     rcParams['toolbar'] = tbar
-    CurrentFigure.set_active(manager)  # restore the current figure
+    GlobalFigureManager.set_active(manager)  # restore the current figure
     return ret
 
 

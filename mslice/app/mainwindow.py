@@ -67,7 +67,7 @@ class MainWindow(MainView, QMainWindow):
         self.wgtWorkspacemanager.busy.connect(self.show_busy)
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
-        self.actionQuit.triggered.connect(self.close)
+        self.action_quit.triggered.connect(self.close)
 
     def setup_save(self):
         menu = QMenu()
