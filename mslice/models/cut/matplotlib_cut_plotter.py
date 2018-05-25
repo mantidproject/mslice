@@ -43,14 +43,14 @@ class MatplotlibCutPlotter(CutPlotter):
         if not cur_canvas.manager.has_plot_handler():
             self._create_cut(cut_ws_name if cut_ws_name is not None else selected_workspace)
             cur_canvas.restore_region(cur_canvas.manager.get_cut_background())
-        if plot_over:
-            cur_canvas.draw_idle()
-        else:
-            try:
-                cur_axes.draw_artist(cur_fig.get_children()[1])
+        try:
+            children = cur_fig.get_children()
+            for artist in children:
+                cur_axes.draw_artist(artist)
                 cur_canvas.blit(cur_axes.clipbox)
-            except AttributeError:
-                cur_canvas.draw_idle()
+        except AttributeError:
+            cur_canvas.draw_idle()
+        plt.show()
 
     def _create_cut(self, workspace):
         canvas = plt.gcf().canvas
