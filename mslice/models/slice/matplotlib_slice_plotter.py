@@ -10,8 +10,8 @@ from mslice.models.slice.slice_functions import (compute_slice, sample_temperatu
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
 import mslice.plotting.pyplot as plt
 
-overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
-picker=5
+OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
+PICKER_TOL_PTS = 5
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
@@ -53,8 +53,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.clf()
         image = plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                            interpolation='none')
+        plot_axes.set_title(workspace_name, picker=PICKER_TOL_PTS)
         plot_axes = plt.gca()
-        plot_axes.set_title(workspace_name, picker=picker)
         if self.slice_cache[workspace_name]['rotated']:
             x_axis = energy_axis
             y_axis = momentum_axis
@@ -63,8 +63,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
             y_axis = energy_axis
         comment = get_comment(str(workspace_name))
         # labels
-        plot_axes.set_xlabel(get_display_name(x_axis.units, comment), picker=picker)
-        plot_axes.set_ylabel(get_display_name(y_axis.units, comment), picker=picker)
+        plot_axes.set_xlabel(get_display_name(x_axis.units, comment), picker=PICKER_TOL_PTS)
+        plot_axes.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
         plot_axes.set_xlim(x_axis.start)
         plot_axes.set_ylim(y_axis.start)
         plot_axes.get_xaxis().set_units(x_axis.units)
@@ -72,7 +72,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
         # colorbar
         cb = plt.colorbar(image, ax=plot_axes)
-        cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)
+        cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
         plt.gcf().canvas.draw_idle()
         plt.show()
 
