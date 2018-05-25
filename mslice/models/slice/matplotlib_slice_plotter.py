@@ -50,11 +50,14 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self.slice_cache[ws]['rotated'] = True
 
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
-        plt.clf()
+        # Clear out the artists in the image Axes - same as was ishold=False used to do
+        # Do not call plt.gcf() here as the overplot Line1D objects have been cached and they
+        # must be redrawn on the same Axes instance
+        plot_axes = plt.gca()
+        plot_axes.cla()
         image = plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
                            interpolation='none')
         plot_axes.set_title(workspace_name, picker=PICKER_TOL_PTS)
-        plot_axes = plt.gca()
         if self.slice_cache[workspace_name]['rotated']:
             x_axis = energy_axis
             y_axis = momentum_axis
@@ -70,8 +73,15 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plot_axes.get_xaxis().set_units(x_axis.units)
         plot_axes.get_yaxis().set_units(y_axis.units)
 
-        # colorbar
-        cb = plt.colorbar(image, ax=plot_axes)
+        # colorbar - have we plotted one previously?
+        try:
+            cb_axes = plt.gcf().get_axes()[1]
+        except IndexError:
+            cb_axes = None
+        if cb_axes is None:
+            cb = plt.colorbar(image, ax=plot_axes)
+        else:
+            cb = plt.colorbar(image, cax=cb_axes)
         cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
         plt.gcf().canvas.draw_idle()
         plt.show()
@@ -137,13 +147,13 @@ class MatplotlibSlicePlotter(SlicePlotter):
                 x, y = compute_recoil_line(workspace, momentum_axis, key)
             else:
                 x, y = compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
-            color = overplot_colors[key] if key in overplot_colors else 'c'
+            color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c' 
             if self.slice_cache[workspace]['rotated']:
                 self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label,
-                                                                     alpha=.7, picker=picker)[0]
+                                                                     alpha=.7, picker=PICKER_TOL_PTS)[0]
             else:
                 self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label,
-                                                                     alpha=.7, picker=picker)[0]
+                                                                     alpha=.7, picker=PICKER_TOL_PTS)[0]
 
     def hide_overplot_line(self, workspace, key):
         if key in self.overplot_lines[workspace]:
