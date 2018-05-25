@@ -45,8 +45,10 @@ class QuickOptionsTest(unittest.TestCase):
     @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
     def test_line_slice(self, qlo_mock):
         plot_figure = MagicMock()
+        window = MagicMock()
+        plot_figure.window = window
         canvas = MagicMock()
-        plot_figure.canvas = canvas
+        window.canvas = canvas
         slice_plotter = MagicMock()
         model = SlicePlot(plot_figure, slice_plotter, 'workspace')
         qlo_mock, target = setup_line_values(qlo_mock)
@@ -65,8 +67,10 @@ class QuickOptionsTest(unittest.TestCase):
     @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
     def test_line_cut(self, qlo_mock):
         plot_figure = MagicMock()
+        window = MagicMock()
+        plot_figure.window = window
         canvas = MagicMock()
-        plot_figure.canvas = canvas
+        window.canvas = canvas
         cut_plotter = MagicMock()
         model = CutPlot(plot_figure, cut_plotter, 'workspace')
         qlo_mock, target = setup_line_values(qlo_mock)

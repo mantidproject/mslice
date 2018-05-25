@@ -146,8 +146,7 @@ class SlicePlot(object):
             if str(line.get_linestyle()) == 'None':
                 if isinstance(key, int):
                     key = self._slice_plotter.get_recoil_label(key)
-                action_checked = getattr(self.plot_window, 'action' + key)
-                action_checked.setChecked(False)
+                self.plot_window.disable_action(key)
 
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
         if checked:

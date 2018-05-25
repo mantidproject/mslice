@@ -11,11 +11,12 @@ class SlicePlotTest(unittest.TestCase):
 
     def setUp(self):
         self.plot_figure = MagicMock()
-        self.canvas = MagicMock()
-        self.plot_figure.canvas = self.canvas
+        self.plot_figure.window = MagicMock()
+        canvas = MagicMock()
+        self.plot_figure.window.canvas = canvas
         self.slice_plotter = MagicMock()
         self.axes = MagicMock()
-        self.canvas.figure.gca = MagicMock(return_value=self.axes)
+        canvas.figure.gca = MagicMock(return_value=self.axes)
         self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
 
     def test_change_logarithmic(self):
@@ -52,13 +53,8 @@ class SlicePlotTest(unittest.TestCase):
         self.slice_plotter.overplot_lines.__getitem__ = MagicMock(return_value={0: line1, 1: line2})
         self.slice_plotter.get_recoil_label = MagicMock()
         self.slice_plotter.get_recoil_label.side_effect = ['0', '1']
-        action0 = PropertyMock()
-        type(self.slice_plot).action0 = action0
-        action1 = PropertyMock()
-        type(self.slice_plot).action1 = action1
         self.slice_plot.reset_info_checkboxes()
-        self.plot_figure.action0.setChecked.assert_called_once_with(False)
-        self.plot_figure.action1.setChecked.assert_not_called()
+        self.slice_plot.plot_window.disable_action.assert_called_once_with('0')
 
     def test_lines_redrawn(self):
         self.slice_plot.toggle_overplot_line(self.slice_plot.plot_window.action_helium, 4, True, True)

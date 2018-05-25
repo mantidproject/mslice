@@ -138,6 +138,17 @@ class PlotWindow(QtWidgets.QMainWindow):
         # The QActionGroup ensures the other is not checked
         self.action_make_current.setChecked(True)
 
+    def disable_action(self, key):
+        """
+        Disable the action based on the string key
+        :param key: A string denoting the action. Spaces are
+                    replaced by _ and the whole thing is converted to lowercase
+        """
+        try:
+            getattr(self, create_attribute_name(key)).setChecked(False)
+        except AttributeError:
+            pass
+
 
 def create_attribute_name(text):
     """Create the name of an action attribute based on the text"""

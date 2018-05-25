@@ -10,8 +10,9 @@ class CutPlotTest(unittest.TestCase):
 
     def setUp(self):
         self.plot_figure = MagicMock()
+        self.plot_figure.window = MagicMock()
         self.canvas = MagicMock()
-        self.plot_figure.canvas = self.canvas
+        self.plot_figure.window.canvas = self.canvas
         self.cut_plotter = MagicMock()
         self.axes = MagicMock()
         self.canvas.figure.gca = MagicMock(return_value=self.axes)

@@ -2,6 +2,7 @@ from six import string_types
 from matplotlib import text
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
 
+
 def quick_options(target, model, log=None):
     if isinstance(target, text.Text):
         view = QuickLabelOptions(target)
