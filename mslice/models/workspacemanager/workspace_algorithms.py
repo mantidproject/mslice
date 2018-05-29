@@ -248,14 +248,13 @@ def _save_single_ws(workspace, save_name, save_method, path, extension, slice_no
 
 
 def _get_slice_mdhisto(workspace, ws_name):
-    from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
+    from mslice.models.slice.slice_functions import compute_slice
     try:
         return get_workspace_handle('__' + ws_name)
     except KeyError:
-        slice_alg = MantidSliceAlgorithm()
         x_axis = get_axis_from_dimension(workspace, ws_name, 0)
         y_axis = get_axis_from_dimension(workspace, ws_name, 1)
-        slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
+        compute_slice(ws_name, x_axis, y_axis, False)
         return get_workspace_handle('__' + ws_name)
 
 

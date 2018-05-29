@@ -8,7 +8,6 @@ from __future__ import (absolute_import, division, print_function)
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
 
-from mslice.models.cut.mantid_cut_algorithm import MantidCutAlgorithm
 from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 from mslice.presenters.cut_presenter import CutPresenter
 from mslice.util.qt import load_ui
@@ -35,9 +34,8 @@ class CutWidget(CutView, QWidget):
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
-        cut_algorithm = MantidCutAlgorithm()
-        cut_plotter = MatplotlibCutPlotter(cut_algorithm)
-        self._presenter = CutPresenter(self, cut_algorithm, cut_plotter)
+        cut_plotter = MatplotlibCutPlotter()
+        self._presenter = CutPresenter(self, cut_plotter)
         self.cmbCutAxis.currentIndexChanged.connect(self.axis_changed)
         self._minimumStep = None
         self.lneCutStep.editingFinished.connect(self._step_edited)

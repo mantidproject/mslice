@@ -1,20 +1,19 @@
 from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
-from .cut_plotter import CutPlotter
-from .mantid_cut_algorithm import output_workspace_name
+from mslice.models.cut.cut_plotter import CutPlotter
+from mslice.models.cut.cut_functions import output_workspace_name, compute_cut_xye
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
 
 picker=3
 
 class MatplotlibCutPlotter(CutPlotter):
-    def __init__(self, cut_algorithm):
-        self._cut_algorithm = cut_algorithm
+    def __init__(self):
         self.icut = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
                  intensity_end, plot_over):
-        x, y, e = self._cut_algorithm.compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one)
+        x, y, e = compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one)
         output_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
         legend = generate_legend(selected_workspace, integration_axis.units, integration_axis.start,
                                  integration_axis.end)
@@ -70,4 +69,5 @@ class MatplotlibCutPlotter(CutPlotter):
         return self.icut
 
     def save_cut(self, params):
-        return self._cut_algorithm.compute_cut(*params)
+        #TODO: broken on master, issue #332
+        pass
