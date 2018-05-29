@@ -32,7 +32,7 @@ from functools import wraps
 
 
 # Labels for each category
-CATEGORY_1D, CATEGORY_2D = "1d", "2d"
+CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
 
 
 class GlobalFigureManager(object):
@@ -47,8 +47,8 @@ class GlobalFigureManager(object):
     """
     # if there is a current figure it should be both current and active
     _active_category = None
-    _category_current_figures = {CATEGORY_1D: None, CATEGORY_2D: None}  # Current _figures receive decorated commands
-    _figures_by_category = {CATEGORY_1D: [], CATEGORY_2D: []}
+    _category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}  # Current _figures receive decorated commands
+    _figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
     _unclassified_figures = []
     _active_figure = None
     _figures = {}
@@ -57,8 +57,8 @@ class GlobalFigureManager(object):
     def reset(cls):
         """Reset all class variables to initial state. This function exists for testing purposes """
         cls._active_category = None
-        cls._category_current_figures = {CATEGORY_1D: None, CATEGORY_2D: None}  # Current _figures are overplotted
-        cls._figures_by_category = {CATEGORY_1D: [], CATEGORY_2D: []}
+        cls._category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}  # Current _figures are overplotted
+        cls._figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
         cls._unclassified_figures = []
         cls._active_figure = None
         cls._figures = {}
@@ -253,13 +253,14 @@ class GlobalFigureManager(object):
                 return key
         raise ValueError('Figure %s was not recognised' % fig)
 
-
-def setcategory(category):
+# WARNING: If you change the name or parameter list here then the corresponding changes
+# to tools/boilerplate.py must be made and that script reran to regenerate pyplot.py
+def set_category(category):
     """A decorator to mark a function as part of the given category. For details
     of the category mechanism see the docstring on the currentfigure
     module.
 
-    :param category: '1d' or '2d' to denote the category of the plot produced
+    :param category: 'cut' or 'slice' to denote the category of the plot produced
     """
     def activate_impl(function):
         @wraps(function)

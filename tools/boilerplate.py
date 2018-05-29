@@ -221,10 +221,10 @@ def boilerplate_gen():
             # color map
             if func in cmappable:
                 mappable = '    ' + cmappable[func] % locals()
-                category = '@category(CATEGORY_2D)'
+                category = '@set_category(CATEGORY_SLICE)'
             else:
                 mappable = ''
-                category = '@category(CATEGORY_1D)'
+                category = '@set_category(CATEGORY_CUT)'
 
             # Get argspec of wrapped function
             base_func = getattr(Axes, func)
