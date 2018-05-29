@@ -29,7 +29,7 @@ from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 
 _POWDER_PROJECTION_MODEL = _MantidProjectionCalculator()
 _SLICE_MODEL = _MatplotlibSlicePlotter()
-_CUT_PLOTTER = MatplotlibCutPlotter(_CUT_ALGORITHM)
+_CUT_PLOTTER = MatplotlibCutPlotter()
 
 # -----------------------------------------------------------------------------
 # Convenience functions
