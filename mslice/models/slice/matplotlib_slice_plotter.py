@@ -148,7 +148,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
                 x, y = compute_recoil_line(workspace, momentum_axis, key)
             else:
                 x, y = compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
-            color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c' 
+            color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
             if self.slice_cache[workspace]['rotated']:
                 self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label,
                                                                      alpha=.7, picker=PICKER_TOL_PTS)[0]
