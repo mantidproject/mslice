@@ -48,7 +48,7 @@ class MatplotlibCutPlotter(CutPlotter):
             children = cur_fig.get_children()
             for artist in children:
                 cur_axes.draw_artist(artist)
-                cur_canvas.blit(cur_axes.clipbox)
+            cur_canvas.blit(cur_axes.clipbox)
         except AttributeError:
             cur_canvas.draw_idle()
         plt.show()
