@@ -10,11 +10,13 @@ class CutPlotTest(unittest.TestCase):
 
     def setUp(self):
         self.plot_figure = MagicMock()
+        self.plot_figure.window = MagicMock()
         self.canvas = MagicMock()
+        self.plot_figure.window.canvas = self.canvas
         self.cut_plotter = MagicMock()
         self.axes = MagicMock()
         self.canvas.figure.gca = MagicMock(return_value=self.axes)
-        self.cut_plot = CutPlot(self.plot_figure, self.canvas, self.cut_plotter, "workspace")
+        self.cut_plot = CutPlot(self.plot_figure, self.cut_plotter, "workspace")
 
     def test_get_min(self):
         data = [np.array([3, 6, 10]), np.array([3, 2, 7])]

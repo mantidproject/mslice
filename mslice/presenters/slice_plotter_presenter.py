@@ -86,6 +86,8 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
                                            norm_to_one, colourmap)
         except RuntimeError as e:
+            import traceback
+            traceback.print_exc(e)
             self._slice_view.error(e.args[0])
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa

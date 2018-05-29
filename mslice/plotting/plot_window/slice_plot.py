@@ -17,62 +17,70 @@ from .plot_options import SlicePlotOptions
 
 class SlicePlot(object):
 
-    def __init__(self, plot_figure, canvas, slice_plotter, workspace):
-        self.plot_figure = plot_figure
-        self._canvas = canvas
+    def __init__(self, figure_manager, slice_plotter, workspace):
+        self.manager = figure_manager
+        self.plot_window = figure_manager.window
+        self._canvas = self.plot_window.canvas
         self._slice_plotter = slice_plotter
         self.ws_name = workspace
+        self._arb_nuclei_rmm = None
+        self._cif_file = None
         self._cif_path = None
         self._quick_presenter = None
         self._legend_dict = {}
         self.icut_event = [None, None]
         self.icut = None
-        self.setup_connections(plot_figure)
+        self.setup_connections(self.plot_window)
         self._update_lines()
 
-    def setup_connections(self, plot_figure):
-        plot_figure.actionInteractive_Cuts.setVisible(True)
-        plot_figure.actionInteractive_Cuts.triggered.connect(self.interactive_cuts)
-        plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
-        plot_figure.actionFlip_Axis.setVisible(False)
-        plot_figure.actionFlip_Axis.triggered.connect(self.flip_icut)
+    def window_closing(self):
+        # nothing to do
+        pass
 
-        plot_figure.actionS_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionS_Q_E,
-                                                          self._slice_plotter.show_scattering_function, False))
-        plot_figure.actionChi_Q_E.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionChi_Q_E,
+    def setup_connections(self, plot_figure):
+        plot_figure.action_interactive_cuts.setVisible(True)
+        plot_figure.action_interactive_cuts.triggered.connect(self.interactive_cuts)
+        plot_figure.action_save_cut.setVisible(False)
+        plot_figure.action_save_cut.triggered.connect(self.save_icut)
+        plot_figure.action_flip_axis.setVisible(False)
+        plot_figure.action_flip_axis.triggered.connect(self.flip_icut)
+
+        plot_figure.action_sqe.triggered.connect(partial(self.show_intensity_plot, plot_figure.action_sqe,
+                                                         self._slice_plotter.show_scattering_function, False))
+        plot_figure.action_chi_qe.triggered.connect(partial(self.show_intensity_plot, plot_figure.action_chi_qe,
                                                             self._slice_plotter.show_dynamical_susceptibility, True))
 
-        plot_figure.actionChi_Q_E_magnetic.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.actionChi_Q_E_magnetic,
+        plot_figure.action_chi_qe_magnetic.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.action_chi_qe_magnetic,
                     self._slice_plotter.show_dynamical_susceptibility_magnetic, True))
 
-        plot_figure.actionD2sigma_dOmega_dE.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.actionD2sigma_dOmega_dE,
+        plot_figure.action_d2sig_dw_de.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.action_d2sig_dw_de,
                     self._slice_plotter.show_d2sigma, False))
 
-        plot_figure.actionSymmetrised_S_Q_E.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.actionSymmetrised_S_Q_E,
+        plot_figure.action_symmetrised_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.action_symmetrised_sqe,
                     self._slice_plotter.show_symmetrised, True))
 
-        plot_figure.actionGDOS.triggered.connect(partial(self.show_intensity_plot, plot_figure.actionGDOS,
-                                                         self._slice_plotter.show_gdos, True))
+        plot_figure.action_gdos.triggered.connect(partial(self.show_intensity_plot, plot_figure.action_gdos,
+                                                          self._slice_plotter.show_gdos, True))
 
-        plot_figure.actionHydrogen.triggered.connect(
-            partial(self.toggle_overplot_line, plot_figure.actionHydrogen, 1, True))
-        plot_figure.actionDeuterium.triggered.connect(
-            partial(self.toggle_overplot_line, plot_figure.actionDeuterium, 2, True))
-        plot_figure.actionHelium.triggered.connect(
-            partial(self.toggle_overplot_line, plot_figure.actionHelium, 4, True))
-        plot_figure.actionArbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
-        plot_figure.actionAluminium.triggered.connect(
-            partial(self.toggle_overplot_line, plot_figure.actionAluminium, 'Aluminium', False))
-        plot_figure.actionCopper.triggered.connect(
-            partial(self.toggle_overplot_line, plot_figure.actionCopper, 'Copper', False))
-        plot_figure.actionNiobium.triggered.connect(
-            partial(self.toggle_overplot_line, plot_figure.actionNiobium, 'Niobium', False))
-        plot_figure.actionTantalum.triggered.connect(
-            partial(self.toggle_overplot_line, plot_figure.actionTantalum, 'Tantalum', False))
-        plot_figure.actionCIF_file.triggered.connect(partial(self.cif_file_powder_line))
+        plot_figure.action_hydrogen.triggered.connect(
+            partial(self.toggle_overplot_line, 1, True))
+        plot_figure.action_deuterium.triggered.connect(
+            partial(self.toggle_overplot_line, 2, True))
+        plot_figure.action_helium.triggered.connect(
+            partial(self.toggle_overplot_line, 4, True))
+        plot_figure.action_arbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
+        plot_figure.action_aluminium.triggered.connect(
+            partial(self.toggle_overplot_line, 'Aluminium', False))
+        plot_figure.action_copper.triggered.connect(
+            partial(self.toggle_overplot_line, 'Copper', False))
+        plot_figure.action_niobium.triggered.connect(
+            partial(self.toggle_overplot_line, 'Niobium', False))
+        plot_figure.action_tantalum.triggered.connect(
+            partial(self.toggle_overplot_line, 'Tantalum', False))
+        plot_figure.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
 
     def plot_options(self):
         new_config = SlicePlotOptionsPresenter(SlicePlotOptions(), self).get_new_config()
@@ -138,10 +146,9 @@ class SlicePlot(object):
             if str(line.get_linestyle()) == 'None':
                 if isinstance(key, int):
                     key = self._slice_plotter.get_recoil_label(key)
-                action_checked = getattr(self.plot_figure, 'action' + key)
-                action_checked.setChecked(False)
+                self.plot_window.disable_action(key)
 
-    def toggle_overplot_line(self, action, key, recoil, checked, cif_file=None):
+    def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
         if checked:
             self._slice_plotter.add_overplot_line(self.ws_name, key, recoil, cif_file)
         else:
@@ -150,29 +157,29 @@ class SlicePlot(object):
         self._canvas.draw()
 
     def arbitrary_recoil_line(self):
-        checked = self.plot_figure.actionArbitrary_nuclei.isChecked()
+        recoil = True
+        checked = self.plot_window.action_arbitrary_nuclei.isChecked()
         if checked:
-            self.plot_figure.arbitrary_nuclei, confirm = QtWidgets.QInputDialog.getInt(
-                self.plot_figure, 'Arbitrary Nuclei', 'Enter relative mass:')
+            self._arb_nuclei_rmm, confirm = QtWidgets.QInputDialog.getInt(
+                self.plot_window, 'Arbitrary Nuclei', 'Enter relative mass:')
             if confirm:
-                self.toggle_overplot_line(self.plot_figure.actionArbitrary_nuclei,
-                                          self.plot_figure.arbitrary_nuclei, True, checked)
+                self.toggle_overplot_line(self._arb_nuclei_rmm, recoil, checked)
+        else:
+            self.toggle_overplot_line(self._arb_nuclei_rmm, recoil, checked)
 
     def cif_file_powder_line(self, checked):
         if checked:
-            cif_path = QtWidgets.QFileDialog().getOpenFileName(self.plot_figure, 'Open CIF file', '/home', 'Files (*.cif)')
+            cif_path = QtWidgets.QFileDialog().getOpenFileName(self.plot_window, 'Open CIF file', '/home', 'Files (*.cif)')
             cif_path = str(cif_path[0]) if isinstance(cif_path, tuple) else str(cif_path)
             key = path.basename(cif_path).rsplit('.')[0]
-            self.plot_figure.cif_file = key
+            self._cif_file = key
             self._cif_path = cif_path
         else:
-            key = self.plot_figure.cif_file
+            key = self._cif_file
             cif_path = None
         if key:
-            self.toggle_overplot_line(self.plot_figure.actionCIF_file, key, False,
-                                      self.plot_figure.actionCIF_file.isChecked(), cif_file=cif_path)
-        else:
-            self.plot_figure.actionCIF_file.setChecked(False)
+            recoil = False
+            self.toggle_overplot_line(key, recoil, checked, cif_file=cif_path)
 
     def update_legend(self):
         lines = []
@@ -195,12 +202,12 @@ class SlicePlot(object):
             axes.legend_ = None  # remove legend
 
     def _reset_intensity(self):
-        options = self.plot_figure.menuIntensity.actions()
+        options = self.plot_window.menu_intensity.actions()
         for op in options:
             op.setChecked(False)
 
     def selected_intensity(self):
-        options = self.plot_figure.menuIntensity.actions()
+        options = self.plot_window.menu_intensity.actions()
         for op in options:
             if op.isChecked():
                 return op
@@ -226,7 +233,7 @@ class SlicePlot(object):
             self.x_range = x_range
             self.y_range = y_range
             self.title = title
-            self.plot_figure.update_grid()
+            self.manager.update_grid()
             self._update_lines()
             self._canvas.draw()
         else:
@@ -250,7 +257,7 @@ class SlicePlot(object):
                     if temp_value < 0:
                         raise ValueError
                 except ValueError:
-                    self.plot_figure.error_box("Invalid value entered for sample temperature. Enter a value in Kelvin \
+                    self.plot_window.error_box("Invalid value entered for sample temperature. Enter a value in Kelvin \
                                                or a sample log field.")
                     self.set_intensity(previous)
                     return False
@@ -265,7 +272,7 @@ class SlicePlot(object):
             keys = ws.raw_ws.run().keys()
         except AttributeError:
             keys = ws.raw_ws.getExperimentInfo(0).run().keys()
-        temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_figure, 'Sample Temperature',
+        temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_window, 'Sample Temperature',
                                                              'Sample Temperature not found. Select the sample ' +
                                                              'temperature field or enter a value in Kelvin:',
                                                              keys)
@@ -276,15 +283,15 @@ class SlicePlot(object):
 
     def _update_lines(self):
         """ Updates the powder/recoil overplots lines when intensity type changes """
-        lines = {self.plot_figure.actionHydrogen:[1, True, ''],
-                 self.plot_figure.actionDeuterium:[2, True, ''],
-                 self.plot_figure.actionHelium:[4, True, ''],
-                 self.plot_figure.actionArbitrary_nuclei:[self.plot_figure.arbitrary_nuclei, True, ''],
-                 self.plot_figure.actionAluminium:['Aluminium', False, ''],
-                 self.plot_figure.actionCopper:['Copper', False, ''],
-                 self.plot_figure.actionNiobium:['Niobium', False, ''],
-                 self.plot_figure.actionTantalum:['Tantalum', False, ''],
-                 self.plot_figure.actionCIF_file:[self.plot_figure.cif_file, False, self._cif_path]}
+        lines = {self.plot_window.action_hydrogen:[1, True, ''],
+                 self.plot_window.action_deuterium:[2, True, ''],
+                 self.plot_window.action_helium:[4, True, ''],
+                 self.plot_window.action_arbitrary_nuclei:[self._arb_nuclei_rmm, True, ''],
+                 self.plot_window.action_aluminium:['Aluminium', False, ''],
+                 self.plot_window.action_copper:['Copper', False, ''],
+                 self.plot_window.action_niobium:['Niobium', False, ''],
+                 self.plot_window.action_tantalum:['Tantalum', False, ''],
+                 self.plot_window.action_cif_file:[self._cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
                 self._slice_plotter.add_overplot_line(self.ws_name, *lines[line])
@@ -311,24 +318,24 @@ class SlicePlot(object):
 
     def interactive_cuts(self):
         if not self.icut:
-            if self.plot_figure.actionZoom_In.isChecked():
-                self.plot_figure.actionZoom_In.setChecked(False)
-                self.plot_figure.actionZoom_In.triggered.emit(False)  # turn off zoom
-            self.plot_figure.actionZoom_In.setEnabled(False)
-            self.plot_figure.picking_connected(False)
-            self.plot_figure.actionKeep.trigger()
-            self.plot_figure.actionKeep.setEnabled(False)
-            self.plot_figure.actionMakeCurrent.setEnabled(False)
-            self.plot_figure.actionSave_Cut.setVisible(True)
-            self.plot_figure.actionFlip_Axis.setVisible(True)
+            self.manager.picking_connected(False)
+            if self.plot_window.action_zoom_in.isChecked():
+                self.plot_window.action_zoom_in.setChecked(False)
+                self.plot_window.action_zoom_in.triggered.emit(False)  # turn off zoom
+            self.plot_window.action_zoom_in.setEnabled(False)
+            self.plot_window.action_keep.trigger()
+            self.plot_window.action_keep.setEnabled(False)
+            self.plot_window.action_make_current.setEnabled(False)
+            self.plot_window.action_save_cut.setVisible(True)
+            self.plot_window.action_flip_axis.setVisible(True)
             self._canvas.setCursor(Qt.CrossCursor)
         else:
-            self.plot_figure.actionZoom_In.setEnabled(True)
-            self.plot_figure.picking_connected(True)
-            self.plot_figure.actionKeep.setEnabled(True)
-            self.plot_figure.actionMakeCurrent.setEnabled(True)
-            self.plot_figure.actionSave_Cut.setVisible(False)
-            self.plot_figure.actionFlip_Axis.setVisible(False)
+            self.manager.picking_connected(True)
+            self.plot_window.action_zoom_in.setEnabled(True)
+            self.plot_window.action_keep.setEnabled(True)
+            self.plot_window.action_make_current.setEnabled(True)
+            self.plot_window.action_save_cut.setVisible(False)
+            self.plot_window.action_flip_axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
         self.toggle_icut()
 
@@ -348,28 +355,25 @@ class SlicePlot(object):
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
 
-    def disconnect(self, plot_figure):
-        plot_figure.actionInteractive_Cuts.triggered.disconnect()
-        plot_figure.actionSave_Cut.triggered.disconnect()
-        plot_figure.actionFlip_Axis.triggered.disconnect()
-        plot_figure.actionS_Q_E.triggered.disconnect()
-        plot_figure.actionChi_Q_E.triggered.disconnect()
-        plot_figure.actionChi_Q_E_magnetic.triggered.disconnect()
-        plot_figure.actionD2sigma_dOmega_dE.triggered.disconnect()
-        plot_figure.actionSymmetrised_S_Q_E.triggered.disconnect()
-        plot_figure.actionGDOS.triggered.disconnect()
-        plot_figure.actionHydrogen.triggered.disconnect()
-        plot_figure.actionDeuterium.triggered.disconnect()
-        plot_figure.actionHelium.triggered.disconnect()
-        plot_figure.actionArbitrary_nuclei.triggered.disconnect()
-        plot_figure.actionAluminium.triggered.disconnect()
-        plot_figure.actionCopper.triggered.disconnect()
-        plot_figure.actionNiobium.triggered.disconnect()
-        plot_figure.actionTantalum.triggered.disconnect()
-        plot_figure.actionCIF_file.triggered.disconnect()
-
-    def close_event(self, event):
-        event.accept()
+    def disconnect(self, plot_window):
+        plot_window.action_interactive_cuts.triggered.disconnect()
+        plot_window.action_save_cut.triggered.disconnect()
+        plot_window.action_flip_axis.triggered.disconnect()
+        plot_window.action_sqe.triggered.disconnect()
+        plot_window.action_chi_qe.triggered.disconnect()
+        plot_window.action_chi_qe_magnetic.triggered.disconnect()
+        plot_window.action_d2sig_dw_de.triggered.disconnect()
+        plot_window.action_symmetrised_sqe.triggered.disconnect()
+        plot_window.action_gdos.triggered.disconnect()
+        plot_window.action_hydrogen.triggered.disconnect()
+        plot_window.action_deuterium.triggered.disconnect()
+        plot_window.action_helium.triggered.disconnect()
+        plot_window.action_arbitrary_nuclei.triggered.disconnect()
+        plot_window.action_aluminium.triggered.disconnect()
+        plot_window.action_copper.triggered.disconnect()
+        plot_window.action_niobium.triggered.disconnect()
+        plot_window.action_tantalum.triggered.disconnect()
+        plot_window.action_cif_file.triggered.disconnect()
 
     @property
     def colorbar_label(self):
@@ -399,56 +403,56 @@ class SlicePlot(object):
 
     @property
     def title(self):
-        return self.plot_figure.title
+        return self.manager.title
 
     @title.setter
     def title(self, value):
-        self.plot_figure.title = value
+        self.manager.title = value
 
     @property
     def x_label(self):
-        return self.plot_figure.x_label
+        return self.manager.x_label
 
     @x_label.setter
     def x_label(self, value):
-        self.plot_figure.x_label = value
+        self.manager.x_label = value
 
     @property
     def y_label(self):
-        return self.plot_figure.y_label
+        return self.manager.y_label
 
     @y_label.setter
     def y_label(self, value):
-        self.plot_figure.y_label = value
+        self.manager.y_label = value
 
     @property
     def x_range(self):
-        return self.plot_figure.x_range
+        return self.manager.x_range
 
     @x_range.setter
     def x_range(self, value):
-        self.plot_figure.x_range = value
+        self.manager.x_range = value
 
     @property
     def y_range(self):
-        return self.plot_figure.y_range
+        return self.manager.y_range
 
     @y_range.setter
     def y_range(self, value):
-        self.plot_figure.y_range = value
+        self.manager.y_range = value
 
     @property
     def x_grid(self):
-        return self.plot_figure.x_grid
+        return self.manager.x_grid
 
     @x_grid.setter
     def x_grid(self, value):
-        self.plot_figure.x_grid = value
+        self.manager.x_grid = value
 
     @property
     def y_grid(self):
-        return self.plot_figure.y_grid
+        return self.manager.y_grid
 
     @y_grid.setter
     def y_grid(self, value):
-        self.plot_figure.y_grid = value
+        self.manager.y_grid = value
