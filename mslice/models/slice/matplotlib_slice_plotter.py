@@ -49,6 +49,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self.slice_cache[ws]['energy_axis'] = x_axis
             self.slice_cache[ws]['rotated'] = True
 
+    @plt.set_category(plt.CATEGORY_SLICE)
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
         # Clear out the artists in the image Axes - same as was ishold=False used to do
         # Do not call plt.gcf() here as the overplot Line1D objects have been cached and they

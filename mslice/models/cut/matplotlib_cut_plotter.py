@@ -23,6 +23,7 @@ class MatplotlibCutPlotter(CutPlotter):
                                plot_over, output_ws_name, legend)
         plt.show()
 
+    @plt.set_category(plt.CATEGORY_CUT)
     def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, intensity_range=None, plot_over=False,
                           cut_ws_name=None, legend=None):
         legend = selected_workspace if legend is None else legend
