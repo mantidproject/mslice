@@ -82,6 +82,7 @@ class CutPresenter(PresenterUtility):
 
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
+        self._cut_plotter.set_icut(False)
         self._main_presenter.highlight_ws_tab(2)
         self._main_presenter.update_displayed_workspaces()
 
@@ -92,6 +93,8 @@ class CutPresenter(PresenterUtility):
 
     def _plot_cut_from_workspace(self, plot_over):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
+        self._cut_plotter.set_icut(False)
+
         for workspace in selected_workspaces:
             x, y, e, units = get_arrays_from_workspace(workspace)
             self._cut_plotter.plot_cut_from_xye(x, y, e, units, workspace, plot_over=plot_over)
