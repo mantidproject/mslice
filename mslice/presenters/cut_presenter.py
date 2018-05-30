@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
-from mslice.models.cut.cut_functions import (get_arrays_from_workspace, is_cuttable)
+from mslice.models.cut.cut_functions import compute_cut_xye, get_arrays_from_workspace, is_cuttable
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -32,9 +32,9 @@ class CutPresenter(PresenterUtility):
         self._clear_displayed_error(self._cut_view)
         with show_busy(self._cut_view):
             if command == Command.Plot:
-                self._cut(output_method=self._plot_and_save_to_workspace)
+                self._cut(output_method=self._plot_cut)
             elif command == Command.PlotOver:
-                self._cut(output_method=self._plot_and_save_to_workspace, plot_over=True)
+                self._cut(output_method=self._plot_cut, plot_over=True)
             elif command == Command.PlotFromWorkspace:
                 self._plot_cut_from_workspace(plot_over=False)
             elif command == Command.PlotOverFromWorkspace:
@@ -80,17 +80,13 @@ class CutPresenter(PresenterUtility):
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
 
-    def _plot_and_save_to_workspace(self, params, plot_over):
-        self._plot_cut(params, plot_over)
-        self._save_cut_to_workspace(params, plot_over)
-
     def _plot_cut(self, params, plot_over):
         self._cut_plotter.plot_cut(*params, plot_over=plot_over)
         self._main_presenter.highlight_ws_tab(2)
 
     def _save_cut_to_workspace(self, params, _):
         cut_params = params[:4]
-        self._cut_plotter.save_cut(cut_params)
+        compute_cut_xye(*cut_params)
         self._main_presenter.update_displayed_workspaces()
 
     def _plot_cut_from_workspace(self, plot_over):
