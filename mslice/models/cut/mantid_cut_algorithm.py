@@ -6,7 +6,7 @@ from mantid.api import MDNormalization, WorkspaceUnitValidator
 from .cut_algorithm import CutAlgorithm
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
-from mslice.util.mantid import run_algorithm
+import mslice.util.mantid.mantid_algorithms as mantid_algorithms
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
 from.cut_normalisation import _num_events_normalized_array
@@ -22,10 +22,9 @@ class MantidCutAlgorithm(CutAlgorithm):
     def compute_cut_xye(self, selected_workspace, cut_axis, integration_axis, is_norm):
         ws_handle = get_workspace_handle(selected_workspace)
         out_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
-
-        cut = run_algorithm('Cut', output_name=out_ws_name, InputWorkspace=ws_handle,
-                            CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
-                            EMode = ws_handle.e_mode, PSD=ws_handle.is_PSD, NormToOne=is_norm)
+        cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, InputWorkspace=ws_handle,
+                                    CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
+                                    EMode = ws_handle.e_mode, PSD=ws_handle.is_PSD, NormToOne=is_norm)
         plot_data = _num_events_normalized_array(cut.raw_ws)
         plot_data = plot_data.squeeze()
         with np.errstate(all='ignore'):
