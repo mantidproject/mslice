@@ -14,8 +14,8 @@ class MatplotlibCutPlotter(CutPlotter):
         self.icut = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
-                 intensity_end, plot_over):
-        x, y, e = compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one)
+                 intensity_end, plot_over, store=True):
+        x, y, e = compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one, store)
         output_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
         legend = generate_legend(selected_workspace, integration_axis.units, integration_axis.start,
                                  integration_axis.end)

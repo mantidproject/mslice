@@ -39,7 +39,7 @@ class InteractiveCut(object):
             units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
                 self._canvas.figure.gca().get_xaxis().units
             integration_axis = Axis(units, integration_start, integration_end, 0)
-            self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_axis, False, None, None, False)
+            self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_axis, False, None, None, False, False)
 
     def get_cut_parameters(self, pos1, pos2):
         start = pos1[not self.horizontal]
