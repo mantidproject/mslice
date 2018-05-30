@@ -4,18 +4,18 @@ from mslice.models.axis import Axis
 from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
+from mslice.widgets.cut.cut import CUT_PLOTTER
 
 
 class InteractiveCut(object):
 
     def __init__(self, slice_plot, canvas, ws_title):
-        from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
         self.slice_plot = slice_plot
         self._canvas = canvas
         self._ws_title = ws_title
         self.horizontal = None
         self.connect_event = [None, None, None]
-        self._cut_plotter = MatplotlibCutPlotter()
+        self._cut_plotter = CUT_PLOTTER
         self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
