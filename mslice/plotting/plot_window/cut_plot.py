@@ -49,7 +49,7 @@ class CutPlot(object):
     def is_icut(self, is_icut):
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
-        self.plot_window.action_toggle_legends.setVisible(not is_icut)
+        self.plot_window.keep_make_current_seperator.setVisible(not is_icut)
         self.plot_window.action_keep.setVisible(not is_icut)
         self.plot_window.action_make_current.setVisible(not is_icut)
         self.plot_window.action_flip_axis.setVisible(is_icut)

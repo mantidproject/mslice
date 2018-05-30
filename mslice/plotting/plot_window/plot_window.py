@@ -113,7 +113,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.keep_make_current_group = QtWidgets.QActionGroup(self)
         self.keep_make_current_group.addAction(self.action_keep)
         self.keep_make_current_group.addAction(self.action_make_current)
-        toolbar.addSeparator()
+        self.keep_make_current_seperator = toolbar.addSeparator()
 
         self.action_save_image = add_action(toolbar, self, "Save Image", icon_name='fa.save')
         self.action_print_plot = add_action(toolbar, self,  "Print", icon_name='fa.print')

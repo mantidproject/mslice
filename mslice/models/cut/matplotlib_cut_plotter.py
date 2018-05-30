@@ -33,11 +33,13 @@ class MatplotlibCutPlotter(CutPlotter):
         cur_fig = plt.gcf()
         cur_axes = cur_fig.gca()
         cur_axes.set_ylim(*intensity_range) if intensity_range is not None else cur_axes.autoscale()
-        leg = cur_axes.legend(fontsize='medium')
-        leg.draggable()
+        cur_canvas = cur_fig.canvas
+        if cur_canvas.manager.window.action_toggle_legends.isChecked():
+            leg = cur_axes.legend(fontsize='medium')
+            leg.draggable()
         cur_axes.set_xlabel(get_display_name(x_units, get_comment(selected_workspace)), picker=PICKER_TOL_PTS)
         cur_axes.set_ylabel(CUT_INTENSITY_LABEL, picker=PICKER_TOL_PTS)
-        cur_canvas = cur_fig.canvas
+
         if not plot_over:
             cur_canvas.set_window_title('Cut: ' + selected_workspace)
             cur_canvas.manager.update_grid()
