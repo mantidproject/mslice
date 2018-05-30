@@ -3,7 +3,7 @@ from matplotlib.widgets import RectangleSelector
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.widgets.cut.cut import CUT_PLOTTER
 
 
