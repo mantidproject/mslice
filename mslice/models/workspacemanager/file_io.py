@@ -46,11 +46,11 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 def save_nexus(workspace, path, is_slice):
     if isinstance(workspace, HistogramWorkspace):
         if is_slice:
-            run_algorithm('SaveMD', InputWorkspace=get_workspace_handle(workspace.name[2:]), Filename=path)
+            run_algorithm('SaveMD', store=False, InputWorkspace=get_workspace_handle(workspace.name[2:]), Filename=path)
         else:
-            run_algorithm('SaveMD', InputWorkspace=workspace, Filename=path)
+            run_algorithm('SaveMD', store=False, InputWorkspace=workspace, Filename=path)
     else:
-        run_algorithm('SaveNexus', InputWorkspace=workspace, Filename=path)
+        run_algorithm('SaveNexus', store=False, InputWorkspace=workspace, Filename=path)
 
 
 def save_ascii(workspace, path, is_slice):

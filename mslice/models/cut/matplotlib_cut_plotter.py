@@ -79,7 +79,3 @@ class MatplotlibCutPlotter(CutPlotter):
 
     def get_icut(self):
         return self.icut
-
-    def save_cut(self, params):
-        #TODO: broken on master, issue #332
-        pass

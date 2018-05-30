@@ -32,6 +32,7 @@ class CutPlot(object):
         plot_window.menu_intensity.setDisabled(True)
         plot_window.menu_information.setDisabled(True)
         plot_window.action_interactive_cuts.setVisible(False)
+        plot_window.action_save_cut.setVisible(False)
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
