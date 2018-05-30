@@ -1,20 +1,21 @@
 from matplotlib.widgets import RectangleSelector
 
 from mslice.models.axis import Axis
+from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.widgets.cut.cut import CUT_PLOTTER
 
 
 class InteractiveCut(object):
 
     def __init__(self, slice_plot, canvas, ws_title):
-        from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
         self.slice_plot = slice_plot
         self._canvas = canvas
         self._ws_title = ws_title
         self.horizontal = None
         self.connect_event = [None, None, None]
-        self._cut_plotter = MatplotlibCutPlotter()
+        self._cut_plotter = CUT_PLOTTER
         self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
@@ -33,13 +34,13 @@ class InteractiveCut(object):
         self.connect_event[2] = self._canvas.mpl_connect('button_press_event', self.clicked)
         self._rect_pos_cache = rect_pos
 
-    def plot_cut(self, x1, x2, y1, y2):
+    def plot_cut(self, x1, x2, y1, y2, store=False):
         if x2 > x1 and y2 > y1:
             ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
             units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
                 self._canvas.figure.gca().get_xaxis().units
             integration_axis = Axis(units, integration_start, integration_end, 0)
-            self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_axis, False, None, None, False)
+            self._cut_plotter.plot_cut(str(self._ws_title), ax, integration_axis, False, None, None, False, store)
 
     def get_cut_parameters(self, pos1, pos2):
         start = pos1[not self.horizontal]
@@ -63,13 +64,10 @@ class InteractiveCut(object):
 
     def save_cut(self):
         x1, x2, y1, y2 = self.rect.extents
-        ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
-        units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
-            self._canvas.figure.gca().get_xaxis().units
-        integration_axis = Axis(units, integration_start, integration_end, 0)
-        output_ws = self._cut_plotter.save_cut((str(self._ws_title), ax, integration_axis, False))
+        self.plot_cut(x1, x2, y1, y2, store=True)
         self.update_workspaces()
-        return get_workspace_name(output_ws)
+        ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
+        return output_workspace_name(str(self._ws_title), integration_start, integration_end)
 
     def update_workspaces(self):
         self.slice_plot.update_workspaces()

@@ -19,6 +19,7 @@ from .command import Command
 # Classes and functions
 # -----------------------------------------------------------------------------
 
+CUT_PLOTTER = MatplotlibCutPlotter()
 
 class CutWidget(CutView, QWidget):
     error_occurred = Signal('QString')
@@ -34,8 +35,7 @@ class CutWidget(CutView, QWidget):
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
-        cut_plotter = MatplotlibCutPlotter()
-        self._presenter = CutPresenter(self, cut_plotter)
+        self._presenter = CutPresenter(self, CUT_PLOTTER)
         self.cmbCutAxis.currentIndexChanged.connect(self.axis_changed)
         self._minimumStep = None
         self.lneCutStep.editingFinished.connect(self._step_edited)

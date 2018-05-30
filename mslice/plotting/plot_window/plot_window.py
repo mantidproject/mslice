@@ -113,15 +113,16 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.keep_make_current_group = QtWidgets.QActionGroup(self)
         self.keep_make_current_group.addAction(self.action_keep)
         self.keep_make_current_group.addAction(self.action_make_current)
-        toolbar.addSeparator()
+        self.keep_make_current_seperator = toolbar.addSeparator()
 
         self.action_save_image = add_action(toolbar, self, "Save Image", icon_name='fa.save')
         self.action_print_plot = add_action(toolbar, self,  "Print", icon_name='fa.print')
         self.action_plot_options = add_action(toolbar, self, "Plot Options", icon_name='fa.cog')
-        self.action_interactive_cuts = add_action(toolbar, self,  "Interactive Cuts", checkable=True)
 
-        # Options enabled depending on whether we are slicing or cutting
-        self.action_save_cut = add_action(toolbar, self,  "Save Cut")
+        toolbar.addSeparator()
+        self.action_interactive_cuts = add_action(toolbar, self,  "Interactive Cuts", checkable=True)
+        # options for interactive cuts only
+        self.action_save_cut = add_action(toolbar, self,  "Save Cut to Workspace")
         self.action_flip_axis = add_action(toolbar, self,  "Flip Integration Axis",
                                            icon_name='fa.retweet')
 

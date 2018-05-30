@@ -240,7 +240,7 @@ def _save_single_ws(workspace, save_name, save_method, path, extension, slice_no
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
     workspace = get_workspace_handle(workspace)
-    non_psd_slice = slice_nonpsd and not workspace.is_PSD and isinstance(workspace, MatrixWorkspace)
+    non_psd_slice = slice_nonpsd and isinstance(workspace, MatrixWorkspace) and not workspace.is_PSD
     if is_pixel_workspace(workspace) or non_psd_slice:
         slice = True
         workspace = _get_slice_mdhisto(workspace, get_workspace_name(workspace))

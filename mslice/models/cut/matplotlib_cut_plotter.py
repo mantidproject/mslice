@@ -14,8 +14,8 @@ class MatplotlibCutPlotter(CutPlotter):
         self.icut = None
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
-                 intensity_end, plot_over):
-        x, y, e = compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one)
+                 intensity_end, plot_over, store=True):
+        x, y, e = compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one, store)
         output_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
         legend = generate_legend(selected_workspace, integration_axis.units, integration_axis.start,
                                  integration_axis.end)
@@ -33,11 +33,13 @@ class MatplotlibCutPlotter(CutPlotter):
         cur_fig = plt.gcf()
         cur_axes = cur_fig.gca()
         cur_axes.set_ylim(*intensity_range) if intensity_range is not None else cur_axes.autoscale()
-        leg = cur_axes.legend(fontsize='medium')
-        leg.draggable()
+        cur_canvas = cur_fig.canvas
+        if cur_canvas.manager.window.action_toggle_legends.isChecked():
+            leg = cur_axes.legend(fontsize='medium')
+            leg.draggable()
         cur_axes.set_xlabel(get_display_name(x_units, get_comment(selected_workspace)), picker=PICKER_TOL_PTS)
         cur_axes.set_ylabel(CUT_INTENSITY_LABEL, picker=PICKER_TOL_PTS)
-        cur_canvas = cur_fig.canvas
+
         if not plot_over:
             cur_canvas.set_window_title('Cut: ' + selected_workspace)
             cur_canvas.manager.update_grid()
@@ -79,7 +81,3 @@ class MatplotlibCutPlotter(CutPlotter):
 
     def get_icut(self):
         return self.icut
-
-    def save_cut(self, params):
-        #TODO: broken on master, issue #332
-        pass

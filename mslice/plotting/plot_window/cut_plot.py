@@ -32,6 +32,7 @@ class CutPlot(object):
         plot_window.menu_intensity.setDisabled(True)
         plot_window.menu_information.setDisabled(True)
         plot_window.action_interactive_cuts.setVisible(False)
+        plot_window.action_save_cut.setVisible(False)
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
@@ -48,7 +49,7 @@ class CutPlot(object):
     def is_icut(self, is_icut):
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
-        self.plot_window.action_toggle_legends.setVisible(not is_icut)
+        self.plot_window.keep_make_current_seperator.setVisible(not is_icut)
         self.plot_window.action_keep.setVisible(not is_icut)
         self.plot_window.action_make_current.setVisible(not is_icut)
         self.plot_window.action_flip_axis.setVisible(is_icut)
