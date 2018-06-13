@@ -29,5 +29,5 @@ def _num_events_normalized_array(workspace):
             data[np.where(workspace.getNumEventsArray() == 0)] = np.nan
         else:
             data = workspace.getSignalArray() / workspace.getNumEventsArray()
-    data = np.ma.masked_where(np.isnan(data), data)
+    data = np.ma.masked_where(np.isnan(data) & (data > 0), data)
     return data
