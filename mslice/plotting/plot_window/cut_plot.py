@@ -313,7 +313,7 @@ class CutPlot(object):
 
     @property
     def title(self):
-        return self.plot_window.title
+        return self.manager.title
 
     @title.setter
     def title(self, value):
