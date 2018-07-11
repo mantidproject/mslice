@@ -107,6 +107,7 @@ def _get_property_from_history(name, history):
 
 
 def get_q_limits(theta, emax, efix):
+    # calculate |Q| limits in Angstrom^-1 from theta (scattering angle) in radians
     qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
     qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
     return qmin, qmax, qstep
@@ -123,18 +124,8 @@ def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
 def _get_theta_for_limits(ws):
     # Don't parse all spectra in cases where there are a lot to save time.
     num_hist = ws.raw_ws.getNumberHistograms()
-    if num_hist > 1000:
-        n_segments = 5
-        interval = int(num_hist / n_segments)
-        theta = []
-        for segment in range(n_segments):
-            i0 = segment * interval
-            theta.append([ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i))
-                          for i in range(i0, i0+200)])
-        round_fac = 573
-    else:
-        theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_hist)]
-        round_fac = 100
+    theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_hist)]
+    round_fac = 100
     ws.is_PSD = not all(x < y for x, y in zip(theta, theta[1:]))
     # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
     thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
