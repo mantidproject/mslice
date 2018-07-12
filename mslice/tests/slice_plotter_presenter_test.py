@@ -124,8 +124,6 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_x_start_bigger_than_x_stop_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x','2','1','.1')
-        y = Axis('y','2','8','3')
         intensity_start = '7'
         intensity_end = '8'
         norm_to_one = '9'
@@ -133,14 +131,14 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value = x.units
-        self.slice_view.get_slice_x_start.return_value = x.start
-        self.slice_view.get_slice_x_end.return_value = x.end
-        self.slice_view.get_slice_x_step.return_value = x.step
-        self.slice_view.get_slice_y_axis.return_value = y.units
-        self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value = y.end
-        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_x_axis.return_value = 'x'
+        self.slice_view.get_slice_x_start.return_value = '2'
+        self.slice_view.get_slice_x_end.return_value = '1' # invalid
+        self.slice_view.get_slice_x_step.return_value = '.1'
+        self.slice_view.get_slice_y_axis.return_value = 'y'
+        self.slice_view.get_slice_y_start.return_value = '2'
+        self.slice_view.get_slice_y_end.return_value = '8'
+        self.slice_view.get_slice_y_step.return_value = '3'
         self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
@@ -182,8 +180,6 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_invalid_y_params_y_end_less_than_y_start_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x','0','7','1')
-        y = Axis('y','20','8','3')
         intensity_start = '7'
         intensity_end = '8'
         norm_to_one = '9'
@@ -191,14 +187,14 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value = x.units
-        self.slice_view.get_slice_x_start.return_value = x.start
-        self.slice_view.get_slice_x_end.return_value = x.end
-        self.slice_view.get_slice_x_step.return_value = x.step
-        self.slice_view.get_slice_y_axis.return_value = y.units
-        self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value = y.end
-        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_x_axis.return_value = 'x'
+        self.slice_view.get_slice_x_start.return_value = '0'
+        self.slice_view.get_slice_x_end.return_value = '7'
+        self.slice_view.get_slice_x_step.return_value = '1'
+        self.slice_view.get_slice_y_axis.return_value = 'y'
+        self.slice_view.get_slice_y_start.return_value = '20' # invalid
+        self.slice_view.get_slice_y_end.return_value = '8'
+        self.slice_view.get_slice_y_step.return_value = '3'
         self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
@@ -215,20 +211,20 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         x = Axis('x','0','7','1')
         y = Axis('y','2','8','3')
         intensity_start = '7'
-        intensity_end = "j"
+        intensity_end = "j" #invalid
         norm_to_one = '9'
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value = x.units
-        self.slice_view.get_slice_x_start.return_value = x.start
-        self.slice_view.get_slice_x_end.return_value = x.end
-        self.slice_view.get_slice_x_step.return_value = x.step
-        self.slice_view.get_slice_y_axis.return_value = y.units
-        self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value = y.end
-        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_x_axis.return_value = 'x'
+        self.slice_view.get_slice_x_start.return_value = '0'
+        self.slice_view.get_slice_x_end.return_value = '7'
+        self.slice_view.get_slice_x_step.return_value = '1'
+        self.slice_view.get_slice_y_axis.return_value = 'y'
+        self.slice_view.get_slice_y_start.return_value = '2'
+        self.slice_view.get_slice_y_end.return_value = '8'
+        self.slice_view.get_slice_y_step.return_value = '3'
         self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
