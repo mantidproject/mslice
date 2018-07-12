@@ -79,7 +79,7 @@ def process_limits_event(ws):
     theta = _get_theta_for_limits_event(ws)
     estep = _original_step_size(ws)
     emax_1 = -emin if (str(ws.e_mode == 'Direct')) else emax
-    qmin, qmax, qstep = get_q_limits(theta, emax_1, ws.e_fixed)
+    qmin, qmax, qstep = get_q_limits(theta, emax_1, ws.e_fixed, ws.e_mode)
     set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep)
 
 
@@ -108,8 +108,8 @@ def get_q_limits(theta, en, efix, e_mode):
     #calculates the Q(E) line for the given two theta and then finds the min and max values
     direct = (e_mode == 'Direct')
     qlines = [np.sqrt(E2q * (2 * efix - en - 2 * np.sqrt(efix * (efix - en)) * np.cos(tth)) * meV2J) / 1e10 for tth in theta[:2]]
-    qmin = np.min(qlines[0 if direct else 1])
-    qmax = np.max(qlines[1 if direct else 0])
+    qmin = np.nanmin(qlines[0 if direct else 1])
+    qmax = np.nanmax(qlines[1 if direct else 0])
     e = efix if direct else -efix
     qstep = np.sqrt(E2q * 2 * e * (1 - np.cos(theta[2])) * meV2J) / m2A
     return qmin, qmax, qstep
