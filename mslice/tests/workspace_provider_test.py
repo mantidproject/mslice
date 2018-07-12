@@ -15,13 +15,15 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
     def setUp(self):
         self.test_ws_2d = run_algorithm('CreateSimulationWorkspace', output_name='test_ws_2d', Instrument='MAR',
                                         BinParams=[-10, 1, 10], UnitX='DeltaE')
-        run_algorithm('AddSampleLog', Workspace=self.test_ws_2d.raw_ws, store=False, LogName='Ei', LogText='3.',
+        run_algorithm('AddSampleLog', Workspace=self.test_ws_2d.raw_ws, store=False, LogName='Ei', LogText='50.',
                       LogType='Number')
         self.test_ws_md = run_algorithm('ConvertToMD', output_name='test_ws_md', InputWorkspace=self.test_ws_2d,
                                         QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                         SplitInto='50,50')
+        self.test_ws_2d.e_mode = "Direct"
         self.test_ws_md.ef_defined = False
         self.test_ws_md.is_PSD = True
+        self.test_ws_md.e_mode = "Direct"
         self.test_ws_md.limits = {'DeltaE': [0, 2, 1]}
 
     def test_delete_workspace(self):
@@ -44,10 +46,11 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
     @patch('mslice.models.workspacemanager.workspace_algorithms._original_step_size')
     def test_combine_workspace(self, step_mock):
         ws_2 = run_algorithm('CloneWorkspace', output_name='ws_2', InputWorkspace=self.test_ws_md)
+        ws_2.e_mode = "Direct"
         step_mock.return_value = 1
         combined = combine_workspace([self.test_ws_md, ws_2], 'combined')
         np.testing.assert_array_almost_equal(combined.limits['DeltaE'], [-10, 10, 1], 4)
-        np.testing.assert_array_almost_equal(combined.limits['|Q|'], [0.071989, 3.45243, 0.033804], 4)
+        np.testing.assert_array_almost_equal(combined.limits['|Q|'], [0.2939, 9.4817, 0.0919], 4)
         self.assertTrue(combined.is_PSD)
 
     def test_process_EFixed(self):
@@ -83,7 +86,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         limits = get_limits('test_ws_md', 'DeltaE')
         np.testing.assert_array_almost_equal(limits, [-10, 10, 1], 4)
         limits = get_limits('test_ws_md', '|Q|')
-        np.testing.assert_array_almost_equal(limits, [0.06, 3.4645, 0.004], 4)
+        np.testing.assert_array_almost_equal(limits, [0.5393, 8.622, 0.0164], 4)
 
 
     def test_get_limits_saved(self):
@@ -91,5 +94,5 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         get_limits('test_ws_2d', 'DeltaE')
         np.testing.assert_array_equal(self.test_ws_2d.limits['DeltaE'], [-10, 10, 1])
         np.testing.assert_array_equal(self.test_ws_2d.limits['|Q|'], self.test_ws_2d.limits['MomentumTransfer'])
-        np.testing.assert_almost_equal(self.test_ws_2d.limits['|Q|'], [0.05998867,  3.46446147,  0.00401079], 5)
-        np.testing.assert_almost_equal(self.test_ws_2d.limits['Degrees'], [3.43, 134.14, 0.5729578], 5)
+        np.testing.assert_almost_equal(self.test_ws_2d.limits['|Q|'], [0.2449,  9.53079,  0.01637], 5)
+        np.testing.assert_almost_equal(self.test_ws_2d.limits['Degrees'], [3.43, 134.14, 0.57296], 5)
