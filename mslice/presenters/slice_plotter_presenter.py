@@ -48,7 +48,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             return
 
         selected_workspace = selected_workspaces[0]
-        axes = self.create_axes_from_input()
+        axes = self.validate_axes()
         if (not axes):
             return
         x_axis, y_axis = axes
@@ -87,7 +87,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
                 raise e
             self._slice_view.error_invalid_intensity_params()
 
-    def create_axes_from_input(self):
+    def validate_axes(self):
         try:
             x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
                           self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
@@ -98,6 +98,9 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
                           self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
         except ValueError:
+            self._slice_view.error_invalid_y_params()
+            return False
+        if x_axis.units == y_axis.units:
             self._slice_view.error_invalid_plot_parameters()
             return False
         return x_axis, y_axis

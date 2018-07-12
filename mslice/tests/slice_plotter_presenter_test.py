@@ -116,8 +116,9 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
         self.slice_view.get_slice_smoothing.return_value = smoothing
         self.slice_view.get_slice_colourmap.return_value = colourmap
-        with self.assertRaises(ValueError):
-            self.slice_plotter_presenter.notify(Command.DisplaySlice)
+
+        self.slice_plotter_presenter.notify(Command.DisplaySlice)
+        self.slice_view.error_invalid_x_params.assert_called_once_with()
         assert(not self.slice_plotter.plot_slice.called)
 
     def test_plot_slice_x_start_bigger_than_x_stop_fail(self):
@@ -174,8 +175,8 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_smoothing.return_value = smoothing
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
-        with self.assertRaises(ValueError):
-            self.slice_plotter_presenter.notify(Command.DisplaySlice)
+        self.slice_plotter_presenter.notify(Command.DisplaySlice)
+        self.slice_view.error_invalid_y_params()
         assert(not self.slice_plotter.plot_slice.called)
 
     def test_plot_slice_invalid_y_params_y_end_less_than_y_start_fail(self):

@@ -34,6 +34,8 @@ class Axis(object):
 
     @end.setter
     def end(self, value):
+        if value < self.start:
+            raise ValueError("Invalid axis parameter - end is smaller than start")
         try:
             self._end = float(value)
         except ValueError:
