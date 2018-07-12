@@ -50,5 +50,3 @@ class MantidProjectionCalculator(ProjectionCalculator):
                                Limits=workspace.limits['MomentumTransfer'], ProjectionType=projection_type)
         propagate_properties(workspace, new_ws)
         return new_ws
-
-
