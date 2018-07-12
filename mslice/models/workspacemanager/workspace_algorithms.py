@@ -68,7 +68,7 @@ def _processLoadedWSLimits(workspace):
 def process_limits(ws):
     en = ws.raw_ws.getAxis(0).extractValues()
     theta = _get_theta_for_limits(ws)
-    qmin, qmax, qstep = get_q_limits(theta, en, ws.e_fixed, ws.e_mode)
+    qmin, qmax, qstep = get_q_limits(theta, en, ws.e_fixed)
     set_limits(ws, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
 
 
@@ -104,14 +104,12 @@ def _get_property_from_history(name, history):
     return None
 
 
-def get_q_limits(theta, en, efix, e_mode):
+def get_q_limits(theta, en, efix):
     #calculates the Q(E) line for the given two theta and then finds the min and max values
-    direct = (e_mode == 'Direct')
     qlines = [np.sqrt(E2q * (2 * efix - en - 2 * np.sqrt(efix * (efix - en)) * np.cos(tth)) * meV2J) / 1e10 for tth in theta[:2]]
-    qmin = np.nanmin(qlines[0 if direct else 1])
-    qmax = np.nanmax(qlines[1 if direct else 0])
-    e = efix if direct else -efix
-    qstep = np.sqrt(E2q * 2 * e * (1 - np.cos(theta[2])) * meV2J) / m2A
+    qmin = np.nanmin(qlines[0])
+    qmax = np.nanmax(qlines[1])
+    qstep = np.sqrt(E2q * 2 * efix * (1 - np.cos(theta[2])) * meV2J) / m2A
     return qmin, qmax, qstep
 
 
