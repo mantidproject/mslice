@@ -68,9 +68,7 @@ def _processLoadedWSLimits(workspace):
 def process_limits(ws):
     en = ws.raw_ws.getAxis(0).extractValues()
     theta = _get_theta_for_limits(ws)
-    # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
-    emax = -np.min(en) if (str(ws.e_mode == 'Direct')) else np.max(en)
-    qmin, qmax, qstep = get_q_limits(theta, emax, ws.e_fixed)
+    qmin, qmax, qstep = get_q_limits(theta, en, ws.e_fixed, ws.e_mode)
     set_limits(ws, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
 
 
@@ -106,10 +104,14 @@ def _get_property_from_history(name, history):
     return None
 
 
-def get_q_limits(theta, emax, efix):
-    # calculate |Q| limits in Angstrom^-1 from theta (scattering angle) in radians
-    qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
-    qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
+def get_q_limits(theta, en, efix, e_mode):
+    #calculates the Q(E) line for the given two theta and then finds the min and max values
+    direct = (e_mode == 'Direct')
+    qlines = [np.sqrt(E2q * (2 * efix - en - 2 * np.sqrt(efix * (efix - en)) * np.cos(tth)) * meV2J) / 1e10 for tth in theta[:2]]
+    qmin = np.min(qlines[0 if direct else 1])
+    qmax = np.max(qlines[1 if direct else 0])
+    e = efix if direct else -efix
+    qstep = np.sqrt(E2q * 2 * e * (1 - np.cos(theta[2])) * meV2J) / m2A
     return qmin, qmax, qstep
 
 
