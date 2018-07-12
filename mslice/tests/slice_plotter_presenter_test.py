@@ -208,8 +208,6 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_invalid_intensity_params_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x','0','7','1')
-        y = Axis('y','2','8','3')
         intensity_start = '7'
         intensity_end = "j" #invalid
         norm_to_one = '9'
