@@ -79,7 +79,7 @@ def process_limits_event(ws):
     theta = _get_theta_for_limits_event(ws)
     estep = _original_step_size(ws)
     emax_1 = -emin if (str(ws.e_mode == 'Direct')) else emax
-    qmin, qmax, qstep = get_q_limits(theta, emax_1, ws.e_fixed, ws.e_mode)
+    qmin, qmax, qstep = get_q_limits(theta, emax_1, ws.e_fixed)
     set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep)
 
 
