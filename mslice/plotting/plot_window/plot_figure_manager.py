@@ -57,6 +57,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         if self._plot_handler is not None:
             self._plot_handler.window_closing()
 
+    def resize(self, width, height):
+        self.window.resize(width, height)
+
     @property
     def canvas(self):
         return self.window.canvas
@@ -146,9 +149,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         try:
             save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
-            if e.message == "unrecognised file extension":
+            if str(e) == "unrecognised file extension":
                 self.save_image(os.path.join(file_path, save_name))
-            elif e.message == "dialog cancelled":
+            elif str(e) == "dialog cancelled":
                 pass
             else:
                 raise RuntimeError(e)
