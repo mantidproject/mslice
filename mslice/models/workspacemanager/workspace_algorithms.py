@@ -114,7 +114,6 @@ def get_q_limits(theta, en, efix, ndetectors):
         qstep = (qmax - qmin) / 100
     else:
         qstep = np.sqrt(E2q * 2 * efix * (1 - np.cos(theta[2])) * meV2J) / m2A
-        qstep = qstep / 3  # Use a step size a bit smaller than angular spacing ( / 3) so user can rebin if they want
     qmin -= qstep
     qmax += qstep
     return qmin, qmax, qstep
