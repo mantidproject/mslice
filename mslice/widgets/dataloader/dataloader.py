@@ -101,8 +101,12 @@ class DataLoaderWidget(QWidget): # and some view interface
             if self.file_system.isDir(self.file_system.index(selection)):
                 return
         self.btnload.setEnabled(True)
-        if len(selected) > 1:
+        if len(selected) > 1 and self.file_types_match(selected):
             self.btnmerge.setEnabled(True)
+
+    def file_types_match(self, selected_files):
+        extensions = [selection.rsplit('.', 1)[-1] for selection in selected_files]
+        return all(ext == extensions[0] for ext in extensions)
 
     def get_selected_file_paths(self):
         selected = self.table_view.selectionModel().selectedRows()
