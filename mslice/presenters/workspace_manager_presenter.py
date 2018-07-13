@@ -154,7 +154,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         try:
             add_workspace_runs(selected_ws)
         except ValueError as e:
-            self._workspace_manager_view.display_error(str(e))
+            self._workspace_manager_view._display_error(str(e))
         self.update_displayed_workspaces()
 
     def _subtract_workspace(self):
