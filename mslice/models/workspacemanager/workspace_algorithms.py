@@ -109,11 +109,8 @@ def get_q_limits(theta, en, efix, ndetectors):
     qlines = [np.sqrt(E2q * (2 * efix - en - 2 * np.sqrt(efix * (efix - en)) * np.cos(tth)) * meV2J) / 1e10 for tth in theta[:2]]
     qmin = np.nanmin(qlines[0])
     qmax = np.nanmax(qlines[1])
-
-    if(ndetectors > 1000):
-        qstep = (qmax - qmin) / 100
-    else:
-        qstep = np.sqrt(E2q * 2 * efix * (1 - np.cos(theta[2])) * meV2J) / m2A
+    const_tth = np.radians(0.5)
+    qstep = np.sqrt(E2q * 2 * efix * (1 - np.cos(const_tth)) * meV2J) / m2A
     qmin -= qstep
     qmax += qstep
     return qmin, qmax, qstep
