@@ -88,8 +88,6 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         limits = get_limits('test_ws_md', '|Q|')
         np.testing.assert_allclose(limits, [0.545576, 8.615743, 0.042867], rtol=0, atol=1e-3)
 
-
-
     def test_get_limits_saved(self):
         self.test_ws_2d.limits = {}
         get_limits('test_ws_2d', 'DeltaE')
