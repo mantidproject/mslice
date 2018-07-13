@@ -93,7 +93,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             save_directory, save_name, extension = get_save_directory(multiple_files=len(selected_workspaces) > 1,
                                                                       save_as_image=False, default_ext=extension)
         except RuntimeError as e:
-            if e.message == "dialog cancelled":
+            if str(e) == "dialog cancelled":
                 return
             else:
                 raise RuntimeError(e)

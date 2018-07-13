@@ -146,9 +146,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         try:
             save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
-            if e.message == "unrecognised file extension":
+            if str(e) == "unrecognised file extension":
                 self.save_image(os.path.join(file_path, save_name))
-            elif e.message == "dialog cancelled":
+            elif str(e) == "dialog cancelled":
                 pass
             else:
                 raise RuntimeError(e)
