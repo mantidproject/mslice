@@ -1,18 +1,22 @@
 #!/bin/sh
 #
-# Launch MSlice using the Mantid Python wrappers. It is currently hardcoded to
-# use the nightly build
+# Launch MSlice using the Mantid Python wrappers. Uses MANTIDPATH
+# to determine where mantid is located otherwise it defaults to a
+# nightly build
 #
 
 # Get the directory this script resides in. This will only work on bash-like shells
 SCRIPT=$(readlink -f "$0")
 SCRIPT_PATH=$(dirname "$SCRIPT")
 
-INSTALL_PREFIX=/opt
-PACKAGE=mantidnightly
-MANTIDPYTHON=mantidpython
+if [ -n "$MANTIDPATH" ]; then
+  MANTIDPYTHON=$MANTIDPATH/mantidpython
+else
+  MANTIDPYTHON=/opt/mantidnightly/bin/mantidpython
+fi
+
 MANTIDPYTHON_ARGS="--classic"
 MAIN_SCRIPT=${SCRIPT_PATH}/start_mslice.py
 
 # Run
-${INSTALL_PREFIX}/${PACKAGE}/bin/${MANTIDPYTHON} ${MANTIDPYTHON_ARGS} ${MAIN_SCRIPT}
+${MANTIDPYTHON} ${MANTIDPYTHON_ARGS} ${MAIN_SCRIPT}
