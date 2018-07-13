@@ -57,6 +57,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         if self._plot_handler is not None:
             self._plot_handler.window_closing()
 
+    def resize(self, width, height):
+        self.window.resize(width, height)
+
     @property
     def canvas(self):
         return self.window.canvas
