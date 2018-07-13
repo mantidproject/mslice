@@ -68,9 +68,7 @@ def _processLoadedWSLimits(workspace):
 def process_limits(ws):
     en = ws.raw_ws.getAxis(0).extractValues()
     theta = _get_theta_for_limits(ws)
-    # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
-    emax = -np.min(en) if (str(ws.e_mode == 'Direct')) else np.max(en)
-    qmin, qmax, qstep = get_q_limits(theta, emax, ws.e_fixed)
+    qmin, qmax, qstep = get_q_limits(theta, en, ws.e_fixed)
     set_limits(ws, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
 
 
@@ -106,35 +104,30 @@ def _get_property_from_history(name, history):
     return None
 
 
-def get_q_limits(theta, emax, efix):
-    qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
-    qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
+def get_q_limits(theta, en, efix):
+    #calculates the Q(E) line for the given two theta and then finds the min and max values
+    qlines = [np.sqrt(E2q * (2 * efix - en - 2 * np.sqrt(efix * (efix - en)) * np.cos(tth)) * meV2J) / 1e10 for tth in theta[:2]]
+    qmin = np.nanmin(qlines[0])
+    qmax = np.nanmax(qlines[1])
+    const_tth = np.radians(0.5)
+    qstep = np.sqrt(E2q * 2 * efix * (1 - np.cos(const_tth)) * meV2J) / m2A
+    qmin -= qstep
+    qmax += qstep
     return qmin, qmax, qstep
 
 
 def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
-    # Use a step size a bit smaller than angular spacing ( / 3) so user can rebin if they want...
-    ws.limits['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep / 3]
+
+    ws.limits['MomentumTransfer'] = [qmin, qmax, qstep]
     ws.limits['|Q|'] = ws.limits['MomentumTransfer']  # ConvertToMD renames it(!)
     ws.limits['Degrees'] = theta * 180 / np.pi
     ws.limits['DeltaE'] = [emin, emax, estep]
 
 
 def _get_theta_for_limits(ws):
-    # Don't parse all spectra in cases where there are a lot to save time.
     num_hist = ws.raw_ws.getNumberHistograms()
-    if num_hist > 1000:
-        n_segments = 5
-        interval = int(num_hist / n_segments)
-        theta = []
-        for segment in range(n_segments):
-            i0 = segment * interval
-            theta.append([ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i))
-                          for i in range(i0, i0+200)])
-        round_fac = 573
-    else:
-        theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_hist)]
-        round_fac = 100
+    theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_hist)]
+    round_fac = 100
     ws.is_PSD = not all(x < y for x, y in zip(theta, theta[1:]))
     # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
     thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
