@@ -12,10 +12,11 @@ import numpy as np
 from scipy import constants
 
 from mslice.models.axis import Axis
-from mslice.util.mantid import add_to_ads, run_algorithm
+from mslice.util.mantid import add_to_ads, wrap_in_ads, run_algorithm
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
                                                                remove_workspace, add_workspace)
 from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 
 # -----------------------------------------------------------------------------
@@ -170,7 +171,7 @@ def rename_workspace(selected_workspace, new_name):
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
     workspace_names = [workspace.name for workspace in workspaces]
-    with add_to_ads(workspaces):
+    with wrap_in_ads(workspaces):
         ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspace_names)
     propagate_properties(workspaces[0], ws)
     # Set limits for result workspace. Use precalculated step size, otherwise get limits directly from Mantid workspace
@@ -189,7 +190,7 @@ def combine_workspace(selected_workspaces, new_name):
 def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
     workspaces = [get_workspace_handle(ws) for ws in selected_ws]
-    with add_to_ads(workspaces):
+    with wrap_in_ads(workspaces):
         sum_ws = run_algorithm('MergeRuns', output_name=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
@@ -226,6 +227,18 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
         raise RuntimeError("unrecognised file extension")
     for workspace in workspaces:
         _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd)
+
+
+def export_workspace_to_ads(workspace):
+    '''
+    Exports an MSlice workspace to ADS. If the workspace is MDHisto, convert it to Matrix
+    :param workspace: name of MSlice workspace to export to ADS
+    '''
+    workspace = get_workspace_handle(workspace)
+    if isinstance(workspace, HistogramWorkspace):
+        with wrap_in_ads([workspace]):
+            workspace = workspace.convert_to_matrix()
+    add_to_ads(workspace)
 
 
 def _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd):

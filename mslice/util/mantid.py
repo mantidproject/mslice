@@ -16,7 +16,13 @@ def initialize_mantid():
     AlgorithmFactory.subscribe(Cut)
     s_api._create_algorithm_function('MakeProjection', 1, MakeProjection())
     s_api._create_algorithm_function('Slice', 1, Slice())
-s_api._create_algorithm_function('Cut', 1, Cut())
+    s_api._create_algorithm_function('Cut', 1, Cut())
+    try:
+        import mantidplot
+    except ImportError:
+        return(False)
+    else:
+        return(True)
 
 
 def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
@@ -33,8 +39,17 @@ def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
     return ws
 
 
-@contextmanager
 def add_to_ads(workspaces):
+    try:
+        workspaces = iter(workspaces)
+    except TypeError:
+        workspaces = [workspaces]
+    for workspace in workspaces:
+        AnalysisDataService.Instance().addOrReplace(workspace.name, workspace.raw_ws)
+
+
+@contextmanager
+def wrap_in_ads(workspaces):
     '''Need to wrap some algorithm calls because they don't like input workspaces that aren't in the ADS...'''
     for workspace in workspaces:
         AnalysisDataService.Instance().addOrReplace(workspace.name, workspace.raw_ws)
