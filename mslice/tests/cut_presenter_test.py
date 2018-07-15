@@ -159,14 +159,6 @@ class CutPresenterTest(unittest.TestCase):
         # Bad cut axis
         with self.assertRaises(ValueError):
             Axis("units", "a", "100", "1")
-        # Invalid axis range
-        axis = Axis("units", "100", "0", "1")
-        cut_presenter = CutPresenter(self.view, self.cut_plotter)
-        cut_presenter.register_master(self.main_presenter)
-        self._create_cut(axis, processed_axis, integration_start, integration_end, width,
-                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
-        cut_presenter.notify(Command.Plot)
-        self.assertRaises(ValueError)
         axis = Axis("units", "0", "100", "1")
         # Bad integration
         integration_start = "a"

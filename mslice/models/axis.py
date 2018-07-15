@@ -35,9 +35,12 @@ class Axis(object):
     @end.setter
     def end(self, value):
         try:
-            self._end = float(value)
+            end_float = float(value)
         except ValueError:
             raise ValueError("Invalid axis parameter - end '%s' is not a valid float" % value)
+        if end_float < self.start:
+            raise ValueError("Invalid axis parameter - end is smaller than start")
+        self._end = end_float
 
     @property
     def step(self):

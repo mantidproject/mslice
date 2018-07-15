@@ -48,21 +48,10 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             return
 
         selected_workspace = selected_workspaces[0]
-        x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
-                      self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
-        y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
-                      self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
-        status = self._process_axis(x_axis, y_axis)
-        if status == INVALID_Y_PARAMS:
-            self._slice_view.error_invalid_y_params()
+        axes = self.validate_axes()
+        if (not axes):
             return
-        elif status == INVALID_X_PARAMS:
-            self._slice_view.error_invalid_x_params()
-            return
-        elif status == INVALID_PARAMS:
-            self._slice_view.error_invalid_plot_parameters()
-            return
-
+        x_axis, y_axis = axes
         intensity_start = self._slice_view.get_slice_intensity_start()
         intensity_end = self._slice_view.get_slice_intensity_end()
         norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
@@ -97,6 +86,24 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             if str(e) != "minvalue must be less than or equal to maxvalue":
                 raise e
             self._slice_view.error_invalid_intensity_params()
+
+    def validate_axes(self):
+        try:
+            x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
+                          self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
+        except ValueError:
+            self._slice_view.error_invalid_x_params()
+            return False
+        try:
+            y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
+                          self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
+        except ValueError:
+            self._slice_view.error_invalid_y_params()
+            return False
+        if x_axis.units == y_axis.units:
+            self._slice_view.error_invalid_plot_parameters()
+            return False
+        return x_axis, y_axis
 
 
     @require_main_presenter
