@@ -5,7 +5,7 @@ def _normalize_workspace(workspace):
     assert isinstance(workspace, IMDHistoWorkspace)
     num_events = workspace.getNumEventsArray()
     average_event_intensity = _num_events_normalized_array(workspace)
-    average_event_max = average_event_intensity.max()
+    average_event_max = np.abs(average_event_intensity).max()
 
     normed_average_event_intensity = average_event_intensity / average_event_max
     if workspace.displayNormalization() == MDNormalization.NoNormalization:
@@ -14,7 +14,6 @@ def _normalize_workspace(workspace):
         new_data = normed_average_event_intensity * num_events
     new_data = np.array(new_data)
 
-    new_data = np.nan_to_num(new_data)
     workspace.setSignalArray(new_data)
 
     errors = workspace.getErrorSquaredArray() / (average_event_max**2)
@@ -29,5 +28,5 @@ def _num_events_normalized_array(workspace):
             data[np.where(workspace.getNumEventsArray() == 0)] = np.nan
         else:
             data = workspace.getSignalArray() / workspace.getNumEventsArray()
-    data = np.ma.masked_where(np.isnan(data) + (data < 0), data)
+    data = np.ma.masked_where(np.isnan(data), data)
     return data
