@@ -108,8 +108,13 @@
                    <height>16777215</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>9</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
-                  <string>Save to ADS</string>
+                  <string>Save to MantidPlot</string>
                  </property>
                 </widget>
                </item>
