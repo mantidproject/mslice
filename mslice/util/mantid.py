@@ -18,7 +18,7 @@ def initialize_mantid():
     s_api._create_algorithm_function('Slice', 1, Slice())
     s_api._create_algorithm_function('Cut', 1, Cut())
     try:
-        import mantidplot
+        import mantidplot # noqa: F401
     except ImportError:
         return(False)
     else:

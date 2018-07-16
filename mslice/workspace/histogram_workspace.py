@@ -23,7 +23,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         return HistogramWorkspace(ws, self.name)
 
     def convert_to_matrix(self):
-        ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization', 
+        ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization',
                                                   FindXAxis=False, StoreInADS=False, OutputWorkspace=self.name)
         coord = self.get_coordinates()
         bin_size = coord[coord.keys()[0]][1] - coord[coord.keys()[0]][0]
