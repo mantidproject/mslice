@@ -255,8 +255,7 @@ def compute_dvalues(d_min, d_max, structure):
     return dvalues
 
 def _norm_to_one(data):
-    data_range = np.nanmax(data) - np.nanmin(data)
-    return (data - np.nanmin(data))/data_range
+    return data / np.nanmax(np.abs(data))
 
 def is_sliceable(workspace):
     ws = get_workspace_handle(workspace)

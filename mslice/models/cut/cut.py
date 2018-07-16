@@ -29,7 +29,7 @@ class Cut(PythonAlgorithm):
         int_axis = Axis(int_dict['units'].value, int_dict['start'].value, int_dict['end'].value, int_dict['step'].value)
         e_mode = self.getProperty('EMode').value
         PSD = self.getProperty('PSD').value
-        norm_to_one = self.getProperty('NormToOne')
+        norm_to_one = self.getProperty('NormToOne').value
         cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one)
         self.setProperty('OutputWorkspace', cut)
 
