@@ -101,12 +101,8 @@ class DataLoaderWidget(QWidget): # and some view interface
             if self.file_system.isDir(self.file_system.index(selection)):
                 return
         self.btnload.setEnabled(True)
-        if len(selected) > 1 and self.file_types_match(selected):
+        if len(selected) > 1:
             self.btnmerge.setEnabled(True)
-
-    def file_types_match(self, selected_files):
-        extensions = [selection.rsplit('.', 1)[-1] for selection in selected_files]
-        return all(ext == extensions[0] for ext in extensions)
 
     def get_selected_file_paths(self):
         selected = self.table_view.selectionModel().selectedRows()
@@ -126,6 +122,9 @@ class DataLoaderWidget(QWidget): # and some view interface
 
     def error_unable_to_open_file(self, filename=None):
         self._display_error('MSlice was not able to load %s' % ('the selected file' if filename is None else filename))
+
+    def error_merge_different_file_formats(self):
+        self._display_error('Cannot merge files with different formats')
 
     def no_workspace_has_been_loaded(self, filename=None):
         if filename is None:
