@@ -20,7 +20,7 @@ TAB_POWDER = 0
 
 class MainWindow(MainView, QMainWindow):
 
-    def __init__(self):
+    def __init__(self, in_mantidplot=False):
         QMainWindow.__init__(self)
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
@@ -35,6 +35,8 @@ class MainWindow(MainView, QMainWindow):
                                   TAB_EVENT: [self.btnMerge],
                                   TAB_HISTO: [self.btnPlot, self.btnOverplot],
                                   TAB_NONPSD: [self.btnAdd, self.btnSubtract]}
+        if in_mantidplot:
+            self.buttons_to_enable[TAB_HISTO] += [self.btnSaveToADS]
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         dataloader_presenter = self.data_loading.get_presenter()
@@ -54,6 +56,7 @@ class MainWindow(MainView, QMainWindow):
         self.btnMerge.clicked.connect(self.button_merge)
         self.btnPlot.clicked.connect(self.button_plot)
         self.btnOverplot.clicked.connect(self.button_overplot)
+        self.btnSaveToADS.clicked.connect(self.button_savetoads)
         self.btnHistory.hide()
         self.ws_tab_changed(0)
 
@@ -98,7 +101,7 @@ class MainWindow(MainView, QMainWindow):
 
     def enable_buttons(self, tab):
         '''enables correct buttons based on workspace tab'''
-        variable_buttons = [self.btnAdd, self.btnSubtract, self.btnMerge, self.btnPlot, self.btnOverplot]
+        variable_buttons = [self.btnAdd, self.btnSubtract, self.btnMerge, self.btnPlot, self.btnOverplot, self.btnSaveToADS]
         for button in variable_buttons:
             button.hide()
         for button in self.buttons_to_enable[tab]:
@@ -127,6 +130,9 @@ class MainWindow(MainView, QMainWindow):
 
     def button_overplot(self):
         self.cut_presenter.notify(cut_command.PlotOverFromWorkspace)
+
+    def button_savetoads(self):
+        self.workspace_presenter.notify(ws_command.SaveToADS)
 
     def init_ui(self):
         self.busy_text = QLabel()

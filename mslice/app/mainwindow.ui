@@ -98,7 +98,7 @@
                 </spacer>
                </item>
                <item row="6" column="1">
-                <widget class="QPushButton" name="btnHistory">
+                <widget class="QPushButton" name="btnSaveToADS">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
@@ -108,8 +108,13 @@
                    <height>16777215</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>9</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
-                  <string>History</string>
+                  <string>Save to MantidPlot</string>
                  </property>
                 </widget>
                </item>
@@ -216,6 +221,13 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="7" column="1">
+                <widget class="QPushButton" name="btnHistory">
+                 <property name="text">
+                  <string>History</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>

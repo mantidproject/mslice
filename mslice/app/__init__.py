@@ -20,9 +20,9 @@ def show_gui():
     If this is the first call then an instance of the Windows is cached to ensure it
     survives for the duration of the application
     """
-    initialize_mantid()
+    in_mantidplot = initialize_mantid()
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow
-        MAIN_WINDOW = MainWindow()
+        MAIN_WINDOW = MainWindow(in_mantidplot)
     MAIN_WINDOW.show()
