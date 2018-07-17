@@ -170,7 +170,7 @@ class SliceWidget(SlicePlotterView, QWidget):
         self._display_error('Invalid selection of the y axis')
 
     def error_invalid_y_params(self):
-        self._display_error('Invalid parameters for the y axis os the slice')
+        self._display_error('Invalid parameters for the y axis of the slice')
 
     def error_invalid_x_units(self):
         self._display_error('Invalid selection of the x axis')
