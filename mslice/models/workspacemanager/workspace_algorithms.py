@@ -345,6 +345,7 @@ def propagate_properties(old_workspace, new_workspace):
     new_workspace.e_mode = old_workspace.e_mode
     new_workspace.limits = old_workspace.limits
     new_workspace.is_PSD = old_workspace.is_PSD
+    new_workspace.e_fixed = old_workspace.e_fixed
 
 
 def get_comment(workspace):
