@@ -43,7 +43,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def _display_slice(self):
         try:
-            selected_workspace = self._get_main_presenter().get_selected_workspaces()[0]
+            selected_workspace = validate(self._selected_workspace, self._slice_view.error_select_one_workspace)
             x_axis = validate(self._x_axis, self._slice_view.error_invalid_x_params)
             y_axis = validate(self._y_axis, self._slice_view.error_invalid_y_params)
             intensity_start, intensity_end = validate(self._intensity, self._slice_view.error_invalid_intensity_params)
@@ -74,6 +74,12 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             if str(e) != "minvalue must be less than or equal to maxvalue":
                 raise e
             self._slice_view.error_invalid_intensity_params()
+
+    def _selected_workspace(self):
+        selected_workspaces = self._get_main_presenter().get_selected_workspaces()
+        if not selected_workspaces or len(selected_workspaces) > 1:
+            raise ValueError()
+        return selected_workspaces[0]
 
     def _x_axis(self):
         return Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
