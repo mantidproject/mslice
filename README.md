@@ -31,13 +31,15 @@ To develop purely on the command line then simply use your favourite editor and 
 
 ### PyCharm
 
-Mantid must be installed prior to running this setup. The setup assumes that mantid is installed in its default location.
+Mantid must be installed prior to running this setup.
 
 To set up the [PyCharm IDE](https://www.jetbrains.com/pycharm/) first open PyCharm and select `File->Open Project`. Select the cloned `mslice` directory and select open.
 The project layout should be displayed. The first run may take some time to open while PyCharm parses the structure.
 
-#### Run Configurations
+You will also need to edit the run configurations:  
 
-You will also need to edit the run configurations if you ae running on Linux/OSX or installed Mantid to a nonstandard
-location on Windows.
+[example pycharm run configuration](resources/images/pycharm_run_config.png)
 
+- The startup script is `start_mslice.py`.
+- The `bin` directory of an installed version of mantid must be on the `PATH`.
+- If you're developing on Windows, the Python interpreter used must be the one shipped with the Mantid installation `MantidInstall/bin/python.exe`.
