@@ -11,14 +11,6 @@ from mslice.widgets.slice.command import Command
 from .interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from .validation_decorators import require_main_presenter
 
-INVALID_PARAMS = 1
-INVALID_X_PARAMS = 2
-INVALID_Y_PARAMS = 3
-INVALID_INTENSITY = 4
-INVALID_SMOOTHING = 5
-INVALID_X_UNITS = 6
-INVALID_Y_UNITS = 7
-
 
 def validate(field_method, error_method):
     try:
@@ -26,6 +18,7 @@ def validate(field_method, error_method):
     except ValueError as e:
         error_method()
         raise e
+
 
 class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
     def __init__(self, slice_view, slice_plotter):
@@ -84,11 +77,11 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def _x_axis(self):
         return Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
-                      self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
+                    self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
 
     def _y_axis(self):
         return Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
-                      self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
+                    self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
 
     def _intensity(self):
         intensity_start = self._slice_view.get_slice_intensity_start()
