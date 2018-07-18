@@ -10,6 +10,12 @@ from mslice.presenters.quick_options_presenter import quick_options
 from .plot_options import CutPlotOptions
 
 
+def get_min(data, absolute_minimum=-np.inf):
+    """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
+    mask = np.greater(data, absolute_minimum)
+    return np.min(np.extract(mask, data))
+
+
 class CutPlot(object):
 
     def __init__(self, figure_manager, cut_plotter, workspace):
@@ -110,18 +116,6 @@ class CutPlot(object):
         bounds['x_label'] = fig_y * 0.05
         return bounds
 
-    @staticmethod
-    def get_min(data, absolute_minimum=-np.inf):
-        """Determines the minimum of a set of numpy arrays"""
-        data = data if isinstance(data, list) else [data]
-        running_min = []
-        for values in data:
-            try:
-                running_min.append(np.min(values[np.isfinite(values) * (values > absolute_minimum)]))
-            except ValueError:  # If data is empty or not array of numbers
-                pass
-        return np.min(running_min) if running_min else absolute_minimum
-
     def xy_config(self):
         return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
 
@@ -129,7 +123,7 @@ class CutPlot(object):
         current_axis = self._canvas.figure.gca()
         if xy_config['x_log']:
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-            xmin = self.get_min(xdata, absolute_minimum=0.)
+            xmin = get_min(xdata, absolute_minimum=0.)
             current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
             if xmin > 0:
                 xy_config['x_range'] = (xmin, xy_config['x_range'][1])
@@ -137,7 +131,7 @@ class CutPlot(object):
             current_axis.set_xscale('linear')
         if xy_config['y_log']:
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-            ymin = self.get_min(ydata, absolute_minimum=0.)
+            ymin = get_min(ydata, absolute_minimum=0.)
             current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])

@@ -3,7 +3,7 @@ import numpy as np
 import unittest
 
 from matplotlib.lines import Line2D
-from mslice.plotting.plot_window.cut_plot import CutPlot
+from mslice.plotting.plot_window.cut_plot import CutPlot, get_min
 
 
 class CutPlotTest(unittest.TestCase):
@@ -20,8 +20,8 @@ class CutPlotTest(unittest.TestCase):
 
     def test_get_min(self):
         data = [np.array([3, 6, 10]), np.array([3, 2, 7])]
-        self.assertEqual(self.cut_plot.get_min(data), 2)
-        self.assertEqual(self.cut_plot.get_min(data, 4), 6)
+        self.assertEqual(get_min(data), 2)
+        self.assertEqual(get_min(data, 4), 6)
 
     def test_change_scale_linear(self):
         self.axes.set_xscale = MagicMock()
