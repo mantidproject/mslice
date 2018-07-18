@@ -12,15 +12,17 @@ def quick_options(target, model, has_logarithmic=None):
         else:
             grid = None
         view = QuickAxisOptions(target, getattr(model, target), grid, has_logarithmic)
-        run_quick_options(view, set_axis_range, model, target, has_logarithmic, grid)
+        run_quick_options(view, set_axis_range, target, model, has_logarithmic, grid)
     else:
         view = QuickLineOptions(model.get_line_data(target))
         run_quick_options(view, set_line_options, model, target)
+
 
 def run_quick_options(view, update_model_function, *args):
     accepted = view.exec_()
     if accepted:
         update_model_function(view, *args)
+
 
 def set_axis_range(view, target, model, has_logarithmic, grid):
     range = (float(view.range_min), float(view.range_max))
@@ -30,8 +32,10 @@ def set_axis_range(view, target, model, has_logarithmic, grid):
     if grid is not None:
         setattr(model, target[:-5] + 'grid', view.grid_state)
 
+
 def set_label(view, target):
     target.set_text(view.label)
+
 
 def set_line_options(view, model, line):
     line_options = {}
@@ -39,7 +43,3 @@ def set_line_options(view, model, line):
     for value in values:
         line_options[value] = getattr(view, value)
     model.set_line_data(line, line_options)
-
-
-
-
