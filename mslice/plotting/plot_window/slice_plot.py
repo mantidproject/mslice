@@ -26,7 +26,6 @@ class SlicePlot(object):
         self._arb_nuclei_rmm = None
         self._cif_file = None
         self._cif_path = None
-        self._quick_presenter = None
         self._legend_dict = {}
         self.icut_event = [None, None]
         self.icut = None
@@ -92,18 +91,18 @@ class SlicePlot(object):
         if bounds['x_label'] < y < bounds['title']:
             if bounds['y_label'] < x < bounds['colorbar_label']:
                 if y < bounds['x_range']:
-                    self._quick_presenter = quick_options('x_range', self)
+                    quick_options('x_range', self)
                 elif x < bounds['y_range']:
-                    self._quick_presenter = quick_options('y_range', self)
+                    quick_options('y_range', self)
                 elif x > bounds['colorbar_range']:
-                    self._quick_presenter = quick_options('colorbar_range', self, self.colorbar_log)
+                    quick_options('colorbar_range', self, self.colorbar_log)
             self._canvas.draw()
 
     def object_clicked(self, target):
         if target in self._legend_dict:
-            self._quick_presenter = quick_options(self._legend_dict[target], self)
+            quick_options(self._legend_dict[target], self)
         else:
-            self._quick_presenter = quick_options(target, self)
+            quick_options(target, self)
         self.reset_info_checkboxes()
         self.update_legend()
         self._canvas.draw()

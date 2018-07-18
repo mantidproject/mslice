@@ -73,9 +73,9 @@ class CutPlot(object):
         if isinstance(target, Legend):
             return
         elif isinstance(target, Line2D):
-            self._quick_presenter = quick_options(self.get_line_index(target), self)
+            quick_options(self.get_line_index(target), self)
         else:
-            self._quick_presenter = quick_options(target, self)
+            quick_options(target, self)
         self.update_legend()
         self._canvas.draw()
 
@@ -101,9 +101,9 @@ class CutPlot(object):
         if bounds['x_label'] < y < bounds['title']:
             if bounds['y_label'] < x:
                 if y < bounds['x_range']:
-                    self._quick_presenter = quick_options('x_range', self, self.x_log)
+                    quick_options('x_range', self, self.x_log)
                 elif x < bounds['y_range']:
-                    self._quick_presenter = quick_options('y_range', self, self.y_log)
+                    quick_options('y_range', self, self.y_log)
             self._canvas.draw()
 
     def calc_figure_boundaries(self):
