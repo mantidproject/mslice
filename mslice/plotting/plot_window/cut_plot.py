@@ -72,14 +72,12 @@ class CutPlot(object):
     def object_clicked(self, target):
         if isinstance(target, Legend):
             return
-        elif isinstance(target, Line2D):
-            quick_options(self.get_line_index(target), self)
         else:
             quick_options(target, self)
         self.update_legend()
         self._canvas.draw()
 
-    def get_line_index(self, line):
+    def _get_line_index(self, line):
         '''
         Checks if line index is cached, and if not finds the index by iterating over the axes' containers.
         :param line: Line to find the index of
@@ -198,17 +196,21 @@ class CutPlot(object):
     def get_all_line_data(self):
         all_line_options = []
         for i in range(len(self._canvas.figure.gca().containers)):
-            line_options = self.get_line_data(i)
+            line_options = self.get_line_data_by_index(i)
             all_line_options.append(line_options)
         return all_line_options
 
     def set_all_line_data(self, line_data):
         containers = self._canvas.figure.gca().containers
         for i in range(len(containers)):
-            self.set_line_data(i, line_data[i])
+            self.set_line_data_by_index(i, line_data[i])
         self.update_legend(line_data)
 
-    def get_line_data(self, index):
+    def get_line_data(self, line):
+        index = self._get_line_index(line)
+        return self.get_line_data_by_index(index)
+
+    def get_line_data_by_index(self, index):
         line_options = {}
         container = self._canvas.figure.gca().containers[index]
         line = container.get_children()[0]
@@ -221,7 +223,11 @@ class CutPlot(object):
         line_options['marker'] = line.get_marker()
         return line_options
 
-    def set_line_data(self, index, line_options):
+    def set_line_data(self, line, line_options):
+        index = self._get_line_index(line)
+        self.set_line_data_by_index(index, line_options)
+
+    def set_line_data_by_index(self, index, line_options):
         container = self._canvas.figure.gca().containers[index]
         container.set_label(line_options['label'])
         main_line = container.get_children()[0]

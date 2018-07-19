@@ -6,8 +6,7 @@ from matplotlib.lines import Line2D
 from matplotlib.container import Container
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
-from mslice.presenters.quick_options_presenter import (quick_options, QuickLinePresenter, QuickAxisPresenter,
-                                                       QuickLabelPresenter)
+from mslice.presenters.quick_options_presenter import quick_options, quick_axis_options
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
 
 
@@ -30,17 +29,27 @@ class QuickOptionsTest(unittest.TestCase):
 
     @patch.object(QuickLabelOptions, '__init__', lambda x, y: None)
     @patch.object(QuickLabelOptions, 'exec_', lambda x: None)
-    def test_label(self):
-        self.target = Mock(spec=text.Text)
-        self.presenter = quick_options(self.target, self.model)
-        assert type(self.presenter) is QuickLabelPresenter
+    @patch('mslice.presenters.quick_options_presenter.quick_label_options')
+    def test_label(self, label_options_mock):
+        target = Mock(spec=text.Text)
+        quick_options(target, self.model)
+        label_options_mock.assert_called_once_with(target)
 
     @patch.object(QuickLineOptions, '__init__', lambda x, y: None)
     @patch.object(QuickLineOptions, 'exec_', lambda x: None)
-    def test_line(self):
-        self.target = 1
-        self.presenter = quick_options(self.target, self.model)
-        assert type(self.presenter) is QuickLinePresenter
+    @patch('mslice.presenters.quick_options_presenter.quick_line_options')
+    def test_line(self, line_options_mock):
+        target = Line2D([], [], 3, '-', 'red', 'o', label='label1')
+        quick_options(target, self.model)
+        line_options_mock.assert_called_once_with(target, self.model)
+
+    @patch.object(QuickLineOptions, '__init__', lambda x, y: None)
+    @patch.object(QuickLineOptions, 'exec_', lambda x: None)
+    @patch('mslice.presenters.quick_options_presenter.quick_axis_options')
+    def test_axis(self, axis_options_mock):
+        target = "x_axis"
+        quick_options(target, self.model)
+        axis_options_mock.assert_called_once_with(target, self.model, None)
 
     @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
     def test_line_slice(self, qlo_mock):
@@ -52,9 +61,7 @@ class QuickOptionsTest(unittest.TestCase):
         slice_plotter = MagicMock()
         model = SlicePlot(plot_figure, slice_plotter, 'workspace')
         qlo_mock, target = setup_line_values(qlo_mock)
-
-        self.presenter = quick_options(target, model)
-        assert type(self.presenter) is QuickLinePresenter
+        quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
             {'shown': None, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
@@ -81,14 +88,13 @@ class QuickOptionsTest(unittest.TestCase):
         container_mock.containers = [container]
         canvas.figure.gca = MagicMock(return_value=container_mock)
 
-        self.presenter = quick_options(model.get_line_index(target), model)
-        assert type(self.presenter) is QuickLinePresenter
+        quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
             {'shown': True, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
              'marker': 'o', 'legend': True})
         # check model is updated with parameters from view
-        self.assertDictEqual(model.get_line_data(model.get_line_index(target)),
+        self.assertDictEqual(model.get_line_data(target),
                              {'shown': True, 'color': 'blue', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': True})
 
@@ -99,26 +105,19 @@ class QuickOptionsTest(unittest.TestCase):
     @patch.object(QuickAxisOptions, 'grid_state', PropertyMock(return_value=True))
     def test_axis_with_grid(self):
         self.target = 'y_range'
-        self.presenter = quick_options(self.target, self.model)
-        assert type(self.presenter) is QuickAxisPresenter
+        quick_options(self.target, self.model)
         self.assertEquals(self.model.y_grid, True)
 
-    @patch.object(QuickAxisOptions, '__init__', lambda v, w, x, y, z: None)
-    @patch.object(QuickAxisOptions, 'exec_', lambda x: True)
-    @patch.object(QuickAxisOptions, 'range_min', PropertyMock(return_value='0'))
-    @patch.object(QuickAxisOptions, 'range_max', PropertyMock(return_value='10'))
-    def test_axis_no_grid(self):
-        self.target = 'colorbar_range'
-        self.presenter = quick_options(self.target, self.model)
-        assert type(self.presenter) is QuickAxisPresenter
-
-
+@patch('mslice.presenters.quick_options_presenter.QuickAxisOptions')
 class QuickAxisTest(unittest.TestCase):
 
     def setUp(self):
         self.view = MagicMock()
         self.model = MagicMock()
         self.model.canvas.draw = MagicMock()
+        x_grid = PropertyMock(return_value=False)
+        self.model.x_grid = x_grid
+
         range_min = PropertyMock(return_value=5)
         type(self.view).range_min = range_min
         range_max = PropertyMock(return_value=10)
@@ -126,50 +125,58 @@ class QuickAxisTest(unittest.TestCase):
         grid_state = PropertyMock(return_value=True)
         type(self.view).grid_state = grid_state
 
-    def test_accept(self):
+
+    def test_accept(self, quick_axis_options_view):
+        quick_axis_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=True)
-        QuickAxisPresenter(self.view, 'x_range', self.model, False, None)
+        quick_axis_options('x_range', self.model)
         self.assertEquals(self.model.x_range, (5, 10))
         self.assertEquals(self.model.x_grid, True)
 
-    def test_reject(self):
+
+    def test_reject(self, quick_axis_options_view):
+        quick_axis_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=False)
         self.view.set_range = Mock()
-        QuickAxisPresenter(self.view, 'x_range', self.model, False, None)
+        quick_axis_options('x_range', self.model)
         self.view.set_range.assert_not_called()
         self.view.set_grid.assert_not_called()
 
-    def test_colorbar(self):
+
+    def test_colorbar(self, quick_axis_options_view):
+        quick_axis_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=True)
         colorbar_log = PropertyMock()
         type(self.model).colorbar_log = colorbar_log
         self.view.log_scale.isChecked = Mock()
-        QuickAxisPresenter(self.view, 'colorbar_range', self.model, None, True)
+        quick_axis_options('x_range', self.model, True)
         self.view.log_scale.isChecked.assert_called_once()
         colorbar_log.assert_called_once()
 
-
+@patch('mslice.presenters.quick_options_presenter.QuickLabelOptions')
 class QuickLabelTest(unittest.TestCase):
 
     def setUp(self):
         self.view = MagicMock()
         self.model = MagicMock()
-        self.target = MagicMock()
+        self.target = text.Text()
         label = PropertyMock(return_value="label")
         type(self.view).label = label
         self.target.set_text = MagicMock()
 
-    def test_accept(self):
+    def test_accept(self, quick_label_options_view):
+        quick_label_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=True)
-        QuickLabelPresenter(self.view, self.target, self.model)
+        quick_options(self.target, self.model)
         self.target.set_text.assert_called_once_with("label")
 
-    def test_reject(self):
+    def test_reject(self, quick_label_options_view):
+        quick_label_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=False)
-        QuickLabelPresenter(self.view, self.target, self.model)
+        quick_options(self.target, self.model)
         self.target.set_text.assert_not_called()
 
-
+@patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
 class QuickLineTest(unittest.TestCase):
 
     def setUp(self):
@@ -193,25 +200,28 @@ class QuickLineTest(unittest.TestCase):
         label = PropertyMock(return_value=5)
         type(self.view).label = label
 
-    def test_accept(self):
+    def test_accept(self, quick_line_options_view):
+        quick_line_options_view.return_value = self.view
         shown = PropertyMock(return_value=True)
         type(self.view).shown = shown
         legend = PropertyMock(return_value=True)
         type(self.view).legend = legend
         self.view.exec_ = MagicMock(return_value=True)
-        QuickLinePresenter(self.view, self.target, self.model)
+        quick_options(self.target, self.model)
 
-    def test_accept_legend_shown(self):
+    def test_accept_legend_shown(self, quick_line_options_view):
+        quick_line_options_view.return_value = self.view
         shown = PropertyMock(return_value=False)
         type(self.view).shown = shown
         legend = PropertyMock(return_value=False)
         type(self.view).legend = legend
         self.view.exec_ = MagicMock(return_value=True)
-        QuickLinePresenter(self.view, self.target, self.model)
+        quick_options(self.target, self.model)
         values = {'color': 1, 'style': 2, 'width': 3, 'marker': 4, 'label': 5, 'shown': False, 'legend': False}
         self.model.set_line_data.assert_called_once_with(self.target, values)
 
-    def test_reject(self):
+    def test_reject(self, quick_line_options_view):
+        quick_line_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=False)
-        QuickLinePresenter(self.view, self.target, self.model)
-        self.model.set_line_data.assert_not_called()
+        quick_options(self.target, self.model)
+        self.model.set_line_data_by_index.assert_not_called()
