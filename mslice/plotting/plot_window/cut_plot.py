@@ -193,29 +193,29 @@ class CutPlot(object):
             line_containers[line] = container
         return line_containers
 
-    def get_all_line_data(self):
+    def get_all_line_options(self):
         all_line_options = []
         for i in range(len(self._canvas.figure.gca().containers)):
-            line_options = self.get_line_data_by_index(i)
+            line_options = self.get_line_options_by_index(i)
             all_line_options.append(line_options)
         return all_line_options
 
-    def set_all_line_data(self, line_data):
+    def set_all_line_options(self, line_data):
         containers = self._canvas.figure.gca().containers
         for i in range(len(containers)):
-            self.set_line_data_by_index(i, line_data[i])
+            self.set_line_options_by_index(i, line_data[i])
         self.update_legend(line_data)
 
-    def get_line_data(self, line):
+    def get_line_options(self, line):
         index = self._get_line_index(line)
-        return self.get_line_data_by_index(index)
+        return self.get_line_options_by_index(index)
 
-    def get_line_data_by_index(self, index):
+    def get_line_options_by_index(self, line_index):
         line_options = {}
-        container = self._canvas.figure.gca().containers[index]
+        container = self._canvas.figure.gca().containers[line_index]
         line = container.get_children()[0]
         line_options['label'] = container.get_label()
-        line_options['legend'] = self.legend_visible(index)
+        line_options['legend'] = self.legend_visible(line_index)
         line_options['shown'] = True
         line_options['color'] = line.get_color()
         line_options['style'] = line.get_linestyle()
@@ -223,17 +223,17 @@ class CutPlot(object):
         line_options['marker'] = line.get_marker()
         return line_options
 
-    def set_line_data(self, line, line_options):
+    def set_line_options(self, line, line_options):
         index = self._get_line_index(line)
-        self.set_line_data_by_index(index, line_options)
+        self.set_line_options_by_index(index, line_options)
 
-    def set_line_data_by_index(self, index, line_options):
-        container = self._canvas.figure.gca().containers[index]
+    def set_line_options_by_index(self, line_index, line_options):
+        container = self._canvas.figure.gca().containers[line_index]
         container.set_label(line_options['label'])
         main_line = container.get_children()[0]
         main_line.set_linestyle(line_options['style'])
         main_line.set_marker(line_options['marker'])
-        self._legends_visible[index] = bool(line_options['legend'])
+        self._legends_visible[line_index] = bool(line_options['legend'])
         for child in container.get_children():
             child.set_color(line_options['color'])
             child.set_linewidth(line_options['width'])

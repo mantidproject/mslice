@@ -28,7 +28,7 @@ def quick_axis_options(target, model, has_logarithmic=None):
 
 
 def quick_line_options(target, model):
-    view = QuickLineOptions(model.get_line_data(target))
+    view = QuickLineOptions(model.get_line_options(target))
     _run_quick_options(view, _set_line_options, model, target)
 
 
@@ -56,4 +56,4 @@ def _set_line_options(view, model, line):
     values = ['color', 'style', 'width', 'marker', 'label', 'shown', 'legend']
     for value in values:
         line_options[value] = getattr(view, value)
-    model.set_line_data(line, line_options)
+    model.set_line_options(line, line_options)

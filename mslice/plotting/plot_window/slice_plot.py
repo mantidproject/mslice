@@ -297,7 +297,7 @@ class SlicePlot(object):
         self.update_legend()
         self._canvas.draw()
 
-    def get_line_data(self, target):
+    def get_line_options(self, target):
         line_options = {}
         line_options['label'] = target.get_label()
         line_options['legend'] = None
@@ -308,7 +308,7 @@ class SlicePlot(object):
         line_options['marker'] = target.get_marker()
         return line_options
 
-    def set_line_data(self, line, line_options):
+    def set_line_options(self, line, line_options):
         line.set_label(line_options['label'])
         line.set_linestyle(line_options['style'])
         line.set_marker(line_options['marker'])

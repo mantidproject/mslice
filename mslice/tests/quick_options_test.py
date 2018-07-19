@@ -67,7 +67,7 @@ class QuickOptionsTest(unittest.TestCase):
             {'shown': None, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
              'marker': 'o', 'legend': None})
         # check model is updated with parameters from view
-        self.assertDictEqual(model.get_line_data(target),
+        self.assertDictEqual(model.get_line_options(target),
                              {'shown': None, 'color': 'blue', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': None})
 
@@ -94,7 +94,7 @@ class QuickOptionsTest(unittest.TestCase):
             {'shown': True, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
              'marker': 'o', 'legend': True})
         # check model is updated with parameters from view
-        self.assertDictEqual(model.get_line_data(target),
+        self.assertDictEqual(model.get_line_options(target),
                              {'shown': True, 'color': 'blue', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': True})
 
@@ -218,10 +218,10 @@ class QuickLineTest(unittest.TestCase):
         self.view.exec_ = MagicMock(return_value=True)
         quick_options(self.target, self.model)
         values = {'color': 1, 'style': 2, 'width': 3, 'marker': 4, 'label': 5, 'shown': False, 'legend': False}
-        self.model.set_line_data.assert_called_once_with(self.target, values)
+        self.model.set_line_options.assert_called_once_with(self.target, values)
 
     def test_reject(self, quick_line_options_view):
         quick_line_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=False)
         quick_options(self.target, self.model)
-        self.model.set_line_data_by_index.assert_not_called()
+        self.model.set_line_options_by_index.assert_not_called()
