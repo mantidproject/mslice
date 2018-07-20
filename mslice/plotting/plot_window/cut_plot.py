@@ -3,6 +3,7 @@ from itertools import chain
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
+from matplotlib import warnings
 import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
@@ -13,7 +14,8 @@ from mslice.plotting.plot_window.iplot import IPlot
 
 def get_min(data, absolute_minimum=-np.inf):
     """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
-    mask = np.greater(data, absolute_minimum)
+    with warnings.catch_warnings('ignore'):
+        mask = np.greater(data, absolute_minimum)
     return np.min(np.extract(mask, data))
 
 
