@@ -24,10 +24,6 @@ class IPlot(object):
     def update_legend(self):
         pass
 
-    # @abc.abstractmethod
-    # def change_axis_scale(self):
-    #     pass
-
     @abc.abstractmethod
     def get_line_options(self, line):
         pass
