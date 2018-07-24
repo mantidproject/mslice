@@ -12,11 +12,13 @@ import numpy as np
 from scipy import constants
 
 from mslice.models.axis import Axis
+
+from mslice.util.mantid.algorithm_wrapper import wrap_in_ads
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
                                                                remove_workspace, add_workspace)
-from mslice.util.mantid.algorithm_wrapper import add_to_ads
 from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus
 from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 
 # -----------------------------------------------------------------------------
@@ -69,9 +71,7 @@ def _processLoadedWSLimits(workspace):
 def process_limits(ws):
     en = ws.raw_ws.getAxis(0).extractValues()
     theta = _get_theta_for_limits(ws)
-    # Use minimum energy (Direct geometry) or maximum energy (Indirect) to get qmax
-    emax = -np.min(en) if (str(ws.e_mode == 'Direct')) else np.max(en)
-    qmin, qmax, qstep = get_q_limits(theta, emax, ws.e_fixed)
+    qmin, qmax, qstep = get_q_limits(theta, en, ws.e_fixed)
     set_limits(ws, qmin, qmax, qstep, theta, np.min(en), np.max(en), np.mean(np.diff(en)))
 
 
@@ -107,35 +107,30 @@ def _get_property_from_history(name, history):
     return None
 
 
-def get_q_limits(theta, emax, efix):
-    qmin, qmax, qstep = tuple(np.sqrt(E2q * 2 * efix * (1 - np.cos(theta)) * meV2J) / m2A)
-    qmax = np.sqrt(E2q * (2 * efix + emax - 2 * np.sqrt(efix * (efix + emax)) * np.cos(theta[1])) * meV2J) / m2A
+def get_q_limits(theta, en, efix):
+    #calculates the Q(E) line for the given two theta and then finds the min and max values
+    qlines = [np.sqrt(E2q * (2 * efix - en - 2 * np.sqrt(efix * (efix - en)) * np.cos(tth)) * meV2J) / 1e10 for tth in theta[:2]]
+    qmin = np.nanmin(qlines[0])
+    qmax = np.nanmax(qlines[1])
+    const_tth = np.radians(0.5)
+    qstep = np.sqrt(E2q * 2 * efix * (1 - np.cos(const_tth)) * meV2J) / m2A
+    qmin -= qstep
+    qmax += qstep
     return qmin, qmax, qstep
 
 
 def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
-    # Use a step size a bit smaller than angular spacing ( / 3) so user can rebin if they want...
-    ws.limits['MomentumTransfer'] = [qmin - qstep, qmax + qstep, qstep / 3]
+
+    ws.limits['MomentumTransfer'] = [qmin, qmax, qstep]
     ws.limits['|Q|'] = ws.limits['MomentumTransfer']  # ConvertToMD renames it(!)
     ws.limits['2Theta'] = theta * 180 / np.pi
     ws.limits['DeltaE'] = [emin, emax, estep]
 
 
 def _get_theta_for_limits(ws):
-    # Don't parse all spectra in cases where there are a lot to save time.
     num_hist = ws.raw_ws.getNumberHistograms()
-    if num_hist > 1000:
-        n_segments = 5
-        interval = int(num_hist / n_segments)
-        theta = []
-        for segment in range(n_segments):
-            i0 = segment * interval
-            theta.append([ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i))
-                          for i in range(i0, i0+200)])
-        round_fac = 573
-    else:
-        theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_hist)]
-        round_fac = 100
+    theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_hist)]
+    round_fac = 100
     ws.is_PSD = not all(x < y for x, y in zip(theta, theta[1:]))
     # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
     thdiff = np.diff(np.round(np.sort(theta)*round_fac)/round_fac)
@@ -178,7 +173,7 @@ def rename_workspace(selected_workspace, new_name):
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
     workspace_names = [workspace.name for workspace in workspaces]
-    with add_to_ads(workspaces):
+    with wrap_in_ads(workspaces):
         ws = MergeMD(OutputWorkspace=new_name, InputWorkspaces=workspace_names)
     propagate_properties(workspaces[0], ws)
     # Set limits for result workspace. Use precalculated step size, otherwise get limits directly from Mantid workspace
@@ -197,7 +192,7 @@ def combine_workspace(selected_workspaces, new_name):
 def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
     workspaces = [get_workspace_handle(ws) for ws in selected_ws]
-    with add_to_ads(workspaces):
+    with wrap_in_ads(workspaces):
         sum_ws = MergeRuns(OutputWorkspace=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
@@ -236,12 +231,24 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
         _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd)
 
 
+def export_workspace_to_ads(workspace):
+    '''
+    Exports an MSlice workspace to ADS. If the workspace is MDHisto, convert it to Matrix
+    :param workspace: name of MSlice workspace to export to ADS
+    '''
+    workspace = get_workspace_handle(workspace)
+    if isinstance(workspace, HistogramWorkspace):
+        with wrap_in_ads([workspace]):
+            workspace = workspace.convert_to_matrix()
+    add_to_ads(workspace)
+
+
 def _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd):
     slice = False
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
     workspace = get_workspace_handle(workspace)
-    non_psd_slice = slice_nonpsd and not workspace.is_PSD and isinstance(workspace, MatrixWorkspace)
+    non_psd_slice = slice_nonpsd and isinstance(workspace, MatrixWorkspace) and not workspace.is_PSD
     if is_pixel_workspace(workspace) or non_psd_slice:
         slice = True
         workspace = _get_slice_mdhisto(workspace, get_workspace_name(workspace))
@@ -249,14 +256,13 @@ def _save_single_ws(workspace, save_name, save_method, path, extension, slice_no
 
 
 def _get_slice_mdhisto(workspace, ws_name):
-    from mslice.models.slice.mantid_slice_algorithm import MantidSliceAlgorithm
+    from mslice.models.slice.slice_functions import compute_slice
     try:
         return get_workspace_handle('__' + ws_name)
     except KeyError:
-        slice_alg = MantidSliceAlgorithm()
         x_axis = get_axis_from_dimension(workspace, ws_name, 0)
         y_axis = get_axis_from_dimension(workspace, ws_name, 1)
-        slice_alg.compute_slice(ws_name, x_axis, y_axis, False)
+        compute_slice(ws_name, x_axis, y_axis, False)
         return get_workspace_handle('__' + ws_name)
 
 
@@ -341,6 +347,7 @@ def propagate_properties(old_workspace, new_workspace):
     new_workspace.e_mode = old_workspace.e_mode
     new_workspace.limits = old_workspace.limits
     new_workspace.is_PSD = old_workspace.is_PSD
+    new_workspace.e_fixed = old_workspace.e_fixed
 
 
 def get_comment(workspace):

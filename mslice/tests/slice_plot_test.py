@@ -11,11 +11,13 @@ class SlicePlotTest(unittest.TestCase):
 
     def setUp(self):
         self.plot_figure = MagicMock()
-        self.canvas = MagicMock()
+        self.plot_figure.window = MagicMock()
+        canvas = MagicMock()
+        self.plot_figure.window.canvas = canvas
         self.slice_plotter = MagicMock()
         self.axes = MagicMock()
-        self.canvas.figure.gca = MagicMock(return_value=self.axes)
-        self.slice_plot = SlicePlot(self.plot_figure, self.canvas, self.slice_plotter, "workspace")
+        canvas.figure.gca = MagicMock(return_value=self.axes)
+        self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
 
     def test_change_logarithmic(self):
         image = MagicMock()
@@ -51,26 +53,21 @@ class SlicePlotTest(unittest.TestCase):
         self.slice_plotter.overplot_lines.__getitem__ = MagicMock(return_value={0: line1, 1: line2})
         self.slice_plotter.get_recoil_label = MagicMock()
         self.slice_plotter.get_recoil_label.side_effect = ['0', '1']
-        action0 = PropertyMock()
-        type(self.slice_plot).action0 = action0
-        action1 = PropertyMock()
-        type(self.slice_plot).action1 = action1
         self.slice_plot.reset_info_checkboxes()
-        self.plot_figure.action0.setChecked.assert_called_once_with(False)
-        self.plot_figure.action1.setChecked.assert_not_called()
+        self.slice_plot.plot_window.disable_action.assert_called_once_with('0')
 
     def test_lines_redrawn(self):
-        self.slice_plot.toggle_overplot_line(self.slice_plot.plot_figure.actionHelium, 4, True, True)
-        new_slice_plot = SlicePlot(self.plot_figure, self.canvas, self.slice_plotter, "workspace")
+        self.slice_plot.toggle_overplot_line(self.slice_plot.plot_window.action_helium, 4, True, True)
+        new_slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
 
-        self.assertTrue(new_slice_plot.plot_figure.actionHelium.checked)
+        self.assertTrue(new_slice_plot.plot_window.action_helium.checked)
         self.slice_plotter.add_overplot_line.assert_any_call('workspace', 4, True, '')
 
     @patch('mslice.plotting.plot_window.slice_plot.QtWidgets.QInputDialog.getInt')
     def test_arbitrary_recoil_line(self, qt_get_int_mock):
         qt_get_int_mock.return_value = (5, True)
         self.slice_plotter.add_overplot_line.reset_mock()
-        self.plot_figure.actionArbitrary_nuclei.isChecked = MagicMock(return_value=True)
+        self.plot_figure.action_arbitrary_nuclei.isChecked = MagicMock(return_value=True)
 
         self.slice_plot.arbitrary_recoil_line()
         self.slice_plotter.add_overplot_line.assert_called_once_with('workspace', 5, True, None)
@@ -79,7 +76,7 @@ class SlicePlotTest(unittest.TestCase):
     def test_arbitrary_recoil_line_cancelled(self, qt_get_int_mock):
         qt_get_int_mock.return_value = (5, False)
         self.slice_plotter.add_overplot_line.reset_mock()
-        self.plot_figure.actionArbitrary_nuclei.isChecked = MagicMock(return_value=True)
+        self.plot_figure.action_arbitrary_nuclei.isChecked = MagicMock(return_value=True)
 
         self.slice_plot.arbitrary_recoil_line()
         self.slice_plotter.add_overplot_line.assert_not_called()

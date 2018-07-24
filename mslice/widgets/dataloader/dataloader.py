@@ -123,6 +123,9 @@ class DataLoaderWidget(QWidget): # and some view interface
     def error_unable_to_open_file(self, filename=None):
         self._display_error('MSlice was not able to load %s' % ('the selected file' if filename is None else filename))
 
+    def error_merge_different_file_formats(self):
+        self._display_error('Cannot merge files with different formats')
+
     def no_workspace_has_been_loaded(self, filename=None):
         if filename is None:
             self._display_error('No new workspaces have been loaded')

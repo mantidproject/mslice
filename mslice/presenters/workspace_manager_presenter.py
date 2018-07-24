@@ -5,7 +5,7 @@ from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces,
+from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads,
                                                                  rename_workspace, subtract,
                                                                  is_pixel_workspace, combine_workspace,
                                                                  add_workspace_runs)
@@ -50,6 +50,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._add_workspaces()
             elif command  == Command.Subtract:
                 self._subtract_workspace()
+            elif command == Command.SaveToADS:
+                self._save_to_ads()
             else:
                 raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
 
@@ -93,7 +95,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             save_directory, save_name, extension = get_save_directory(multiple_files=len(selected_workspaces) > 1,
                                                                       save_as_image=False, default_ext=extension)
         except RuntimeError as e:
-            if e.message == "dialog cancelled":
+            if str(e) == "dialog cancelled":
                 return
             else:
                 raise RuntimeError(e)
@@ -105,6 +107,14 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             save_workspaces(selected_workspaces, save_directory, save_name, extension)
         except RuntimeError:
             self._workspace_manager_view.error_unable_to_save()
+
+    def _save_to_ads(self):
+        selected_workspaces = self._workspace_manager_view.get_workspace_selected()
+        if not selected_workspaces:
+            self._workspace_manager_view.error_select_one_or_more_workspaces()
+            return
+        for workspace in selected_workspaces:
+            export_workspace_to_ads(workspace)
 
     def _remove_selected_workspaces(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
@@ -154,7 +164,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         try:
             add_workspace_runs(selected_ws)
         except ValueError as e:
-            self._workspace_manager_view.display_error(str(e))
+            self._workspace_manager_view._display_error(str(e))
         self.update_displayed_workspaces()
 
     def _subtract_workspace(self):
@@ -169,7 +179,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         try:
             subtract(selected_workspaces, background_ws, ssf)
         except ValueError as e:
-            self._workspace_manager_view.display_error(str(e))
+            self._workspace_manager_view._display_error(str(e))
         self.update_displayed_workspaces()
 
     def get_selected_workspaces(self):

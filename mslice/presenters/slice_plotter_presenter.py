@@ -1,8 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
-from mslice.models.alg_workspace_ops import get_available_axis, get_axis_range
+from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
 from mslice.models.slice.slice_plotter import SlicePlotter
+from mslice.models.slice.slice_functions import is_sliceable
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.slice_plotter_view import SlicePlotterView
@@ -46,10 +47,10 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_view.error_select_one_workspace()
             return
         selected_workspace = selected_workspaces[0]
-        try:
-            x_axis, y_axis = self.get_axes()
-        except ValueError:
+        axes = self.validate_axes()
+        if (not axes):
             return
+        x_axis, y_axis = axes
         intensity_start = self._slice_view.get_slice_intensity_start()
         intensity_end = self._slice_view.get_slice_intensity_end()
         norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
@@ -73,6 +74,8 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
                                            norm_to_one, colourmap)
         except RuntimeError as e:
+            import traceback
+            traceback.print_exc(e)
             self._slice_view.error(e.args[0])
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
@@ -83,29 +86,23 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
                 raise e
             self._slice_view.error_invalid_intensity_params()
 
-    def get_axes(self):
+
+    def validate_axes(self):
         try:
             x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
                           self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
         except ValueError:
             self._slice_view.error_invalid_x_params()
-            raise ValueError
+            return False
         try:
             y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
                           self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
         except ValueError:
             self._slice_view.error_invalid_y_params()
-            raise ValueError
-        status = self._process_axis(x_axis, y_axis)
-        if status == INVALID_Y_PARAMS:
-            self._slice_view.error_invalid_y_params()
-            raise ValueError
-        elif status == INVALID_X_PARAMS:
-            self._slice_view.error_invalid_x_params()
-            raise ValueError
-        elif status == INVALID_PARAMS:
+            return False
+        if x_axis.units == y_axis.units:
             self._slice_view.error_invalid_plot_parameters()
-            raise ValueError
+            return False
         return x_axis, y_axis
 
     @require_main_presenter
@@ -126,7 +123,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def workspace_selection_changed(self):
         workspace_selection = self._get_main_presenter().get_selected_workspaces()
-        if len(workspace_selection) != 1 or not self._slice_plotter.is_sliceable(workspace_selection[0]):
+        if len(workspace_selection) != 1 or not is_sliceable(workspace_selection[0]):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
         else:
@@ -135,7 +132,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
             self._slice_view.enable()
             self._slice_view.enable_units_choice(non_psd)
-            axis = get_available_axis(get_workspace_handle(workspace_selection))
+            axis = get_available_axes(get_workspace_handle(workspace_selection))
             self._slice_view.populate_slice_x_options(axis)
             self._slice_view.populate_slice_y_options(axis[::-1])
             self.populate_slice_params()

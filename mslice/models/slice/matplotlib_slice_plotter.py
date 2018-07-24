@@ -1,22 +1,22 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
-from .slice_plotter import SlicePlotter
-import mslice.plotting.pyplot as plt
-from mslice.util import MPL_COMPAT
-from mslice.models.workspacemanager.workspace_algorithms import get_comment
-from ..labels import get_display_name, recoil_labels
 
-overplot_colors={1:'b', 2:'g', 4:'r', 'Aluminium': 'g', 'Copper':'m', 'Niobium':'y', 'Tantalum':'b'}
-picker=5
+from mslice.models.cmap import allowed_cmaps
+from mslice.models.labels import get_display_name, recoil_labels
+from mslice.models.slice.slice_plotter import SlicePlotter
+from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
+                                                 compute_chi_magnetic, compute_gdos, compute_d2sigma,
+                                                 compute_powder_line, compute_chi, compute_symmetrised)
+from mslice.models.workspacemanager.workspace_algorithms import get_comment
+import mslice.plotting.pyplot as plt
+
+OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
+PICKER_TOL_PTS = 5
 
 
 class MatplotlibSlicePlotter(SlicePlotter):
 
-    def __init__(self, slice_algorithm):
-        self._slice_algorithm = slice_algorithm
-        self._colormaps = ['jet', 'summer', 'winter', 'coolwarm']
-        if not MPL_COMPAT:
-            self._colormaps.insert(0, 'viridis')
+    def __init__(self):
         self.listener = None
         self.slice_cache = {}
         self._sample_temp_fields = []
@@ -24,17 +24,17 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
-        sample_temp = self._slice_algorithm.sample_temperature(selected_ws, self._sample_temp_fields)
-        plot_data, boundaries = self._slice_algorithm.compute_slice(selected_ws, x_axis, y_axis,
-                                                                    norm_to_one)
+        sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
+        plot_data, boundaries = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._cache_slice(plot_data, selected_ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis)
         if selected_ws not in self.overplot_lines:
             self.overplot_lines[selected_ws] = {}
         self.show_scattering_function(selected_ws)
-        plt.gcf().canvas.set_window_title(selected_ws)
-        plt.gcf().canvas.manager.add_slice_plot(self, selected_ws)
-        plt.gcf().canvas.manager.update_grid()
+        fig_canvas = plt.gcf().canvas
+        fig_canvas.set_window_title(selected_ws)
+        fig_canvas.manager.add_slice_plot(self, selected_ws)
+        fig_canvas.manager.update_grid()
         plt.draw_all()
 
     def _cache_slice(self, plot_data, ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis):
@@ -49,10 +49,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
             self.slice_cache[ws]['energy_axis'] = x_axis
             self.slice_cache[ws]['rotated'] = True
 
+    @plt.set_category(plt.CATEGORY_SLICE)
     def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
-        plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
-                   interpolation='none', hold=False)
-        plt.title(workspace_name, picker=picker)
+        # Clear out the artists in the image Axes - same as was ishold=False used to do
+        # Do not call plt.gcf() here as the overplot Line1D objects have been cached and they
+        # must be redrawn on the same Axes instance
+        plot_axes = plt.gca()
+        plot_axes.cla()
+        image = plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
+                           interpolation='none')
+        plot_axes.set_title(workspace_name, picker=PICKER_TOL_PTS)
         if self.slice_cache[workspace_name]['rotated']:
             x_axis = energy_axis
             y_axis = momentum_axis
@@ -60,13 +66,26 @@ class MatplotlibSlicePlotter(SlicePlotter):
             x_axis = momentum_axis
             y_axis = energy_axis
         comment = get_comment(str(workspace_name))
-        plt.xlabel(get_display_name(x_axis.units, comment), picker=picker)
-        plt.ylabel(get_display_name(y_axis.units, comment), picker=picker)
-        plt.xlim(x_axis.start)
-        plt.ylim(y_axis.start)
-        plt.gcf().get_axes()[1].set_ylabel('Intensity (arb. units)', labelpad=20, rotation=270, picker=picker)
-        plt.gca().get_xaxis().set_units(x_axis.units)
-        plt.gca().get_yaxis().set_units(y_axis.units)
+        # labels
+        plot_axes.set_xlabel(get_display_name(x_axis.units, comment), picker=PICKER_TOL_PTS)
+        plot_axes.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
+        plot_axes.set_xlim(x_axis.start)
+        plot_axes.set_ylim(y_axis.start)
+        plot_axes.get_xaxis().set_units(x_axis.units)
+        plot_axes.get_yaxis().set_units(y_axis.units)
+
+        # colorbar - have we plotted one previously?
+        try:
+            cb_axes = plt.gcf().get_axes()[1]
+        except IndexError:
+            cb_axes = None
+        if cb_axes is None:
+            cb = plt.colorbar(image, ax=plot_axes)
+        else:
+            cb = plt.colorbar(image, cax=cb_axes)
+        cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
+        plt.gcf().canvas.draw_idle()
+        plt.show()
 
     def show_scattering_function(self, workspace):
         cached_slice = self.slice_cache[workspace]
@@ -126,16 +145,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
         else:
             momentum_axis = self.slice_cache[workspace]['momentum_axis']
             if recoil:
-                x, y = self._slice_algorithm.compute_recoil_line(workspace, momentum_axis, key)
+                x, y = compute_recoil_line(workspace, momentum_axis, key)
             else:
-                x, y = self._slice_algorithm.compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
-            color = overplot_colors[key] if key in overplot_colors else 'c'
+                x, y = compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
+            color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
             if self.slice_cache[workspace]['rotated']:
                 self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label,
-                                                                     alpha=.7, picker=picker)[0]
+                                                                     alpha=.7, picker=PICKER_TOL_PTS)[0]
             else:
                 self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label,
-                                                                     alpha=.7, picker=picker)[0]
+                                                                     alpha=.7, picker=PICKER_TOL_PTS)[0]
 
     def hide_overplot_line(self, workspace, key):
         if key in self.overplot_lines[workspace]:
@@ -148,7 +167,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self._sample_temp_fields.append(field_name)
 
     def update_sample_temperature(self, workspace):
-        temp = self._slice_algorithm.sample_temperature(workspace, self._sample_temp_fields)
+        temp = sample_temperature(workspace, self._sample_temp_fields)
         self.slice_cache[workspace]['sample_temp'] = temp
 
     def set_sample_temperature(self, workspace, temp):
@@ -164,42 +183,37 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def compute_chi(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][1] = self._slice_algorithm.compute_chi(
-            cached_slice['plot_data'][0], self.sample_temperature(workspace),
-            cached_slice['energy_axis'], cached_slice['rotated'])
+        cached_slice['plot_data'][1] = compute_chi(cached_slice['plot_data'][0], self.sample_temperature(workspace),
+                                                   cached_slice['energy_axis'], cached_slice['rotated'])
 
     def compute_chi_magnetic(self, workspace):
         cached_slice = self.slice_cache[workspace]
         if cached_slice['plot_data'][1] is None:
             self.compute_chi(workspace)
-        cached_slice['plot_data'][2] = self._slice_algorithm.compute_chi_magnetic(
-            cached_slice['plot_data'][1])
+        cached_slice['plot_data'][2] = compute_chi_magnetic(cached_slice['plot_data'][1])
 
     def compute_d2sigma(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][3] = self._slice_algorithm.compute_d2sigma(
-            cached_slice['plot_data'][0], workspace, cached_slice['energy_axis'], cached_slice['rotated'])
+        cached_slice['plot_data'][3] = compute_d2sigma(cached_slice['plot_data'][0],
+                                                       workspace, cached_slice['energy_axis'], cached_slice['rotated'])
 
     def compute_symmetrised(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][4] = self._slice_algorithm.compute_symmetrised(
-            cached_slice['plot_data'][0], self.sample_temperature(workspace),
-            cached_slice['energy_axis'], cached_slice['rotated'])
+        cached_slice['plot_data'][4] = compute_symmetrised(cached_slice['plot_data'][0],
+                                                           self.sample_temperature(workspace),
+                                                           cached_slice['energy_axis'], cached_slice['rotated'])
 
     def compute_gdos(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][5] = self._slice_algorithm.compute_gdos(
-            cached_slice['plot_data'][0], self.sample_temperature(workspace),
-            cached_slice['momentum_axis'], cached_slice['energy_axis'], cached_slice['rotated'])
+        cached_slice['plot_data'][5] = compute_gdos(cached_slice['plot_data'][0], self.sample_temperature(workspace),
+                                                    cached_slice['momentum_axis'], cached_slice['energy_axis'],
+                                                    cached_slice['rotated'])
 
     def get_available_colormaps(self):
-        return self._colormaps
+        return allowed_cmaps()
 
     def get_recoil_label(self, key):
         return recoil_labels[key]
-
-    def is_sliceable(self, workspace):
-        return self._slice_algorithm.is_sliceable(workspace)
 
     def update_displayed_workspaces(self):
         self.listener.update_workspaces()

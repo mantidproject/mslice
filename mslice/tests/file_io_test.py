@@ -7,7 +7,7 @@ from tempfile import gettempdir
 import unittest
 from mantid.simpleapi import CreateMDHistoWorkspace
 
-from mslice.models.cut.mantid_cut_algorithm import output_workspace_name
+from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.file_io import _save_cut_to_ascii, _save_slice_to_ascii, get_save_directory
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 

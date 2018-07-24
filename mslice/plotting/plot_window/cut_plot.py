@@ -12,9 +12,10 @@ from .plot_options import CutPlotOptions
 
 class CutPlot(object):
 
-    def __init__(self, plot_figure, canvas, cut_plotter, workspace):
-        self.plot_figure = plot_figure
-        self._canvas = canvas
+    def __init__(self, figure_manager, cut_plotter, workspace):
+        self.manager = figure_manager
+        self.plot_window = figure_manager.window
+        self._canvas = self.plot_window.canvas
         self._cut_plotter = cut_plotter
         self._lines_visible = {}
         self._legends_shown = True
@@ -22,18 +23,23 @@ class CutPlot(object):
         self._legend_dict = {}
         self.ws_name = workspace
         self._lines = self.line_containers()
-        self.setup_connections(plot_figure)
+        self.setup_connections(self.plot_window)
 
-    def setup_connections(self, plot_figure):
-        plot_figure.menuIntensity.setDisabled(True)
-        plot_figure.menuInformation.setDisabled(True)
-        plot_figure.actionSave_Cut.triggered.connect(self.save_icut)
-        plot_figure.actionFlip_Axis.setVisible(False)
-        plot_figure.actionFlip_Axis.triggered.connect(self.flip_icut)
+    def window_closing(self):
+        self._canvas.figure.clf()
 
-    def disconnect(self, plot_figure):
-        plot_figure.actionSave_Cut.triggered.disconnect()
-        plot_figure.actionFlip_Axis.triggered.disconnect()
+    def setup_connections(self, plot_window):
+        plot_window.menu_intensity.setDisabled(True)
+        plot_window.menu_information.setDisabled(True)
+        plot_window.action_interactive_cuts.setVisible(False)
+        plot_window.action_save_cut.setVisible(False)
+        plot_window.action_save_cut.triggered.connect(self.save_icut)
+        plot_window.action_flip_axis.setVisible(False)
+        plot_window.action_flip_axis.triggered.connect(self.flip_icut)
+
+    def disconnect(self, plot_window):
+        plot_window.action_save_cut.triggered.disconnect()
+        plot_window.action_flip_axis.triggered.disconnect()
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
@@ -41,13 +47,13 @@ class CutPlot(object):
             self._canvas.draw()
 
     def is_icut(self, is_icut):
-        self.plot_figure.actionSave_Cut.setVisible(is_icut)
-        self.plot_figure.actionPlotOptions.setVisible(not is_icut)
-        self.plot_figure.actionToggleLegends.setVisible(not is_icut)
-        self.plot_figure.actionKeep.setVisible(not is_icut)
-        self.plot_figure.actionMakeCurrent.setVisible(not is_icut)
-        self.plot_figure.actionFlip_Axis.setVisible(is_icut)
-        self.plot_figure.show()
+        self.plot_window.action_save_cut.setVisible(is_icut)
+        self.plot_window.action_plot_options.setVisible(not is_icut)
+        self.plot_window.keep_make_current_seperator.setVisible(not is_icut)
+        self.plot_window.action_keep.setVisible(not is_icut)
+        self.plot_window.action_make_current.setVisible(not is_icut)
+        self.plot_window.action_flip_axis.setVisible(is_icut)
+        self.plot_window.show()
 
     def save_icut(self):
         icut = self._cut_plotter.get_icut()
@@ -267,10 +273,6 @@ class CutPlot(object):
             self._lines_visible[line_index] = True
             return True
 
-    def close_event(self, event):
-        self._canvas.figure.clf()
-        event.accept()
-
     @property
     def x_log(self):
         return 'log' in self._canvas.figure.gca().get_xscale()
@@ -311,56 +313,56 @@ class CutPlot(object):
 
     @property
     def title(self):
-        return self.plot_figure.title
+        return self.manager.title
 
     @title.setter
     def title(self, value):
-        self.plot_figure.title = value
+        self.manager.title = value
 
     @property
     def x_label(self):
-        return self.plot_figure.x_label
+        return self.manager.x_label
 
     @x_label.setter
     def x_label(self, value):
-        self.plot_figure.x_label = value
+        self.manager.x_label = value
 
     @property
     def y_label(self):
-        return self.plot_figure.y_label
+        return self.manager.y_label
 
     @y_label.setter
     def y_label(self, value):
-        self.plot_figure.y_label = value
+        self.manager.y_label = value
 
     @property
     def x_range(self):
-        return self.plot_figure.x_range
+        return self.manager.x_range
 
     @x_range.setter
     def x_range(self, value):
-        self.plot_figure.x_range = value
+        self.manager.x_range = value
 
     @property
     def y_range(self):
-        return self.plot_figure.y_range
+        return self.manager.y_range
 
     @y_range.setter
     def y_range(self, value):
-        self.plot_figure.y_range = value
+        self.manager.y_range = value
 
     @property
     def x_grid(self):
-        return self.plot_figure.x_grid
+        return self.manager.x_grid
 
     @x_grid.setter
     def x_grid(self, value):
-        self.plot_figure.x_grid = value
+        self.manager.x_grid = value
 
     @property
     def y_grid(self):
-        return self.plot_figure.y_grid
+        return self.manager.y_grid
 
     @y_grid.setter
     def y_grid(self, value):
-        self.plot_figure.y_grid = value
+        self.manager.y_grid = value

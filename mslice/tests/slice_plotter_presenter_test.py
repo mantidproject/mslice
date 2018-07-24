@@ -105,7 +105,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
         self.slice_view.get_slice_x_axis.return_value = 'x'
         self.slice_view.get_slice_x_start.return_value = '0'
-        self.slice_view.get_slice_x_end.return_value = 'aa' # invalid
+        self.slice_view.get_slice_x_end.return_value = 'aa'  # invalid
         self.slice_view.get_slice_x_step.return_value = '1'
         self.slice_view.get_slice_y_axis.return_value = 'y'
         self.slice_view.get_slice_y_start.return_value = '2'
@@ -118,14 +118,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
-        assert(not self.slice_plotter.plot_slice.called)
         self.slice_view.error_invalid_x_params.assert_called_once_with()
+        assert(not self.slice_plotter.plot_slice.called)
 
     def test_plot_slice_x_start_bigger_than_x_stop_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x','2','1','.1')
-        y = Axis('y','2','8','3')
         intensity_start = '7'
         intensity_end = '8'
         norm_to_one = '9'
@@ -133,14 +131,14 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value = x.units
-        self.slice_view.get_slice_x_start.return_value = x.start
-        self.slice_view.get_slice_x_end.return_value = x.end
-        self.slice_view.get_slice_x_step.return_value = x.step
-        self.slice_view.get_slice_y_axis.return_value = y.units
-        self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value = y.end
-        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_x_axis.return_value = 'x'
+        self.slice_view.get_slice_x_start.return_value = '2'
+        self.slice_view.get_slice_x_end.return_value = '1' # invalid
+        self.slice_view.get_slice_x_step.return_value = '.1'
+        self.slice_view.get_slice_y_axis.return_value = 'y'
+        self.slice_view.get_slice_y_start.return_value = '2'
+        self.slice_view.get_slice_y_end.return_value = '8'
+        self.slice_view.get_slice_y_step.return_value = '3'
         self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
@@ -176,14 +174,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_colourmap.return_value = colourmap
 
         self.slice_plotter_presenter.notify(Command.DisplaySlice)
+        self.slice_view.error_invalid_y_params()
         assert(not self.slice_plotter.plot_slice.called)
-        self.slice_view.error_invalid_y_params.assert_called_once_with()
 
     def test_plot_slice_invalid_y_params_y_end_less_than_y_start_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x','0','7','1')
-        y = Axis('y','20','8','3')
         intensity_start = '7'
         intensity_end = '8'
         norm_to_one = '9'
@@ -191,14 +187,14 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value = x.units
-        self.slice_view.get_slice_x_start.return_value = x.start
-        self.slice_view.get_slice_x_end.return_value = x.end
-        self.slice_view.get_slice_x_step.return_value = x.step
-        self.slice_view.get_slice_y_axis.return_value = y.units
-        self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value = y.end
-        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_x_axis.return_value = 'x'
+        self.slice_view.get_slice_x_start.return_value = '0'
+        self.slice_view.get_slice_x_end.return_value = '7'
+        self.slice_view.get_slice_x_step.return_value = '1'
+        self.slice_view.get_slice_y_axis.return_value = 'y'
+        self.slice_view.get_slice_y_start.return_value = '20' # invalid
+        self.slice_view.get_slice_y_end.return_value = '8'
+        self.slice_view.get_slice_y_step.return_value = '3'
         self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
@@ -212,23 +208,21 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_plot_slice_invalid_intensity_params_fail(self):
         self.slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         self.slice_plotter_presenter.register_master(self.main_presenter)
-        x = Axis('x','0','7','1')
-        y = Axis('y','2','8','3')
         intensity_start = '7'
-        intensity_end = "j"
+        intensity_end = "j" #invalid
         norm_to_one = '9'
         smoothing = '10'
         colourmap = 'colormap'
         selected_workspace = 'workspace1'
         self.main_presenter.get_selected_workspaces.return_value = [selected_workspace]
-        self.slice_view.get_slice_x_axis.return_value = x.units
-        self.slice_view.get_slice_x_start.return_value = x.start
-        self.slice_view.get_slice_x_end.return_value = x.end
-        self.slice_view.get_slice_x_step.return_value = x.step
-        self.slice_view.get_slice_y_axis.return_value = y.units
-        self.slice_view.get_slice_y_start.return_value = y.start
-        self.slice_view.get_slice_y_end.return_value = y.end
-        self.slice_view.get_slice_y_step.return_value = y.step
+        self.slice_view.get_slice_x_axis.return_value = 'x'
+        self.slice_view.get_slice_x_start.return_value = '0'
+        self.slice_view.get_slice_x_end.return_value = '7'
+        self.slice_view.get_slice_x_step.return_value = '1'
+        self.slice_view.get_slice_y_axis.return_value = 'y'
+        self.slice_view.get_slice_y_start.return_value = '2'
+        self.slice_view.get_slice_y_end.return_value = '8'
+        self.slice_view.get_slice_y_step.return_value = '3'
         self.slice_view.get_slice_intensity_start.return_value = intensity_start
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
@@ -337,10 +331,12 @@ class SlicePlotterPresenterTest(unittest.TestCase):
 
     @mock.patch('mslice.presenters.slice_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.models.alg_workspace_ops.get_workspace_handle')
-    @mock.patch('mslice.presenters.slice_plotter_presenter.get_available_axis')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.get_available_axes')
     @mock.patch('mslice.presenters.slice_plotter_presenter.get_axis_range')
-    def test_workspace_selection_changed(self, get_axis_range_mock, get_available_axis_mock, get_ws_handle_mock,
-                                         get_ws_handle_mock2):
+    @mock.patch('mslice.presenters.slice_plotter_presenter.is_sliceable')
+    def test_workspace_selection_changed(self, is_sliceable_mock, get_axis_range_mock, get_available_axes_mock,
+                                         get_ws_handle_mock, get_ws_handle_mock2):
+
         slice_plotter_presenter = SlicePlotterPresenter( self.slice_view, self.slice_plotter )
         slice_plotter_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
@@ -348,13 +344,14 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         ws_mock = mock.Mock()
         get_ws_handle_mock.return_value = ws_mock
         get_ws_handle_mock2.return_value = ws_mock
+        is_sliceable_mock.return_value = True
         dims = ['dim1', 'dim2']
-        get_available_axis_mock.return_value=dims
+        get_available_axes_mock.return_value=dims
         get_axis_range_mock.return_value = (0, 1, 0.1)
         slice_plotter_presenter.workspace_selection_changed()
         assert(self.slice_view.populate_slice_x_options.called)
         assert(self.slice_view.populate_slice_y_options.called)
-        assert(get_available_axis_mock.called)
+        assert(get_available_axes_mock.called)
         assert(get_axis_range_mock.called)
         # Test error handling
         get_axis_range_mock.side_effect = KeyError
