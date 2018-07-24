@@ -6,44 +6,18 @@
 
 # Mantid Tools imported for convenience
 from __future__ import (absolute_import, division, print_function)
-<<<<<<< HEAD
-=======
-from mantid.api import IMDWorkspace as _IMDWorkspace
-from mantid.api import Workspace as _Workspace
-from mantid.kernel.funcinspect import lhs_info as _lhs_info
-from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F401
-
-# Helper tools
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.presenters.slice_plotter_presenter import Axis as _Axis
-# Projections
-from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
-# Slicing
-from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
-import mslice.models.slice.slice_functions as _SLICE_ALGORITHM
-# Cutting
-import mslice.models.cut.cut_functions as _CUT_ALGORITHM
-from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
->>>>>>> 82c4fae1356f770d5f8ad59edea4bd5f58206190
 
 import os.path as ospath
 
 import mslice.app as app
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
-from mslice.models.alg_workspace_ops import get_axis_range, get_available_axis
+from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.util.mantid import mantid_algorithms
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
-
-<<<<<<< HEAD
-=======
-_POWDER_PROJECTION_MODEL = _MantidProjectionCalculator()
-_SLICE_MODEL = _MatplotlibSlicePlotter()
-_CUT_PLOTTER = MatplotlibCutPlotter()
->>>>>>> 82c4fae1356f770d5f8ad59edea4bd5f58206190
 
 # -----------------------------------------------------------------------------
 # Convenience functions
@@ -70,7 +44,7 @@ def _string_to_integration_axis(string):
     return valid_axis
 
 def _process_axis(axis, fallback_index, input_workspace, string_function=_string_to_axis):
-    available_axes = get_available_axis(input_workspace)
+    available_axes = get_available_axes(input_workspace)
     if axis is None:
         axis = available_axes[fallback_index]
     # check to see if axis is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
