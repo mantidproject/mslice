@@ -5,8 +5,7 @@ from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads,
-                                                                 rename_workspace, subtract,
+from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads, subtract,
                                                                  is_pixel_workspace, combine_workspace,
                                                                  add_workspace_runs)
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
