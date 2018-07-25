@@ -4,7 +4,7 @@ import os
 
 from .busy import show_busy
 from mslice.models.workspacemanager.workspace_algorithms import load
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_names
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_visible_workspace_names
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.models.workspacemanager.file_io import load_from_ascii
@@ -75,7 +75,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
             return allChecked
 
     def _confirm_workspace_overwrite(self, ws_name):
-        if ws_name in get_workspace_names():
+        if ws_name in get_visible_workspace_names():
             return self._view.confirm_overwrite_workspace()
         else:
             return True
