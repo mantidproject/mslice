@@ -20,8 +20,8 @@ def compute_cut_xye(selected_workspace, cut_axis, integration_axis, is_norm, sto
     out_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
 
     cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, store=store, InputWorkspace=ws_handle,
-                        CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
-                        EMode = ws_handle.e_mode, PSD=ws_handle.is_PSD, NormToOne=is_norm)
+                                CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
+                                EMode = ws_handle.e_mode, PSD=ws_handle.is_PSD, NormToOne=is_norm)
     if store:
         cut = cut.raw_ws
     plot_data = _num_events_normalized_array(cut)

@@ -233,7 +233,7 @@ def _compute_powder_line_momentum(ws_name, q_axis, element, cif_file):
 def _crystal_structure(ws_name, element, cif_file):
     if cif_file:
         ws = get_workspace_handle(ws_name).raw_ws
-        run_algorithm('LoadCIF', store=False, InputWorkspace=ws, InputFile=cif_file)
+        LoadCIF(InputWorkspace=ws, InputFile=cif_file)
         return ws.sample().getCrystalStructure()
     else:
         return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
