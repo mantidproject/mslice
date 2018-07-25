@@ -2,7 +2,6 @@ from itertools import chain
 
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
-from matplotlib.lines import Line2D
 from matplotlib import warnings
 import numpy as np
 
