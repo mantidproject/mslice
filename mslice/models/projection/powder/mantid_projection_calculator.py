@@ -25,9 +25,9 @@ class MantidProjectionCalculator(ProjectionCalculator):
             raise TypeError('Input workspace for projection calculation must be a reduced '
                             'data workspace with a spectra and energy transfer axis.')
 
-    def calculate_projection(self, input_workspace_name, axis1, axis2, units):
+    def calculate_projection(self, input_workspace, axis1, axis2, units):
         """Calculate the projection workspace AND return a python handle to it"""
-        workspace = get_workspace_handle(input_workspace_name)
+        workspace = get_workspace_handle(input_workspace)
         if not workspace.is_PSD:
             raise RuntimeError('Cannot calculate projections for non-PSD workspaces')
 
@@ -36,10 +36,10 @@ class MantidProjectionCalculator(ProjectionCalculator):
             raise NotImplementedError("Must have a '%s' axis" % DELTA_E_LABEL)
         if (axis1 == MOD_Q_LABEL or axis2 == MOD_Q_LABEL):
             projection_type='QE'
-            output_workspace_name = input_workspace_name + ('_QE' if axis1 == MOD_Q_LABEL else '_EQ')
+            output_workspace_name = workspace.name + ('_QE' if axis1 == MOD_Q_LABEL else '_EQ')
         elif (axis1 == THETA_LABEL or axis2 == THETA_LABEL):
             projection_type='Theta'
-            output_workspace_name = input_workspace_name + ('_ThE' if axis1 == THETA_LABEL else '_ETh')
+            output_workspace_name = workspace.name + ('_ThE' if axis1 == THETA_LABEL else '_ETh')
         else:
             raise NotImplementedError(" Axis '%s' not recognised. Must be '|Q|' or '2Theta'." % (axis1 if
                                       axis1 != DELTA_E_LABEL else axis2))
