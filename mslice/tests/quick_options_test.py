@@ -149,7 +149,7 @@ class QuickAxisTest(unittest.TestCase):
         colorbar_log = PropertyMock()
         type(self.model).colorbar_log = colorbar_log
         self.view.log_scale.isChecked = Mock()
-        quick_axis_options('x_range', self.model, True)
+        quick_axis_options('colorbar_range', self.model, True)
         self.view.log_scale.isChecked.assert_called_once()
         colorbar_log.assert_called_once()
 
