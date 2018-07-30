@@ -43,7 +43,7 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def _display_slice(self):
         try:
-            selected_workspace = validate(self._selected_workspace, self._slice_view.error_select_one_workspace)
+            selected_workspaces = validate(self._selected_workspace, self._slice_view.error_select_one_workspace)
             x_axis = validate(self._x_axis, self._slice_view.error_invalid_x_params)
             y_axis = validate(self._y_axis, self._slice_view.error_invalid_y_params)
             intensity_start, intensity_end = validate(self._intensity, self._slice_view.error_invalid_intensity_params)
