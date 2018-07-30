@@ -45,7 +45,7 @@ class DataLoaderTest(unittest.TestCase):
         self.main_presenter.update_displayed_workspaces.assert_called_once()
 
     @patch('mslice.presenters.data_loader_presenter.load')
-    @patch('mslice.presenters.data_loader_presenter.get_workspace_names')
+    @patch('mslice.presenters.data_loader_presenter.get_visible_workspace_names')
     @patch('mslice.presenters.data_loader_presenter.get_workspace_handle')
     def test_load_multiple_workspaces(self, get_ws_handle_mock, get_ws_names_mock, load_mock):
         # Create a view that will return three filepaths on 3 subsequent calls to get_workspace_to_load_path
@@ -72,7 +72,7 @@ class DataLoaderTest(unittest.TestCase):
         self.view.no_workspace_has_been_loaded.assert_called_once_with(ws_name1)
         self.view.get_workspace_efixed.assert_not_called()
 
-    @patch('mslice.presenters.data_loader_presenter.get_workspace_names')
+    @patch('mslice.presenters.data_loader_presenter.get_visible_workspace_names')
     @patch('mslice.presenters.data_loader_presenter.get_workspace_handle')
     def test_load_workspace_dont_overwrite(self, get_ws_handle_mock, get_ws_names_mock):
         tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
@@ -87,7 +87,7 @@ class DataLoaderTest(unittest.TestCase):
         self.view.no_workspace_has_been_loaded.assert_called_once()
 
     @patch('mslice.presenters.data_loader_presenter.load')
-    @patch('mslice.presenters.data_loader_presenter.get_workspace_names')
+    @patch('mslice.presenters.data_loader_presenter.get_visible_workspace_names')
     def test_load_workspace_fail(self, get_ws_names_mock, load_mock):
         tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
         path_to_nexus = join(tempdir, 'cde.nxs')
