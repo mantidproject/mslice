@@ -71,7 +71,7 @@ class CutPlot(object):
         else:
             self._quick_presenter = quick_options(target, self)
         self.update_legend()
-        self._canvas.draw()
+        self._canvas.draw_artist(target)
 
     def get_line_index(self, line):
         '''
