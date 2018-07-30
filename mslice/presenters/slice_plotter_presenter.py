@@ -52,9 +52,8 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             return
 
         selected_workspace = selected_workspaces[0]
-        axes = self.validate_axes()
-        if (not axes):
-            return
+        if x_axis.units == y_axis.units:
+            self._slice_view.error_invalid_plot_parameters()
 
         norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
         colourmap = self._slice_view.get_slice_colourmap()
