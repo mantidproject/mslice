@@ -69,16 +69,16 @@ class MakeProjection(PythonAlgorithm):
         numSpectra = input_workspace.getNumberHistograms()
         if emode == 'Indirect' or numSpectra > 1000:
             retval = ConvertToMD(InputWorkspace=input_workspace, QDimensions=MOD_Q_LABEL,
-                                 PreprocDetectorsWS='-', dEAnalysisMode=emode)
+                                 PreprocDetectorsWS='-', dEAnalysisMode=emode, StoreInADS=False)
             if axis1 == DELTA_E_LABEL and axis2 == MOD_Q_LABEL:
                 retval = self._flip_axes(retval)
         # Otherwise first run SofQW3 to rebin it in |Q| properly before calling ConvertToMD with CopyToMD
         else:
             limits = self.getProperty('Limits').value
             limits = ','.join([str(limits[i]) for i in [0, 2, 1]])
-            retval = SofQW3(InputWorkspace=input_workspace,
-                            QAxisBinning=limits, Emode=emode)
-            retval = ConvertToMD(InputWorkspace=retval, QDimensions='CopyToMD', PreprocDetectorsWS='-', dEAnalysisMode=emode)
+            retval = SofQW3(InputWorkspace=input_workspace, QAxisBinning=limits, Emode=emode, StoreInADS=False)
+            retval = ConvertToMD(InputWorkspace=retval, QDimensions='CopyToMD', PreprocDetectorsWS='-',
+                                 dEAnalysisMode=emode, StoreInADS=False)
             if axis1 == MOD_Q_LABEL:
                 retval = self._flip_axes(retval)
         return retval
@@ -89,7 +89,7 @@ class MakeProjection(PythonAlgorithm):
         # Work-around for a bug in ConvertToMD.
         wsdet = self._getDetWS(input_workspace) if emode == 'Indirect' else '-'
         retval = ConvertToMD(InputWorkspace=retval, QDimensions='CopyToMD', PreprocDetectorsWS=wsdet,
-                             dEAnalysisMode=emode)
+                             dEAnalysisMode=emode, StoreInADS=False)
         if emode == 'Indirect':
             DeleteWorkspace(wsdet)
         if axis1 == THETA_LABEL:
