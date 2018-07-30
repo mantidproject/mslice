@@ -13,7 +13,7 @@ from mslice.models.slice.slice_functions import (compute_slice, compute_boltzman
                                                  compute_chi_magnetic, compute_d2sigma, compute_symmetrised,
                                                  compute_gdos, compute_powder_line, compute_recoil_line)
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
-from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace, LoadCIF
+from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 
 def invert_axes(matrix):
     return np.rot90(np.flipud(matrix))

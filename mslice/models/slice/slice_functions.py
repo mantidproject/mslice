@@ -9,7 +9,7 @@ from scipy import constants
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.util.mantid import mantid_algorithms
+from mslice.util.mantid.mantid_algorithms import Slice, LoadCIF
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
@@ -25,7 +25,7 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
 
 def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
     workspace = get_workspace_handle(selected_workspace)
-    slice =  mantid_algorithms.Slice(OutputWorkspace = '__' + workspace.name, InputWorkspace=workspace,
+    slice =  Slice(OutputWorkspace = '__' + workspace.name, InputWorkspace=workspace,
                                      XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
                                      EMode=workspace.e_mode, NormToOne=norm_to_one)
     plot_data = plot_data_from_slice(workspace, slice, x_axis, workspace.is_PSD)
