@@ -17,7 +17,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
     def setUp(self):
         self.test_ws_2d = CreateSimulationWorkspace(OutputWorkspace='test_ws_2d', Instrument='MAR',
                                                     BinParams=[-10, 1, 10], UnitX='DeltaE')
-        AddSampleLog(Workspace=self.test_ws_2d.raw_ws, LogName='Ei', LogText='3.',
+        AddSampleLog(Workspace=self.test_ws_2d.raw_ws, LogName='Ei', LogText='50.',
                      LogType='Number', StoreInADS=False)
         self.test_ws_md = ConvertToMD(OutputWorkspace='test_ws_md', InputWorkspace=self.test_ws_2d,
                                       QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
@@ -96,4 +96,4 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_equal(self.test_ws_2d.limits['DeltaE'], [-10, 10, 1])
         np.testing.assert_array_equal(self.test_ws_2d.limits['|Q|'], self.test_ws_2d.limits['MomentumTransfer'])
         np.testing.assert_almost_equal(self.test_ws_2d.limits['|Q|'], [0.25116,  9.52454,  0.04287], 5)
-        np.testing.assert_almost_equal(self.test_ws_2d.limits['Degrees'], [3.43, 134.14, 0.57296], 5)
+        np.testing.assert_almost_equal(self.test_ws_2d.limits['2Theta'], [3.43, 134.14, 0.57296], 5)
