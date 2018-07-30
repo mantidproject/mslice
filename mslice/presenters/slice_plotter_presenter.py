@@ -11,13 +11,13 @@ from mslice.widgets.slice.command import Command
 from .interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from .validation_decorators import require_main_presenter
 
-INVALID_PARAMS = 1
-INVALID_X_PARAMS = 2
-INVALID_Y_PARAMS = 3
-INVALID_INTENSITY = 4
-INVALID_SMOOTHING = 5
-INVALID_X_UNITS = 6
-INVALID_Y_UNITS = 7
+
+def validate(field_method, error_method):
+    try:
+        return field_method()
+    except ValueError as e:
+        error_method()
+        raise e
 
 
 class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
@@ -42,98 +42,69 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
                 raise ValueError("Slice Plotter Presenter received an unrecognised command")
 
     def _display_slice(self):
-        selected_workspaces = self._get_main_presenter().get_selected_workspaces()
-        if not selected_workspaces or len(selected_workspaces) > 1:
-            self._slice_view.error_select_one_workspace()
+        try:
+            selected_workspace = validate(self._selected_workspace, self._slice_view.error_select_one_workspace)
+            x_axis = validate(self._x_axis, self._slice_view.error_invalid_x_params)
+            y_axis = validate(self._y_axis, self._slice_view.error_invalid_y_params)
+            intensity_start, intensity_end = validate(self._intensity, self._slice_view.error_invalid_intensity_params)
+            smoothing = validate(self._smoothing, self._slice_view.error_invalid_smoothing_params)
+        except ValueError:
             return
 
-        selected_workspace = selected_workspaces[0]
-        axes = self.validate_axes()
-        if (not axes):
+        if x_axis.units == y_axis.units:
+            self._slice_view.error_invalid_plot_parameters()
             return
-        x_axis, y_axis = axes
-        intensity_start = self._slice_view.get_slice_intensity_start()
-        intensity_end = self._slice_view.get_slice_intensity_end()
+
         norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
-        smoothing = self._slice_view.get_slice_smoothing()
         colourmap = self._slice_view.get_slice_colourmap()
-        try:
-            intensity_start = self._to_float(intensity_start)
-            intensity_end = self._to_float(intensity_end)
-        except ValueError:
-            self._slice_view.error_invalid_intensity_params()
-            return
 
-        if intensity_start is not None and intensity_end is not None and intensity_start > intensity_end:
-            self._slice_view.error_invalid_intensity_params()
-            return
+        self._plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end,
+                         norm_to_one, colourmap)
+
+    def _plot_slice(self, *args):
         try:
-            smoothing = self._to_int(smoothing)
-        except ValueError:
-            self._slice_view.error_invalid_smoothing_params()
-        try:
-            self._slice_plotter.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start,intensity_end,
-                                           norm_to_one, colourmap)
+            self._slice_plotter.plot_slice(*args)
         except RuntimeError as e:
             import traceback
             traceback.print_exc(e)
             self._slice_view.error(e.args[0])
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
-            # will break if matplotlib change exception eror message
-
-            # If the mesage string is not equal to what is set below the exception will be re-raised
+            # will break if matplotlib change exception error message
             if str(e) != "minvalue must be less than or equal to maxvalue":
                 raise e
             self._slice_view.error_invalid_intensity_params()
 
-    def validate_axes(self):
-        try:
-            x_axis = Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
-                          self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
-        except ValueError:
-            self._slice_view.error_invalid_x_params()
-            return False
-        try:
-            y_axis = Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
-                          self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
-        except ValueError:
-            self._slice_view.error_invalid_y_params()
-            return False
-        if x_axis.units == y_axis.units:
-            self._slice_view.error_invalid_plot_parameters()
-            return False
-        return x_axis, y_axis
+    def _selected_workspace(self):
+        selected_workspaces = self._get_main_presenter().get_selected_workspaces()
+        if not selected_workspaces or len(selected_workspaces) > 1:
+            raise ValueError()
+        return selected_workspaces[0]
 
+    def _x_axis(self):
+        return Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
+                    self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
+
+    def _y_axis(self):
+        return Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
+                    self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
+
+    def _intensity(self):
+        intensity_start = self._slice_view.get_slice_intensity_start()
+        intensity_end = self._slice_view.get_slice_intensity_end()
+        intensity_start = self._to_float(intensity_start)
+        intensity_end = self._to_float(intensity_end)
+        if intensity_start is not None and intensity_end is not None and intensity_start > intensity_end:
+            raise ValueError()
+        return intensity_start, intensity_end
+
+    def _smoothing(self):
+        smoothing = self._slice_view.get_slice_smoothing()
+        return self._to_int(smoothing)
 
     @require_main_presenter
     def _get_main_presenter(self):
         return self._main_presenter
-
-    def _process_axis(self, x, y):
-        if x.units == y.units:
-            return INVALID_PARAMS
-        try:
-            x.start = float(x.start)
-            x.step = float(x.step)
-            x.end = float(x.end)
-        except ValueError:
-            return INVALID_X_PARAMS
-
-        try:
-            y.start = float(y.start)
-            y.step = float(y.step)
-            y.end = float(y.end)
-        except ValueError:
-            return INVALID_Y_PARAMS
-
-        if x.start and x.end:
-            if x.start > x.end:
-                return INVALID_X_PARAMS
-
-        if y.start is not None and y.end is not None:
-            if y.start > y.end:
-                return INVALID_Y_PARAMS
 
     def workspace_selection_changed(self):
         workspace_selection = self._get_main_presenter().get_selected_workspaces()
