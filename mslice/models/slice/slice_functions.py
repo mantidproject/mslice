@@ -9,6 +9,7 @@ from scipy import constants
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.util.mantid.mantid_algorithms import LoadCIF
 from mslice.util.mantid import mantid_algorithms
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -233,7 +234,7 @@ def _compute_powder_line_momentum(ws_name, q_axis, element, cif_file):
 def _crystal_structure(ws_name, element, cif_file):
     if cif_file:
         ws = get_workspace_handle(ws_name).raw_ws
-        run_algorithm('LoadCIF', store=False, InputWorkspace=ws, InputFile=cif_file)
+        LoadCIF(InputWorkspace=ws, InputFile=cif_file)
         return ws.sample().getCrystalStructure()
     else:
         return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
