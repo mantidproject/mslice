@@ -1,8 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
+from mantid.plots import *
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.models.cut.cut_functions import output_workspace_name, compute_cut_xye
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
 
 
@@ -15,13 +17,48 @@ class MatplotlibCutPlotter(CutPlotter):
 
     def plot_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
                  intensity_end, plot_over, store=True):
-        x, y, e = compute_cut_xye(selected_workspace, cut_axis, integration_axis, norm_to_one, store)
-        output_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
-        legend = generate_legend(selected_workspace, integration_axis.units, integration_axis.start,
+        workspace = get_workspace_handle(selected_workspace)
+        cut = compute_cut_xye(workspace, cut_axis, integration_axis, norm_to_one, store)
+        # output_ws_name = output_workspace_name(workspace.name, integration_axis.start, integration_axis.end)
+        legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start,
                                  integration_axis.end)
-        self.plot_cut_from_xye(x, y, e, cut_axis.units, selected_workspace, (intensity_start, intensity_end),
-                               plot_over, output_ws_name, legend)
+        # self.plot_cut_from_xye(x, y, e, cut_axis.units, selected_workspace, (intensity_start, intensity_end),
+        #                        plot_over, output_ws_name, legend)
+        self.plot_cut_2(cut, cut_axis.units, (intensity_start, intensity_end), plot_over, legend)
         plt.show()
+
+    @plt.set_category(plt.CATEGORY_CUT)
+    def plot_cut_2(self, workspace, x_units, intensity_range=None, plot_over=False, legend=None):
+        legend = workspace.name if legend is None else legend
+        if not plot_over:
+            plt.cla()
+        cur_fig = plt.gcf()
+        ax = cur_fig.add_subplot(111, projection='mantid')
+        ax.errorbar(workspace.raw_ws, 'o-', label=legend, picker=PICKER_TOL_PTS)
+        ax.set_ylim(*intensity_range) if intensity_range is not None else cur_axes.autoscale()
+        cur_canvas = cur_fig.canvas
+        if cur_canvas.manager.window.action_toggle_legends.isChecked():
+            leg = ax.legend(fontsize='medium')
+            leg.draggable()
+        ax.set_xlabel(get_display_name(x_units, get_comment(workspace)), picker=PICKER_TOL_PTS)
+        ax.set_ylabel(CUT_INTENSITY_LABEL, picker=PICKER_TOL_PTS)
+        if not plot_over:
+            cur_canvas.set_window_title(workspace.name)
+            cur_canvas.manager.update_grid()
+        if not cur_canvas.manager.has_plot_handler():
+            self._create_cut(workspace.name)
+
+        #interactive cute stuff
+            cur_canvas.restore_region(cur_canvas.manager.get_cut_background())
+        try:
+            children = cur_fig.get_children()
+            for artist in children:
+                ax.draw_artist(artist)
+            cur_canvas.blit(ax.clipbox)
+        except AttributeError:
+            cur_canvas.draw_idle()
+        plt.show()
+
 
     @plt.set_category(plt.CATEGORY_CUT)
     def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, intensity_range=None, plot_over=False,

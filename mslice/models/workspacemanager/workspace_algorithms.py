@@ -351,5 +351,6 @@ def propagate_properties(old_workspace, new_workspace):
 def get_comment(workspace):
     if hasattr(workspace, 'getComment'):
         return workspace.getComment()
-    ws_handle = get_workspace_handle(workspace)
-    return ws_handle.raw_ws.getComment()
+    if not hasattr(workspace, 'raw_ws'):
+        workspace = get_workspace_handle(workspace)
+    return workspace.raw_ws.getComment()

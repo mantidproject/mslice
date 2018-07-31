@@ -33,8 +33,8 @@ def run_algorithm(alg_name, output_name=None, store=True, **kwargs):
 
     ws = getattr(s_api, alg_name)(StoreInADS=False, **kwargs)
 
+    ws = wrap_workspace(ws, output_name)
     if store:
-        ws = wrap_workspace(ws, output_name)
         add_workspace(ws, output_name)
     return ws
 
