@@ -182,8 +182,8 @@ def get_cut_xye(input_workspace, cut_axis, integration_start, integration_end, n
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
-    x, y, e = _CUT_ALGORITHM.compute_cut_xye(input_workspace, cut_axis, integration_start, integration_end,
-                                             is_norm=normalize)
+    x, y, e = _CUT_ALGORITHM.compute_cut(input_workspace, cut_axis, integration_start, integration_end,
+                                         is_norm=normalize)
     x, y, e = x.squeeze(), y.squeeze(), e.squeeze()
     return x, y, e
 
