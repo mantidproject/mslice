@@ -170,13 +170,13 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkYLog.stateChanged.connect(self.yLogEdited)
         self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
 
-    def set_line_data(self, line_data):
-        for line in line_data:
+    def set_line_options(self, line_options):
+        for line in line_options:
             line_widget = LegendAndLineOptionsSetter(line, self.color_validator)
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
 
-    def get_line_data(self):
+    def get_line_options(self):
         all_line_options = []
         for line_widget in self._line_widgets:
             line_options = {}
