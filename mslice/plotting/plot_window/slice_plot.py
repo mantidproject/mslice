@@ -122,24 +122,22 @@ class SlicePlot(object):
 
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
-        images = current_axis.get_images()
-        if len(images) != 1:
-            raise RuntimeError("Expected single image on axes, found " + str(len(images)))
-        mappable = images[0]
+        colormesh = current_axis.collections[0]
         vmin, vmax = colorbar_range
-        if logarithmic and type(mappable.norm) != colors.LogNorm:
-            mappable.colorbar.remove()
-            if vmin == float(0):
+        if logarithmic:
+            colormesh.colorbar.remove()
+            if vmin <= float(0):
                 vmin = 0.001
+            colormesh.set_clim((vmin, vmax))
             norm = colors.LogNorm(vmin, vmax)
-            mappable.set_norm(norm)
-            self._canvas.figure.colorbar(mappable)
-        elif not logarithmic and type(mappable.norm) != colors.Normalize:
-            mappable.colorbar.remove()
+            colormesh.set_norm(norm)
+            self._canvas.figure.colorbar(colormesh)
+        else:
+            colormesh.colorbar.remove()
+            colormesh.set_clim((vmin, vmax))
             norm = colors.Normalize(vmin, vmax)
-            mappable.set_norm(norm)
-            self._canvas.figure.colorbar(mappable)
-        mappable.set_clim((vmin, vmax))
+            colormesh.set_norm(norm)
+            self._canvas.figure.colorbar(colormesh)
 
     def reset_info_checkboxes(self):
         for key, line in six.iteritems(self._slice_plotter.overplot_lines[self.ws_name]):
@@ -385,7 +383,8 @@ class SlicePlot(object):
 
     @property
     def colorbar_range(self):
-        return self._canvas.figure.gca().get_images()[0].get_clim()
+        collections = self._canvas.figure.gca().collections
+        return self._canvas.figure.gca().collections[0].get_clim()
 
     @colorbar_range.setter
     def colorbar_range(self, value):
@@ -393,9 +392,7 @@ class SlicePlot(object):
 
     @property
     def colorbar_log(self):
-        mappable = self._canvas.figure.gca().get_images()[0]
-        norm = mappable.norm
-        return isinstance(norm, colors.LogNorm)
+        return isinstance(self._canvas.figure.gca().collections[0].norm, colors.LogNorm)
 
     @colorbar_log.setter
     def colorbar_log(self, value):

@@ -10,7 +10,9 @@ from mslice.models.slice.slice_functions import (compute_slice, sample_temperatu
                                                  compute_chi_magnetic, compute_gdos, compute_d2sigma,
                                                  compute_powder_line, compute_chi, compute_symmetrised)
 from mslice.models.workspacemanager.workspace_algorithms import get_comment, get_workspace_handle
+from mslice.util.mantid import run_algorithm
 import mslice.plotting.pyplot as plt
+import numpy as np
 
 OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
 PICKER_TOL_PTS = 5
@@ -39,21 +41,23 @@ class MatplotlibSlicePlotter(SlicePlotter):
         plt.draw_all()
 
     def _cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
-        rotated = x_axis.units in ['MomentumTransfer', 'Degrees', '|Q|']
+        rotated = x_axis.units not in ['MomentumTransfer', 'Degrees', '|Q|']
         q_axis = y_axis if rotated else x_axis
         e_axis = x_axis if rotated else y_axis
         self.slice_cache[slice.name] = SliceCache(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     @plt.set_category(plt.CATEGORY_SLICE)
     def _show_plot(self, slice_cache, workspace):
-        # Clear out the artists in the image Axes - same as was ishold=False used to do
         # Do not call plt.gcf() here as the overplot Line1D objects have been cached and they
         # must be redrawn on the same Axes instance
-        plot_axes = plt.gca()
-        plot_axes.cla()
         cur_fig = plt.gcf()
+        cur_fig.clf()
         ax = cur_fig.add_subplot(111, projection='mantid')
+        signal = workspace.get_signal()
+        if not workspace.is_PSD:
+            workspace = run_algorithm('Transpose', output_name=workspace.name, InputWorkspace=workspace, store=False)
         image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap)
+        print(image.get_clim())
         ax.set_title(workspace.name, picker=PICKER_TOL_PTS)
         x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
         y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
@@ -68,25 +72,21 @@ class MatplotlibSlicePlotter(SlicePlotter):
         try:
             cb_axes = plt.gcf().get_axes()[1]
         except IndexError:
-            cb_axes = None
-        if cb_axes is None:
             cb = plt.colorbar(image, ax=ax)
+
         else:
             cb = plt.colorbar(image, cax=cb_axes)
         cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
-        plt.gcf().canvas.draw_idle()
-        plt.show()
+        cur_fig.canvas.draw_idle()
+        cur_fig.show()
 
     def show_scattering_function(self, workspace_name):
         slice_cache = self.slice_cache[workspace_name]
         self._show_plot(slice_cache, slice_cache.scattering_function)
 
-    def show_dynamical_susceptibility(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        if cached_slice['plot_data'][1] is None:
-            self.compute_chi(workspace)
-        self._show_plot(workspace, cached_slice['plot_data'][1], cached_slice['boundaries'], cached_slice['colourmap'],
-                        cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
+    def show_dynamical_susceptibility(self, workspace_name):
+        slice_cache = self.slice_cache[workspace_name]
+        self._show_plot(slice_cache, slice_cache.chi)
 
     def show_dynamical_susceptibility_magnetic(self, workspace):
         cached_slice = self.slice_cache[workspace]
@@ -155,24 +155,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
 
-    def update_sample_temperature(self, workspace):
-        temp = sample_temperature(workspace, self._sample_temp_fields)
-        self.slice_cache[workspace]['sample_temp'] = temp
+    def update_sample_temperature(self, workspace_name):
+        temp = sample_temperature(workspace_name, self._sample_temp_fields)
+        self.set_sample_temperature(workspace_name, temp)
 
-    def set_sample_temperature(self, workspace, temp):
-        self.slice_cache[workspace]['sample_temp'] = temp
-
-    def sample_temperature(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        sample_temp = cached_slice['sample_temp']
-        if sample_temp is not None:
-            return sample_temp
-        else:
-            raise ValueError('sample temperature not found')
+    def set_sample_temperature(self, workspace_name, temp):
+        self.slice_cache[workspace_name].sample_temp = temp
 
     def compute_chi(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][1] = compute_chi(cached_slice['plot_data'][0], self.sample_temperature(workspace),
+        cached_slice['plot_data'][1] = compute_chi(cached_slice['plot_data'][0], self._sample_temperature(cached_slice),
                                                    cached_slice['energy_axis'], cached_slice['rotated'])
 
     def compute_chi_magnetic(self, workspace):
@@ -189,12 +181,12 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def compute_symmetrised(self, workspace):
         cached_slice = self.slice_cache[workspace]
         cached_slice['plot_data'][4] = compute_symmetrised(cached_slice['plot_data'][0],
-                                                           self.sample_temperature(workspace),
+                                                           self._sample_temperature(workspace),
                                                            cached_slice['energy_axis'], cached_slice['rotated'])
 
     def compute_gdos(self, workspace):
         cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][5] = compute_gdos(cached_slice['plot_data'][0], self.sample_temperature(workspace),
+        cached_slice['plot_data'][5] = compute_gdos(cached_slice['plot_data'][0], self._sample_temperature(workspace),
                                                     cached_slice['momentum_axis'], cached_slice['energy_axis'],
                                                     cached_slice['rotated'])
 
