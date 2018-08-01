@@ -28,40 +28,11 @@ def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
     slice =  run_algorithm('Slice', output_name = '__' + workspace.name, InputWorkspace=workspace,
                            XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
                            EMode=workspace.e_mode, NormToOne=norm_to_one)
-    plot_data = plot_data_from_slice(workspace, slice, x_axis, workspace.is_PSD)
-    # rot90 switches the x and y axis to to plot what user expected.
-    plot_data = np.rot90(plot_data)
-    boundaries = [x_axis.start, x_axis.end, y_axis.start, y_axis.end]
-    if norm_to_one:
-        plot_data = _norm_to_one(plot_data)
-    plot = [plot_data] + [None]*5
-    return plot, boundaries
-
-
-def plot_data_from_slice(input_ws, slice_ws, x_axis, PSD):
-    if PSD:
-        return get_plot_data_PSD(input_ws, slice_ws)
-    else:
-        return get_plot_data_nonPSD(input_ws, slice_ws, x_axis)
-
-def get_plot_data_PSD(input_ws, slice_ws):
-    slice = slice_ws.raw_ws
-    # perform number of events normalization
-    with np.errstate(invalid='ignore'):
-        if slice.displayNormalization() == MDNormalization.NoNormalization:
-            plot_data = np.array(slice.getSignalArray())
-            plot_data[np.where(slice.getNumEventsArray() == 0)] = np.nan
-        else:
-            plot_data = slice.getSignalArray() / slice.getNumEventsArray()
-    propagate_properties(input_ws, slice_ws)
-    return plot_data
-
-def get_plot_data_nonPSD(input_ws, slice_ws, x_axis):
-    plot_data = slice_ws.raw_ws.extractY()
-    propagate_properties(input_ws, slice_ws)
-    if x_axis.units == 'DeltaE':
-        plot_data = np.transpose(plot_data)
-    return plot_data
+    if not workspace.is_PSD:
+        slice = run_algorithm('Transpose', output_name = slice.name, InputWorkspace=slice)
+    # if norm_to_one:
+    #     plot_data = _norm_to_one(plot_data)
+    return slice
 
 def axis_values(axis, reverse=False):
     """

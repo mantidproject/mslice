@@ -1,13 +1,15 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
+from matplotlib import transforms
 
 from mslice.models.cmap import allowed_cmaps
 from mslice.models.labels import get_display_name, recoil_labels
 from mslice.models.slice.slice_plotter import SlicePlotter
+from mslice.models.slice.slice_cache import SliceCache
 from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
                                                  compute_chi_magnetic, compute_gdos, compute_d2sigma,
                                                  compute_powder_line, compute_chi, compute_symmetrised)
-from mslice.models.workspacemanager.workspace_algorithms import get_comment
+from mslice.models.workspacemanager.workspace_algorithms import get_comment, get_workspace_handle
 import mslice.plotting.pyplot as plt
 
 OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
@@ -24,55 +26,43 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
+        selected_ws = get_workspace_handle(selected_ws)
         sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
-        plot_data, boundaries = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
+        slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
-        self._cache_slice(plot_data, selected_ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis)
-        if selected_ws not in self.overplot_lines:
-            self.overplot_lines[selected_ws] = {}
-        self.show_scattering_function(selected_ws)
+        self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
+        self.show_scattering_function(slice.name)
         fig_canvas = plt.gcf().canvas
-        fig_canvas.set_window_title(selected_ws)
-        fig_canvas.manager.add_slice_plot(self, selected_ws)
+        fig_canvas.set_window_title(selected_ws.name)
+        fig_canvas.manager.add_slice_plot(self, slice.name)
         fig_canvas.manager.update_grid()
         plt.draw_all()
 
-    def _cache_slice(self, plot_data, ws, boundaries, colourmap, norm, sample_temp, x_axis, y_axis):
-        self.slice_cache[ws] = {'plot_data': plot_data, 'boundaries': boundaries, 'colourmap': colourmap,
-                                'norm': norm, 'sample_temp': sample_temp}
-        if x_axis.units == 'MomentumTransfer' or x_axis.units == 'Degrees' or x_axis.units == '|Q|':
-            self.slice_cache[ws]['momentum_axis'] = x_axis
-            self.slice_cache[ws]['energy_axis'] = y_axis
-            self.slice_cache[ws]['rotated'] = False
-        else:
-            self.slice_cache[ws]['momentum_axis'] = y_axis
-            self.slice_cache[ws]['energy_axis'] = x_axis
-            self.slice_cache[ws]['rotated'] = True
+    def _cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
+        rotated = x_axis.units in ['MomentumTransfer', 'Degrees', '|Q|']
+        q_axis = y_axis if rotated else x_axis
+        e_axis = x_axis if rotated else y_axis
+        self.slice_cache[slice.name] = SliceCache(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     @plt.set_category(plt.CATEGORY_SLICE)
-    def _show_plot(self, workspace_name, plot_data, extent, colourmap, norm, momentum_axis, energy_axis):
+    def _show_plot(self, slice_cache, workspace):
         # Clear out the artists in the image Axes - same as was ishold=False used to do
         # Do not call plt.gcf() here as the overplot Line1D objects have been cached and they
         # must be redrawn on the same Axes instance
         plot_axes = plt.gca()
         plot_axes.cla()
-        image = plt.imshow(plot_data, extent=extent, cmap=colourmap, aspect='auto', norm=norm,
-                           interpolation='none')
-        plot_axes.set_title(workspace_name, picker=PICKER_TOL_PTS)
-        if self.slice_cache[workspace_name]['rotated']:
-            x_axis = energy_axis
-            y_axis = momentum_axis
-        else:
-            x_axis = momentum_axis
-            y_axis = energy_axis
-        comment = get_comment(str(workspace_name))
+        cur_fig = plt.gcf()
+        ax = cur_fig.add_subplot(111, projection='mantid')
+        image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap)
+        ax.set_title(workspace.name, picker=PICKER_TOL_PTS)
+        x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
+        y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
+        comment = get_comment(str(workspace.name))
         # labels
-        plot_axes.set_xlabel(get_display_name(x_axis.units, comment), picker=PICKER_TOL_PTS)
-        plot_axes.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
-        plot_axes.set_xlim(x_axis.start)
-        plot_axes.set_ylim(y_axis.start)
-        plot_axes.get_xaxis().set_units(x_axis.units)
-        plot_axes.get_yaxis().set_units(y_axis.units)
+        ax.set_xlabel(get_display_name(x_axis.units, comment), picker=PICKER_TOL_PTS)
+        ax.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
+        ax.set_xlim(x_axis.start)
+        ax.set_ylim(y_axis.start)
 
         # colorbar - have we plotted one previously?
         try:
@@ -80,17 +70,16 @@ class MatplotlibSlicePlotter(SlicePlotter):
         except IndexError:
             cb_axes = None
         if cb_axes is None:
-            cb = plt.colorbar(image, ax=plot_axes)
+            cb = plt.colorbar(image, ax=ax)
         else:
             cb = plt.colorbar(image, cax=cb_axes)
         cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
         plt.gcf().canvas.draw_idle()
         plt.show()
 
-    def show_scattering_function(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        self._show_plot(workspace, cached_slice['plot_data'][0], cached_slice['boundaries'], cached_slice['colourmap'],
-                        cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
+    def show_scattering_function(self, workspace_name):
+        slice_cache = self.slice_cache[workspace_name]
+        self._show_plot(slice_cache, slice_cache.scattering_function)
 
     def show_dynamical_susceptibility(self, workspace):
         cached_slice = self.slice_cache[workspace]
