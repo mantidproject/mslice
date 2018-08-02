@@ -383,7 +383,6 @@ class SlicePlot(object):
 
     @property
     def colorbar_range(self):
-        collections = self._canvas.figure.gca().collections
         return self._canvas.figure.gca().collections[0].get_clim()
 
     @colorbar_range.setter
