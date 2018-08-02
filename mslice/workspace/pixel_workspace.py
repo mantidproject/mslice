@@ -29,4 +29,8 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
         self.e_fixed = None
 
     def rewrap(self, ws):
-        return PixelWorkspace(ws, self.name)
+        new_ws = PixelWorkspace(ws, self.name)
+        new_ws.is_PSD = self.is_PSD
+        new_ws.e_mode = self.e_mode
+        new_ws.e_fixed = self.e_fixed
+        return new_ws

@@ -72,12 +72,10 @@ class WorkspaceMixin(object):
     def _binary_op_array(self, operator, other):
         """Perform binary operation using a numpy array with the same number of elements as _raw_ws signal"""
         if other.size in self.get_signal().shape:
-            signal = self.get_signal()
             new_signal = operator(other, self.get_signal())
             new_ws = run_child_alg('CloneWorkspace', InputWorkspace= self._raw_ws, OutputWorkspace='dummy')
             for i in range(self.raw_ws.getNumberHistograms()):
                 new_ws.setY(i, new_signal[i])
-            sig = new_ws.extractY()
             return new_ws
         else:
             raise RuntimeError("List or array must have same number of elements as an axis of the workspace")

@@ -18,9 +18,13 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
             raise TypeError('HistogramWorkspace expected IMDHistoWorkspace, got %s' % mantid_ws.__class__.__name__)
         self.name = name
         self._cut_params = {}
+        self.is_PSD = None
 
     def rewrap(self, ws):
-        return HistogramWorkspace(ws, self.name)
+        new_ws = HistogramWorkspace(ws, self.name)
+        new_ws.is_PSD = self.is_PSD
+        return new_ws
+
 
     def convert_to_matrix(self):
         ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization',

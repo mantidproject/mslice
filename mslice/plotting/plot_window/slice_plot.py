@@ -31,7 +31,6 @@ class SlicePlot(object):
         self.icut_event = [None, None]
         self.icut = None
         self.setup_connections(self.plot_window)
-        self._update_lines()
 
     def window_closing(self):
         # nothing to do

@@ -19,35 +19,21 @@ class HistoMixin(object):
         variance = self._raw_ws.getErrorSquaredArray()
         return variance.copy() if copy else variance
 
-    def _binary_op_array(self, op, other):
+    def _binary_op_array(self, operator, other):
         """
         Perform binary operation (+,-,*,/) using a 1D numpy array.
-
-        CreateMDHistoWorkspace using numpy array and then use ReplicateMD so it matches the shape of _raw_ws.
-        Then, apply operator.
 
         :param operator: binary operator to apply (add/sub/mul/div)
         :param other: 1D numpy array to use with operator.
         :return: new HistogramWorkspace
         """
-        min = np.amin(other)
-        max = np.amax(other)
-        size = other.size
-        ws = CreateMDHistoWorkspace(Dimensionality=1, Extents='' + str(min) + ',' + str(max),
-                                    SignalInput=other, ErrorInput=other, NumberOfBins=str(size),
-                                    Names=self._raw_ws.getDimension(0).getName(), Units='MomentumTransfer',
-                                    StoreInADS=False)
-        try:
-            replicated = ReplicateMD(ShapeWorkspace=self._raw_ws, DataWorkspace=ws)
-        except RuntimeError:
-            raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
-        # return operator(self._raw_ws, replicated)
-        if op.__name__ == 'add':
-            alg = 'PlusMD'
-        elif op.__name__ == 'sub':
-            alg = 'MinusMD'
-        elif op.__name__ == 'mul':
-            alg = 'MultiplyMD'
+        signal = self.get_signal()
+        new_ws = run_child_alg('CloneWorkspace', InputWorkspace=self._raw_ws, OutputWorkspace='dummy')
+        if other.size == signal.shape[1]:
+            new_signal = operator(signal, other)
+        elif other.size == signal.shape[0]:
+            new_signal = np.transpose(operator(np.transpose(signal), other))
         else:
-            alg = 'DivideMD'
-        return run_child_alg(alg, LHSWorkspace=self._raw_ws, RHSWorkspace=replicated)
+            raise ValueError("List or array must have same number of elements as an axis of the workspace")
+        new_ws.setSignalArray(new_signal)
+        return new_ws

@@ -53,7 +53,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         cur_fig = plt.gcf()
         cur_fig.clf()
         ax = cur_fig.add_subplot(111, projection='mantid')
-        if not workspace.is_PSD:
+        if not workspace.is_PSD and not slice_cache.rotated:
             workspace = run_algorithm('Transpose', output_name=workspace.name, InputWorkspace=workspace, store=False)
         image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap)
         ax.set_title(workspace.name, picker=PICKER_TOL_PTS)

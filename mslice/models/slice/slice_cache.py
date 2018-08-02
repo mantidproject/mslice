@@ -35,8 +35,7 @@ class SliceCache():
     @property
     def chi(self):
         if self._chi is None:
-            self._chi = compute_chi(self.scattering_function, self.sample_temp, self.energy_axis, self.rotated)
-            add_workspace(self._chi, "chi_workspace")
+            self._chi = compute_chi(self.scattering_function, self.sample_temp, self.energy_axis)
         return self._chi
 
     @property

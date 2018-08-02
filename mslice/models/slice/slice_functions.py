@@ -25,9 +25,10 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
 
 def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
     workspace = get_workspace_handle(selected_workspace)
-    slice =  run_algorithm('Slice', output_name = '__' + workspace.name, InputWorkspace=workspace,
+    slice =  run_algorithm('Slice', output_name = 'slice_' + workspace.name, InputWorkspace=workspace,
                            XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
                            EMode=workspace.e_mode, NormToOne=norm_to_one)
+    propagate_properties(workspace, slice)
     # if norm_to_one:
     #     plot_data = _norm_to_one(plot_data)
     return slice
@@ -50,7 +51,7 @@ def compute_boltzmann_dist(sample_temp, delta_e):
     kBT = sample_temp * KB_MEV
     return np.exp(-delta_e / kBT)
 
-def compute_chi(scattering_data, sample_temp, e_axis, data_rotated):
+def compute_chi(scattering_data, sample_temp, e_axis):
     """
     :param scattering_data: Scattering data in axes selected by user
     :param sample_temp: The sample temperature in Kelvin
@@ -59,19 +60,13 @@ def compute_chi(scattering_data, sample_temp, e_axis, data_rotated):
     it is assumed Y-axis=energy
     :return: The dynamic susceptibility of the data
     """
-    energy_transfer = axis_values(e_axis, reverse=data_rotated)
+    energy_transfer = axis_values(e_axis)
     signs = np.sign(energy_transfer)
     signs[signs == 0] = 1
     boltzmann_dist =  compute_boltzmann_dist(sample_temp, energy_transfer)
     chi = np.pi * (signs + (boltzmann_dist * -signs))
-    if not data_rotated:
-        chi = chi[None, :]
-    else:
-        chi = chi[:, None]
     out = scattering_data * chi
-    sig = np.rot90(out.get_signal())
     return out
-    # return run_algorithm('ReplaceSpecialValues', output_name=out.name, InputWorkspace=out, NaNValue=0)
 
 def compute_chi_magnetic(chi):
     if chi is None:
