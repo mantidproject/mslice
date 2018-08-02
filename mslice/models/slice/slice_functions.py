@@ -29,8 +29,8 @@ def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
                            XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
                            EMode=workspace.e_mode, NormToOne=norm_to_one)
     propagate_properties(workspace, slice)
-    # if norm_to_one:
-    #     plot_data = _norm_to_one(plot_data)
+    if norm_to_one:
+        slice = _norm_to_one(slice)
     return slice
 
 def axis_values(axis, reverse=False):
@@ -220,8 +220,8 @@ def compute_dvalues(d_min, d_max, structure):
     dvalues = np.sort(np.array(generator.getDValues(hkls)))[::-1]
     return dvalues
 
-def _norm_to_one(data):
-    return data / np.nanmax(np.abs(data))
+def _norm_to_one(workspace):
+    return workspace / np.nanmax(np.abs(workspace.get_signal()))
 
 def is_sliceable(workspace):
     ws = get_workspace_handle(workspace)
