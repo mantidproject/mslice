@@ -3,11 +3,10 @@ import numpy as np
 from mock import patch
 import unittest
 from mslice.models.workspacemanager.workspace_algorithms import (subtract,
-                                                                 add_workspace_runs,
-                                                                 combine_workspace, rename_workspace,
+                                                                 add_workspace_runs, combine_workspace,
                                                                  propagate_properties, get_limits, run_algorithm)
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_names, \
-    delete_workspace
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
+                                                               delete_workspace, rename_workspace)
 from mslice.models.workspacemanager.workspace_algorithms import processEfixed
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
@@ -28,14 +27,14 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def test_delete_workspace(self):
         delete_workspace('test_ws_md')
-        self.assertFalse('test_ws_md' in get_workspace_names())
+        self.assertFalse('test_ws_md' in get_visible_workspace_names())
 
     def test_subtract_workspace(self):
         subtract(['test_ws_2d'], 'test_ws_2d', 0.95)
         result = get_workspace_handle('test_ws_2d_subtracted')
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [0.05] * 20)
         np.testing.assert_array_almost_equal(self.test_ws_2d.raw_ws.dataY(0), [1] * 20)
-        self.assertFalse('scaled_bg_ws' in get_workspace_names())
+        self.assertFalse('scaled_bg_ws' in get_visible_workspace_names())
 
     def test_add_workspace(self):
         add_workspace_runs(['test_ws_2d', 'test_ws_2d'])
@@ -59,8 +58,8 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def test_rename_workspace(self):
         rename_workspace('test_ws_md', 'newname')
-        self.assertTrue('newname' in get_workspace_names())
-        self.assertFalse('test_ws_md' in get_workspace_names())
+        self.assertTrue('newname' in get_visible_workspace_names())
+        self.assertFalse('test_ws_md' in get_visible_workspace_names())
         new_ws = get_workspace_handle('newname')
         self.assertFalse(new_ws.ef_defined)
         self.assertEqual(new_ws.limits['DeltaE'], [0, 2, 1])

@@ -13,8 +13,7 @@ from scipy import constants
 
 from mslice.models.axis import Axis
 from mslice.util.mantid import add_to_ads, wrap_in_ads, run_algorithm
-from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
-                                                               remove_workspace, add_workspace)
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -158,13 +157,6 @@ def load(filename, output_workspace):
     if workspace.e_mode == 'Indirect':
         processEfixed(workspace)
     _processLoadedWSLimits(workspace)
-    return workspace
-
-
-def rename_workspace(selected_workspace, new_name):
-    workspace = get_workspace_handle(selected_workspace)
-    remove_workspace(workspace)
-    add_workspace(workspace, new_name)
     return workspace
 
 
