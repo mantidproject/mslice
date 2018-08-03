@@ -86,35 +86,23 @@ class MatplotlibSlicePlotter(SlicePlotter):
         slice_cache = self.slice_cache[workspace_name]
         self._show_plot(slice_cache, slice_cache.chi)
 
-    def show_dynamical_susceptibility_magnetic(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        if cached_slice['plot_data'][2] is None:
-            self.compute_chi_magnetic(workspace)
-        self._show_plot(workspace, cached_slice['plot_data'][2], cached_slice['boundaries'], cached_slice['colourmap'],
-                        cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
+    def show_dynamical_susceptibility_magnetic(self, workspace_name):
+        slice_cache = self.slice_cache[workspace_name]
+        self._show_plot(slice_cache, slice_cache.chi_magnetic)
         plt.gcf().get_axes()[1].set_ylabel('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)',
                                            rotation=270, labelpad=20)
 
-    def show_d2sigma(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        if cached_slice['plot_data'][3] is None:
-            self.compute_d2sigma(workspace)
-        self._show_plot(workspace, cached_slice['plot_data'][3], cached_slice['boundaries'], cached_slice['colourmap'],
-                        cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
+    def show_d2sigma(self, workspace_name):
+        slice_cache = self.slice_cache[workspace_name]
+        self._show_plot(slice_cache, slice_cache.d2sigma)
 
-    def show_symmetrised(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        if cached_slice['plot_data'][4] is None:
-            self.compute_symmetrised(workspace)
-        self._show_plot(workspace, cached_slice['plot_data'][4], cached_slice['boundaries'], cached_slice['colourmap'],
-                        cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
+    def show_symmetrised(self, workspace_name):
+        slice_cache = self.slice_cache[workspace_name]
+        self._show_plot(slice_cache, slice_cache.symmetrised)
 
-    def show_gdos(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        if cached_slice['plot_data'][5] is None:
-            self.compute_gdos(workspace)
-        self._show_plot(workspace, cached_slice['plot_data'][5], cached_slice['boundaries'], cached_slice['colourmap'],
-                        cached_slice['norm'], cached_slice['momentum_axis'], cached_slice['energy_axis'])
+    def show_gdos(self, workspace_name):
+        slice_cache = self.slice_cache[workspace_name]
+        self._show_plot(slice_cache, slice_cache.gdos)
 
     def add_overplot_line(self, workspace, key, recoil, extra_info):
         if recoil:  # key is relative mass
@@ -159,34 +147,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def set_sample_temperature(self, workspace_name, temp):
         self.slice_cache[workspace_name].sample_temp = temp
-
-    def compute_chi(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][1] = compute_chi(cached_slice['plot_data'][0], self._sample_temperature(cached_slice),
-                                                   cached_slice['energy_axis'], cached_slice['rotated'])
-
-    def compute_chi_magnetic(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        if cached_slice['plot_data'][1] is None:
-            self.compute_chi(workspace)
-        cached_slice['plot_data'][2] = compute_chi_magnetic(cached_slice['plot_data'][1])
-
-    def compute_d2sigma(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][3] = compute_d2sigma(cached_slice['plot_data'][0],
-                                                       workspace, cached_slice['energy_axis'], cached_slice['rotated'])
-
-    def compute_symmetrised(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][4] = compute_symmetrised(cached_slice['plot_data'][0],
-                                                           self._sample_temperature(workspace),
-                                                           cached_slice['energy_axis'], cached_slice['rotated'])
-
-    def compute_gdos(self, workspace):
-        cached_slice = self.slice_cache[workspace]
-        cached_slice['plot_data'][5] = compute_gdos(cached_slice['plot_data'][0], self._sample_temperature(workspace),
-                                                    cached_slice['momentum_axis'], cached_slice['energy_axis'],
-                                                    cached_slice['rotated'])
 
     def get_available_colormaps(self):
         return allowed_cmaps()

@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from six import string_types
 import numpy as np
+from functools import partial
 
 from mantid.api import MDNormalization, WorkspaceUnitValidator
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
@@ -11,6 +12,7 @@ from mslice.models.workspacemanager.workspace_algorithms import propagate_proper
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid import run_algorithm
 
+from mslice.util.numpy_helper import apply_with_swapped_axes
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
@@ -25,7 +27,7 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
 
 def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
     workspace = get_workspace_handle(selected_workspace)
-    slice =  run_algorithm('Slice', output_name = 'slice_' + workspace.name, InputWorkspace=workspace,
+    slice =  run_algorithm('Slice', output_name = '__' + workspace.name, InputWorkspace=workspace,
                            XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
                            EMode=workspace.e_mode, NormToOne=norm_to_one)
     propagate_properties(workspace, slice)
@@ -33,18 +35,9 @@ def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
         slice = _norm_to_one(slice)
     return slice
 
-def axis_values(axis, reverse=False):
-    """
-    Compute a set of bins for the given axis values
-    :param axis: Axis object defining axis details
-    :param reverse: If true then the axis should have values in decreasing order
-    :return: A new numpy array containing the axis values
-    """
-    if reverse:
-        values = np.linspace(axis.end, axis.start, get_number_of_steps(axis))
-    else:
-        values = np.linspace(axis.start, axis.end, get_number_of_steps(axis))
-    return values
+def axis_values(axis):
+    '''Compute a numpy array of bins for the given axis values'''
+    return np.linspace(axis.start, axis.end, get_number_of_steps(axis))
 
 def compute_boltzmann_dist(sample_temp, delta_e):
     '''calculates exp(-E/kBT), a common factor in intensity corrections'''
@@ -53,11 +46,9 @@ def compute_boltzmann_dist(sample_temp, delta_e):
 
 def compute_chi(scattering_data, sample_temp, e_axis):
     """
-    :param scattering_data: Scattering data in axes selected by user
+    :param scattering_data: Scattering data workspace
     :param sample_temp: The sample temperature in Kelvin
-    :param e_axis: Axis object defining axis details
-    :param data_rotated: If true then it is assumed that the X axis=energy otherwise
-    it is assumed Y-axis=energy
+    :param e_axis: Axis object defining energy axis details
     :return: The dynamic susceptibility of the data
     """
     energy_transfer = axis_values(e_axis)
@@ -69,64 +60,53 @@ def compute_chi(scattering_data, sample_temp, e_axis):
     return out
 
 def compute_chi_magnetic(chi):
-    if chi is None:
-        return None
     # 291 milibarns is the total neutron cross-section for a moment of one bohr magneton
     chi_magnetic = chi / 291
     return chi_magnetic
 
-def compute_d2sigma(scattering_data, workspace, e_axis, data_rotated):
+def compute_d2sigma(scattering_data, e_axis):
     """
-    :param scattering_data: Scattering data in axes selected by user
-    :param workspace: A reference to the workspace
-    :param e_axis: Axis object defining axis details
-    :param data_rotated: If true then it is assumed that the X axis=energy otherwise
-    it is assumed Y-axis=energy
+    :param scattering_data: Scattering data workspace
+    :param e_axis: Axis object defining energy axis details
     :return: d2sigma
     """
-    Ei = get_workspace_handle(workspace).e_fixed
+    Ei = scattering_data.e_fixed
     if Ei is None:
         return None
     ki = np.sqrt(Ei) * E_TO_K
-    energy_transfer = axis_values(e_axis, reverse=not data_rotated)
+    energy_transfer = axis_values(e_axis)
     kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)
-    if data_rotated:
-        kf = kf[None, :]
-    else:
-        kf = kf[:, None]
-
     return scattering_data * kf / ki
 
 def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
-    energy_transfer = axis_values(e_axis, reverse=not data_rotated)
+    energy_transfer = axis_values(e_axis)
     negative_de = energy_transfer[energy_transfer < 0]
     negative_de_len = len(negative_de)
     boltzmann_dist = compute_boltzmann_dist(sample_temp, negative_de)
-    if data_rotated:
-        # xaxis=dE
-        lhs = scattering_data[:, :negative_de_len] * boltzmann_dist
-        rhs = scattering_data[:, negative_de_len:]
-        return np.concatenate((lhs, rhs), 1)
+    signal = scattering_data.get_signal()
+    if data_rotated and scattering_data.is_PSD:
+       new_signal = apply_with_swapped_axes(partial(modify_part_of_signal, boltzmann_dist, negative_de_len), signal)
     else:
-        rhs = scattering_data[-negative_de_len:, :] * boltzmann_dist[:, None]
-        lhs = scattering_data[:-negative_de_len, :]
-        return np.concatenate((lhs, rhs))
+       new_signal = modify_part_of_signal(boltzmann_dist, negative_de_len, signal)
+    new_ws = run_algorithm('CloneWorkspace', InputWorkspace=scattering_data, output_name=scattering_data.name,
+                           store=False)
+    propagate_properties(scattering_data, new_ws)
+    new_ws.set_signal(new_signal)
+    return new_ws
 
+def modify_part_of_signal(multiplier, up_to_index, signal):
+    lhs = signal[:, :up_to_index] * multiplier
+    rhs = signal[:, up_to_index:]
+    return np.concatenate((lhs, rhs), 1)
 
-def compute_gdos(scattering_data, sample_temp, q_axis, e_axis, data_rotated):
-    energy_transfer = axis_values(e_axis, reverse=not data_rotated)
-    momentum_transfer = axis_values(q_axis, reverse=data_rotated)
+def compute_gdos(scattering_data, sample_temp, q_axis, e_axis):
+    energy_transfer = axis_values(e_axis)
+    momentum_transfer = axis_values(q_axis)
     momentum_transfer = np.square(momentum_transfer, out=momentum_transfer)
     boltzmann_dist = compute_boltzmann_dist(sample_temp, energy_transfer)
-    if data_rotated:
-        gdos = scattering_data / momentum_transfer[:,None]
-        gdos *= energy_transfer
-        gdos *= (1 - boltzmann_dist)[None, :]
-    else:
-        gdos = scattering_data / momentum_transfer
-        gdos *= energy_transfer[:, None]
-        gdos *= (1 - boltzmann_dist)[:, None]
-
+    gdos = scattering_data / momentum_transfer
+    gdos *= energy_transfer
+    gdos *= (1 - boltzmann_dist)
     return gdos
 
 def sample_temperature(ws_name, sample_temp_fields):

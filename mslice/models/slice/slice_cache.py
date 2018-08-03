@@ -47,5 +47,17 @@ class SliceCache():
     @property
     def d2sigma(self):
         if self._d2sigma is None:
-            self._d2sigma = compute_d2sigma(self.scattering_function, self.sample_temp, self.energy_axis, self.rotated)
+            self._d2sigma = compute_d2sigma(self.scattering_function, self.energy_axis)
         return self._d2sigma
+
+    @property
+    def symmetrised(self):
+        if self._symmetrised is None:
+            self._symmetrised = compute_symmetrised(self.scattering_function, self.sample_temp, self.energy_axis, self.rotated)
+        return self._symmetrised
+
+    @property
+    def gdos(self):
+        if self._gdos is None:
+            self._gdos = compute_gdos(self.scattering_function, self.sample_temp, self.momentum_axis, self.energy_axis)
+        return self._gdos
