@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
 from matplotlib import transforms
+from matplotlib import lines
 
 from mslice.models.cmap import allowed_cmaps
 from mslice.models.labels import get_display_name, recoil_labels
@@ -24,7 +25,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
         self.listener = None
         self.slice_cache = {}
         self._sample_temp_fields = []
-        self.overplot_lines = {}
 
     def plot_slice(self, selected_ws, x_axis, y_axis, smoothing, intensity_start, intensity_end, norm_to_one,
                    colourmap):
@@ -104,39 +104,33 @@ class MatplotlibSlicePlotter(SlicePlotter):
         slice_cache = self.slice_cache[workspace_name]
         self._show_plot(slice_cache, slice_cache.gdos)
 
-    def add_overplot_line(self, workspace, key, recoil, extra_info):
+    def add_overplot_line(self, workspace_name, key, recoil, cif=None):
+        cache = self.slice_cache[workspace_name]
         if recoil:  # key is relative mass
-            label = recoil_labels[key] if key in recoil_labels else \
-                'Relative mass ' + str(key)
+            label = recoil_labels[key] if key in recoil_labels else 'Relative mass ' + str(key)
         else:  # key is element name
             label = key
-        if key in self.overplot_lines[workspace]:
-            line = self.overplot_lines[workspace][key]
-            line.set_linestyle('-')  # make visible
-            line.set_label(label)  # add to legend
-            line.set_markersize(6)  # show markers - 6.0 is default size
-            if line not in plt.gca().get_children():
-                plt.gca().add_artist(line)
+        if recoil:
+            x, y = compute_recoil_line(workspace_name, cache.momentum_axis, key)
         else:
-            momentum_axis = self.slice_cache[workspace]['momentum_axis']
-            if recoil:
-                x, y = compute_recoil_line(workspace, momentum_axis, key)
-            else:
-                x, y = compute_powder_line(workspace, momentum_axis, key, cif_file=extra_info)
-            color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
-            if self.slice_cache[workspace]['rotated']:
-                self.overplot_lines[workspace][key] = plt.gca().plot(y, x, color=color, label=label,
-                                                                     alpha=.7, picker=PICKER_TOL_PTS)[0]
-            else:
-                self.overplot_lines[workspace][key] = plt.gca().plot(x, y, color=color, label=label,
-                                                                     alpha=.7, picker=PICKER_TOL_PTS)[0]
+            x, y = compute_powder_line(workspace_name, cache.momentum_axis, key, cif_file=cif)
+        self.plot_overplot_line(x, y, key, label, cache)
 
     def hide_overplot_line(self, workspace, key):
-        if key in self.overplot_lines[workspace]:
-            line = self.overplot_lines[workspace][key]
-            line.set_linestyle('')
-            line.set_label('')
-            line.set_markersize(0)
+        cache = self.slice_cache[workspace]
+        if key in cache.overplot_lines:
+            line = cache.overplot_lines.pop(key)
+            plt.gca().lines.remove(line)
+
+    def plot_overplot_line(self, x, y, key, label, cache):
+        color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
+        fig = plt.gcf()
+        if cache.rotated:
+            cache.overplot_lines[key] = plt.gca().plot(y, x, color=color, label=label, alpha=.7,
+                                                       picker=PICKER_TOL_PTS)[0]
+        else:
+            cache.overplot_lines[key] = plt.gca().plot(x, y, color=color, label=label, alpha=.7,
+                                                       picker=PICKER_TOL_PTS)[0]
 
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
