@@ -21,8 +21,7 @@ class MatplotlibCutPlotter(CutPlotter):
         cut = compute_cut(workspace, cut_axis, integration_axis, norm_to_one, store)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start,
                                  integration_axis.end)
-        self.plot_cut_impl(cut, cut_axis.units, (intensity_start, intensity_end), plot_over, legend)
-        plt.show()
+        self._plot_cut_impl(cut, cut_axis.units, (intensity_start, intensity_end), plot_over, legend)
 
     def plot_interactive_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
                  intensity_end, plot_over, store=True):
@@ -44,7 +43,7 @@ class MatplotlibCutPlotter(CutPlotter):
         plt.show()
 
     @plt.set_category(plt.CATEGORY_CUT)
-    def plot_cut_impl(self, workspace, x_units, intensity_range=None, plot_over=False, legend=None):
+    def _plot_cut_impl(self, workspace, x_units, intensity_range=None, plot_over=False, legend=None):
         legend = workspace.name if legend is None else legend
         if not plot_over:
             plt.cla()
@@ -63,6 +62,7 @@ class MatplotlibCutPlotter(CutPlotter):
             cur_canvas.manager.update_grid()
         if not cur_canvas.manager.has_plot_handler():
             cur_canvas.manager.add_cut_plot(self, workspace)
+        cur_fig.canvas.draw()
 
     def _create_cut(self, workspace):
         canvas = plt.gcf().canvas

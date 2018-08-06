@@ -139,7 +139,7 @@ class SlicePlot(object):
             self._canvas.figure.colorbar(colormesh)
 
     def reset_info_checkboxes(self):
-        for key, line in six.iteritems(self._slice_plotter.overplot_lines[self.ws_name]):
+        for key, line in six.iteritems(self._slice_plotter.slice_cache[self.ws_name].overplot_lines):
             if str(line.get_linestyle()) == 'None':
                 if isinstance(key, int):
                     key = self._slice_plotter.get_recoil_label(key)
