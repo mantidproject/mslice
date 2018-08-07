@@ -33,10 +33,10 @@ class MatplotlibSlicePlotter(SlicePlotter):
         slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
-        self.show_scattering_function(slice.name)
+        self.show_scattering_function(selected_ws.name)
         fig_canvas = plt.gcf().canvas
         fig_canvas.set_window_title(selected_ws.name)
-        fig_canvas.manager.add_slice_plot(self, slice.name)
+        fig_canvas.manager.add_slice_plot(self, selected_ws.name)
         fig_canvas.manager.update_grid()
         plt.draw_all()
 
@@ -44,7 +44,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         rotated = x_axis.units not in ['MomentumTransfer', 'Degrees', '|Q|']
         q_axis = y_axis if rotated else x_axis
         e_axis = x_axis if rotated else y_axis
-        self.slice_cache[slice.name] = SliceCache(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
+        self.slice_cache[slice.name[2:]] = SliceCache(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     @plt.set_category(plt.CATEGORY_SLICE)
     def _show_plot(self, slice_cache, workspace):
@@ -56,10 +56,12 @@ class MatplotlibSlicePlotter(SlicePlotter):
         if not workspace.is_PSD and not slice_cache.rotated:
             workspace = run_algorithm('Transpose', output_name=workspace.name, InputWorkspace=workspace, store=False)
         image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap)
-        ax.set_title(workspace.name, picker=PICKER_TOL_PTS)
+        ax.set_title(workspace.name[2:], picker=PICKER_TOL_PTS)
         x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
         y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
         comment = get_comment(str(workspace.name))
+        ax.get_xaxis().set_units(x_axis.units)
+        ax.get_yaxis().set_units(y_axis.units)
         # labels
         ax.set_xlabel(get_display_name(x_axis.units, comment), picker=PICKER_TOL_PTS)
         ax.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
