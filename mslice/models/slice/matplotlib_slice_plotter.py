@@ -67,18 +67,11 @@ class MatplotlibSlicePlotter(SlicePlotter):
         ax.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
         ax.set_xlim(x_axis.start)
         ax.set_ylim(y_axis.start)
-
-        # colorbar - have we plotted one previously?
-        try:
-            cb_axes = plt.gcf().get_axes()[1]
-        except IndexError:
-            cb = plt.colorbar(image, ax=ax)
-
-        else:
-            cb = plt.colorbar(image, cax=cb_axes)
+        cb = plt.colorbar(image, ax=ax)
         cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
         cur_fig.canvas.draw_idle()
         cur_fig.show()
+
 
     def show_scattering_function(self, workspace_name):
         slice_cache = self.slice_cache[workspace_name]

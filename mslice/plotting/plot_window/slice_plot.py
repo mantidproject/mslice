@@ -124,6 +124,7 @@ class SlicePlot(object):
         colormesh = current_axis.collections[0]
         vmin, vmax = colorbar_range
         if logarithmic:
+            label = self.colorbar_label
             colormesh.colorbar.remove()
             if vmin <= float(0):
                 vmin = 0.001
@@ -131,12 +132,16 @@ class SlicePlot(object):
             norm = colors.LogNorm(vmin, vmax)
             colormesh.set_norm(norm)
             self._canvas.figure.colorbar(colormesh)
+            self.colorbar_label = label
         else:
+            label = self.colorbar_label
             colormesh.colorbar.remove()
             colormesh.set_clim((vmin, vmax))
             norm = colors.Normalize(vmin, vmax)
             colormesh.set_norm(norm)
+            # self._canvas.figure.colorbar(colormesh)
             self._canvas.figure.colorbar(colormesh)
+            self.colorbar_label = label
 
     def reset_info_checkboxes(self):
         for key, line in six.iteritems(self._slice_plotter.slice_cache[self.ws_name].overplot_lines):
