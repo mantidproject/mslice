@@ -55,7 +55,7 @@ class MatplotlibSlicePlotter(SlicePlotter):
         ax = cur_fig.add_subplot(111, projection='mantid')
         if not workspace.is_PSD and not slice_cache.rotated:
             workspace = run_algorithm('Transpose', output_name=workspace.name, InputWorkspace=workspace, store=False)
-        image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap)
+        image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap, norm=slice_cache.norm)
         ax.set_title(workspace.name[2:], picker=PICKER_TOL_PTS)
         x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
         y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
@@ -71,7 +71,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
         cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
         cur_fig.canvas.draw_idle()
         cur_fig.show()
-
 
     def show_scattering_function(self, workspace_name):
         slice_cache = self.slice_cache[workspace_name]
