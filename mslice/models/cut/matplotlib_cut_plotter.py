@@ -1,8 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
-from mantid.plots import *
 from mslice.models.cut.cut_plotter import CutPlotter
-from mslice.models.cut.cut_functions import output_workspace_name, compute_cut
+from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
@@ -24,7 +23,7 @@ class MatplotlibCutPlotter(CutPlotter):
         self._plot_cut_impl(cut, cut_axis.units, (intensity_start, intensity_end), plot_over, legend)
 
     def plot_interactive_cut(self, selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start,
-                 intensity_end, plot_over, store=True):
+                             intensity_end, plot_over, store=True):
         self.plot_cut(selected_workspace, cut_axis, integration_axis, norm_to_one, intensity_start, intensity_end,
                       plot_over, store)
         cur_fig = plt.gcf()
@@ -51,7 +50,7 @@ class MatplotlibCutPlotter(CutPlotter):
         cur_canvas = cur_fig.canvas
         ax = cur_fig.add_subplot(111, projection='mantid')
         ax.errorbar(workspace.raw_ws, 'o-', label=legend, picker=PICKER_TOL_PTS)
-        ax.set_ylim(*intensity_range) if intensity_range is not None else cur_axes.autoscale()
+        ax.set_ylim(*intensity_range) if intensity_range is not None else ax.autoscale()
         if cur_canvas.manager.window.action_toggle_legends.isChecked():
             leg = ax.legend(fontsize='medium')
             leg.draggable()

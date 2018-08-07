@@ -1,7 +1,7 @@
 import numpy as np
 from mantid.api import IMDHistoWorkspace, MDNormalization
 
-def _normalize_workspace(workspace):
+def normalize_workspace(workspace):
     assert isinstance(workspace, IMDHistoWorkspace)
     num_events = workspace.getNumEventsArray()
     average_event_intensity = _num_events_normalized_array(workspace)

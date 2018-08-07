@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
 import operator
-from mantid.simpleapi import CloneWorkspace
+from mantid.simpleapi import CloneWorkspace, PowerMD
 from mslice.util.numpy_helper import apply_with_corrected_shape
 
 

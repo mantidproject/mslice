@@ -1,19 +1,15 @@
 from __future__ import (absolute_import, division, print_function)
 from matplotlib.colors import Normalize
-from matplotlib import transforms
-from matplotlib import lines
 
 from mslice.models.cmap import allowed_cmaps
 from mslice.models.labels import get_display_name, recoil_labels
 from mslice.models.slice.slice_plotter import SlicePlotter
 from mslice.models.slice.slice_cache import SliceCache
 from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
-                                                 compute_chi_magnetic, compute_gdos, compute_d2sigma,
-                                                 compute_powder_line, compute_chi, compute_symmetrised)
+                                                 compute_powder_line)
 from mslice.models.workspacemanager.workspace_algorithms import get_comment, get_workspace_handle
 from mslice.util.mantid import run_algorithm
 import mslice.plotting.pyplot as plt
-import numpy as np
 
 OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
 PICKER_TOL_PTS = 5
@@ -118,7 +114,6 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def plot_overplot_line(self, x, y, key, label, cache):
         color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
-        fig = plt.gcf()
         if cache.rotated:
             cache.overplot_lines[key] = plt.gca().plot(y, x, color=color, label=label, alpha=.7,
                                                        picker=PICKER_TOL_PTS)[0]

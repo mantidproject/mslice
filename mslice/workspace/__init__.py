@@ -1,5 +1,4 @@
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
-from mantid.simpleapi import CloneWorkspace
 from .workspace import Workspace as MatrixWorkspace
 from .pixel_workspace import PixelWorkspace
 from .histogram_workspace import HistogramWorkspace

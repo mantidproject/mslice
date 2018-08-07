@@ -3,7 +3,6 @@ import numpy as np
 
 from mantid.api import MDNormalization, WorkspaceUnitValidator
 
-from mslice.models.cut.cut_normalisation import _num_events_normalized_array
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid import run_algorithm
 from mslice.workspace.pixel_workspace import PixelWorkspace

@@ -3,7 +3,7 @@ from six import string_types
 import numpy as np
 from functools import partial
 
-from mantid.api import MDNormalization, WorkspaceUnitValidator
+from mantid.api import WorkspaceUnitValidator
 from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
@@ -85,9 +85,9 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
     boltzmann_dist = compute_boltzmann_dist(sample_temp, negative_de)
     signal = scattering_data.get_signal()
     if data_rotated and scattering_data.is_PSD:
-       new_signal = apply_with_swapped_axes(partial(modify_part_of_signal, boltzmann_dist, negative_de_len), signal)
+        new_signal = apply_with_swapped_axes(partial(modify_part_of_signal, boltzmann_dist, negative_de_len), signal)
     else:
-       new_signal = modify_part_of_signal(boltzmann_dist, negative_de_len, signal)
+        new_signal = modify_part_of_signal(boltzmann_dist, negative_de_len, signal)
     new_ws = run_algorithm('CloneWorkspace', InputWorkspace=scattering_data, output_name=scattering_data.name,
                            store=False)
     propagate_properties(scattering_data, new_ws)
