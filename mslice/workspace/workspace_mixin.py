@@ -71,7 +71,8 @@ class WorkspaceMixin(object):
         """Perform binary operation using a numpy array with the same number of elements as an axis of _raw_ws signal"""
         signal = self.get_signal()
         new_ws = CloneWorkspace(InputWorkspace= self._raw_ws, StoreInADS=False)
-        new_signal = apply_with_corrected_shape(operator, signal, other)
+        error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
+        new_signal = apply_with_corrected_shape(operator, signal, other, error)
         self._set_signal_raw(new_ws, new_signal)
         # scale errors?
         return new_ws
@@ -120,4 +121,4 @@ class WorkspaceMixin(object):
         return self * -1
 
     def __pow__(self, exponent):
-        return self.rewrap(PowerMD(InputWorkspace=self._raw_ws, Exponent=exponent, StoreInADS=False))
+        return self.rewrap(PowerMD(InputWorkspace=self._raw_ws, OutputWorkspace="_", Exponent=exponent, StoreInADS=False))

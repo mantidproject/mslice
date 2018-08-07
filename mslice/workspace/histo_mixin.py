@@ -32,6 +32,7 @@ class HistoMixin(object):
         """
         signal = self.get_signal()
         new_ws = CloneWorkspace(InputWorkspace=self._raw_ws, StoreInADS=False)
-        new_signal = apply_with_corrected_shape(operator, signal, other)
+        error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
+        new_signal = apply_with_corrected_shape(operator, signal, other, error)
         new_ws.setSignalArray(new_signal)
         return new_ws

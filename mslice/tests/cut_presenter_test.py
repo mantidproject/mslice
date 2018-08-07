@@ -244,9 +244,9 @@ class CutPresenterTest(unittest.TestCase):
         self.cut_plotter.plot_cut.assert_called_with(workspace, processed_axis, integration_axis,
                                                      is_norm, None, intensity_end, plot_over=True)
 
-    @patch('mslice.presenters.cut_presenter.compute_cut_xye')
+    @patch('mslice.presenters.cut_presenter.compute_cut')
     @patch('mslice.models.cut.cut_functions.get_workspace_handle')
-    def test_cut_single_save_to_workspace(self, get_workspace_handle_mock, compute_cut_xye_mock):
+    def test_cut_single_save_to_workspace(self, get_workspace_handle_mock, compute_cut_mock):
         cut_presenter = CutPresenter(self.view, self.cut_plotter)
         cut_presenter.register_master(self.main_presenter)
         axis = Axis("units", "0", "100", "1")
@@ -266,7 +266,7 @@ class CutPresenterTest(unittest.TestCase):
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis)
         self.cut_plotter.plot_cut = mock.Mock()
         cut_presenter.notify(Command.SaveToWorkspace)
-        compute_cut_xye_mock.assert_called_with(workspace, processed_axis, integration_axis, is_norm)
+        compute_cut_mock.assert_called_with(workspace, processed_axis, integration_axis, is_norm)
         self.cut_plotter.plot_cut.assert_not_called()
 
     def test_plot_multiple_cuts_with_width(self):
