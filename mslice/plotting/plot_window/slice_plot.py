@@ -223,6 +223,7 @@ class SlicePlot(object):
             previous = self.selected_intensity()
             self.set_intensity(action)
             cbar_log = self.colorbar_log
+            cbar_range = self.colorbar_range
             x_range = self.x_range
             y_range = self.y_range
             title = self.title
@@ -231,7 +232,7 @@ class SlicePlot(object):
                     return
             else:
                 slice_plotter_method(self.ws_name)
-            self.change_axis_scale(self.colorbar_range, cbar_log)
+            self.change_axis_scale(cbar_range, cbar_log)
             self.x_range = x_range
             self.y_range = y_range
             self.title = title
