@@ -82,9 +82,3 @@ class InteractiveCut(object):
     def flip_axis(self):
         self.horizontal = not self.horizontal
         self.plot_cut(*self.rect.extents)
-
-    # def window_closing(self):
-    #     self.clear()
-    #     slice_plot = self._cut_plotter.get_icut().slice_plot
-    #     slice_plot.icut_window_closing()
-
