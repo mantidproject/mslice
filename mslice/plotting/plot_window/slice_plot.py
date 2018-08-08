@@ -375,10 +375,6 @@ class SlicePlot(IPlot):
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
 
-    def icut_window_closing(self):
-        self.plot_window.action_interactive_cuts.setChecked(False)
-        self.toggle_icut()
-
     @property
     def colorbar_label(self):
         return self._canvas.figure.get_axes()[1].get_ylabel()
