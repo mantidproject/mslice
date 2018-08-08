@@ -103,7 +103,6 @@ class SlicePlot(object):
             self._quick_presenter = quick_options(self._legend_dict[target], self)
         else:
             self._quick_presenter = quick_options(target, self)
-        self.reset_info_checkboxes()
         self.update_legend()
         self._canvas.draw()
 
@@ -139,16 +138,8 @@ class SlicePlot(object):
             colormesh.set_clim((vmin, vmax))
             norm = colors.Normalize(vmin, vmax)
             colormesh.set_norm(norm)
-            # self._canvas.figure.colorbar(colormesh)
             self._canvas.figure.colorbar(colormesh)
             self.colorbar_label = label
-
-    def reset_info_checkboxes(self):
-        for key, line in six.iteritems(self._slice_plotter.slice_cache[self.ws_name].overplot_lines):
-            if str(line.get_linestyle()) == 'None':
-                if isinstance(key, int):
-                    key = self._slice_plotter.get_recoil_label(key)
-                self.plot_window.disable_action(key)
 
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
         if checked:

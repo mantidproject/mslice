@@ -134,8 +134,5 @@ class MatplotlibSlicePlotter(SlicePlotter):
     def get_available_colormaps(self):
         return allowed_cmaps()
 
-    def get_recoil_label(self, key):
-        return recoil_labels[key]
-
     def update_displayed_workspaces(self):
         self.listener.update_workspaces()

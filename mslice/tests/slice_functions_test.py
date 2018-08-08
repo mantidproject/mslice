@@ -77,8 +77,8 @@ class SliceFunctionsTest(unittest.TestCase):
     def test_compute_gdos(self):
         gdos = compute_gdos(self.test_ws, 10, self.q_axis, self.e_axis).get_signal()
         self.assertAlmostEqual(gdos[0][0], 0.0, 6)
-        self.assertAlmostEqual(gdos[15][10], 0.697758, 6)
-        self.assertAlmostEqual(gdos[24][29], 2246.999938, 6)
+        self.assertAlmostEqual(gdos[15][10], 2.312954, 6)
+        self.assertAlmostEqual(gdos[24][29], 2.338189, 6)
 
     @patch('mslice.models.slice.slice_functions.get_workspace_handle')
     def test_recoil_line(self, ws_handle_mock):
