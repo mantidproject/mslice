@@ -106,6 +106,7 @@ class PlotWindow(QtWidgets.QMainWindow):
                                           icon_name='fa.search-minus', checkable=False)
         self.action_toggle_legends = add_action(toolbar, self, "Legends", checkable=True,
                                                 checked=True)
+        toolbar.addSeparator()
         self.action_keep = add_action(toolbar, self,  "Keep", checkable=True)
         self.action_make_current = add_action(toolbar, self,  "Make Current",
                                               checkable=True, checked=True)
