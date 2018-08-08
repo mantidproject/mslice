@@ -8,7 +8,6 @@ from mslice.models.axis import Axis
 from mslice.models.slice.slice_functions import (compute_slice, compute_boltzmann_dist, compute_chi,
                                                  compute_chi_magnetic, compute_d2sigma, compute_symmetrised,
                                                  compute_gdos, compute_powder_line, compute_recoil_line)
-from mslice.models.slice.slice_cache import SliceCache
 from mslice.util.mantid import initialize_mantid, run_algorithm
 from mantid.simpleapi import AddSampleLog
 
@@ -27,7 +26,8 @@ class SliceFunctionsTest(unittest.TestCase):
         cls.e_axis = Axis('DeltaE', -10, 15, 1)
         cls.q_axis = Axis('|Q|', 0.1, 3.1, 0.1)
         cls.q_axis_degrees = Axis('Degrees', 3, 33, 1)
-        cls.test_ws = run_algorithm('CreateSampleWorkspace', output_name='test_ws', NumBanks=1, BankPixelWidth=5, XMin=0.1, XMax=3.1, BinWidth=0.1, XUnit='DeltaE')
+        cls.test_ws = run_algorithm('CreateSampleWorkspace', output_name='test_ws', NumBanks=1, BankPixelWidth=5,
+                                    XMin=0.1, XMax=3.1, BinWidth=0.1, XUnit='DeltaE')
         for i in range(cls.test_ws.raw_ws.getNumberHistograms()):
             cls.test_ws.raw_ws.setY(i, cls.sim_scattering_data[i])
         AddSampleLog(workspace=cls.test_ws.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)

@@ -17,7 +17,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.test_ws_2d = run_algorithm('CreateSimulationWorkspace', output_name='test_ws_2d', Instrument='MAR',
                                         BinParams=[-10, 1, 10], UnitX='DeltaE')
         AddSampleLog(Workspace=self.test_ws_2d.raw_ws, StoreInADS=False, LogName='Ei', LogText='50.',
-                      LogType='Number')
+                     LogType='Number')
         self.test_ws_md = run_algorithm('ConvertToMD', output_name='test_ws_md', InputWorkspace=self.test_ws_2d,
                                         QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                         SplitInto='50,50')
