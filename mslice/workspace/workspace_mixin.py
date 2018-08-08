@@ -115,7 +115,7 @@ class WorkspaceMixin(object):
         return self._binary_op(operator.mul, other)
 
     def __truediv__(self, other):
-        return self._binary_op(operator.div, other)
+        return self._binary_op(operator.truediv, other)
 
     def __neg__(self):
         return self * -1
