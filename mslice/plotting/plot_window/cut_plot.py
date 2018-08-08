@@ -49,6 +49,7 @@ class CutPlot(IPlot):
 
     def window_closing(self):
         self._canvas.figure.clf()
+        self._cut_plotter.get_icut().slice_plot.icut_window_closing()
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()

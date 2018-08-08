@@ -1,7 +1,6 @@
 from functools import partial
 import six
 
-from mslice.util.qt import QtWidgets
 from mslice.util.qt.QtCore import Qt
 
 import os.path as path
@@ -375,6 +374,10 @@ class SlicePlot(IPlot):
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
 
+    def icut_window_closing(self):
+        self.plot_window.action_interactive_cuts.toggle()
+        self.icut.clear()
+        self.icut = None
 
     @property
     def colorbar_label(self):
