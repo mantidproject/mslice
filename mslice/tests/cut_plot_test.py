@@ -3,7 +3,7 @@ import numpy as np
 import unittest
 
 from matplotlib.lines import Line2D
-from mslice.plotting.plot_window.cut_plot import CutPlot
+from mslice.plotting.plot_window.cut_plot import CutPlot, get_min
 
 
 class CutPlotTest(unittest.TestCase):
@@ -20,8 +20,8 @@ class CutPlotTest(unittest.TestCase):
 
     def test_get_min(self):
         data = [np.array([3, 6, 10]), np.array([3, 2, 7])]
-        self.assertEqual(self.cut_plot.get_min(data), 2)
-        self.assertEqual(self.cut_plot.get_min(data, 4), 6)
+        self.assertEqual(get_min(data), 2)
+        self.assertEqual(get_min(data, 4), 6)
 
     def test_change_scale_linear(self):
         self.axes.set_xscale = MagicMock()
@@ -53,21 +53,19 @@ class CutPlotTest(unittest.TestCase):
     @patch('mslice.plotting.plot_window.cut_plot.quick_options')
     def test_line_clicked(self, quick_options_mock):
         line = Line2D([], [])
-        self.cut_plot.get_line_index = MagicMock(return_value=2)
         self.cut_plot.update_legend = MagicMock()
         self.cut_plot.object_clicked(line)
-        self.cut_plot.get_line_index.assert_called_once_with(line)
-        quick_options_mock.assert_called_once_with(2, self.cut_plot)
+        quick_options_mock.assert_called_once_with(line, self.cut_plot)
         self.cut_plot.update_legend.assert_called_once()
         self.cut_plot._canvas.draw.assert_called_once()
 
     @patch('mslice.plotting.plot_window.cut_plot.quick_options')
     def test_object_clicked(self, quick_options_mock):
         text = "some_label"
-        self.cut_plot.get_line_index = MagicMock(return_value=2)
+        self.cut_plot._get_line_index = MagicMock(return_value=2)
         self.cut_plot.update_legend = MagicMock()
         self.cut_plot.object_clicked(text)
-        self.cut_plot.get_line_index.assert_not_called()
+        self.cut_plot._get_line_index.assert_not_called()
         quick_options_mock.assert_called_once_with(text, self.cut_plot)
         self.cut_plot.update_legend.assert_called_once()
         self.cut_plot._canvas.draw.assert_called_once()

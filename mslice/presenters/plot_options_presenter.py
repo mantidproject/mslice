@@ -74,8 +74,8 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._view.xLogEdited.connect(partial(self._xy_config_modified, 'x_log'))
         self._view.yLogEdited.connect(partial(self._xy_config_modified, 'y_log'))
 
-        line_data = self._model.get_all_line_data()
-        self._view.set_line_data(line_data)
+        line_options = self._model.get_all_line_options()
+        self._view.set_line_options(line_options)
 
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log',
@@ -91,7 +91,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
             self._model.change_axis_scale(self._xy_config)
         for key, value in list(self._modified_values.items()):
             setattr(self._model, key, value)
-        line_data = self._view.get_line_data()
-        self._model.set_all_line_data(line_data)
+        line_options = self._view.get_line_options()
+        self._model.set_all_line_options(line_options)
         self._model.error_bars = self._view.error_bars
         return True
