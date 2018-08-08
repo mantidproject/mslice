@@ -12,7 +12,7 @@ def apply_with_corrected_shape(method, shape_array, array, exception):
         array = array[:, np.newaxis]
     if array.shape[1] == 1:
         array = np.transpose(array)
-    if shape_array.shape[0] in array.shape: # array matches the wrong (leftmost) axis
+    if shape_array.shape[0] in array.shape and shape_array.shape[0] != 1: # array matches the wrong (leftmost) axis
         return apply_with_swapped_axes(method, shape_array, array)
     if shape_array.shape[1] == array.shape[1]:
         return method(shape_array, array)
