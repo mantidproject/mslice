@@ -202,7 +202,7 @@ def subtract(workspaces, background_ws, ssf):
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
             result = run_algorithm('Minus', output_name=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
-                                   RHSWorkspace=scaled_bg_ws)
+                                   RHSWorkspace=scaled_bg_ws.raw_ws)
             propagate_properties(ws, result)
     except ValueError as e:
         raise ValueError(e)

@@ -56,7 +56,9 @@ def compute_chi(scattering_data, sample_temp, e_axis):
     signs[signs == 0] = 1
     boltzmann_dist =  compute_boltzmann_dist(sample_temp, energy_transfer)
     chi = np.pi * (signs + (boltzmann_dist * -signs))
+    signal = scattering_data.get_signal()
     out = scattering_data * chi
+    signal = out.get_signal()
     return out
 
 def compute_chi_magnetic(chi):
