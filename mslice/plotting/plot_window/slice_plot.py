@@ -11,31 +11,27 @@ from matplotlib.lines import Line2D
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from .interactive_cut import InteractiveCut
-from .plot_options import SlicePlotOptions
+from mslice.plotting.plot_window.iplot import IPlot
+from mslice.plotting.plot_window.interactive_cut import InteractiveCut
+from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 
 
-class SlicePlot(object):
+class SlicePlot(IPlot):
 
-    def __init__(self, figure_manager, slice_plotter, workspace):
+    def __init__(self, figure_manager, slice_plotter, workspace_name):
         self.manager = figure_manager
         self.plot_window = figure_manager.window
         self._canvas = self.plot_window.canvas
         self._slice_plotter = slice_plotter
-        self.ws_name = workspace
+        self.ws_name = workspace_name
         self._arb_nuclei_rmm = None
         self._cif_file = None
         self._cif_path = None
-        self._quick_presenter = None
         self._legend_dict = {}
         self.icut_event = [None, None]
         self.icut = None
         self.setup_connections(self.plot_window)
         self._update_lines()
-
-    def window_closing(self):
-        # nothing to do
-        pass
 
     def setup_connections(self, plot_figure):
         plot_figure.action_interactive_cuts.setVisible(True)
@@ -82,6 +78,30 @@ class SlicePlot(object):
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_figure.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
 
+    def disconnect(self, plot_window):
+        plot_window.action_interactive_cuts.triggered.disconnect()
+        plot_window.action_save_cut.triggered.disconnect()
+        plot_window.action_flip_axis.triggered.disconnect()
+        plot_window.action_sqe.triggered.disconnect()
+        plot_window.action_chi_qe.triggered.disconnect()
+        plot_window.action_chi_qe_magnetic.triggered.disconnect()
+        plot_window.action_d2sig_dw_de.triggered.disconnect()
+        plot_window.action_symmetrised_sqe.triggered.disconnect()
+        plot_window.action_gdos.triggered.disconnect()
+        plot_window.action_hydrogen.triggered.disconnect()
+        plot_window.action_deuterium.triggered.disconnect()
+        plot_window.action_helium.triggered.disconnect()
+        plot_window.action_arbitrary_nuclei.triggered.disconnect()
+        plot_window.action_aluminium.triggered.disconnect()
+        plot_window.action_copper.triggered.disconnect()
+        plot_window.action_niobium.triggered.disconnect()
+        plot_window.action_tantalum.triggered.disconnect()
+        plot_window.action_cif_file.triggered.disconnect()
+
+    def window_closing(self):
+        # nothing to do
+        pass
+
     def plot_options(self):
         new_config = SlicePlotOptionsPresenter(SlicePlotOptions(), self).get_new_config()
         if new_config:
@@ -92,33 +112,41 @@ class SlicePlot(object):
         if bounds['x_label'] < y < bounds['title']:
             if bounds['y_label'] < x < bounds['colorbar_label']:
                 if y < bounds['x_range']:
-                    self._quick_presenter = quick_options('x_range', self)
+                    quick_options('x_range', self)
                 elif x < bounds['y_range']:
-                    self._quick_presenter = quick_options('y_range', self)
+                    quick_options('y_range', self)
                 elif x > bounds['colorbar_range']:
-                    self._quick_presenter = quick_options('colorbar_range', self, self.colorbar_log)
+                    quick_options('colorbar_range', self, self.colorbar_log)
             self._canvas.draw()
 
     def object_clicked(self, target):
         if target in self._legend_dict:
-            self._quick_presenter = quick_options(self._legend_dict[target], self)
+            quick_options(self._legend_dict[target], self)
         else:
-            self._quick_presenter = quick_options(target, self)
+            quick_options(target, self)
         self.reset_info_checkboxes()
         self.update_legend()
         self._canvas.draw()
 
-    def calc_figure_boundaries(self):
-        fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
-        bounds = {}
-        bounds['y_label'] = fig_x * 0.07
-        bounds['y_range'] = fig_x * 0.12
-        bounds['colorbar_range'] = fig_x * 0.75
-        bounds['colorbar_label'] = fig_x * 0.86
-        bounds['title'] = fig_y * 0.9
-        bounds['x_range'] = fig_y * 0.09
-        bounds['x_label'] = fig_y * 0.05
-        return bounds
+    def update_legend(self):
+        lines = []
+        labels = []
+        axes = self._canvas.figure.gca()
+        line_artists = [artist for artist in axes.get_children() if isinstance(artist, Line2D)]
+        for line in line_artists:
+            if str(line.get_linestyle()) != 'None' and line.get_label() != '':
+                lines.append(line)
+                labels.append(line.get_label())
+        if len(lines) > 0:
+            legend = axes.legend(lines, labels, fontsize='small')
+            for legline, line in zip(legend.get_lines(), lines):
+                legline.set_picker(5)
+                self._legend_dict[legline] = line
+            for label, line in zip(legend.get_texts(), lines):
+                label.set_picker(5)
+                self._legend_dict[label] = line
+        else:
+            axes.legend_ = None  # remove legend
 
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
@@ -140,6 +168,36 @@ class SlicePlot(object):
             mappable.set_norm(norm)
             self._canvas.figure.colorbar(mappable)
         mappable.set_clim((vmin, vmax))
+
+    def get_line_options(self, target):
+        line_options = {}
+        line_options['label'] = target.get_label()
+        line_options['legend'] = None
+        line_options['shown'] = None
+        line_options['color'] = target.get_color()
+        line_options['style'] = target.get_linestyle()
+        line_options['width'] = str(int(target.get_linewidth()))
+        line_options['marker'] = target.get_marker()
+        return line_options
+
+    def set_line_options(self, line, line_options):
+        line.set_label(line_options['label'])
+        line.set_linestyle(line_options['style'])
+        line.set_marker(line_options['marker'])
+        line.set_color(line_options['color'])
+        line.set_linewidth(line_options['width'])
+
+    def calc_figure_boundaries(self):
+        fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
+        bounds = {}
+        bounds['y_label'] = fig_x * 0.07
+        bounds['y_range'] = fig_x * 0.12
+        bounds['colorbar_range'] = fig_x * 0.75
+        bounds['colorbar_label'] = fig_x * 0.86
+        bounds['title'] = fig_y * 0.9
+        bounds['x_range'] = fig_y * 0.09
+        bounds['x_label'] = fig_y * 0.05
+        return bounds
 
     def reset_info_checkboxes(self):
         for key, line in six.iteritems(self._slice_plotter.overplot_lines[self.ws_name]):
@@ -180,26 +238,6 @@ class SlicePlot(object):
         if key:
             recoil = False
             self.toggle_overplot_line(key, recoil, checked, cif_file=cif_path)
-
-    def update_legend(self):
-        lines = []
-        labels = []
-        axes = self._canvas.figure.gca()
-        line_artists = [artist for artist in axes.get_children() if isinstance(artist, Line2D)]
-        for line in line_artists:
-            if str(line.get_linestyle()) != 'None' and line.get_label() != '':
-                lines.append(line)
-                labels.append(line.get_label())
-        if len(lines) > 0:
-            legend = axes.legend(lines, labels, fontsize='small')
-            for legline, line in zip(legend.get_lines(), lines):
-                legline.set_picker(5)
-                self._legend_dict[legline] = line
-            for label, line in zip(legend.get_texts(), lines):
-                label.set_picker(5)
-                self._legend_dict[label] = line
-        else:
-            axes.legend_ = None  # remove legend
 
     def _reset_intensity(self):
         options = self.plot_window.menu_intensity.actions()
@@ -298,24 +336,6 @@ class SlicePlot(object):
         self.update_legend()
         self._canvas.draw()
 
-    def get_line_data(self, target):
-        line_options = {}
-        line_options['label'] = target.get_label()
-        line_options['legend'] = None
-        line_options['shown'] = None
-        line_options['color'] = target.get_color()
-        line_options['style'] = target.get_linestyle()
-        line_options['width'] = str(int(target.get_linewidth()))
-        line_options['marker'] = target.get_marker()
-        return line_options
-
-    def set_line_data(self, line, line_options):
-        line.set_label(line_options['label'])
-        line.set_linestyle(line_options['style'])
-        line.set_marker(line_options['marker'])
-        line.set_color(line_options['color'])
-        line.set_linewidth(line_options['width'])
-
     def interactive_cuts(self):
         if not self.icut:
             self.manager.picking_connected(False)
@@ -355,25 +375,6 @@ class SlicePlot(object):
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
 
-    def disconnect(self, plot_window):
-        plot_window.action_interactive_cuts.triggered.disconnect()
-        plot_window.action_save_cut.triggered.disconnect()
-        plot_window.action_flip_axis.triggered.disconnect()
-        plot_window.action_sqe.triggered.disconnect()
-        plot_window.action_chi_qe.triggered.disconnect()
-        plot_window.action_chi_qe_magnetic.triggered.disconnect()
-        plot_window.action_d2sig_dw_de.triggered.disconnect()
-        plot_window.action_symmetrised_sqe.triggered.disconnect()
-        plot_window.action_gdos.triggered.disconnect()
-        plot_window.action_hydrogen.triggered.disconnect()
-        plot_window.action_deuterium.triggered.disconnect()
-        plot_window.action_helium.triggered.disconnect()
-        plot_window.action_arbitrary_nuclei.triggered.disconnect()
-        plot_window.action_aluminium.triggered.disconnect()
-        plot_window.action_copper.triggered.disconnect()
-        plot_window.action_niobium.triggered.disconnect()
-        plot_window.action_tantalum.triggered.disconnect()
-        plot_window.action_cif_file.triggered.disconnect()
 
     @property
     def colorbar_label(self):

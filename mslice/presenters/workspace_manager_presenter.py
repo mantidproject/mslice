@@ -5,12 +5,11 @@ from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads,
-                                                                 rename_workspace, subtract,
+from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads, subtract,
                                                                  is_pixel_workspace, combine_workspace,
                                                                  add_workspace_runs)
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_names, \
-    get_workspace_name, delete_workspace
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
+                                                               get_workspace_name, delete_workspace, rename_workspace)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -80,7 +79,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._psd = False
 
     def _confirm_workspace_overwrite(self, ws_name):
-        if ws_name in get_workspace_names():
+        if ws_name in get_visible_workspace_names():
             return self._workspace_manager_view.confirm_overwrite_workspace()
         else:
             return True
@@ -204,7 +203,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         This function must be called by the main presenter if any other
         presenter does any operation that changes the name or type of any existing workspace or creates or removes a
         workspace"""
-        self._workspace_manager_view.display_loaded_workspaces(get_workspace_names())
+        self._workspace_manager_view.display_loaded_workspaces(get_visible_workspace_names())
 
     def _clear_displayed_error(self):
         self._workspace_manager_view.clear_displayed_error()

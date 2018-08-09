@@ -50,7 +50,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.assertRaises(AssertionError, workspace_presenter.register_master, 3)
 
     @patch('mslice.presenters.workspace_manager_presenter.rename_workspace')
-    @patch('mslice.presenters.workspace_manager_presenter.get_workspace_names')
+    @patch('mslice.presenters.workspace_manager_presenter.get_visible_workspace_names')
     def test_rename_workspace(self, get_ws_names_mock, rename_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that will return a single selected workspace on call to get_workspace_selected and supply a

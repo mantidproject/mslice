@@ -2,17 +2,26 @@ from itertools import chain
 
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
-from matplotlib.lines import Line2D
+import warnings
 import numpy as np
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
-from .plot_options import CutPlotOptions
+from mslice.plotting.plot_window.plot_options import CutPlotOptions
+from mslice.plotting.plot_window.iplot import IPlot
 
 
-class CutPlot(object):
+def get_min(data, absolute_minimum=-np.inf):
+    """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        mask = np.greater(data, absolute_minimum)
+    return np.min(np.extract(mask, data))
 
-    def __init__(self, figure_manager, cut_plotter, workspace):
+
+class CutPlot(IPlot):
+
+    def __init__(self, figure_manager, cut_plotter, workspace_name):
         self.manager = figure_manager
         self.plot_window = figure_manager.window
         self._canvas = self.plot_window.canvas
@@ -21,12 +30,9 @@ class CutPlot(object):
         self._legends_shown = True
         self._legends_visible = []
         self._legend_dict = {}
-        self.ws_name = workspace
+        self.ws_name = workspace_name
         self._lines = self.line_containers()
         self.setup_connections(self.plot_window)
-
-    def window_closing(self):
-        self._canvas.figure.clf()
 
     def setup_connections(self, plot_window):
         plot_window.menu_intensity.setDisabled(True)
@@ -41,10 +47,119 @@ class CutPlot(object):
         plot_window.action_save_cut.triggered.disconnect()
         plot_window.action_flip_axis.triggered.disconnect()
 
+    def window_closing(self):
+        self._canvas.figure.clf()
+
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
         if new_config:
             self._canvas.draw()
+
+    def plot_clicked(self, x, y):
+        bounds = self.calc_figure_boundaries()
+        if bounds['x_label'] < y < bounds['title']:
+            if bounds['y_label'] < x:
+                if y < bounds['x_range']:
+                    quick_options('x_range', self, self.x_log)
+                elif x < bounds['y_range']:
+                    quick_options('y_range', self, self.y_log)
+            self._canvas.draw()
+
+    def object_clicked(self, target):
+        if isinstance(target, Legend):
+            return
+        else:
+            quick_options(target, self)
+        self.update_legend()
+        self._canvas.draw()
+
+    def update_legend(self, line_data=None):
+        axes = self._canvas.figure.gca()
+        labels_to_show = []
+        handles_to_show = []
+        handles, labels = axes.get_legend_handles_labels()
+        if line_data is None:
+            i = 0
+            for handle, label in zip(handles, labels):
+                if self.legend_visible(i):
+                    labels_to_show.append(label)
+                    handles_to_show.append(handle)
+                i+=1
+        else:
+            containers = axes.containers
+            for i in range(len(containers)):
+                if line_data[i]['legend']:
+                    handles_to_show.append(handles[i])
+                    labels_to_show.append(line_data[i]['label'])
+                self._legends_visible[i] = line_data[i]['legend']
+        axes.legend(handles_to_show, labels_to_show, fontsize='medium').draggable()  # add new legends
+
+    def change_axis_scale(self, xy_config):
+        current_axis = self._canvas.figure.gca()
+        if xy_config['x_log']:
+            xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
+            xmin = get_min(xdata, absolute_minimum=0.)
+            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
+            if xmin > 0:
+                xy_config['x_range'] = (xmin, xy_config['x_range'][1])
+        else:
+            current_axis.set_xscale('linear')
+        if xy_config['y_log']:
+            ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
+            ymin = get_min(ydata, absolute_minimum=0.)
+            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
+            if ymin > 0:
+                xy_config['y_range'] = (ymin, xy_config['y_range'][1])
+        else:
+            current_axis.set_yscale('linear')
+        self.x_range = xy_config['x_range']
+        self.y_range = xy_config['y_range']
+
+    def get_line_options(self, line):
+        index = self._get_line_index(line)
+        return self.get_line_options_by_index(index)
+
+    def set_line_options(self, line, line_options):
+        index = self._get_line_index(line)
+        self.set_line_options_by_index(index, line_options)
+
+    def get_all_line_options(self):
+        all_line_options = []
+        for i in range(len(self._canvas.figure.gca().containers)):
+            line_options = self.get_line_options_by_index(i)
+            all_line_options.append(line_options)
+        return all_line_options
+
+    def set_all_line_options(self, line_data):
+        containers = self._canvas.figure.gca().containers
+        for i in range(len(containers)):
+            self.set_line_options_by_index(i, line_data[i])
+        self.update_legend(line_data)
+
+    def get_line_options_by_index(self, line_index):
+        line_options = {}
+        container = self._canvas.figure.gca().containers[line_index]
+        line = container.get_children()[0]
+        line_options['label'] = container.get_label()
+        line_options['legend'] = self.legend_visible(line_index)
+        line_options['shown'] = True
+        line_options['color'] = line.get_color()
+        line_options['style'] = line.get_linestyle()
+        line_options['width'] = str(int(line.get_linewidth()))
+        line_options['marker'] = line.get_marker()
+        return line_options
+
+    def set_line_options_by_index(self, line_index, line_options):
+        container = self._canvas.figure.gca().containers[line_index]
+        container.set_label(line_options['label'])
+        main_line = container.get_children()[0]
+        main_line.set_linestyle(line_options['style'])
+        main_line.set_marker(line_options['marker'])
+        self._legends_visible[line_index] = bool(line_options['legend'])
+        for child in container.get_children():
+            child.set_color(line_options['color'])
+            child.set_linewidth(line_options['width'])
+            child.set_visible(line_options['shown'])
 
     def is_icut(self, is_icut):
         self.plot_window.action_save_cut.setVisible(is_icut)
@@ -63,17 +178,8 @@ class CutPlot(object):
         icut = self._cut_plotter.get_icut()
         icut.flip_axis()
 
-    def object_clicked(self, target):
-        if isinstance(target, Legend):
-            return
-        elif isinstance(target, Line2D):
-            self._quick_presenter = quick_options(self.get_line_index(target), self)
-        else:
-            self._quick_presenter = quick_options(target, self)
-        self.update_legend()
-        self._canvas.draw()
 
-    def get_line_index(self, line):
+    def _get_line_index(self, line):
         '''
         Checks if line index is cached, and if not finds the index by iterating over the axes' containers.
         :param line: Line to find the index of
@@ -90,16 +196,6 @@ class CutPlot(object):
                 return i
             i+=1
 
-    def plot_clicked(self, x, y):
-        bounds = self.calc_figure_boundaries()
-        if bounds['x_label'] < y < bounds['title']:
-            if bounds['y_label'] < x:
-                if y < bounds['x_range']:
-                    self._quick_presenter = quick_options('x_range', self, self.x_log)
-                elif x < bounds['y_range']:
-                    self._quick_presenter = quick_options('y_range', self, self.y_log)
-            self._canvas.draw()
-
     def calc_figure_boundaries(self):
         fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
         bounds = {}
@@ -110,41 +206,9 @@ class CutPlot(object):
         bounds['x_label'] = fig_y * 0.05
         return bounds
 
-    @staticmethod
-    def get_min(data, absolute_minimum=-np.inf):
-        """Determines the minimum of a set of numpy arrays"""
-        data = data if isinstance(data, list) else [data]
-        running_min = []
-        for values in data:
-            try:
-                running_min.append(np.min(values[np.isfinite(values) * (values > absolute_minimum)]))
-            except ValueError:  # If data is empty or not array of numbers
-                pass
-        return np.min(running_min) if running_min else absolute_minimum
-
     def xy_config(self):
         return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
 
-    def change_axis_scale(self, xy_config):
-        current_axis = self._canvas.figure.gca()
-        if xy_config['x_log']:
-            xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-            xmin = self.get_min(xdata, absolute_minimum=0.)
-            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
-            if xmin > 0:
-                xy_config['x_range'] = (xmin, xy_config['x_range'][1])
-        else:
-            current_axis.set_xscale('linear')
-        if xy_config['y_log']:
-            ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-            ymin = self.get_min(ydata, absolute_minimum=0.)
-            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
-            if ymin > 0:
-                xy_config['y_range'] = (ymin, xy_config['y_range'][1])
-        else:
-            current_axis.set_yscale('linear')
-        self.x_range = xy_config['x_range']
-        self.y_range = xy_config['y_range']
 
     def _has_errorbars(self):
         """True current axes has visible errorbars,
@@ -200,65 +264,6 @@ class CutPlot(object):
             line = container.get_children()[0]
             line_containers[line] = container
         return line_containers
-
-    def get_all_line_data(self):
-        all_line_options = []
-        for i in range(len(self._canvas.figure.gca().containers)):
-            line_options = self.get_line_data(i)
-            all_line_options.append(line_options)
-        return all_line_options
-
-    def set_all_line_data(self, line_data):
-        containers = self._canvas.figure.gca().containers
-        for i in range(len(containers)):
-            self.set_line_data(i, line_data[i])
-        self.update_legend(line_data)
-
-    def get_line_data(self, index):
-        line_options = {}
-        container = self._canvas.figure.gca().containers[index]
-        line = container.get_children()[0]
-        line_options['label'] = container.get_label()
-        line_options['legend'] = self.legend_visible(index)
-        line_options['shown'] = True
-        line_options['color'] = line.get_color()
-        line_options['style'] = line.get_linestyle()
-        line_options['width'] = str(int(line.get_linewidth()))
-        line_options['marker'] = line.get_marker()
-        return line_options
-
-    def set_line_data(self, index, line_options):
-        container = self._canvas.figure.gca().containers[index]
-        container.set_label(line_options['label'])
-        main_line = container.get_children()[0]
-        main_line.set_linestyle(line_options['style'])
-        main_line.set_marker(line_options['marker'])
-        self._legends_visible[index] = bool(line_options['legend'])
-        for child in container.get_children():
-            child.set_color(line_options['color'])
-            child.set_linewidth(line_options['width'])
-            child.set_visible(line_options['shown'])
-
-    def update_legend(self, line_data=None):
-        axes = self._canvas.figure.gca()
-        labels_to_show = []
-        handles_to_show = []
-        handles, labels = axes.get_legend_handles_labels()
-        if line_data is None:
-            i = 0
-            for handle, label in zip(handles, labels):
-                if self.legend_visible(i):
-                    labels_to_show.append(label)
-                    handles_to_show.append(handle)
-                i+=1
-        else:
-            containers = axes.containers
-            for i in range(len(containers)):
-                if line_data[i]['legend']:
-                    handles_to_show.append(handles[i])
-                    labels_to_show.append(line_data[i]['label'])
-                self._legends_visible[i] = line_data[i]['legend']
-        axes.legend(handles_to_show, labels_to_show, fontsize='medium').draggable()  # add new legends
 
     def set_line_visible(self, line_index, visible):
         self._lines_visible[line_index] = visible

@@ -163,13 +163,6 @@ def load(filename, output_workspace):
     return workspace
 
 
-def rename_workspace(selected_workspace, new_name):
-    workspace = get_workspace_handle(selected_workspace)
-    remove_workspace(workspace)
-    add_workspace(workspace, new_name)
-    return workspace
-
-
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
     workspace_names = [workspace.name for workspace in workspaces]

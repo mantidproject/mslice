@@ -20,10 +20,18 @@ def add_workspace(workspace, name):
 
 
 def remove_workspace(workspace):
-    del _loaded_workspaces[get_workspace_name(workspace)]
+    workspace = get_workspace_handle(workspace)
+    del _loaded_workspaces[workspace.name]
 
 
-def get_workspace_names():
+def rename_workspace(workspace, new_name):
+    workspace = get_workspace_handle(workspace)
+    _loaded_workspaces[new_name] = _loaded_workspaces.pop(workspace.name)
+    workspace.name = new_name
+    return workspace
+
+
+def get_visible_workspace_names():
     return [key for key in iterkeys(_loaded_workspaces) if key[:2] != '__']
 
 
