@@ -38,14 +38,11 @@ class MatplotlibSlicePlotter(SlicePlotter):
 
     def _cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
         rotated = x_axis.units not in ['MomentumTransfer', 'Degrees', '|Q|']
-        q_axis = y_axis if rotated else x_axis
-        e_axis = x_axis if rotated else y_axis
+        (q_axis, e_axis) = (x_axis, y_axis) if not rotated else (y_axis, x_axis)
         self.slice_cache[slice.name[2:]] = SliceCache(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     @plt.set_category(plt.CATEGORY_SLICE)
     def _show_plot(self, slice_cache, workspace):
-        # Do not call plt.gcf() here as the overplot Line1D objects have been cached and they
-        # must be redrawn on the same Axes instance
         cur_fig = plt.gcf()
         cur_fig.clf()
         ax = cur_fig.add_subplot(111, projection='mantid')
