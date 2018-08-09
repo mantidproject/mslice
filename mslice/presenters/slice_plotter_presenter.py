@@ -58,10 +58,10 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
         colourmap = self._slice_view.get_slice_colourmap()
 
-        self._plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end,
-                         norm_to_one, colourmap)
+        self.plot_slice(selected_workspace, x_axis, y_axis, smoothing, intensity_start, intensity_end,
+                        norm_to_one, colourmap)
 
-    def _plot_slice(self, *args):
+    def plot_slice(self, *args):
         try:
             self._slice_plotter.plot_slice(*args)
         except RuntimeError as e:
@@ -92,6 +92,9 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
     def _intensity(self):
         intensity_start = self._slice_view.get_slice_intensity_start()
         intensity_end = self._slice_view.get_slice_intensity_end()
+        return self.validate_intensity(intensity_start, intensity_end)
+
+    def validate_intensity(self, intensity_start, intensity_end):
         intensity_start = self._to_float(intensity_start)
         intensity_end = self._to_float(intensity_end)
         if intensity_start is not None and intensity_end is not None and intensity_start > intensity_end:
@@ -137,6 +140,9 @@ class SlicePlotterPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def invalidate_slice_cache(self):
         self._slice_plotter.slice_cache.clear()
+
+    def get_slice_cache(self, workspace_name):
+        return self._slice_plotter.slice_cache[workspace_name]
 
     def update_workspaces(self):
         self._main_presenter.update_displayed_workspaces()

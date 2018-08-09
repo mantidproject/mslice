@@ -9,6 +9,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
 
+from matplotlib.colors import Normalize
+
 import mslice.app as app
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
@@ -125,8 +127,11 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
 
-    return mantid_algorithms.Slice(InputWorkspace=workspace, XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(),
-                                   EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne = NormToOne)
+    slice = mantid_algorithms.Slice(InputWorkspace=workspace, OutputWorkspace="__" + workspace.name, XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(),
+                                   EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=NormToOne)
+    slice_presenter = app.MAIN_WINDOW.slice_presenter
+    slice_presenter._slice_plotter.cache_slice(slice, 'viridis', None, None, x_axis, y_axis)
+    return slice
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     """ Cuts workspace.
@@ -163,3 +168,12 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     return mantid_algorithms.Cut(InputWorkspace=workspace, CutAxis=cut_axis.to_dict(),
                                  IntegrationAxis=integration_axis.to_dict(), EMode=workspace.e_mode,
                                  PSD=workspace.is_PSD, NormToOne=NormToOne)
+
+def PlotSlice(InputWorkspace, IntensityStart=None, IntensityEnd=None):
+    _validate_workspace(InputWorkspace) # check type?
+    workspace = get_workspace_handle(InputWorkspace)
+    slice_presenter = app.MAIN_WINDOW.slice_presenter
+    slice_cache = slice_presenter.get_slice_cache(InputWorkspace.name[2:])
+    IntensityStart, IntensityEnd = slice_presenter.validate_intensity(IntensityStart, IntensityEnd) # if intensity is none?
+    slice_cache.norm = Normalize(vmin=IntensityStart, vmax=IntensityEnd)
+    slice_presenter._slice_plotter.plot_cached_slice(slice_cache, workspace) # remove smoothing

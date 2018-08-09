@@ -28,15 +28,22 @@ class MatplotlibSlicePlotter(SlicePlotter):
         sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
         slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
-        self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
+        self.cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
         self.show_scattering_function(selected_ws.name)
+        self._plot_slice_canvas_setup(selected_ws.name)
+
+    def plot_cached_slice(self, slice_workspace, slice_cache):
+        self._show_plot(slice_workspace, slice_cache)
+        self._plot_slice_canvas_setup(slice_workspace.name[2:])
+
+    def _plot_slice_canvas_setup(self, workspace_name):
         fig_canvas = plt.gcf().canvas
-        fig_canvas.set_window_title(selected_ws.name)
-        fig_canvas.manager.add_slice_plot(self, selected_ws.name)
+        fig_canvas.set_window_title(workspace_name)
+        fig_canvas.manager.add_slice_plot(self, workspace_name)
         fig_canvas.manager.update_grid()
         plt.draw_all()
 
-    def _cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
+    def cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
         rotated = x_axis.units not in ['MomentumTransfer', 'Degrees', '|Q|']
         q_axis = y_axis if rotated else x_axis
         e_axis = x_axis if rotated else y_axis
