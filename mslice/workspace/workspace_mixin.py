@@ -1,18 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
 import operator
-from mantid.api import AlgorithmManager
+from mantid.simpleapi import CloneWorkspace, PowerMD
+from mslice.util.numpy_helper import apply_with_corrected_shape
 
-
-def run_child_alg(name, output='OutputWorkspace', **kwargs):
-    alg = AlgorithmManager.createUnmanaged(name)
-    alg.setChild(True)
-    alg.initialize()
-    alg.setProperty('OutputWorkspace', 'dummy') # must be set for some algs but is not used
-    for key in kwargs:
-        alg.setProperty(key, kwargs[key])
-    alg.execute()
-    return alg.getProperty(output).value
 
 class WorkspaceMixin(object):
 
@@ -39,6 +30,13 @@ class WorkspaceMixin(object):
     def get_variance(self):
         """Gets variance (error^2) from the workspace as a numpy array."""
         return np.square(self.get_error())
+
+    def set_signal(self, signal):
+        self._set_signal_raw(self.raw_ws, signal)
+
+    def _set_signal_raw(self, raw_ws, signal):
+        for i in range(raw_ws.getNumberHistograms()):
+            raw_ws.setY(i, signal[i])
 
     def _binary_op(self, operator, other):
         """
@@ -70,13 +68,15 @@ class WorkspaceMixin(object):
         return self.rewrap(inner_res)
 
     def _binary_op_array(self, operator, other):
-        """Perform binary operation using a numpy array with the same number of elements as _raw_ws signal"""
-        if other.size == self.get_signal().size:
-            new_signal = operator(other, self.get_signal()[0])
-            return run_child_alg('CreateWorkspace', DataX=self._raw_ws.extractX(), DataY=new_signal,
-                                 DataE=self._raw_ws.extractE(), outputWorkspace='dummy')
-        else:
-            raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
+        """Perform binary operation using a numpy array with the same number of elements as an axis of _raw_ws signal"""
+        signal = self.get_signal()
+        new_ws = CloneWorkspace(InputWorkspace= self._raw_ws, StoreInADS=False)
+        error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
+        new_signal = apply_with_corrected_shape(operator, signal, other, error)
+        self._set_signal_raw(new_ws, new_signal)
+        # scale errors?
+        return new_ws
+
 
     def check_dimensions(self, workspace_to_check):
         """check if a workspace has the same number of bins as self for each dimension"""
@@ -114,11 +114,11 @@ class WorkspaceMixin(object):
     def __mul__(self, other):
         return self._binary_op(operator.mul, other)
 
-    def __div__(self, other):
-        return self._binary_op(operator.div, other)
+    def __truediv__(self, other):
+        return self._binary_op(operator.truediv, other)
 
     def __neg__(self):
         return self * -1
 
     def __pow__(self, exponent):
-        return self.rewrap(run_child_alg('PowerMD', InputWorkspace=self._raw_ws, Exponent=exponent))
+        return self.rewrap(PowerMD(InputWorkspace=self._raw_ws, OutputWorkspace="_", Exponent=exponent, StoreInADS=False))

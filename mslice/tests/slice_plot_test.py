@@ -23,7 +23,7 @@ class SlicePlotTest(unittest.TestCase):
         image = MagicMock()
         norm = PropertyMock(return_value=colors.Normalize)
         type(image).norm = norm
-        self.axes.get_images = MagicMock(return_value=[image])
+        self.axes.collections.__getitem__ = MagicMock(return_value=image)
         self.slice_plot.change_axis_scale((0, 10), True)
         image.set_norm.assert_called_once()
         norm_set = image.set_norm.call_args_list[0][0][0]
@@ -36,7 +36,7 @@ class SlicePlotTest(unittest.TestCase):
         image = MagicMock()
         norm = PropertyMock(return_value=colors.LogNorm)
         type(image).norm = norm
-        self.axes.get_images = MagicMock(return_value=[image])
+        self.axes.collections.__getitem__ = MagicMock(return_value=image)
         self.slice_plot.change_axis_scale((0, 15), False)
         image.set_norm.assert_called_once()
         norm_set = image.set_norm.call_args_list[0][0][0]
@@ -45,22 +45,15 @@ class SlicePlotTest(unittest.TestCase):
         self.assertEqual(type(norm_set), colors.Normalize)
         image.set_clim.assert_called_once_with((0, 15))
 
-    def test_reset_checkboxes(self):
-        line1 = MagicMock()
-        line2 = MagicMock()
-        line1.get_linestyle = MagicMock(return_value='None')
-        line2.get_linestyle = MagicMock(return_value='-')
-        self.slice_plotter.overplot_lines.__getitem__ = MagicMock(return_value={0: line1, 1: line2})
-        self.slice_plotter.get_recoil_label = MagicMock()
-        self.slice_plotter.get_recoil_label.side_effect = ['0', '1']
-        self.slice_plot.reset_info_checkboxes()
-        self.slice_plot.plot_window.disable_action.assert_called_once_with('0')
-
-    def test_lines_redrawn(self):
+    def test_lines_redrawn_on_intensity_change(self):
         self.slice_plot.toggle_overplot_line(self.slice_plot.plot_window.action_helium, 4, True, True)
-        new_slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
+        colorbar_range=PropertyMock(return_value=(0,10))
+        type(self.slice_plot).colorbar_range = colorbar_range
+        self.slice_plot.show_intensity_plot(self.plot_figure.action_chi_qe,
+                                            self.slice_plotter.show_dynamical_susceptibility,
+                                            True)
 
-        self.assertTrue(new_slice_plot.plot_window.action_helium.checked)
+        self.assertTrue(self.slice_plot.plot_window.action_helium.checked)
         self.slice_plotter.add_overplot_line.assert_any_call('workspace', 4, True, '')
 
     @patch('mslice.plotting.plot_window.slice_plot.QtWidgets.QInputDialog.getInt')

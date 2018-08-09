@@ -3,7 +3,6 @@ import numpy as np
 
 from mantid.api import MDNormalization, WorkspaceUnitValidator
 
-from mslice.models.cut.cut_normalisation import _num_events_normalized_array
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid import mantid_algorithms
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -14,28 +13,12 @@ def output_workspace_name(selected_workspace, integration_start, integration_end
     return selected_workspace + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
         integration_end) + ")"
 
-
-def compute_cut_xye(selected_workspace, cut_axis, integration_axis, is_norm, store=True):
-    ws_handle = get_workspace_handle(selected_workspace)
-    out_ws_name = output_workspace_name(selected_workspace, integration_axis.start, integration_axis.end)
-
-    cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, store=store, InputWorkspace=ws_handle,
+def compute_cut(workspace, cut_axis, integration_axis, is_norm, store=True):
+    out_ws_name = output_workspace_name(workspace.name, integration_axis.start, integration_axis.end)
+    cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, store=store, InputWorkspace=workspace,
                                 CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
-                                EMode = ws_handle.e_mode, PSD=ws_handle.is_PSD, NormToOne=is_norm)
-    if store:
-        cut = cut.raw_ws
-    plot_data = _num_events_normalized_array(cut)
-    plot_data = plot_data.squeeze()
-    with np.errstate(invalid='ignore'):
-        if cut.displayNormalization() == MDNormalization.NoNormalization:
-            errors = np.sqrt(cut.getErrorSquaredArray())
-            errors[np.where(cut.getNumEventsArray() == 0)] = np.nan
-        else:
-            errors = np.sqrt(cut.getErrorSquaredArray()) / cut.getNumEventsArray()
-    errors = errors.squeeze()
-    x = np.linspace(cut_axis.start, cut_axis.end, plot_data.size)
-    return x, plot_data, errors
-
+                                EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=is_norm)
+    return cut
 
 def get_arrays_from_workspace(workspace):
     mantid_ws = get_workspace_handle(workspace).raw_ws

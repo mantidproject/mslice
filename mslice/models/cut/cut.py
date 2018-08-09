@@ -5,7 +5,7 @@ from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace,
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
-from .cut_normalisation import _normalize_workspace
+from .cut_normalisation import normalize_workspace
 
 
 class Cut(PythonAlgorithm):
@@ -42,7 +42,7 @@ def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_
     else:
         cut = _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, e_mode)
     if is_norm:
-        _normalize_workspace(cut)
+        normalize_workspace(cut)
     return cut
 
 

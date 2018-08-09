@@ -8,6 +8,7 @@ from mslice.models.workspacemanager.workspace_provider import (get_workspace_han
                                                                delete_workspace, rename_workspace)
 from mslice.models.workspacemanager.workspace_algorithms import processEfixed
 from mslice.util.mantid.mantid_algorithms import ConvertToMD, CloneWorkspace, CreateSimulationWorkspace
+
 from mantid.simpleapi import AddSampleLog
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
@@ -20,6 +21,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.test_ws_md = ConvertToMD(OutputWorkspace='test_ws_md', InputWorkspace=self.test_ws_2d,
                                       QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                       SplitInto='50,50')
+        self.test_ws_2d.e_mode = "Direct"
         self.test_ws_md.ef_defined = False
         self.test_ws_md.is_PSD = True
         self.test_ws_md.e_mode = "Direct"

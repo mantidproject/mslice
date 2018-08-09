@@ -411,49 +411,11 @@ def disconnect(cid):
     return get_current_fig_manager().canvas.mpl_disconnect(cid)
 
 
-def close(*args):
+def close(num):
     """
     Close a figure window.
-
-    ``close()`` by itself closes the current figure
-
-    ``close(fig)`` closes the `.Figure` instance *fig*
-
-    ``close(num)`` closes the figure number *num*
-
-    ``close(name)`` where *name* is a string, closes figure with that label
-
-    ``close('all')`` closes all the figure windows
     """
-
-    if len(args) == 0:
-        figManager = GlobalFigureManager.get_active()
-        if figManager is None:
-            return
-        else:
-            GlobalFigureManager.destroy(figManager.num)
-    elif len(args) == 1:
-        arg = args[0]
-        if arg == 'all':
-            GlobalFigureManager.destroy_all()
-        elif isinstance(arg, int):
-            GlobalFigureManager.destroy(arg)
-        elif hasattr(arg, 'int'):
-            # if we are dealing with a type UUID, we
-            # can use its integer representation
-            GlobalFigureManager.destroy(arg.int)
-        elif isinstance(arg, str):
-            allLabels = get_figlabels()
-            if arg in allLabels:
-                num = get_fignums()[allLabels.index(arg)]
-                GlobalFigureManager.destroy(num)
-        elif isinstance(arg, Figure):
-            GlobalFigureManager.destroy_fig(arg)
-        else:
-            raise TypeError('Unrecognized argument type %s to close'
-                            % type(arg))
-    else:
-        raise TypeError('close takes 0 or 1 arguments')
+    GlobalFigureManager.figure_closed(num)
 
 
 def clf():

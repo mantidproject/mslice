@@ -11,6 +11,7 @@ from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
 from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
+import mslice.plotting.pyplot as plt
 
 
 class PlotFigureManagerQT(QtCore.QObject):
@@ -56,6 +57,7 @@ class PlotFigureManagerQT(QtCore.QObject):
     def window_closing(self):
         if self._plot_handler is not None:
             self._plot_handler.window_closing()
+        plt.close(self.number)
 
     def resize(self, width, height):
         self.window.resize(width, height)

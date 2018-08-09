@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
-from mslice.models.cut.cut_functions import compute_cut_xye, get_arrays_from_workspace, is_cuttable
+from mslice.models.cut.cut_functions import compute_cut, get_arrays_from_workspace, is_cuttable
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -88,7 +88,7 @@ class CutPresenter(PresenterUtility):
 
     def _save_cut_to_workspace(self, params, _):
         cut_params = params[:4]
-        compute_cut_xye(*cut_params)
+        compute_cut(*cut_params)
         self._main_presenter.update_displayed_workspaces()
 
     def _plot_cut_from_workspace(self, plot_over):
