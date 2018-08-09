@@ -375,7 +375,6 @@ class SlicePlot(IPlot):
     def update_workspaces(self):
         self._slice_plotter.update_displayed_workspaces()
 
-
     @property
     def colorbar_label(self):
         return self._canvas.figure.get_axes()[1].get_ylabel()

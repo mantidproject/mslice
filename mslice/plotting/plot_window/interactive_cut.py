@@ -19,7 +19,7 @@ class InteractiveCut(object):
         self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
-                                      button=[1,3], spancoords='pixels', interactive=True)
+                                      button=[1, 3], spancoords='pixels', interactive=True)
         self._canvas.draw()
 
     def plot_from_mouse_event(self, eclick, erelease):
@@ -82,3 +82,7 @@ class InteractiveCut(object):
     def flip_axis(self):
         self.horizontal = not self.horizontal
         self.plot_cut(*self.rect.extents)
+
+    def window_closing(self):
+        self.slice_plot.plot_window.action_interactive_cuts.setChecked(False)
+        self.slice_plot.toggle_icut()
