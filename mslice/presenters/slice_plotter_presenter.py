@@ -92,8 +92,5 @@ class SlicePlotterPresenter(PresenterUtility):
     def set_sample_temperature(self, workspace_name, temp):
         self._slice_cache[workspace_name].sample_temp = temp
 
-    def clear_cache(self):
-        self._slice_cache.clear()
-
     def workspace_selection_changed(self):
         pass

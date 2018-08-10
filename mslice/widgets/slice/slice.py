@@ -77,7 +77,6 @@ class SliceWidget(SliceView, QWidget):
             new_index = (index[other_axis] + 1) % num_items
             axes_set[other_axis](new_index)
         self._presenter.populate_slice_params()
-        self._presenter.invalidate_slice_cache()
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
