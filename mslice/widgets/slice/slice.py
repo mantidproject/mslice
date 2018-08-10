@@ -8,8 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
 
-from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
-from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
+from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
 from mslice.util.qt import load_ui
 from mslice.views.slice_plotter_view import SlicePlotterView
 from .command import Command
@@ -31,8 +30,7 @@ class SliceWidget(SlicePlotterView, QWidget):
         load_ui(__file__, 'slice.ui', self)
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
-        plotter = MatplotlibSlicePlotter()
-        self._presenter = SlicePlotterPresenter(self, plotter)
+        self._presenter = SliceWidgetPresenter(self)
         # Each time the fields are populated, set a minimum step size
         self._minimumStep = {}
         self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))

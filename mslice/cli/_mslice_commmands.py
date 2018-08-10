@@ -13,11 +13,11 @@ from mantid.simpleapi import mtd, Load, ConvertUnits, RenameWorkspace # noqa: F4
 
 # Helper tools
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.presenters.slice_plotter_presenter import Axis as _Axis
+from mslice.presenters.slice_widget_presenter import Axis as _Axis
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
 # Slicing
-from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
+from mslice.models.slice.slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
 import mslice.models.slice.slice_functions as _SLICE_ALGORITHM
 # Cutting
 import mslice.models.cut.cut_functions as _CUT_ALGORITHM

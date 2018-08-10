@@ -63,8 +63,7 @@ class GlobalFigureManager(object):
         """
         if not cls.has_fignum(num):
             return
-        if cls._active_figure == cls._figures[num]:
-            cls._active_figure = None
+        cls._active_figure = None
         del cls._figures[num]
         cls._category_current_figures[cls.get_category(num)] = None
 
