@@ -199,6 +199,7 @@ class SlicePlot(IPlot):
         return bounds
 
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
+        self.manager.report_as_current()
         if checked:
             self._slice_plotter.add_overplot_line(self.ws_name, key, recoil, cif_file)
         else:
@@ -247,6 +248,7 @@ class SlicePlot(IPlot):
         intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
+        self.manager.report_as_current()
         if action.isChecked():
             previous = self.selected_intensity()
             self.set_intensity(action)
