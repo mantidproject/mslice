@@ -63,10 +63,14 @@ class GlobalFigureManager(object):
         """
         if not cls.has_fignum(num):
             return
-        if cls._active_figure == cls._figures[num]:
+        category = cls.get_category(num)
+        if cls._active_figure == num:
             cls._active_figure = None
+        if cls._category_current_figures[category] == num:
+            cls._category_current_figures[category] = None
+        cls._figures_by_category[category].remove(num)
         del cls._figures[num]
-        cls._category_current_figures[cls.get_category(num)] = None
+
 
     @classmethod
     def destroy_fig(cls, fig):
