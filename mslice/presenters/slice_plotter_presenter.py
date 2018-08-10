@@ -4,8 +4,8 @@ from mslice.models.cmap import allowed_cmaps
 from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
                                                  compute_powder_line)
 from mslice.models.slice.slice_cache import SliceCache
-from mslice.models.slice.slice_plotter import (set_colorbar_label, plot_cached_slice, remove_line,
-                                               plot_overplot_line, create_slice)
+from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, remove_line,
+                                        plot_overplot_line, create_slice)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 

@@ -5,7 +5,7 @@ from mslice.models.axis import Axis
 from mslice.models.slice.slice_functions import is_sliceable
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
-from mslice.views.slice_plotter_view import SlicePlotterView
+from mslice.views.interfaces.slice_view import SliceView
 from mslice.widgets.slice.command import Command
 from .interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -21,7 +21,7 @@ def validate(field_method, error_method):
 
 class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
     def __init__(self, slice_view):
-        if not isinstance(slice_view, SlicePlotterView):
+        if not isinstance(slice_view, SliceView):
             raise TypeError("Parameter slice_view is not of type SlicePlotterView")
         self._slice_view = slice_view
         self._main_presenter = None

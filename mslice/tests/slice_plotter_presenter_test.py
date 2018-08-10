@@ -5,7 +5,7 @@ import unittest
 from mslice.models.axis import Axis
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
-from mslice.views.slice_plotter_view import SlicePlotterView
+from mslice.views.interfaces.slice_view import SliceView
 from mslice.widgets.slice.command import Command
 
 
@@ -15,7 +15,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
         # Setting up view for slice plotter window
         self.slice_plotter = mock.create_autospec(SlicePlotter)
-        self.slice_view = mock.create_autospec(SlicePlotterView)
+        self.slice_view = mock.create_autospec(SliceView)
 
     def test_constructor_success(self):
         self.slice_plotter_presenter = SliceWidgetPresenter(self.slice_view, self.slice_plotter)

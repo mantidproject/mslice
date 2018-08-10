@@ -5,8 +5,8 @@ import unittest
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
-from mslice.views.mainview import MainView
-from mslice.views.powder_projection_view import PowderView
+from mslice.views.interfaces.mainview import MainView
+from mslice.views.interfaces.powder_projection_view import PowderView
 from mslice.widgets.projection.powder.command import Command
 
 

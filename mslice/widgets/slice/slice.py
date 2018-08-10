@@ -10,7 +10,7 @@ from mslice.util.qt.QtWidgets import QWidget
 
 from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
 from mslice.util.qt import load_ui
-from mslice.views.slice_plotter_view import SlicePlotterView
+from mslice.views.interfaces.slice_view import SliceView
 from .command import Command
 
 
@@ -18,7 +18,7 @@ from .command import Command
 # Classes and functions
 # -----------------------------------------------------------------------------
 
-class SliceWidget(SlicePlotterView, QWidget):
+class SliceWidget(SliceView, QWidget):
     error_occurred = Signal('QString')
     busy = Signal(bool)
 
