@@ -3,8 +3,17 @@ from mslice.models.slice.slice_functions import (compute_chi, compute_chi_magnet
 
 
 class SliceCache():
-    '''class that caches intensities and metadata for a single workspace'''
+    """class that caches intensities and metadata for a single workspace"""
     def __init__(self, slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated=False):
+        """
+        :param slice: output workspace of Slice algorithm
+        :param colourmap: default colourmap to use
+        :param norm: normalisation - contains min and max intensity values
+        :param sample_temp: cached sample temperature
+        :param q_axis: non-energy Axis object (momentum or scattering angle)
+        :param e_axis: energy Axis object
+        :param rotated: true if energy is on the x axis
+        """
         self.scattering_function = slice
         self.colourmap = colourmap
         self.norm = norm

@@ -54,6 +54,47 @@ class GlobalFigureManager(object):
     _figures = {}
 
     @classmethod
+    def destroy(cls, num):
+        """
+        Try to remove all traces of figure *num*.
+
+        In the interactive backends, this is bound to the
+        window "destroy" and "delete" events.
+        """
+        if not cls.has_fignum(num):
+            return
+        if cls._active_figure == cls._figures[num]:
+            cls._active_figure = None
+        del cls._figures[num]
+        cls._category_current_figures[cls.get_category(num)] = None
+
+    @classmethod
+    def destroy_fig(cls, fig):
+        "*fig* is a Figure instance"
+        num = next((manager.num for manager in cls._figures.values()
+                    if manager.canvas.figure == fig), None)
+        if num is not None:
+            cls.destroy(num)
+
+    @classmethod
+    def destroy_all(cls):
+        # this is need to ensure that gc is available in corner cases
+        # where modules are being torn down after install with easy_install
+        import gc  # noqa
+        for manager in list(cls._figures.values()):
+            manager.destroy()
+        cls._active_figure = None
+        cls._category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}
+        cls._figures.clear()
+
+    @classmethod
+    def has_fignum(cls, num):
+        """
+        Return *True* if figure *num* exists.
+        """
+        return num in cls._figures
+
+    @classmethod
     def reset(cls):
         """Reset all class variables to initial state. This function exists for testing purposes """
         cls._active_category = None
