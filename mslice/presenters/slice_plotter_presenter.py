@@ -28,7 +28,7 @@ class SlicePlotterPresenter(PresenterUtility):
         create_slice(selected_ws.name, self)
         self.show_scattering_function(selected_ws.name)
 
-    def update_workspaces(self):
+    def update_displayed_workspaces(self):
         self._main_presenter.update_displayed_workspaces()
 
     def _cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
