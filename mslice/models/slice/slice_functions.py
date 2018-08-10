@@ -37,11 +37,11 @@ def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
     return slice
 
 def axis_values(axis):
-    '''Compute a numpy array of bins for the given axis values'''
+    """Compute a numpy array of bins for the given axis values"""
     return np.linspace(axis.start, axis.end, get_number_of_steps(axis))
 
 def compute_boltzmann_dist(sample_temp, delta_e):
-    '''calculates exp(-E/kBT), a common factor in intensity corrections'''
+    """calculates exp(-E/kBT), a common factor in intensity corrections"""
     kBT = sample_temp * KB_MEV
     return np.exp(-delta_e / kBT)
 
