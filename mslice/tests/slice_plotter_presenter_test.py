@@ -89,5 +89,3 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_presenter.hide_overplot_line('workspace', key)
         self.assertTrue(key not in cache_mock.overplot_lines)
         remove_line_mock.assert_called_once_with('line')
-
-
