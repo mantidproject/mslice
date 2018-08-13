@@ -2,7 +2,6 @@ from __future__ import (absolute_import, division, print_function)
 import mock
 import unittest
 
-from mslice.models.axis import Axis
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 

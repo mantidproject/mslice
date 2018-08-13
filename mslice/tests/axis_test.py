@@ -36,8 +36,3 @@ class AxisTest(unittest.TestCase):
     def test_invalid_start_greater_than_end(self):
         with self.assertRaises(ValueError):
             Axis('x', '1', '0', '.1')
-
-
-
-
-

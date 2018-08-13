@@ -143,8 +143,6 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         slice_widget_presenter.register_master(self.main_presenter)
         workspace = "a"
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace,workspace])
-        axis = ["x","y"]
-        # self.slice_plotter_presenter.get_available_axis = mock.Mock(return_value=axis)
         slice_widget_presenter.workspace_selection_changed()
         assert(self.slice_view.clear_input_fields.called)
 
