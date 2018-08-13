@@ -17,7 +17,7 @@ from mslice.presenters.slice_widget_presenter import Axis as _Axis
 # Projections
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator as _MantidProjectionCalculator
 # Slicing
-from mslice.views.slice_plotter import MatplotlibSlicePlotter as _MatplotlibSlicePlotter
+from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 import mslice.models.slice.slice_functions as _SLICE_ALGORITHM
 # Cutting
 import mslice.models.cut.cut_functions as _CUT_ALGORITHM
@@ -28,7 +28,7 @@ from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 # -----------------------------------------------------------------------------
 
 _POWDER_PROJECTION_MODEL = _MantidProjectionCalculator()
-_SLICE_MODEL = _MatplotlibSlicePlotter()
+_SLICE_MODEL = SlicePlotterPresenter()
 _CUT_PLOTTER = MatplotlibCutPlotter()
 
 # -----------------------------------------------------------------------------
@@ -161,8 +161,7 @@ def plot_slice(input_workspace, x=None, y=None, colormap='viridis', intensity_mi
     y_axis = _process_axis(y, 1, input_workspace)
 
     _SLICE_MODEL.plot_slice(selected_ws=input_workspace, x_axis=x_axis, y_axis=y_axis, colourmap=colormap,
-                            intensity_start=intensity_min, intensity_end=intensity_max,
-                            smoothing=None, norm_to_one=normalize)
+                            intensity_start=intensity_min, intensity_end=intensity_max, norm_to_one=normalize)
 
 
 def get_cut_xye(input_workspace, cut_axis, integration_start, integration_end, normalize=False):
