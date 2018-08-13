@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import mock
 import unittest
 
+from mslice.models.axis import Axis
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 
@@ -30,3 +31,27 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_presenter = SlicePlotterPresenter()
         with self.assertRaises(ValueError):
             slice_presenter.validate_intensity('8', '7')
+
+    @mock.patch('mslice.presenters.slice_plotter_presenter.plot_cached_slice')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.create_slice')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.get_workspace_handle')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.sample_temperature')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.compute_slice')
+    def test_plot_slice_success(self, compute_slice_mock, sample_temp_mock, get_workspace_handle_mock,
+                                create_slice_mock, plot_cached_slice_mock):
+        workspace_mock = mock.MagicMock()
+        name = mock.PropertyMock(return_value='workspace')
+        type(workspace_mock).name = name
+        slice_mock = mock.MagicMock()
+        slice_name = mock.PropertyMock(return_value='__workspace')
+        type(slice_mock).name = slice_name
+        get_workspace_handle_mock.return_value = workspace_mock
+        sample_temp_mock.return_value = 5
+        compute_slice_mock.return_value = slice_mock
+        x_axis = Axis('x', 0, 1, 0.1)
+        y_axis = Axis('y', 0, 1, 0.1)
+        slice_presenter = SlicePlotterPresenter()
+        slice_presenter.plot_slice('workspace', x_axis, y_axis, 7, 8, False, 'viridis')
+        self.assertTrue(slice_presenter._slice_cache.has_key('workspace'))
+        create_slice_mock.assert_called_once()
+        plot_cached_slice_mock.assert_called_once()
