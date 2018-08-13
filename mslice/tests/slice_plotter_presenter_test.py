@@ -52,6 +52,6 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         y_axis = Axis('y', 0, 1, 0.1)
         slice_presenter = SlicePlotterPresenter()
         slice_presenter.plot_slice('workspace', x_axis, y_axis, 7, 8, False, 'viridis')
-        self.assertTrue(slice_presenter._slice_cache.has_key('workspace'))
+        self.assertTrue('workspace' in slice_presenter._slice_cache)
         create_slice_mock.assert_called_once()
         plot_cached_slice_mock.assert_called_once()
