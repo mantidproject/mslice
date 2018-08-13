@@ -70,6 +70,16 @@ def _validate_workspace(workspace):
     if not workspace_exists(workspace):
         raise TypeError('InputWorkspace %s could not be found.' % workspace)
 
+def _check_workspace_type(workspace):
+    if workspace.is_PSD:
+        if isinstance(workspace, MatrixWorkspace):
+            raise RuntimeError("Incorrect workspace type - run MakeProjection first.")
+        if not isinstance(workspace, PixelWorkspace):
+            raise RuntimeError("Incorrect workspace type.")
+    else:
+        if not isinstance(workspace, MatrixWorkspace):
+            raise RuntimeError("Incorrect workspace type.")
+
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
@@ -92,8 +102,8 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
     """ Calculate projections of workspace.
 
        Keyword Arguments:
-           InputWorkspace -- Workspace to project, can be either python handle to workspace or a string containing the
-           workspace name.
+           InputWorkspace -- Workspace to project, can be either python handle
+            to the workspace or a string containing the workspace name.
            Axis1 -- The first axis of projection (string)
            Axis2 -- The second axis of the projection (string)
            Units -- The energy units (string) [default: 'meV']
@@ -116,8 +126,9 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
        Axis1 -- The x axis of the slice. If not specified will default to |Q| (or Degrees).
        Axis2 -- The y axis of the slice. If not specified will default to DeltaE
        Axis Format:-
-           Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5'
-           or just the name e.g. 'DeltaE'. In that case, the start and end will default to the range in the data.
+            Either a string in format '<name>, <start>, <end>, <step_size>' e.g.
+            'DeltaE,0,100,5'  or just the name e.g. 'DeltaE'. In that case, the
+            start and end will default to the range in the data.
 
        NormToOne -- if true the slice will be normalized to one.
 
@@ -126,40 +137,30 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     workspace = get_workspace_handle(InputWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
+    return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
+                                                                'viridis')
 
-    slice = mantid_algorithms.Slice(InputWorkspace=workspace, OutputWorkspace="__" + workspace.name, XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(),
-                                   EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=NormToOne)
-    slice_presenter = app.MAIN_WINDOW.slice_presenter
-    slice_presenter._slice_plotter.cache_slice(slice, 'viridis', None, None, x_axis, y_axis)
-    return slice
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     """ Cuts workspace.
      Keyword Arguments:
-    InputWorkspace -- Workspace to cut. The parameter can be either a python handle to the workspace
-    OR the workspace name as a string.
+    InputWorkspace -- Workspace to cut. The parameter can be either a python
+                      handle to the workspace OR the workspace name as a string.
 
     CutAxis -- The x axis of the cut. If not specified will default to |Q| (or Degrees).
     IntegrationAxis --  The integration axis of the cut. If not specified will default to DeltaE.
     Axis Format:-
-           Either a string in format '<name>, <start>, <end>, <step_size>' e.g. 'DeltaE,0,100,5' (step_size may be
-           omitted for the integration axis) or just the name e.g. 'DeltaE'. In that case, the start and end will
-           default to the range in the data.
+            Either a string in format '<name>, <start>, <end>, <step_size>' e.g.
+            'DeltaE,0,100,5' (step_size may be omitted for the integration axis)
+            or just the name e.g. 'DeltaE'. In that case, the start and end will
+            default to the full range of the data.
 
     NormToOne -- if true the cut will be normalized to one.
 
     """
     _validate_workspace(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
-    if workspace.is_PSD:
-        if isinstance(workspace, MatrixWorkspace):
-            raise RuntimeError("Incorrect workspace type - run MakeProjection first.")
-        if not isinstance(workspace, PixelWorkspace):
-            raise RuntimeError("Incorrect workspace type.")
-    else:
-        if not isinstance(workspace, MatrixWorkspace):
-            raise RuntimeError("Incorrect workspace type.")
-
+    _check_workspace_type(workspace)
     cut_axis = _process_axis(CutAxis, 0, workspace)
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
@@ -168,11 +169,23 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
                                  IntegrationAxis=integration_axis.to_dict(), EMode=workspace.e_mode,
                                  PSD=workspace.is_PSD, NormToOne=NormToOne)
 
-def PlotSlice(InputWorkspace, IntensityStart=None, IntensityEnd=None):
-    _validate_workspace(InputWorkspace) # check type?
+
+def PlotSlice(InputWorkspace, IntensityStart=None, IntensityEnd=None, Colourmap=None):
+    """
+    Creates mslice standard matplotlib plot of a slice workspace.
+    Keyword Arguments:
+    InputWorkspace -- Workspace to plot. The parameter can be either a python
+                      handle to the workspace OR the workspace name as a string.
+    IntensityStart -- Lower bound of the intensity axis (colorbar)
+    IntensityEnd -- Upper bound of the intensity axis (colorbar)
+    Colourmap -- Colourmap name as a string. Default is 'viridis'.
+    """
+    _validate_workspace(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
-    slice_presenter = app.MAIN_WINDOW.slice_presenter
-    slice_cache = slice_presenter.get_slice_cache(InputWorkspace.name[2:])
-    IntensityStart, IntensityEnd = slice_presenter.validate_intensity(IntensityStart, IntensityEnd) # if intensity is none?
-    slice_cache.norm = Normalize(vmin=IntensityStart, vmax=IntensityEnd)
-    slice_presenter._slice_plotter.plot_cached_slice(slice_cache, workspace) # remove smoothing
+    _check_workspace_type(workspace)
+    slice_presenter = app.MAIN_WINDOW.slice_plotter_presenter
+    if IntensityStart is not None and IntensityEnd is not None:
+        slice_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
+    if Colourmap is not None:
+        slice_presenter.change_colourmap(workspace.name, Colourmap)
+    slice_presenter.plot_from_cache(workspace)

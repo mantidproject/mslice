@@ -5,7 +5,7 @@ from mslice.models.slice.slice_functions import (compute_slice, sample_temperatu
                                                  compute_powder_line)
 from mslice.models.slice.slice_cache import SliceCache
 from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, remove_line,
-                                        plot_overplot_line, create_slice)
+                                        plot_overplot_line, create_slice_figure)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 
@@ -21,13 +21,34 @@ class SlicePlotterPresenter(PresenterUtility):
         return allowed_cmaps()
 
     def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
+        self.create_slice(selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap)
+        self.plot_from_cache(selected_ws.name)
+
+    def create_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
         selected_ws = get_workspace_handle(selected_ws)
         sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
-        slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
+        slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
-        create_slice(selected_ws.name, self)
-        self.show_scattering_function(selected_ws.name)
+        return slice
+
+    def plot_from_cache(self, workspace):
+        ws_name = workspace.name.lstrip('__')
+        create_slice_figure(ws_name, self)
+        self.show_scattering_function(ws_name)
+
+    def change_intensity(self, workspace_name, intensity_start, intensity_end):
+        workspace_name = workspace_name.lstrip('__')
+        intensity_start, intensity_end = self.validate_intensity(intensity_start, intensity_end)
+        norm = Normalize(vmin=intensity_start, vmax=intensity_end)
+        self._slice_cache[workspace_name].norm = norm
+
+    def change_colourmap(self, workspace_name, colourmap):
+        if colourmap in self.get_available_colormaps():
+            workspace_name = workspace_name.lstrip('__')
+            self._slice_cache[workspace_name].colourmap = colourmap
+        else:
+            raise ValueError('colourmap not recognised')
 
     def update_displayed_workspaces(self):
         self._main_presenter.update_displayed_workspaces()

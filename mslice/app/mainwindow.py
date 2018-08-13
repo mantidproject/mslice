@@ -41,14 +41,15 @@ class MainWindow(MainView, QMainWindow):
             self.buttons_to_enable[TAB_HISTO] += [self.btnSaveToADS]
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
-        dataloader_presenter = self.data_loading.get_presenter()
-        slice_plotter_presenter = SlicePlotterPresenter()
+        self.dataloader_presenter = self.data_loading.get_presenter()
+        self.slice_plotter_presenter = SlicePlotterPresenter()
         slice_widget_presenter = self.wgtSlice.get_presenter()
-        slice_widget_presenter.set_slice_plotter_presenter(slice_plotter_presenter)
+        slice_widget_presenter.set_slice_plotter_presenter(self.slice_plotter_presenter)
         powder_presenter = self.wgtPowder.get_presenter()
         self.cut_presenter = self.wgtCut.get_presenter()
-        self._presenter = MainPresenter(self, self.workspace_presenter, dataloader_presenter,
-                                        slice_widget_presenter, powder_presenter, self.cut_presenter, slice_plotter_presenter)
+        self._presenter = MainPresenter(self, self.workspace_presenter, self.dataloader_presenter,
+                                        slice_widget_presenter, powder_presenter, self.cut_presenter,
+                                        self.slice_plotter_presenter)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.setup_save()
