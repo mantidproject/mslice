@@ -55,3 +55,39 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         self.assertTrue('workspace' in slice_presenter._slice_cache)
         create_slice_mock.assert_called_once()
         plot_cached_slice_mock.assert_called_once()
+
+    @mock.patch('mslice.presenters.slice_plotter_presenter.plot_overplot_line')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.compute_recoil_line')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.compute_powder_line')
+    def test_add_overplot_line(self, compute_powder_mock, compute_recoil_mock, plot_line_mock):
+        slice_presenter = SlicePlotterPresenter()
+        compute_recoil_mock.return_value = ('compute', 'recoil')
+        compute_powder_mock.return_value = ('compute', 'powder')
+        plot_line_mock.return_value = 'plot'
+        recoil_key = 5
+        powder_key = 6
+        cache_mock = mock.MagicMock()
+        slice_presenter._slice_cache['workspace'] = cache_mock
+        type(cache_mock).overplot_lines = mock.MagicMock()
+
+        slice_presenter.add_overplot_line('workspace', recoil_key, True)
+        compute_recoil_mock.assert_called_once()
+        cache_mock.overplot_lines.__setitem__.assert_called_with(recoil_key, 'plot')
+        plot_line_mock.assert_called_with('compute', 'recoil', recoil_key, True, cache_mock)
+        slice_presenter.add_overplot_line('workspace', powder_key, False)
+        compute_powder_mock.assert_called_once()
+        cache_mock.overplot_lines.__setitem__.assert_called_with(powder_key, 'plot')
+        plot_line_mock.assert_called_with('compute', 'powder', powder_key, False, cache_mock)
+
+    @mock.patch('mslice.presenters.slice_plotter_presenter.remove_line')
+    def test_hide_overplot_line(self, remove_line_mock):
+        slice_presenter = SlicePlotterPresenter()
+        cache_mock = mock.MagicMock()
+        key = 5
+        type(cache_mock).overplot_lines = {key: 'line'}
+        slice_presenter._slice_cache['workspace'] = cache_mock
+        slice_presenter.hide_overplot_line('workspace', key)
+        self.assertTrue(key not in cache_mock.overplot_lines)
+        remove_line_mock.assert_called_once_with('line')
+
+
