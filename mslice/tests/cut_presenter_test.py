@@ -12,7 +12,7 @@ from mslice.models.alg_workspace_ops import get_available_axes
 from mslice.presenters.cut_presenter import CutPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.widgets.cut.command import Command
-from mslice.views.cut_view import CutView
+from mslice.views.interfaces.cut_view import CutView
 
 
 class CutPresenterTest(unittest.TestCase):

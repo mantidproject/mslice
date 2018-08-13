@@ -11,7 +11,7 @@ from mslice.util.qt.QtWidgets import QWidget
 from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 from mslice.presenters.cut_presenter import CutPresenter
 from mslice.util.qt import load_ui
-from mslice.views.cut_view import CutView
+from mslice.views.interfaces.cut_view import CutView
 from .command import Command
 
 

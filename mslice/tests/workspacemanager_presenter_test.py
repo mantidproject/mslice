@@ -7,8 +7,8 @@ import numpy as np
 
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
-from mslice.views.mainview import MainView
-from mslice.views.workspace_view import WorkspaceView
+from mslice.views.interfaces.mainview import MainView
+from mslice.views.interfaces.workspace_view import WorkspaceView
 from mslice.widgets.workspacemanager.command import Command
 from mslice.workspace import wrap_workspace
 from mantid.simpleapi import AddSampleLog, CreateWorkspace, CreateSimulationWorkspace, ConvertToMD, CloneWorkspace

@@ -8,7 +8,7 @@ from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 
-from mslice.views.cut_view import CutView
+from mslice.views.interfaces.cut_view import CutView
 from mslice.widgets.cut.command import Command
 from .validation_decorators import require_main_presenter
 import warnings

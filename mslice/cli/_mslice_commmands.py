@@ -135,7 +135,6 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     """ Cuts workspace.
-
      Keyword Arguments:
     InputWorkspace -- Workspace to cut. The parameter can be either a python handle to the workspace
     OR the workspace name as a string.

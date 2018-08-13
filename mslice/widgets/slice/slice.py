@@ -8,10 +8,9 @@ from __future__ import (absolute_import, division, print_function)
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
 
-from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter
-from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
+from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
 from mslice.util.qt import load_ui
-from mslice.views.slice_plotter_view import SlicePlotterView
+from mslice.views.interfaces.slice_view import SliceView
 from .command import Command
 
 
@@ -19,7 +18,7 @@ from .command import Command
 # Classes and functions
 # -----------------------------------------------------------------------------
 
-class SliceWidget(SlicePlotterView, QWidget):
+class SliceWidget(SliceView, QWidget):
     error_occurred = Signal('QString')
     busy = Signal(bool)
 
@@ -31,8 +30,7 @@ class SliceWidget(SlicePlotterView, QWidget):
         load_ui(__file__, 'slice.ui', self)
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
-        plotter = MatplotlibSlicePlotter()
-        self._presenter = SlicePlotterPresenter(self, plotter)
+        self._presenter = SliceWidgetPresenter(self)
         # Each time the fields are populated, set a minimum step size
         self._minimumStep = {}
         self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))
@@ -79,7 +77,6 @@ class SliceWidget(SlicePlotterView, QWidget):
             new_index = (index[other_axis] + 1) % num_items
             axes_set[other_axis](new_index)
         self._presenter.populate_slice_params()
-        self._presenter.invalidate_slice_cache()
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
