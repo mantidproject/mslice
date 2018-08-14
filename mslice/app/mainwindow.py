@@ -47,7 +47,8 @@ class MainWindow(MainView, QMainWindow):
         self.cut_widget_presenter = self.wgtCut.get_presenter()
         self.cut_widget_presenter.set_cut_plotter_presenter(self.cut_plotter_presenter)
         self._presenter = MainPresenter(self, self.workspace_presenter, dataloader_presenter,
-                                        slice_presenter, powder_presenter, self.cut_widget_presenter)
+                                        slice_presenter, powder_presenter, self.cut_widget_presenter,
+                                        self.cut_plotter_presenter)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.setup_save()
@@ -129,10 +130,10 @@ class MainWindow(MainView, QMainWindow):
         self.workspace_presenter.notify(ws_command.CombineWorkspace)
 
     def button_plot(self):
-        self.cut_presenter.notify(cut_command.PlotFromWorkspace)
+        self.cut_widget_presenter.notify(cut_command.PlotFromWorkspace)
 
     def button_overplot(self):
-        self.cut_presenter.notify(cut_command.PlotOverFromWorkspace)
+        self.cut_widget_presenter.notify(cut_command.PlotOverFromWorkspace)
 
     def button_savetoads(self):
         self.workspace_presenter.notify(ws_command.SaveToADS)

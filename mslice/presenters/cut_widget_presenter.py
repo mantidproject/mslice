@@ -4,7 +4,7 @@ from mslice.models.cut.cut_cache import CutCache
 from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
-from mslice.models.cut.cut_functions import compute_cut, get_arrays_from_workspace, is_cuttable
+from mslice.models.cut.cut_functions import compute_cut, is_cuttable
 from mslice.models.cut.cut_plotter import CutPlotter
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -39,9 +39,9 @@ class CutWidgetPresenter(PresenterUtility):
             elif command == Command.PlotOver:
                 self._cut(plot_over=True)
             elif command == Command.PlotFromWorkspace:
-                self._plot_cut_from_workspace(plot_over=False)
+                self._cut_plotter_presenter.plot_cut_from_workspace(plot_over=False)
             elif command == Command.PlotOverFromWorkspace:
-                self._plot_cut_from_workspace(plot_over=True)
+                self._cut_plotter_presenter.plot_cut_from_workspace(plot_over=True)
             elif command == Command.SaveToWorkspace:
                 self._cut(save_only=True)
             elif command == Command.AxisChanged:
@@ -60,15 +60,6 @@ class CutWidgetPresenter(PresenterUtility):
             self._cut_plotter_presenter.run_cut(workspace, params, plot_over=plot_over, save_only=save_only)
             plot_over = True # The first plot will respect which button the user pressed. The rest will over plot
 
-
-    def plot_cut_from_workspace(self, plot_over):
-        selected_workspaces = self._main_presenter.get_selected_workspaces()
-        self._cut_plotter.set_icut(False)
-
-        for workspace in selected_workspaces:
-            x, y, e, units = get_arrays_from_workspace(workspace)
-            self._cut_plotter.plot_cut_from_xye(x, y, e, units, workspace, plot_over=plot_over)
-            plot_over = True  # plot over if multiple workspaces selected
 
     def _parse_step(self):
         step = self._cut_view.get_cut_axis_step()

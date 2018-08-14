@@ -22,24 +22,6 @@ def compute_cut(workspace, cut_axis, integration_axis, is_norm, store=True):
     return cut
 
 
-def get_arrays_from_workspace(workspace):
-    mantid_ws = get_workspace_handle(workspace).raw_ws
-    dim = mantid_ws.getDimension(0)
-    x = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
-    with np.errstate(invalid='ignore'):
-        if mantid_ws.displayNormalization() == MDNormalization.NoNormalization:
-            y = np.array(mantid_ws.getSignalArray())
-            e = np.sqrt(mantid_ws.getErrorSquaredArray())
-            nanidx = np.where(mantid_ws.getNumEventsArray() == 0)
-            y[nanidx] = np.nan
-            e[nanidx] = np.nan
-        else:
-            y = mantid_ws.getSignalArray() / mantid_ws.getNumEventsArray()
-            e = np.sqrt(mantid_ws.getErrorSquaredArray()) / mantid_ws.getNumEventsArray()
-    e = e.squeeze()
-    return x, y, e, dim.getUnits()
-
-
 def is_cuttable(workspace):
     workspace = get_workspace_handle(workspace)
     try:

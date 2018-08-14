@@ -21,11 +21,11 @@ def get_min(data, absolute_minimum=-np.inf):
 
 class CutPlot(IPlot):
 
-    def __init__(self, figure_manager, cut_plotter, workspace_name):
+    def __init__(self, figure_manager, cut_plotter_presenter, workspace_name):
         self.manager = figure_manager
         self.plot_window = figure_manager.window
         self._canvas = self.plot_window.canvas
-        self._cut_plotter = cut_plotter
+        self._cut_plotter_presenter = cut_plotter_presenter
         self._lines_visible = {}
         self._legends_shown = True
         self._legends_visible = []
@@ -171,11 +171,11 @@ class CutPlot(IPlot):
         self.plot_window.show()
 
     def save_icut(self):
-        icut = self._cut_plotter.get_icut(self.ws_name)
+        icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         return icut.save_cut()
 
     def flip_icut(self):
-        icut = self._cut_plotter.get_icut(self.ws_name)
+        icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         icut.flip_axis()
 
 

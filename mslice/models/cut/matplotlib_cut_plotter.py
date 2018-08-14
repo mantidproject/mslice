@@ -28,7 +28,7 @@ def draw_interactive_cut(workspace):
 
 
 @plt.set_category(plt.CATEGORY_CUT)
-def plot_cut_impl(workspace, x_units, intensity_range=None, plot_over=False, legend=None):
+def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over=False, legend=None):
     legend = workspace.name if legend is None else legend
     if not plot_over:
         plt.cla()
@@ -46,7 +46,7 @@ def plot_cut_impl(workspace, x_units, intensity_range=None, plot_over=False, leg
         cur_canvas.set_window_title(workspace.name)
         cur_canvas.manager.update_grid()
     if not cur_canvas.manager.has_plot_handler():
-        cur_canvas.manager.add_cut_plot(None, workspace)
+        cur_canvas.manager.add_cut_plot(presenter, workspace.name.rsplit('_', 1)[0])
     cur_fig.canvas.draw()
 
 
