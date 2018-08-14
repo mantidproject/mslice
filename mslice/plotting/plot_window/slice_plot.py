@@ -17,11 +17,11 @@ from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 
 class SlicePlot(IPlot):
 
-    def __init__(self, figure_manager, slice_plotter, workspace_name):
+    def __init__(self, figure_manager, slice_plotter_presenter, workspace_name):
         self.manager = figure_manager
         self.plot_window = figure_manager.window
         self._canvas = self.plot_window.canvas
-        self._slice_plotter = slice_plotter
+        self._slice_plotter_presenter = slice_plotter_presenter
         self.ws_name = workspace_name
         self._arb_nuclei_rmm = None
         self._cif_file = None
@@ -39,25 +39,28 @@ class SlicePlot(IPlot):
         plot_figure.action_flip_axis.setVisible(False)
         plot_figure.action_flip_axis.triggered.connect(self.flip_icut)
 
-        plot_figure.action_sqe.triggered.connect(partial(self.show_intensity_plot, plot_figure.action_sqe,
-                                                         self._slice_plotter.show_scattering_function, False))
-        plot_figure.action_chi_qe.triggered.connect(partial(self.show_intensity_plot, plot_figure.action_chi_qe,
-                                                            self._slice_plotter.show_dynamical_susceptibility, True))
+        plot_figure.action_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.action_sqe,
+                    self._slice_plotter_presenter.show_scattering_function, False))
+
+        plot_figure.action_chi_qe.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.action_chi_qe,
+                    self._slice_plotter_presenter.show_dynamical_susceptibility, True))
 
         plot_figure.action_chi_qe_magnetic.triggered.connect(
             partial(self.show_intensity_plot, plot_figure.action_chi_qe_magnetic,
-                    self._slice_plotter.show_dynamical_susceptibility_magnetic, True))
+                    self._slice_plotter_presenter.show_dynamical_susceptibility_magnetic, True))
 
         plot_figure.action_d2sig_dw_de.triggered.connect(
             partial(self.show_intensity_plot, plot_figure.action_d2sig_dw_de,
-                    self._slice_plotter.show_d2sigma, False))
+                    self._slice_plotter_presenter.show_d2sigma, False))
 
         plot_figure.action_symmetrised_sqe.triggered.connect(
             partial(self.show_intensity_plot, plot_figure.action_symmetrised_sqe,
-                    self._slice_plotter.show_symmetrised, True))
+                    self._slice_plotter_presenter.show_symmetrised, True))
 
-        plot_figure.action_gdos.triggered.connect(partial(self.show_intensity_plot, plot_figure.action_gdos,
-                                                          self._slice_plotter.show_gdos, True))
+        plot_figure.action_gdos.triggered.connect(
+            partial(self.show_intensity_plot, plot_figure.action_gdos, self._slice_plotter_presenter.show_gdos, True))
 
         plot_figure.action_hydrogen.triggered.connect(
             partial(self.toggle_overplot_line, 1, True))
@@ -201,9 +204,9 @@ class SlicePlot(IPlot):
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
         self.manager.report_as_current()
         if checked:
-            self._slice_plotter.add_overplot_line(self.ws_name, key, recoil, cif_file)
+            self._slice_plotter_presenter.add_overplot_line(self.ws_name, key, recoil, cif_file)
         else:
-            self._slice_plotter.hide_overplot_line(self.ws_name, key)
+            self._slice_plotter_presenter.hide_overplot_line(self.ws_name, key)
         self.update_legend()
         self._canvas.draw()
 
@@ -282,8 +285,8 @@ class SlicePlot(IPlot):
                 self.set_intensity(previous)
                 return False
             if field:
-                self._slice_plotter.add_sample_temperature_field(temp_value)
-                self._slice_plotter.update_sample_temperature(self.ws_name)
+                self._slice_plotter_presenter.add_sample_temperature_field(temp_value)
+                self._slice_plotter_presenter.update_sample_temperature(self.ws_name)
             else:
                 try:
                     temp_value = float(temp_value)
@@ -295,7 +298,7 @@ class SlicePlot(IPlot):
                     self.set_intensity(previous)
                     return False
                 else:
-                    self._slice_plotter.set_sample_temperature(self.ws_name, temp_value)
+                    self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
             slice_plotter_method(self.ws_name)
         return True
 
@@ -327,7 +330,7 @@ class SlicePlot(IPlot):
                  self.plot_window.action_cif_file:[self._cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
-                self._slice_plotter.add_overplot_line(self.ws_name, *lines[line])
+                self._slice_plotter_presenter.add_overplot_line(self.ws_name, *lines[line])
         self.update_legend()
         self._canvas.draw()
 
@@ -368,7 +371,7 @@ class SlicePlot(IPlot):
         self.icut.flip_axis()
 
     def update_workspaces(self):
-        self._slice_plotter.update_displayed_workspaces()
+        self._slice_plotter_presenter.update_displayed_workspaces()
 
     @property
     def colorbar_label(self):
