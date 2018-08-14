@@ -1,5 +1,9 @@
-from mslice.models.cut.matplotlib_cut_plotter import plot_cut_impl
+from mslice.models.cut.matplotlib_cut_plotter import plot_cut_impl, draw_interactive_cut
 from mslice.models.cut.cut_functions import compute_cut
+from mslice.models.cut.cut_cache import CutCache
+from mslice.models.labels import generate_legend
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
 
 class CutPlotterPresenter(PresenterUtility):
@@ -48,18 +52,20 @@ class CutPlotterPresenter(PresenterUtility):
         self._main_presenter.update_displayed_workspaces()
 
     def plot_interactive_cut(self, workspace, cut_axis, integration_axis, store):
+        workspace = get_workspace_handle(workspace)
         cache = CutCache(cut_axis, integration_axis, None, None)
+        self._cut_cache[workspace.name] = cache
         self.plot_cut(workspace, cache, False, store, update_main=False)
         draw_interactive_cut(workspace)
 
     def store_icut(self, workspace_name, icut):
-        self.set_is_icut(True, workspace_name)
-        self._slice_cache[workspace_name].icut = icut
+        self.set_is_icut(workspace_name, True)
+        self._cut_cache[workspace_name].icut = icut
 
     def set_is_icut(self, workspace_name, is_icut):
         if not is_icut:
-            self._slice_cache[workspace_name].icut = None
+            self._cut_cache[workspace_name].icut = None
         plt.gcf().canvas.manager.is_icut(is_icut)
 
     def get_icut(self, workspace_name):
-        return self._slice_cache[workspace_name].icut
+        return self._cut_cache[workspace_name].icut

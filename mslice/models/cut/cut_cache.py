@@ -35,10 +35,13 @@ class CutCache(object):
 
     @intensity_start.setter
     def intensity_start(self, int_start):
-        try:
-            self._intensity_start = None if int_start == '' else float(int_start)
-        except ValueError:
-            raise ValueError('Invalid intensity parameters')
+        if int_start is None:
+            self._intensity_start = None
+        else:
+            try:
+                self._intensity_start = None if int_start == '' else float(int_start)
+            except ValueError:
+                raise ValueError('Invalid intensity parameters')
 
     @property
     def intensity_end(self):
@@ -46,10 +49,13 @@ class CutCache(object):
 
     @intensity_end.setter
     def intensity_end(self, int_end):
-        try:
-            self._intensity_end = None if int_end == '' else float(int_end)
-        except ValueError:
-            raise ValueError('Invalid intensity parameters')
+        if int_end is None:
+            self._intensity_end = None
+        else:
+            try:
+                self._intensity_end = None if int_end == '' else float(int_end)
+            except ValueError:
+                raise ValueError('Invalid intensity parameters')
 
     @property
     def norm_to_one(self):
@@ -65,7 +71,7 @@ class CutCache(object):
 
     @width.setter
     def width(self, width_str):
-        if width_str.strip():
+        if width_str is not None and width_str.strip():
             try:
                 self._width = float(width_str)
             except ValueError:

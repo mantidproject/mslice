@@ -52,7 +52,7 @@ class CutWidgetPresenter(PresenterUtility):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         try:
             self._parse_step()
-            parsed_params = self._parse_input()
+            params = self._parse_input()
         except ValueError as e:
             self._cut_view.display_error(str(e))
             return

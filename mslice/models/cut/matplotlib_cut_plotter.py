@@ -10,7 +10,7 @@ from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
 PICKER_TOL_PTS = 3
 
 
-def draw_interactive_cut(self, workspace):
+def draw_interactive_cut(workspace):
     cur_fig = plt.gcf()
     cur_canvas = cur_fig.canvas
     ax = plt.gca()
@@ -26,8 +26,9 @@ def draw_interactive_cut(self, workspace):
         cur_canvas.draw_idle()
     plt.show()
 
+
 @plt.set_category(plt.CATEGORY_CUT)
-def plot_cut_impl(self, workspace, x_units, intensity_range=None, plot_over=False, legend=None):
+def plot_cut_impl(workspace, x_units, intensity_range=None, plot_over=False, legend=None):
     legend = workspace.name if legend is None else legend
     if not plot_over:
         plt.cla()
@@ -45,10 +46,11 @@ def plot_cut_impl(self, workspace, x_units, intensity_range=None, plot_over=Fals
         cur_canvas.set_window_title(workspace.name)
         cur_canvas.manager.update_grid()
     if not cur_canvas.manager.has_plot_handler():
-        cur_canvas.manager.add_cut_plot(self, workspace)
+        cur_canvas.manager.add_cut_plot(None, workspace)
     cur_fig.canvas.draw()
 
-def _create_cut(self, workspace):
+
+def _create_cut():
     canvas = plt.gcf().canvas
     # don't include axis ticks in the saved background
     canvas.figure.gca().xaxis.set_visible(False)
