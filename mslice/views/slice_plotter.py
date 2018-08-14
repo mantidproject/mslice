@@ -5,6 +5,7 @@ from mslice.models.workspacemanager.workspace_algorithms import get_comment
 import mslice.plotting.pyplot as plt
 from mslice.util.mantid.mantid_algorithms import Transpose
 
+
 OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
 PICKER_TOL_PTS = 5
 
@@ -13,6 +14,7 @@ def plot_cached_slice(slice_workspace, slice_cache):
     _show_plot(slice_workspace, slice_cache)
 
 @plt.set_category(plt.CATEGORY_SLICE)
+
 def create_slice_figure(workspace_name, presenter):
     fig_canvas = plt.gcf().canvas
     fig_canvas.set_window_title(workspace_name)

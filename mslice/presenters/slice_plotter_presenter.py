@@ -21,11 +21,11 @@ class SlicePlotterPresenter(PresenterUtility):
         return allowed_cmaps()
 
     def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
-        self.create_slice(selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap)
-        self.plot_from_cache(selected_ws.name)
+        workspace = get_workspace_handle(selected_ws)
+        self.create_slice(workspace, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap)
+        self.plot_from_cache(workspace)
 
     def create_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
-        selected_ws = get_workspace_handle(selected_ws)
         sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
