@@ -6,7 +6,7 @@ from mslice.util.qt.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInp
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.util.qt import load_ui
-from mslice.views.workspace_view import WorkspaceView
+from mslice.views.interfaces.workspace_view import WorkspaceView
 from mslice.workspace.workspace import Workspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace

@@ -19,6 +19,7 @@ from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 
+
 # -----------------------------------------------------------------------------
 # Convenience functions
 # -----------------------------------------------------------------------------

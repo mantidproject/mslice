@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.presenters.presenter_utility import PresenterUtility
-from mslice.views.powder_projection_view import PowderView
+from mslice.views.interfaces.powder_projection_view import PowderView
 from mslice.widgets.projection.powder.command import Command
 from .interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
 from .validation_decorators import require_main_presenter
