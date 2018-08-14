@@ -244,6 +244,16 @@ class CutPlot(IPlot):
                     # elements[0] is the actual line, the others are the bits of the error bar
                     for element in range(1, len(elements)):
                         elements[element].set_alpha(alpha)
+        self.toggle_errobars_in_legend(current_axis)
+
+    def toggle_errobars_in_legend(self, current_axis):
+        if not self._has_errorbars():
+            handles, labels = current_axis.get_legend_handles_labels()
+            handles = [h[0] for h in handles]
+            current_axis.legend(handles, labels)
+        else:
+            handles, labels = current_axis.get_legend_handles_labels()
+            current_axis.legend(handles, labels)
 
     def _toggle_errorbars(self):
         state = self._has_errorbars()
