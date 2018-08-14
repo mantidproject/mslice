@@ -39,4 +39,3 @@ class IPythonWidget(RichIPythonWidget):
         self.kernel_client = kernel_client
         self.execute('from mslice.util.mantid.mantid_algorithms import *', hidden=True)
         self.execute('from mslice.cli import *', hidden=True)
-        self.execute('import mslice.plotting.pyplot as plt', hidden=True)
