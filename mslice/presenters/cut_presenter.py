@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
+from mslice.models.cut.cut_cache import CutCache
 from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
@@ -115,7 +116,7 @@ class CutPresenter(PresenterUtility):
 
     def _parse_input(self):
         '''Gets values entered by user. Validation is performed by the CutParams object.'''
-        cut_params = CutParams()
+        cut_params = CutCache()
         cut_params.cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
                                    self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
 
@@ -226,88 +227,3 @@ class CutPresenter(PresenterUtility):
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)
         self.update_integration_axis()
-
-
-class CutParams(PresenterUtility):
-    '''
-    Groups parameters needed to cut and validates them
-    '''
-    def validate_axis(self, axis):
-        # Note this checks for empty / invalid string in axis parameters
-        axis.start = float(axis.start)
-        axis.end = float(axis.end)
-        axis.step = float(axis.step)
-
-        if axis.start >= axis.end:
-            raise ValueError()
-        return axis
-
-    def unpack(self):
-        return (self.cut_axis, self.integration_axis, self.norm_to_one, self.intensity_start,
-                self.intensity_end, self.width)
-
-    @property
-    def cut_axis(self):
-        return self._cut_axis
-
-    @cut_axis.setter
-    def cut_axis(self, axis):
-        try:
-            self._cut_axis = self.validate_axis(axis)
-        except ValueError:
-            raise ValueError('Invalid cut axis parameters')
-
-    @property
-    def integration_axis(self):
-        return self._integration_axis
-
-    @integration_axis.setter
-    def integration_axis(self, axis):
-        try:
-            self._integration_axis = self.validate_axis(axis)
-        except ValueError:
-            raise ValueError('Invalid integration axis parameters')
-
-    @property
-    def intensity_start(self):
-        return self._intensity_start
-
-    @intensity_start.setter
-    def intensity_start(self, int_start):
-        try:
-            self._intensity_start = self._to_float(int_start)
-        except ValueError:
-            raise ValueError('Invalid intensity parameters')
-
-    @property
-    def intensity_end(self):
-        return self._intensity_end
-
-    @intensity_end.setter
-    def intensity_end(self, int_end):
-        try:
-            self._intensity_end = self._to_float(int_end)
-        except ValueError:
-            raise ValueError('Invalid intensity parameters')
-
-    @property
-    def norm_to_one(self):
-        return self._norm_to_one
-
-    @norm_to_one.setter
-    def norm_to_one(self, value):
-        self._norm_to_one = value
-
-    @property
-    def width(self):
-        return self._width
-
-    @width.setter
-    def width(self, width_str):
-        if width_str.strip():
-            try:
-                self._width = float(width_str)
-            except ValueError:
-                raise ValueError("Invalid width")
-        else:
-            self._width = None
