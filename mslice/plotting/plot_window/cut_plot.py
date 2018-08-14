@@ -242,10 +242,8 @@ class CutPlot(IPlot):
                 elements = current_axis.containers[i].get_children()
                 if self.get_line_visible(i):
                     # elements[0] is the actual line, the others are the bits of the error bar
-                    # [elements[i].set_alpha(alpha) for i in range(1, len(elements))]
-                    #elements[2].set_alpha(alpha)
-                    elements[3].set_alpha(alpha)
-                    elements[1].set_alpha(alpha)  # elements[0] is the actual line, elements[1] is error bars
+                    for element in range(1, len(elements)):
+                        elements[element].set_alpha(alpha)
 
     def _toggle_errorbars(self):
         state = self._has_errorbars()
