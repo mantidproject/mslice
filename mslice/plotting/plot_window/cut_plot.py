@@ -171,11 +171,11 @@ class CutPlot(IPlot):
         self.plot_window.show()
 
     def save_icut(self):
-        icut = self._cut_plotter.get_icut()
+        icut = self._cut_plotter.get_icut(self.ws_name)
         return icut.save_cut()
 
     def flip_icut(self):
-        icut = self._cut_plotter.get_icut()
+        icut = self._cut_plotter.get_icut(self.ws_name)
         icut.flip_axis()
 
 

@@ -1,14 +1,17 @@
 from mslice.presenters.presenter_utility import PresenterUtility
 
 
-class CutCache(PresenterUtility):
-    '''
-    Groups parameters needed to cut and validates them
-    '''
+class CutCache(object):
+    """Groups parameters needed to cut and validates them"""
 
-    def unpack(self):
-        return (self.cut_axis, self.integration_axis, self.norm_to_one, self.intensity_start,
-                self.intensity_end, self.width)
+    def __init__(self, cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one=False, width=None):
+        self.cut_axis = cut_axis
+        self.integration_axis = integration_axis
+        self.intensity_start = intensity_start
+        self.intensity_end = intensity_end
+        self.norm_to_one = norm_to_one
+        self.width = width
+        self.icut = None
 
     @property
     def cut_axis(self):
@@ -16,7 +19,7 @@ class CutCache(PresenterUtility):
 
     @cut_axis.setter
     def cut_axis(self, axis):
-        self._cut_axis = self.validate_axis(axis)
+        self._cut_axis = axis
 
     @property
     def integration_axis(self):
@@ -24,7 +27,7 @@ class CutCache(PresenterUtility):
 
     @integration_axis.setter
     def integration_axis(self, axis):
-        self._integration_axis = self.validate_axis(axis)
+        self._integration_axis = axis
 
     @property
     def intensity_start(self):
@@ -33,7 +36,7 @@ class CutCache(PresenterUtility):
     @intensity_start.setter
     def intensity_start(self, int_start):
         try:
-            self._intensity_start = self._to_float(int_start)
+            self._intensity_start = None if int_start == '' else float(int_start)
         except ValueError:
             raise ValueError('Invalid intensity parameters')
 
@@ -44,7 +47,7 @@ class CutCache(PresenterUtility):
     @intensity_end.setter
     def intensity_end(self, int_end):
         try:
-            self._intensity_end = self._to_float(int_end)
+            self._intensity_end = None if int_end == '' else float(int_end)
         except ValueError:
             raise ValueError('Invalid intensity parameters')
 
