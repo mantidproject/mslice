@@ -1,7 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
-import numpy as np
 
-from mantid.api import MDNormalization, WorkspaceUnitValidator
+from mantid.api import WorkspaceUnitValidator
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid import run_algorithm

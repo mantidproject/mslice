@@ -4,8 +4,7 @@ from mslice.models.cut.cut_cache import CutCache
 from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
-from mslice.models.cut.cut_functions import compute_cut, is_cuttable
-from mslice.models.cut.cut_plotter import CutPlotter
+from mslice.models.cut.cut_functions import is_cuttable
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 
@@ -77,10 +76,10 @@ class CutWidgetPresenter(PresenterUtility):
     def _parse_input(self):
         '''Gets values entered by user. Validation is performed by the CutCache object.'''
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
-                                   self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
+                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
 
         integration_axis = Axis(self._cut_view.get_integration_axis(), self._cut_view.get_integration_start(),
-                                           self._cut_view.get_integration_end(), 0.)
+                                self._cut_view.get_integration_end(), 0.)
 
         intensity_start = self._cut_view.get_intensity_start()
         intensity_end = self._cut_view.get_intensity_end()

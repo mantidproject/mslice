@@ -1,5 +1,3 @@
-from mslice.presenters.presenter_utility import PresenterUtility
-
 
 class CutCache(object):
     """Groups parameters needed to cut and validates them"""

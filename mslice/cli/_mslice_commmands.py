@@ -21,7 +21,7 @@ from mslice.models.slice.matplotlib_slice_plotter import MatplotlibSlicePlotter 
 import mslice.models.slice.slice_functions as _SLICE_ALGORITHM
 # Cutting
 import mslice.models.cut.cut_functions as _CUT_ALGORITHM
-from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+from mslice.views.cut_plotter import MatplotlibCutPlotter
 
 # -----------------------------------------------------------------------------
 # Module constants

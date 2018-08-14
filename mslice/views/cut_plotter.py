@@ -1,10 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
-from mslice.models.cut.cut_plotter import CutPlotter
-from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from ..labels import get_display_name, generate_legend, CUT_INTENSITY_LABEL
+from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 
 
 PICKER_TOL_PTS = 3
@@ -16,7 +13,7 @@ def draw_interactive_cut(workspace):
     ax = plt.gca()
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.restore_region(cur_canvas.manager.get_cut_background())
-        self._create_cut(workspace)
+        _create_cut(workspace)
     try:
         children = cur_fig.get_children()
         for artist in children:

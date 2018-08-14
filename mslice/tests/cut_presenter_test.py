@@ -7,7 +7,7 @@ import warnings
 from six import string_types
 
 from mslice.models.axis import Axis
-from mslice.models.cut.cut_plotter import CutPlotter
+from mslice.views.cut_plotter import CutPlotter
 from mslice.models.alg_workspace_ops import get_available_axes
 from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface

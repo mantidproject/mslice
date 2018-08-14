@@ -1,4 +1,4 @@
-from mslice.models.cut.matplotlib_cut_plotter import plot_cut_impl, draw_interactive_cut
+from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cut.cut_cache import CutCache
 from mslice.models.labels import generate_legend
@@ -38,12 +38,12 @@ class CutPlotterPresenter(PresenterUtility):
         """This function handles the width parameter."""
         integration_start = cut_cache.integration_axis.start
         integration_end = cut_cache.integration_axis.end
-        cut_start, cut_end = integration_start, min(integration_start + width, integration_end)
+        cut_start, cut_end = integration_start, min(integration_start + cut_cache.width, integration_end)
         while cut_start != cut_end:
             cut_cache.integration_axis.start = cut_start
             cut_cache.integration_axis.end = cut_end
             self._plot_cut(workspace, cut_cache, plot_over)
-            cut_start, cut_end = cut_end, min(cut_end + width, integration_end)
+            cut_start, cut_end = cut_end, min(cut_end + cut_cache.width, integration_end)
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
 
