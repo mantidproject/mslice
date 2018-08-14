@@ -13,7 +13,7 @@ class SlicePlotter():
     def get_axis_range(self, workspace, dimension_name):
         pass
 
-    def sample_temperature(self, ws_name):
+    def _sample_temperature(self, ws_name):
         pass
 
     def show_scattering_function(self, workspace):

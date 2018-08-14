@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
-from .workspace_mixin import run_child_alg
-from mantid.simpleapi import CreateMDHistoWorkspace, ReplicateMD
+from mslice.util.numpy_helper import apply_with_corrected_shape
+from mantid.simpleapi import CloneWorkspace
 
 
 class HistoMixin(object):
@@ -19,35 +19,20 @@ class HistoMixin(object):
         variance = self._raw_ws.getErrorSquaredArray()
         return variance.copy() if copy else variance
 
-    def _binary_op_array(self, op, other):
+    def set_signal(self, signal):
+        self._raw_ws.setSignalArray(signal)
+
+    def _binary_op_array(self, operator, other):
         """
         Perform binary operation (+,-,*,/) using a 1D numpy array.
-
-        CreateMDHistoWorkspace using numpy array and then use ReplicateMD so it matches the shape of _raw_ws.
-        Then, apply operator.
 
         :param operator: binary operator to apply (add/sub/mul/div)
         :param other: 1D numpy array to use with operator.
         :return: new HistogramWorkspace
         """
-        min = np.amin(other)
-        max = np.amax(other)
-        size = other.size
-        ws = CreateMDHistoWorkspace(Dimensionality=1, Extents='' + str(min) + ',' + str(max),
-                                    SignalInput=other, ErrorInput=other, NumberOfBins=str(size),
-                                    Names=self._raw_ws.getDimension(0).getName(), Units='MomentumTransfer',
-                                    StoreInADS=False)
-        try:
-            replicated = ReplicateMD(ShapeWorkspace=self._raw_ws, DataWorkspace=ws)
-        except RuntimeError:
-            raise RuntimeError("List or array must have same number of elements as an axis of the workspace")
-        # return operator(self._raw_ws, replicated)
-        if op.__name__ == 'add':
-            alg = 'PlusMD'
-        elif op.__name__ == 'sub':
-            alg = 'MinusMD'
-        elif op.__name__ == 'mul':
-            alg = 'MultiplyMD'
-        else:
-            alg = 'DivideMD'
-        return run_child_alg(alg, LHSWorkspace=self._raw_ws, RHSWorkspace=replicated)
+        signal = self.get_signal()
+        new_ws = CloneWorkspace(InputWorkspace=self._raw_ws, StoreInADS=False)
+        error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
+        new_signal = apply_with_corrected_shape(operator, signal, other, error)
+        new_ws.setSignalArray(new_signal)
+        return new_ws

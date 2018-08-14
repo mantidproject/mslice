@@ -38,7 +38,7 @@ class WorkspaceBase(object):
         return
 
     @abc.abstractmethod
-    def __div__(self, other):
+    def __truediv__(self, other):
         return
 
     @abc.abstractmethod

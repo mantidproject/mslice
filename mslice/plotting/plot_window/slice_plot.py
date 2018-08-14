@@ -1,5 +1,4 @@
 from functools import partial
-import six
 
 from mslice.util.qt import QtWidgets
 from mslice.util.qt.QtCore import Qt
@@ -31,7 +30,6 @@ class SlicePlot(IPlot):
         self.icut_event = [None, None]
         self.icut = None
         self.setup_connections(self.plot_window)
-        self._update_lines()
 
     def setup_connections(self, plot_figure):
         plot_figure.action_interactive_cuts.setVisible(True)
@@ -124,7 +122,6 @@ class SlicePlot(IPlot):
             quick_options(self._legend_dict[target], self)
         else:
             quick_options(target, self)
-        self.reset_info_checkboxes()
         self.update_legend()
         self._canvas.draw()
 
@@ -150,24 +147,26 @@ class SlicePlot(IPlot):
 
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
-        images = current_axis.get_images()
-        if len(images) != 1:
-            raise RuntimeError("Expected single image on axes, found " + str(len(images)))
-        mappable = images[0]
+        colormesh = current_axis.collections[0]
         vmin, vmax = colorbar_range
-        if logarithmic and type(mappable.norm) != colors.LogNorm:
-            mappable.colorbar.remove()
-            if vmin == float(0):
+        if logarithmic:
+            label = self.colorbar_label
+            colormesh.colorbar.remove()
+            if vmin <= float(0):
                 vmin = 0.001
+            colormesh.set_clim((vmin, vmax))
             norm = colors.LogNorm(vmin, vmax)
-            mappable.set_norm(norm)
-            self._canvas.figure.colorbar(mappable)
-        elif not logarithmic and type(mappable.norm) != colors.Normalize:
-            mappable.colorbar.remove()
+            colormesh.set_norm(norm)
+            self._canvas.figure.colorbar(colormesh)
+            self.colorbar_label = label
+        else:
+            label = self.colorbar_label
+            colormesh.colorbar.remove()
+            colormesh.set_clim((vmin, vmax))
             norm = colors.Normalize(vmin, vmax)
-            mappable.set_norm(norm)
-            self._canvas.figure.colorbar(mappable)
-        mappable.set_clim((vmin, vmax))
+            colormesh.set_norm(norm)
+            self._canvas.figure.colorbar(colormesh)
+            self.colorbar_label = label
 
     def get_line_options(self, target):
         line_options = {}
@@ -199,14 +198,8 @@ class SlicePlot(IPlot):
         bounds['x_label'] = fig_y * 0.05
         return bounds
 
-    def reset_info_checkboxes(self):
-        for key, line in six.iteritems(self._slice_plotter.overplot_lines[self.ws_name]):
-            if str(line.get_linestyle()) == 'None':
-                if isinstance(key, int):
-                    key = self._slice_plotter.get_recoil_label(key)
-                self.plot_window.disable_action(key)
-
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
+        self.manager.report_as_current()
         if checked:
             self._slice_plotter.add_overplot_line(self.ws_name, key, recoil, cif_file)
         else:
@@ -255,10 +248,12 @@ class SlicePlot(IPlot):
         intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
+        self.manager.report_as_current()
         if action.isChecked():
             previous = self.selected_intensity()
             self.set_intensity(action)
             cbar_log = self.colorbar_log
+            cbar_range = self.colorbar_range
             x_range = self.x_range
             y_range = self.y_range
             title = self.title
@@ -267,7 +262,7 @@ class SlicePlot(IPlot):
                     return
             else:
                 slice_plotter_method(self.ws_name)
-            self.change_axis_scale(self.colorbar_range, cbar_log)
+            self.change_axis_scale(cbar_range, cbar_log)
             self.x_range = x_range
             self.y_range = y_range
             self.title = title
@@ -385,7 +380,7 @@ class SlicePlot(IPlot):
 
     @property
     def colorbar_range(self):
-        return self._canvas.figure.gca().get_images()[0].get_clim()
+        return self._canvas.figure.gca().collections[0].get_clim()
 
     @colorbar_range.setter
     def colorbar_range(self, value):
@@ -393,9 +388,7 @@ class SlicePlot(IPlot):
 
     @property
     def colorbar_log(self):
-        mappable = self._canvas.figure.gca().get_images()[0]
-        norm = mappable.norm
-        return isinstance(norm, colors.LogNorm)
+        return isinstance(self._canvas.figure.gca().collections[0].norm, colors.LogNorm)
 
     @colorbar_log.setter
     def colorbar_log(self, value):

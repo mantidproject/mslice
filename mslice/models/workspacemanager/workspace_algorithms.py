@@ -194,7 +194,7 @@ def subtract(workspaces, background_ws, ssf):
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
             result = run_algorithm('Minus', output_name=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
-                                   RHSWorkspace=scaled_bg_ws)
+                                   RHSWorkspace=scaled_bg_ws.raw_ws)
             propagate_properties(ws, result)
     except ValueError as e:
         raise ValueError(e)
@@ -343,5 +343,6 @@ def propagate_properties(old_workspace, new_workspace):
 def get_comment(workspace):
     if hasattr(workspace, 'getComment'):
         return workspace.getComment()
-    ws_handle = get_workspace_handle(workspace)
-    return ws_handle.raw_ws.getComment()
+    if not hasattr(workspace, 'raw_ws'):
+        workspace = get_workspace_handle(workspace)
+    return workspace.raw_ws.getComment()

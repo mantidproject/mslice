@@ -8,14 +8,15 @@ from mslice.models.workspacemanager.workspace_algorithms import (subtract,
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
                                                                delete_workspace, rename_workspace)
 from mslice.models.workspacemanager.workspace_algorithms import processEfixed
+from mantid.simpleapi import AddSampleLog
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def setUp(self):
         self.test_ws_2d = run_algorithm('CreateSimulationWorkspace', output_name='test_ws_2d', Instrument='MAR',
                                         BinParams=[-10, 1, 10], UnitX='DeltaE')
-        run_algorithm('AddSampleLog', Workspace=self.test_ws_2d.raw_ws, store=False, LogName='Ei', LogText='50.',
-                      LogType='Number')
+        AddSampleLog(Workspace=self.test_ws_2d.raw_ws, StoreInADS=False, LogName='Ei', LogText='50.',
+                     LogType='Number')
         self.test_ws_md = run_algorithm('ConvertToMD', output_name='test_ws_md', InputWorkspace=self.test_ws_2d,
                                         QDimensions='|Q|', dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                         SplitInto='50,50')
