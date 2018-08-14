@@ -9,8 +9,6 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
 
-from matplotlib.colors import Normalize
-
 import mslice.app as app
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
