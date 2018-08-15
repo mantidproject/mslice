@@ -10,7 +10,7 @@ from mslice.util.qt.QtWidgets import QWidget
 
 from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
 from mslice.util.qt import load_ui
-from mslice.views.cut_view import CutView
+from mslice.views.interfaces.cut_view import CutView
 from .command import Command
 
 
