@@ -55,7 +55,6 @@ class CutPlotterPresenter(PresenterUtility):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         for workspace_name in selected_workspaces:
             workspace = get_workspace_handle(workspace_name)
-            # self.set_is_icut(workspace_name, False)
             plot_cut_impl(workspace, self, workspace.raw_ws.getDimension(0).getUnits(), plot_over=plot_over)
             plot_over = True  # plot over if multiple workspaces selected
 
