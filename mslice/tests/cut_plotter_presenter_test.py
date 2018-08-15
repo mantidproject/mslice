@@ -87,5 +87,3 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(1, compute_cut_mock.call_count)
         self.assertEqual(1, plot_cut_impl_mock.call_count)
         self.assertEqual(1, draw_interact_mock.call_count)
-
-
