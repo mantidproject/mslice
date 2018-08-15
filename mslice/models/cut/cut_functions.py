@@ -34,16 +34,3 @@ def is_cuttable(workspace):
     else:
         validator = WorkspaceUnitValidator('DeltaE')
         return isinstance(workspace, Workspace2D) and validator.isValid(workspace.raw_ws) == ''
-
-
-def _infer_missing_parameters(workspace, cut_axis):
-    """Infer Missing parameters. This will come in handy at the CLI"""
-    assert isinstance(workspace, PixelWorkspace)
-    dim = workspace.raw_ws.getDimensionIndexByName(cut_axis.units)
-    dim = workspace.raw_ws.getDimension(dim)
-    if cut_axis.start is None:
-        cut_axis.start = dim.getMinimum()
-    if cut_axis.end is None:
-        cut_axis.end = dim.getMaximum()
-    if cut_axis.step is None:
-        cut_axis.step = (cut_axis.end - cut_axis.start)/100

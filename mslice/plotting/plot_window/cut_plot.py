@@ -49,7 +49,7 @@ class CutPlot(IPlot):
 
     def window_closing(self):
         self._canvas.figure.clf()
-        icut = self._cut_plotter_presenter.get_icut()
+        icut = self._cut_plotter_presenter.get_icut(self._ws_title)
         if icut is not None:
             icut.window_closing()
 
