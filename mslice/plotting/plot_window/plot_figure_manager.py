@@ -140,7 +140,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
             painter = QtGui.QPainter(printer)
-            painter.drawPixmap(0,0,pixmap_image)
+            painter.drawPixmap(0, 0, pixmap_image)
             painter.end()
 
     def save_plot(self):

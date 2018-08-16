@@ -9,7 +9,6 @@ from mslice.util.qt import load_ui
 
 class PlotOptionsDialog(QtWidgets.QDialog):
 
-
     titleEdited = Signal()
     xLabelEdited = Signal()
     yLabelEdited = Signal()
@@ -111,7 +110,6 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.chkYGrid.setChecked(value)
 
 
-
 class SlicePlotOptions(PlotOptionsDialog):
 
     cRangeEdited = Signal()
@@ -180,7 +178,7 @@ class CutPlotOptions(PlotOptionsDialog):
         all_line_options = []
         for line_widget in self._line_widgets:
             line_options = {}
-            for option in ['shown', 'color', 'style', 'width', 'marker', 'legend', 'label']:
+            for option in ['shown', 'color', 'style', 'width', 'marker', 'legend', 'label', 'error_bar']:
                 line_options[option] = getattr(line_widget, option)
             all_line_options.append(line_options)
         return all_line_options
@@ -214,14 +212,6 @@ class CutPlotOptions(PlotOptionsDialog):
     @y_log.setter
     def y_log(self, value):
         self.chkYLog.setChecked(value)
-
-    @property
-    def error_bars(self):
-        return self.chkShowErrorBars.isChecked()
-
-    @error_bars.setter
-    def error_bars(self, value):
-        self.chkShowErrorBars.setChecked(value)
 
     @property
     def show_legends(self):
@@ -259,6 +249,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     def __init__(self, line_options, color_validator):
         super(LegendAndLineOptionsSetter, self).__init__()
+        self.legend_text_label = QtWidgets.QLabel("Plot")
         self.legendText = QtWidgets.QLineEdit(self)
         self.legendText.setText(line_options['label'])
         self.color_validator = color_validator
@@ -281,7 +272,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         self.width_label = QtWidgets.QLabel(self)
         self.width_label.setText("Width:")
         self.line_width = QtWidgets.QComboBox(self)
-        self.line_width.addItems([str(x+1) for x in range(10)])
+        self.line_width.addItems([str(x + 1) for x in range(10)])
         self.line_width.setCurrentIndex(self.line_width.findText(line_options['width']))
 
         self.marker_label = QtWidgets.QLabel(self)
@@ -300,8 +291,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         layout.addLayout(row2)
         row3 = QtWidgets.QHBoxLayout()
         layout.addLayout(row3)
-        layout.addStretch()
 
+        row1.addWidget(self.legend_text_label)
         row1.addWidget(self.legendText)
         row2.addWidget(self.color_label)
         row2.addWidget(self.line_color)
@@ -312,24 +303,27 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         row3.addWidget(self.marker_label)
         row3.addWidget(self.line_marker)
 
+        self.error_bar_checkbox = QtWidgets.QCheckBox("Show Line Error Bars")
+        self.error_bar_checkbox.setChecked(line_options['error_bar'])
+
+        row4 = QtWidgets.QHBoxLayout()
+        layout.addLayout(row4)
+
+        row4.addWidget(self.error_bar_checkbox)
+
         if line_options['shown'] is not None and line_options['legend'] is not None:
-            self.show_line_label = QtWidgets.QLabel(self)
-            self.show_line_label.setText("Show: ")
-            self.show_line = QtWidgets.QCheckBox(self)
+            self.show_line = QtWidgets.QCheckBox("Show Line")
             self.show_line.setChecked(line_options['shown'])
 
-            self.show_legend_label = QtWidgets.QLabel(self)
-            self.show_legend_label.setText("Show legend: ")
-            self.show_legend = QtWidgets.QCheckBox(self)
+            self.show_legend = QtWidgets.QCheckBox("Show Legend")
             self.show_legend.setChecked(line_options['legend'])
+
             self.show_legend.setEnabled(line_options['shown'])
 
-            row4 = QtWidgets.QHBoxLayout()
-            layout.addLayout(row4)
+            row5 = QtWidgets.QHBoxLayout()
+            layout.addLayout(row5)
 
-            row4.addWidget(self.show_line_label)
-            row4.addWidget(self.show_line)
-            row4.addWidget(self.show_legend_label)
+            row5.addWidget(self.show_line)
             row4.addWidget(self.show_legend)
 
             self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))
@@ -339,6 +333,11 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
+
+        separator = QtWidgets.QFrame()
+        separator.setFrameShape(QtWidgets.QFrame.HLine)
+        separator.setFrameShadow(QtWidgets.QFrame.Sunken)
+        layout.addWidget(separator)
 
     def color_valid(self, index):
         if self.color_validator is None:
@@ -353,8 +352,15 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         self.show_legend.setEnabled(state)
         self.show_legend.setChecked(state)
 
+        self.error_bar_checkbox.setEnabled(state)
+        self.error_bar_checkbox.setChecked(state)
+
     def get_color_index(self):
         return self.line_color.currentIndex()
+
+    @property
+    def error_bar(self):
+        return self.error_bar_checkbox.isChecked()
 
     @property
     def legend(self):
