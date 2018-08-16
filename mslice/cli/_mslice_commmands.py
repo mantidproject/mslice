@@ -167,11 +167,24 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     app.MAIN_WINDOW.cut_plotter_presenter.update_main_window()
     return cut
 
-def PlotCut(InputWorkspace):
+def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
+    """
+    Create mslice standard matplotlib plot of a cut workspace.
+    Keyword Arguments:
+    InputWorkspace -- Workspace to cut. The parameter can be either a python
+                      handle to the workspace OR the workspace name as a string.
+
+    IntensityStart -- Lower bound of the y axis
+    IntensityEnd -- Upper bound of the y axis
+    PlotOver -- if true the cut will be plotted on an existing figure.
+    """
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, HistogramWorkspace):
         raise RuntimeError("Incorrect workspace type.")
     cut_presenter = CutPlotterPresenter()
-    cut_presenter.plot_cut_from_workspace(workspace)
-q
+    if IntensityStart == 0 and IntensityEnd == 0:
+        intensity_range = None
+    else:
+        intensity_range = (IntensityStart, IntensityEnd)
+    cut_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range, plot_over=PlotOver)
