@@ -4,7 +4,7 @@ from mslice.models.axis import Axis
 from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.widgets.cut.cut import CUT_PLOTTER
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 
 
 class InteractiveCut(object):
@@ -15,7 +15,7 @@ class InteractiveCut(object):
         self._ws_title = ws_title
         self.horizontal = None
         self.connect_event = [None, None, None]
-        self._cut_plotter = CUT_PLOTTER
+        self._cut_plotter_presenter = CutPlotterPresenter()
         self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
@@ -30,7 +30,7 @@ class InteractiveCut(object):
         if rectangle_changed:
             self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - eclick.y)
         self.plot_cut(eclick.xdata, erelease.xdata, eclick.ydata, erelease.ydata)
-        self._cut_plotter.set_icut(self)
+        self._cut_plotter_presenter.store_icut(self._ws_title, self)
         self.connect_event[2] = self._canvas.mpl_connect('button_press_event', self.clicked)
         self._rect_pos_cache = rect_pos
 
@@ -40,7 +40,7 @@ class InteractiveCut(object):
             units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
                 self._canvas.figure.gca().get_xaxis().units
             integration_axis = Axis(units, integration_start, integration_end, 0)
-            self._cut_plotter.plot_interactive_cut(str(self._ws_title), ax, integration_axis, False, None, None, False, store)
+            self._cut_plotter_presenter.plot_interactive_cut(str(self._ws_title), ax, integration_axis, store)
 
     def get_cut_parameters(self, pos1, pos2):
         start = pos1[not self.horizontal]
@@ -73,7 +73,7 @@ class InteractiveCut(object):
         self.slice_plot.update_workspaces()
 
     def clear(self):
-        self._cut_plotter.set_icut(None)
+        self._cut_plotter_presenter.set_is_icut(self._ws_title, False)
         self.rect.set_active(False)
         for event in self.connect_event:
             self._canvas.mpl_disconnect(event)

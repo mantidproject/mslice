@@ -21,7 +21,7 @@ from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 import mslice.models.slice.slice_functions as _SLICE_ALGORITHM
 # Cutting
 import mslice.models.cut.cut_functions as _CUT_ALGORITHM
-from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 
 # -----------------------------------------------------------------------------
 # Module constants
@@ -29,7 +29,7 @@ from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
 
 _POWDER_PROJECTION_MODEL = _MantidProjectionCalculator()
 _SLICE_MODEL = SlicePlotterPresenter()
-_CUT_PLOTTER = MatplotlibCutPlotter()
+_CUT_PLOTTER = CutPlotterPresenter()
 
 # -----------------------------------------------------------------------------
 # Convenience functions
@@ -205,5 +205,5 @@ def plot_cut(input_workspace, cut_axis, integration_start, integration_end, inte
     if isinstance(input_workspace, _Workspace):
         input_workspace = input_workspace.getName()
     cut_axis = _process_axis(cut_axis, None, input_workspace)
-    _CUT_PLOTTER.plot_cut(input_workspace, cut_axis, integration_start, integration_end, normalize, intensity_start,
-                          intensity_end, plot_over=hold)
+    _CUT_PLOTTER.plot_cut_intermediate(input_workspace, cut_axis, integration_start, integration_end, normalize, intensity_start,
+                                       intensity_end, plot_over=hold)

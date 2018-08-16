@@ -3,9 +3,9 @@ from contextlib import contextmanager
 import mantid.simpleapi as s_api
 from mantid.api import AlgorithmFactory, AnalysisDataService
 from mslice.models.workspacemanager.workspace_provider import add_workspace
-from mslice.models.cut.cut import Cut
+from mslice.models.cut.cut_algorithm import Cut
 from mslice.models.projection.powder.make_projection import MakeProjection
-from mslice.models.slice.slice import Slice
+from mslice.models.slice.slice_algorithm import Slice
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as Workspace
 

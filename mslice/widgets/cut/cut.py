@@ -5,12 +5,13 @@
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 
+from mslice.util.qt import load_ui
+from mslice.util.qt.QtGui import QDoubleValidator
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
 
-from mslice.models.cut.matplotlib_cut_plotter import MatplotlibCutPlotter
-from mslice.presenters.cut_presenter import CutPresenter
-from mslice.util.qt import load_ui
+from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
+
 from mslice.views.interfaces.cut_view import CutView
 from .command import Command
 
@@ -18,8 +19,6 @@ from .command import Command
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------
-
-CUT_PLOTTER = MatplotlibCutPlotter()
 
 class CutWidget(CutView, QWidget):
     error_occurred = Signal('QString')
@@ -35,11 +34,12 @@ class CutWidget(CutView, QWidget):
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
-        self._presenter = CutPresenter(self, CUT_PLOTTER)
+        self._presenter = CutWidgetPresenter(self)
         self.cmbCutAxis.currentIndexChanged.connect(self.axis_changed)
         self._minimumStep = None
         self.lneCutStep.editingFinished.connect(self._step_edited)
         self.enable_integration_axis(False)
+        self.set_validators()
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -53,9 +53,9 @@ class CutWidget(CutView, QWidget):
             try:
                 value = float(self.lneCutStep.text())
             except ValueError:
-                value = 0
+                value = 0.0
                 self.display_error('Invalid cut step parameter. Using default.')
-            if value == 0:
+            if value == 0.0:
                 self.lneCutStep.setText('%.5f' % (self._minimumStep))
                 self.display_error('Setting step size to default.')
             elif value < (self._minimumStep / 100.):
@@ -254,6 +254,16 @@ class CutWidget(CutView, QWidget):
         self.btnCutPlot.setEnabled(True)
         self.btnCutPlotOver.setEnabled(True)
 
+    def set_validators(self):
+        line_edits = [self.lneCutStart, self.lneCutEnd, self.lneCutIntegrationStart,
+                      self.lneCutIntegrationEnd, self.lneCutIntegrationWidth, self.lneEditCutIntensityStart,
+                      self.lneCutIntensityEnd]
+        for line_edit in line_edits:
+            line_edit.setValidator(QDoubleValidator())
+
     def force_normalization(self):
         self.rdoCutNormToOne.setEnabled(False)
         self.rdoCutNormToOne.setChecked(True)
+
+    def clear_displayed_error(self):
+        self.display_error("")
