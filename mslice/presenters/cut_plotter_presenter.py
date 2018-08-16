@@ -51,12 +51,15 @@ class CutPlotterPresenter(PresenterUtility):
         compute_cut(workspace, cut_cache.cut_axis, cut_cache.integration_axis, cut_cache.norm_to_one)
         self._main_presenter.update_displayed_workspaces()
 
-    def plot_cut_from_workspace(self, plot_over):
+    def plot_cut_from_selected_workspace(self, plot_over=False):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         for workspace_name in selected_workspaces:
-            workspace = get_workspace_handle(workspace_name)
-            plot_cut_impl(workspace, self, workspace.raw_ws.getDimension(0).getUnits(), plot_over=plot_over)
+            self.plot_cut_from_workspace(workspace_name, plot_over)
             plot_over = True  # plot over if multiple workspaces selected
+
+    def plot_cut_from_workspace(self, workspace, plot_over=False):
+        workspace = get_workspace_handle(workspace)
+        plot_cut_impl(workspace, self, workspace.raw_ws.getDimension(0).getUnits(), plot_over=plot_over)
 
     def plot_interactive_cut(self, workspace, cut_axis, integration_axis, store):
         workspace = get_workspace_handle(workspace)
