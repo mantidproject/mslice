@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QMenu
 
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.util.qt import load_ui
@@ -46,10 +47,12 @@ class MainWindow(MainView, QMainWindow):
         slice_widget_presenter = self.wgtSlice.get_presenter()
         slice_widget_presenter.set_slice_plotter_presenter(self.slice_plotter_presenter)
         powder_presenter = self.wgtPowder.get_presenter()
-        self.cut_presenter = self.wgtCut.get_presenter()
+        self.cut_plotter_presenter = CutPlotterPresenter()
+        self.cut_widget_presenter = self.wgtCut.get_presenter()
+        self.cut_widget_presenter.set_cut_plotter_presenter(self.cut_plotter_presenter)
         self._presenter = MainPresenter(self, self.workspace_presenter, self.dataloader_presenter,
-                                        slice_widget_presenter, powder_presenter, self.cut_presenter,
-                                        self.slice_plotter_presenter)
+                                        slice_widget_presenter, powder_presenter, self.cut_widget_presenter,
+                                        slice_plotter_presenter, self.cut_plotter_presenter)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.setup_save()
@@ -131,10 +134,10 @@ class MainWindow(MainView, QMainWindow):
         self.workspace_presenter.notify(ws_command.CombineWorkspace)
 
     def button_plot(self):
-        self.cut_presenter.notify(cut_command.PlotFromWorkspace)
+        self.cut_widget_presenter.notify(cut_command.PlotFromWorkspace)
 
     def button_overplot(self):
-        self.cut_presenter.notify(cut_command.PlotOverFromWorkspace)
+        self.cut_widget_presenter.notify(cut_command.PlotOverFromWorkspace)
 
     def button_savetoads(self):
         self.workspace_presenter.notify(ws_command.SaveToADS)

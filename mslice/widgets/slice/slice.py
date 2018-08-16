@@ -5,11 +5,12 @@
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 
+from mslice.util.qt import load_ui
+from mslice.util.qt.QtGui import QDoubleValidator
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
 
 from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
-from mslice.util.qt import load_ui
 from mslice.views.interfaces.slice_view import SliceView
 from .command import Command
 
@@ -38,6 +39,7 @@ class SliceWidget(SliceView, QWidget):
         self.enable_units_choice(False)
         self.cmbSliceXAxis.currentIndexChanged.connect(lambda ind: self._change_axes(1, ind))
         self.cmbSliceYAxis.currentIndexChanged.connect(lambda ind: self._change_axes(2, ind))
+        self.set_validators()
 
     def get_presenter(self):
         return self._presenter
@@ -196,7 +198,6 @@ class SliceWidget(SliceView, QWidget):
         self.populate_slice_y_params("", "", "")
         self.lneSliceIntensityStart.setText("")
         self.lneSliceIntensityEnd.setText("")
-        self.lneSliceSmoothing.setText("")
         self.rdoSliceNormToOne.setChecked(0)
         self._minimumStep = {}
 
@@ -211,7 +212,6 @@ class SliceWidget(SliceView, QWidget):
         self.lneSliceYStep.setEnabled(False)
         self.lneSliceIntensityStart.setEnabled(False)
         self.lneSliceIntensityEnd.setEnabled(False)
-        self.lneSliceSmoothing.setEnabled(False)
         self.rdoSliceNormToOne.setEnabled(False)
         self.btnSliceDisplay.setEnabled(False)
         self.cmbSliceColormap.setEnabled(False)
@@ -227,10 +227,15 @@ class SliceWidget(SliceView, QWidget):
         self.lneSliceYStep.setEnabled(True)
         self.lneSliceIntensityStart.setEnabled(True)
         self.lneSliceIntensityEnd.setEnabled(True)
-        self.lneSliceSmoothing.setEnabled(True)
         self.rdoSliceNormToOne.setEnabled(True)
         self.btnSliceDisplay.setEnabled(True)
         self.cmbSliceColormap.setEnabled(True)
+
+    def set_validators(self):
+        line_edits = [self.lneSliceXStart, self.lneSliceXEnd, self.lneSliceXStep,self.lneSliceYStart,self.lneSliceYEnd,
+                      self.lneSliceYStep, self.lneSliceIntensityStart,self.lneSliceIntensityEnd]
+        for line_edit in line_edits:
+            line_edit.setValidator(QDoubleValidator())
 
     def clear_displayed_error(self):
         self._display_error("")

@@ -34,7 +34,11 @@
       </widget>
      </item>
      <item row="0" column="3">
-      <widget class="QLineEdit" name="lneSliceXStart"/>
+      <widget class="QLineEdit" name="lneSliceXStart">
+       <property name="inputMask">
+        <string/>
+       </property>
+      </widget>
      </item>
      <item row="0" column="4">
       <widget class="QLabel" name="label_267">
@@ -133,21 +137,11 @@
      </item>
      <item row="3" column="0" colspan="2">
       <widget class="QLabel" name="label_14">
+       <property name="visible">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Smoothing</string>
-       </property>
-       <property name="visible">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2" colspan="2">
-      <widget class="QLineEdit" name="lneSliceSmoothing">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="visible">
-        <bool>false</bool>
        </property>
       </widget>
      </item>
