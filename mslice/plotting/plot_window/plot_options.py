@@ -303,7 +303,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         row3.addWidget(self.marker_label)
         row3.addWidget(self.line_marker)
 
-        self.error_bar_checkbox = QtWidgets.QCheckBox("Show Line Error Bars")
+        self.error_bar_checkbox = QtWidgets.QCheckBox("Show Error Bars")
         self.error_bar_checkbox.setChecked(line_options['error_bar'])
 
         row4 = QtWidgets.QHBoxLayout()

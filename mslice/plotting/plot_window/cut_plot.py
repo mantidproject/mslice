@@ -207,7 +207,7 @@ class CutPlot(IPlot):
 
     def calc_figure_boundaries(self):
         fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
-        bounds = dict()
+        bounds = {}
         bounds['y_label'] = fig_x * 0.07
         bounds['y_range'] = fig_x * 0.12
         bounds['title'] = fig_y * 0.9
@@ -228,11 +228,7 @@ class CutPlot(IPlot):
         alpha = [x.get_alpha() for x in errorbar]
         # replace None with 1(None indicates default which is 1)
         alpha = [x if x is not None else 1 for x in alpha]
-        if sum(alpha) == 0:
-            has_errorbars = False
-        else:
-            has_errorbars = True
-        return has_errorbars
+        return sum(alpha) != 0
 
     def legend_visible(self, index):
         try:

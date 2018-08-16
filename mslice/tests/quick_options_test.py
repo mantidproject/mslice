@@ -92,11 +92,11 @@ class QuickOptionsTest(unittest.TestCase):
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
             {'shown': True, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
-             'marker': 'o', 'legend': True})
+             'marker': 'o', 'legend': True, 'error_bar': True})
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
                              {'shown': True, 'color': 'blue', 'label': u'label2',
-                              'style': '--', 'width': '5', 'marker': '.', 'legend': True})
+                              'style': '--', 'width': '5', 'marker': '.', 'legend': True, 'error_bar': False})
 
     @patch.object(QuickAxisOptions, '__init__', lambda v, w, x, y, z: None)
     @patch.object(QuickAxisOptions, 'exec_', lambda x: True)
@@ -217,7 +217,8 @@ class QuickLineTest(unittest.TestCase):
         type(self.view).legend = legend
         self.view.exec_ = MagicMock(return_value=True)
         quick_options(self.target, self.model)
-        values = {'color': 1, 'style': 2, 'width': 3, 'marker': 4, 'label': 5, 'shown': False, 'legend': False}
+        values = {'color': 1, 'style': 2, 'width': 3, 'marker': 4, 'label': 5, 'shown': False, 'legend': False,
+                  'error_bar': True}
         self.model.set_line_options.assert_called_once_with(self.target, values)
 
     def test_reject(self, quick_line_options_view):
