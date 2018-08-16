@@ -14,8 +14,7 @@ from scipy import constants
 from mslice.models.axis import Axis
 
 from mslice.util.mantid.algorithm_wrapper import add_to_ads, wrap_in_ads
-from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_workspace_name,
-                                                               remove_workspace, add_workspace)
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
 from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
