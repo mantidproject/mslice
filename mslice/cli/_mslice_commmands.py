@@ -12,6 +12,7 @@ import os.path as ospath
 import mslice.app as app
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
+from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
@@ -63,9 +64,9 @@ def _process_axis(axis, fallback_index, input_workspace, string_function=_string
     return axis
 
 
-def _validate_workspace(workspace):
+def _check_workspace_name(workspace):
     if isinstance(workspace, Workspace):
-        workspace = workspace.name
+        return
     if not isinstance(workspace, str):
         raise TypeError('InputWorkspace must be a workspace or a workspace name')
     if not workspace_exists(workspace):
@@ -100,7 +101,7 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
            Units -- The energy units (string) [default: 'meV']
 
        """
-    _validate_workspace(InputWorkspace)
+    _check_workspace_name(InputWorkspace)
 
     proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
     app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
@@ -123,7 +124,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
        NormToOne -- if true the slice will be normalized to one.
 
        """
-    _validate_workspace(InputWorkspace)
+    _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
@@ -148,7 +149,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     NormToOne -- if true the cut will be normalized to one.
 
     """
-    _validate_workspace(InputWorkspace)
+    _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if workspace.is_PSD:
         if isinstance(workspace, MatrixWorkspace):
@@ -162,15 +163,15 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     cut_axis = _process_axis(CutAxis, 0, workspace)
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
-
-    return mantid_algorithms.Cut(InputWorkspace=workspace, CutAxis=cut_axis.to_dict(),
-                                 IntegrationAxis=integration_axis.to_dict(), EMode=workspace.e_mode,
-                                 PSD=workspace.is_PSD, NormToOne=NormToOne)
+    cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, store=True)
+    app.MAIN_WINDOW.cut_plotter_presenter.update_main_window()
+    return cut
 
 def PlotCut(InputWorkspace):
-    _validate_workspace(InputWorkspace)
+    _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, HistogramWorkspace):
-        return # error
+        raise RuntimeError("Incorrect workspace type.")
     cut_presenter = CutPlotterPresenter()
     cut_presenter.plot_cut_from_workspace(workspace)
+q

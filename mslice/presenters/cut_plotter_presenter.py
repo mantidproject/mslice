@@ -31,8 +31,7 @@ class CutPlotterPresenter(PresenterUtility):
         plot_cut_impl(cut, self, cut_axis.units, (cut_cache.intensity_start, cut_cache.intensity_end), plot_over, legend)
         if update_main:
             self.set_is_icut(workspace.name, False)
-            self._main_presenter.highlight_ws_tab(2)
-            self._main_presenter.update_displayed_workspaces()
+            self.update_main_window()
 
     def _plot_with_width(self, workspace, cut_cache, plot_over):
         """This function handles the width parameter."""
@@ -58,6 +57,7 @@ class CutPlotterPresenter(PresenterUtility):
             plot_over = True  # plot over if multiple workspaces selected
 
     def plot_cut_from_workspace(self, workspace, plot_over=False):
+
         workspace = get_workspace_handle(workspace)
         plot_cut_impl(workspace, self, workspace.raw_ws.getDimension(0).getUnits(), plot_over=plot_over)
 
@@ -78,7 +78,14 @@ class CutPlotterPresenter(PresenterUtility):
         plt.gcf().canvas.manager.is_icut(is_icut)
 
     def get_icut(self, workspace_name):
-        return self._cut_cache[workspace_name].icut
+        try:
+            return self._cut_cache[workspace_name].icut
+        except KeyError:
+            return None
+
+    def update_main_window(self):
+        self._main_presenter.highlight_ws_tab(2)
+        self._main_presenter.update_displayed_workspaces()
 
     def workspace_selection_changed(self):
         pass
