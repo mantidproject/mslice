@@ -3,7 +3,7 @@ from matplotlib.colors import Normalize
 from mslice.models.cmap import allowed_cmaps
 from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
                                                  compute_powder_line)
-from mslice.models.slice.slice_cache import SliceCache
+from mslice.models.slice.slice import Slice
 from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, remove_line,
                                         plot_overplot_line, create_slice)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -34,7 +34,7 @@ class SlicePlotterPresenter(PresenterUtility):
     def _cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
         rotated = x_axis.units not in ['MomentumTransfer', 'Degrees', '|Q|']
         (q_axis, e_axis) = (x_axis, y_axis) if not rotated else (y_axis, x_axis)
-        self._slice_cache[slice.name[2:]] = SliceCache(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
+        self._slice_cache[slice.name[2:]] = Slice(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     def show_scattering_function(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]

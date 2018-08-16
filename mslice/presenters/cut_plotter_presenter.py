@@ -1,6 +1,6 @@
 from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut
 from mslice.models.cut.cut_functions import compute_cut
-from mslice.models.cut.cut_cache import CutCache
+from mslice.models.cut.cut import Cut
 from mslice.models.labels import generate_legend
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 import mslice.plotting.pyplot as plt
@@ -60,7 +60,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     def plot_interactive_cut(self, workspace, cut_axis, integration_axis, store):
         workspace = get_workspace_handle(workspace)
-        cache = CutCache(cut_axis, integration_axis, None, None)
+        cache = Cut(cut_axis, integration_axis, None, None)
         self._cut_cache[workspace.name] = cache
         self._plot_cut(workspace, cache, False, store, update_main=False)
         draw_interactive_cut(workspace)

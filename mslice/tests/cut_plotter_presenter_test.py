@@ -1,7 +1,7 @@
 import unittest
 import mock
 from mslice.models.axis import Axis
-from mslice.models.cut.cut_cache import CutCache
+from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 
@@ -16,7 +16,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
     def create_cut_cache(self):
         axis = Axis("units", "0", "100", "1")
         integration_axis = Axis("units", 0.0, 100.0, 0)
-        return CutCache(axis, integration_axis, intensity_start=3.0, intensity_end= 11.0, norm_to_one=True, width=None)
+        return Cut(axis, integration_axis, intensity_start=3.0, intensity_end= 11.0, norm_to_one=True, width=None)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.compute_cut')

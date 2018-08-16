@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.models.cut.cut_cache import CutCache
+from mslice.models.cut.cut import Cut
 from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
@@ -86,7 +86,7 @@ class CutWidgetPresenter(PresenterUtility):
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
         width = self._cut_view.get_integration_width()
-        return CutCache(cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width)
+        return Cut(cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width)
 
     def _set_minimum_step(self, workspace, axis):
         """Gets axes limits and then sets the minimumStep dictionary with those values"""
