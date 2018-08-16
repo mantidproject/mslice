@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from mslice.models.labels import get_display_name, recoil_labels
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
-from mslice.util.mantid import run_algorithm
+from mslice.util.mantid.mantid_algorithms import Transpose
 import mslice.plotting.pyplot as plt
 
 OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
@@ -27,7 +27,7 @@ def _show_plot(slice_cache, workspace):
     cur_fig.clf()
     ax = cur_fig.add_subplot(111, projection='mantid')
     if not workspace.is_PSD and not slice_cache.rotated:
-        workspace = run_algorithm('Transpose', output_name=workspace.name, InputWorkspace=workspace, store=False)
+        workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
     image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap, norm=slice_cache.norm)
     ax.set_title(workspace.name[2:], picker=PICKER_TOL_PTS)
     x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis

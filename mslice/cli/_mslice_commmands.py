@@ -14,10 +14,12 @@ import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.util.mantid import mantid_algorithms
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
 # -----------------------------------------------------------------------------
@@ -164,3 +166,11 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     return mantid_algorithms.Cut(InputWorkspace=workspace, CutAxis=cut_axis.to_dict(),
                                  IntegrationAxis=integration_axis.to_dict(), EMode=workspace.e_mode,
                                  PSD=workspace.is_PSD, NormToOne=NormToOne)
+
+def PlotCut(InputWorkspace):
+    _validate_workspace(InputWorkspace)
+    workspace = get_workspace_handle(InputWorkspace)
+    if not isinstance(workspace, HistogramWorkspace):
+        return # error
+    cut_presenter = CutPlotterPresenter()
+    cut_presenter.plot_cut_from_workspace(workspace)
