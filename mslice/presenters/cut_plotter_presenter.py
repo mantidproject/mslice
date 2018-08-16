@@ -25,10 +25,10 @@ class CutPlotterPresenter(PresenterUtility):
     def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
-        cut = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, store)
+        cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, store)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start,
                                  integration_axis.end)
-        plot_cut_impl(cut, self, cut_axis.units, (cut.intensity_start, cut.intensity_end), plot_over, legend)
+        plot_cut_impl(cut_ws, self, cut_axis.units, (cut.intensity_start, cut.intensity_end), plot_over, legend)
         if update_main:
             self.set_is_icut(workspace.name, False)
             self._main_presenter.highlight_ws_tab(2)

@@ -52,7 +52,6 @@ class CutWidget(CutView, QWidget):
         if self._minimumStep:
             try:
                 value = float(self.lneCutStep.text())
-                print(value)
             except ValueError:
                 value = 0.0
                 self.display_error('Invalid cut step parameter. Using default.')
@@ -265,3 +264,6 @@ class CutWidget(CutView, QWidget):
     def force_normalization(self):
         self.rdoCutNormToOne.setEnabled(False)
         self.rdoCutNormToOne.setChecked(True)
+
+    def clear_displayed_error(self):
+        self.display_error("")
