@@ -6,7 +6,7 @@ from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.util.qt import load_ui
-from mslice.views.mainview import MainView
+from mslice.views.interfaces.mainview import MainView
 from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 from mslice.widgets.workspacemanager import TAB_2D, TAB_EVENT, TAB_HISTO, TAB_NONPSD
 from mslice.widgets.workspacemanager.command import Command as ws_command
