@@ -44,6 +44,7 @@ class CutPresenter(PresenterUtility):
             elif command == Command.AxisChanged:
                 self._cut_axis_changed()
 
+
     def _cut(self, output_method, plot_over=False):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         try:
