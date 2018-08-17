@@ -249,6 +249,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     def __init__(self, line_options, color_validator):
         super(LegendAndLineOptionsSetter, self).__init__()
+        self.line_options = line_options
+
         self.legend_text_label = QtWidgets.QLabel("Plot")
         self.legendText = QtWidgets.QLineEdit(self)
         self.legendText.setText(line_options['label'])
@@ -333,6 +335,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
+
+        self.error_bar_checkbox.setEnabled(line_options['shown'])
 
         separator = QtWidgets.QFrame()
         separator.setFrameShape(QtWidgets.QFrame.HLine)

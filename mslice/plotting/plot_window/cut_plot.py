@@ -137,13 +137,25 @@ class CutPlot(IPlot):
             self.set_line_options_by_index(i, line_data[i])
         self.update_legend(line_data)
 
+    def _single_line_has_error_bars(self, line_index):
+        current_axis = self._canvas.figure.gca()
+        # If all the error bars have alpha = 0 they are all transparent (hidden)
+        containers = [x for x in current_axis.containers if isinstance(x, ErrorbarContainer)]
+        line_components = [x.get_children() for x in containers]
+        # drop the first element of each container because it is the the actual line
+        errorbar = [x[1:] for x in line_components][line_index]
+        alpha = [x.get_alpha() for x in errorbar]
+        # replace None with 1(None indicates default which is 1)
+        alpha = [x if x is not None else 1 for x in alpha]
+        return sum(alpha) != 0
+
     def get_line_options_by_index(self, line_index):
         line_options = {}
         container = self._canvas.figure.gca().containers[line_index]
         line = container.get_children()[0]
         line_options['label'] = container.get_label()
         line_options['legend'] = self.legend_visible(line_index)
-        line_options['shown'] = True
+        line_options['shown'] = self.get_line_visible(line_index)
         line_options['color'] = line.get_color()
         line_options['style'] = line.get_linestyle()
         line_options['width'] = str(int(line.get_linewidth()))
@@ -159,10 +171,19 @@ class CutPlot(IPlot):
         main_line.set_marker(line_options['marker'])
 
         self._legends_visible[line_index] = bool(line_options['legend'])
+
+        self.toggle_errorbar(line_index, line_options)
+
         for child in container.get_children():
             child.set_color(line_options['color'])
             child.set_linewidth(line_options['width'])
             child.set_visible(line_options['shown'])
+
+        self._lines_visible[line_index] = line_options['shown']
+
+    def toggle_errorbar(self, line_index, line_options):
+        container = self._canvas.figure.gca().containers[line_index]
+        error_bar_elements = container.get_children()[1:]
 
         if not line_options['error_bar'] and self.get_line_visible(line_index):
             for element in error_bar_elements:
@@ -218,18 +239,6 @@ class CutPlot(IPlot):
     def xy_config(self):
         return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
 
-    def _single_line_has_error_bars(self, index):
-        current_axis = self._canvas.figure.gca()
-        # If all the error bars have alpha = 0 they are all transparent (hidden)
-        containers = [x for x in current_axis.containers if isinstance(x, ErrorbarContainer)]
-        line_components = [x.get_children() for x in containers]
-        # drop the first element of each container because it is the the actual line
-        errorbar = [x[1:] for x in line_components][index]
-        alpha = [x.get_alpha() for x in errorbar]
-        # replace None with 1(None indicates default which is 1)
-        alpha = [x if x is not None else 1 for x in alpha]
-        return sum(alpha) != 0
-
     def legend_visible(self, index):
         try:
             v = self._legends_visible[index]
@@ -239,18 +248,13 @@ class CutPlot(IPlot):
         return v
 
     def line_containers(self):
-        '''build dictionary of lines and their containers'''
+        """build dictionary of lines and their containers"""
         line_containers = {}
         containers = self._canvas.figure.gca().containers
         for container in containers:
             line = container.get_children()[0]
             line_containers[line] = container
         return line_containers
-
-    def set_line_visible(self, line_index, visible):
-        self._lines_visible[line_index] = visible
-        for child in self._canvas.figure.gca().containers[line_index].get_children():
-            child.set_visible(visible)
 
     def get_line_visible(self, line_index):
         try:
