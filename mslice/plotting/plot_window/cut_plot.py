@@ -166,7 +166,7 @@ class CutPlot(IPlot):
     def set_line_options_by_index(self, line_index, line_options):
         container = self._canvas.figure.gca().containers[line_index]
         container.set_label(line_options['label'])
-        main_line, error_bar_elements = container.get_children()[0], container.get_children()[1:]
+        main_line = container.get_children()[0]
         main_line.set_linestyle(line_options['style'])
         main_line.set_marker(line_options['marker'])
 

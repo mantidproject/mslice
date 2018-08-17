@@ -4,7 +4,7 @@ import unittest
 
 from matplotlib import text
 from matplotlib.lines import Line2D
-from matplotlib.container import Container, ErrorbarContainer
+from matplotlib.container import ErrorbarContainer
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.presenters.quick_options_presenter import quick_options, quick_axis_options
