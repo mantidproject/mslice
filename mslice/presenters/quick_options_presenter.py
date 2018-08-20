@@ -53,7 +53,7 @@ def _set_label(view, target):
 
 def _set_line_options(view, model, line):
     line_options = {}
-    values = ['color', 'style', 'width', 'marker', 'label', 'shown', 'legend']
+    values = ['error_bar', 'color', 'style', 'width', 'marker', 'label', 'shown', 'legend']
     for value in values:
         line_options[value] = getattr(view, value)
     model.set_line_options(line, line_options)

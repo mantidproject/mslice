@@ -187,27 +187,9 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.model.change_axis_scale.assert_called_once_with({'x_range': (1, 2), 'y_range': (3, 4), 'modified': True,
                                                               'x_log': False,    'y_log': True})
 
-    def test_show_error_bars(self):
-        view_error_bars_mock = PropertyMock()
-        model_error_bars_mock = PropertyMock(return_value=True)
-        type(self.view).error_bars = view_error_bars_mock
-        type(self.model).error_bars = model_error_bars_mock
-
-        # model -> view
-        self.presenter = CutPlotOptionsPresenter(self.view, self.model)
-        model_error_bars_mock.assert_called_once_with()
-        view_error_bars_mock.assert_called_once_with(True)
-
-        # view -> model
-        model_error_bars_mock.reset_mock()
-        view_error_bars_mock.return_value = False
-        self.presenter.get_new_config()
-
-        model_error_bars_mock.assert_called_once_with(False)
-
     def test_line_options(self):
         #  model -> view
-        line_options = [{'color': 'k', 'style': '-', 'width': '10', 'marker': '*'}]
+        line_options = [{'color': 'k', 'style': '-', 'width': '10', 'marker': '*', 'error_bars': True}]
         legends = {'label': 'legend1', 'visible': True}
         line_data = list(zip(legends, line_options))
         self.model.get_all_line_options = Mock(return_value=line_data)
@@ -217,7 +199,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.view.set_line_options.assert_called_once_with(line_data)
 
         #  view -> model
-        line_options2 = [{'color': 'b', 'style': '-', 'width': '10', 'marker': 'o'}]
+        line_options2 = [{'color': 'b', 'style': '-', 'width': '10', 'marker': 'o', 'error_bars': False}]
         legends2 = {'label': 'legend1', 'visible': False}
         line_data2 = list(zip(legends2, line_options2))
 

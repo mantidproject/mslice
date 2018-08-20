@@ -3,6 +3,7 @@ from functools import partial
 
 
 class PlotOptionsPresenter(object):
+
     def __init__(self, plot_options_dialog, plot_handler):
         self._model = plot_handler
         self._view = plot_options_dialog
@@ -79,7 +80,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
 
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log',
-                      'x_grid', 'y_grid', 'error_bars', 'show_legends']
+                      'x_grid', 'y_grid', 'show_legends']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 
@@ -93,5 +94,4 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
             setattr(self._model, key, value)
         line_options = self._view.get_line_options()
         self._model.set_all_line_options(line_options)
-        self._model.error_bars = self._view.error_bars
         return True
