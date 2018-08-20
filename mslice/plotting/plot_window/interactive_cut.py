@@ -56,7 +56,6 @@ class InteractiveCut(object):
 
     def callback(self, event):
         if self.rect.active:
-            print('thing was done')
             self.rect.update()
 
     def clicked(self, event):
