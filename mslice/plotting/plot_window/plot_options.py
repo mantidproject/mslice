@@ -249,7 +249,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     def __init__(self, line_options, color_validator):
         super(LegendAndLineOptionsSetter, self).__init__()
-        self.line_options = line_options
 
         self.legend_text_label = QtWidgets.QLabel("Plot")
         self.legendText = QtWidgets.QLineEdit(self)
