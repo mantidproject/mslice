@@ -20,6 +20,8 @@ class InteractiveCut(object):
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
                                       button=[1, 3], spancoords='pixels', interactive=True)
+
+        self.connect_event[3] = self._canvas.mpl_connect('draw_event', self.callback)
         self._canvas.draw()
 
     def plot_from_mouse_event(self, eclick, erelease):
@@ -30,7 +32,6 @@ class InteractiveCut(object):
         if rectangle_changed:
             self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - eclick.y)
         self.plot_cut(eclick.xdata, erelease.xdata, eclick.ydata, erelease.ydata)
-        self.connect_event[3] = self._canvas.mpl_connect('draw_event', self.callback)
         self._cut_plotter_presenter.store_icut(self._ws_title, self)
         self.connect_event[2] = self._canvas.mpl_connect('button_press_event', self.clicked)
         self._rect_pos_cache = rect_pos
@@ -91,3 +92,4 @@ class InteractiveCut(object):
     def window_closing(self):
         self.slice_plot.plot_window.action_interactive_cuts.setChecked(False)
         self.slice_plot.toggle_icut()
+        self._canvas.mpl_disconnect(self.connect_event[3])
