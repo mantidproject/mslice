@@ -14,12 +14,14 @@ class InteractiveCut(object):
         self._canvas = canvas
         self._ws_title = ws_title
         self.horizontal = None
-        self.connect_event = [None, None, None]
+        self.connect_event = [None, None, None, None]
         self._cut_plotter_presenter = CutPlotterPresenter()
         self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
                                       button=[1, 3], spancoords='pixels', interactive=True)
+
+        self.connect_event[3] = self._canvas.mpl_connect('draw_event', self.redraw_rectangle)
         self._canvas.draw()
 
     def plot_from_mouse_event(self, eclick, erelease):
@@ -61,6 +63,10 @@ class InteractiveCut(object):
     def end_drag(self, event):
         self._canvas.mpl_disconnect(self.connect_event[0])
         self._canvas.mpl_disconnect(self.connect_event[1])
+
+    def redraw_rectangle(self, event):
+        if self.rect.active:
+            self.rect.update()
 
     def save_cut(self):
         x1, x2, y1, y2 = self.rect.extents
