@@ -21,7 +21,7 @@ class InteractiveCut(object):
                                       drawtype='box', useblit=True,
                                       button=[1, 3], spancoords='pixels', interactive=True)
 
-        self.connect_event[3] = self._canvas.mpl_connect('draw_event', self.callback)
+        self.connect_event[3] = self._canvas.mpl_connect('draw_event', self.redraw_rectangle)
         self._canvas.draw()
 
     def plot_from_mouse_event(self, eclick, erelease):
@@ -64,7 +64,7 @@ class InteractiveCut(object):
         self._canvas.mpl_disconnect(self.connect_event[0])
         self._canvas.mpl_disconnect(self.connect_event[1])
 
-    def callback(self, event):
+    def redraw_rectangle(self, event):
         if self.rect.active:
             self.rect.update()
 
