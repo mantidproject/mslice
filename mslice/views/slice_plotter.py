@@ -12,6 +12,7 @@ PICKER_TOL_PTS = 5
 def plot_cached_slice(slice_workspace, slice_cache):
     _show_plot(slice_workspace, slice_cache)
 
+
 @plt.set_category(plt.CATEGORY_SLICE)
 def create_slice(workspace_name, presenter):
     fig_canvas = plt.gcf().canvas

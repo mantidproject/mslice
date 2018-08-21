@@ -69,6 +69,8 @@ class CutPlot(IPlot):
     def object_clicked(self, target):
         if isinstance(target, Legend):
             return
+        elif self.plot_window.action_interactive_cuts.toggled:
+            return
         else:
             quick_options(target, self)
         self.update_legend()
@@ -199,6 +201,7 @@ class CutPlot(IPlot):
         self.plot_window.action_keep.setVisible(not is_icut)
         self.plot_window.action_make_current.setVisible(not is_icut)
         self.plot_window.action_flip_axis.setVisible(is_icut)
+
         self.plot_window.show()
 
     def save_icut(self):
