@@ -1,9 +1,9 @@
 from matplotlib.colors import Normalize
 
-from mslice.models.cmap import allowed_cmaps
 from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
                                                  compute_powder_line)
 from mslice.models.slice.slice_cache import SliceCache
+from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, remove_line,
                                         plot_overplot_line, create_slice_figure)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -16,9 +16,6 @@ class SlicePlotterPresenter(PresenterUtility):
         self._main_presenter = None
         self._slice_cache = {}
         self._sample_temp_fields = []
-
-    def get_available_colormaps(self):
-        return allowed_cmaps()
 
     def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
         workspace = get_workspace_handle(selected_ws)
@@ -44,7 +41,7 @@ class SlicePlotterPresenter(PresenterUtility):
         self._slice_cache[workspace_name].norm = norm
 
     def change_colourmap(self, workspace_name, colourmap):
-        if colourmap in self.get_available_colormaps():
+        if colourmap in ALLOWED_CMAPS:
             workspace_name = workspace_name.lstrip('__')
             self._slice_cache[workspace_name].colourmap = colourmap
         else:

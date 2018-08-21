@@ -178,7 +178,7 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colourmap=DEFA
                       handle to the workspace OR the workspace name as a string.
     IntensityStart -- Lower bound of the intensity axis (colorbar)
     IntensityEnd -- Upper bound of the intensity axis (colorbar)
-    Colourmap -- Colourmap name as a string. Default is 'viridis'.
+    Colourmap -- Colormap name as a string. Default is 'viridis'.
     """
     _validate_workspace(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
