@@ -14,6 +14,7 @@ import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
+from mslice.models.cmap import DEFAULT_CMAP
 from mslice.util.mantid import mantid_algorithms
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -137,7 +138,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
     return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
-                                                                'viridis')
+                                                                DEFAULT_CMAP)
 
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
@@ -169,7 +170,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
                                  PSD=workspace.is_PSD, NormToOne=NormToOne)
 
 
-def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colourmap='viridis'):
+def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colourmap=DEFAULT_CMAP):
     """
     Creates mslice standard matplotlib plot of a slice workspace.
     Keyword Arguments:

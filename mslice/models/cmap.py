@@ -3,6 +3,7 @@ Colour-map related functionality
 """
 from mslice.util import MPL_COMPAT
 
+DEFAULT_CMAP = 'viridis'
 
 def allowed_cmaps():
     """Return the allowed list of colour maps"""
