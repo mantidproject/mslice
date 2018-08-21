@@ -170,7 +170,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
                                  PSD=workspace.is_PSD, NormToOne=NormToOne)
 
 
-def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colourmap=DEFAULT_CMAP):
+def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAULT_CMAP):
     """
     Creates mslice standard matplotlib plot of a slice workspace.
     Keyword Arguments:
@@ -178,12 +178,12 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colourmap=DEFA
                       handle to the workspace OR the workspace name as a string.
     IntensityStart -- Lower bound of the intensity axis (colorbar)
     IntensityEnd -- Upper bound of the intensity axis (colorbar)
-    Colourmap -- Colormap name as a string. Default is 'viridis'.
+    Colormap -- Colormap name as a string. Default is 'viridis'.
     """
     _validate_workspace(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace)
     slice_presenter = app.MAIN_WINDOW.slice_plotter_presenter
     slice_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
-    slice_presenter.change_colourmap(workspace.name, Colourmap)
+    slice_presenter.change_colourmap(workspace.name, Colormap)
     slice_presenter.plot_from_cache(workspace)
