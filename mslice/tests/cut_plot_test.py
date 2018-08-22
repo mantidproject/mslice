@@ -1,4 +1,4 @@
-from mock import MagicMock, patch, ANY, Mock
+from mock import MagicMock, patch, ANY
 import numpy as np
 import unittest
 
