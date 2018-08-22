@@ -15,7 +15,7 @@ def draw_interactive_cut(workspace):
     # disconnect picking in interactive cut
     cur_canvas.manager.picking_connected(False)
     cur_canvas.manager.button_pressed_connected(False)
-    
+
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.restore_region(cur_canvas.manager.get_cut_background())
         _create_cut(workspace)
@@ -27,7 +27,6 @@ def draw_interactive_cut(workspace):
     except AttributeError:
         cur_canvas.draw_idle()
     plt.show()
-
 
 
 @plt.set_category(plt.CATEGORY_CUT)
