@@ -50,9 +50,6 @@ class PlotFigureManagerQT(QtCore.QObject):
 
         self.show()
 
-    def get_plot_handler(self):
-        if self.has_plot_handler():
-            return self._plot_handler
 
     def show(self):
         self.window.show()
