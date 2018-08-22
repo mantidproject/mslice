@@ -225,7 +225,7 @@ class CutPlot(IPlot):
         try:
             container = self._lines[line]
         except KeyError:
-            self._lines=self.line_containers()
+            self._lines = self.line_containers()
             container = self._lines[line]
         i = 0
         for c in self._canvas.figure.gca().containers:
