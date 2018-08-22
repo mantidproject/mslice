@@ -57,9 +57,6 @@ class CutPlot(IPlot):
             self._canvas.draw()
 
     def plot_clicked(self, x, y):
-        icut = self._cut_plotter_presenter.get_icut(self.ws_name)
-        if icut is not None and icut.slice_plot.plot_window.action_interactive_cuts.isChecked():
-            return
         bounds = self.calc_figure_boundaries()
         if bounds['x_label'] < y < bounds['title']:
             if bounds['y_label'] < x:
@@ -70,13 +67,9 @@ class CutPlot(IPlot):
             self._canvas.draw()
 
     def object_clicked(self, target):
-        icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         if isinstance(target, Legend):
             return
-        elif icut is not None and icut.slice_plot.plot_window.action_interactive_cuts.isChecked():
-            return
-        else:
-            quick_options(target, self)
+        quick_options(target, self)
         self.update_legend()
         self._canvas.draw()
 

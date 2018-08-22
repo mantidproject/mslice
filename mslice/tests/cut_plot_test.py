@@ -54,17 +54,8 @@ class CutPlotTest(unittest.TestCase):
     def test_line_clicked(self, quick_options_mock):
         line = Line2D([], [])
         self.cut_plot.update_legend = MagicMock()
-        icut = MagicMock()
-        self.cut_plotter.get_icut = MagicMock(return_value=icut)
-        icut.slice_plot.plot_window.action_interactive_cuts.isChecked = MagicMock(return_value=False)
-
         self.cut_plot.object_clicked(line)
         quick_options_mock.assert_called_once_with(line, self.cut_plot)
-        self.cut_plot.update_legend.assert_called_once()
-        self.cut_plot._canvas.draw.assert_called_once()
-
-        icut.slice_plot.plot_window.action_interactive_cuts.isChecked = MagicMock(return_value=True)
-        quick_options_mock.assert_not_called()
         self.cut_plot.update_legend.assert_called_once()
         self.cut_plot._canvas.draw.assert_called_once()
 
@@ -73,22 +64,9 @@ class CutPlotTest(unittest.TestCase):
         text = "some_label"
         self.cut_plot._get_line_index = MagicMock(return_value=2)
         self.cut_plot.update_legend = MagicMock()
-        icut = MagicMock()
-        self.cut_plotter.get_icut = MagicMock(return_value=icut)
-
-        icut.slice_plot.plot_window.action_interactive_cuts.isChecked = MagicMock(return_value=False)
-
         self.cut_plot.object_clicked(text)
-
         self.cut_plot._get_line_index.assert_not_called()
         quick_options_mock.assert_called_once_with(text, self.cut_plot)
-        self.cut_plot.update_legend.assert_called_once()
-        self.cut_plot._canvas.draw.assert_called_once()
-
-        icut.slice_plot.plot_window.action_interactive_cuts.isChecked = MagicMock(return_value=True)
-
-        self.cut_plot._get_line_index.assert_not_called()
-        quick_options_mock.assert_not_called()
         self.cut_plot.update_legend.assert_called_once()
         self.cut_plot._canvas.draw.assert_called_once()
 

@@ -11,6 +11,10 @@ def draw_interactive_cut(workspace):
     cur_fig = plt.gcf()
     cur_canvas = cur_fig.canvas
     ax = plt.gca()
+
+    # disconnect picking in interactive cut
+    cur_canvas.manager.picking_connected(False)
+
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.restore_region(cur_canvas.manager.get_cut_background())
         _create_cut(workspace)
@@ -23,6 +27,7 @@ def draw_interactive_cut(workspace):
         cur_canvas.draw_idle()
     plt.show()
 
+    cur_canvas.manager.button_pressed_connected(False)
 
 @plt.set_category(plt.CATEGORY_CUT)
 def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over=False, legend=None):
