@@ -210,6 +210,4 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     else:
         intensity_range = (IntensityStart, IntensityEnd)
     cut_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range, plot_over=PlotOver)
-    return mantid_algorithms.Cut(InputWorkspace=workspace, CutAxis=cut_axis.to_dict(),
-                                 IntegrationAxis=integration_axis.to_dict(), EMode=workspace.e_mode,
-                                 PSD=workspace.is_PSD, NormToOne=NormToOne)
+    
