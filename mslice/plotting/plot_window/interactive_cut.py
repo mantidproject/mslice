@@ -5,8 +5,6 @@ from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
-import mslice.plotting.pyplot as plt
-
 
 class InteractiveCut(object):
 
