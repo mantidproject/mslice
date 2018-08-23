@@ -46,12 +46,12 @@ class CutPlot(IPlot):
         plot_window.action_flip_axis.triggered.disconnect()
 
     def window_closing(self):
-        self._canvas.manager.button_pressed_connected(False)
-        self._canvas.manager.picking_connected(False)
-        self._canvas.figure.clf()
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         if icut is not None:
             icut.window_closing()
+            self._canvas.manager.button_pressed_connected(False)
+            self._canvas.manager.picking_connected(False)
+        self._canvas.figure.clf()
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
@@ -194,9 +194,13 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def is_icut(self, is_icut):
+
+        if is_icut:
+            self.plot_window.action_keep.triggered.connect(self.keep_triggered)
+            self.plot_window.action_make_current.triggered.connect(self.make_current_triggered)
+
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
-        self.plot_window.action_keep.triggered.connect(self.keep_triggered)
         self.plot_window.keep_make_current_seperator.setVisible(not is_icut)
         self.plot_window.action_keep.setVisible(not is_icut)
         self.plot_window.action_make_current.setVisible(not is_icut)
@@ -207,6 +211,10 @@ class CutPlot(IPlot):
     def keep_triggered(self):
         self._canvas.manager.button_pressed_connected(self.plot_window.action_keep.isChecked())
         self._canvas.manager.picking_connected(self.plot_window.action_keep.isChecked())
+
+    def make_current_triggered(self):
+        self._canvas.manager.button_pressed_connected(not self.plot_window.action_make_current.isChecked())
+        self._canvas.manager.picking_connected(not self.plot_window.action_make_current.isChecked())
 
     def save_icut(self):
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
