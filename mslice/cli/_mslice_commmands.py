@@ -181,7 +181,7 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     IntensityEnd -- Upper bound of the intensity axis (colorbar)
     Colormap -- Colormap name as a string. Default is 'viridis'.
     """
-    _validate_workspace(InputWorkspace)
+    _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace)
     slice_presenter = app.MAIN_WINDOW.slice_plotter_presenter
