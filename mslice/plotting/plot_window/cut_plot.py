@@ -49,8 +49,8 @@ class CutPlot(IPlot):
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         if icut is not None:
             icut.window_closing()
-            self._canvas.manager.button_pressed_connected(False)
-            self._canvas.manager.picking_connected(False)
+            self.manager.button_pressed_connected(False)
+            self.manager.picking_connected(False)
         self._canvas.figure.clf()
 
     def plot_options(self):
@@ -194,8 +194,8 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def is_icut(self, is_icut):
-        self._canvas.manager.button_pressed_connected(not is_icut)
-        self._canvas.manager.picking_connected(not is_icut)
+        self.manager.button_pressed_connected(not is_icut)
+        self.manager.picking_connected(not is_icut)
 
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
