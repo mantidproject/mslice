@@ -161,6 +161,10 @@ class GlobalFigureManager(object):
         return cls._figures[cls._active_figure]
 
     @classmethod
+    def active_cut_figure_exists(cls):
+        return cls._category_current_figures[CATEGORY_CUT] is not None
+
+    @classmethod
     def activate_category(cls, category):
         """Sets the active category to the supplied argument. Do not call this function directly, instead use supplied
         decorator below 'activate_category' """
