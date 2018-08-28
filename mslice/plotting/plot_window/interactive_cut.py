@@ -6,13 +6,13 @@ from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 
-
 class InteractiveCut(object):
 
     def __init__(self, slice_plot, canvas, ws_title):
         self.slice_plot = slice_plot
         self._canvas = canvas
         self._ws_title = ws_title
+
         self.horizontal = None
         self.connect_event = [None, None, None, None]
         self._cut_plotter_presenter = CutPlotterPresenter()

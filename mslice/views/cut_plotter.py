@@ -12,6 +12,11 @@ def draw_interactive_cut(workspace):
     cur_fig = plt.gcf()
     cur_canvas = cur_fig.canvas
     ax = plt.gca()
+
+    # disconnect picking in interactive cut
+    cur_canvas.manager.picking_connected(False)
+    cur_canvas.manager.button_pressed_connected(False)
+
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.restore_region(cur_canvas.manager.get_cut_background())
         _create_cut(workspace)

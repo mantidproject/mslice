@@ -6,6 +6,7 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
 
+
 class CutPlotterPresenter(PresenterUtility):
 
     def __init__(self):

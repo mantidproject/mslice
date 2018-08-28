@@ -46,10 +46,12 @@ class CutPlot(IPlot):
         plot_window.action_flip_axis.triggered.disconnect()
 
     def window_closing(self):
-        self._canvas.figure.clf()
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         if icut is not None:
             icut.window_closing()
+            self.manager.button_pressed_connected(False)
+            self.manager.picking_connected(False)
+        self._canvas.figure.clf()
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
@@ -69,8 +71,7 @@ class CutPlot(IPlot):
     def object_clicked(self, target):
         if isinstance(target, Legend):
             return
-        else:
-            quick_options(target, self)
+        quick_options(target, self)
         self.update_legend()
         self._canvas.draw()
 
@@ -193,12 +194,16 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def is_icut(self, is_icut):
+        self.manager.button_pressed_connected(not is_icut)
+        self.manager.picking_connected(not is_icut)
+
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
         self.plot_window.keep_make_current_seperator.setVisible(not is_icut)
         self.plot_window.action_keep.setVisible(not is_icut)
         self.plot_window.action_make_current.setVisible(not is_icut)
         self.plot_window.action_flip_axis.setVisible(is_icut)
+
         self.plot_window.show()
 
     def save_icut(self):
@@ -218,7 +223,7 @@ class CutPlot(IPlot):
         try:
             container = self._lines[line]
         except KeyError:
-            self._lines=self.line_containers()
+            self._lines = self.line_containers()
             container = self._lines[line]
         i = 0
         for c in self._canvas.figure.gca().containers:
