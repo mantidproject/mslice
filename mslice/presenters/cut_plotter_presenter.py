@@ -1,4 +1,4 @@
-from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut
+from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cut.cut import Cut
 from mslice.models.labels import generate_legend
@@ -72,7 +72,8 @@ class CutPlotterPresenter(PresenterUtility):
     def set_is_icut(self, workspace_name, is_icut):
         if not is_icut:
             self._cut_cache[workspace_name].icut = None
-        plt.gcf().canvas.manager.is_icut(is_icut)
+        if cut_figure_exists():
+            plt.gcf().canvas.manager.is_icut(is_icut)
 
     def get_icut(self, workspace_name):
         return self._cut_cache[workspace_name].icut

@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 
 PICKER_TOL_PTS = 3
@@ -58,3 +59,6 @@ def _create_cut():
     canvas.figure.gca().xaxis.set_visible(True)
     canvas.figure.gca().yaxis.set_visible(True)
     canvas.draw()
+
+def cut_figure_exists():
+    return GlobalFigureManager.active_cut_figure_exists()
