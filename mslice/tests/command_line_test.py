@@ -1,5 +1,4 @@
-from mslice.util.mantid.init_mantid import initialize_mantid
-initialize_mantid()
+import mslice.util.mantid.init_mantid
 
 import unittest
 import mock
