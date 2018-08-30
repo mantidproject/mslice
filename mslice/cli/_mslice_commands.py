@@ -183,7 +183,8 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     """
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
-    _check_workspace_type(workspace)
+    if not isinstance(workspace, HistogramWorkspace):
+        raise RuntimeError("Incorrect workspace type.")
     slice_presenter = app.MAIN_WINDOW.slice_plotter_presenter
     slice_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
     slice_presenter.change_colourmap(workspace.name, Colormap)
@@ -204,9 +205,9 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, HistogramWorkspace):
         raise RuntimeError("Incorrect workspace type.")
-    cut_presenter = CutPlotterPresenter()
     if IntensityStart == 0 and IntensityEnd == 0:
         intensity_range = None
     else:
         intensity_range = (IntensityStart, IntensityEnd)
-    cut_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range, plot_over=PlotOver)
+    app.MAIN_WINDOW.cut_plotter_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range,
+                                                                  plot_over=PlotOver)

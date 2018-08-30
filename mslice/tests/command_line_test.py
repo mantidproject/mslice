@@ -6,7 +6,7 @@ import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 
-from mslice.cli._mslice_commands import Load, MakeProjection, Slice, Cut
+from mslice.cli._mslice_commands import Load, MakeProjection, Slice, Cut, PlotSlice, PlotCut
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
@@ -165,3 +165,24 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_histo_workspace('test_cut_fail_type_cli')
         with self.assertRaises(RuntimeError):
             Cut(workspace)
+
+    @mock.patch('mslice.cli._mslice_commands.app')
+    def test_plot_slice(self, app_mock):
+        app_mock.MAIN_WINDOW.slice_plotter_presenter = SlicePlotterPresenter()
+        app_mock.MAIN_WINDOW.slice_plotter_presenter.plot_from_cache = mock.Mock()
+        workspace = self.create_pixel_workspace('test_plot_slice_cli')
+        slice = Slice(workspace)
+        PlotSlice(slice)
+        app_mock.MAIN_WINDOW.slice_plotter_presenter.plot_from_cache.assert_called_once_with(slice)
+
+    @mock.patch('mslice.cli._mslice_commands.app')
+    def test_plot_cut(self, app_mock):
+        app_mock.MAIN_WINDOW.cut_plotter_presenter = CutPlotterPresenter()
+        app_mock.MAIN_WINDOW.cut_plotter_presenter.register_master(mock.create_autospec(MainPresenterInterface))
+        app_mock.MAIN_WINDOW.cut_plotter_presenter.plot_cut_from_workspace = mock.Mock()
+        workspace = self.create_pixel_workspace('test_plot_cut_cli')
+        cut = Cut(workspace)
+        PlotCut(cut)
+        app_mock.MAIN_WINDOW.cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut,
+                                                                                                   intensity_range=None,
+                                                                                                   plot_over=False)
