@@ -55,7 +55,7 @@ def _process_axis(axis, fallback_index, input_workspace, string_function=_string
         axis = string_function(axis)
     elif axis in available_axes:
         range = get_axis_range(input_workspace, axis)
-        range = map(float, range)
+        range = list(map(float, range))
         axis = Axis(units=axis, start=range[0], end=range[1], step=range[2])
     else:
         raise RuntimeError("Axis '%s' not recognised. Workspace has these axes: %s " %
