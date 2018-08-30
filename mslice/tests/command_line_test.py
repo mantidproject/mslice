@@ -1,4 +1,4 @@
-import mslice.util.mantid.init_mantid
+import mslice.util.mantid.init_mantid # noqa: F401
 
 import unittest
 import mock

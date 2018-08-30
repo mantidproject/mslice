@@ -3,7 +3,7 @@ and entry points.
 """
 
 from mslice.util.qt.QtWidgets import QApplication
-import mslice.util.mantid.init_mantid
+import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.util.mantid import in_mantidplot
 
 # Module-level reference to keep main window alive after show_gui has returned
