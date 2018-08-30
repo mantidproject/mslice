@@ -137,6 +137,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
        """
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
+    _check_workspace_type(workspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
     return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
