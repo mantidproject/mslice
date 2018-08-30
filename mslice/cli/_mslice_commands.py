@@ -16,7 +16,6 @@ from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.cmap import DEFAULT_CMAP
-from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
