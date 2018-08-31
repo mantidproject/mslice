@@ -68,7 +68,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
         get_ws_handle_mock.return_value = mock_ws
         self.main_presenter.get_selected_workspaces.return_value = ['workspace']
 
-        self.cut_plotter_presenter.plot_cut_from_workspace(plot_over=True)
+        self.cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over=True)
         self.assertEqual(0, compute_cut_mock.call_count)
         self.assertEqual(1, plot_cut_impl_mock.call_count)
 

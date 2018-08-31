@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
+from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice_functions import is_sliceable
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -29,8 +30,7 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def set_slice_plotter_presenter(self, slice_plotter_presenter):
         self._slice_plotter_presenter = slice_plotter_presenter
-        colormaps = self._slice_plotter_presenter.get_available_colormaps()
-        self._slice_view.populate_colormap_options(colormaps)
+        self._slice_view.populate_colormap_options(ALLOWED_CMAPS)
 
     def notify(self, command):
         self._clear_displayed_error(self._slice_view)

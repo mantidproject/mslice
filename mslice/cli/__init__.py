@@ -1,16 +1,2 @@
-"""Defines the command-line interface to MSlice
-"""
-# -----------------------------------------------------------------------------
-# Imports
-# -----------------------------------------------------------------------------
-import mslice.plotting.pyplot as _plt
+from ._mslice_commands import * # noqa: F401
 from mslice.plotting.pyplot import * # noqa: F401
-from . import _mslice_commmands
-from ._mslice_commmands import * # noqa: F401
-
-# Define names imported by * imports
-__all__ = dir(_plt) + dir(_mslice_commmands)
-
-# -----------------------------------------------------------------------------
-# Classes and functions
-# -----------------------------------------------------------------------------

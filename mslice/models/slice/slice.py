@@ -30,7 +30,6 @@ class Slice():
         self._symmetrised = None
         self._gdos = None
 
-
     @property
     def sample_temp(self):
         if self._sample_temp is None:

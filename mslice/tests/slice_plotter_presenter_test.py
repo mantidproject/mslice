@@ -3,6 +3,7 @@ import mock
 import unittest
 
 from mslice.models.axis import Axis
+from mslice.models.cmap import DEFAULT_CMAP
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 
@@ -33,7 +34,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
             slice_presenter.validate_intensity('8', '7')
 
     @mock.patch('mslice.presenters.slice_plotter_presenter.plot_cached_slice')
-    @mock.patch('mslice.presenters.slice_plotter_presenter.create_slice')
+    @mock.patch('mslice.presenters.slice_plotter_presenter.create_slice_figure')
     @mock.patch('mslice.presenters.slice_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.slice_plotter_presenter.sample_temperature')
     @mock.patch('mslice.presenters.slice_plotter_presenter.compute_slice')
@@ -51,7 +52,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         x_axis = Axis('x', 0, 1, 0.1)
         y_axis = Axis('y', 0, 1, 0.1)
         slice_presenter = SlicePlotterPresenter()
-        slice_presenter.plot_slice('workspace', x_axis, y_axis, 7, 8, False, 'viridis')
+        slice_presenter.plot_slice('workspace', x_axis, y_axis, 7, 8, False, DEFAULT_CMAP)
         self.assertTrue('workspace' in slice_presenter._slice_cache)
         create_slice_mock.assert_called_once()
         plot_cached_slice_mock.assert_called_once()

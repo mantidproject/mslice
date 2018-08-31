@@ -1,6 +1,6 @@
 from mslice.util.qt import QtWidgets
 import unittest
-
+from mock import patch
 from mslice.app.mainwindow import MainWindow
 
 
@@ -16,4 +16,5 @@ class AppTests(unittest.TestCase):
 
     def test_mainwindow(self):
         """Test the MainWindow initialises correctly"""
-        MainWindow()
+        with patch.object(MainWindow, 'setup_ipython'):
+            MainWindow()

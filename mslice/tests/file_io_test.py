@@ -5,7 +5,6 @@ import numpy as np
 from os.path import join
 from tempfile import gettempdir
 import unittest
-
 from mantid.simpleapi import CreateMDHistoWorkspace
 
 from mslice.models.cut.cut_functions import output_workspace_name

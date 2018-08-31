@@ -1,13 +1,14 @@
 from matplotlib.colors import Normalize
 
-from mslice.models.cmap import allowed_cmaps
 from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
                                                  compute_powder_line)
+from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice import Slice
 from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, remove_line,
-                                        plot_overplot_line, create_slice)
+                                        plot_overplot_line, create_slice_figure)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
+
 
 class SlicePlotterPresenter(PresenterUtility):
 
@@ -16,17 +17,35 @@ class SlicePlotterPresenter(PresenterUtility):
         self._slice_cache = {}
         self._sample_temp_fields = []
 
-    def get_available_colormaps(self):
-        return allowed_cmaps()
-
     def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
-        selected_ws = get_workspace_handle(selected_ws)
+        workspace = get_workspace_handle(selected_ws)
+        self.create_slice(workspace, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap)
+        self.plot_from_cache(workspace)
+
+    def create_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
         sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
-        slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
+        slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
-        create_slice(selected_ws.name, self)
-        self.show_scattering_function(selected_ws.name)
+        return slice
+
+    def plot_from_cache(self, workspace):
+        ws_name = workspace.name.lstrip('__')
+        create_slice_figure(ws_name, self)
+        self.show_scattering_function(ws_name)
+
+    def change_intensity(self, workspace_name, intensity_start, intensity_end):
+        workspace_name = workspace_name.lstrip('__')
+        intensity_start, intensity_end = self.validate_intensity(intensity_start, intensity_end)
+        norm = Normalize(vmin=intensity_start, vmax=intensity_end)
+        self._slice_cache[workspace_name].norm = norm
+
+    def change_colourmap(self, workspace_name, colourmap):
+        if colourmap in ALLOWED_CMAPS:
+            workspace_name = workspace_name.lstrip('__')
+            self._slice_cache[workspace_name].colourmap = colourmap
+        else:
+            raise ValueError('colourmap not recognised')
 
     def update_displayed_workspaces(self):
         self._main_presenter.update_displayed_workspaces()
