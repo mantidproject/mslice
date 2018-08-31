@@ -71,15 +71,17 @@ def _check_workspace_name(workspace):
     if not workspace_exists(workspace):
         raise TypeError('InputWorkspace %s could not be found.' % workspace)
 
-def _check_workspace_type(workspace):
+def _check_workspace_type(workspace, correct_type):
+    """check a PSD workspace is MatrixWorkspace, or non-PSD is the specified type"""
     if workspace.is_PSD:
         if isinstance(workspace, MatrixWorkspace):
             raise RuntimeError("Incorrect workspace type - run MakeProjection first.")
-        if not isinstance(workspace, PixelWorkspace):
+        if not isinstance(workspace, correct_type):
             raise RuntimeError("Incorrect workspace type.")
     else:
         if not isinstance(workspace, MatrixWorkspace):
             raise RuntimeError("Incorrect workspace type.")
+
 
 # -----------------------------------------------------------------------------
 # Command functions
@@ -136,7 +138,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
        """
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
-    _check_workspace_type(workspace)
+    _check_workspace_type(workspace, PixelWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
     return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
@@ -162,7 +164,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     """
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
-    _check_workspace_type(workspace)
+    _check_workspace_type(workspace, PixelWorkspace)
     cut_axis = _process_axis(CutAxis, 0, workspace)
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
@@ -182,8 +184,7 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     """
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
-    if not isinstance(workspace, HistogramWorkspace):
-        raise RuntimeError("Incorrect workspace type.")
+    _check_workspace_type(workspace, HistogramWorkspace)
     slice_presenter = app.MAIN_WINDOW.slice_plotter_presenter
     slice_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
     slice_presenter.change_colourmap(workspace.name, Colormap)
