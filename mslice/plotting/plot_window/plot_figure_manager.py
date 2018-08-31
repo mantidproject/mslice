@@ -33,6 +33,7 @@ class PlotFigureManagerQT(QtCore.QObject):
 
         self._plot_handler = None
         self._picking = None
+        self._button_pressed = None
 
         # Need flags here as matplotlib provides no way to access the grid state
         self._xgrid = False
@@ -44,7 +45,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window.action_print_plot.triggered.connect(self.print_plot)
         self.window.action_plot_options.triggered.connect(self._plot_options)
         self.window.action_toggle_legends.triggered.connect(self._toggle_legend)
-        self.canvas.mpl_connect('button_press_event', self.plot_clicked)
+        self.button_pressed_connected(True)
         self.picking_connected(True)
 
         self.show()
@@ -113,6 +114,12 @@ class PlotFigureManagerQT(QtCore.QObject):
         else:
             self.canvas.mpl_disconnect(self._picking)
 
+    def button_pressed_connected(self, connect):
+        if connect:
+            self._button_pressed = self.canvas.mpl_connect('button_press_event', self.plot_clicked)
+        else:
+            self.canvas.mpl_disconnect(self._button_pressed)
+
     def _toggle_legend(self):
         axes = self.canvas.figure.gca()
         if axes.legend_ is None:
@@ -142,7 +149,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
             painter = QtGui.QPainter(printer)
-            painter.drawPixmap(0,0,pixmap_image)
+            painter.drawPixmap(0, 0, pixmap_image)
             painter.end()
 
     def save_plot(self):

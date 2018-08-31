@@ -264,3 +264,6 @@ class CutWidget(CutView, QWidget):
     def force_normalization(self):
         self.rdoCutNormToOne.setEnabled(False)
         self.rdoCutNormToOne.setChecked(True)
+
+    def clear_displayed_error(self):
+        self.display_error("")

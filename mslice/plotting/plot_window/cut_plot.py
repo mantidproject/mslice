@@ -1,5 +1,3 @@
-from itertools import chain
-
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 import warnings
@@ -48,10 +46,12 @@ class CutPlot(IPlot):
         plot_window.action_flip_axis.triggered.disconnect()
 
     def window_closing(self):
-        self._canvas.figure.clf()
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         if icut is not None:
             icut.window_closing()
+            self.manager.button_pressed_connected(False)
+            self.manager.picking_connected(False)
+        self._canvas.figure.clf()
 
     def plot_options(self):
         new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
@@ -71,8 +71,7 @@ class CutPlot(IPlot):
     def object_clicked(self, target):
         if isinstance(target, Legend):
             return
-        else:
-            quick_options(target, self)
+        quick_options(target, self)
         self.update_legend()
         self._canvas.draw()
 
@@ -87,7 +86,7 @@ class CutPlot(IPlot):
                 if self.legend_visible(i):
                     labels_to_show.append(label)
                     handles_to_show.append(handle)
-                i+=1
+                i += 1
         else:
             containers = axes.containers
             for i in range(len(containers)):
@@ -139,17 +138,30 @@ class CutPlot(IPlot):
             self.set_line_options_by_index(i, line_data[i])
         self.update_legend(line_data)
 
+    def _single_line_has_error_bars(self, line_index):
+        current_axis = self._canvas.figure.gca()
+        # If all the error bars have alpha = 0 they are all transparent (hidden)
+        containers = [x for x in current_axis.containers if isinstance(x, ErrorbarContainer)]
+        line_components = [x.get_children() for x in containers]
+        # drop the first element of each container because it is the the actual line
+        errorbar = [x[1:] for x in line_components][line_index]
+        alpha = [x.get_alpha() for x in errorbar]
+        # replace None with 1(None indicates default which is 1)
+        alpha = [x if x is not None else 1 for x in alpha]
+        return sum(alpha) != 0
+
     def get_line_options_by_index(self, line_index):
         line_options = {}
         container = self._canvas.figure.gca().containers[line_index]
         line = container.get_children()[0]
         line_options['label'] = container.get_label()
         line_options['legend'] = self.legend_visible(line_index)
-        line_options['shown'] = True
+        line_options['shown'] = self.get_line_visible(line_index)
         line_options['color'] = line.get_color()
         line_options['style'] = line.get_linestyle()
         line_options['width'] = str(int(line.get_linewidth()))
         line_options['marker'] = line.get_marker()
+        line_options['error_bar'] = self._single_line_has_error_bars(line_index)
         return line_options
 
     def set_line_options_by_index(self, line_index, line_options):
@@ -158,19 +170,40 @@ class CutPlot(IPlot):
         main_line = container.get_children()[0]
         main_line.set_linestyle(line_options['style'])
         main_line.set_marker(line_options['marker'])
+
         self._legends_visible[line_index] = bool(line_options['legend'])
+
+        self.toggle_errorbar(line_index, line_options)
+
         for child in container.get_children():
             child.set_color(line_options['color'])
             child.set_linewidth(line_options['width'])
             child.set_visible(line_options['shown'])
 
+        self._lines_visible[line_index] = line_options['shown']
+
+    def toggle_errorbar(self, line_index, line_options):
+        container = self._canvas.figure.gca().containers[line_index]
+        error_bar_elements = container.get_children()[1:]
+
+        if not line_options['error_bar'] and self.get_line_visible(line_index):
+            for element in error_bar_elements:
+                element.set_alpha(0)
+        else:
+            for element in error_bar_elements:
+                element.set_alpha(1)
+
     def is_icut(self, is_icut):
+        self.manager.button_pressed_connected(not is_icut)
+        self.manager.picking_connected(not is_icut)
+
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
         self.plot_window.keep_make_current_seperator.setVisible(not is_icut)
         self.plot_window.action_keep.setVisible(not is_icut)
         self.plot_window.action_make_current.setVisible(not is_icut)
         self.plot_window.action_flip_axis.setVisible(is_icut)
+
         self.plot_window.show()
 
     def save_icut(self):
@@ -181,23 +214,22 @@ class CutPlot(IPlot):
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         icut.flip_axis()
 
-
     def _get_line_index(self, line):
-        '''
+        """
         Checks if line index is cached, and if not finds the index by iterating over the axes' containers.
         :param line: Line to find the index of
         :return: Index of line
-        '''
+        """
         try:
             container = self._lines[line]
         except KeyError:
-            self._lines=self.line_containers()
+            self._lines = self.line_containers()
             container = self._lines[line]
         i = 0
         for c in self._canvas.figure.gca().containers:
             if container == c:
                 return i
-            i+=1
+            i += 1
 
     def calc_figure_boundaries(self):
         fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
@@ -212,45 +244,6 @@ class CutPlot(IPlot):
     def xy_config(self):
         return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
 
-
-    def _has_errorbars(self):
-        """True current axes has visible errorbars,
-         False if current axes has hidden errorbars"""
-        current_axis = self._canvas.figure.gca()
-        # If all the error bars have alpha= 0 they are all transparent (hidden)
-        containers = [x for x in current_axis.containers if isinstance(x, ErrorbarContainer)]
-        line_components = [x.get_children() for x in containers]
-        # drop the first element of each container because it is the the actual line
-        errorbars = [x[1:] for x in line_components]
-        errorbars = chain(*errorbars)
-        alpha = [x.get_alpha() for x in errorbars]
-        # replace None with 1(None indicates default which is 1)
-        alpha = [x if x is not None else 1 for x in alpha]
-        if sum(alpha) == 0:
-            has_errorbars = False
-        else:
-            has_errorbars = True
-        return has_errorbars
-
-    def _set_errorbars_shown_state(self, state):
-        """Show errrorbar if state = 1, hide if state = 0"""
-        current_axis = self._canvas.figure.gca()
-        if state:
-            alpha = 1
-        else:
-            alpha = 0.
-        for i in range(len(current_axis.containers)):
-            if isinstance(current_axis.containers[i], ErrorbarContainer):
-                elements = current_axis.containers[i].get_children()
-                if self.get_line_visible(i):
-                    elements[1].set_alpha(alpha)  # elements[0] is the actual line, elements[1] is error bars
-
-    def _toggle_errorbars(self):
-        state = self._has_errorbars()
-        if state is None:  # No errorbars in this plot
-            return
-        self._set_errorbars_shown_state(not state)
-
     def legend_visible(self, index):
         try:
             v = self._legends_visible[index]
@@ -260,18 +253,13 @@ class CutPlot(IPlot):
         return v
 
     def line_containers(self):
-        '''build dictionary of lines and their containers'''
+        """build dictionary of lines and their containers"""
         line_containers = {}
         containers = self._canvas.figure.gca().containers
         for container in containers:
             line = container.get_children()[0]
             line_containers[line] = container
         return line_containers
-
-    def set_line_visible(self, line_index, visible):
-        self._lines_visible[line_index] = visible
-        for child in self._canvas.figure.gca().containers[line_index].get_children():
-            child.set_visible(visible)
 
     def get_line_visible(self, line_index):
         try:
@@ -302,14 +290,6 @@ class CutPlot(IPlot):
         config['y_log'] = value
         self.change_axis_scale(config)
         self._canvas.draw()
-
-    @property
-    def error_bars(self):
-        return self._has_errorbars()
-
-    @error_bars.setter
-    def error_bars(self, value):
-        self._set_errorbars_shown_state(value)
 
     @property
     def show_legends(self):

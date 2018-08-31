@@ -1,101 +1,78 @@
 
-from mantid.api import PythonAlgorithm, WorkspaceProperty
-from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator
-from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3
+class Cut(object):
+    """Groups parameters needed to cut and validates them"""
 
-from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
-from mslice.models.axis import Axis
-from .cut_normalisation import normalize_workspace
+    def __init__(self, cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one=False, width=None):
+        self.cut_axis = cut_axis
+        self.integration_axis = integration_axis
+        self.intensity_start = intensity_start
+        self.intensity_end = intensity_end
+        self.norm_to_one = norm_to_one
+        self.width = width
+        self.icut = None
 
+    @property
+    def cut_axis(self):
+        return self._cut_axis
 
-class Cut(PythonAlgorithm):
+    @cut_axis.setter
+    def cut_axis(self, axis):
+        self._cut_axis = axis
 
-    def PyInit(self):
-        self.declareProperty(WorkspaceProperty('InputWorkspace', '', direction=Direction.Input))
-        self.declareProperty(PropertyManagerProperty('CutAxis', {}, direction=Direction.Input),
-                             doc='MSlice Axis object as a dictionary')
-        self.declareProperty(PropertyManagerProperty('IntegrationAxis', {}, direction=Direction.Input),
-                             doc='MSlice Axis object as a dictionary')
-        self.declareProperty('EMode', 'Direct', StringMandatoryValidator())
-        self.declareProperty('PSD', False)
-        self.declareProperty('NormToOne', False)
-        self.declareProperty(WorkspaceProperty('OutputWorkspace', '', direction=Direction.Output))
+    @property
+    def integration_axis(self):
+        return self._integration_axis
 
-    def PyExec(self):
-        workspace = self.getProperty('InputWorkspace').value
-        cut_dict = self.getProperty('CutAxis').value
-        cut_axis = Axis(cut_dict['units'].value, cut_dict['start'].value, cut_dict['end'].value, cut_dict['step'].value)
-        int_dict = self.getProperty('IntegrationAxis').value
-        int_axis = Axis(int_dict['units'].value, int_dict['start'].value, int_dict['end'].value, int_dict['step'].value)
-        e_mode = self.getProperty('EMode').value
-        PSD = self.getProperty('PSD').value
-        norm_to_one = self.getProperty('NormToOne').value
-        cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one)
-        self.setProperty('OutputWorkspace', cut)
+    @integration_axis.setter
+    def integration_axis(self, axis):
+        self._integration_axis = axis
 
-    def category(self):
-        return 'MSlice'
+    @property
+    def intensity_start(self):
+        return self._intensity_start
 
-def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_norm):
-    if PSD:
-        cut = _compute_cut_PSD(selected_workspace, cut_axis, integration_axis)
-    else:
-        cut = _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, e_mode)
-    if is_norm:
-        normalize_workspace(cut)
-    return cut
+    @intensity_start.setter
+    def intensity_start(self, int_start):
+        if int_start is None:
+            self._intensity_start = None
+        else:
+            try:
+                self._intensity_start = None if int_start == '' else float(int_start)
+            except ValueError:
+                raise ValueError('Invalid intensity parameters')
 
+    @property
+    def intensity_end(self):
+        return self._intensity_end
 
-def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis):
-    fill_in_missing_input(cut_axis, selected_workspace)
-    n_steps = get_number_of_steps(cut_axis)
-    cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
-    integration_binning = integration_axis.units + "," + str(integration_axis.start) + "," + \
-        str(integration_axis.end) + ",1"
+    @intensity_end.setter
+    def intensity_end(self, int_end):
+        if int_end is None:
+            self._intensity_end = None
+        else:
+            try:
+                self._intensity_end = None if int_end == '' else float(int_end)
+            except ValueError:
+                raise ValueError('Invalid intensity parameters')
 
-    return BinMD(InputWorkspace=selected_workspace, AxisAligned="1", AlignedDim1=integration_binning,
-                 AlignedDim0=cut_binning, StoreInADS=False)
+    @property
+    def norm_to_one(self):
+        return self._norm_to_one
 
+    @norm_to_one.setter
+    def norm_to_one(self, value):
+        self._norm_to_one = value
 
-def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
-    cut_binning = " ,".join(map(str, (cut_axis.start, cut_axis.step, cut_axis.end)))
-    int_binning = " ,".join(map(str, (integration_axis.start, integration_axis.end - integration_axis.start,
-                                      integration_axis.end)))
-    idx = 0
-    unit = 'DeltaE'
-    name = 'EnergyTransfer'
-    if cut_axis.units == '|Q|':
-        ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace)
-        idx = 1
-        unit = 'MomentumTransfer'
-        name = '|Q|'
-    elif cut_axis.units == 'Degrees':
-        ws_out = _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace)
-        idx = 1
-        unit = 'Degrees'
-        name = 'Theta'
-    elif integration_axis.units == '|Q|':
-        ws_out = _cut_nonPSD_momentum(int_binning, cut_binning, emode, selected_workspace)
-    else:
-        ws_out = _cut_nonPSD_theta(int_binning, cut_binning, selected_workspace)
-    xdim = ws_out.getDimension(idx)
-    extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
-    return CreateMDHistoWorkspace(SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(), Dimensionality=1,
-                                  Extents=extents, NumberOfBins=xdim.getNBins(), Names=name, Units=unit,
-                                  StoreInADS=False)
+    @property
+    def width(self):
+        return self._width
 
-
-def _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace):
-
-    converted_nonpsd = ConvertSpectrumAxis( OutputWorkspace='__convToTheta', InputWorkspace=selected_workspace,
-                                            Target='theta', StoreInADS=False)
-
-    ws_out = Rebin2D(InputWorkspace=converted_nonpsd, Axis1Binning=int_binning, Axis2Binning=cut_binning,
-                     StoreInADS=False)
-    return ws_out
-
-
-def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace):
-    ws_out = SofQW3(InputWorkspace=selected_workspace, OutputWorkspace='out', EMode=emode, QAxisBinning=q_binning,
-                    EAxisBinning=e_binning, StoreInADS=False)
-    return ws_out
+    @width.setter
+    def width(self, width_str):
+        if width_str is not None and width_str.strip():
+            try:
+                self._width = float(width_str)
+            except ValueError:
+                raise ValueError("Invalid width")
+        else:
+            self._width = None

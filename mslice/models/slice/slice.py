@@ -1,79 +1,71 @@
-from mantid.api import PythonAlgorithm, WorkspaceProperty, IMDEventWorkspace
-from mantid.kernel import Direction, StringMandatoryValidator, PropertyManagerProperty
-from mantid.simpleapi import BinMD, Rebin2D, ConvertSpectrumAxis, SofQW3
-from mslice.models.alg_workspace_ops import get_number_of_steps
-from mslice.models.axis import Axis
+from mslice.models.slice.slice_functions import (compute_chi, compute_chi_magnetic, compute_d2sigma, compute_gdos,
+                                                 compute_symmetrised)
 
 
-class Slice(PythonAlgorithm):
+class Slice():
+    """class that caches intensities and parameters for a single workspace"""
+    def __init__(self, slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated=False):
+        """
+        :param slice: output workspace of Slice algorithm
+        :param colourmap: default colourmap to use
+        :param norm: normalisation - contains min and max intensity values
+        :param sample_temp: cached sample temperature
+        :param q_axis: non-energy Axis object (momentum or scattering angle)
+        :param e_axis: energy Axis object
+        :param rotated: true if energy is on the x axis
+        """
+        self.scattering_function = slice
+        self.colourmap = colourmap
+        self.norm = norm
+        self._sample_temp = sample_temp
+        self.momentum_axis = q_axis
+        self.energy_axis = e_axis
+        self.rotated = rotated
+        self.overplot_lines = {}
 
-    def PyInit(self):
-        self.declareProperty(WorkspaceProperty('InputWorkspace', "", direction=Direction.Input))
-        self.declareProperty(PropertyManagerProperty('XAxis', {}, direction=Direction.Input),
-                             doc='MSlice Axis object as a dictionary')
-        self.declareProperty(PropertyManagerProperty('YAxis', {}, direction=Direction.Input),
-                             doc='MSlice Axis object as a dictionary')
-        self.declareProperty('EMode', 'Direct', StringMandatoryValidator())
-        self.declareProperty('PSD', False)
-        self.declareProperty('NormToOne', False)
-        self.declareProperty(WorkspaceProperty('OutputWorkspace', '', direction=Direction.Output))
+        #intensities
+        self._chi = None
+        self._chi_magnetic = None
+        self._d2sigma = None
+        self._symmetrised = None
+        self._gdos = None
 
-    def PyExec(self):
-        workspace = self.getProperty('InputWorkspace').value
-        x_dict = self.getProperty('XAxis').value
-        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value)
-        y_dict = self.getProperty('YAxis').value
-        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value)
-        norm_to_one = self.getProperty('NormToOne')
-        if self.getProperty('PSD').value:
-            slice = self._compute_slice_PSD(workspace, x_axis, y_axis, norm_to_one)
-        else:
-            e_mode = self.getProperty('EMode').value
-            slice = self._compute_slice_nonPSD(workspace, x_axis, y_axis, e_mode, norm_to_one)
-        self.setProperty('OutputWorkspace', slice)
+    @property
+    def sample_temp(self):
+        if self._sample_temp is None:
+            raise ValueError('sample temperature not found')
+        return self._sample_temp
 
-    def category(self):
-        return 'MSlice'
+    @sample_temp.setter
+    def sample_temp(self, value):
+        self._sample_temp = value
 
-    def _compute_slice_PSD(self, workspace, x_axis, y_axis, norm_to_one):
-        assert isinstance(workspace, IMDEventWorkspace)
-        n_x_bins = get_number_of_steps(x_axis)
-        n_y_bins = get_number_of_steps(y_axis)
-        x_dim_id = self.dimension_index(workspace, x_axis)
-        y_dim_id = self.dimension_index(workspace, y_axis)
-        x_dim = workspace.getDimension(x_dim_id)
-        y_dim = workspace.getDimension(y_dim_id)
-        xbinning = x_dim.getName() + "," + str(x_axis.start) + "," + str(x_axis.end) + "," + str(n_x_bins)
-        ybinning = y_dim.getName() + "," + str(y_axis.start) + "," + str(y_axis.end) + "," + str(n_y_bins)
-        return BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
-                     StoreInADS=False)
+    @property
+    def chi(self):
+        if self._chi is None:
+            self._chi = compute_chi(self.scattering_function, self.sample_temp, self.energy_axis)
+        return self._chi
 
-    def dimension_index(self, workspace, axis):
-        try:
-            return workspace.getDimensionIndexByName(axis.units)
-        except RuntimeError:
-            if axis.units == '2Theta':
-                return workspace.getDimensionIndexByName('Degrees')
-            else:
-                raise
+    @property
+    def chi_magnetic(self):
+        if self._chi_magnetic is None:
+            self._chi_magnetic = compute_chi_magnetic(self.chi)
+        return self._chi_magnetic
 
-    def _compute_slice_nonPSD(self, workspace, x_axis, y_axis, e_mode, norm_to_one):
-        axes = [x_axis, y_axis]
-        if x_axis.units == 'DeltaE':
-            e_axis = 0
-        elif y_axis.units == 'DeltaE':
-            e_axis = 1
-        else:
-            raise RuntimeError('Cannot calculate slices without an energy axis')
-        q_axis = (e_axis + 1) % 2
-        ebin = '%f, %f, %f' % (axes[e_axis].start, axes[e_axis].step, axes[e_axis].end)
-        qbin = '%f, %f, %f' % (axes[q_axis].start, axes[q_axis].step, axes[q_axis].end)
-        if axes[q_axis].units == '|Q|':
-            thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin, EMode=e_mode,
-                               StoreInADS=False)
-        elif axes[q_axis].units == '2Theta':
-            thisslice = ConvertSpectrumAxis(InputWorkspace=workspace, Target='Theta', StoreInADS=False)
-            thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin, StoreInADS=False)
-        else:
-            raise RuntimeError("axis %s not recognised, must be '|Q|' or '2Theta'" % axes[q_axis].units)
-        return thisslice
+    @property
+    def d2sigma(self):
+        if self._d2sigma is None:
+            self._d2sigma = compute_d2sigma(self.scattering_function, self.energy_axis)
+        return self._d2sigma
+
+    @property
+    def symmetrised(self):
+        if self._symmetrised is None:
+            self._symmetrised = compute_symmetrised(self.scattering_function, self.sample_temp, self.energy_axis, self.rotated)
+        return self._symmetrised
+
+    @property
+    def gdos(self):
+        if self._gdos is None:
+            self._gdos = compute_gdos(self.scattering_function, self.sample_temp, self.momentum_axis, self.energy_axis)
+        return self._gdos

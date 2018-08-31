@@ -5,9 +5,9 @@ it can affect other imports.
 
 from mantid.api import AlgorithmFactory
 import mantid.simpleapi as s_api
-from mslice.models.cut.cut import Cut
+from mslice.models.cut.cut_algorithm import Cut
 from mslice.models.projection.powder.make_projection import MakeProjection
-from mslice.models.slice.slice import Slice
+from mslice.models.slice.slice_algorithm import Slice
 
 AlgorithmFactory.subscribe(MakeProjection)
 AlgorithmFactory.subscribe(Slice)

@@ -1,10 +1,10 @@
 from mock import MagicMock, PropertyMock, Mock, patch
 import unittest
 
+
 from matplotlib import text
 from matplotlib.lines import Line2D
-from matplotlib.container import Container
-
+from matplotlib.container import ErrorbarContainer
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.presenters.quick_options_presenter import quick_options, quick_axis_options
@@ -19,6 +19,7 @@ def setup_line_values(qlo_mock):
     type(quick_line_options).style = PropertyMock(return_value='--')
     type(quick_line_options).width = PropertyMock(return_value='5')
     type(quick_line_options).label = PropertyMock(return_value='label2')
+    type(quick_line_options).shown = PropertyMock(return_value=True)
     target = Line2D([], [], 3, '-', 'red', 'o', label='label1')
     return qlo_mock, target
 
@@ -83,7 +84,7 @@ class QuickOptionsTest(unittest.TestCase):
         model = CutPlot(plot_figure, cut_plotter, 'workspace')
         qlo_mock, target = setup_line_values(qlo_mock)
 
-        container = Container([target], label='label1')
+        container = ErrorbarContainer([target], has_yerr=True, label='label1')
         model._lines[target] = container
         container_mock = MagicMock()
         container_mock.containers = [container]
@@ -93,11 +94,11 @@ class QuickOptionsTest(unittest.TestCase):
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
             {'shown': True, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
-             'marker': 'o', 'legend': True})
+             'marker': 'o', 'legend': True, 'error_bar': False})
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
                              {'shown': True, 'color': 'blue', 'label': u'label2',
-                              'style': '--', 'width': '5', 'marker': '.', 'legend': True})
+                              'style': '--', 'width': '5', 'marker': '.', 'legend': True, 'error_bar': False})
 
     @patch.object(QuickAxisOptions, '__init__', lambda v, w, x, y, z: None)
     @patch.object(QuickAxisOptions, 'exec_', lambda x: True)
@@ -108,6 +109,7 @@ class QuickOptionsTest(unittest.TestCase):
         self.target = 'y_range'
         quick_options(self.target, self.model)
         self.assertEquals(self.model.y_grid, True)
+
 
 @patch('mslice.presenters.quick_options_presenter.QuickAxisOptions')
 class QuickAxisTest(unittest.TestCase):
@@ -126,14 +128,12 @@ class QuickAxisTest(unittest.TestCase):
         grid_state = PropertyMock(return_value=True)
         type(self.view).grid_state = grid_state
 
-
     def test_accept(self, quick_axis_options_view):
         quick_axis_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=True)
         quick_axis_options('x_range', self.model)
         self.assertEquals(self.model.x_range, (5, 10))
         self.assertEquals(self.model.x_grid, True)
-
 
     def test_reject(self, quick_axis_options_view):
         quick_axis_options_view.return_value = self.view
@@ -142,7 +142,6 @@ class QuickAxisTest(unittest.TestCase):
         quick_axis_options('x_range', self.model)
         self.view.set_range.assert_not_called()
         self.view.set_grid.assert_not_called()
-
 
     def test_colorbar(self, quick_axis_options_view):
         quick_axis_options_view.return_value = self.view
@@ -153,6 +152,7 @@ class QuickAxisTest(unittest.TestCase):
         quick_axis_options('colorbar_range', self.model, True)
         self.view.log_scale.isChecked.assert_called_once()
         colorbar_log.assert_called_once()
+
 
 @patch('mslice.presenters.quick_options_presenter.QuickLabelOptions')
 class QuickLabelTest(unittest.TestCase):
@@ -177,6 +177,7 @@ class QuickLabelTest(unittest.TestCase):
         quick_options(self.target, self.model)
         self.target.set_text.assert_not_called()
 
+
 @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
 class QuickLineTest(unittest.TestCase):
 
@@ -200,6 +201,8 @@ class QuickLineTest(unittest.TestCase):
         type(self.view).marker = marker
         label = PropertyMock(return_value=5)
         type(self.view).label = label
+        error_bar = PropertyMock(return_value=True)
+        type(self.view).error_bar = error_bar
 
     def test_accept(self, quick_line_options_view):
         quick_line_options_view.return_value = self.view
@@ -207,6 +210,8 @@ class QuickLineTest(unittest.TestCase):
         type(self.view).shown = shown
         legend = PropertyMock(return_value=True)
         type(self.view).legend = legend
+        error_bar = PropertyMock(return_value=True)
+        type(self.view).error_bar = error_bar
         self.view.exec_ = MagicMock(return_value=True)
         quick_options(self.target, self.model)
 
@@ -218,7 +223,8 @@ class QuickLineTest(unittest.TestCase):
         type(self.view).legend = legend
         self.view.exec_ = MagicMock(return_value=True)
         quick_options(self.target, self.model)
-        values = {'color': 1, 'style': 2, 'width': 3, 'marker': 4, 'label': 5, 'shown': False, 'legend': False}
+        values = {'color': 1, 'style': 2, 'width': 3, 'marker': 4, 'label': 5, 'shown': False, 'legend': False,
+                  'error_bar': True}
         self.model.set_line_options.assert_called_once_with(self.target, values)
 
     def test_reject(self, quick_line_options_view):
