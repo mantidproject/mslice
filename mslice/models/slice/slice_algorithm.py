@@ -1,7 +1,7 @@
 from mantid.api import PythonAlgorithm, WorkspaceProperty, IMDEventWorkspace
 from mantid.kernel import Direction, StringMandatoryValidator, PropertyManagerProperty
 from mantid.simpleapi import BinMD, Rebin2D, ConvertSpectrumAxis, SofQW3
-from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
+from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.axis import Axis
 
 
