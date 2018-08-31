@@ -3,10 +3,10 @@ from __future__ import (absolute_import, division, print_function)
 from contextlib import contextmanager
 
 from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle
-from mantid.api import AnalysisDataService
+from mantid.api import AnalysisDataService, Workspace
 
 from mslice.workspace import wrap_workspace
-from mslice.workspace.base import WorkspaceBase as Workspace
+from mslice.workspace.base import WorkspaceBase as MsliceWorkspace
 
 
 def wrap_algorithm(algorithm):
@@ -21,15 +21,15 @@ def wrap_algorithm(algorithm):
         store = kwargs.pop('store', True)
 
         result = algorithm(*args, StoreInADS=False, **kwargs)
-
-        result = wrap_workspace(result, output_name)
-        if store:
-            add_workspace(result, output_name)
+        if isinstance(result, Workspace):
+            result = wrap_workspace(result, output_name)
+            if store:
+                add_workspace(result, output_name)
         return result
     return alg_wrapper
 
 def _name_or_wrapper_to_workspace(input_ws):
-    if isinstance(input_ws, Workspace):
+    if isinstance(input_ws, MsliceWorkspace):
         return input_ws.raw_ws
     elif isinstance(input_ws, str):
         return get_workspace_handle(input_ws).raw_ws
