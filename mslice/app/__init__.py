@@ -3,7 +3,8 @@ and entry points.
 """
 
 from mslice.util.qt.QtWidgets import QApplication
-from mslice.util.mantid.init_mantid import initialize_mantid
+import mslice.util.mantid.init_mantid # noqa: F401
+from mslice.util.mantid import in_mantidplot
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
@@ -20,9 +21,8 @@ def show_gui():
     If this is the first call then an instance of the Windows is cached to ensure it
     survives for the duration of the application
     """
-    in_mantidplot = initialize_mantid()
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow
-        MAIN_WINDOW = MainWindow(in_mantidplot)
+        MAIN_WINDOW = MainWindow(in_mantidplot())
     MAIN_WINDOW.show()

@@ -38,9 +38,9 @@ class CutWidgetPresenter(PresenterUtility):
             elif command == Command.PlotOver:
                 self._cut(plot_over=True)
             elif command == Command.PlotFromWorkspace:
-                self._cut_plotter_presenter.plot_cut_from_workspace(plot_over=False)
+                self._cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over=False)
             elif command == Command.PlotOverFromWorkspace:
-                self._cut_plotter_presenter.plot_cut_from_workspace(plot_over=True)
+                self._cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over=True)
             elif command == Command.SaveToWorkspace:
                 self._cut(save_only=True)
             elif command == Command.AxisChanged:
