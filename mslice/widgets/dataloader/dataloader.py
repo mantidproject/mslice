@@ -25,6 +25,7 @@ class DataLoaderWidget(QWidget): # and some view interface
         self.file_system = QFileSystemModel()
         self.directory = QDir(os.path.expanduser('~'))
         path = self.directory.absolutePath()
+        self.root_path = path
         self.file_system.setRootPath(path)
         self.file_system.setNameFilters(MSLICE_EXTENSIONS)
         self.file_system.setNameFilterDisables(False)
@@ -75,6 +76,13 @@ class DataLoaderWidget(QWidget): # and some view interface
 
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
+        try:
+            rel_path = os.path.relpath(new_path, self.root_path)
+        except ValueError:   # We are in windows and user changed to another drive
+            rel_path = '..'
+        if rel_path.startswith('..'):
+            self.file_system.setRootPath(new_path)
+            self.root_path = new_path
         self.table_view.setRootIndex(self.file_system.index(new_path))
         self.txtpath.setText(new_path)
         self._clear_displayed_error()
