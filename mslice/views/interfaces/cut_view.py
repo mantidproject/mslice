@@ -1,5 +1,3 @@
-
-
 class CutView:
     error_occurred = None
     busy = None
