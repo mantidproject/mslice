@@ -46,8 +46,9 @@ class Axis(object):
             else:
                 raise ValueError("Invalid axis parameter on {}: "
                                  "End value {} is not a valid float!".format(self.units, value))
-        if end_float < self.start:
-            raise ValueError("Invalid axis parameter on {}: End value is less than start value!".format(self.units))
+        if end_float <= self.start:
+            raise ValueError("Invalid axis parameter on {}: End value must be greater"
+                             " than start value!".format(self.units))
         self._end = end_float
 
     @property
