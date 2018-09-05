@@ -181,7 +181,6 @@ class CutPlot(IPlot):
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         icut.flip_axis()
 
-
     def _get_line_index(self, line):
         '''
         Checks if line index is cached, and if not finds the index by iterating over the axes' containers.
@@ -211,7 +210,6 @@ class CutPlot(IPlot):
 
     def xy_config(self):
         return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
-
 
     def _has_errorbars(self):
         """True current axes has visible errorbars,
