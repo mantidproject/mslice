@@ -99,17 +99,19 @@ class CutPlot(IPlot):
     def change_axis_scale(self, xy_config):
         current_axis = self._canvas.figure.gca()
         if xy_config['x_log']:
+            xmin = xy_config['x_range'][0]
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-            xmin = get_min(xdata, absolute_minimum=0.)
-            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(xmin))))
+            min = get_min(xdata, absolute_minimum=0.)
+            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(min))))
             if xmin > 0:
                 xy_config['x_range'] = (xmin, xy_config['x_range'][1])
         else:
             current_axis.set_xscale('linear')
         if xy_config['y_log']:
-            ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-            ymin = get_min(ydata, absolute_minimum=0.)
-            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(ymin))))
+            ymin = xy_config['y_range'][0]
+            ydata = [ll.get_xdata() for ll in current_axis.get_lines()]
+            min = get_min(ydata, absolute_minimum=0.)
+            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(min))))
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
         else:

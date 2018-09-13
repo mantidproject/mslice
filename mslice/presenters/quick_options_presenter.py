@@ -4,7 +4,7 @@ from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLab
 
 
 def quick_options(target, model, has_logarithmic=None):
-    '''Find which quick_options to use based on type of target'''
+    """Find which quick_options to use based on type of target"""
     if isinstance(target, text.Text):
         quick_label_options(target)
     elif isinstance(target, string_types):
