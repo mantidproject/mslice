@@ -87,7 +87,7 @@ class CutPlot(IPlot):
                 if self.legend_visible(i):
                     labels_to_show.append(label)
                     handles_to_show.append(handle)
-                i+=1
+                i += 1
         else:
             containers = axes.containers
             for i in range(len(containers)):
@@ -110,7 +110,7 @@ class CutPlot(IPlot):
             current_axis.set_xscale('linear')
         if xy_config['y_log']:
             ymin = xy_config['y_range'][0]
-            ydata = [ll.get_xdata() for ll in current_axis.get_lines()]
+            ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
             min = get_min(ydata, absolute_minimum=0.)
             current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(min))))
             if ymin > 0:
@@ -183,13 +183,11 @@ class CutPlot(IPlot):
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         icut.flip_axis()
 
-
     def _get_line_index(self, line):
-        '''
-        Checks if line index is cached, and if not finds the index by iterating over the axes' containers.
+        """Checks if line index is cached, and if not finds the index by iterating over the axes' containers.
         :param line: Line to find the index of
         :return: Index of line
-        '''
+        """
         try:
             container = self._lines[line]
         except KeyError:
@@ -199,7 +197,7 @@ class CutPlot(IPlot):
         for c in self._canvas.figure.gca().containers:
             if container == c:
                 return i
-            i+=1
+            i += 1
 
     def calc_figure_boundaries(self):
         fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
@@ -213,7 +211,6 @@ class CutPlot(IPlot):
 
     def xy_config(self):
         return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
-
 
     def _has_errorbars(self):
         """True current axes has visible errorbars,
@@ -262,7 +259,7 @@ class CutPlot(IPlot):
         return v
 
     def line_containers(self):
-        '''build dictionary of lines and their containers'''
+        """build dictionary of lines and their containers"""
         line_containers = {}
         containers = self._canvas.figure.gca().containers
         for container in containers:
