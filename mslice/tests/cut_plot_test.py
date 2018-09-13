@@ -45,8 +45,8 @@ class CutPlotTest(unittest.TestCase):
         xy_config = {'x_log': True, 'y_log': True, 'x_range': (0, 20), 'y_range': (1, 7)}
 
         self.cut_plot.change_axis_scale(xy_config)
-        self.axes.set_xscale.assert_called_once_with('symlog', linthreshx=0.0)
-        self.axes.set_yscale.assert_called_once_with('symlog', linthreshy=1.0)
+        self.axes.set_xscale.assert_called_once_with('symlog', linthreshx=1.0)
+        self.axes.set_yscale.assert_called_once_with('symlog', linthreshy=10.0)
         self.assertEqual(self.cut_plot.x_range, (12, 20))
         self.assertEqual(self.cut_plot.y_range, (1, 7))
 
