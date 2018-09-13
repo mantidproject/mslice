@@ -16,10 +16,47 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_12">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_251">
+       <property name="text">
+        <string>along</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbCutAxis"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>from</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLineEdit" name="lneCutStart"/>
+     </item>
      <item row="0" column="4">
       <widget class="QLabel" name="label_257">
        <property name="text">
         <string>to</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QLineEdit" name="lneCutEnd"/>
+     </item>
+     <item row="0" column="6">
+      <widget class="QLabel" name="label_256">
+       <property name="text">
+        <string>step</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="7">
+      <widget class="QLineEdit" name="lneCutStep">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -31,11 +68,7 @@
       </widget>
      </item>
      <item row="1" column="3">
-      <widget class="QLineEdit" name="lneCutIntegrationStart">
-       <property name="placeholderText">
-        <string/>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="lneCutIntegrationStart"/>
      </item>
      <item row="1" column="4">
       <widget class="QLabel" name="label_259">
@@ -44,55 +77,13 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>from</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_251">
-       <property name="text">
-        <string>along</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLineEdit" name="lneCutStart">
-       <property name="placeholderText">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="cmbCutAxis"/>
-     </item>
-     <item row="0" column="7">
-      <widget class="QLineEdit" name="lneCutStep">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="5">
-      <widget class="QLineEdit" name="lneCutEnd">
-       <property name="placeholderText">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="6">
-      <widget class="QLabel" name="label_256">
-       <property name="text">
-        <string>step</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="5">
-      <widget class="QLineEdit" name="lneCutIntegrationEnd">
-       <property name="placeholderText">
-        <string/>
+      <widget class="QLineEdit" name="lneCutIntegrationEnd"/>
+     </item>
+     <item row="1" column="6">
+      <widget class="QLabel" name="label_253">
+       <property name="text">
+        <string>width</string>
        </property>
       </widget>
      </item>
@@ -106,6 +97,13 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Intensity</string>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="2">
       <widget class="QLabel" name="label_264">
        <property name="text">
@@ -113,19 +111,18 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="6">
-      <widget class="QLabel" name="label_253">
+     <item row="2" column="3">
+      <widget class="QLineEdit" name="lneEditCutIntensityStart"/>
+     </item>
+     <item row="2" column="4">
+      <widget class="QLabel" name="label_265">
        <property name="text">
-        <string>width</string>
+        <string>to</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Intensity</string>
-       </property>
-      </widget>
+     <item row="2" column="5">
+      <widget class="QLineEdit" name="lneCutIntensityEnd"/>
      </item>
      <item row="3" column="1">
       <widget class="QLabel" name="label_5">
@@ -134,6 +131,23 @@
        </property>
        <property name="text">
         <string>Smoothing</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2" colspan="2">
+      <widget class="QLineEdit" name="lneCutSmoothing">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="visible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="6" colspan="2">
+      <widget class="QPushButton" name="btnCutPlot">
+       <property name="text">
+        <string>Plot</string>
        </property>
       </widget>
      </item>
@@ -147,51 +161,10 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QStackedWidget" name="integrationStack">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Integrating</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="cmbIntegrationAxis"/>
-      </widget>
-     </item>
-     <item row="3" column="2" colspan="2">
-      <widget class="QLineEdit" name="lneCutSmoothing">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="visible">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_250">
+     <item row="4" column="6" colspan="2">
+      <widget class="QPushButton" name="btnCutPlotOver">
        <property name="text">
-        <string>over</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="4">
-      <widget class="QLabel" name="label_265">
-       <property name="text">
-        <string>to</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="5">
-      <widget class="QLineEdit" name="lneCutIntensityEnd">
-       <property name="placeholderText">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="6" colspan="2">
-      <widget class="QPushButton" name="btnCutPlot">
-       <property name="text">
-        <string>Plot</string>
+        <string>Plot Over</string>
        </property>
       </widget>
      </item>
@@ -202,17 +175,20 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="6" colspan="2">
-      <widget class="QPushButton" name="btnCutPlotOver">
-       <property name="text">
-        <string>Plot Over</string>
-       </property>
+     <item row="1" column="1">
+      <widget class="QStackedWidget" name="integrationStack">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Integrating</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="cmbIntegrationAxis"/>
       </widget>
      </item>
-     <item row="2" column="3">
-      <widget class="QLineEdit" name="lneEditCutIntensityStart">
-       <property name="placeholderText">
-        <string/>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_250">
+       <property name="text">
+        <string>over</string>
        </property>
       </widget>
      </item>
