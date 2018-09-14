@@ -249,6 +249,7 @@ class CutPlot(IPlot):
             return
         self._set_errorbars_shown_state(not state)
 
+
     def legend_visible(self, index):
         try:
             v = self._legends_visible[index]
