@@ -212,8 +212,8 @@ class CutPlot(IPlot):
         return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
 
     def _has_errorbars(self):
-        """True current axes has visible errorbars,
-         False if current axes has hidden errorbars"""
+        '''True current axes has visible errorbars,
+         False if current axes has hidden errorbars'''
         current_axis = self._canvas.figure.gca()
         # If all the error bars have alpha= 0 they are all transparent (hidden)
         containers = [x for x in current_axis.containers if isinstance(x, ErrorbarContainer)]
@@ -231,7 +231,7 @@ class CutPlot(IPlot):
         return has_errorbars
 
     def _set_errorbars_shown_state(self, state):
-        """Show errrorbar if state = 1, hide if state = 0"""
+        '''Show errrorbar if state = 1, hide if state = 0'''
         current_axis = self._canvas.figure.gca()
         if state:
             alpha = 1
