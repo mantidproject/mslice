@@ -12,8 +12,10 @@ import numpy as np
 from scipy import constants
 
 from mslice.models.axis import Axis
-from mslice.util.mantid import add_to_ads, wrap_in_ads, run_algorithm
+
+from mslice.util.mantid.algorithm_wrapper import add_to_ads, wrap_in_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
+from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -120,7 +122,7 @@ def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
 
     ws.limits['MomentumTransfer'] = [qmin, qmax, qstep]
     ws.limits['|Q|'] = ws.limits['MomentumTransfer']  # ConvertToMD renames it(!)
-    ws.limits['Degrees'] = theta * 180 / np.pi
+    ws.limits['2Theta'] = theta * 180 / np.pi
     ws.limits['DeltaE'] = [emin, emax, estep]
 
 
@@ -152,7 +154,7 @@ def _get_theta_for_limits_event(ws):
 
 
 def load(filename, output_workspace):
-    workspace = run_algorithm('Load', output_name=output_workspace, Filename=filename)
+    workspace = Load(OutputWorkspace=output_workspace, Filename=filename)
     workspace.e_mode = get_EMode(workspace.raw_ws)
     if workspace.e_mode == 'Indirect':
         processEfixed(workspace)
@@ -164,7 +166,7 @@ def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
     workspace_names = [workspace.name for workspace in workspaces]
     with wrap_in_ads(workspaces):
-        ws = run_algorithm('MergeMD', output_name=new_name, InputWorkspaces=workspace_names)
+        ws = MergeMD(OutputWorkspace=new_name, InputWorkspaces=workspace_names)
     propagate_properties(workspaces[0], ws)
     # Set limits for result workspace. Use precalculated step size, otherwise get limits directly from Mantid workspace
     ax1 = ws.raw_ws.getDimension(0)
@@ -183,18 +185,18 @@ def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
     workspaces = [get_workspace_handle(ws) for ws in selected_ws]
     with wrap_in_ads(workspaces):
-        sum_ws = run_algorithm('MergeRuns', output_name=out_ws_name, InputWorkspaces=selected_ws)
+        sum_ws = MergeRuns(OutputWorkspace=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
     bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = run_algorithm('Scale', output_name='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf)
+    scaled_bg_ws = Scale(OutputWorkspace='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf)
     try:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result = run_algorithm('Minus', output_name=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
-                                   RHSWorkspace=scaled_bg_ws.raw_ws)
+            result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
+                           RHSWorkspace=scaled_bg_ws.raw_ws)
             propagate_properties(ws, result)
     except ValueError as e:
         raise ValueError(e)

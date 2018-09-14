@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 
 PICKER_TOL_PTS = 3
@@ -11,6 +12,11 @@ def draw_interactive_cut(workspace):
     cur_fig = plt.gcf()
     cur_canvas = cur_fig.canvas
     ax = plt.gca()
+
+    # disconnect picking in interactive cut
+    cur_canvas.manager.picking_connected(False)
+    cur_canvas.manager.button_pressed_connected(False)
+
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.restore_region(cur_canvas.manager.get_cut_background())
         _create_cut(workspace)
@@ -58,3 +64,6 @@ def _create_cut():
     canvas.figure.gca().xaxis.set_visible(True)
     canvas.figure.gca().yaxis.set_visible(True)
     canvas.draw()
+
+def cut_figure_exists():
+    return GlobalFigureManager.active_cut_figure_exists()

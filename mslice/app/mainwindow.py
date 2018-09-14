@@ -7,6 +7,7 @@ from mslice.presenters.main_presenter import MainPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.util.qt import load_ui
 from mslice.views.interfaces.mainview import MainView
+from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 from mslice.widgets.workspacemanager import TAB_2D, TAB_EVENT, TAB_HISTO, TAB_NONPSD
 from mslice.widgets.workspacemanager.command import Command as ws_command
 from mslice.widgets.cut.command import Command as cut_command
@@ -41,17 +42,17 @@ class MainWindow(MainView, QMainWindow):
             self.buttons_to_enable[TAB_HISTO] += [self.btnSaveToADS]
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
-        dataloader_presenter = self.data_loading.get_presenter()
-        slice_plotter_presenter = SlicePlotterPresenter()
+        self.dataloader_presenter = self.data_loading.get_presenter()
+        self.slice_plotter_presenter = SlicePlotterPresenter()
         slice_widget_presenter = self.wgtSlice.get_presenter()
-        slice_widget_presenter.set_slice_plotter_presenter(slice_plotter_presenter)
-        powder_presenter = self.wgtPowder.get_presenter()
+        slice_widget_presenter.set_slice_plotter_presenter(self.slice_plotter_presenter)
+        self.powder_presenter = self.wgtPowder.get_presenter()
         self.cut_plotter_presenter = CutPlotterPresenter()
         self.cut_widget_presenter = self.wgtCut.get_presenter()
         self.cut_widget_presenter.set_cut_plotter_presenter(self.cut_plotter_presenter)
-        self._presenter = MainPresenter(self, self.workspace_presenter, dataloader_presenter,
-                                        slice_widget_presenter, powder_presenter, self.cut_widget_presenter,
-                                        slice_plotter_presenter, self.cut_plotter_presenter)
+        self._presenter = MainPresenter(self, self.workspace_presenter, self.dataloader_presenter,
+                                        slice_widget_presenter, self.powder_presenter, self.cut_widget_presenter,
+                                        self.slice_plotter_presenter, self.cut_plotter_presenter)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.setup_save()
@@ -142,11 +143,17 @@ class MainWindow(MainView, QMainWindow):
         self.workspace_presenter.notify(ws_command.SaveToADS)
 
     def init_ui(self):
+        self.setup_ipython()
         self.busy_text = QLabel()
         self.statusBar().addPermanentWidget(self.busy_text)
         self.busy_text.setText("  Idle  ")
         self.busy_text.setStyleSheet("QLabel { color: black }")
         self.busy = False
+
+    def setup_ipython(self):
+        ipython = IPythonWidget()
+        self.splitter.addWidget(ipython)
+        self.splitter.setSizes([500, 250])
 
     def show_error(self, msg):
         """Show an error message on status bar. If msg ==""  the function will clear the displayed message """

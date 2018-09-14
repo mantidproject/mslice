@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 from mantid.api import MDNormalization
 from mslice.util.qt.QtWidgets import QFileDialog
-from mslice.models.workspacemanager.workspace_algorithms import run_algorithm
+from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace, SaveAscii, SaveMD, SaveNexus
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
@@ -46,11 +46,11 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 def save_nexus(workspace, path, is_slice):
     if isinstance(workspace, HistogramWorkspace):
         if is_slice:
-            run_algorithm('SaveMD', store=False, InputWorkspace=get_workspace_handle(workspace.name[2:]), Filename=path)
+            SaveMD(InputWorkspace=get_workspace_handle(workspace.name[2:]), Filename=path)
         else:
-            run_algorithm('SaveMD', store=False, InputWorkspace=workspace, Filename=path)
+            SaveMD(InputWorkspace=workspace, Filename=path)
     else:
-        run_algorithm('SaveNexus', store=False, InputWorkspace=workspace, Filename=path)
+        SaveNexus(InputWorkspace=workspace, Filename=path)
 
 
 def save_ascii(workspace, path, is_slice):
@@ -60,7 +60,7 @@ def save_ascii(workspace, path, is_slice):
         else:
             _save_cut_to_ascii(workspace, workspace.name, path)
     else:
-        run_algorithm('SaveAscii', InputWorkspace=workspace, Filename=path)
+        SaveAscii(InputWorkspace=workspace, Filename=path)
 
 
 def save_matlab(workspace, path, is_slice):
@@ -119,8 +119,8 @@ def load_from_ascii(file_path, ws_name):
     extents = str(np.min(x)) + ',' + str(np.max(x))
     nbins = len(x)
     units = header[header.find('along "'):header.find('" between')]
-    run_algorithm('CreateMDHistoWorkspace', output_name=ws_name, SignalInput=y, ErrorInput=e, Dimensionality=1,
-                  Extents=extents, NumberOfBins=nbins, Names='Dim1', Units=units)
+    CreateMDHistoWorkspace(output_name=ws_name, SignalInput=y, ErrorInput=e, Dimensionality=1,
+                           Extents=extents, NumberOfBins=nbins, Names='Dim1', Units=units)
 
 
 def _get_md_histo_xye(histo_ws):

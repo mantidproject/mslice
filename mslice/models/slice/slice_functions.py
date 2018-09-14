@@ -10,7 +10,8 @@ from scipy import constants
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.util.mantid import run_algorithm
+from mslice.util.mantid.mantid_algorithms import LoadCIF, CloneWorkspace
+from mslice.util.mantid import mantid_algorithms
 
 from mslice.util.numpy_helper import apply_with_swapped_axes
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -27,9 +28,9 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
 
 def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
     workspace = get_workspace_handle(selected_workspace)
-    slice =  run_algorithm('Slice', output_name = '__' + workspace.name, InputWorkspace=workspace,
-                           XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
-                           EMode=workspace.e_mode, NormToOne=norm_to_one)
+    slice = mantid_algorithms.Slice(OutputWorkspace='__' + workspace.name, InputWorkspace=workspace,
+                                    XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
+                                    EMode=workspace.e_mode, NormToOne=norm_to_one)
     propagate_properties(workspace, slice)
     if norm_to_one:
         slice = _norm_to_one(slice)
@@ -88,8 +89,7 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
         new_signal = apply_with_swapped_axes(partial(modify_part_of_signal, boltzmann_dist, negative_de_len), signal)
     else:
         new_signal = modify_part_of_signal(boltzmann_dist, negative_de_len, signal)
-    new_ws = run_algorithm('CloneWorkspace', InputWorkspace=scattering_data, output_name=scattering_data.name,
-                           store=False)
+    new_ws = CloneWorkspace(InputWorkspace=scattering_data, OutputWorkspace=scattering_data.name, store=False)
     propagate_properties(scattering_data, new_ws)
     new_ws.set_signal(new_signal)
     return new_ws
@@ -179,7 +179,7 @@ def _compute_powder_line_momentum(ws_name, q_axis, element, cif_file):
 def _crystal_structure(ws_name, element, cif_file):
     if cif_file:
         ws = get_workspace_handle(ws_name).raw_ws
-        run_algorithm('LoadCIF', store=False, InputWorkspace=ws, InputFile=cif_file)
+        LoadCIF(InputWorkspace=ws, InputFile=cif_file)
         return ws.sample().getCrystalStructure()
     else:
         return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],

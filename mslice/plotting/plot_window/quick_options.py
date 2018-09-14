@@ -1,4 +1,3 @@
-
 from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
 
 from mslice.util.qt import QtWidgets
@@ -66,6 +65,7 @@ class QuickAxisOptions(QuickOptions):
     def grid_state(self):
         return self.grid.checkState()
 
+
 class QuickLabelOptions(QuickOptions):
 
     ok_clicked = Signal()
@@ -98,6 +98,10 @@ class QuickLineOptions(QuickOptions):
         self.layout.addLayout(self.button_row)
 
         self.line_widget.show()
+
+    @property
+    def error_bar(self):
+        return self.line_widget.error_bar
 
     @property
     def color(self):
