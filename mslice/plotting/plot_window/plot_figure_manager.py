@@ -142,7 +142,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
             painter = QtGui.QPainter(printer)
-            painter.drawPixmap(0,0,pixmap_image)
+            painter.drawPixmap(0, 0, pixmap_image)
             painter.end()
 
     def save_plot(self):
@@ -152,7 +152,9 @@ class PlotFigureManagerQT(QtCore.QObject):
             save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
             if str(e) == "unrecognised file extension":
-                self.save_image(os.path.join(file_path, save_name))
+                resolution, confirm = QtWidgets.QInputDialog.getDouble(
+                    self.window, 'Resolution', 'Enter image resolution (dpi):', min=30, value=300)
+                self.save_image(os.path.join(file_path, save_name), resolution)
             elif str(e) == "dialog cancelled":
                 pass
             else:
@@ -161,8 +163,8 @@ class PlotFigureManagerQT(QtCore.QObject):
             workspace = self._plot_handler.save_icut()
             save_workspaces([workspace], file_path, save_name, ext)
 
-    def save_image(self, path):
-        self.canvas.figure.savefig(path)
+    def save_image(self, path, resolution):
+        self.canvas.figure.savefig(path, dpi=resolution)
 
     def error_box(self, message):
         error_box = QtWidgets.QMessageBox(self)

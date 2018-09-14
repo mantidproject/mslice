@@ -222,10 +222,10 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
 
 
 def export_workspace_to_ads(workspace):
-    '''
+    """
     Exports an MSlice workspace to ADS. If the workspace is MDHisto, convert it to Matrix
     :param workspace: name of MSlice workspace to export to ADS
-    '''
+    """
     workspace = get_workspace_handle(workspace)
     if isinstance(workspace, HistogramWorkspace):
         with wrap_in_ads([workspace]):
