@@ -159,9 +159,12 @@ class PlotFigureManagerQT(QtCore.QObject):
             save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
             if str(e) == "unrecognised file extension":
-                resolution, confirm = QtWidgets.QInputDialog.getDouble(
-                    self.window, 'Resolution', 'Enter image resolution (dpi):', min=30, value=300)
-                self.save_image(os.path.join(file_path, save_name), resolution)
+                if not save_name.endswith(".pdf"):
+                    resolution, confirm = QtWidgets.QInputDialog.getDouble(
+                        self.window, 'Resolution', 'Enter image resolution (dpi):', min=30, value=300, max=3000)
+                    self.save_image(os.path.join(file_path, save_name), resolution)
+                else:
+                    self.save_image(os.path.join(file_path, save_name))
             elif str(e) == "dialog cancelled":
                 pass
             else:
@@ -170,7 +173,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             workspace = self._plot_handler.save_icut()
             save_workspaces([workspace], file_path, save_name, ext)
 
-    def save_image(self, path, resolution):
+    def save_image(self, path, resolution=300):
         self.canvas.figure.savefig(path, dpi=resolution)
 
     def error_box(self, message):
