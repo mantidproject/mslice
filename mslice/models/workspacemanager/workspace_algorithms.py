@@ -203,13 +203,13 @@ def subtract(workspaces, background_ws, ssf):
 
 
 def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
-    '''
+    """
     :param workspaces: list of workspaces to save
     :param path: directory to save to
     :param save_name: name to save the file as (plus file extension). Pass none to use workspace name
     :param extension: file extension (such as .txt)
     :param slice_nonpsd: whether the selection is in non_psd mode
-    '''
+    """
     from .file_io import save_ascii, save_matlab, save_nexus
     if extension == '.nxs':
         save_method = save_nexus
@@ -224,10 +224,10 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
 
 
 def export_workspace_to_ads(workspace):
-    '''
+    """
     Exports an MSlice workspace to ADS. If the workspace is MDHisto, convert it to Matrix
     :param workspace: name of MSlice workspace to export to ADS
-    '''
+    """
     workspace = get_workspace_handle(workspace)
     if isinstance(workspace, HistogramWorkspace):
         with wrap_in_ads([workspace]):

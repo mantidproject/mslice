@@ -11,14 +11,14 @@ from scipy.io import savemat
 
 
 def get_save_directory(multiple_files=False, save_as_image=False, default_ext=None):
-    '''
+    """
     Show file dialog so user can choose where to save.
     :param multiple_files: boolean - whether more than one file is being saved
     :param save_as_image: boolean - whether to allow saving as a .png/pdf
     :param default_ext: file extension that is selected by default
     :return: path to save directory, name to save the file as, file format extension
     :raises: RuntimeError if dialog is cancelled
-    '''
+    """
     if multiple_files:
         return QFileDialog.getExistingDirectory(), None, default_ext
     else:
