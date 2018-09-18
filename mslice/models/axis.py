@@ -26,7 +26,11 @@ class Axis(object):
         try:
             self._start = float(value)
         except ValueError:
-            raise ValueError("Invalid axis parameter - start '%s' is not a valid float" % value)
+            if str(value) == '':
+                raise ValueError("Invalid axis parameter on {}: Start value required!".format(self.units))
+            else:
+                raise ValueError("Invalid axis parameter on {}: "
+                                 "Start value {} is not a valid float!".format(self.units, value))
 
     @property
     def end(self):
@@ -37,9 +41,14 @@ class Axis(object):
         try:
             end_float = float(value)
         except ValueError:
-            raise ValueError("Invalid axis parameter - end '%s' is not a valid float" % value)
-        if end_float < self.start:
-            raise ValueError("Invalid axis parameter - end is smaller than start")
+            if str(value) == '':
+                raise(ValueError("Invalid axis parameter on {}: End value required!".format(self.units)))
+            else:
+                raise ValueError("Invalid axis parameter on {}: "
+                                 "End value {} is not a valid float!".format(self.units, value))
+        if end_float <= self.start:
+            raise ValueError("Invalid axis parameter on {}: End value must be greater"
+                             " than start value!".format(self.units))
         self._end = end_float
 
     @property
@@ -51,4 +60,4 @@ class Axis(object):
         try:
             self._step = float(value)
         except ValueError:
-            raise ValueError("Invalid axis parameter - step '%s' is not a valid float" % value)
+            raise ValueError("Invalid axis parameter on {}: Step {} is not a valid float!".format(self.units, value))

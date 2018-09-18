@@ -46,7 +46,6 @@ class CutWidgetPresenter(PresenterUtility):
             elif command == Command.AxisChanged:
                 self._cut_axis_changed()
 
-
     def _cut(self, plot_over=False, save_only=False):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
         try:
@@ -57,8 +56,7 @@ class CutWidgetPresenter(PresenterUtility):
             return
         for workspace in selected_workspaces:
             self._cut_plotter_presenter.run_cut(workspace, params, plot_over=plot_over, save_only=save_only)
-            plot_over = True # The first plot will respect which button the user pressed. The rest will over plot
-
+            plot_over = True  # The first plot will respect which button the user pressed. The rest will over plot
 
     def _parse_step(self):
         step = self._cut_view.get_cut_axis_step()
@@ -74,7 +72,7 @@ class CutWidgetPresenter(PresenterUtility):
                 warnings.warn("Invalid cut step, using default value")
 
     def _parse_input(self):
-        '''Gets values entered by user. Validation is performed by the CutCache object.'''
+        """Gets values entered by user. Validation is performed by the CutCache object."""
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
                         self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
 
