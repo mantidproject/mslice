@@ -215,9 +215,11 @@ class SlicePlot(IPlot):
         checked = self.plot_window.action_arbitrary_nuclei.isChecked()
         if checked:
             self._arb_nuclei_rmm, confirm = QtWidgets.QInputDialog.getInt(
-                self.plot_window, 'Arbitrary Nuclei', 'Enter relative mass:')
+                self.plot_window, 'Arbitrary Nuclei', 'Enter relative mass:', min=1)
             if confirm:
                 self.toggle_overplot_line(self._arb_nuclei_rmm, recoil, checked)
+            else:
+                self.plot_window.action_arbitrary_nuclei.setChecked(not checked)
         else:
             self.toggle_overplot_line(self._arb_nuclei_rmm, recoil, checked)
 
@@ -320,15 +322,15 @@ class SlicePlot(IPlot):
 
     def _update_lines(self):
         """ Updates the powder/recoil overplots lines when intensity type changes """
-        lines = {self.plot_window.action_hydrogen:[1, True, ''],
-                 self.plot_window.action_deuterium:[2, True, ''],
-                 self.plot_window.action_helium:[4, True, ''],
-                 self.plot_window.action_arbitrary_nuclei:[self._arb_nuclei_rmm, True, ''],
-                 self.plot_window.action_aluminium:['Aluminium', False, ''],
-                 self.plot_window.action_copper:['Copper', False, ''],
-                 self.plot_window.action_niobium:['Niobium', False, ''],
-                 self.plot_window.action_tantalum:['Tantalum', False, ''],
-                 self.plot_window.action_cif_file:[self._cif_file, False, self._cif_path]}
+        lines = {self.plot_window.action_hydrogen: [1, True, ''],
+                 self.plot_window.action_deuterium: [2, True, ''],
+                 self.plot_window.action_helium: [4, True, ''],
+                 self.plot_window.action_arbitrary_nuclei: [self._arb_nuclei_rmm, True, ''],
+                 self.plot_window.action_aluminium: ['Aluminium', False, ''],
+                 self.plot_window.action_copper: ['Copper', False, ''],
+                 self.plot_window.action_niobium: ['Niobium', False, ''],
+                 self.plot_window.action_tantalum: ['Tantalum', False, ''],
+                 self.plot_window.action_cif_file: [self._cif_file, False, self._cif_path]}
         for line in lines:
             if line.isChecked():
                 self._slice_plotter_presenter.add_overplot_line(self.ws_name, *lines[line])
