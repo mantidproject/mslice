@@ -12,12 +12,14 @@ def output_workspace_name(selected_workspace, integration_start, integration_end
     return selected_workspace + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
         integration_end) + ")"
 
+
 def compute_cut(workspace, cut_axis, integration_axis, is_norm, store=True):
     out_ws_name = output_workspace_name(workspace.name, integration_axis.start, integration_axis.end)
     cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, store=store, InputWorkspace=workspace,
                                 CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
                                 EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=is_norm)
     return cut
+
 
 def is_cuttable(workspace):
     workspace = get_workspace_handle(workspace)

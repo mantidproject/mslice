@@ -4,6 +4,7 @@ from mslice.workspace.base import WorkspaceBase as Workspace
 
 _loaded_workspaces = {}
 
+
 def get_workspace_handle(workspace_name):
     """"Return handle to workspace given workspace_name_as_string"""
     # if passed a workspace handle return the handle
