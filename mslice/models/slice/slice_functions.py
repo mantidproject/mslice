@@ -36,14 +36,17 @@ def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
         slice = _norm_to_one(slice)
     return slice
 
+
 def axis_values(axis):
     """Compute a numpy array of bins for the given axis values"""
     return np.linspace(axis.start, axis.end, get_number_of_steps(axis))
+
 
 def compute_boltzmann_dist(sample_temp, delta_e):
     """calculates exp(-E/kBT), a common factor in intensity corrections"""
     kBT = sample_temp * KB_MEV
     return np.exp(-delta_e / kBT)
+
 
 def compute_chi(scattering_data, sample_temp, e_axis):
     """
@@ -55,15 +58,17 @@ def compute_chi(scattering_data, sample_temp, e_axis):
     energy_transfer = axis_values(e_axis)
     signs = np.sign(energy_transfer)
     signs[signs == 0] = 1
-    boltzmann_dist =  compute_boltzmann_dist(sample_temp, energy_transfer)
+    boltzmann_dist = compute_boltzmann_dist(sample_temp, energy_transfer)
     chi = np.pi * (signs + (boltzmann_dist * -signs))
     out = scattering_data * chi
     return out
+
 
 def compute_chi_magnetic(chi):
     # 291 milibarns is the total neutron cross-section for a moment of one bohr magneton
     chi_magnetic = chi / 291
     return chi_magnetic
+
 
 def compute_d2sigma(scattering_data, e_axis):
     """
@@ -78,6 +83,7 @@ def compute_d2sigma(scattering_data, e_axis):
     energy_transfer = axis_values(e_axis)
     kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)
     return scattering_data * kf / ki
+
 
 def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
     energy_transfer = axis_values(e_axis)
@@ -94,10 +100,12 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
     new_ws.set_signal(new_signal)
     return new_ws
 
+
 def modify_part_of_signal(multiplier, up_to_index, signal):
     lhs = signal[:, :up_to_index] * multiplier
     rhs = signal[:, up_to_index:]
     return np.concatenate((lhs, rhs), 1)
+
 
 def compute_gdos(scattering_data, sample_temp, q_axis, e_axis):
     energy_transfer = axis_values(e_axis)
@@ -108,6 +116,7 @@ def compute_gdos(scattering_data, sample_temp, q_axis, e_axis):
     gdos *= energy_transfer
     gdos *= (1 - boltzmann_dist)
     return gdos
+
 
 def sample_temperature(ws_name, sample_temp_fields):
     ws = get_workspace_handle(ws_name).raw_ws
@@ -131,6 +140,7 @@ def sample_temperature(ws_name, sample_temp_fields):
         sample_temp = np.mean(sample_temp)
     return sample_temp
 
+
 def get_sample_temperature_from_string(string):
     pos_k = string.find('K')
     if pos_k == -1:
@@ -138,6 +148,7 @@ def get_sample_temperature_from_string(string):
     k_string = string[pos_k - 3:pos_k]
     sample_temp = float(''.join(c for c in k_string if c.isdigit()))
     return sample_temp
+
 
 def compute_recoil_line(ws_name, axis, relative_mass=1):
     efixed = get_workspace_handle(ws_name).e_fixed
@@ -156,6 +167,7 @@ def compute_recoil_line(ws_name, axis, relative_mass=1):
         raise RuntimeError("units of axis not recognised")
     return x_axis, line
 
+
 def compute_powder_line(ws_name, axis, element, cif_file=False):
     efixed = get_workspace_handle(ws_name).e_fixed
     if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
@@ -168,6 +180,7 @@ def compute_powder_line(ws_name, axis, element, cif_file=False):
     y = sum([[efixed / 20,  -efixed / 20, np.nan] for xv in x0], [])
     return x, y
 
+
 def _compute_powder_line_momentum(ws_name, q_axis, element, cif_file):
     d_min = (2 * np.pi) / q_axis.end
     d_max = (2 * np.pi) / q_axis.start
@@ -175,6 +188,7 @@ def _compute_powder_line_momentum(ws_name, q_axis, element, cif_file):
     dvalues = compute_dvalues(d_min, d_max, structure)
     x = (2 * np.pi) / dvalues
     return x
+
 
 def _crystal_structure(ws_name, element, cif_file):
     if cif_file:
@@ -185,6 +199,7 @@ def _crystal_structure(ws_name, element, cif_file):
         return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
                                 crystal_structure[element][2])
 
+
 def _compute_powder_line_degrees(ws_name, theta_axis, element, efixed, cif_file):
     wavelength = np.sqrt(E2L / efixed)
     d_min = wavelength / (2 * np.sin(np.deg2rad(theta_axis.end / 2)))
@@ -194,14 +209,17 @@ def _compute_powder_line_degrees(ws_name, theta_axis, element, efixed, cif_file)
     x = 2 * np.arcsin(wavelength / 2 / dvalues) * 180 / np.pi
     return x
 
+
 def compute_dvalues(d_min, d_max, structure):
     generator = ReflectionGenerator(structure)
     hkls = generator.getUniqueHKLsUsingFilter(d_min, d_max, ReflectionConditionFilter.StructureFactor)
     dvalues = np.sort(np.array(generator.getDValues(hkls)))[::-1]
     return dvalues
 
+
 def _norm_to_one(workspace):
     return workspace / np.nanmax(np.abs(workspace.get_signal()))
+
 
 def is_sliceable(workspace):
     ws = get_workspace_handle(workspace)

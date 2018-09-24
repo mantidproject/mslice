@@ -105,7 +105,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         return self._plot_handler.background
 
     def is_icut(self, is_icut):
-        if self._plot_handler is not None:
+        if self._plot_handler is not None and not isinstance(self._plot_handler, SlicePlot):
             self._plot_handler.is_icut(is_icut)
 
     def picking_connected(self, connect):

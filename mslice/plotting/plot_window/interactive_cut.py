@@ -6,6 +6,7 @@ from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 
+
 class InteractiveCut(object):
 
     def __init__(self, slice_plot, canvas, ws_title):
@@ -23,9 +24,11 @@ class InteractiveCut(object):
 
         self.connect_event[3] = self._canvas.mpl_connect('draw_event', self.redraw_rectangle)
         self._canvas.draw()
+        self.mouse_event_cache = []
 
     def plot_from_mouse_event(self, eclick, erelease):
         # Make axis orientation sticky, until user selects entirely new rectangle.
+        self.mouse_event_cache = [eclick, erelease]
         rect_pos = [eclick.x, eclick.y, erelease.x, erelease.y,
                     abs(erelease.x - eclick.x), abs(erelease.y - eclick.y)]
         rectangle_changed = all([abs(rect_pos[i] - self._rect_pos_cache[i]) > 0.1 for i in range(6)])
@@ -83,6 +86,14 @@ class InteractiveCut(object):
         self.rect.set_active(False)
         for event in self.connect_event:
             self._canvas.mpl_disconnect(event)
+        self._canvas.draw()
+
+    def toggle_show_rectangle(self):
+        if self.rect.active:
+            self.rect.set_active(False)
+        else:
+            self.rect.set_active(True)
+            self.plot_from_mouse_event(*self.mouse_event_cache)
         self._canvas.draw()
 
     def flip_axis(self):
