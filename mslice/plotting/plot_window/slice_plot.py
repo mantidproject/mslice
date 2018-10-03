@@ -27,8 +27,11 @@ class SlicePlot(IPlot):
         self._cif_file = None
         self._cif_path = None
         self._legend_dict = {}
-        self.icut_event = [None, None]
+
+        # Interactive cuts
         self.icut = None
+        self.icut_event = [None, None]
+
         self.setup_connections(self.plot_window)
 
     def setup_connections(self, plot_figure):
@@ -202,8 +205,8 @@ class SlicePlot(IPlot):
         return bounds
 
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
-        self.toggle_rect()
         self.manager.report_as_current()
+
         if checked:
             self._slice_plotter_presenter.add_overplot_line(self.ws_name, key, recoil, cif_file)
         else:
@@ -211,7 +214,9 @@ class SlicePlot(IPlot):
 
         self.update_legend()
         self._canvas.draw()
-        self.toggle_rect()
+
+        # Since some methods in the plot figure manager do not check if the plot handler is a slice plot or cut plot
+        self.manager._current_figs.set_figure_as_current(2)
 
     def arbitrary_recoil_line(self):
         recoil = True
@@ -257,8 +262,8 @@ class SlicePlot(IPlot):
         intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
-        self.toggle_rect()
         self.manager.report_as_current()
+
         if action.isChecked():
             previous = self.selected_intensity()
             self.set_intensity(action)
@@ -281,11 +286,8 @@ class SlicePlot(IPlot):
             self._canvas.draw()
         else:
             action.setChecked(True)
-        self.toggle_rect()
-
-    def toggle_rect(self):
-        if self.icut is not None:
-            self.icut.toggle_show_rectangle()
+        # Since some methods in the plot figure manager do not check if the plot handler is a slice plot or cut plot
+        self.manager._current_figs.set_figure_as_current(2)
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         try:
@@ -347,6 +349,10 @@ class SlicePlot(IPlot):
         self._canvas.draw()
 
     def interactive_cuts(self):
+        self.toggle_icut_button()
+        self.toggle_icut()
+
+    def toggle_icut_button(self):
         if not self.icut:
             self.manager.picking_connected(False)
             if self.plot_window.action_zoom_in.isChecked():
@@ -367,7 +373,6 @@ class SlicePlot(IPlot):
             self.plot_window.action_save_cut.setVisible(False)
             self.plot_window.action_flip_axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
-        self.toggle_icut()
 
     def toggle_icut(self):
         if self.icut is not None:

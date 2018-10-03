@@ -86,13 +86,6 @@ class InteractiveCut(object):
             self._canvas.mpl_disconnect(event)
         self._canvas.draw()
 
-    def toggle_show_rectangle(self):
-        if self.rect.active:
-            self.rect.set_active(False)
-        else:
-            self.rect.set_active(True)
-        self._canvas.draw()
-
     def flip_axis(self):
         self.horizontal = not self.horizontal
         self.plot_cut(*self.rect.extents)

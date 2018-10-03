@@ -216,7 +216,7 @@ class GlobalFigureManager(object):
     @classmethod
     def get_category(cls, num):
         """Return the category of the figure"""
-        for category,fig_list in list(cls._figures_by_category.items()):
+        for category, fig_list in list(cls._figures_by_category.items()):
             if num in fig_list:
                 figure_category = category
                 break
@@ -297,7 +297,7 @@ class GlobalFigureManager(object):
 
     @classmethod
     def number_of_figure(cls, fig):
-        for key,value in list(cls._figures.items()):
+        for key, value in list(cls._figures.items()):
             if value == fig:
                 return key
         raise ValueError('Figure %s was not recognised' % fig)
