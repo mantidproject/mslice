@@ -75,7 +75,7 @@ class CutPlotterPresenter(PresenterUtility):
         self._cut_cache[workspace_name].icut = icut
 
     def set_is_icut(self, workspace_name, is_icut):
-        if not is_icut:
+        if not is_icut and workspace_name in self._cut_cache:
             self._cut_cache[workspace_name].icut = None
         if cut_figure_exists():
             plt.gcf().canvas.manager.is_icut(is_icut)

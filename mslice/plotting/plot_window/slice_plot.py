@@ -151,6 +151,9 @@ class SlicePlot(IPlot):
         else:
             axes.legend_ = None  # remove legend
 
+        if self._canvas.manager._plot_handler.icut is not None:
+            self._canvas.manager._plot_handler.icut.rect.ax = axes
+
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
         colormesh = current_axis.collections[0]
@@ -205,6 +208,7 @@ class SlicePlot(IPlot):
         return bounds
 
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
+        last_active_figure_number = self.manager._current_figs.get_active_figure().number
         self.manager.report_as_current()
 
         if checked:
@@ -216,7 +220,7 @@ class SlicePlot(IPlot):
         self._canvas.draw()
 
         # Since some methods in the plot figure manager do not check if the plot handler is a slice plot or cut plot
-        self.manager._current_figs.set_figure_as_current(2)
+        self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def arbitrary_recoil_line(self):
         recoil = True
@@ -262,6 +266,7 @@ class SlicePlot(IPlot):
         intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
+        last_active_figure_number = self.manager._current_figs.get_active_figure().number
         self.manager.report_as_current()
 
         if action.isChecked():
@@ -287,7 +292,7 @@ class SlicePlot(IPlot):
         else:
             action.setChecked(True)
         # Since some methods in the plot figure manager do not check if the plot handler is a slice plot or cut plot
-        self.manager._current_figs.set_figure_as_current(2)
+        self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         try:
