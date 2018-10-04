@@ -219,7 +219,7 @@ class SlicePlot(IPlot):
         self.update_legend()
         self._canvas.draw()
 
-        # Since some methods in the plot figure manager do not check if the plot handler is a slice plot or cut plot
+        # Reset current active figure
         self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def arbitrary_recoil_line(self):
@@ -291,7 +291,7 @@ class SlicePlot(IPlot):
             self._canvas.draw()
         else:
             action.setChecked(True)
-        # Since some methods in the plot figure manager do not check if the plot handler is a slice plot or cut plot
+        # Reset current active figure
         self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
