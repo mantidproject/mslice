@@ -208,7 +208,9 @@ class SlicePlot(IPlot):
         return bounds
 
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
-        last_active_figure_number = self.manager._current_figs.get_active_figure().number
+        last_active_figure_number = None
+        if self.manager._current_figs._active_figure is not None:
+            last_active_figure_number = self.manager._current_figs.get_active_figure().number
         self.manager.report_as_current()
 
         if checked:
@@ -220,7 +222,8 @@ class SlicePlot(IPlot):
         self._canvas.draw()
 
         # Reset current active figure
-        self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+        if last_active_figure_number is not None:
+            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def arbitrary_recoil_line(self):
         recoil = True
@@ -266,7 +269,10 @@ class SlicePlot(IPlot):
         intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
-        last_active_figure_number = self.manager._current_figs.get_active_figure().number
+        last_active_figure_number = None
+        if self.manager._current_figs._active_figure is not None:
+            last_active_figure_number = self.manager._current_figs.get_active_figure().number
+
         self.manager.report_as_current()
 
         if action.isChecked():
@@ -292,7 +298,8 @@ class SlicePlot(IPlot):
         else:
             action.setChecked(True)
         # Reset current active figure
-        self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+        if last_active_figure_number is not None:
+            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         try:
