@@ -36,7 +36,7 @@ class SlicePlot(IPlot):
 
     def setup_connections(self, plot_figure):
         plot_figure.action_interactive_cuts.setVisible(True)
-        plot_figure.action_interactive_cuts.triggered.connect(self.interactive_cuts)
+        plot_figure.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
         plot_figure.action_save_cut.setVisible(False)
         plot_figure.action_save_cut.triggered.connect(self.save_icut)
         plot_figure.action_flip_axis.setVisible(False)
@@ -360,7 +360,7 @@ class SlicePlot(IPlot):
         self.update_legend()
         self._canvas.draw()
 
-    def interactive_cuts(self):
+    def toggle_interactive_cuts(self):
         self.toggle_icut_button()
         self.toggle_icut()
 
