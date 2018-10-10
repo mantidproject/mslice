@@ -65,5 +65,6 @@ def _create_cut():
     canvas.figure.gca().yaxis.set_visible(True)
     canvas.draw()
 
+
 def cut_figure_exists():
     return GlobalFigureManager.active_cut_figure_exists()

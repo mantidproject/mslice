@@ -5,9 +5,9 @@ kept (will not be modified until it is made current once again).
 The FigureManager in its responsibilities highly resembles the class maptplotlib._pylab_helpers.Gcf, However it
 adds the functionality of having multiple 'categories' with each category having it own current window.
 This is achieved through use of the supplied decorator 'activate_category' This decorator accepts one parameter  (a
-string ) specifying which category a function belongs two. For instance to apply the the the decorator
+string ) specifying which category a function belongs two. For instance to apply the decorator
 activate_category('<category>') to the the function pyplot.pcolor would signal that the function pcolor would only apply
-to  plots of the category '<category>'. All of this is done through manipulating the the return value of `pyplot.gcf`. gcf
+to  plots of the category '<category>'. All of this is done through manipulating the return value of `pyplot.gcf`. gcf
 in pyplot returns FigureManager.get_active_figure()
 
 If gcf is called from inside a categorized (decorated) function then it will return the current figure for that
@@ -216,7 +216,7 @@ class GlobalFigureManager(object):
     @classmethod
     def get_category(cls, num):
         """Return the category of the figure"""
-        for category,fig_list in list(cls._figures_by_category.items()):
+        for category, fig_list in list(cls._figures_by_category.items()):
             if num in fig_list:
                 figure_category = category
                 break
@@ -297,10 +297,11 @@ class GlobalFigureManager(object):
 
     @classmethod
     def number_of_figure(cls, fig):
-        for key,value in list(cls._figures.items()):
+        for key, value in list(cls._figures.items()):
             if value == fig:
                 return key
         raise ValueError('Figure %s was not recognised' % fig)
+
 
 # WARNING: If you change the name or parameter list here then the corresponding changes
 # to tools/boilerplate.py must be made and that script reran to regenerate pyplot.py

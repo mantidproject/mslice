@@ -27,13 +27,16 @@ class SlicePlot(IPlot):
         self._cif_file = None
         self._cif_path = None
         self._legend_dict = {}
-        self.icut_event = [None, None]
+
+        # Interactive cuts
         self.icut = None
+        self.icut_event = [None, None]
+
         self.setup_connections(self.plot_window)
 
     def setup_connections(self, plot_figure):
         plot_figure.action_interactive_cuts.setVisible(True)
-        plot_figure.action_interactive_cuts.triggered.connect(self.interactive_cuts)
+        plot_figure.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
         plot_figure.action_save_cut.setVisible(False)
         plot_figure.action_save_cut.triggered.connect(self.save_icut)
         plot_figure.action_flip_axis.setVisible(False)
@@ -148,6 +151,9 @@ class SlicePlot(IPlot):
         else:
             axes.legend_ = None  # remove legend
 
+        if self._canvas.manager._plot_handler.icut is not None:
+            self._canvas.manager._plot_handler.icut.rect.ax = axes
+
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
         colormesh = current_axis.collections[0]
@@ -202,13 +208,22 @@ class SlicePlot(IPlot):
         return bounds
 
     def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
+        last_active_figure_number = None
+        if self.manager._current_figs._active_figure is not None:
+            last_active_figure_number = self.manager._current_figs.get_active_figure().number
         self.manager.report_as_current()
+
         if checked:
             self._slice_plotter_presenter.add_overplot_line(self.ws_name, key, recoil, cif_file)
         else:
             self._slice_plotter_presenter.hide_overplot_line(self.ws_name, key)
+
         self.update_legend()
         self._canvas.draw()
+
+        # Reset current active figure
+        if last_active_figure_number is not None:
+            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def arbitrary_recoil_line(self):
         recoil = True
@@ -254,7 +269,12 @@ class SlicePlot(IPlot):
         intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
+        last_active_figure_number = None
+        if self.manager._current_figs._active_figure is not None:
+            last_active_figure_number = self.manager._current_figs.get_active_figure().number
+
         self.manager.report_as_current()
+
         if action.isChecked():
             previous = self.selected_intensity()
             self.set_intensity(action)
@@ -277,6 +297,9 @@ class SlicePlot(IPlot):
             self._canvas.draw()
         else:
             action.setChecked(True)
+        # Reset current active figure
+        if last_active_figure_number is not None:
+            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         try:
@@ -337,7 +360,11 @@ class SlicePlot(IPlot):
         self.update_legend()
         self._canvas.draw()
 
-    def interactive_cuts(self):
+    def toggle_interactive_cuts(self):
+        self.toggle_icut_button()
+        self.toggle_icut()
+
+    def toggle_icut_button(self):
         if not self.icut:
             self.manager.picking_connected(False)
             if self.plot_window.action_zoom_in.isChecked():
@@ -358,7 +385,6 @@ class SlicePlot(IPlot):
             self.plot_window.action_save_cut.setVisible(False)
             self.plot_window.action_flip_axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
-        self.toggle_icut()
 
     def toggle_icut(self):
         if self.icut is not None:

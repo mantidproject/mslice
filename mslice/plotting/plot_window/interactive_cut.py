@@ -6,6 +6,7 @@ from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 
+
 class InteractiveCut(object):
 
     def __init__(self, slice_plot, canvas, ws_title):
@@ -32,7 +33,6 @@ class InteractiveCut(object):
         if rectangle_changed:
             self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - eclick.y)
         self.plot_cut(eclick.xdata, erelease.xdata, eclick.ydata, erelease.ydata)
-        self._cut_plotter_presenter.store_icut(self._ws_title, self)
         self.connect_event[2] = self._canvas.mpl_connect('button_press_event', self.clicked)
         self._rect_pos_cache = rect_pos
 
@@ -43,6 +43,7 @@ class InteractiveCut(object):
                 self._canvas.figure.gca().get_xaxis().units
             integration_axis = Axis(units, integration_start, integration_end, 0)
             self._cut_plotter_presenter.plot_interactive_cut(str(self._ws_title), ax, integration_axis, store)
+            self._cut_plotter_presenter.store_icut(self._ws_title, self)
 
     def get_cut_parameters(self, pos1, pos2):
         start = pos1[not self.horizontal]
@@ -90,5 +91,5 @@ class InteractiveCut(object):
         self.plot_cut(*self.rect.extents)
 
     def window_closing(self):
+        self.slice_plot.toggle_interactive_cuts()
         self.slice_plot.plot_window.action_interactive_cuts.setChecked(False)
-        self.slice_plot.toggle_icut()

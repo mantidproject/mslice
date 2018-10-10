@@ -2,8 +2,9 @@ from mslice.models.slice.slice_functions import (compute_chi, compute_chi_magnet
                                                  compute_symmetrised)
 
 
-class Slice():
+class Slice:
     """class that caches intensities and parameters for a single workspace"""
+
     def __init__(self, slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated=False):
         """
         :param slice: output workspace of Slice algorithm

@@ -15,7 +15,6 @@ def plot_cached_slice(slice_workspace, slice_cache):
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
-
 def create_slice_figure(workspace_name, presenter):
     fig_canvas = plt.gcf().canvas
     fig_canvas.set_window_title(workspace_name)
@@ -45,6 +44,12 @@ def _show_plot(slice_cache, workspace):
     ax.set_ylim(y_axis.start)
     cb = plt.colorbar(image, ax=ax)
     cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
+
+    # Because the axis is cleared, RectangleSelector needs to use the new axis
+    # otherwise it can't be used after doing an intensity plot (as it clears the axes)
+    if cur_fig.canvas.manager._plot_handler.icut is not None:
+        cur_fig.canvas.manager._plot_handler.icut.rect.ax = ax
+
     cur_fig.canvas.draw_idle()
     cur_fig.show()
 
