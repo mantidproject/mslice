@@ -58,7 +58,6 @@ class CutPlotterPresenter(PresenterUtility):
             plot_over = True  # plot over if multiple workspaces selected
 
     def plot_cut_from_workspace(self, workspace, intensity_range=None, plot_over=False):
-
         workspace = get_workspace_handle(workspace)
         plot_cut_impl(workspace, self, workspace.raw_ws.getDimension(0).getUnits(), intensity_range=intensity_range,
                       plot_over=plot_over)
@@ -73,12 +72,15 @@ class CutPlotterPresenter(PresenterUtility):
     def store_icut(self, workspace_name, icut):
         self.set_is_icut(workspace_name, True)
         self._cut_cache[workspace_name].icut = icut
+        if cut_figure_exists():
+            plt.gcf().canvas.manager.save_icut_object(icut)
 
     def set_is_icut(self, workspace_name, is_icut):
         if not is_icut and workspace_name in self._cut_cache:
             self._cut_cache[workspace_name].icut = None
         if cut_figure_exists():
-            plt.gcf().canvas.manager.is_icut(is_icut)
+            curr_fig = plt.gcf()
+            curr_fig.canvas.manager.is_icut(is_icut)
 
     def get_icut(self, workspace_name):
         try:

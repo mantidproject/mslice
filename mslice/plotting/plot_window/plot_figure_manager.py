@@ -73,7 +73,16 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def report_as_current(self):
         """Report to the global figure manager that this figure should be made active"""
+        #last_active_figure = None
+        #if self._current_figs._active_figure is not None:
+        #    last_active_figure = plt.gcf()
+
         self._current_figs.set_figure_as_current(self.number)
+
+        # To create a new cutplot form interactive
+        #if last_active_figure is not None and isinstance(last_active_figure.canvas.manager._plot_handler, CutPlot):
+        #    cut_cache = last_active_figure.canvas.manager._plot_handler._cut_plotter_presenter._cut_cache
+        #    plt.gcf().canvas.manager._plot_handler._cut_plotter_presenter._cut_cache = cut_cache
 
     def flag_as_kept(self):
         self.window.flag_as_kept()
@@ -107,6 +116,10 @@ class PlotFigureManagerQT(QtCore.QObject):
     def is_icut(self, is_icut):
         if self._plot_handler is not None:
             self._plot_handler.is_icut(is_icut)
+
+    def save_icut_object(self, icut):
+        if self._plot_handler is not None:
+            self._plot_handler.save_icut_object(icut)
 
     def picking_connected(self, connect):
         if connect:

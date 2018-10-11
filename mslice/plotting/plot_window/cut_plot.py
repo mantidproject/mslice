@@ -2,6 +2,7 @@ from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 import warnings
 import numpy as np
+import copy
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
@@ -31,6 +32,7 @@ class CutPlot(IPlot):
         self.ws_name = workspace_name
         self._lines = self.line_containers()
         self.setup_connections(self.plot_window)
+        self.icut_object = None
 
     def setup_connections(self, plot_window):
         plot_window.menu_intensity.setDisabled(True)
@@ -196,25 +198,45 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def is_icut(self, is_icut):
+        self.toggle_picking(is_icut)
+        self.toggle_icut_buttons(is_icut)
+        self.plot_window.show()
+
+    def save_icut_object(self, icut):
+        if not self.plot_window.action_keep.isChecked():
+            self.icut_object = icut
+
+    def toggle_picking(self, is_icut):
         self.manager.button_pressed_connected(not is_icut)
         self.manager.picking_connected(not is_icut)
 
+    def toggle_icut_buttons(self, is_icut):
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
         self.plot_window.keep_make_current_seperator.setVisible(not is_icut)
-        self.plot_window.action_keep.setVisible(not is_icut)
-        self.plot_window.action_make_current.setVisible(not is_icut)
+        self.plot_window.action_keep.setVisible(True)
+        self.plot_window.action_make_current.setVisible(True)
         self.plot_window.action_flip_axis.setVisible(is_icut)
-
-        self.plot_window.show()
 
     def save_icut(self):
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
         return icut.save_cut()
 
     def flip_icut(self):
-        icut = self._cut_plotter_presenter.get_icut(self.ws_name)
+        # Get active figure number
+        last_active_figure_number = None
+        if self.manager._current_figs._active_figure is not None:
+            last_active_figure_number = self.manager._current_figs.get_active_figure().number
+
+        figure_number = self.manager.number
+        self.manager._current_figs.set_figure_as_current(figure_number)
+
+        icut = self.icut_object
         icut.flip_axis()
+
+        # Reset current active figure
+        if last_active_figure_number is not None:
+            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
 
     def _get_line_index(self, line):
         """
