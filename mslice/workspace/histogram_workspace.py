@@ -31,5 +31,5 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         coord = self.get_coordinates()
         bin_size = coord[coord.keys()[0]][1] - coord[coord.keys()[0]][0]
         ws_conv = Scale(ws_conv, bin_size, OutputWorkspace=self.name, StoreInADS=False)
-        ConvertToDistribution(ws_conv, StoreInADS=False)git
+        ConvertToDistribution(ws_conv, StoreInADS=False)
         return Workspace(ws_conv, self.name)
