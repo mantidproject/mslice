@@ -18,11 +18,11 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         self._EfCache = None
 
     def load_workspace(self, file_paths, merge=False):
-        '''
+        """
         Loads one or more workspaces.
         :param file_paths: list of paths to files to load
         :param merge: boolean - whether to combine files into a single workspace
-        '''
+        """
         with show_busy(self._view):
             ws_names = [os.path.splitext(os.path.basename(base))[0] for base in file_paths]
             if merge:

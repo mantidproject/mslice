@@ -25,12 +25,11 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         new_ws.is_PSD = self.is_PSD
         return new_ws
 
-
     def convert_to_matrix(self):
         ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization',
                                                   FindXAxis=False, StoreInADS=False, OutputWorkspace=self.name)
         coord = self.get_coordinates()
         bin_size = coord[coord.keys()[0]][1] - coord[coord.keys()[0]][0]
         ws_conv = Scale(ws_conv, bin_size, OutputWorkspace=self.name, StoreInADS=False)
-        ConvertToDistribution(ws_conv, StoreInADS=False)
+        ConvertToDistribution(ws_conv, StoreInADS=False)git
         return Workspace(ws_conv, self.name)
