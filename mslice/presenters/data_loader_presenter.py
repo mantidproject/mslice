@@ -66,7 +66,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         return all(ext == extensions[0] for ext in extensions)
 
     def check_efixed(self, ws_name, multi=False):
-        '''checks if a newly loaded workspace has efixed set'''
+        """checks if a newly loaded workspace has efixed set"""
         ws = get_workspace_handle(ws_name)
         if ws.e_mode == 'Indirect' and not ws.ef_defined:
             Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi, self._EfCache)
