@@ -60,8 +60,9 @@ class CutPlotterPresenter(PresenterUtility):
     def plot_cut_from_workspace(self, workspace, intensity_range=None, plot_over=False):
 
         workspace = get_workspace_handle(workspace)
-        plot_cut_impl(workspace, self, workspace.raw_ws.getDimension(0).getUnits(), intensity_range=intensity_range,
-                      plot_over=plot_over)
+        manager = plot_cut_impl(workspace, self, workspace.raw_ws.getDimension(0).getUnits(),
+                                intensity_range=intensity_range, plot_over=plot_over)
+        return manager
 
     def plot_interactive_cut(self, workspace, cut_axis, integration_axis, store):
         workspace = get_workspace_handle(workspace)

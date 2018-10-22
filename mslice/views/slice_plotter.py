@@ -22,6 +22,8 @@ def create_slice_figure(workspace_name, presenter):
     fig_canvas.manager.update_grid()
     plt.draw_all()
 
+    return fig_canvas.manager
+
 
 @plt.set_category(plt.CATEGORY_SLICE)
 def _show_plot(slice_cache, workspace):

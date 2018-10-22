@@ -51,6 +51,7 @@ def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.manager.add_cut_plot(presenter, workspace.name.rsplit('_', 1)[0])
     cur_fig.canvas.draw()
+    return cur_fig.canvas.manager
 
 
 def _create_cut():
