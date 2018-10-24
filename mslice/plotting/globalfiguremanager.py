@@ -71,6 +71,17 @@ class GlobalFigureManager(object):
         cls._figures_by_category[category].remove(num)
         del cls._figures[num]
 
+    @classmethod
+    def get_figure_by_number(cls, num):
+        """
+        Returns the figure with figure number num
+        :param num: The assigned figure number
+        :return: The figure with figure number num
+        """
+        if cls.has_fignum(num):
+            return cls._figures[num]
+        else:
+            return None
 
     @classmethod
     def destroy_fig(cls, fig):

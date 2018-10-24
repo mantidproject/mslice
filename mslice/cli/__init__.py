@@ -8,6 +8,7 @@ from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.plotting.cli_helperfunctions import _check_workspace_type, _check_workspace_name
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.plotting.plot_window.slice_plot import SlicePlot
 
 # Imports for mslice projections
 from matplotlib.axes import Axes
@@ -35,6 +36,7 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     global CLI_SLICE_PLOTTER_PRESENTER
     global current_figure_number
     global figure_manager
+
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, HistogramWorkspace)
@@ -65,6 +67,7 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     global CLI_CUT_PLOTTER_PRESENTER
     global figure_manager
     global current_figure_number
+
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, HistogramWorkspace):
@@ -98,6 +101,81 @@ def MakeCurrent(figure_number=None):
         figure_manager.set_figure_as_current(figure_number)
     else:
         figure_manager.set_figure_as_current(current_figure_number)
+
+
+def ConvertToChi(figure_number):
+    """
+    Converts to the Dynamical susceptibility Chi''(Q,E) on Slice Plot
+    :param figure_number: The slice plot figure number returned when the plot was made.
+    :return:
+    """
+    global figure_manager
+
+    plot_handler = figure_manager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_chi_qe.trigger()
+    else:
+        print('This function cannot be used on a Cut')
+
+
+def ConvertToChiMag(figure_number):
+    """
+        Converts to the magnetic dynamical susceptibility Chi''(Q,E magnetic on Slice Plot
+        :param figure_number: The slice plot figure number returned when the plot was made.
+        :return:
+        """
+    global figure_manager
+
+    plot_handler = figure_manager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_chi_qe_magnetic.trigger()
+    else:
+        print('This function cannot be used on a Cut')
+
+
+def ConvertToCrossSection(figure_number):
+    """
+        Converts to the double differential cross-section d2sigma/dOmega.dE  on Slice Plot
+        :param figure_number: The slice plot figure number returned when the plot was made.
+        :return:
+        """
+    global figure_manager
+
+    plot_handler = figure_manager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_d2sig_dw_de.trigger()
+    else:
+        print('This function cannot be used on a Cut')
+
+
+def SymmetriseSQE(figure_number):
+    """
+        Converts to the double differential cross-section d2sigma/dOmega.dE  on Slice Plot
+        :param figure_number: The slice plot figure number returned when the plot was made.
+        :return:
+        """
+    global figure_manager
+
+    plot_handler = figure_manager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_symmetrised_sqe.trigger()
+    else:
+        print('This function cannot be used on a Cut')
+
+
+def ConvertToGDOS(figure_number):
+    """
+        Converts to symmetrised S(Q,E) (w.r.t. energy using temperature Boltzmann factor) on Slice Plot
+        :param figure_number: The slice plot figure number returned when the plot was made.
+        :return:
+        """
+    global figure_manager
+
+    plot_handler = figure_manager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_gdos.trigger()
+    else:
+        print('This function cannot be used on a Cut')
 
 
 class MSliceAxes(Axes):
