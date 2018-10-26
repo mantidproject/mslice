@@ -329,15 +329,13 @@ class SlicePlot(IPlot):
         return True
 
     def ask_sample_temperature_field(self, ws_name):
+        text = 'Sample Temperature not found. Select the sample temperature field or enter a value in Kelvin:'
         ws = get_workspace_handle(ws_name)
         try:
             keys = ws.raw_ws.run().keys()
         except AttributeError:
             keys = ws.raw_ws.getExperimentInfo(0).run().keys()
-        temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_window, 'Sample Temperature',
-                                                             'Sample Temperature not found. Select the sample ' +
-                                                             'temperature field or enter a value in Kelvin:',
-                                                             keys)
+        temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_window, 'Sample Temperature', text, keys)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
