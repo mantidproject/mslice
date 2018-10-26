@@ -35,7 +35,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.txtpath.setText(path)
         self.table_view.setColumnWidth(0, 320)
         self.table_view.setColumnWidth(1, 0)
-        self.table_view.setColumnWidth(4, 0)
+        self.table_view.setColumnWidth(3, 140)
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._presenter = DataLoaderPresenter(self)
         self.btnload.setEnabled(False)
@@ -142,8 +142,8 @@ class DataLoaderWidget(QWidget):  # and some view interface
             self._display_error('File %s has not been loaded' % filename)
 
     def confirm_overwrite_workspace(self):
-        text = 'The workspace you want to load has the same name as and existing workspace. ' \
-                  'Are you sure you want to overwrite it?'
+        text = 'The workspace you want to load has the same name as and existing workspace.' \
+               'Are you sure you want to overwrite it?'
         reply = QMessageBox.question(self,'Confirm Overwrite', text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             return True
