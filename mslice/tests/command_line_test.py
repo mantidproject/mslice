@@ -6,7 +6,8 @@ import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 
-from mslice.cli._mslice_commands import Load, MakeProjection, Slice, Cut, PlotSlice, PlotCut
+from mslice.cli._mslice_commands import Load, MakeProjection, Slice, Cut
+from mslice.cli.__init__ import PlotCut, PlotSlice
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
@@ -62,7 +63,6 @@ class CommandLineTest(unittest.TestCase):
         workspace = wrap_workspace(workspace, name)
         workspace.is_PSD = True
         return workspace
-
 
     @mock.patch('mslice.cli._mslice_commands.get_workspace_handle')
     @mock.patch('mslice.cli._mslice_commands.app')
