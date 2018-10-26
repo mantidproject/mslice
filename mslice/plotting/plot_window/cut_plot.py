@@ -2,7 +2,6 @@ from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 import warnings
 import numpy as np
-import copy
 
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
