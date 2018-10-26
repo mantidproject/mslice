@@ -1,10 +1,10 @@
-'''Module to create axis and legend labels'''
+"""Module to create axis and legend labels"""
 
 from __future__ import (absolute_import, division, print_function)
 from mslice.util import MPL_COMPAT
 
 CUT_INTENSITY_LABEL = 'Signal/#Events'
-recoil_labels={1:'Hydrogen', 2:'Deuterium', 4:'Helium'}
+recoil_labels = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium'}
 
 # unit labels for projections
 MOD_Q_LABEL = '|Q|'
