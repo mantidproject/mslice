@@ -139,13 +139,12 @@ class DataLoaderWidget(QWidget):  # and some view interface
         if filename is None:
             self._display_error('No new workspaces have been loaded')
         else:
-            self._display_error('File %s has not been loaded' % (filename))
+            self._display_error('File %s has not been loaded' % filename)
 
     def confirm_overwrite_workspace(self):
-        reply = QMessageBox.question(self,'Confirm Overwrite',
-                                     'The workspace you want to load has the same name as '
-                                     'an existing workspace, Are you sure you want to overwrite it? ',
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        text = 'The workspace you want to load has the same name as and existing workspace. ' \
+                  'Are you sure you want to overwrite it?'
+        reply = QMessageBox.question(self,'Confirm Overwrite', text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             return True
         else:
