@@ -1,5 +1,4 @@
-"""Defines the additional mslice commands on top of the standard matplotlib plotting commands
-"""
+"""Defines the additional mslice commands on top of the standard matplotlib plotting commands"""
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------

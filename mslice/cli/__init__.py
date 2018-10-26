@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import mantid.kernel
 
-from ._mslice_commands import *
+from ._mslice_commands import app, DEFAULT_CMAP, get_workspace_handle
 from mslice.plotting.cli_helperfunctions import is_slice, is_cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
