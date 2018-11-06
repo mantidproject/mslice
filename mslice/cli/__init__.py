@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import mantid.kernel
 
-from ._mslice_commands import app, DEFAULT_CMAP, get_workspace_handle
+from ._mslice_commands import app, DEFAULT_CMAP, get_workspace_handle, Load, Cut, Slice
 from mslice.plotting.cli_helperfunctions import is_slice, is_cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
@@ -50,7 +50,8 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
 
     figure_manager = manager._current_figs
     current_figure_number = manager.number
-    return manager
+
+    return current_figure_number
 
 
 def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
@@ -80,27 +81,18 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
                                                                 plot_over=PlotOver)
     figure_manager = manager._current_figs
     current_figure_number = manager.number
-    return manager
+
+    return current_figure_number
 
 
 def KeepFigure(figure_number=None):
     global figure_manager
-    global current_figure_number
-
-    if figure_number is not None:
-        figure_manager.set_figure_as_kept(figure_number)
-    else:
-        figure_manager.set_figure_as_kept(current_figure_number)
+    figure_manager.set_figure_as_kept(figure_number)
 
 
 def MakeCurrent(figure_number=None):
     global figure_manager
-    global current_figure_number
-
-    if figure_number is not None:
-        figure_manager.set_figure_as_current(figure_number)
-    else:
-        figure_manager.set_figure_as_current(current_figure_number)
+    figure_manager.set_figure_as_current(figure_number)
 
 
 def ConvertToChi(figure_number):
