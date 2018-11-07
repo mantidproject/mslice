@@ -391,7 +391,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def width(self):
-        return self.line_width.currentText()
+        return int(self.line_width.currentText())
 
     @property
     def marker(self):
