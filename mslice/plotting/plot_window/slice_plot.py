@@ -7,6 +7,7 @@ import os.path as path
 import matplotlib.colors as colors
 from matplotlib.lines import Line2D
 
+from mslice.models.colors import to_hex
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -178,14 +179,16 @@ class SlicePlot(IPlot):
             self.colorbar_label = label
 
     def get_line_options(self, target):
-        line_options = {}
-        line_options['label'] = target.get_label()
-        line_options['legend'] = None
-        line_options['shown'] = None
-        line_options['color'] = target.get_color()
-        line_options['style'] = target.get_linestyle()
-        line_options['width'] = str(int(target.get_linewidth()))
-        line_options['marker'] = target.get_marker()
+        line_options = {
+            'label': target.get_label(),
+            'legend': None,
+            'shown': None,
+            'color': to_hex(target.get_color()),
+            'style': target.get_linestyle(),
+            'width': str(int(target.get_linewidth())),
+            'marker': target.get_marker(),
+            'error_bar': None
+        }
         return line_options
 
     def set_line_options(self, line, line_options):
