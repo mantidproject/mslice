@@ -31,9 +31,9 @@ class SlicePlotterPresenter(PresenterUtility):
 
     def plot_from_cache(self, workspace):
         ws_name = workspace.name.lstrip('__')
-        manager = create_slice_figure(ws_name, self)
-        self.show_scattering_function(ws_name)
-        return manager
+        create_slice_figure(ws_name, self)
+        quadmesh = self.show_scattering_function(ws_name)
+        return quadmesh
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):
         workspace_name = workspace_name.lstrip('__')
@@ -58,7 +58,8 @@ class SlicePlotterPresenter(PresenterUtility):
 
     def show_scattering_function(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
-        plot_cached_slice(slice_cache, slice_cache.scattering_function)
+        quadmesh = plot_cached_slice(slice_cache, slice_cache.scattering_function)
+        return quadmesh
 
     def show_dynamical_susceptibility(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]

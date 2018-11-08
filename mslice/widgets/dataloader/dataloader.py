@@ -13,7 +13,8 @@ from .inputdialog import EfInputDialog
 
 MSLICE_EXTENSIONS = ['*.nxs', '*.nxspe', '*.txt', '*.xye']
 
-class DataLoaderWidget(QWidget): # and some view interface
+
+class DataLoaderWidget(QWidget):  # and some view interface
 
     error_occurred = Signal('QString')
     busy = Signal(bool)
