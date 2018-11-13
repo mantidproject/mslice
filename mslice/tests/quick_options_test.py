@@ -66,12 +66,13 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
-            {'shown': None, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
-             'marker': 'o', 'legend': None})
+            {'shown': None, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3',
+             'marker': 'o', 'legend': None, 'error_bar': None})
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
-                             {'shown': None, 'color': 'blue', 'label': u'label2',
-                              'style': '--', 'width': '5', 'marker': '.', 'legend': None})
+                             {'shown': None, 'color': '#0000ff', 'label': u'label2',
+                              'style': '--', 'width': '5', 'marker': '.', 'legend': None,
+                              'error_bar': None})
 
     @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
     def test_line_cut(self, qlo_mock):
@@ -93,11 +94,11 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
-            {'shown': True, 'color': 'red', 'label': u'label1', 'style': '-', 'width': '3',
+            {'shown': True, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3',
              'marker': 'o', 'legend': True, 'error_bar': False})
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
-                             {'shown': True, 'color': 'blue', 'label': u'label2',
+                             {'shown': True, 'color': '#0000ff', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': True, 'error_bar': False})
 
     @patch.object(QuickAxisOptions, '__init__', lambda v, w, x, y, z: None)

@@ -1,9 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
 
-import mslice.util.qt.QtWidgets as QtWidgets
-from mslice.util.qt.QtCore import Signal
 from six import iteritems
 
+import mslice.util.qt.QtWidgets as QtWidgets
+from mslice.models.colors import named_cycle_colors, color_to_name
+from mslice.util.qt.QtCore import Signal
 from mslice.util.qt import load_ui
 
 
@@ -226,15 +227,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     """This is a widget that has various legend and line controls for each line of a plot"""
 
     # dictionaries used to convert from matplotlib arguments to UI selection and vice versa
-    import matplotlib
-    if matplotlib.__version__.startswith('1'):
-        colors = {'b': 'Blue', 'g': 'Green', 'r': 'Red', 'c': 'Cyan', 'm': 'Magenta', 'y': 'Yellow',
-                  'k': 'Black', 'w': 'White'}
-    else:
-        colors = {'#1f77b4': 'Blue', '#ff7f0e': 'Orange', '#2ca02c': 'Green', '#d62728': 'Red',
-                  '#9467bd': 'Purple', '#8c564b': 'Brown', '#e377c2': 'Pink', '#7f7f7f': 'Grey',
-                  '#bcbd22': 'Olive', '#17becf': 'Cyan'}
-
     styles = {'-': 'Solid', '--': 'Dashed', '-.': 'Dashdot', ':': 'Dotted'}
 
     markers = {'o': 'Circle', ',': 'Pixel', '.': 'Point', 'v': 'Triangle down', '^': 'Triangle up',
@@ -243,7 +235,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
                     '*': 'Star', 'h': 'Hexagon 1', 'H': 'Hexagon 2', '+': 'Plus', 'x': 'X', 'D': 'Diamond',
                     'd': 'Diamond (thin)', '|': 'Vertical line', '_': 'Horizontal line', 'None': 'None'}
 
-    inverse_colors = {v: k for k, v in iteritems(colors)}
     inverse_styles = {v: k for k, v in iteritems(styles)}
     inverse_markers = {v: k for k, v in iteritems(markers)}
 
@@ -258,9 +249,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         self.color_label = QtWidgets.QLabel(self)
         self.color_label.setText("Color:")
         self.line_color = QtWidgets.QComboBox(self)
-        self.line_color.addItems(list(self.colors.values()))
-        chosen_color_as_string = self.colors[line_options['color'].lower()]
-        self.line_color.setCurrentIndex(self.line_color.findText(chosen_color_as_string))
+        self.line_color.addItems(named_cycle_colors())
+        self.line_color.setCurrentIndex(self.line_color.findText(color_to_name(line_options['color'])))
         self.previous_color = self.line_color.currentIndex()
 
         self.style_label = QtWidgets.QLabel(self)
@@ -304,13 +294,16 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         row3.addWidget(self.marker_label)
         row3.addWidget(self.line_marker)
 
-        self.error_bar_checkbox = QtWidgets.QCheckBox("Show Error Bars")
-        self.error_bar_checkbox.setChecked(line_options['error_bar'])
+        if line_options['error_bar'] is not None:
+            self.error_bar_checkbox = QtWidgets.QCheckBox("Show Error Bars")
+            self.error_bar_checkbox.setChecked(line_options['error_bar'])
+            self.error_bar_checkbox.setEnabled(line_options['shown'])
 
-        row4 = QtWidgets.QHBoxLayout()
-        layout.addLayout(row4)
-
-        row4.addWidget(self.error_bar_checkbox)
+            row4 = QtWidgets.QHBoxLayout()
+            layout.addLayout(row4)
+            row4.addWidget(self.error_bar_checkbox)
+        else:
+            self.error_bar_checkbox = None
 
         if line_options['shown'] is not None and line_options['legend'] is not None:
             self.show_line = QtWidgets.QCheckBox("Show Line")
@@ -334,8 +327,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
-
-        self.error_bar_checkbox.setEnabled(line_options['shown'])
 
         separator = QtWidgets.QFrame()
         separator.setFrameShape(QtWidgets.QFrame.HLine)
@@ -363,7 +354,10 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def error_bar(self):
-        return self.error_bar_checkbox.isChecked()
+        if self.error_bar_checkbox is None:
+            return None
+        else:
+            return self.error_bar_checkbox.isChecked()
 
     @property
     def legend(self):
@@ -383,7 +377,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def color(self):
-        return self.inverse_colors[str(self.line_color.currentText())]
+        return self.line_color.currentText()
 
     @property
     def style(self):
@@ -391,7 +385,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def width(self):
-        return self.line_width.currentText()
+        return int(self.line_width.currentText())
 
     @property
     def marker(self):

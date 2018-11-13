@@ -3,6 +3,7 @@ from matplotlib.legend import Legend
 import warnings
 import numpy as np
 
+from mslice.models.colors import to_hex
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
@@ -153,17 +154,18 @@ class CutPlot(IPlot):
         return sum(alpha) != 0
 
     def get_line_options_by_index(self, line_index):
-        line_options = {}
         container = self._canvas.figure.gca().containers[line_index]
         line = container.get_children()[0]
-        line_options['label'] = container.get_label()
-        line_options['legend'] = self.legend_visible(line_index)
-        line_options['shown'] = self.get_line_visible(line_index)
-        line_options['color'] = line.get_color()
-        line_options['style'] = line.get_linestyle()
-        line_options['width'] = str(int(line.get_linewidth()))
-        line_options['marker'] = line.get_marker()
-        line_options['error_bar'] = self._single_line_has_error_bars(line_index)
+        line_options = {
+            'label': container.get_label(),
+            'legend': self.legend_visible(line_index),
+            'shown': self.get_line_visible(line_index),
+            'color': to_hex(line.get_color()),
+            'style': line.get_linestyle(),
+            'width': str(int(line.get_linewidth())),
+            'marker': line.get_marker(),
+            'error_bar': self._single_line_has_error_bars(line_index)
+        }
         return line_options
 
     def set_line_options_by_index(self, line_index, line_options):
