@@ -13,7 +13,7 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
     def __init__(self, powder_view, projection_calculator):
         self._powder_view = powder_view
         self._projection_calculator = projection_calculator
-        if not isinstance(self._powder_view,PowderView):
+        if not isinstance(self._powder_view, PowderView):
             raise TypeError("powder_view is not of type PowderView")
         if not isinstance(self._projection_calculator,ProjectionCalculator):
             raise TypeError("projection_calculator is not of type ProjectionCalculator")

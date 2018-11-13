@@ -20,20 +20,23 @@ from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
-from mslice.widgets.dataloader.dataloader import DataLoaderWidget
-from mslice.widgets.projection.powder.powder import PowderWidget
+from mslice.cli.cli_data_loader import CLIDataLoaderWidget
+from mslice.presenters.data_loader_presenter import DataLoaderPresenter
+from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
+from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
+from mslice.cli.cli_powder import CLIPowderWidget
+
 
 # Separate presenters for cli
 cli_cut_plotter_presenter = CutPlotterPresenter()
 cli_slice_plotter_presenter = SlicePlotterPresenter()
-cli_data_loader_presenter = DataLoaderWidget().get_presenter()
-cli_powder_presenter = PowderWidget().get_presenter()
+cli_data_loader_presenter = DataLoaderPresenter(CLIDataLoaderWidget())
+cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), ProjectionCalculator())
 
 # Define cli mainwindow alternative
 cli_presenter = {'cli_cut_plotter_presenter': cli_cut_plotter_presenter,
                  'cli_slice_plotter_presenter': cli_slice_plotter_presenter,
                  'cli_data_loader_presenter': cli_data_loader_presenter,
-                 'cli_powder_presenter': cli_powder_presenter,
                  }
 
 
@@ -56,7 +59,7 @@ def Load(path):
     if is_gui():
         app.MAIN_WINDOW.dataloader_presenter.load_workspace([path])
     else:
-        cli_presenter['dataloader_presenter'].load_workspace([path])
+        cli_presenter['cli_data_loader_presenter'].load_workspace([path])
 
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
@@ -79,8 +82,8 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
         proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
         app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
     else:
-        proj_ws = cli_presenter['powder_presenter'].calc_projection(InputWorkspace, Axis1, Axis2, Units)
-        cli_presenter['powder_presenter'].after_projection([proj_ws])
+        proj_ws = cli_presenter['cli_powder_presenter'].calc_projection(InputWorkspace, Axis1, Axis2, Units)
+        cli_presenter['cli_powder_presenter'].after_projection([proj_ws])
 
     return proj_ws
 
