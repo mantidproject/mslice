@@ -5,8 +5,7 @@ import mantid.kernel
 from mslice.cli.cli_helperfunctions import is_slice, is_cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
-from mslice.cli.cli_helperfunctions import _check_workspace_type, _check_workspace_name
-from mslice.cli._mslice_commands import *
+from mslice.cli._mslice_commands import *  # noqa: F401
 
 # Imports for mslice projections
 from matplotlib.axes import Axes

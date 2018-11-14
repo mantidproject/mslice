@@ -87,7 +87,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
     if is_gui():
         return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
-                                                                DEFAULT_CMAP)
+                                                                    DEFAULT_CMAP)
     else:
         pass
 
