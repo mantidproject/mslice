@@ -15,7 +15,7 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         self._projection_calculator = projection_calculator
         if not isinstance(self._powder_view, PowderView):
             raise TypeError("powder_view is not of type PowderView")
-        if not isinstance(self._projection_calculator,ProjectionCalculator):
+        if not isinstance(self._projection_calculator, ProjectionCalculator):
             raise TypeError("projection_calculator is not of type ProjectionCalculator")
 
         #Add rest of options

@@ -56,9 +56,10 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                         allChecked = self.check_efixed(ws_name, multi)
                     else:
                         get_workspace_handle(ws_name).e_fixed = self._EfCache
-                    self._main_presenter.show_workspace_manager_tab()
-                    self._main_presenter.update_displayed_workspaces()
-                    self._main_presenter.show_tab_for_workspace(get_workspace_handle(ws_name))
+                    if self._main_presenter is not None:
+                        self._main_presenter.show_workspace_manager_tab()
+                        self._main_presenter.update_displayed_workspaces()
+                        self._main_presenter.show_tab_for_workspace(get_workspace_handle(ws_name))
         self._report_load_errors(ws_names, not_opened, not_loaded)
 
     def file_types_match(self, selected_files):

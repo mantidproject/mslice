@@ -18,26 +18,7 @@ from mslice.cli.cli_helperfunctions import \
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
-from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
-from mslice.cli.cli_data_loader import CLIDataLoaderWidget
-from mslice.presenters.data_loader_presenter import DataLoaderPresenter
-from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
-from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
-from mslice.cli.cli_powder import CLIPowderWidget
-
-
-# Separate presenters for cli
-cli_cut_plotter_presenter = CutPlotterPresenter()
-cli_slice_plotter_presenter = SlicePlotterPresenter()
-cli_data_loader_presenter = DataLoaderPresenter(CLIDataLoaderWidget())
-cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), ProjectionCalculator())
-
-# Define cli mainwindow alternative
-cli_presenter = {'cli_cut_plotter_presenter': cli_cut_plotter_presenter,
-                 'cli_slice_plotter_presenter': cli_slice_plotter_presenter,
-                 'cli_data_loader_presenter': cli_data_loader_presenter,
-                 }
+from mslice.cli.cli_mslice_projection_functions import cli_presenter
 
 
 # -----------------------------------------------------------------------------
@@ -276,16 +257,3 @@ def ConvertToGDOS(figure_number):
         plot_handler.plot_window.action_gdos.trigger()
     else:
         print('This function cannot be used on a Cut')
-
-
-if '__name__' == '__main__':
-    import matplotlib.pyplot as plt
-
-    fig, ax = plt.subplots(subplot_kw={'projection': 'mslice'})
-    ws = Load("C:/Users/qzp95127/Documents/Work/mslice_test_data/MAR21335_Ei60.00meV.nxs")
-    cut_ws = Cut(ws)
-    slice_ws = Slice(ws)
-    p1 = ax.plot(cut_ws)
-    p2 = ax.pcolormesh(slice_ws)
-    f1 = PlotCut(cut_ws)
-    f2 = PlotSlice(slice_ws)
