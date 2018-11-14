@@ -26,12 +26,19 @@ class MatplotlibCutPlotter(CutPlotter):
     @plt.set_category(plt.CATEGORY_CUT)
     def plot_cut_from_xye(self, x, y, e, x_units, selected_workspace, intensity_range=None, plot_over=False,
                           cut_ws_name=None, legend=None):
+        # get/create figure and ensure the axes are setup
+        cur_fig = plt.gcf()
+        try:
+            cur_axes = cur_fig.axes[0]
+            if not plot_over:
+                cur_axes.cla()
+        except IndexError:
+            cur_axes = cur_fig.add_subplot(1, 1, 1, projection='mantid')
+
         legend = selected_workspace if legend is None else legend
         if not plot_over:
             plt.cla()
-        plt.errorbar(x, y, yerr=e, label=legend, marker='o', picker=PICKER_TOL_PTS)
-        cur_fig = plt.gcf()
-        cur_axes = cur_fig.gca()
+        cur_axes.errorbar(x, y, yerr=e, label=legend, marker='o', picker=PICKER_TOL_PTS)
         cur_axes.set_ylim(*intensity_range) if intensity_range is not None else cur_axes.autoscale()
         cur_canvas = cur_fig.canvas
         if cur_canvas.manager.window.action_toggle_legends.isChecked():
