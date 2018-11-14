@@ -69,8 +69,8 @@ class MatplotlibSlicePlotter(SlicePlotter):
         # labels
         plot_axes.set_xlabel(get_display_name(x_axis.units, comment), picker=PICKER_TOL_PTS)
         plot_axes.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
-        plot_axes.set_xlim(x_axis.start)
-        plot_axes.set_ylim(y_axis.start)
+        plot_axes.set_xlim(x_axis.start, x_axis.end)
+        plot_axes.set_ylim(y_axis.start, y_axis.end)
         plot_axes.get_xaxis().set_units(x_axis.units)
         plot_axes.get_yaxis().set_units(y_axis.units)
 
