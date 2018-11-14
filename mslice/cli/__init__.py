@@ -7,8 +7,6 @@ from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.cli.cli_helperfunctions import _check_workspace_type, _check_workspace_name
 from mslice.cli._mslice_commands import *
-from mslice.presenters.data_loader_presenter import DataLoaderPresenter
-from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 
 # Imports for mslice projections
 from matplotlib.axes import Axes
