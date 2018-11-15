@@ -6,8 +6,8 @@ import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 
-from mslice.cli._mslice_commands import Load, MakeProjection, Slice, Cut
-from mslice.cli.__init__ import PlotCut, PlotSlice
+from mslice.cli.__init__ import cli_cut_plotter_presenter, cli_slice_plotter_presenter
+from mslice.cli._mslice_commands import Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
@@ -171,18 +171,18 @@ class CommandLineTest(unittest.TestCase):
         app_mock.MAIN_WINDOW.slice_plotter_presenter = SlicePlotterPresenter()
         app_mock.MAIN_WINDOW.slice_plotter_presenter.plot_from_cache = mock.Mock()
         workspace = self.create_pixel_workspace('test_plot_slice_cli')
-        slice = Slice(workspace)
-        PlotSlice(slice)
-        app_mock.MAIN_WINDOW.slice_plotter_presenter.plot_from_cache.assert_called_once_with(slice)
+        slice_ws = Slice(workspace)
+        PlotSlice(slice_ws)
+        cli_slice_plotter_presenter.plot_from_cache.assert_called_once_with(slice_ws)
 
     @mock.patch('mslice.cli._mslice_commands.app')
     def test_plot_slice_non_psd(self, app_mock):
         app_mock.MAIN_WINDOW.slice_plotter_presenter = SlicePlotterPresenter()
         app_mock.MAIN_WINDOW.slice_plotter_presenter.plot_from_cache = mock.Mock()
         workspace = self.create_workspace('test_plot_slice_non_psd_cli')
-        slice = Slice(workspace)
-        PlotSlice(slice)
-        app_mock.MAIN_WINDOW.slice_plotter_presenter.plot_from_cache.assert_called_once_with(slice)
+        slice_ws = Slice(workspace)
+        PlotSlice(slice_ws)
+        cli_slice_plotter_presenter.plot_from_cache.assert_called_once_with(slice_ws)
 
     @mock.patch('mslice.cli._mslice_commands.app')
     def test_plot_cut(self, app_mock):
@@ -192,7 +192,7 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_pixel_workspace('test_plot_cut_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        app_mock.MAIN_WINDOW.cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut,
+        cli_cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut,
                                                                                                    intensity_range=None,
                                                                                                    plot_over=False)
 
@@ -204,6 +204,6 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        app_mock.MAIN_WINDOW.cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut,
+        cli_cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut,
                                                                                                    intensity_range=None,
                                                                                                    plot_over=False)

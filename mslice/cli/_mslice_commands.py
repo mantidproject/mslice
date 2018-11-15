@@ -13,7 +13,7 @@ from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cmap import DEFAULT_CMAP
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.cli.cli_helperfunctions import \
-    _string_to_integration_axis, _process_axis, _check_workspace_name, _check_workspace_type, is_gui
+    _string_to_integration_axis, _process_axis, _check_workspace_name, _check_workspace_type
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
@@ -34,10 +34,7 @@ def Load(path):
         raise RuntimeError('path given to load must be a string')
     if not ospath.exists(path):
         raise RuntimeError('could not find the path %s' % path)
-    if is_gui():
-        app.MAIN_WINDOW.dataloader_presenter.load_workspace([path])
-    else:
-        pass
+    app.MAIN_WINDOW.dataloader_presenter.load_workspace([path])
 
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
@@ -56,11 +53,8 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
 
     _check_workspace_name(InputWorkspace)
 
-    if is_gui():
-        proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
-        app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
-    else:
-        pass
+    proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
+    app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
     return proj_ws
 
 
@@ -85,11 +79,8 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     _check_workspace_type(workspace, PixelWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
-    if is_gui():
-        return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
-                                                                    DEFAULT_CMAP)
-    else:
-        pass
+    return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
+                                                                DEFAULT_CMAP)
 
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
@@ -115,10 +106,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, store=True)
-    if is_gui():
-        app.MAIN_WINDOW.cut_plotter_presenter.update_main_window()
-    else:
-        pass
+    app.MAIN_WINDOW.cut_plotter_presenter.update_main_window()
     return cut
 
 
@@ -142,10 +130,7 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     slice_presenter = cli_slice_plotter_presenter
 
     # slice cache needed from main slice plotter presenter
-    if is_gui():
-        slice_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
-    else:
-        pass
+    slice_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
     slice_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
     slice_presenter.change_colourmap(workspace.name, Colormap)
     slice_presenter.plot_from_cache(workspace)
