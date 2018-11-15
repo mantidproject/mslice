@@ -192,9 +192,8 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_pixel_workspace('test_plot_cut_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        cli_cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut,
-                                                                                                   intensity_range=None,
-                                                                                                   plot_over=False)
+        cli_cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None,
+                                                                                  plot_over=False)
 
     @mock.patch('mslice.cli._mslice_commands.app')
     def test_plot_cut_non_psd(self, app_mock):
@@ -204,6 +203,5 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        cli_cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut,
-                                                                                                   intensity_range=None,
-                                                                                                   plot_over=False)
+        cli_cut_plotter_presenter.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None,
+                                                                                  plot_over=False)
