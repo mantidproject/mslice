@@ -35,7 +35,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
         if axis1 != DELTA_E_LABEL and axis2 != DELTA_E_LABEL:
             raise NotImplementedError("Must have a '%s' axis" % DELTA_E_LABEL)
         if (axis1 == MOD_Q_LABEL or axis2 == MOD_Q_LABEL):
-            projection_type='QE'
+            projection_type = 'QE'
             output_workspace_name = workspace.name + ('_QE' if axis1 == MOD_Q_LABEL else '_EQ')
         elif (axis1 == THETA_LABEL or axis2 == THETA_LABEL):
             projection_type='Theta'

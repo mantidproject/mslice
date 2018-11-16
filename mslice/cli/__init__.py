@@ -1,20 +1,19 @@
 from __future__ import (absolute_import, division, print_function)
 
 import mantid.kernel
-
-from mslice.cli.cli_helperfunctions import is_slice, is_cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
-from mslice.cli._mslice_commands import *  # noqa: F401
+from mslice.cli.cli_helperfunctions import is_slice, is_cut
 
 # Imports for mslice projections
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
 
-
 # Separate presenters for cli
 cli_cut_plotter_presenter = CutPlotterPresenter()
 cli_slice_plotter_presenter = SlicePlotterPresenter()
+
+from mslice.cli._mslice_commands import *  # noqa: F401
 
 
 # MSlice Matplotlib Projection

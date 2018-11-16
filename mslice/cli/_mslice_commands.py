@@ -17,11 +17,12 @@ from mslice.cli.cli_helperfunctions import \
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-
+from mslice.cli import cli_cut_plotter_presenter, cli_slice_plotter_presenter
 
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
+
 
 def Load(path):
     """
@@ -52,7 +53,6 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
     """
 
     _check_workspace_name(InputWorkspace)
-
     proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
     app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
     return proj_ws
@@ -122,12 +122,12 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     :return:
     """
 
-    from . import cli_slice_plotter_presenter
+    slice_presenter = cli_slice_plotter_presenter
+
 
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, HistogramWorkspace)
-    slice_presenter = cli_slice_plotter_presenter
 
     # slice cache needed from main slice plotter presenter
     slice_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
@@ -149,7 +149,8 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     :param PlotOver: if true the cut will be plotted on an existing figure.
     :return:
     """
-    from . import cli_cut_plotter_presenter
+
+    cut_presenter = cli_cut_plotter_presenter
 
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
@@ -159,8 +160,8 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
         intensity_range = None
     else:
         intensity_range = (IntensityStart, IntensityEnd)
-    cli_cut_plotter_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range,
-                                                      plot_over=PlotOver)
+    cut_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range,
+                                          plot_over=PlotOver)
 
     return GlobalFigureManager._active_figure
 
