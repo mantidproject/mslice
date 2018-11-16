@@ -17,7 +17,6 @@ from mslice.workspace import wrap_workspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
-from mslice.app.qpp import create_qapp, close
 
 
 class CommandLineTest(unittest.TestCase):
