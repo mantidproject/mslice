@@ -16,5 +16,3 @@ def create_qapp():
 def show():
     if qApp is not None:
         return qApp.exec_()
-
-
