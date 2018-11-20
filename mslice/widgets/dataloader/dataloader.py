@@ -144,7 +144,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
     def confirm_overwrite_workspace(self):
         text = 'The workspace you want to load has the same name as an existing workspace,' \
                'Are you sure you want to overwrite it?'
-        reply = QMessageBox.question(self, 'Confirm Overwrite', text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(self,'Confirm Overwrite', text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             return True
         else:
