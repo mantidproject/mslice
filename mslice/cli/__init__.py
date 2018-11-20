@@ -4,14 +4,13 @@ import mantid.kernel
 
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
-from mslice.cli.cli_helperfunctions import _check_workspace_type, _check_workspace_name, is_slice, is_cut, is_gui
-
-from mslice.cli._mslice_commands import *  # noqa: F401
+from mslice.cli.cli_helperfunctions import is_slice, is_cut
+from mslice.app import qpp
 
 
 # Show function to keep event loop running
 def show():
-    app.qpp.show()
+    qpp.show()
 
 
 # MSlice Matplotlib Projection

@@ -1,14 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.util.qt.QtCore import Signal, QDir, Qt
-
 MSLICE_EXTENSIONS = ['*.nxs', '*.nxspe', '*.txt', '*.xye']
 
 
 class CLIDataLoaderWidget:
-    #error_occurred = Signal('QString')
-
-    #busy = Signal(bool)
 
     def __init__(self):
         pass
