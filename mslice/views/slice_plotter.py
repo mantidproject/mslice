@@ -41,8 +41,8 @@ def _show_plot(slice_cache, workspace):
     # labels
     ax.set_xlabel(get_display_name(x_axis.units, comment), picker=PICKER_TOL_PTS)
     ax.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
-    ax.set_xlim(x_axis.start)
-    ax.set_ylim(y_axis.start)
+    ax.set_xlim(x_axis.start, x_axis.end)
+    ax.set_ylim(y_axis.start, y_axis.end)
     cb = plt.colorbar(image, ax=ax)
     cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
 

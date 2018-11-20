@@ -35,7 +35,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.txtpath.setText(path)
         self.table_view.setColumnWidth(0, 320)
         self.table_view.setColumnWidth(1, 0)
-        self.table_view.setColumnWidth(3, 0)
+        self.table_view.setColumnWidth(3, 140)
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._presenter = DataLoaderPresenter(self)
         self.btnload.setEnabled(False)
@@ -57,7 +57,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
             event.accept()
 
     def activated(self, file_clicked):
-        file_clicked = file_clicked.sibling(file_clicked.row(), 0) # so clicking anywhere on row gives filename
+        file_clicked = file_clicked.sibling(file_clicked.row(), 0)  # so clicking anywhere on row gives filename
         if self.file_system.isDir(file_clicked):
             self.enter_dir(self.file_system.fileName(file_clicked))
         else:
@@ -139,7 +139,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         if filename is None:
             self._display_error('No new workspaces have been loaded')
         else:
-            self._display_error('File %s has not been loaded' % (filename))
+            self._display_error('File %s has not been loaded' % filename)
 
     def confirm_overwrite_workspace(self):
         text = 'The workspace you want to load has the same name as an existing workspace,' \

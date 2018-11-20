@@ -27,4 +27,5 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
         new_ws.e_mode = self.e_mode
         new_ws.e_fixed = self.e_fixed
         new_ws.ef_defined = self.ef_defined
+        new_ws.limits = self.limits
         return new_ws
