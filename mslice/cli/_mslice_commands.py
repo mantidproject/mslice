@@ -7,7 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
-
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.cut.cut_functions import compute_cut
@@ -18,12 +17,25 @@ from mslice.cli.cli_helperfunctions import \
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.cli.cli_mslice_projection_functions import cli_presenter
 
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
+from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
+from mslice.cli.cli_helper_classes.cli_data_loader import CLIDataLoaderWidget
+from mslice.presenters.data_loader_presenter import DataLoaderPresenter
+from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
+from mslice.cli.cli_helper_classes.cli_powder import CLIPowderWidget
+from mslice.cli.cli_helper_classes.cli_projection_calculator import CLIProjectionCalculator
+
+# Separate presenters for cli
+cli_cut_plotter_presenter = CutPlotterPresenter()
+cli_slice_plotter_presenter = SlicePlotterPresenter()
+cli_data_loader_presenter = DataLoaderPresenter(CLIDataLoaderWidget())
+cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), CLIProjectionCalculator())
 
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
+
 
 def Load(path):
     """
@@ -40,7 +52,7 @@ def Load(path):
     if is_gui():
         app.MAIN_WINDOW.dataloader_presenter.load_workspace([path])
     else:
-        cli_presenter['cli_data_loader_presenter'].load_workspace([path])
+        cli_data_loader_presenter.load_workspace([path])
 
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
@@ -63,9 +75,7 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
         proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
         app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
     else:
-        proj_ws = cli_presenter['cli_powder_presenter'].calc_projection(InputWorkspace, Axis1, Axis2, Units)
-        cli_presenter['cli_powder_presenter'].after_projection([proj_ws])
-
+        proj_ws = cli_powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
     return proj_ws
 
 
@@ -94,8 +104,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
         return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
                                                                     DEFAULT_CMAP)
     else:
-        return cli_presenter['cli_slice_plotter_presenter'].create_slice(workspace, x_axis, y_axis, None, None,
-                                                                         NormToOne, DEFAULT_CMAP)
+        return cli_slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
 
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
@@ -139,10 +148,11 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     :return:
     """
 
+    slice_presenter = cli_slice_plotter_presenter
+
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, HistogramWorkspace)
-    slice_presenter = cli_presenter['cli_slice_plotter_presenter']
 
     # slice cache needed from main_window slice plotter presenter
     if is_gui():
@@ -167,6 +177,8 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     :return:
     """
 
+    cut_presenter = cli_cut_plotter_presenter
+
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, HistogramWorkspace):
@@ -175,8 +187,8 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
         intensity_range = None
     else:
         intensity_range = (IntensityStart, IntensityEnd)
-    cli_presenter['cli_cut_plotter_presenter'].plot_cut_from_workspace(workspace, intensity_range=intensity_range,
-                                                                       plot_over=PlotOver)
+    cut_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range, plot_over=PlotOver,
+                                          is_gui=is_gui())
 
     return GlobalFigureManager._active_figure
 

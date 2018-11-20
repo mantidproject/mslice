@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import abc
 
+
 class ProjectionCalculator(object):
     @abc.abstractmethod
     def available_axes(self):

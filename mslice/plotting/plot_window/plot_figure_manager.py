@@ -12,6 +12,8 @@ from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 import mslice.plotting.pyplot as plt
+import mslice.app.qpp as qpp
+from mslice.cli.cli_helperfunctions import is_gui
 
 
 class PlotFigureManagerQT(QtCore.QObject):
@@ -28,7 +30,11 @@ class PlotFigureManagerQT(QtCore.QObject):
         self._current_figs = current_figs
 
         # window instance
-        self.window = PlotWindow(manager=weakref.proxy(self))
+        if not is_gui():  # if in cli only mode
+            qpp.create_qapp()
+            self.window = PlotWindow(manager=weakref.proxy(self))
+        else:
+            self.window = PlotWindow(manager=weakref.proxy(self))
         self.window.resize(800, 600)
 
         self._plot_handler = None

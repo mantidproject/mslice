@@ -2,13 +2,16 @@ from __future__ import (absolute_import, division, print_function)
 
 import mantid.kernel
 
-# Imports for mslice projections
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
+from mslice.cli.cli_helperfunctions import _check_workspace_type, _check_workspace_name, is_slice, is_cut, is_gui
 
-from mslice.cli.cli_helperfunctions import _check_workspace_type, _check_workspace_name, is_slice, is_cut
-from mslice.cli._mslice_commands import Load, MakeProjection, Slice, Cut, PlotSlice, PlotCut, KeepFigure, MakeCurrent,\
-    ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE, ConvertToGDOS
+from mslice.cli._mslice_commands import *  # noqa: F401
+
+
+# Show function to keep event loop running
+def show():
+    app.qpp.show()
 
 
 # MSlice Matplotlib Projection

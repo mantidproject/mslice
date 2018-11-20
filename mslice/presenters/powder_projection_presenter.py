@@ -16,7 +16,11 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         if not isinstance(self._powder_view, PowderView):
             raise TypeError("powder_view is not of type PowderView")
         if not isinstance(self._projection_calculator, ProjectionCalculator):
-            raise TypeError("projection_calculator is not of type ProjectionCalculator")
+            from mslice.cli.cli_helper_classes.cli_projection_calculator import CLIProjectionCalculator
+            if isinstance(self._projection_calculator, CLIProjectionCalculator):
+                pass
+            else:
+                raise TypeError("projection_calculator is not of type ProjectionCalculator")
 
         #Add rest of options
         self._available_axes = projection_calculator.available_axes()

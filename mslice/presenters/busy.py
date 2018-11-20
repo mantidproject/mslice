@@ -1,9 +1,9 @@
 from contextlib import contextmanager
-from mslice.cli.cli_data_loader import CLIDataLoaderWidget
 
 
 @contextmanager
 def show_busy(view):
+    from mslice.cli.cli_helper_classes.cli_data_loader import CLIDataLoaderWidget
     if isinstance(view, CLIDataLoaderWidget):
         yield
         return
