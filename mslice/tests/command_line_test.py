@@ -7,7 +7,8 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHisto
                               ConvertToMD)
 
 from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
-ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE, ConvertToGDOS)
+                                         ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE,
+                                         ConvertToGDOS)
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
@@ -19,7 +20,6 @@ from mslice.workspace import wrap_workspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
-from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 
 class CommandLineTest(unittest.TestCase):
@@ -308,7 +308,7 @@ class CommandLineTest(unittest.TestCase):
         plot_handler_mock.plot_window.action_d2sig_dw_de.trigger.assert_called_once_with()
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
-    def test_that_convert_to_cross_section_is_called_correctly(self, gfm):
+    def test_that_convert_to_symmetrise_sqe_is_called_correctly(self, gfm):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
@@ -321,7 +321,6 @@ class CommandLineTest(unittest.TestCase):
         SymmetriseSQE(figure_number)
 
         plot_handler_mock.plot_window.action_symmetrised_sqe.trigger.assert_called_once_with()
-
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_convert_to_gdos_is_called_correctly(self, gfm):
