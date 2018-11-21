@@ -8,7 +8,7 @@ from mslice.cli.cli_helperfunctions import is_slice, is_cut
 from mslice.app import qpp
 
 
-# Show function to keep event loop running
+# Show function to keep window running and not disappearing
 def show():
     qpp.show()
 

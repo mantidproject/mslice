@@ -1,17 +1,6 @@
-"""A widget for defining projections for powders
-"""
-# -----------------------------------------------------------------------------
-# Imports
-# -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 
-#from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
-#from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.views.interfaces.powder_projection_view import PowderView
-
-# -----------------------------------------------------------------------------
-# Classes and functions
-# -----------------------------------------------------------------------------
 
 
 class CLIPowderWidget(PowderView):

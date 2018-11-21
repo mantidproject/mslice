@@ -6,7 +6,9 @@ import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 
-from mslice.cli._mslice_commands import Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice
+from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
+ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE, ConvertToGDOS)
+from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
@@ -17,6 +19,7 @@ from mslice.workspace import wrap_workspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 
 class CommandLineTest(unittest.TestCase):
@@ -202,7 +205,7 @@ class CommandLineTest(unittest.TestCase):
         app_mock.MAIN_WINDOW.cut_plotter_presenter.plot_cut_from_workspace = mock.Mock()
         cut = Cut(self.create_pixel_workspace('test_plot_cut_cli'))
         PlotCut(cut)
-        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None,  plot_over=False)
+        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None,  plot_over=False, is_gui=False)
 
     @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
     @mock.patch('mslice.cli._mslice_commands.app')
@@ -213,4 +216,124 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
+        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False, is_gui=False)
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_keep_figure_works_for_last_figure_number(self, gfm):
+        gfm.set_figure_as_kept = mock.Mock()
+        workspace = self.create_workspace('test_keep_figure')
+        slice_ws = Slice(workspace)
+        PlotSlice(slice_ws)
+
+        KeepFigure()
+
+        gfm.set_figure_as_kept.assert_called_with(None)
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_keep_figure_works_on_figure_number(self, gfm):
+        gfm.set_figure_as_kept = mock.Mock()
+        workspace = self.create_workspace('test_keep_figure')
+        cut_ws = Cut(workspace)
+        figure_number = PlotCut(cut_ws)
+
+        KeepFigure(figure_number)
+
+        gfm.set_figure_as_kept.assert_called_with(figure_number)
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_make_current_works_on_last_figure_number(self, gfm):
+        gfm.set_figure_as_current = mock.Mock()
+        workspace = self.create_workspace('test_make_current')
+        slice_ws = Slice(workspace)
+        PlotSlice(slice_ws)
+
+        MakeCurrent()
+
+        gfm.set_figure_as_current.assert_called_with(None)
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_make_current_works_on_figure_number(self, gfm):
+        gfm.set_figure_as_current = mock.Mock()
+        workspace = self.create_workspace('test_make_current')
+        cut_ws = Cut(workspace)
+        figure_number = PlotCut(cut_ws)
+
+        MakeCurrent(figure_number)
+
+        gfm.set_figure_as_current.assert_called_with(figure_number)
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_convert_to_chi_is_called_correctly(self, gfm):
+        figure_mock = mock.MagicMock()
+        plot_handler_mock = mock.MagicMock(spec=SlicePlot)
+        plot_handler_mock.plot_window = mock.MagicMock()
+        figure_mock._plot_handler = plot_handler_mock
+        gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
+        workspace = self.create_workspace('test_keep_figure')
+        slice_ws = Slice(workspace)
+        figure_number = PlotSlice(slice_ws)
+
+        ConvertToChi(figure_number)
+
+        plot_handler_mock.plot_window.action_chi_qe.trigger.assert_called_once_with()
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_convert_to_chi_mag_is_called_correctly(self, gfm):
+        figure_mock = mock.MagicMock()
+        plot_handler_mock = mock.MagicMock(spec=SlicePlot)
+        plot_handler_mock.plot_window = mock.MagicMock()
+        figure_mock._plot_handler = plot_handler_mock
+        gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
+        workspace = self.create_workspace('test_keep_figure')
+        slice_ws = Slice(workspace)
+        figure_number = PlotSlice(slice_ws)
+
+        ConvertToChiMag(figure_number)
+
+        plot_handler_mock.plot_window.action_chi_qe_magnetic.trigger.assert_called_once_with()
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_convert_to_cross_section_is_called_correctly(self, gfm):
+        figure_mock = mock.MagicMock()
+        plot_handler_mock = mock.MagicMock(spec=SlicePlot)
+        plot_handler_mock.plot_window = mock.MagicMock()
+        figure_mock._plot_handler = plot_handler_mock
+        gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
+        workspace = self.create_workspace('test_keep_figure')
+        slice_ws = Slice(workspace)
+        figure_number = PlotSlice(slice_ws)
+
+        ConvertToCrossSection(figure_number)
+
+        plot_handler_mock.plot_window.action_d2sig_dw_de.trigger.assert_called_once_with()
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_convert_to_cross_section_is_called_correctly(self, gfm):
+        figure_mock = mock.MagicMock()
+        plot_handler_mock = mock.MagicMock(spec=SlicePlot)
+        plot_handler_mock.plot_window = mock.MagicMock()
+        figure_mock._plot_handler = plot_handler_mock
+        gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
+        workspace = self.create_workspace('test_keep_figure')
+        slice_ws = Slice(workspace)
+        figure_number = PlotSlice(slice_ws)
+
+        SymmetriseSQE(figure_number)
+
+        plot_handler_mock.plot_window.action_symmetrised_sqe.trigger.assert_called_once_with()
+
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_convert_to_gdos_is_called_correctly(self, gfm):
+        figure_mock = mock.MagicMock()
+        plot_handler_mock = mock.MagicMock(spec=SlicePlot)
+        plot_handler_mock.plot_window = mock.MagicMock()
+        figure_mock._plot_handler = plot_handler_mock
+        gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
+        workspace = self.create_workspace('test_keep_figure')
+        slice_ws = Slice(workspace)
+        figure_number = PlotSlice(slice_ws)
+
+        ConvertToGDOS(figure_number)
+
+        plot_handler_mock.plot_window.action_gdos.trigger.assert_called_once_with()
