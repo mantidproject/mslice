@@ -5,7 +5,7 @@ import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.cli.cli_helperfunctions import _check_workspace_type, _check_workspace_name, is_gui
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.cli import cli_cut_plotter_presenter, cli_slice_plotter_presenter
+from mslice.cli._mslice_commands import cli_cut_plotter_presenter, cli_slice_plotter_presenter
 
 
 def PlotCutMsliceProjection(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
