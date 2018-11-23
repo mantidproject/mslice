@@ -35,7 +35,7 @@ class CommandLineTest(unittest.TestCase):
         workspace.is_PSD = False
         workspace.limits['MomentumTransfer'] = [0.1, 3.1, 0.1]
         workspace.limits['|Q|'] = [0.1, 3.1, 0.1]
-        workspace.limits['DeltaE'] = [-10,15,1]
+        workspace.limits['DeltaE'] = [-10, 15, 1]
         workspace.e_fixed = 10
         return workspace
 

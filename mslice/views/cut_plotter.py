@@ -34,18 +34,14 @@ def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over
     legend = workspace.name if legend is None else legend
     if not plot_over and is_gui:
         plt.cla()
+
     cur_fig = plt.gcf()
-    try:
-        ax = cur_fig.axes[0]
-        if not plot_over:
-            ax.cla()
-    except IndexError:
-        ax = cur_fig.add_subplot(1, 1, 1, projection='mantid')
+    cur_canvas = cur_fig.canvas
+    ax = cur_fig.add_subplot(1, 1, 1, projection='mantid')
 
     legend = workspace.name if legend is None else legend
     ax.errorbar(workspace.raw_ws, 'o-', label=legend, picker=PICKER_TOL_PTS)
     ax.set_ylim(*intensity_range) if intensity_range is not None else ax.autoscale()
-    cur_canvas = cur_fig.canvas
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
         leg = ax.legend(fontsize='medium')
         leg.draggable()
