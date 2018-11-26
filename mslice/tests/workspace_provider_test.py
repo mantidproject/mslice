@@ -72,7 +72,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.assertFalse(new_ws.ef_defined)
         self.assertEqual(new_ws.limits['DeltaE'], [0, 2, 1])
 
-    @patch('mslice.models.workspacemanager.workspace_provider.rename_workspace')
+    @patch('mslice.presenters.workspace_manager_presenter.rename_workspace')
     @patch('mslice.presenters.workspace_manager_presenter.get_visible_workspace_names')
     def test_that_rename_workspace_works_as_expected(self, get_ws_names_mock, rename_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
@@ -91,7 +91,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         rename_ws_mock.assert_called_once_with('file1', 'new_name')
         self.view.display_loaded_workspaces.assert_called_once()
 
-    @patch('mslice.models.workspacemanager.workspace_provider.rename_workspace')
+    @patch('mslice.presenters.workspace_manager_presenter.rename_workspace')
     def test_rename_workspace_multiple_workspace_selected_prompt_user(self, rename_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports multiple selected workspaces on calls to get_workspace_selected
@@ -103,7 +103,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.view.error_select_only_one_workspace.assert_called_once_with()
         rename_ws_mock.assert_not_called()
 
-    @patch('mslice.models.workspacemanager.workspace_provider.rename_workspace')
+    @patch('mslice.presenters.workspace_manager_presenter.rename_workspace')
     def test_rename_workspace_non_selected_prompt_user(self, rename_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports that no workspaces are selected on calls to get_workspace_selected
