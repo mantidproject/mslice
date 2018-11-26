@@ -8,6 +8,9 @@ class CLIDataLoaderWidget:
     def __init__(self):
         pass
 
+    def show_busy(self, is_busy):
+        pass
+
     def keyPressEvent(self, event):
         pass
 

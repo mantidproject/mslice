@@ -314,5 +314,6 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         assert(not self.view.error_select_more_than_one_workspaces.called)
         combine_ws_mock.assert_called_once_with(selected_workspaces, selected_workspaces[0]+'_combined')
 
+
 if __name__ == '__main__':
     unittest.main()

@@ -150,6 +150,9 @@ class DataLoaderWidget(QWidget):  # and some view interface
         else:
             return False
 
+    def show_busy(self, is_busy):
+        self.busy.emit(is_busy)
+
     def error_loading_workspace(self, message):
         self._display_error(str(message))
 

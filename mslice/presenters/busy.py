@@ -3,10 +3,6 @@ from contextlib import contextmanager
 
 @contextmanager
 def show_busy(view):
-    from mslice.cli.cli_helper_classes.cli_data_loader import CLIDataLoaderWidget
-    if isinstance(view, CLIDataLoaderWidget):
-        yield
-        return
-    view.busy.emit(True)
+    view.show_busy(True)
     yield
-    view.busy.emit(False)
+    view.show_busy(False)
