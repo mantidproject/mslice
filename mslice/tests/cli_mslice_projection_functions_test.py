@@ -3,7 +3,7 @@ import mock
 import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 
-import mslice.cli as mc
+import mslice.cli._mslice_commands as mc
 import matplotlib.pyplot as plt
 from mslice.workspace import wrap_workspace
 
