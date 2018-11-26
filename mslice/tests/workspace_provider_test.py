@@ -74,7 +74,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
     @patch('mslice.models.workspacemanager.workspace_provider.rename_workspace')
     @patch('mslice.presenters.workspace_manager_presenter.get_visible_workspace_names')
-    def test_rename_workspace(self, get_ws_names_mock, rename_ws_mock):
+    def test_that_rename_workspace_works_as_expected(self, get_ws_names_mock, rename_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that will return a single selected workspace on call to get_workspace_selected and supply a
         # name on call to get_workspace_new_name
