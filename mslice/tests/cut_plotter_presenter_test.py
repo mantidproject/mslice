@@ -5,6 +5,7 @@ from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 
+
 class CutPlotterPresenterTest(unittest.TestCase):
 
     def setUp(self):

@@ -3,7 +3,7 @@ import unittest
 
 from mslice.models.axis import Axis
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
-from mslice.presenters.slice_widget_presenter import  SliceWidgetPresenter
+from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
 from mslice.views.interfaces.slice_view import SliceView
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.widgets.slice.command import Command

@@ -7,6 +7,7 @@ from mslice.views.interfaces.powder_projection_view import PowderView
 from mslice.widgets.projection.powder.command import Command
 from .interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
 from .validation_decorators import require_main_presenter
+from mslice.cli.cli_helper_classes.cli_projection_calculator import CLIProjectionCalculator
 
 
 class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInterface):
@@ -15,12 +16,9 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         self._projection_calculator = projection_calculator
         if not isinstance(self._powder_view, PowderView):
             raise TypeError("powder_view is not of type PowderView")
-        if not isinstance(self._projection_calculator, ProjectionCalculator):
-            from mslice.cli.cli_helper_classes.cli_projection_calculator import CLIProjectionCalculator
-            if isinstance(self._projection_calculator, CLIProjectionCalculator):
-                pass
-            else:
-                raise TypeError("projection_calculator is not of type ProjectionCalculator")
+        if not (isinstance(self._projection_calculator, ProjectionCalculator)
+                and isinstance(self._projection_calculator, CLIProjectionCalculator)):
+            raise TypeError("projection_calculator is not of type ProjectionCalculator or CLIProjectionCalculator")
 
         #Add rest of options
         self._available_axes = projection_calculator.available_axes()
