@@ -125,4 +125,3 @@ class CLIHelperFunctionsTest(unittest.TestCase):
     def test_that_is_gui_works_as_expected(self):
         return_value = is_gui()
         self.assertEqual(return_value, False)
-
