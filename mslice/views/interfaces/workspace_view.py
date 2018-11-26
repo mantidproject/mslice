@@ -8,6 +8,9 @@ class WorkspaceView(object):
     def __init__(self):
         raise Exception("This abstact base class must not be instantiated")
 
+    def show_busy(self, is_busy):
+        self.busy.emit(is_busy)
+
     def display_loaded_workspaces(self, workspaces):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
