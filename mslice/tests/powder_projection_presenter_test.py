@@ -29,6 +29,14 @@ class PowderProjectionPresenterTest(unittest.TestCase):
     def test_constructor_success_with_cli_projection(self):
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.cli_projection_calculator)
 
+    def test_constructor_failure_with_incorrect_powder_view(self):
+        with self.assertRaises(TypeError):
+            self.powder_presenter = PowderProjectionPresenter(self.projection_calculator, self.powder_view)
+
+    def test_constructor_failure_with_incorrect_projection_calculator(self):
+        with self.assertRaises(TypeError):
+            self.powder_presenter = PowderProjectionPresenter(self.powder_view, MainView)
+
     def test_constructor_incorrect_powder_view_fail(self):
         self.assertRaises(TypeError, PowderProjectionPresenter, self.mainview, self.mainview, self.projection_calculator)
 
