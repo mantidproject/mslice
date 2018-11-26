@@ -49,48 +49,6 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         workspace_presenter = WorkspaceManagerPresenter(self.view)
         self.assertRaises(AssertionError, workspace_presenter.register_master, 3)
 
-    @patch('mslice.presenters.workspace_manager_presenter._rename_workspace')
-    @patch('mslice.presenters.workspace_manager_presenter.get_visible_workspace_names')
-    def test_rename_workspace(self, get_ws_names_mock, rename_ws_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view)
-        # Create a view that will return a single selected workspace on call to get_workspace_selected and supply a
-        # name on call to get_workspace_new_name
-        old_workspace_name = 'file1'
-        new_workspace_name = 'new_name'
-        self.view.get_workspace_selected = mock.Mock(return_value=[old_workspace_name])
-        self.view.get_workspace_new_name = mock.Mock(return_value=new_workspace_name)
-        self.view.display_loaded_workspaces = mock.Mock()
-        get_ws_names_mock.return_value = ['file1', 'file2', 'file3']
-
-        self.presenter.notify(Command.RenameWorkspace)
-        self.view.get_workspace_selected.assert_called_once_with()
-        self.view.get_workspace_new_name.assert_called_once_with()
-        rename_ws_mock.assert_called_once_with('file1', 'new_name')
-        self.view.display_loaded_workspaces.assert_called_once()
-
-    @patch('mslice.presenters.workspace_manager_presenter._rename_workspace')
-    def test_rename_workspace_multiple_workspace_selected_prompt_user(self, rename_ws_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view)
-        # Create a view that reports multiple selected workspaces on calls to get_workspace_selected
-        selected_workspaces = ['ws1', 'ws2']
-        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
-
-        self.presenter.notify(Command.RenameWorkspace)
-        self.view.get_workspace_selected.assert_called_once_with()
-        self.view.error_select_only_one_workspace.assert_called_once_with()
-        rename_ws_mock.assert_not_called()
-
-    @patch('mslice.presenters.workspace_manager_presenter._rename_workspace')
-    def test_rename_workspace_non_selected_prompt_user(self, rename_ws_mock):
-        self.presenter = WorkspaceManagerPresenter(self.view)
-        # Create a view that reports that no workspaces are selected on calls to get_workspace_selected
-        self.view.get_workspace_selected = mock.Mock(return_value=[])
-
-        self.presenter.notify(Command.RenameWorkspace)
-        self.view.get_workspace_selected.assert_called_once_with()
-        self.view.error_select_one_workspace.assert_called_once_with()
-        rename_ws_mock.assert_not_called()
-
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     @patch('mslice.presenters.workspace_manager_presenter.save_workspaces')
     def test_save_workspace(self, save_ws_mock, save_dir_mock):
