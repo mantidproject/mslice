@@ -1,3 +1,4 @@
 [report]
 omit =
     */mslice/presenters/interfaces/*
+show_missing = True
