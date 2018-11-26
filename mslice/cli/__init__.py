@@ -6,7 +6,7 @@ from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
 from mslice.cli.cli_helperfunctions import is_slice, is_cut
 from mslice.app import qpp
-from mslice.cli._mslice_commands import *  # noga: F401
+from mslice.cli._mslice_commands import *  # noqa: F401
 
 
 # Show function to keep window running and not disappearing

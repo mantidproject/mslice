@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-import mock
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 from mslice.workspace import wrap_workspace

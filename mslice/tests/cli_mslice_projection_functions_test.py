@@ -1,8 +1,7 @@
 import unittest
 import mock
 import numpy as np
-from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
-                              ConvertToMD)
+from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 
 import mslice.cli as mc
 import matplotlib.pyplot as plt
