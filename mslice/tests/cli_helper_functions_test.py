@@ -1,4 +1,5 @@
 import unittest
+import mock
 import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
@@ -9,7 +10,8 @@ from mslice.cli import Cut, Slice
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
-
+from mslice.presenters.busy import show_busy
+from mslice.cli.cli_helper_classes.cli_data_loader import CLIDataLoaderWidget
 
 class CLIHelperFunctionsTest(unittest.TestCase):
 
@@ -125,3 +127,8 @@ class CLIHelperFunctionsTest(unittest.TestCase):
     def test_that_is_gui_works_as_expected(self):
         return_value = is_gui()
         self.assertEqual(return_value, False)
+
+    def test_that_cli_data_loader_widget_view_is_used_correctly_with_busy(self):
+        data_loader_widget = CLIDataLoaderWidget()
+        return_value = show_busy(data_loader_widget)
+        self.assertNotEquals(return_value, None)

@@ -14,6 +14,7 @@ class MainPresenterTests(unittest.TestCase):
         self.mainview = mock.create_autospec(MainView)
         self.workspace_presenter = mock.create_autospec(WorkspaceManagerPresenterInterface)
         self.workspace_presenter.get_selected_workspaces = mock.Mock(return_value=SELECTED_WORKSPACES)
+
     def test_consturctor_sucess(self):
         subpresenters = [mock.Mock() for i in range(10)]
         main_presenter = MainPresenter(self.mainview, *subpresenters)
