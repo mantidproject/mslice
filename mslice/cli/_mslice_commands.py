@@ -25,6 +25,7 @@ from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.cli.cli_helper_classes.cli_powder import CLIPowderWidget
 from mslice.cli.cli_helper_classes.cli_projection_calculator import CLIProjectionCalculator
+from mslice.app import qpp
 
 # Separate presenters for cli
 cli_cut_plotter_presenter = CutPlotterPresenter()
@@ -35,6 +36,11 @@ cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), CLIProjectio
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
+
+
+# Show function to keep window running and not disappearing
+def show():
+    qpp.show()
 
 
 def Load(path):
@@ -187,8 +193,7 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
         intensity_range = None
     else:
         intensity_range = (IntensityStart, IntensityEnd)
-    cut_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range, plot_over=PlotOver,
-                                          is_gui=is_gui())
+    cut_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range, plot_over=PlotOver)
 
     return GlobalFigureManager._active_figure
 

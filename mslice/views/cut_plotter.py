@@ -30,9 +30,9 @@ def draw_interactive_cut(workspace):
 
 
 @plt.set_category(plt.CATEGORY_CUT)
-def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over=False, legend=None, is_gui=True):
+def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over=False, legend=None):
     legend = workspace.name if legend is None else legend
-    if not plot_over and is_gui:
+    if not plot_over:
         plt.cla()
 
     cur_fig = plt.gcf()

@@ -22,7 +22,7 @@ def PlotCutMsliceProjection(InputWorkspace, IntensityStart=0, IntensityEnd=0, Pl
     else:
         intensity_range = (IntensityStart, IntensityEnd)
     lines = cli_cut_plotter_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range,
-                                                              plot_over=PlotOver, is_gui=is_gui())
+                                                              plot_over=PlotOver)
 
     return lines
 
