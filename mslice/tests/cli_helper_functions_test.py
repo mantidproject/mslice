@@ -5,7 +5,7 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHisto
 from mslice.workspace import wrap_workspace
 from mslice.cli.cli_helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
     _check_workspace_name, _check_workspace_type, is_gui, is_slice, is_cut
-from mslice.cli import Cut, Slice
+from mslice.cli._mslice_commands import Cut, Slice
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
