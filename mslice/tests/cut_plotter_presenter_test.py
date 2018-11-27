@@ -114,8 +114,9 @@ class CutPlotterPresenterTest(unittest.TestCase):
         workspace.icut = 'icut'
 
         self.cut_plotter_presenter._cut_cache = {}
-        return_value = self.cut_plotter_presenter.get_icut('workspace')
-        self.assertEquals(return_value, None)
+        with self.assertRaises(KeyError):
+            return_value = self.cut_plotter_presenter.get_icut('workspace')
+            self.assertEquals(return_value, None)
 
         self.cut_plotter_presenter._cut_cache = {mock_ws.name: workspace}
         return_value = self.cut_plotter_presenter.get_icut('workspace')
