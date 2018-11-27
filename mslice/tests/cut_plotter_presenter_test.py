@@ -92,8 +92,10 @@ class CutPlotterPresenterTest(unittest.TestCase):
     def test_store_icut(self):
         self.cut_plotter_presenter.set_is_icut = mock.MagicMock()
         mock_ws = mock.MagicMock()
+        mock_ws.icut = 'icut'
         mock_ws.name = 'workspace'
         mock_icut = mock.MagicMock()
+        self.cut_plotter_presenter._cut_cache = {'workspace': mock_ws}
         self.cut_plotter_presenter.store_icut(mock_ws.name, mock_icut)
         self.cut_plotter_presenter.set_is_icut.assert_called_once_with(mock_ws.name, True)
 
@@ -110,15 +112,13 @@ class CutPlotterPresenterTest(unittest.TestCase):
     def test_get_icut(self):
         mock_ws = mock.MagicMock()
         mock_ws.name = 'workspace'
-        workspace = mock.MagicMock()
-        workspace.icut = 'icut'
+        mock_ws.icut = 'icut'
 
         self.cut_plotter_presenter._cut_cache = {}
-        with self.assertRaises(KeyError):
-            return_value = self.cut_plotter_presenter.get_icut('workspace')
-            self.assertEquals(return_value, None)
+        return_value = self.cut_plotter_presenter.get_icut('workspace')
+        self.assertEquals(return_value, None)
 
-        self.cut_plotter_presenter._cut_cache = {mock_ws.name: workspace}
+        self.cut_plotter_presenter._cut_cache = {mock_ws.name: mock_ws}
         return_value = self.cut_plotter_presenter.get_icut('workspace')
         self.assertEquals(return_value, 'icut')
 
