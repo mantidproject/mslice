@@ -36,9 +36,8 @@ class CLIProjectionTest(unittest.TestCase):
 
         intensity_range = None
         PlotOver = False
-        is_gui = False
         cut_presenter.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=intensity_range,
-                                                                      plot_over=PlotOver, is_gui=is_gui)
+                                                                      plot_over=PlotOver)
 
     @mock.patch('mslice.cli.cli_mslice_projection_functions.cli_slice_plotter_presenter')
     def test_that_mslice_projection_slice_cut_works_correctly(self, slice_presenter):

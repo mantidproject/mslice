@@ -205,7 +205,7 @@ class CommandLineTest(unittest.TestCase):
         app_mock.MAIN_WINDOW.cut_plotter_presenter.plot_cut_from_workspace = mock.Mock()
         cut = Cut(self.create_pixel_workspace('test_plot_cut_cli'))
         PlotCut(cut)
-        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None,  plot_over=False, is_gui=False)
+        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None,  plot_over=False)
 
     @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
     @mock.patch('mslice.cli._mslice_commands.app')
@@ -216,7 +216,7 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False, is_gui=False)
+        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_keep_figure_works_for_last_figure_number(self, gfm):
