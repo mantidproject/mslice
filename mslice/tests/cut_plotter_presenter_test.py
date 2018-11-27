@@ -88,3 +88,38 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(1, compute_cut_mock.call_count)
         self.assertEqual(1, plot_cut_impl_mock.call_count)
         self.assertEqual(1, draw_interact_mock.call_count)
+
+    def test_store_icut(self):
+        self.cut_plotter_presenter.set_is_icut = mock.MagicMock()
+        mock_ws = mock.MagicMock()
+        mock_ws.name = 'workspace'
+        mock_icut = mock.MagicMock()
+        self.cut_plotter_presenter.store_icut(mock_ws.name, mock_icut)
+        self.cut_plotter_presenter.set_is_icut.assert_called_once_with(mock_ws.name, True)
+
+    @mock.patch('mslice.presenters.cut_plotter_presenter.cut_figure_exists')
+    def test_set_is_icut(self, cut_figure_exists):
+        mock_ws = mock.MagicMock()
+        mock_ws.name = 'workspace'
+
+        self.cut_plotter_presenter._cut_cache = {mock_ws.name: 'workspace'}
+        cut_figure_exists.return_value = True
+
+        self.cut_plotter_presenter.set_is_icut(mock_ws.name, False)
+
+    def test_get_icut(self):
+        mock_ws = mock.MagicMock()
+        mock_ws.name = 'workspace'
+        workspace = mock.MagicMock()
+        workspace.icut = 'icut'
+
+        self.cut_plotter_presenter._cut_cache = {}
+        return_value = self.cut_plotter_presenter.get_icut('workspace')
+        self.assertEquals(return_value, None)
+
+        self.cut_plotter_presenter._cut_cache = {mock_ws.name: workspace}
+        return_value = self.cut_plotter_presenter.get_icut('workspace')
+        self.assertEquals(return_value, 'icut')
+
+    def test_workspace_selection_changed(self):
+        self.cut_plotter_presenter.workspace_selection_changed()
