@@ -25,7 +25,7 @@ from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.cli.cli_helper_classes.cli_powder import CLIPowderWidget
 from mslice.cli.cli_helper_classes.cli_projection_calculator import CLIProjectionCalculator
-from mslice.app import qpp
+from mslice.app import qapp
 
 # Separate presenters for cli
 cli_cut_plotter_presenter = CutPlotterPresenter()
@@ -40,7 +40,7 @@ cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), CLIProjectio
 
 # Show function to keep window running and not disappearing
 def show():
-    qpp.show()
+    qapp.show()
 
 
 def Load(path):

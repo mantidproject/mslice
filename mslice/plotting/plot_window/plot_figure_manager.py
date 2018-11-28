@@ -12,7 +12,7 @@ from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 import mslice.plotting.pyplot as plt
-import mslice.app.qpp as qpp
+import mslice.app.qapp as qpp
 from mslice.cli.cli_helperfunctions import is_gui
 
 

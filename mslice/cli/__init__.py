@@ -14,23 +14,16 @@ class MSliceAxes(Axes):
     def plot(self, *args, **kwargs):
         from mslice.cli.cli_mslice_projection_functions import PlotCutMsliceProjection
         if is_cut(*args):
-            try:
-                lines = PlotCutMsliceProjection(*args, **kwargs)
-                return lines
-            except Exception as e:
-                print('Mslice Projection Error: ' + repr(e))
+            lines = PlotCutMsliceProjection(*args, **kwargs)
+            return lines
         else:
             return Axes.plot(self, *args, **kwargs)
 
     def pcolormesh(self, *args, **kwargs):
         from mslice.cli.cli_mslice_projection_functions import PlotSliceMsliceProjection
         if is_slice(*args):
-            try:
-                mantid.kernel.logger.debug('using mantid.plots.plotfunctions')
-                quadmesh = PlotSliceMsliceProjection(*args, **kwargs)
-                return quadmesh
-            except Exception as e:
-                print('MSlice Projection Error: ' + repr(e))
+            quadmesh = PlotSliceMsliceProjection(*args, **kwargs)
+            return quadmesh
         else:
             return Axes.pcolormesh(self, *args, **kwargs)
 
