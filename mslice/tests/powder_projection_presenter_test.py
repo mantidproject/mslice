@@ -8,7 +8,6 @@ from mslice.presenters.powder_projection_presenter import PowderProjectionPresen
 from mslice.views.interfaces.mainview import MainView
 from mslice.views.interfaces.powder_projection_view import PowderView
 from mslice.widgets.projection.powder.command import Command
-from mslice.cli.cli_helper_classes.cli_projection_calculator import CLIProjectionCalculator
 
 
 class PowderProjectionPresenterTest(unittest.TestCase):
@@ -21,13 +20,9 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview = mock.create_autospec(MainView)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
-        self.cli_projection_calculator = CLIProjectionCalculator()
 
     def test_constructor_success(self):
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
-
-    def test_constructor_success_with_cli_projection(self):
-        self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.cli_projection_calculator)
 
     def test_constructor_failure_with_incorrect_powder_view(self):
         with self.assertRaises(TypeError):

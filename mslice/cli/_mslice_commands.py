@@ -24,14 +24,14 @@ from mslice.cli.cli_helper_classes.cli_data_loader import CLIDataLoaderWidget
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.cli.cli_helper_classes.cli_powder import CLIPowderWidget
-from mslice.cli.cli_helper_classes.cli_projection_calculator import CLIProjectionCalculator
+from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.app import qapp
 
 # Separate presenters for cli
 cli_cut_plotter_presenter = CutPlotterPresenter()
 cli_slice_plotter_presenter = SlicePlotterPresenter()
 cli_data_loader_presenter = DataLoaderPresenter(CLIDataLoaderWidget())
-cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), CLIProjectionCalculator())
+cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), MantidProjectionCalculator())
 
 # -----------------------------------------------------------------------------
 # Command functions
