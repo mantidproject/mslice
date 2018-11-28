@@ -11,7 +11,7 @@ def create_qapp():
 
     if qApp is None:
         qApp = QApplication([])
-    qApp.lastWindowClosed.connect(qApp.quit)
+        qApp.lastWindowClosed.connect(qApp.quit)
     return qApp
 
 
