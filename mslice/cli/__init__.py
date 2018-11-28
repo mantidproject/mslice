@@ -1,7 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-import mantid.kernel
-
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
 from mslice.cli.cli_helperfunctions import is_slice, is_cut
