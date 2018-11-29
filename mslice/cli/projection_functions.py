@@ -3,9 +3,9 @@ from __future__ import (absolute_import, division, print_function)
 from mslice.models.cmap import DEFAULT_CMAP
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.cli.cli_helperfunctions import _check_workspace_type, _check_workspace_name, is_gui
+from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.cli._mslice_commands import cli_cut_plotter_presenter, cli_slice_plotter_presenter
+from mslice.app.presenters import cli_cut_plotter_presenter, cli_slice_plotter_presenter, is_gui
 
 
 def PlotCutMsliceProjection(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):

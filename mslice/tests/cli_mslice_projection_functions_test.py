@@ -25,7 +25,7 @@ class CLIProjectionTest(unittest.TestCase):
         workspace.e_fixed = 10
         return workspace
 
-    @mock.patch('mslice.cli.cli_mslice_projection_functions.cli_cut_plotter_presenter')
+    @mock.patch('mslice.cli.projection_functions.cli_cut_plotter_presenter')
     def test_that_mslice_projection_plot_cut_works_correctly(self, cut_presenter):
         cut_presenter.plot_cut_from_workspace = mock.MagicMock()
         fig, ax = plt.subplots(subplot_kw={'projection': 'mslice'})
@@ -39,7 +39,7 @@ class CLIProjectionTest(unittest.TestCase):
         cut_presenter.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=intensity_range,
                                                                       plot_over=PlotOver)
 
-    @mock.patch('mslice.cli.cli_mslice_projection_functions.cli_slice_plotter_presenter')
+    @mock.patch('mslice.cli.projection_functions.cli_slice_plotter_presenter')
     def test_that_mslice_projection_slice_cut_works_correctly(self, slice_presenter):
         slice_presenter.plot_from_cache = mock.MagicMock()
         fig, ax = plt.subplots(subplot_kw={'projection': 'mslice'})

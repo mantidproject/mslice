@@ -1,8 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 
+import mslice.util.mantid.init_mantid # noqa: F401
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
-from mslice.cli.cli_helperfunctions import is_slice, is_cut
+from mslice.cli.helperfunctions import is_slice, is_cut
 
 
 # MSlice Matplotlib Projection
@@ -10,14 +11,14 @@ class MSliceAxes(Axes):
     name = 'mslice'
 
     def plot(self, *args, **kwargs):
-        from mslice.cli.cli_mslice_projection_functions import PlotCutMsliceProjection
+        from mslice.cli.projection_functions import PlotCutMsliceProjection
         if is_cut(*args):
             return PlotCutMsliceProjection(*args, **kwargs)
         else:
             return Axes.plot(self, *args, **kwargs)
 
     def pcolormesh(self, *args, **kwargs):
-        from mslice.cli.cli_mslice_projection_functions import PlotSliceMsliceProjection
+        from mslice.cli.projection_functions import PlotSliceMsliceProjection
         if is_slice(*args):
             return PlotSliceMsliceProjection(*args, **kwargs)
         else:

@@ -3,8 +3,8 @@ import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 from mslice.workspace import wrap_workspace
-from mslice.cli.cli_helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
-    _check_workspace_name, _check_workspace_type, is_gui, is_slice, is_cut
+from mslice.cli.helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
+    _check_workspace_name, _check_workspace_type, is_slice, is_cut
 from mslice.cli._mslice_commands import Cut, Slice
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
@@ -121,7 +121,3 @@ class CLIHelperFunctionsTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             is_cut(slice_ws)
-
-    def test_that_is_gui_works_as_expected(self):
-        return_value = is_gui()
-        self.assertEqual(return_value, False)

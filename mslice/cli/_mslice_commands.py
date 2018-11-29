@@ -7,32 +7,19 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
-import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cmap import DEFAULT_CMAP
 from mslice.workspace.pixel_workspace import PixelWorkspace
-from mslice.cli.cli_helperfunctions import \
-    _string_to_integration_axis, _process_axis, _check_workspace_name, _check_workspace_type, is_gui
+
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.plotting.plot_window.slice_plot import SlicePlot
-from mslice.workspace.histogram_workspace import HistogramWorkspace
-
-from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
-from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
-from mslice.cli.cli_helper_classes.cli_data_loader import CLIDataLoaderWidget
-from mslice.presenters.data_loader_presenter import DataLoaderPresenter
-from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
-from mslice.cli.cli_helper_classes.cli_powder import CLIPowderWidget
-from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.app import qapp
-
-# Separate presenters for cli
-cli_cut_plotter_presenter = CutPlotterPresenter()
-cli_slice_plotter_presenter = SlicePlotterPresenter()
-cli_data_loader_presenter = DataLoaderPresenter(CLIDataLoaderWidget())
-cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), MantidProjectionCalculator())
-
+from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
+                                   get_powder_presenter, is_gui)
+from mslice.cli.projection_functions import PlotSliceMsliceProjection, PlotCutMsliceProjection
+from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
+                                        _check_workspace_type)
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
@@ -55,10 +42,7 @@ def Load(path):
     if not ospath.exists(path):
         raise RuntimeError('could not find the path %s' % path)
 
-    if is_gui():
-        app.MAIN_WINDOW.dataloader_presenter.load_workspace([path])
-    else:
-        cli_data_loader_presenter.load_workspace([path])
+    get_dataloader_presenter().load_workspace([path])
 
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
@@ -77,11 +61,8 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
 
     _check_workspace_name(InputWorkspace)
 
-    if is_gui():
-        proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
-        app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
-    else:
-        proj_ws = cli_powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
+    proj_ws = get_powder_presenter().calc_projection(InputWorkspace, Axis1, Axis2, Units)
+    get_powder_presenter().after_projection([proj_ws], is_gui=is_gui())
     return proj_ws
 
 
@@ -106,11 +87,8 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     _check_workspace_type(workspace, PixelWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
-    if is_gui():
-        return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
-                                                                    DEFAULT_CMAP)
-    else:
-        return cli_slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
+
+    return get_slice_plotter_presenter().create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
 
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
@@ -136,8 +114,8 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, store=True)
-    if is_gui():
-        app.MAIN_WINDOW.cut_plotter_presenter.update_main_window()
+
+    get_cut_plotter_presenter().update_main_window(is_gui=is_gui())
 
     return cut
 
@@ -154,19 +132,7 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     :return:
     """
 
-    slice_presenter = cli_slice_plotter_presenter
-
-    _check_workspace_name(InputWorkspace)
-    workspace = get_workspace_handle(InputWorkspace)
-    _check_workspace_type(workspace, HistogramWorkspace)
-
-    # slice cache needed from main_window slice plotter presenter
-    if is_gui():
-        slice_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
-
-    slice_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
-    slice_presenter.change_colourmap(workspace.name, Colormap)
-    slice_presenter.plot_from_cache(workspace)
+    PlotSliceMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, Colormap)
 
     return GlobalFigureManager._active_figure
 
@@ -183,17 +149,7 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     :return:
     """
 
-    cut_presenter = cli_cut_plotter_presenter
-
-    _check_workspace_name(InputWorkspace)
-    workspace = get_workspace_handle(InputWorkspace)
-    if not isinstance(workspace, HistogramWorkspace):
-        raise RuntimeError("Incorrect workspace type.")
-    if IntensityStart == 0 and IntensityEnd == 0:
-        intensity_range = None
-    else:
-        intensity_range = (IntensityStart, IntensityEnd)
-    cut_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range, plot_over=PlotOver)
+    PlotCutMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, PlotOver)
 
     return GlobalFigureManager._active_figure
 

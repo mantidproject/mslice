@@ -1,7 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-MSLICE_EXTENSIONS = ['*.nxs', '*.nxspe', '*.txt', '*.xye']
-
 
 class CLIDataLoaderWidget:
 

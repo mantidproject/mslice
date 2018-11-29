@@ -4,7 +4,6 @@ from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
-import mslice.app as app
 
 
 def _string_to_axis(string):
@@ -86,8 +85,3 @@ def is_cut(*args):
             return True
         elif isinstance(args[0], Workspace):
             raise ValueError('Warning: To plot a slice use the pcolormesh function instead!')
-
-
-def is_gui():
-    """Check if mainwindow is instantiated"""
-    return app.MAIN_WINDOW is not None
