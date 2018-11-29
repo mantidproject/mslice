@@ -78,8 +78,7 @@ class CommandLineTest(unittest.TestCase):
 
     @mock.patch('mslice.cli._mslice_commands.get_powder_presenter')
     def test_projection(self,  get_pp):
-        get_pp.return_value = PowderProjectionPresenter(mock.create_autospec(PowderView),
-                                                                          MantidProjectionCalculator())
+        get_pp.return_value = PowderProjectionPresenter(mock.create_autospec(PowderView), MantidProjectionCalculator())
         get_pp().register_master(mock.create_autospec(MainPresenterInterface))
         workspace = self.create_workspace('test_projection_cli')
         workspace.is_PSD = True
@@ -92,8 +91,7 @@ class CommandLineTest(unittest.TestCase):
 
     @mock.patch('mslice.cli._mslice_commands.get_powder_presenter')
     def test_projection_fail_non_PSD(self, get_pp):
-        get_pp.return_value = PowderProjectionPresenter(mock.create_autospec(PowderView),
-                                                                          MantidProjectionCalculator())
+        get_pp.return_value = PowderProjectionPresenter(mock.create_autospec(PowderView), MantidProjectionCalculator())
         workspace = self.create_workspace('test_projection_cli')
         with self.assertRaises(RuntimeError):
             MakeProjection(workspace, '|Q|', 'DeltaE')

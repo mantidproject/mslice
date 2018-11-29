@@ -9,7 +9,7 @@ class AppPresentersTest(unittest.TestCase):
 
     @mock.patch('mslice.app.presenters.MAIN_WINDOW')
     def test_that_is_gui_works_as_expected_with_gui(self, MAIN_WINDOW):
-        MAIN_WINDOW = not None
+        MAIN_WINDOW = not None  # noqa: 841
         self.assertTrue(is_gui())
 
     def test_that_is_gui_works_as_expected_without_gui(self):
