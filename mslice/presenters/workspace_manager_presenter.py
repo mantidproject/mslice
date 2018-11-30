@@ -47,7 +47,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._broadcast_selected_workspaces()
             elif command == Command.Add:
                 self._add_workspaces()
-            elif command  == Command.Subtract:
+            elif command == Command.Subtract:
                 self._subtract_workspace()
             elif command == Command.SaveToADS:
                 self._save_to_ads()
