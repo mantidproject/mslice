@@ -16,7 +16,7 @@ from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.app import qapp
 from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
-                                   get_powder_presenter, is_gui)
+                                   get_powder_presenter)
 from mslice.cli.projection_functions import PlotSliceMsliceProjection, PlotCutMsliceProjection
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
                                         _check_workspace_type)
