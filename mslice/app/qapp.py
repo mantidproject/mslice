@@ -14,9 +14,11 @@ def create_qapp_if_required():
         return
 
     if qApp is None:
-        qApp = QApplication([])
-        qApp.lastWindowClosed.connect(qApp.quit)
-
+        instance = QApplication.instance()
+        if instance is None:
+            instance = QApplication(['mslice'])
+            instance.lastWindowClosed.connect(instance.quit)
+        qApp = instance
     return qApp
 
 
