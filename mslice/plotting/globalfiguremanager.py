@@ -47,7 +47,7 @@ class GlobalFigureManager(object):
     """
     # if there is a current figure it should be both current and active
     _active_category = None
-    _category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}  # Current _figures receive decorated commands
+    _category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}  # Current_figures receive decorated commands
     _figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
     _unclassified_figures = []
     _active_figure = None
@@ -242,7 +242,7 @@ class GlobalFigureManager(object):
         # kept figures are just lying around, not really managed much, until they report in as current again
         if num is None:
             if cls._active_figure is not None:
-                num = cls.get_active_figure().number # could change to num = _active_figure
+                num = cls.get_active_figure().number
                 cls._last_active_figure = num
             else:
                 num = cls._last_active_figure

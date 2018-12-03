@@ -3,7 +3,7 @@ and entry points.
 """
 import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.util.mantid import in_mantidplot
-from mslice.app.qapp import create_qapp
+from mslice.app.qapp import create_qapp_if_required
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
@@ -12,7 +12,7 @@ MAIN_WINDOW = None
 def main():
     """Start the application.
     """
-    qapp_ref = create_qapp()
+    qapp_ref = create_qapp_if_required()
     show_gui()
     return qapp_ref.exec_()
 
