@@ -4,6 +4,9 @@ from mslice.views.interfaces.powder_projection_view import PowderView
 
 
 class CLIPowderWidget(PowderView):
+    """
+    A Powder Widget dummy class to interface with the presenter classes without doing anything in CLI mode.
+    """
 
     def __init__(self):
         pass
