@@ -87,8 +87,8 @@ class CutPlotterPresenter(PresenterUtility):
         except KeyError:
             return None
 
-    def update_main_window(self, is_gui=True):
-        if is_gui:
+    def update_main_window(self):
+        if self._main_presenter is not None:
             self._main_presenter.highlight_ws_tab(2)
             self._main_presenter.update_displayed_workspaces()
 

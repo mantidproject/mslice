@@ -43,7 +43,6 @@ def Load(path):
         raise RuntimeError('could not find the path %s' % path)
 
     get_dataloader_presenter().load_workspace([path])
-
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
 
@@ -60,10 +59,7 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
     """
 
     _check_workspace_name(InputWorkspace)
-
-    proj_ws = get_powder_presenter().calc_projection(InputWorkspace, Axis1, Axis2, Units)
-    get_powder_presenter().after_projection([proj_ws], is_gui=is_gui())
-    return proj_ws
+    return get_powder_presenter().calc_projection(InputWorkspace, Axis1, Axis2, Units)
 
 
 def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
@@ -115,7 +111,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, store=True)
 
-    get_cut_plotter_presenter().update_main_window(is_gui=is_gui())
+    get_cut_plotter_presenter().update_main_window()
 
     return cut
 

@@ -55,10 +55,12 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         self.after_projection(outws)
 
     def calc_projection(self, workspace, axis1, axis2, units):
-        return self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
+        proj_ws = self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
+        self.after_projection([proj_ws])
+        return proj_ws
 
-    def after_projection(self, projection_workspaces, is_gui=True):
-        if is_gui:
+    def after_projection(self, projection_workspaces):
+        if self._main_presenter is not None:
             self._get_main_presenter().update_displayed_workspaces()
             self._get_main_presenter().change_ws_tab(1)
             self._get_main_presenter().set_selected_workspaces(projection_workspaces)
