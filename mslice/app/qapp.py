@@ -8,10 +8,6 @@ def create_qapp_if_required():
     Create a qapplication for non gui plots
     """
     global qApp
-    from mslice.app.presenters import is_gui
-
-    if is_gui():
-        return
 
     if qApp is None:
         instance = QApplication.instance()
