@@ -51,12 +51,12 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         units = self._powder_view.get_powder_units()
         outws = []
         for workspace in selected_workspaces:
-            outws.append(self.calc_projection(workspace, axis1, axis2, units, from_calculate_powder_projection=True))
+            outws.append(self.calc_projection(workspace, axis1, axis2, units, quiet=True))
         self.after_projection(outws)
 
-    def calc_projection(self, workspace, axis1, axis2, units, from_calculate_powder_projection=False):
+    def calc_projection(self, workspace, axis1, axis2, units, quiet=False):
         proj_ws = self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
-        if not from_calculate_powder_projection:
+        if not quiet:
             self.after_projection([proj_ws])
         return proj_ws
 
