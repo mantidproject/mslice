@@ -16,7 +16,6 @@ case "$py_ver" in
     py2)
         py_exe=/usr/bin/python
         pkg_name=mantidnightly
-        export QT_API=pyqt
     ;;
     py3)
         py_exe=/usr/bin/python3
@@ -26,6 +25,9 @@ case "$py_ver" in
         echo "Unknown python version requested '$py_ver'"
         exit 1
 esac
+# Qt4 backends
+export QT_API=pyqt
+export MPLBACKEND=Qt4Agg
 
 function onexit {
   deactivate

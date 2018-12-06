@@ -4,7 +4,6 @@ from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
-
 PICKER_TOL_PTS = 3
 
 
@@ -32,19 +31,17 @@ def draw_interactive_cut(workspace):
 
 @plt.set_category(plt.CATEGORY_CUT)
 def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over=False, legend=None):
-    # get/create figure and ensure the axes are setup
+    legend = workspace.name if legend is None else legend
+    if not plot_over:
+        plt.cla()
+
     cur_fig = plt.gcf()
-    try:
-        ax = cur_fig.axes[0]
-        if not plot_over:
-            ax.cla()
-    except IndexError:
-        ax = cur_fig.add_subplot(1, 1, 1, projection='mantid')
+    cur_canvas = cur_fig.canvas
+    ax = cur_fig.add_subplot(1, 1, 1, projection='mantid')
 
     legend = workspace.name if legend is None else legend
     ax.errorbar(workspace.raw_ws, 'o-', label=legend, picker=PICKER_TOL_PTS)
     ax.set_ylim(*intensity_range) if intensity_range is not None else ax.autoscale()
-    cur_canvas = cur_fig.canvas
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
         leg = ax.legend(fontsize='medium')
         leg.draggable()
@@ -56,6 +53,7 @@ def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.manager.add_cut_plot(presenter, workspace.name.rsplit('_', 1)[0])
     cur_fig.canvas.draw()
+    return ax.lines
 
 
 def _create_cut():

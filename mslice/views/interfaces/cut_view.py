@@ -2,6 +2,9 @@ class CutView:
     error_occurred = None
     busy = None
 
+    def show_busy(self, is_busy):
+        self.busy.emit(is_busy)
+
     def get_cut_axis(self):
         pass
 

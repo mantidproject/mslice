@@ -1,5 +1,4 @@
-"""Defines the additional mslice commands on top of the standard matplotlib plotting commands
-"""
+"""Defines the additional mslice commands on top of the standard matplotlib plotting commands"""
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
@@ -8,160 +7,102 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
-
-import mslice.app as app
-
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.cut.cut_functions import compute_cut
-from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
-from mslice.models.axis import Axis
 from mslice.models.cmap import DEFAULT_CMAP
-from mslice.workspace.base import WorkspaceBase as Workspace
-from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
-from mslice.workspace.histogram_workspace import HistogramWorkspace
 
-
-# -----------------------------------------------------------------------------
-# Convenience functions
-# -----------------------------------------------------------------------------
-
-
-def _string_to_axis(string):
-    axis = string.split(',')
-    if len(axis) != 4:
-        raise ValueError('axis should be specified in format <name>,<start>,<end>,<step_size>')
-    return Axis(axis[0], axis[1], axis[2], axis[3])
-
-
-def _string_to_integration_axis(string):
-    '''Allows step to be omitted and set to default value'''
-    axis_str = string.split(',')
-    if len(axis_str) < 3:
-        raise ValueError('axis should be specified in format <name>,<start>,<end>')
-    valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], 0)
-    try:
-        valid_axis.step = axis_str[3]
-    except IndexError:
-        valid_axis.step = valid_axis.end - valid_axis.start
-    return valid_axis
-
-def _process_axis(axis, fallback_index, input_workspace, string_function=_string_to_axis):
-    available_axes = get_available_axes(input_workspace)
-    if axis is None:
-        axis = available_axes[fallback_index]
-    # check to see if axis is just a name e.g 'DeltaE' or a full binning spec e.g. 'DeltaE,0,1,100'
-    if ',' in axis:
-        axis = string_function(axis)
-    elif axis in available_axes:
-        range = get_axis_range(input_workspace, axis)
-        range = list(map(float, range))
-        axis = Axis(units=axis, start=range[0], end=range[1], step=range[2])
-    else:
-        raise RuntimeError("Axis '%s' not recognised. Workspace has these axes: %s " %
-                           (axis, ', '.join(available_axes)))
-    return axis
-
-
-def _check_workspace_name(workspace):
-    if isinstance(workspace, Workspace):
-        return
-    if not isinstance(workspace, str):
-        raise TypeError('InputWorkspace must be a workspace or a workspace name')
-    if not workspace_exists(workspace):
-        raise TypeError('InputWorkspace %s could not be found.' % workspace)
-
-def _check_workspace_type(workspace, correct_type):
-    """check a PSD workspace is MatrixWorkspace, or non-PSD is the specified type"""
-    if workspace.is_PSD:
-        if isinstance(workspace, MatrixWorkspace):
-            raise RuntimeError("Incorrect workspace type - run MakeProjection first.")
-        if not isinstance(workspace, correct_type):
-            raise RuntimeError("Incorrect workspace type.")
-    else:
-        if not isinstance(workspace, MatrixWorkspace):
-            raise RuntimeError("Incorrect workspace type.")
-
-
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.plotting.plot_window.slice_plot import SlicePlot
+from mslice.app import qapp
+from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
+                                   get_powder_presenter)
+from mslice.cli.projection_functions import PlotSliceMsliceProjection, PlotCutMsliceProjection
+from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
+                                        _check_workspace_type)
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
 
-def Load(path):
-    """ Load a workspace from a file.
 
-    Keyword Arguments:
-        path -- full path to input file (string)
+# Show function to keep window running and not disappearing
+def show():
+    qapp.show()
+
+
+def Load(path):
+    """
+    Load a workspace from a file.
+
+    :param path:  full path to input file (string)
+    :return:
     """
     if not isinstance(path, str):
         raise RuntimeError('path given to load must be a string')
     if not ospath.exists(path):
         raise RuntimeError('could not find the path %s' % path)
-    app.MAIN_WINDOW.dataloader_presenter.load_workspace([path])
+
+    get_dataloader_presenter().load_workspace([path])
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
 
 
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
-    """ Calculate projections of workspace.
+    """
+    Calculate projections of workspace
 
-       Keyword Arguments:
-           InputWorkspace -- Workspace to project, can be either python handle
-            to the workspace or a string containing the workspace name.
-           Axis1 -- The first axis of projection (string)
-           Axis2 -- The second axis of the projection (string)
-           Units -- The energy units (string) [default: 'meV']
+    :param InputWorkspace: Workspace to project, can be either python handle
+    to the workspace or a string containing the workspace name.
+    :param Axis1: The first axis of projection (string)
+    :param Axis2: The second axis of the projection (string)
+    :param Units: The energy units (string) [default: 'meV']
+    :return:
+    """
 
-       """
     _check_workspace_name(InputWorkspace)
-
-    proj_ws = app.MAIN_WINDOW.powder_presenter.calc_projection(InputWorkspace, Axis1, Axis2, Units)
-    app.MAIN_WINDOW.powder_presenter.after_projection([proj_ws])
-    return proj_ws
+    return get_powder_presenter().calc_projection(InputWorkspace, Axis1, Axis2, Units)
 
 
 def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
-    """ Slices workspace.
+    """
+    Slices workspace.
 
-       Keyword Arguments:
-       InputWorkspace -- The workspace to slice. The parameter can be either a python handle to the workspace
+    :param InputWorkspace: The workspace to slice. The parameter can be either a python handle to the workspace
        OR the workspace name as a string.
-
-       Axis1 -- The x axis of the slice. If not specified will default to |Q| (or Degrees).
-       Axis2 -- The y axis of the slice. If not specified will default to DeltaE
+    :param Axis1: The x axis of the slice. If not specified will default to |Q| (or Degrees).
+    :param Axis2: The y axis of the slice. If not specified will default to DeltaE
        Axis Format:-
             Either a string in format '<name>, <start>, <end>, <step_size>' e.g.
             'DeltaE,0,100,5'  or just the name e.g. 'DeltaE'. In that case, the
             start and end will default to the range in the data.
+    :param NormToOne: if true the slice will be normalized to one.
+    :return:
+    """
 
-       NormToOne -- if true the slice will be normalized to one.
-
-       """
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, PixelWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
-    return app.MAIN_WINDOW.slice_plotter_presenter.create_slice(workspace, x_axis, y_axis, None, None, NormToOne,
-                                                                DEFAULT_CMAP)
+
+    return get_slice_plotter_presenter().create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
 
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
-    """ Cuts workspace.
-     Keyword Arguments:
-    InputWorkspace -- Workspace to cut. The parameter can be either a python
+    """
+    Cuts workspace.
+    :param InputWorkspace: Workspace to cut. The parameter can be either a python
                       handle to the workspace OR the workspace name as a string.
-
-    CutAxis -- The x axis of the cut. If not specified will default to |Q| (or Degrees).
-    IntegrationAxis --  The integration axis of the cut. If not specified will default to DeltaE.
+    :param CutAxis: The x axis of the cut. If not specified will default to |Q| (or Degrees).
+    :param IntegrationAxis: The integration axis of the cut. If not specified will default to DeltaE.
     Axis Format:-
             Either a string in format '<name>, <start>, <end>, <step_size>' e.g.
             'DeltaE,0,100,5' (step_size may be omitted for the integration axis)
             or just the name e.g. 'DeltaE'. In that case, the start and end will
             default to the full range of the data.
-
-    NormToOne -- if true the cut will be normalized to one.
-
+    :param NormToOne: if true the cut will be normalized to one.
+    :return:
     """
+
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, PixelWorkspace)
@@ -169,45 +110,119 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, store=True)
-    app.MAIN_WINDOW.cut_plotter_presenter.update_main_window()
+
+    get_cut_plotter_presenter().update_main_window()
+
     return cut
+
 
 def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAULT_CMAP):
     """
     Creates mslice standard matplotlib plot of a slice workspace.
-    Keyword Arguments:
-    InputWorkspace -- Workspace to plot. The parameter can be either a python
-                      handle to the workspace OR the workspace name as a string.
-    IntensityStart -- Lower bound of the intensity axis (colorbar)
-    IntensityEnd -- Upper bound of the intensity axis (colorbar)
-    Colormap -- Colormap name as a string. Default is 'viridis'.
+
+    :param InputWorkspace: Workspace to plot. The parameter can be either a python
+    handle to the workspace OR the workspace name as a string.
+    :param IntensityStart: Lower bound of the intensity axis (colorbar)
+    :param IntensityEnd: Upper bound of the intensity axis (colorbar)
+    :param Colormap: Colormap name as a string. Default is 'viridis'.
+    :return:
     """
-    _check_workspace_name(InputWorkspace)
-    workspace = get_workspace_handle(InputWorkspace)
-    _check_workspace_type(workspace, HistogramWorkspace)
-    slice_presenter = app.MAIN_WINDOW.slice_plotter_presenter
-    slice_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
-    slice_presenter.change_colourmap(workspace.name, Colormap)
-    slice_presenter.plot_from_cache(workspace)
+
+    PlotSliceMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, Colormap)
+
+    return GlobalFigureManager._active_figure
+
 
 def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     """
     Create mslice standard matplotlib plot of a cut workspace.
-    Keyword Arguments:
-    InputWorkspace -- Workspace to cut. The parameter can be either a python
-                      handle to the workspace OR the workspace name as a string.
 
-    IntensityStart -- Lower bound of the y axis
-    IntensityEnd -- Upper bound of the y axis
-    PlotOver -- if true the cut will be plotted on an existing figure.
+    :param InputWorkspace: Workspace to cut. The parameter can be either a python handle to the workspace
+    OR the workspace name as a string.
+    :param IntensityStart: Lower bound of the y axis
+    :param IntensityEnd: Upper bound of the y axis
+    :param PlotOver: if true the cut will be plotted on an existing figure.
+    :return:
     """
-    _check_workspace_name(InputWorkspace)
-    workspace = get_workspace_handle(InputWorkspace)
-    if not isinstance(workspace, HistogramWorkspace):
-        raise RuntimeError("Incorrect workspace type.")
-    if IntensityStart == 0 and IntensityEnd == 0:
-        intensity_range = None
+
+    PlotCutMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, PlotOver)
+
+    return GlobalFigureManager._active_figure
+
+
+def KeepFigure(figure_number=None):
+    GlobalFigureManager.set_figure_as_kept(figure_number)
+
+
+def MakeCurrent(figure_number=None):
+    GlobalFigureManager.set_figure_as_current(figure_number)
+
+
+def ConvertToChi(figure_number):
+    """
+    Converts to the Dynamical susceptibility Chi''(Q,E) on Slice Plot
+    :param figure_number: The slice plot figure number returned when the plot was made.
+    :return:
+    """
+
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_chi_qe.trigger()
     else:
-        intensity_range = (IntensityStart, IntensityEnd)
-    app.MAIN_WINDOW.cut_plotter_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range,
-                                                                  plot_over=PlotOver)
+        print('This function cannot be used on a Cut')
+
+
+def ConvertToChiMag(figure_number):
+    """
+        Converts to the magnetic dynamical susceptibility Chi''(Q,E magnetic on Slice Plot
+        :param figure_number: The slice plot figure number returned when the plot was made.
+        :return:
+        """
+
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_chi_qe_magnetic.trigger()
+    else:
+        print('This function cannot be used on a Cut')
+
+
+def ConvertToCrossSection(figure_number):
+    """
+        Converts to the double differential cross-section d2sigma/dOmega.dE  on Slice Plot
+        :param figure_number: The slice plot figure number returned when the plot was made.
+        :return:
+        """
+
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_d2sig_dw_de.trigger()
+    else:
+        print('This function cannot be used on a Cut')
+
+
+def SymmetriseSQE(figure_number):
+    """
+        Converts to the double differential cross-section d2sigma/dOmega.dE  on Slice Plot
+        :param figure_number: The slice plot figure number returned when the plot was made.
+        :return:
+        """
+
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_symmetrised_sqe.trigger()
+    else:
+        print('This function cannot be used on a Cut')
+
+
+def ConvertToGDOS(figure_number):
+    """
+        Converts to symmetrised S(Q,E) (w.r.t. energy using temperature Boltzmann factor) on Slice Plot
+        :param figure_number: The slice plot figure number returned when the plot was made.
+        :return:
+        """
+
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    if isinstance(plot_handler, SlicePlot):
+        plot_handler.plot_window.action_gdos.trigger()
+    else:
+        print('This function cannot be used on a Cut')

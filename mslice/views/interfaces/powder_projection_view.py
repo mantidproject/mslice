@@ -8,6 +8,9 @@ class PowderView(object):
     def __init__(self):
         raise Exception("This abstract class should not be instantiated")
 
+    def show_busy(self, is_busy):
+        self.busy.emit(is_busy)
+
     def populate_powder_u1(self, u1_options):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 

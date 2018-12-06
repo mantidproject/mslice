@@ -25,7 +25,6 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         new_ws.is_PSD = self.is_PSD
         return new_ws
 
-
     def convert_to_matrix(self):
         ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization',
                                                   FindXAxis=False, StoreInADS=False, OutputWorkspace=self.name)

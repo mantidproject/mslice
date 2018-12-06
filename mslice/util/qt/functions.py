@@ -1,6 +1,7 @@
 from mslice.util.qt.uic import loadUi, loadUiType
 import os.path as osp
 
+
 def load_ui(caller_filename, ui_relfilename, baseinstance=None):
     """Load a ui file assuming it is relative to a given callers filepath. If
     an existing instance is given then the this instance is set as the baseclass

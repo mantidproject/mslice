@@ -47,10 +47,11 @@ class GlobalFigureManager(object):
     """
     # if there is a current figure it should be both current and active
     _active_category = None
-    _category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}  # Current _figures receive decorated commands
+    _category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}  # Current_figures receive decorated commands
     _figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
     _unclassified_figures = []
     _active_figure = None
+    _last_active_figure = None
     _figures = {}
 
     @classmethod
@@ -71,10 +72,21 @@ class GlobalFigureManager(object):
         cls._figures_by_category[category].remove(num)
         del cls._figures[num]
 
+    @classmethod
+    def get_figure_by_number(cls, num):
+        """
+        Returns the figure with figure number num
+        :param num: The assigned figure number
+        :return: The figure with figure number num
+        """
+        if cls.has_fignum(num):
+            return cls._figures[num]
+        else:
+            return None
 
     @classmethod
     def destroy_fig(cls, fig):
-        "*fig* is a Figure instance"
+        """*fig* is a Figure instance"""
         num = next((manager.num for manager in cls._figures.values()
                     if manager.canvas.figure == fig), None)
         if num is not None:
@@ -226,8 +238,15 @@ class GlobalFigureManager(object):
         return figure_category
 
     @classmethod
-    def set_figure_as_kept(cls, num):
+    def set_figure_as_kept(cls, num=None):
         # kept figures are just lying around, not really managed much, until they report in as current again
+        if num is None:
+            if cls._active_figure is not None:
+                num = cls.get_active_figure().number
+                cls._last_active_figure = num
+            else:
+                num = cls._last_active_figure
+
         if cls._active_figure == num:
             cls._active_figure = None
         try:
@@ -242,13 +261,21 @@ class GlobalFigureManager(object):
         cls.broadcast(figure_category)
 
     @classmethod
-    def set_figure_as_current(cls, num):
+    def set_figure_as_current(cls, num=None):
+        if num is None:
+            if cls._last_active_figure is None:
+                num = cls.get_active_figure().number
+            else:
+                num = cls._last_active_figure
+
         try:
             figure_category = cls.get_category(num)
         except KeyError:
             figure_category = None
+
         if figure_category:
             cls._category_current_figures[figure_category] = num
+
         cls._active_figure = num
         cls.broadcast(figure_category)
 

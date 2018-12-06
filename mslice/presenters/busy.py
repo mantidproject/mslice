@@ -1,7 +1,8 @@
 from contextlib import contextmanager
 
+
 @contextmanager
 def show_busy(view):
-    view.busy.emit(True)
+    view.show_busy(True)
     yield
-    view.busy.emit(False)
+    view.show_busy(False)

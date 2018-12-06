@@ -95,7 +95,7 @@ class MainWindow(MainView, QMainWindow):
         self.enable_buttons(tab)
 
     def enable_widget_tabs(self, workspace_tab):
-        '''enables correct powder/slice/cut tabs based on workspace tab'''
+        """Enables correct powder/slice/cut tabs based on workspace tab"""
         self.tabWidget_2.show()
         tab_to_show = self.tabs_to_show[workspace_tab]
         for tab_index in range(3):
@@ -108,7 +108,7 @@ class MainWindow(MainView, QMainWindow):
             self.tabWidget_2.hide()
 
     def enable_buttons(self, tab):
-        '''enables correct buttons based on workspace tab'''
+        """Enables correct buttons based on workspace tab"""
         variable_buttons = [self.btnAdd, self.btnSubtract, self.btnMerge, self.btnPlot, self.btnOverplot, self.btnSaveToADS]
         for button in variable_buttons:
             button.hide()

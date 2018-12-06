@@ -13,9 +13,9 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
     def __init__(self, powder_view, projection_calculator):
         self._powder_view = powder_view
         self._projection_calculator = projection_calculator
-        if not isinstance(self._powder_view,PowderView):
+        if not isinstance(self._powder_view, PowderView):
             raise TypeError("powder_view is not of type PowderView")
-        if not isinstance(self._projection_calculator,ProjectionCalculator):
+        if not isinstance(self._projection_calculator, ProjectionCalculator):
             raise TypeError("projection_calculator is not of type ProjectionCalculator")
 
         #Add rest of options
@@ -51,16 +51,20 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         units = self._powder_view.get_powder_units()
         outws = []
         for workspace in selected_workspaces:
-            outws.append(self.calc_projection(workspace, axis1, axis2, units))
+            outws.append(self.calc_projection(workspace, axis1, axis2, units, quiet=True))
         self.after_projection(outws)
 
-    def calc_projection(self, workspace, axis1, axis2, units):
-        return self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
+    def calc_projection(self, workspace, axis1, axis2, units, quiet=False):
+        proj_ws = self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
+        if not quiet:
+            self.after_projection([proj_ws])
+        return proj_ws
 
     def after_projection(self, projection_workspaces):
-        self._get_main_presenter().update_displayed_workspaces()
-        self._get_main_presenter().change_ws_tab(1)
-        self._get_main_presenter().set_selected_workspaces(projection_workspaces)
+        if self._main_presenter is not None:
+            self._get_main_presenter().update_displayed_workspaces()
+            self._get_main_presenter().change_ws_tab(1)
+            self._get_main_presenter().set_selected_workspaces(projection_workspaces)
 
     @require_main_presenter
     def _get_main_presenter(self):

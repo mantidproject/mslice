@@ -11,7 +11,8 @@ PICKER_TOL_PTS = 5
 
 
 def plot_cached_slice(slice_workspace, slice_cache):
-    _show_plot(slice_workspace, slice_cache)
+    quadmesh = _show_plot(slice_workspace, slice_cache)
+    return quadmesh
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
@@ -52,6 +53,8 @@ def _show_plot(slice_cache, workspace):
 
     cur_fig.canvas.draw_idle()
     cur_fig.show()
+
+    return image
 
 
 def set_colorbar_label(label):

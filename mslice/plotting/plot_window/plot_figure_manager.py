@@ -1,4 +1,3 @@
-
 import os.path
 import weakref
 
@@ -12,6 +11,7 @@ from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 import mslice.plotting.pyplot as plt
+import mslice.app.qapp as qapp
 
 
 class PlotFigureManagerQT(QtCore.QObject):
@@ -27,8 +27,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.number = number
         self._current_figs = current_figs
 
-        # window instance
+        qapp.create_qapp_if_required()
         self.window = PlotWindow(manager=weakref.proxy(self))
+
         self.window.resize(800, 600)
 
         self._plot_handler = None

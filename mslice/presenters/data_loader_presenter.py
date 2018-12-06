@@ -18,11 +18,11 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         self._EfCache = None
 
     def load_workspace(self, file_paths, merge=False):
-        '''
+        """
         Loads one or more workspaces.
         :param file_paths: list of paths to files to load
         :param merge: boolean - whether to combine files into a single workspace
-        '''
+        """
         with show_busy(self._view):
             ws_names = [os.path.splitext(os.path.basename(base))[0] for base in file_paths]
             if merge:
@@ -56,9 +56,10 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                         allChecked = self.check_efixed(ws_name, multi)
                     else:
                         get_workspace_handle(ws_name).e_fixed = self._EfCache
-                    self._main_presenter.show_workspace_manager_tab()
-                    self._main_presenter.update_displayed_workspaces()
-                    self._main_presenter.show_tab_for_workspace(get_workspace_handle(ws_name))
+                    if self._main_presenter is not None:
+                        self._main_presenter.show_workspace_manager_tab()
+                        self._main_presenter.update_displayed_workspaces()
+                        self._main_presenter.show_tab_for_workspace(get_workspace_handle(ws_name))
         self._report_load_errors(ws_names, not_opened, not_loaded)
 
     def file_types_match(self, selected_files):
@@ -66,7 +67,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         return all(ext == extensions[0] for ext in extensions)
 
     def check_efixed(self, ws_name, multi=False):
-        '''checks if a newly loaded workspace has efixed set'''
+        """checks if a newly loaded workspace has efixed set"""
         ws = get_workspace_handle(ws_name)
         if ws.e_mode == 'Indirect' and not ws.ef_defined:
             Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi, self._EfCache)

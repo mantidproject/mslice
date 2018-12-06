@@ -24,6 +24,14 @@ class PowderProjectionPresenterTest(unittest.TestCase):
     def test_constructor_success(self):
         self.powder_presenter = PowderProjectionPresenter(self.powder_view, self.projection_calculator)
 
+    def test_constructor_failure_with_incorrect_powder_view(self):
+        with self.assertRaises(TypeError):
+            self.powder_presenter = PowderProjectionPresenter(self.projection_calculator, self.powder_view)
+
+    def test_constructor_failure_with_incorrect_projection_calculator(self):
+        with self.assertRaises(TypeError):
+            self.powder_presenter = PowderProjectionPresenter(self.powder_view, MainView)
+
     def test_constructor_incorrect_powder_view_fail(self):
         self.assertRaises(TypeError, PowderProjectionPresenter, self.mainview, self.mainview, self.projection_calculator)
 
@@ -61,7 +69,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         #self.projection_calculator.calculate_projection.assert_called_once_with(input_workspace=selected_workspace,
         #                           output_workspace=output_workspace,qbinning=???,axis1=u1,axis2=u2)
         self.projection_calculator.calculate_projection.assert_called_once()
-        self.main_presenter.update_displayed_workspaces.assert_called_once_with()
+        self.main_presenter.update_displayed_workspaces.assert_called_once()
         self.main_presenter.set_selected_workspaces.assert_called_once()
 
     def test_notify_presenter_with_unrecognised_command_raise_exception(self):
@@ -80,7 +88,7 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.powder_view.get_powder_u1 = mock.Mock(return_value=u1)
         self.powder_view.get_powder_u2 = mock.Mock(return_value=u2)
         self.powder_presenter.register_master(self.main_presenter)
-        self.assertRaises(ValueError,self.powder_presenter.notify,Command.CalculatePowderProjection)
+        self.assertRaises(ValueError, self.powder_presenter.notify, Command.CalculatePowderProjection)
         self.main_presenter.get_selected_workspaces.assert_called_once_with()
         self.powder_view.get_powder_u1.assert_called_once_with()
         self.powder_view.get_powder_u2.assert_called_once_with()

@@ -8,6 +8,9 @@ class SliceView:
     def __init__(self):
         raise Exception("This abstract class must not be instantiated")
 
+    def show_busy(self, is_busy):
+        self.busy.emit(is_busy)
+
     def ask_sample_temperature(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
