@@ -9,6 +9,8 @@ from mslice.presenters.quick_options_presenter import quick_options
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
 
+from mslice.scripting import generate_workspace_history
+
 
 def get_min(data, absolute_minimum=-np.inf):
     """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
@@ -41,6 +43,7 @@ class CutPlot(IPlot):
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
+        plot_window.action_gen_history.triggered.connect(generate_workspace_history)
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
