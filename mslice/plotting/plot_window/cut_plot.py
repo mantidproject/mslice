@@ -10,7 +10,11 @@ from mslice.presenters.quick_options_presenter import quick_options
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
 
+<<<<<<< HEAD
 from mslice.scripting import generate_script
+=======
+from mslice.scripting import generate_workspace_history
+>>>>>>> Added menu buttons to plotwindow to allow user to generate workspace history #385
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -44,7 +48,6 @@ class CutPlot(IPlot):
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
-        plot_window.action_gen_history.triggered.connect(generate_script)
         plot_window.action_gen_history.triggered.connect(partial(generate_script, self.plot_window, self.ws_name, None))
 
     def disconnect(self, plot_window):
