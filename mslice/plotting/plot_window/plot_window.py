@@ -49,6 +49,11 @@ class PlotWindow(QtWidgets.QMainWindow):
     def create_menus(self):
         self.menubar = self.menuBar()
 
+        # File
+        self.menu_file = QtWidgets.QMenu('File', self.menubar)
+        self.menubar.addMenu(self.menu_file)
+        self.add_file_actions(self.menu_file)
+
         # information
         self.menu_information = QtWidgets.QMenu("Information", self.menubar)
         self.menubar.addMenu(self.menu_information)
@@ -67,6 +72,14 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.add_intensity_actions(self.menu_intensity)
 
         self.setMenuBar(self.menubar)
+
+    def add_file_actions(self, menu):
+        self.action_gen_history = add_action(menu, self, "Generate History")
+        menu.addAction(self.action_gen_history)
+
+        self.action_quit = add_action(menu, self, "Close")
+        menu.addAction(self.action_quit)
+        self.action_quit.triggered.connect(self.close)
 
     def add_information_actions(self, menu, items):
         for text in items:
