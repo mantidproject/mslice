@@ -15,6 +15,8 @@ from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 
+from mslice.scripting import generate_workspace_history
+
 
 class SlicePlot(IPlot):
 
@@ -35,53 +37,55 @@ class SlicePlot(IPlot):
 
         self.setup_connections(self.plot_window)
 
-    def setup_connections(self, plot_figure):
-        plot_figure.action_interactive_cuts.setVisible(True)
-        plot_figure.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
-        plot_figure.action_save_cut.setVisible(False)
-        plot_figure.action_save_cut.triggered.connect(self.save_icut)
-        plot_figure.action_flip_axis.setVisible(False)
-        plot_figure.action_flip_axis.triggered.connect(self.flip_icut)
+    def setup_connections(self, plot_window):
+        plot_window.action_interactive_cuts.setVisible(True)
+        plot_window.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
+        plot_window.action_save_cut.setVisible(False)
+        plot_window.action_save_cut.triggered.connect(self.save_icut)
+        plot_window.action_flip_axis.setVisible(False)
+        plot_window.action_flip_axis.triggered.connect(self.flip_icut)
 
-        plot_figure.action_sqe.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_sqe,
+        plot_window.action_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_sqe,
                     self._slice_plotter_presenter.show_scattering_function, False))
 
-        plot_figure.action_chi_qe.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_chi_qe,
+        plot_window.action_chi_qe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_chi_qe,
                     self._slice_plotter_presenter.show_dynamical_susceptibility, True))
 
-        plot_figure.action_chi_qe_magnetic.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_chi_qe_magnetic,
+        plot_window.action_chi_qe_magnetic.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_chi_qe_magnetic,
                     self._slice_plotter_presenter.show_dynamical_susceptibility_magnetic, True))
 
-        plot_figure.action_d2sig_dw_de.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_d2sig_dw_de,
+        plot_window.action_d2sig_dw_de.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
                     self._slice_plotter_presenter.show_d2sigma, False))
 
-        plot_figure.action_symmetrised_sqe.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_symmetrised_sqe,
+        plot_window.action_symmetrised_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_symmetrised_sqe,
                     self._slice_plotter_presenter.show_symmetrised, True))
 
-        plot_figure.action_gdos.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_gdos, self._slice_plotter_presenter.show_gdos, True))
+        plot_window.action_gdos.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_gdos, self._slice_plotter_presenter.show_gdos, True))
 
-        plot_figure.action_hydrogen.triggered.connect(
+        plot_window.action_hydrogen.triggered.connect(
             partial(self.toggle_overplot_line, 1, True))
-        plot_figure.action_deuterium.triggered.connect(
+        plot_window.action_deuterium.triggered.connect(
             partial(self.toggle_overplot_line, 2, True))
-        plot_figure.action_helium.triggered.connect(
+        plot_window.action_helium.triggered.connect(
             partial(self.toggle_overplot_line, 4, True))
-        plot_figure.action_arbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
-        plot_figure.action_aluminium.triggered.connect(
+        plot_window.action_arbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
+        plot_window.action_aluminium.triggered.connect(
             partial(self.toggle_overplot_line, 'Aluminium', False))
-        plot_figure.action_copper.triggered.connect(
+        plot_window.action_copper.triggered.connect(
             partial(self.toggle_overplot_line, 'Copper', False))
-        plot_figure.action_niobium.triggered.connect(
+        plot_window.action_niobium.triggered.connect(
             partial(self.toggle_overplot_line, 'Niobium', False))
-        plot_figure.action_tantalum.triggered.connect(
+        plot_window.action_tantalum.triggered.connect(
             partial(self.toggle_overplot_line, 'Tantalum', False))
-        plot_figure.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
+        plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
+
+        plot_window.action_gen_history.triggered.connect(generate_workspace_history)
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()
