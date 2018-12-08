@@ -1,33 +1,27 @@
 from __future__ import (absolute_import, division, print_function)
 
-import importlib
-
 from matplotlib.figure import Figure
-
-from mslice.util.qt import QT_VERSION
-from mslice.util.qt import QtCore, QtWidgets
 import qtawesome as qta
 
-# The FigureCanvas & Toolbar are QWidgets so we must import it from the mpl backend that matches
-# the version of Qt we are running with
-mpl_qt_backend  = importlib.import_module('matplotlib.backends.backend_qt{}agg'.format(QT_VERSION[0]))
-FigureCanvasQTAgg = getattr(mpl_qt_backend, 'FigureCanvasQTAgg')
-NavigationToolbar2QT = getattr(mpl_qt_backend, 'NavigationToolbar2QT')
+from mslice.plotting.backend import get_canvas_and_toolbar_cls
+from mslice.util.qt import QtCore, QtWidgets
+
+FigureCanvas, NavigationToolbar2QT =  get_canvas_and_toolbar_cls()
 
 
-class MatplotlibQTCanvas(FigureCanvasQTAgg):
+class MatplotlibQTCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
     def __init__(self, manager, width=5, height=4, dpi=100, parent=None):
         self.figure = Figure(figsize=(width, height), dpi=dpi)
-        FigureCanvasQTAgg.__init__(self, self.figure)
+        FigureCanvas.__init__(self, self.figure)
         self.setParent(parent)
         self.manager = manager
 
-        FigureCanvasQTAgg.setSizePolicy(self,
-                                        QtWidgets.QSizePolicy.Expanding,
-                                        QtWidgets.QSizePolicy.Expanding)
-        FigureCanvasQTAgg.updateGeometry(self)
+        FigureCanvas.setSizePolicy(self,
+                                   QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
 
 
 class PlotWindow(QtWidgets.QMainWindow):

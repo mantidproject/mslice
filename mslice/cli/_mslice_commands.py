@@ -1,33 +1,64 @@
 """Defines the additional mslice commands on top of the standard matplotlib plotting commands"""
-# -----------------------------------------------------------------------------
-# Imports
-# -----------------------------------------------------------------------------
-
-# Mantid Tools imported for convenience
 from __future__ import (absolute_import, division, print_function)
 
 import os.path as ospath
+
+import matplotlib as mpl
+
+from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
+                                   get_powder_presenter)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cmap import DEFAULT_CMAP
-from mslice.workspace.pixel_workspace import PixelWorkspace
 
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.plotting.plot_window.slice_plot import SlicePlot
-from mslice.app import qapp
-from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
-                                   get_powder_presenter)
 from mslice.cli.projection_functions import PlotSliceMsliceProjection, PlotCutMsliceProjection
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
                                         _check_workspace_type)
+from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.util.qt.qapp import QAppThreadCall, mainloop
+from six import string_types
+
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
 
 
-# Show function to keep window running and not disappearing
-def show():
-    qapp.show()
+def Show():
+    """
+    Show all figures and start the event loop if necessary
+    """
+    managers = GlobalFigureManager.get_all_fig_managers()
+    if not managers:
+        return
+
+    for manager in managers:
+        manager.show()
+
+    # Hack: determine at runtime whether we are
+    # inside ipython in pylab mode.
+    from matplotlib import pyplot
+
+    try:
+        ipython_pylab = not pyplot.show._needmain
+        # IPython versions >= 0.10 tack the _needmain
+        # attribute onto pyplot.show, and always set
+        # it to False, when in %pylab mode.
+        ipython_pylab = ipython_pylab and mpl.get_backend() != 'WebAgg'
+        # TODO: The above is a hack to get the WebAgg backend
+        # working with ipython's `%pylab` mode until proper
+        # integration is implemented.
+    except AttributeError:
+        ipython_pylab = False
+
+    # Leave the following as a separate step in case we
+    # want to control this behavior with an rcParam.
+    if ipython_pylab:
+        return
+
+    if not mpl.is_interactive() or mpl.get_backend() == 'WebAgg':
+        QAppThreadCall(mainloop)()
 
 
 def Load(path):
@@ -37,7 +68,7 @@ def Load(path):
     :param path:  full path to input file (string)
     :return:
     """
-    if not isinstance(path, str):
+    if not isinstance(path, string_types):
         raise RuntimeError('path given to load must be a string')
     if not ospath.exists(path):
         raise RuntimeError('could not find the path %s' % path)

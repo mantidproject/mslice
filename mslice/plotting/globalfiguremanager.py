@@ -30,6 +30,8 @@ from __future__ import (absolute_import, division, print_function)
 # system imports
 from functools import wraps
 
+# local imports
+from mslice.util.qt.qapp import QAppThreadCall
 
 # Labels for each category
 CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
@@ -111,6 +113,13 @@ class GlobalFigureManager(object):
         return num in cls._figures
 
     @classmethod
+    def get_all_fig_managers(cls):
+        """
+        Return a list of figure managers.
+        """
+        return list(cls._figures.values())
+
+    @classmethod
     def reset(cls):
         """Reset all class variables to initial state. This function exists for testing purposes """
         cls._active_category = None
@@ -129,7 +138,7 @@ class GlobalFigureManager(object):
             num = 1
             while any([num == existing_fig_num for existing_fig_num in cls._figures.keys()]):
                 num += 1
-        new_fig = PlotFigureManagerQT(num, GlobalFigureManager)
+        new_fig = QAppThreadCall(PlotFigureManagerQT)(num, GlobalFigureManager)
         cls._figures[num] = new_fig
         cls._active_figure = num
         cls._unclassified_figures.append(num)

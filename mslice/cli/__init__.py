@@ -7,6 +7,10 @@ from matplotlib.projections import register_projection
 from mslice.cli.helperfunctions import is_slice, is_cut
 from ._mslice_commands import *  # noqa: F401
 
+# This is not compatible with mslice as we use a separate
+# global figure manager see _mslice_commands.Show
+del show  # noqa: F821
+
 
 # MSlice Matplotlib Projection
 class MSliceAxes(Axes):
