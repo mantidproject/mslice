@@ -3,7 +3,7 @@ and entry points.
 """
 import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.util.mantid import in_mantidplot
-from mslice.app.qapp import create_qapp_if_required
+from mslice.util.qt.qapp import create_qapp_if_required
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None
