@@ -1,3 +1,4 @@
+from functools import partial
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 import warnings
@@ -44,6 +45,7 @@ class CutPlot(IPlot):
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
         plot_window.action_gen_history.triggered.connect(generate_script)
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.plot_window, self.ws_name, None))
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
