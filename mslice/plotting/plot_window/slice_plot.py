@@ -15,11 +15,7 @@ from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 
-<<<<<<< HEAD
 from mslice.scripting import generate_script
-=======
-from mslice.scripting import generate_workspace_history
->>>>>>> Added menu buttons to plotwindow to allow user to generate workspace history #385
 
 
 class SlicePlot(IPlot):
