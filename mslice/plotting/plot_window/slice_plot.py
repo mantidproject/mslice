@@ -15,7 +15,7 @@ from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 
-from mslice.scripting import generate_workspace_history
+from mslice.scripting import generate_script
 
 
 class SlicePlot(IPlot):
@@ -85,7 +85,7 @@ class SlicePlot(IPlot):
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
 
-        plot_window.action_gen_history.triggered.connect(generate_workspace_history)
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name))
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()

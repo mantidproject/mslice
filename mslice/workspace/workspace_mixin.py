@@ -77,7 +77,6 @@ class WorkspaceMixin(object):
         # scale errors?
         return new_ws
 
-
     def check_dimensions(self, workspace_to_check):
         """check if a workspace has the same number of bins as self for each dimension"""
         for i in range(self._raw_ws.getNumDims()):
@@ -103,7 +102,6 @@ class WorkspaceMixin(object):
     @property
     def raw_ws(self):
         return self._raw_ws
-
 
     def __add__(self, other):
         return self._binary_op(operator.add, other)
