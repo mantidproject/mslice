@@ -20,6 +20,7 @@ from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_
 from mslice.cli.projection_functions import PlotSliceMsliceProjection, PlotCutMsliceProjection
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
                                         _check_workspace_type)
+from mslice.scripting import generate_script
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
@@ -44,6 +45,12 @@ def Load(path):
 
     get_dataloader_presenter().load_workspace([path])
     return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
+
+
+def GenerateScript(InputWorkspace, SaveFilePath):
+    _check_workspace_name(InputWorkspace)
+    workspace = get_workspace_handle(InputWorkspace)
+    generate_script(None, ws_name=workspace, filename=SaveFilePath)
 
 
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
