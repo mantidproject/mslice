@@ -19,6 +19,7 @@ from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_ax
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
+from mslice.scripting import generate_script
 
 from mslice.scripting import generate_script
 # -----------------------------------------------------------------------------
