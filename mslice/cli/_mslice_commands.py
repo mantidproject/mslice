@@ -16,10 +16,12 @@ from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.cli.projection_functions import PlotSliceMsliceProjection, PlotCutMsliceProjection
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
                                         _check_workspace_type)
+
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
 from mslice.scripting import generate_script
+
 
 # -----------------------------------------------------------------------------
 # Command functions
