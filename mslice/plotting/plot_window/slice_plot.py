@@ -85,7 +85,8 @@ class SlicePlot(IPlot):
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
 
-        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.plot_window, self.ws_name, None))
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.plot_window, self.ws_name, None,
+                                                                 self))
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()
@@ -486,3 +487,16 @@ class SlicePlot(IPlot):
     @y_grid.setter
     def y_grid(self, value):
         self.manager.y_grid = value
+
+    @property
+    def slice_plot_options(self):
+        options = {
+            'title': self.title,
+            'x_grid': self.x_grid,
+            'y_grid': self.y_grid,
+            'y_label': self.y_label,
+            'x_label': self.x_label,
+            'y_range': self.y_range,
+            'x_range': self.x_range
+        }
+        return options

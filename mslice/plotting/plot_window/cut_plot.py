@@ -44,7 +44,8 @@ class CutPlot(IPlot):
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
-        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.plot_window, self.ws_name, None))
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.plot_window, self.ws_name, None,
+                                                                 self))
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
@@ -362,3 +363,19 @@ class CutPlot(IPlot):
     @y_grid.setter
     def y_grid(self, value):
         self.manager.y_grid = value
+
+    @property
+    def cut_plot_options(self):
+        options = {
+            'title': self.title,
+            'show_legends': self.show_legends,
+            'y_grid': self.y_grid,
+            'x_grid': self.x_grid,
+            'y_label': self.y_label,
+            'x_label': self.x_label,
+            'y_range': self.y_range,
+            'x_range': self.x_range,
+            'y_log': self.y_log,
+            'x_log': self.x_log,
+        }
+        return options
