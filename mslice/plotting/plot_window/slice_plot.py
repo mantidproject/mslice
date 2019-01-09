@@ -487,16 +487,3 @@ class SlicePlot(IPlot):
     @y_grid.setter
     def y_grid(self, value):
         self.manager.y_grid = value
-
-    @property
-    def slice_plot_options(self):
-        options = {
-            'title': self.title,
-            'x_grid': self.x_grid,
-            'y_grid': self.y_grid,
-            'y_label': self.y_label,
-            'x_label': self.x_label,
-            'y_range': self.y_range,
-            'x_range': self.x_range
-        }
-        return options
