@@ -1,7 +1,7 @@
 from mantid.simpleapi import GeneratePythonScript
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.qt import QtWidgets
-from mslice.scripting.helperfunctions import add_plot_statements, add_import_statements, change_axis_scale, PACKAGES
+from mslice.scripting.helperfunctions import add_plot_statements, add_import_statements
 
 
 def generate_script(figure, ws_name, filename=None, plot_handler=None):
