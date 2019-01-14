@@ -21,7 +21,6 @@ from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_ax
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
-
 from mslice.scripting import generate_script
 # -----------------------------------------------------------------------------
 # Command functions
@@ -290,7 +289,7 @@ def update_legend(ax):
     overplot_lines = get_slice_plotter_presenter()._slice_cache['MAR21335_Ei60.00meV'].overplot_lines.values()
     lines = []
     labels = []
-    ax = plt.gca()
+    #ax = plt.gca()
     for line in overplot_lines:
         if str(line.get_linestyle()) != 'None' and line.get_label() != '':
             lines.append(line)
