@@ -21,8 +21,6 @@ from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
 from mslice.scripting import generate_script
-
-
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
