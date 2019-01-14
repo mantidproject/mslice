@@ -27,7 +27,7 @@ def PlotCutMsliceProjection(InputWorkspace, IntensityStart=0, IntensityEnd=0, Pl
     return lines
 
 
-def PlotSliceMsliceProjection(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAULT_CMAP):
+def PlotSliceMsliceProjection(ax, InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAULT_CMAP):
     """
     Same as the CLI PlotSlice but returns the relevant axes object.
     """
@@ -41,6 +41,6 @@ def PlotSliceMsliceProjection(InputWorkspace, IntensityStart="", IntensityEnd=""
         cli_slice_plotter_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
     cli_slice_plotter_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
     cli_slice_plotter_presenter.change_colourmap(workspace.name, Colormap)
-    quadmesh = cli_slice_plotter_presenter.plot_from_cache(workspace)
+    quadmesh = cli_slice_plotter_presenter.plot_from_cache(workspace, ax=ax)
 
     return quadmesh

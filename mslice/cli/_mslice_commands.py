@@ -4,6 +4,8 @@ from __future__ import (absolute_import, division, print_function)
 import os.path as ospath
 
 import matplotlib as mpl
+import matplotlib.colors as colors
+from matplotlib.lines import Line2D
 
 from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
                                    get_powder_presenter)
@@ -19,7 +21,6 @@ from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_ax
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
-from mslice.scripting import generate_script
 
 from mslice.scripting import generate_script
 # -----------------------------------------------------------------------------
@@ -63,26 +64,26 @@ def Show():
         QAppThreadCall(mainloop)()
 
 
-def Load(path):
+def Load(Filename, OutputWorkspace):
     """
     Load a workspace from a file.
 
-    :param path:  full path to input file (string)
+    :param Filename:  full path to input file (string)
     :return:
     """
-    if not isinstance(path, string_types):
+    if not isinstance(Filename, string_types):
         raise RuntimeError('path given to load must be a string')
-    if not ospath.exists(path):
-        raise RuntimeError('could not find the path %s' % path)
+    if not ospath.exists(Filename):
+        raise RuntimeError('could not find the path %s' % Filename)
 
-    get_dataloader_presenter().load_workspace([path])
-    return get_workspace_handle(ospath.splitext(ospath.basename(path))[0])
+    get_dataloader_presenter().load_workspace([Filename])
+    return get_workspace_handle(ospath.splitext(ospath.basename(Filename))[0])
 
 
-def GenerateScript(InputWorkspace, SaveFilePath):
+def GenerateScript(InputWorkspace, path):
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
-    generate_script(None, ws_name=workspace, filename=SaveFilePath)
+    generate_script(None, ws_name=workspace, filename=path)
 
 
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
@@ -265,3 +266,42 @@ def ConvertToGDOS(figure_number):
         plot_handler.plot_window.action_gdos.trigger()
     else:
         print('This function cannot be used on a Cut')
+
+
+def change_axis_scale(colormesh, fig, colorbar_range, logarithmic):
+    vmin, vmax = colorbar_range
+    if logarithmic:
+        colormesh.colorbar.remove()
+        if vmin <= float(0):
+            vmin = 0.001
+        colormesh.set_clim((vmin, vmax))
+        norm = colors.LogNorm(vmin, vmax)
+        colormesh.set_norm(norm)
+        fig.colorbar(colormesh)
+    else:
+        colormesh.colorbar.remove()
+        colormesh.set_clim((vmin, vmax))
+        norm = colors.Normalize(vmin, vmax)
+        colormesh.set_norm(norm)
+        fig.colorbar(colormesh)
+
+
+def update_legend(ax):
+    overplot_lines = get_slice_plotter_presenter()._slice_cache['MAR21335_Ei60.00meV'].overplot_lines.values()
+    lines = []
+    labels = []
+    ax = plt.gca()
+    for line in overplot_lines:
+        if str(line.get_linestyle()) != 'None' and line.get_label() != '':
+            lines.append(line)
+            labels.append(line.get_label())
+    if len(lines) > 0:
+        legend = ax.legend(lines, labels, fontsize='small')
+        for legline, line in zip(legend.get_lines(), lines):
+            legline.set_picker(5)
+            #slice_plotter_presenter._legend_dict[legline] = line
+        for label, line in zip(legend.get_texts(), lines):
+            label.set_picker(5)
+            #slice_plotter_presenter._legend_dict[label] = line
+    else:
+        ax.legend_ = None  # remove legend
