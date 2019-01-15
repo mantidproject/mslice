@@ -54,23 +54,31 @@ def add_slice_plot_statements(script_lines, plot_handler):
 
     script_lines.append('#User Changes\n')  # Could put checks in slice_plot to only write what has changed
 
-    script_lines.append('ax.set_title(\'{}\')\n'.format(plot_handler.title))
+    script_lines.append('ax.set_title(\'{}\')\n'.format(plot_handler.title)
+                        if 'title' in plot_handler.changed else '')
 
-    script_lines.append('ax.set_ylabel(\'{}\')\n'.format(plot_handler.y_label))
-    script_lines.append('ax.set_xlabel(\'{}\')\n'.format(plot_handler.x_label))
+    script_lines.append('ax.set_ylabel(\'{}\')\n'.format(plot_handler.y_label)
+                        if 'y_label' in plot_handler.changed else '')
+    script_lines.append('ax.set_xlabel(\'{}\')\n'.format(plot_handler.x_label)
+                        if 'x_label' in plot_handler.changed else '')
 
-    script_lines.append('ax.grid({}, axis=\'y\')\n'.format(plot_handler.y_grid))
-    script_lines.append('ax.grid({}, axis=\'x\')\n'.format(plot_handler.x_grid))
+    script_lines.append('ax.grid({}, axis=\'y\')\n'.format(plot_handler.y_grid)
+                        if 'y_grid' in plot_handler.changed else '')
+    script_lines.append('ax.grid({}, axis=\'x\')\n'.format(plot_handler.x_grid)
+                        if 'x_grid' in plot_handler.changed else '')
 
-    script_lines.append('ax.set_ylim(bottom={}, top={})\n'.format(*plot_handler.y_range))
-    script_lines.append('ax.set_xlim(left={}, right={})\n'.format(*plot_handler.x_range))
+    script_lines.append('ax.set_ylim(bottom={}, top={})\n'.format(*plot_handler.y_range)
+                        if 'y_range' in plot_handler.changed else '')
+    script_lines.append('ax.set_xlim(left={}, right={})\n'.format(*plot_handler.x_range)
+                        if 'x_range' in plot_handler.changed else '')
 
-    script_lines.append('colormesh.set_clim({})\n'.format(plot_handler.colorbar_range))
-
-    script_lines.append('cb = plt.colorbar(colormesh, ax=ax)')
-    script_lines.append('cb.set_label(\'{}\')\n'.format(plot_handler.colorbar_label))
-    script_lines.append('mc.change_axis_scale(colormesh, fig, {}, {})\n\n'.format(plot_handler.colorbar_range,
-                                                                                  plot_handler.colorbar_log))
+    script_lines.append('cb = plt.colorbar(colormesh, ax=ax)\n'
+                        if 'colorbar_label' in plot_handler.changed else '')
+    script_lines.append('cb.set_label(\'{}\')\n'.format(plot_handler.colorbar_label)
+                        if 'colorbar_label' in plot_handler.changed else '')
+    script_lines.append(
+        'mc.change_axis_scale(colormesh, fig, {}, {})\n'.format(plot_handler.colorbar_range, plot_handler.colorbar_log)
+        if 'colorbar_label' in plot_handler.changed or 'colorbar_log' in plot_handler.changed else '')
 
 
 def add_overplot_statements(script_lines, plot_handler):
@@ -80,15 +88,16 @@ def add_overplot_statements(script_lines, plot_handler):
     for line in line_artists:
         label = line._label
         key = 1 if label == 'Hydrogen' else 2 if label == 'Deuterium' else 4 if label == 'Helium' else label
+        key = int(label.split()[-1]) if "Relative" in label else key
         recoil = isinstance(key, int)  # Recoil line keys are integers
 
         if recoil:
             script_lines.append(
-                'mc.get_slice_plotter_presenter().add_overplot_line(\'{}\', {}, {}, {})\n'.format(
+                'mc.add_overplot_line(\'{}\', {}, {}, {})\n'.format(
                     plot_handler.ws_name, key, recoil, None))  # Does not yet account for CIF files
         else:
             script_lines.append(
-                'mc.get_slice_plotter_presenter().add_overplot_line(\'{}\', \'{}\', {}, {})\n'.format(
+                'mc.add_overplot_line(\'{}\', \'{}\', {}, {})\n'.format(
                     plot_handler.ws_name, key, recoil, None))
 
 

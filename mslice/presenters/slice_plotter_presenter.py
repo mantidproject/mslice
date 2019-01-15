@@ -29,13 +29,10 @@ class SlicePlotterPresenter(PresenterUtility):
         self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
         return slice
 
-    def plot_from_cache(self, workspace, ax=None):
+    def plot_from_cache(self, workspace):
         ws_name = workspace.name.lstrip('__')
         create_slice_figure(ws_name, self)
-        if ax is None:
-            quadmesh = self.show_scattering_function(ws_name)
-        else:
-            quadmesh = self.show_scattering_function(ws_name, ax)
+        quadmesh = self.show_scattering_function(ws_name)
         return quadmesh
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):
@@ -59,12 +56,9 @@ class SlicePlotterPresenter(PresenterUtility):
         (q_axis, e_axis) = (x_axis, y_axis) if not rotated else (y_axis, x_axis)
         self._slice_cache[slice.name[2:]] = Slice(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
-    def show_scattering_function(self, workspace_name, ax=None):
+    def show_scattering_function(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
-        if ax is None:
-            quadmesh = plot_cached_slice(slice_cache, slice_cache.scattering_function)
-        else:
-            quadmesh = plot_cached_slice(slice_cache, slice_cache.scattering_function, ax)
+        quadmesh = plot_cached_slice(slice_cache, slice_cache.scattering_function)
         return quadmesh
 
     def show_dynamical_susceptibility(self, workspace_name):

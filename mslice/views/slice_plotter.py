@@ -10,11 +10,8 @@ OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Nio
 PICKER_TOL_PTS = 5
 
 
-def plot_cached_slice(slice_workspace, slice_cache, ax=None):
-    if ax is None:
-        quadmesh = _show_plot(slice_workspace, slice_cache)
-    else:
-        quadmesh = _show_plot(slice_workspace, slice_cache, ax)
+def plot_cached_slice(slice_workspace, slice_cache):
+    quadmesh = _show_plot(slice_workspace, slice_cache)
     return quadmesh
 
 
@@ -28,11 +25,10 @@ def create_slice_figure(workspace_name, presenter):
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
-def _show_plot(slice_cache, workspace, ax=None):
-    if ax is None:
-        cur_fig = plt.gcf()
-        cur_fig.clf()
-        ax = cur_fig.add_subplot(111, projection='mantid')
+def _show_plot(slice_cache, workspace):
+    cur_fig = plt.gcf()
+    cur_fig.clf()
+    ax = cur_fig.add_subplot(111, projection='mantid')
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
     image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap, norm=slice_cache.norm)

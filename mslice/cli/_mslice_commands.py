@@ -5,11 +5,11 @@ import os.path as ospath
 
 import matplotlib as mpl
 import matplotlib.colors as colors
-from matplotlib.lines import Line2D
+import mslice.plotting.pyplot as plt
 
 from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
                                    get_powder_presenter)
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, rename_workspace
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cmap import DEFAULT_CMAP
 
@@ -63,7 +63,8 @@ def Show():
         QAppThreadCall(mainloop)()
 
 
-def Load(Filename, OutputWorkspace):
+def Load(Filename, OutputWorkspace=None):
+
     """
     Load a workspace from a file.
 
@@ -75,8 +76,13 @@ def Load(Filename, OutputWorkspace):
     if not ospath.exists(Filename):
         raise RuntimeError('could not find the path %s' % Filename)
 
+
     get_dataloader_presenter().load_workspace([Filename])
-    return get_workspace_handle(ospath.splitext(ospath.basename(Filename))[0])
+    name = ospath.splitext(ospath.basename(Filename))[0]
+    if OutputWorkspace is not None:
+        name = rename_workspace(workspace=ospath.splitext(ospath.basename(Filename))[0], new_name=OutputWorkspace).name
+
+    return get_workspace_handle(workspace_name=name)
 
 
 def GenerateScript(InputWorkspace, path):
@@ -285,11 +291,16 @@ def change_axis_scale(colormesh, fig, colorbar_range, logarithmic):
         fig.colorbar(colormesh)
 
 
-def update_legend(ax):
-    overplot_lines = get_slice_plotter_presenter()._slice_cache['MAR21335_Ei60.00meV'].overplot_lines.values()
+def add_overplot_line(workspace_name, key, recoil, cif=None):
+    get_slice_plotter_presenter().add_overplot_line(workspace_name, key, recoil, cif)
+    update_legend(workspace_name)
+
+
+def update_legend(workspace_name):
+    overplot_lines = get_slice_plotter_presenter()._slice_cache[workspace_name].overplot_lines.values()
     lines = []
     labels = []
-    #ax = plt.gca()
+    ax = plt.gca()
     for line in overplot_lines:
         if str(line.get_linestyle()) != 'None' and line.get_label() != '':
             lines.append(line)
@@ -298,9 +309,7 @@ def update_legend(ax):
         legend = ax.legend(lines, labels, fontsize='small')
         for legline, line in zip(legend.get_lines(), lines):
             legline.set_picker(5)
-            #slice_plotter_presenter._legend_dict[legline] = line
         for label, line in zip(legend.get_texts(), lines):
             label.set_picker(5)
-            #slice_plotter_presenter._legend_dict[label] = line
     else:
         ax.legend_ = None  # remove legend

@@ -19,14 +19,14 @@ class MSliceAxes(Axes):
     def plot(self, *args, **kwargs):
         from mslice.cli.projection_functions import PlotCutMsliceProjection
         if is_cut(*args):
-            return PlotCutMsliceProjection(self, *args, **kwargs)
+            return PlotCutMsliceProjection(*args, **kwargs)
         else:
             return Axes.plot(self, *args, **kwargs)
 
     def pcolormesh(self, *args, **kwargs):
         from mslice.cli.projection_functions import PlotSliceMsliceProjection
         if is_slice(*args):
-            return PlotSliceMsliceProjection(self, *args, **kwargs)
+            return PlotSliceMsliceProjection(*args, **kwargs)
         else:
             return Axes.pcolormesh(self, *args, **kwargs)
 
