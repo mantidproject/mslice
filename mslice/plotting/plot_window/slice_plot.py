@@ -36,10 +36,10 @@ class SlicePlot(IPlot):
         self.icut_event = [None, None]
 
         self.setup_connections(self.plot_window)
-        self.default_line_options = {}
+        self.default_options = {}
 
-    def save_default_line_options(self):
-        self.default_line_options = {
+    def save_default_options(self):
+        self.default_options = {
             'colorbar_label': self.colorbar_label,
             'colorbar_log': self.colorbar_log,
             'colorbar_range': self.colorbar_range,
@@ -50,7 +50,7 @@ class SlicePlot(IPlot):
             'y_label': self.y_label,
             'y_grid': self.y_grid,
             'y_range': self.y_range,
-
+            'intensity': False,
         }
 
     def setup_connections(self, plot_window):
@@ -283,9 +283,9 @@ class SlicePlot(IPlot):
 
     def selected_intensity(self):
         options = self.plot_window.menu_intensity.actions()
-        for op in options:
-            if op.isChecked():
-                return op
+        for option in options:
+            if option.isChecked():
+                return option
 
     def set_intensity(self, intensity):
         self._reset_intensity()
@@ -297,6 +297,10 @@ class SlicePlot(IPlot):
             last_active_figure_number = self.manager._current_figs.get_active_figure().number
 
         self.manager.report_as_current()
+
+        self.default_options['intensity'] = True
+        self.default_options['temp_dependent'] = temp_dependent
+        self.default_options['intensity_method'] = slice_plotter_method.__name__
 
         if action.isChecked():
             previous = self.selected_intensity()
@@ -347,6 +351,7 @@ class SlicePlot(IPlot):
                     self.set_intensity(previous)
                     return False
                 else:
+                    self.default_options['temp'] = temp_value
                     self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
             slice_plotter_method(self.ws_name)
         return True
@@ -504,4 +509,4 @@ class SlicePlot(IPlot):
         self.manager.y_grid = value
 
     def is_changed(self, item):
-        return self.default_line_options[item] != getattr(self, item)
+        return self.default_options[item] != getattr(self, item)

@@ -39,6 +39,7 @@ def add_plot_statements(script_lines, plot_handler):
         if isinstance(plot_handler, SlicePlot):
             add_slice_plot_statements(script_lines, plot_handler)
             add_overplot_statements(script_lines, plot_handler)
+            add_intensity_statements(script_lines, plot_handler)
         elif isinstance(plot_handler, CutPlot):
             add_cut_plot_statements(script_lines, plot_handler)
 
@@ -97,11 +98,17 @@ def add_overplot_statements(script_lines, plot_handler):
                     plot_handler.ws_name, key, recoil, None))
 
 
+def add_intensity_statements(script_lines, plot_handler):
+    if plot_handler.default_options['intensity'] is True:
+        script_lines.append(
+            'mc.show_intensity_plot({}, {}, {}, {})'.format(
+                plot_handler.ws_name, plot_handler.default_options['intensity_method'],
+                plot_handler.default_options['temp'], plot_handler.default_options['temp_dependent']))
+
+
 def add_cut_plot_statements(script_lines, plot_handler):
     script_lines.append('cut_ws = mc.Cut(ws)')
     script_lines.append('ax.plot(cut_ws)')
-
-    script_lines.append('#User Changes\n')  # Could put checks in slice_plot to only write what has changed
 
     script_lines.append('ax.set_title(\'{}\')\n'.format(plot_handler.title))
 

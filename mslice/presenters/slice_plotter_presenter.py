@@ -33,7 +33,7 @@ class SlicePlotterPresenter(PresenterUtility):
         ws_name = workspace.name.lstrip('__')
         slice_plot = create_slice_figure(ws_name, self)
         quadmesh = self.show_scattering_function(ws_name)
-        slice_plot.save_default_line_options()
+        slice_plot.save_default_options()
         return quadmesh
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):

@@ -76,13 +76,12 @@ def Load(Filename, OutputWorkspace=None):
     if not ospath.exists(Filename):
         raise RuntimeError('could not find the path %s' % Filename)
 
-
     get_dataloader_presenter().load_workspace([Filename])
     name = ospath.splitext(ospath.basename(Filename))[0]
     if OutputWorkspace is not None:
         name = rename_workspace(workspace=ospath.splitext(ospath.basename(Filename))[0], new_name=OutputWorkspace).name
 
-    return get_workspace_handle(workspace_name=name)
+    return get_workspace_handle(name)
 
 
 def GenerateScript(InputWorkspace, path):
@@ -298,18 +297,38 @@ def change_axis_scale(ax, colorbar_range, logarithmic):
 
 
 def add_overplot_line(workspace_name, key, recoil, cif=None):
-    OVERPLOT_KEYS = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium', 'Aluminium': 'Aluminium', 'Copper': 'Copper',
-                     'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
-                     'CIF file': 'CIF file'}
     get_slice_plotter_presenter().add_overplot_line(workspace_name, key, recoil, cif)
-    window = GlobalFigureManager.get_active_figure().window
-    getattr(window, 'action_' + OVERPLOT_KEYS[key].replace(' ', '_').lower()).setChecked(True)
     update_legend(workspace_name)
 
 
-def update_overplot_checklist():
-    pass
+def show_intensity_plot(workspace_name, method_name, temp_value, temp_dependent):
+    intensity_action_keys = {
+        'show_scattering_function': 'action_sqe',
+        'show_dynamical_susceptibility': 'action_chi_qe',
+        'show_dynamical_susceptibility_magnetic': 'action_chi_qe_magnetic',
+        'show_d2sigma': 'action_d2sig_dw_de',
+        'show_symmetrised': 'action_symmetrised_sqe',
+        'show_gdos': 'action_gdos'
+    }
+    plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+    plot_window = GlobalFigureManager.get_active_figure().window
 
+    intensity_method = getattr(get_slice_plotter_presenter(), method_name)
+    intensity_action = getattr(plot_window, intensity_action_keys[method_name])
+    intensity_action.setChecked(True)
+    
+    if temp_dependent:
+        get_slice_plotter_presenter().set_sample_temperature(workspace_name, temp_value)
+
+    plot_handler.show_intensity_plot(intensity_action, intensity_method, False)
+
+
+def update_overplot_checklist(key):
+    overplot_keys = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium', 'Aluminium': 'Aluminium', 'Copper': 'Copper',
+                     'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
+                     'CIF file': 'CIF file'}
+    window = GlobalFigureManager.get_active_figure().window
+    getattr(window, 'action_' + overplot_keys[key].replace(' ', '_').lower()).setChecked(True)
 
 
 def update_legend(workspace_name):
