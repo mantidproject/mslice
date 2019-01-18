@@ -298,6 +298,7 @@ def change_axis_scale(ax, colorbar_range, logarithmic):
 
 def add_overplot_line(workspace_name, key, recoil, cif=None):
     get_slice_plotter_presenter().add_overplot_line(workspace_name, key, recoil, cif)
+    update_overplot_checklist(key)
     update_legend(workspace_name)
 
 
@@ -316,17 +317,23 @@ def show_intensity_plot(workspace_name, method_name, temp_value, temp_dependent)
     intensity_method = getattr(get_slice_plotter_presenter(), method_name)
     intensity_action = getattr(plot_window, intensity_action_keys[method_name])
     intensity_action.setChecked(True)
-    
+
     if temp_dependent:
         get_slice_plotter_presenter().set_sample_temperature(workspace_name, temp_value)
-
     plot_handler.show_intensity_plot(intensity_action, intensity_method, False)
+    update_legend(workspace_name)
+    #plot_handler._update_lines()
 
 
 def update_overplot_checklist(key):
     overplot_keys = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium', 'Aluminium': 'Aluminium', 'Copper': 'Copper',
                      'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
                      'CIF file': 'CIF file'}
+    if key not in overplot_keys:
+        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+        plot_handler._arb_nuclei_rmm = key
+        key = 'Arbitrary Nuclei'
+
     window = GlobalFigureManager.get_active_figure().window
     getattr(window, 'action_' + overplot_keys[key].replace(' ', '_').lower()).setChecked(True)
 

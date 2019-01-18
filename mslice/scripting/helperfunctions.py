@@ -101,7 +101,7 @@ def add_overplot_statements(script_lines, plot_handler):
 def add_intensity_statements(script_lines, plot_handler):
     if plot_handler.default_options['intensity'] is True:
         script_lines.append(
-            'mc.show_intensity_plot({}, {}, {}, {})'.format(
+            'mc.show_intensity_plot(\'{}\', \'{}\', {}, {})'.format(
                 plot_handler.ws_name, plot_handler.default_options['intensity_method'],
                 plot_handler.default_options['temp'], plot_handler.default_options['temp_dependent']))
 
