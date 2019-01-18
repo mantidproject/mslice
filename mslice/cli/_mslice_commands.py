@@ -298,8 +298,18 @@ def change_axis_scale(ax, colorbar_range, logarithmic):
 
 
 def add_overplot_line(workspace_name, key, recoil, cif=None):
+    OVERPLOT_KEYS = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium', 'Aluminium': 'Aluminium', 'Copper': 'Copper',
+                     'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
+                     'CIF file': 'CIF file'}
     get_slice_plotter_presenter().add_overplot_line(workspace_name, key, recoil, cif)
+    window = GlobalFigureManager.get_active_figure().window
+    getattr(window, 'action_' + OVERPLOT_KEYS[key].replace(' ', '_').lower()).setChecked(True)
     update_legend(workspace_name)
+
+
+def update_overplot_checklist():
+    pass
+
 
 
 def update_legend(workspace_name):
