@@ -1,7 +1,7 @@
 from matplotlib.lines import Line2D
 from datetime import datetime
 
-PACKAGES = {'mslice.cli': 'mc', 'matplotlib.pyplot': 'plt'}
+PACKAGES = {'mslice.cli': 'mc'}
 
 
 def cleanup(script_lines):
@@ -16,7 +16,6 @@ def header():
 
     for package in PACKAGES:
         statements.append('import {} as {}\n'.format(package, PACKAGES[package]))
-    statements.append("fig, ax = plt.subplots(subplot_kw={'projection': 'mslice'})\n")
 
     return statements
 
@@ -50,35 +49,32 @@ def add_plot_statements(script_lines, plot_handler):
 
 def add_slice_plot_statements(script_lines, plot_handler):
     script_lines.append('slice_ws = mc.Slice(ws)\n')
-    script_lines.append('colormesh = ax.pcolormesh(slice_ws)\n\n')
-
-    script_lines.append('#User Changes\n')  # Could put checks in slice_plot to only write what has changed
+    script_lines.append('ax = mc.PlotSlice(slice_ws)\n\n')
 
     script_lines.append('ax.set_title(\'{}\')\n'.format(plot_handler.title)
-                        if 'title' in plot_handler.changed else '')
+                        if plot_handler.is_changed('title') else '')
 
     script_lines.append('ax.set_ylabel(\'{}\')\n'.format(plot_handler.y_label)
-                        if 'y_label' in plot_handler.changed else '')
+                        if plot_handler.is_changed('y_label') else '')
     script_lines.append('ax.set_xlabel(\'{}\')\n'.format(plot_handler.x_label)
-                        if 'x_label' in plot_handler.changed else '')
+                        if plot_handler.is_changed('x_label') else '')
 
     script_lines.append('ax.grid({}, axis=\'y\')\n'.format(plot_handler.y_grid)
-                        if 'y_grid' in plot_handler.changed else '')
+                        if plot_handler.is_changed('y_grid') else '')
     script_lines.append('ax.grid({}, axis=\'x\')\n'.format(plot_handler.x_grid)
-                        if 'x_grid' in plot_handler.changed else '')
+                        if plot_handler.is_changed('x_grid') else '')
 
     script_lines.append('ax.set_ylim(bottom={}, top={})\n'.format(*plot_handler.y_range)
-                        if 'y_range' in plot_handler.changed else '')
+                        if plot_handler.is_changed('y_range') else '')
     script_lines.append('ax.set_xlim(left={}, right={})\n'.format(*plot_handler.x_range)
-                        if 'x_range' in plot_handler.changed else '')
+                        if plot_handler.is_changed('x_range') else '')
 
-    script_lines.append('cb = plt.colorbar(colormesh, ax=ax)\n'
-                        if 'colorbar_label' in plot_handler.changed else '')
-    script_lines.append('cb.set_label(\'{}\')\n'.format(plot_handler.colorbar_label)
-                        if 'colorbar_label' in plot_handler.changed else '')
     script_lines.append(
-        'mc.change_axis_scale(colormesh, fig, {}, {})\n'.format(plot_handler.colorbar_range, plot_handler.colorbar_log)
-        if 'colorbar_label' in plot_handler.changed or 'colorbar_log' in plot_handler.changed else '')
+        'mc.change_axis_scale(ax, {}, {})\n'.format(plot_handler.colorbar_range, plot_handler.colorbar_log)
+        if plot_handler.is_changed('colorbar_range') or plot_handler.is_changed('colorbar_log') else '')
+
+    script_lines.append('ax.collections[0].colorbar.set_label(\'{}\')\n'.format(plot_handler.colorbar_label)
+                        if plot_handler.is_changed('colorbar_label') else '')
 
 
 def add_overplot_statements(script_lines, plot_handler):

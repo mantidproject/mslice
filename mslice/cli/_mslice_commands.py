@@ -173,9 +173,7 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     :return:
     """
 
-    PlotSliceMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, Colormap)
-
-    return GlobalFigureManager._active_figure
+    return PlotSliceMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, Colormap)
 
 
 def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
@@ -190,10 +188,11 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     :return:
     """
 
-    PlotCutMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, PlotOver)
+    return PlotCutMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, PlotOver)
 
+
+def ActiveFigure():
     return GlobalFigureManager._active_figure
-
 
 def KeepFigure(figure_number=None):
     GlobalFigureManager.set_figure_as_kept(figure_number)
@@ -273,9 +272,13 @@ def ConvertToGDOS(figure_number):
         print('This function cannot be used on a Cut')
 
 
-def change_axis_scale(colormesh, fig, colorbar_range, logarithmic):
+def change_axis_scale(ax, colorbar_range, logarithmic):
+    fig = ax.figure
+    colormesh = ax.collections[0]
     vmin, vmax = colorbar_range
+
     if logarithmic:
+        label = colormesh.colorbar._label
         colormesh.colorbar.remove()
         if vmin <= float(0):
             vmin = 0.001
@@ -283,12 +286,15 @@ def change_axis_scale(colormesh, fig, colorbar_range, logarithmic):
         norm = colors.LogNorm(vmin, vmax)
         colormesh.set_norm(norm)
         fig.colorbar(colormesh)
+        colormesh.colorbar.set_label(label)
     else:
+        label = colormesh.colorbar._label
         colormesh.colorbar.remove()
         colormesh.set_clim((vmin, vmax))
         norm = colors.Normalize(vmin, vmax)
         colormesh.set_norm(norm)
         fig.colorbar(colormesh)
+        colormesh.colorbar.set_label(label)
 
 
 def add_overplot_line(workspace_name, key, recoil, cif=None):
@@ -313,3 +319,8 @@ def update_legend(workspace_name):
             label.set_picker(5)
     else:
         ax.legend_ = None  # remove legend
+
+
+def colorbar(ax):
+    colormesh = ax.collections[0]
+    return plt.colorbar(colormesh, ax=ax)

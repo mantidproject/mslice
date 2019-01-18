@@ -31,8 +31,9 @@ class SlicePlotterPresenter(PresenterUtility):
 
     def plot_from_cache(self, workspace):
         ws_name = workspace.name.lstrip('__')
-        create_slice_figure(ws_name, self)
+        slice_plot = create_slice_figure(ws_name, self)
         quadmesh = self.show_scattering_function(ws_name)
+        slice_plot.save_default_line_options()
         return quadmesh
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):

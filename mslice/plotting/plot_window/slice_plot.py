@@ -30,13 +30,28 @@ class SlicePlot(IPlot):
         self._cif_file = None
         self._cif_path = None
         self._legend_dict = {}
-        self.changed = []
 
         # Interactive cuts
         self.icut = None
         self.icut_event = [None, None]
 
         self.setup_connections(self.plot_window)
+        self.default_line_options = {}
+
+    def save_default_line_options(self):
+        self.default_line_options = {
+            'colorbar_label': self.colorbar_label,
+            'colorbar_log': self.colorbar_log,
+            'colorbar_range': self.colorbar_range,
+            'title': self.title,
+            'x_label': self.x_label,
+            'x_grid': self.x_grid,
+            'x_range': self.x_range,
+            'y_label': self.y_label,
+            'y_grid': self.y_grid,
+            'y_range': self.y_range,
+
+        }
 
     def setup_connections(self, plot_window):
         plot_window.action_interactive_cuts.setVisible(True)
@@ -415,7 +430,6 @@ class SlicePlot(IPlot):
     @colorbar_label.setter
     def colorbar_label(self, value):
         self._canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
-        self.changed.append('colorbar_label')
 
     @property
     def colorbar_range(self):
@@ -424,7 +438,6 @@ class SlicePlot(IPlot):
     @colorbar_range.setter
     def colorbar_range(self, value):
         self.change_axis_scale(value, self.colorbar_log)
-        self.changed.append('colorbar_range')
 
     @property
     def colorbar_log(self):
@@ -433,7 +446,6 @@ class SlicePlot(IPlot):
     @colorbar_log.setter
     def colorbar_log(self, value):
         self.change_axis_scale(self.colorbar_range, value)
-        self.changed.append('colorbar_log')
 
     @property
     def title(self):
@@ -442,7 +454,6 @@ class SlicePlot(IPlot):
     @title.setter
     def title(self, value):
         self.manager.title = value
-        self.changed.append('title')
 
     @property
     def x_label(self):
@@ -451,7 +462,6 @@ class SlicePlot(IPlot):
     @x_label.setter
     def x_label(self, value):
         self.manager.x_label = value
-        self.changed.append('x_label')
 
     @property
     def y_label(self):
@@ -460,7 +470,6 @@ class SlicePlot(IPlot):
     @y_label.setter
     def y_label(self, value):
         self.manager.y_label = value
-        self.changed.append('y_label')
 
     @property
     def x_range(self):
@@ -469,7 +478,6 @@ class SlicePlot(IPlot):
     @x_range.setter
     def x_range(self, value):
         self.manager.x_range = value
-        self.changed.append('x_label')
 
     @property
     def y_range(self):
@@ -478,7 +486,6 @@ class SlicePlot(IPlot):
     @y_range.setter
     def y_range(self, value):
         self.manager.y_range = value
-        self.changed.append('y_range')
 
     @property
     def x_grid(self):
@@ -487,7 +494,6 @@ class SlicePlot(IPlot):
     @x_grid.setter
     def x_grid(self, value):
         self.manager.x_grid = value
-        self.changed.append('x_grid')
 
     @property
     def y_grid(self):
@@ -496,4 +502,6 @@ class SlicePlot(IPlot):
     @y_grid.setter
     def y_grid(self, value):
         self.manager.y_grid = value
-        self.changed.append('y_grid')
+
+    def is_changed(self, item):
+        return self.default_line_options[item] != getattr(self, item)

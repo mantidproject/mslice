@@ -19,9 +19,10 @@ def plot_cached_slice(slice_workspace, slice_cache):
 def create_slice_figure(workspace_name, presenter):
     fig_canvas = plt.gcf().canvas
     fig_canvas.set_window_title(workspace_name)
-    fig_canvas.manager.add_slice_plot(presenter, workspace_name)
+    plot_handler = fig_canvas.manager.add_slice_plot(presenter, workspace_name)
     fig_canvas.manager.update_grid()
     plt.draw_all()
+    return plot_handler
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
@@ -54,7 +55,7 @@ def _show_plot(slice_cache, workspace):
     cur_fig.canvas.draw_idle()
     cur_fig.show()
 
-    return image
+    return ax
 
 
 def set_colorbar_label(label):
