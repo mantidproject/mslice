@@ -4,8 +4,6 @@ from __future__ import (absolute_import, division, print_function)
 import os.path as ospath
 
 import matplotlib as mpl
-import matplotlib.colors as colors
-import mslice.plotting.pyplot as plt
 
 from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
                                    get_powder_presenter)
@@ -172,7 +170,9 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     :return:
     """
 
-    return PlotSliceMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, Colormap)
+    PlotSliceMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, Colormap)
+
+    return GlobalFigureManager._active_figure
 
 
 def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
@@ -187,11 +187,10 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     :return:
     """
 
-    return PlotCutMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, PlotOver)
+    PlotCutMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, PlotOver)
 
-
-def ActiveFigure():
     return GlobalFigureManager._active_figure
+
 
 def KeepFigure(figure_number=None):
     GlobalFigureManager.set_figure_as_kept(figure_number)
@@ -269,94 +268,3 @@ def ConvertToGDOS(figure_number):
         plot_handler.plot_window.action_gdos.trigger()
     else:
         print('This function cannot be used on a Cut')
-
-
-def change_axis_scale(ax, colorbar_range, logarithmic):
-    fig = ax.figure
-    colormesh = ax.collections[0]
-    vmin, vmax = colorbar_range
-
-    if logarithmic:
-        label = colormesh.colorbar._label
-        colormesh.colorbar.remove()
-        if vmin <= float(0):
-            vmin = 0.001
-        colormesh.set_clim((vmin, vmax))
-        norm = colors.LogNorm(vmin, vmax)
-        colormesh.set_norm(norm)
-        fig.colorbar(colormesh)
-        colormesh.colorbar.set_label(label)
-    else:
-        label = colormesh.colorbar._label
-        colormesh.colorbar.remove()
-        colormesh.set_clim((vmin, vmax))
-        norm = colors.Normalize(vmin, vmax)
-        colormesh.set_norm(norm)
-        fig.colorbar(colormesh)
-        colormesh.colorbar.set_label(label)
-
-
-def add_overplot_line(workspace_name, key, recoil, cif=None):
-    get_slice_plotter_presenter().add_overplot_line(workspace_name, key, recoil, cif)
-    update_overplot_checklist(key)
-    update_legend(workspace_name)
-
-
-def show_intensity_plot(workspace_name, method_name, temp_value, temp_dependent):
-    intensity_action_keys = {
-        'show_scattering_function': 'action_sqe',
-        'show_dynamical_susceptibility': 'action_chi_qe',
-        'show_dynamical_susceptibility_magnetic': 'action_chi_qe_magnetic',
-        'show_d2sigma': 'action_d2sig_dw_de',
-        'show_symmetrised': 'action_symmetrised_sqe',
-        'show_gdos': 'action_gdos'
-    }
-    plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
-    plot_window = GlobalFigureManager.get_active_figure().window
-
-    intensity_method = getattr(get_slice_plotter_presenter(), method_name)
-    intensity_action = getattr(plot_window, intensity_action_keys[method_name])
-    intensity_action.setChecked(True)
-
-    if temp_dependent:
-        get_slice_plotter_presenter().set_sample_temperature(workspace_name, temp_value)
-    plot_handler.show_intensity_plot(intensity_action, intensity_method, False)
-    update_legend(workspace_name)
-    #plot_handler._update_lines()
-
-
-def update_overplot_checklist(key):
-    overplot_keys = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium', 'Aluminium': 'Aluminium', 'Copper': 'Copper',
-                     'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
-                     'CIF file': 'CIF file'}
-    if key not in overplot_keys:
-        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
-        plot_handler._arb_nuclei_rmm = key
-        key = 'Arbitrary Nuclei'
-
-    window = GlobalFigureManager.get_active_figure().window
-    getattr(window, 'action_' + overplot_keys[key].replace(' ', '_').lower()).setChecked(True)
-
-
-def update_legend(workspace_name):
-    overplot_lines = get_slice_plotter_presenter()._slice_cache[workspace_name].overplot_lines.values()
-    lines = []
-    labels = []
-    ax = plt.gca()
-    for line in overplot_lines:
-        if str(line.get_linestyle()) != 'None' and line.get_label() != '':
-            lines.append(line)
-            labels.append(line.get_label())
-    if len(lines) > 0:
-        legend = ax.legend(lines, labels, fontsize='small')
-        for legline, line in zip(legend.get_lines(), lines):
-            legline.set_picker(5)
-        for label, line in zip(legend.get_texts(), lines):
-            label.set_picker(5)
-    else:
-        ax.legend_ = None  # remove legend
-
-
-def colorbar(ax):
-    colormesh = ax.collections[0]
-    return plt.colorbar(colormesh, ax=ax)

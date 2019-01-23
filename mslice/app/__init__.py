@@ -9,6 +9,11 @@ from mslice.util.qt.qapp import create_qapp_if_required
 MAIN_WINDOW = None
 
 
+def is_gui():
+    """Check if mainwindow is instantiated"""
+    return MAIN_WINDOW is not None
+
+
 def main():
     """Start the application.
     """

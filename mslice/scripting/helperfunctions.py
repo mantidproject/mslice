@@ -1,7 +1,7 @@
 from matplotlib.lines import Line2D
 from datetime import datetime
 
-PACKAGES = {'mslice.cli': 'mc'}
+PACKAGES = {'mslice.cli': 'mc', 'mslice.plotting.pyplot': 'plt'}
 
 
 def cleanup(script_lines):
@@ -37,21 +37,26 @@ def add_plot_statements(script_lines, plot_handler):
 
     if plot_handler is not None:
         if isinstance(plot_handler, SlicePlot):
+            script_lines.append('slice_ws = mc.Slice(ws)\n\n')
+            script_lines.append('fig = plt.gcf()\n')
+            script_lines.append('ax = fig.add_subplot(111, projection=\'mslice\')\n')
+            script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap=\'viridis\')\n')
+            script_lines.append('cb = plt.colorbar(mesh, ax=ax)\n')
+            script_lines.append('cb.set_label(\'{}\', labelpad=20, rotation=270, picker=5)\n'.format(
+                plot_handler.colorbar_label))
+
+            add_intensity_statements(script_lines, plot_handler)
             add_slice_plot_statements(script_lines, plot_handler)
             add_overplot_statements(script_lines, plot_handler)
-            add_intensity_statements(script_lines, plot_handler)
         elif isinstance(plot_handler, CutPlot):
             add_cut_plot_statements(script_lines, plot_handler)
 
-        script_lines.append('\nmc.Show()\n')
+        script_lines.append('mc.Show()\n')
 
     return script_lines
 
 
 def add_slice_plot_statements(script_lines, plot_handler):
-    script_lines.append('slice_ws = mc.Slice(ws)\n')
-    script_lines.append('ax = mc.PlotSlice(slice_ws)\n\n')
-
     script_lines.append('ax.set_title(\'{}\')\n'.format(plot_handler.title)
                         if plot_handler.is_changed('title') else '')
 
@@ -71,11 +76,9 @@ def add_slice_plot_statements(script_lines, plot_handler):
                         if plot_handler.is_changed('x_range') else '')
 
     script_lines.append(
-        'mc.change_axis_scale(ax, {}, {})\n'.format(plot_handler.colorbar_range, plot_handler.colorbar_log)
+        'ax.change_axis_scale(colorbar_range={}, logarithmic={})\n'.format(
+            plot_handler.colorbar_range, plot_handler.colorbar_log)
         if plot_handler.is_changed('colorbar_range') or plot_handler.is_changed('colorbar_log') else '')
-
-    script_lines.append('ax.collections[0].colorbar.set_label(\'{}\')\n'.format(plot_handler.colorbar_label)
-                        if plot_handler.is_changed('colorbar_label') else '')
 
 
 def add_overplot_statements(script_lines, plot_handler):
@@ -90,20 +93,22 @@ def add_overplot_statements(script_lines, plot_handler):
 
         if recoil:
             script_lines.append(
-                'mc.add_overplot_line(\'{}\', {}, {}, {})\n'.format(
+                'ax.recoil_line(workspace_name=\'{}\', key={}, recoil={}, cif={})\n'.format(
                     plot_handler.ws_name, key, recoil, None))  # Does not yet account for CIF files
         else:
             script_lines.append(
-                'mc.add_overplot_line(\'{}\', \'{}\', {}, {})\n'.format(
+                'ax.recoil_line(workspace_name=\'{}\', key=\'{}\', recoil={}, cif={})\n'.format(
                     plot_handler.ws_name, key, recoil, None))
 
 
 def add_intensity_statements(script_lines, plot_handler):
     if plot_handler.default_options['intensity'] is True:
         script_lines.append(
-            'mc.show_intensity_plot(\'{}\', \'{}\', {}, {})'.format(
+            'ax = ax.intensity_plot(workspace_name=\'{}\', method_name=\'{}\', '
+            'temp_value={}, temp_dependent={}, label={})\n'.format(
                 plot_handler.ws_name, plot_handler.default_options['intensity_method'],
-                plot_handler.default_options['temp'], plot_handler.default_options['temp_dependent']))
+                plot_handler.default_options['temp'], plot_handler.default_options['temp_dependent'],
+                plot_handler.colorbar_label))
 
 
 def add_cut_plot_statements(script_lines, plot_handler):

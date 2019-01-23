@@ -32,9 +32,9 @@ class SlicePlotterPresenter(PresenterUtility):
     def plot_from_cache(self, workspace):
         ws_name = workspace.name.lstrip('__')
         slice_plot = create_slice_figure(ws_name, self)
-        quadmesh = self.show_scattering_function(ws_name)
+        ax = self.show_scattering_function(ws_name)
         slice_plot.save_default_options()
-        return quadmesh
+        return ax
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):
         workspace_name = workspace_name.lstrip('__')
@@ -57,31 +57,39 @@ class SlicePlotterPresenter(PresenterUtility):
         (q_axis, e_axis) = (x_axis, y_axis) if not rotated else (y_axis, x_axis)
         self._slice_cache[slice.name[2:]] = Slice(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
+    def get_slice_cache(self, workspace):
+        return self._slice_cache[workspace.name[2:]]
+
     def show_scattering_function(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
-        quadmesh = plot_cached_slice(slice_cache, slice_cache.scattering_function)
-        return quadmesh
+        ax = plot_cached_slice(slice_cache, slice_cache.scattering_function)
+        return ax
 
     def show_dynamical_susceptibility(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
-        plot_cached_slice(slice_cache, slice_cache.chi)
+        ax = plot_cached_slice(slice_cache, slice_cache.chi)
+        return ax
 
     def show_dynamical_susceptibility_magnetic(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
-        plot_cached_slice(slice_cache, slice_cache.chi_magnetic)
+        ax = plot_cached_slice(slice_cache, slice_cache.chi_magnetic)
         set_colorbar_label('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$')
+        return ax
 
     def show_d2sigma(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
-        plot_cached_slice(slice_cache, slice_cache.d2sigma)
+        ax = plot_cached_slice(slice_cache, slice_cache.d2sigma)
+        return ax
 
     def show_symmetrised(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
-        plot_cached_slice(slice_cache, slice_cache.symmetrised)
+        ax = plot_cached_slice(slice_cache, slice_cache.symmetrised)
+        return ax
 
     def show_gdos(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
-        plot_cached_slice(slice_cache, slice_cache.gdos)
+        ax = plot_cached_slice(slice_cache, slice_cache.gdos)
+        return ax
 
     def hide_overplot_line(self, workspace, key):
         cache = self._slice_cache[workspace]

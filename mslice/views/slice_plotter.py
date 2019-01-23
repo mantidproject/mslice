@@ -1,9 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.models.labels import get_display_name, recoil_labels
-from mslice.models.workspacemanager.workspace_algorithms import get_comment
+from mslice.models.labels import recoil_labels
 import mslice.plotting.pyplot as plt
-from mslice.util.mantid.mantid_algorithms import Transpose
 
 
 OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
@@ -11,8 +9,8 @@ PICKER_TOL_PTS = 5
 
 
 def plot_cached_slice(slice_workspace, slice_cache):
-    quadmesh = _show_plot(slice_workspace, slice_cache)
-    return quadmesh
+    ax = _show_plot(slice_workspace, slice_cache)
+    return ax
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
@@ -28,22 +26,10 @@ def create_slice_figure(workspace_name, presenter):
 @plt.set_category(plt.CATEGORY_SLICE)
 def _show_plot(slice_cache, workspace):
     cur_fig = plt.gcf()
-    cur_fig.clf()
-    ax = cur_fig.add_subplot(111, projection='mantid')
-    if not workspace.is_PSD and not slice_cache.rotated:
-        workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
-    image = ax.pcolormesh(workspace.raw_ws, cmap=slice_cache.colourmap, norm=slice_cache.norm)
-    ax.set_title(workspace.name[2:], picker=PICKER_TOL_PTS)
-    x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
-    y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
-    comment = get_comment(str(workspace.name))
-    ax.get_xaxis().set_units(x_axis.units)
-    ax.get_yaxis().set_units(y_axis.units)
-    # labels
-    ax.set_xlabel(get_display_name(x_axis.units, comment), picker=PICKER_TOL_PTS)
-    ax.set_ylabel(get_display_name(y_axis.units, comment), picker=PICKER_TOL_PTS)
-    ax.set_xlim(x_axis.start, x_axis.end)
-    ax.set_ylim(y_axis.start, y_axis.end)
+    cur_fig.clf(keep_observers=True)
+    ax = cur_fig.add_subplot(111, projection='mslice')
+    image = ax.pcolormesh(workspace, cmap=slice_cache.colourmap, norm=slice_cache.norm)
+
     cb = plt.colorbar(image, ax=ax)
     cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
 
