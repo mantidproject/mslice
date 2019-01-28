@@ -4,13 +4,14 @@ import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.plotting.pyplot import *  # noqa: F401
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
-from mslice.cli.helperfunctions import is_slice, is_cut, HistogramWorkspace, _intensity_to_action, _function_to_intensity
+from mslice.cli.helperfunctions import is_slice, is_cut, HistogramWorkspace
 from ._mslice_commands import *  # noqa: F401
 from mslice.app import is_gui
-from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
-                                        _check_workspace_type, _get_overplot_key, _overplot_keys,
+from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_type, _get_overplot_key,
                                         _update_overplot_checklist, _update_legend)
-
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.app.presenters import get_slice_plotter_presenter
 
 # This is not compatible with mslice as we use a separate
 # global figure manager see _mslice_commands.Show

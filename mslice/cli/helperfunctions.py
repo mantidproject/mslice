@@ -11,12 +11,12 @@ _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Alum
                   'CIF file': 'CIF file'}
 
 _function_to_intensity = {
-        'show_scattering_function': 's(q,e)',
-        'show_dynamical_susceptibility': 'chi(q,e)',
-        'show_dynamical_susceptibility_magnetic': 'chi(q,e) magnetic',
-        'show_d2sigma': 'd2sigma/dOmega.de',
-        'show_symmetrised': 'symmetrised s(q,e)',
-        'show_gdos': 'gdos',
+    'show_scattering_function': 's(q,e)',
+    'show_dynamical_susceptibility': 'chi(q,e)',
+    'show_dynamical_susceptibility_magnetic': 'chi(q,e) magnetic',
+    'show_d2sigma': 'd2sigma/dOmega.de',
+    'show_symmetrised': 'symmetrised s(q,e)',
+    'show_gdos': 'gdos',
     }
 
 _intensity_to_action = {
