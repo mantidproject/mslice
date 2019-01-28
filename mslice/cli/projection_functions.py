@@ -2,7 +2,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name
+from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _intensity_to_action, \
+    _intensity_to_workspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app.presenters import cli_cut_plotter_presenter, cli_slice_plotter_presenter, is_gui
 from mslice.util.mantid.mantid_algorithms import Transpose
@@ -11,6 +12,7 @@ from mslice.models.labels import get_display_name
 from mantid.plots import plotfunctions
 from mslice.app.presenters import get_slice_plotter_presenter
 from mslice.views.slice_plotter import create_slice_figure
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 PICKER_TOL_PTS = 5
 
@@ -49,6 +51,21 @@ def PlotSliceMsliceProjection(axes, workspace, *args, **kwargs):
         create_slice_figure(workspace.name[2:], get_slice_plotter_presenter())
 
     slice_cache = get_slice_plotter_presenter().get_slice_cache(workspace)
+
+    intensity = kwargs.pop('intensity', None)
+    temperature = kwargs.pop('temperature', None)
+
+    if temperature is not None:
+        get_slice_plotter_presenter().set_sample_temperature(workspace.name[2:], temperature)
+
+    if intensity is not None and intensity != 's(q,e)':
+
+        workspace = getattr(slice_cache, _intensity_to_workspace[intensity])
+        plot_window = GlobalFigureManager.get_active_figure().window
+        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+        intensity_action = getattr(plot_window, _intensity_to_action[intensity])
+        plot_handler.set_intensity(intensity_action)
+        intensity_action.setChecked(True)
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)

@@ -299,8 +299,8 @@ class SlicePlot(IPlot):
 
         self.manager.report_as_current()
 
-        self.default_options['intensity'] = True
         self.default_options['temp_dependent'] = temp_dependent
+        self.default_options['intensity'] = True
         self.default_options['intensity_method'] = slice_plotter_method.__name__
 
         if action.isChecked():

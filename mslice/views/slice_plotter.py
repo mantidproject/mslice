@@ -26,7 +26,7 @@ def create_slice_figure(workspace_name, presenter):
 @plt.set_category(plt.CATEGORY_SLICE)
 def _show_plot(slice_cache, workspace):
     cur_fig = plt.gcf()
-    cur_fig.clf(keep_observers=True)
+    cur_fig.clf()
     ax = cur_fig.add_subplot(111, projection='mslice')
     image = ax.pcolormesh(workspace, cmap=slice_cache.colourmap, norm=slice_cache.norm)
 

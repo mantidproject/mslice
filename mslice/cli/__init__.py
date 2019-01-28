@@ -4,10 +4,13 @@ import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.plotting.pyplot import *  # noqa: F401
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
-from mslice.cli.helperfunctions import is_slice, is_cut
+from mslice.cli.helperfunctions import is_slice, is_cut, HistogramWorkspace, _intensity_to_action, _function_to_intensity
 from ._mslice_commands import *  # noqa: F401
-import mslice.plotting.pyplot as plt
-from mslice.views.slice_plotter import set_colorbar_label
+from mslice.app import is_gui
+from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
+                                        _check_workspace_type, _get_overplot_key, _overplot_keys,
+                                        _update_overplot_checklist, _update_legend)
+
 
 # This is not compatible with mslice as we use a separate
 # global figure manager see _mslice_commands.Show
@@ -32,57 +35,42 @@ class MSliceAxes(Axes):
         else:
             return Axes.pcolormesh(self, *args, **kwargs)
 
-    def recoil_line(self, workspace_name, key, recoil, cif=None):
-        get_slice_plotter_presenter().add_overplot_line(workspace_name, key, recoil, cif)
-        update_overplot_checklist(key)
-        update_legend()
+    def recoil(self, workspace, element=None, rmm=None):
+        _check_workspace_name(workspace)
+        workspace = get_workspace_handle(workspace)
+        _check_workspace_type(workspace, HistogramWorkspace)
 
-    def intensity_plot(self, workspace_name, method_name, temp_value, temp_dependent, label):
-        plt.gcf().delaxes(plt.gcf().axes[1])
-        intensity_action_keys = {
-            'show_scattering_function': 'action_sqe',
-            'show_dynamical_susceptibility': 'action_chi_qe',
-            'show_dynamical_susceptibility_magnetic': 'action_chi_qe_magnetic',
-            'show_d2sigma': 'action_d2sig_dw_de',
-            'show_symmetrised': 'action_symmetrised_sqe',
-            'show_gdos': 'action_gdos',
-        }
+        key = _get_overplot_key(element, rmm)
+
+        if rmm is not None:
+            plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+            plot_handler._arb_nuclei_rmm = rmm
+
+        get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=True, cif=None)
+
+        _update_overplot_checklist(key)
+        _update_legend()
+
+    def bragg(self, workspace, element=None, cif=None):
+        _check_workspace_name(workspace)
+        workspace = get_workspace_handle(workspace)
+        _check_workspace_type(workspace, HistogramWorkspace)
+
+        key = _get_overplot_key(element, rmm=None)
+
+        get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=False, cif=cif)
+        _update_overplot_checklist(key)
+        _update_legend()
+
+    def grid(self, b=None, which='major', axis='both', **kwargs):
+        Axes.grid(self, b, which, axis, **kwargs)
+
         plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
-        plot_window = GlobalFigureManager.get_active_figure().window
-
-        intensity_method = getattr(get_slice_plotter_presenter(), method_name)
-        intensity_action = getattr(plot_window, intensity_action_keys[method_name])
-        intensity_action.setChecked(True)
-
-        if temp_dependent:
-            get_slice_plotter_presenter().set_sample_temperature(workspace_name, temp_value)
-        ax = plot_handler.show_intensity_plot(intensity_action, intensity_method, False)
-        set_colorbar_label(label)
-        update_legend()
-
-        return ax
-
-    def change_axis_scale(self, colorbar_range, logarithmic):
-        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
-        plot_handler.change_axis_scale(colorbar_range, logarithmic)
+        if plot_handler is not None and not is_gui():
+            if axis == 'x':
+                plot_handler.manager._xgrid = b
+            elif axis == 'y':
+                plot_handler.manager._ygrid = b
 
 
 register_projection(MSliceAxes)
-
-
-def update_overplot_checklist(key):
-    overplot_keys = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium', 'Aluminium': 'Aluminium', 'Copper': 'Copper',
-                     'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
-                     'CIF file': 'CIF file'}
-    if key not in overplot_keys:
-        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
-        plot_handler._arb_nuclei_rmm = key
-        key = 'Arbitrary Nuclei'
-
-    window = GlobalFigureManager.get_active_figure().window
-    getattr(window, 'action_' + overplot_keys[key].replace(' ', '_').lower()).setChecked(True)
-
-
-def update_legend():
-    plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
-    plot_handler.update_legend()
