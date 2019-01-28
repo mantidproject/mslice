@@ -9,8 +9,7 @@ PICKER_TOL_PTS = 5
 
 
 def plot_cached_slice(slice_workspace, slice_cache):
-    ax = _show_plot(slice_workspace, slice_cache)
-    return ax
+    _show_plot(slice_workspace, slice_cache)
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
@@ -40,8 +39,6 @@ def _show_plot(slice_cache, workspace):
 
     cur_fig.canvas.draw_idle()
     cur_fig.show()
-
-    return ax
 
 
 def set_colorbar_label(label):

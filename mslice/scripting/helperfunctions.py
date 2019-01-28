@@ -70,8 +70,8 @@ def add_slice_plot_statements(script_lines, plot_handler):
     script_lines.append(
         'mesh.set_norm(colors.LogNorm({}, {}))\n'.format(
             0.001 + plot_handler.colorbar_range[0] if plot_handler.colorbar_range[0] == 0 else
-            plot_handler.colorbar_range[0],
-            plot_handler.colorbar_range[1]) if plot_handler.colorbar_log is True else '')
+            plot_handler.colorbar_range[0], plot_handler.colorbar_range[1]) if plot_handler.colorbar_log is True else ''
+    )
 
     script_lines.append('cb = plt.colorbar(mesh, ax=ax)\n')
     script_lines.append('cb.set_label(\'{}\', labelpad=20, rotation=270, picker=5)\n'.format(
