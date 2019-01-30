@@ -14,6 +14,13 @@ MEV_LABEL = 'meV'
 WAVENUMBER_LABEL = 'cm-1'
 
 
+def get_recoil_key(label):
+    for key, value in recoil_labels.items():
+        if value == label:
+            return key
+    return label
+
+
 def get_display_name(axisUnits, comment=None):
     if 'DeltaE' in axisUnits:
         # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX

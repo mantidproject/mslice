@@ -22,12 +22,12 @@ del show  # noqa: F821
 class MSliceAxes(Axes):
     name = 'mslice'
 
-    def plot(self, *args, **kwargs):
+    def errorbar(self, *args, **kwargs):
         from mslice.cli.projection_functions import PlotCutMsliceProjection
         if is_cut(*args):
             return PlotCutMsliceProjection(self, *args, **kwargs)
         else:
-            return Axes.plot(self, *args, **kwargs)
+            return Axes.errorbar(self, *args, **kwargs)
 
     def pcolormesh(self, *args, **kwargs):
         from mslice.cli.projection_functions import PlotSliceMsliceProjection

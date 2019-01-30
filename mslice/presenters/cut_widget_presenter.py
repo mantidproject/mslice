@@ -96,7 +96,7 @@ class CutWidgetPresenter(PresenterUtility):
         self._cut_view.set_minimum_step(self._minimumStep[axis[0]])
 
     def workspace_selection_changed(self):
-        if self._previous_cut is not None and self._previous_axis is not None:
+        if self. _previous_cut is not None and self._previous_axis is not None:
             if not self._cut_view.is_fields_cleared():
                 previous_cut_workspace = get_workspace_handle(self._previous_cut)
                 previous_cut_workspace.set_saved_cut_parameters(self._previous_axis, self._cut_view.get_input_fields())

@@ -5,6 +5,9 @@ class Axis(object):
         self.end = end
         self.step = step
 
+    def to_string(self):
+        return "{}, {}, {}, {}".format(self.units, self.start, self.end, self.step)
+
     def to_dict(self):
         return {'start': self.start, 'end': self.end, 'step': self.step, 'units': self.units}
 

@@ -10,6 +10,14 @@ class Cut(object):
         self.norm_to_one = norm_to_one
         self.width = width
         self.icut = None
+        # These are here to save the integration range as the integration axis is
+        # changed when a cut with a width is performed
+        self.start = integration_axis.start
+        self.end = integration_axis.end
+
+    def reset_integration_axis(self, start, end):
+        self.integration_axis.start = start
+        self.integration_axis.end = end
 
     @property
     def cut_axis(self):

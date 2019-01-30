@@ -1,7 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
-from mslice.models.workspacemanager.workspace_algorithms import get_comment
-from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 PICKER_TOL_PTS = 3
@@ -30,29 +28,16 @@ def draw_interactive_cut(workspace):
 
 
 @plt.set_category(plt.CATEGORY_CUT)
-def plot_cut_impl(workspace, presenter, x_units, intensity_range=None, plot_over=False, legend=None):
-    legend = workspace.name if legend is None else legend
+def plot_cut_impl(workspace, x_units, intensity_range=None, plot_over=False, legend=None):
     if not plot_over:
         plt.cla()
 
     cur_fig = plt.gcf()
-    cur_canvas = cur_fig.canvas
-    ax = cur_fig.add_subplot(1, 1, 1, projection='mantid')
-
+    ax = cur_fig.add_subplot(111, projection='mslice')
     legend = workspace.name if legend is None else legend
-    ax.errorbar(workspace.raw_ws, 'o-', label=legend, picker=PICKER_TOL_PTS)
-    ax.set_ylim(*intensity_range) if intensity_range is not None else ax.autoscale()
-    if cur_canvas.manager.window.action_toggle_legends.isChecked():
-        leg = ax.legend(fontsize='medium')
-        leg.draggable()
-    ax.set_xlabel(get_display_name(x_units, get_comment(workspace)), picker=PICKER_TOL_PTS)
-    ax.set_ylabel(CUT_INTENSITY_LABEL, picker=PICKER_TOL_PTS)
-    if not plot_over:
-        cur_canvas.set_window_title(workspace.name)
-        cur_canvas.manager.update_grid()
-    if not cur_canvas.manager.has_plot_handler():
-        cur_canvas.manager.add_cut_plot(presenter, workspace.name.rsplit('_', 1)[0])
-    cur_fig.canvas.draw()
+    ax.errorbar(workspace, 'o-', label=legend, picker=PICKER_TOL_PTS, intensity_range=intensity_range,
+                plot_over=plot_over, x_units=x_units)
+
     return ax.lines
 
 
