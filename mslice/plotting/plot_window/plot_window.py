@@ -6,7 +6,7 @@ import qtawesome as qta
 from mslice.plotting.backend import get_canvas_and_toolbar_cls
 from mslice.util.qt import QtCore, QtWidgets
 
-FigureCanvas, NavigationToolbar2QT =  get_canvas_and_toolbar_cls()
+FigureCanvas, NavigationToolbar2QT = get_canvas_and_toolbar_cls()
 
 
 class MatplotlibQTCanvas(FigureCanvas):

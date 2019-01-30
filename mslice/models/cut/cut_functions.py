@@ -9,8 +9,8 @@ from mslice.workspace.workspace import Workspace as Workspace2D
 
 
 def output_workspace_name(selected_workspace, integration_start, integration_end):
-    return selected_workspace + "_cut(" + "{:.3f}".format(integration_start) + \
-           "," + "{:.3f}".format(integration_end) + ")"
+    return selected_workspace + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
+        integration_end) + ")"
 
 
 def compute_cut(workspace, cut_axis, integration_axis, is_norm, store=True):

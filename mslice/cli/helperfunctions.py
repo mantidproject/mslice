@@ -12,27 +12,27 @@ _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Alum
 
 _function_to_intensity = {
     'show_scattering_function': 's(q,e)',
-    'show_dynamical_susceptibility': 'chi(q,e)',
-    'show_dynamical_susceptibility_magnetic': 'chi(q,e) magnetic',
-    'show_d2sigma': 'd2sigma/dOmega.de',
-    'show_symmetrised': 'symmetrised s(q,e)',
+    'show_dynamical_susceptibility': 'chi',
+    'show_dynamical_susceptibility_magnetic': 'chi_mag',
+    'show_d2sigma': 'xsec',
+    'show_symmetrised': 'symm',
     'show_gdos': 'gdos',
 }
 
 _intensity_to_action = {
     's(q,e)': 'action_sqe',
-    'chi(q,e)': 'action_chi_qe',
-    'chi(q,e) magnetic': 'action_chi_qe_magnetic',
-    'd2sigma/dOmega.de': 'action_d2sig_dw_de',
-    'symmetrised s(q,e)': 'action_symmetrised_sqe',
+    'chi': 'action_chi_qe',
+    'chi_mag': 'action_chi_qe_magnetic',
+    'xsec': 'action_d2sig_dw_de',
+    'symm': 'action_symmetrised_sqe',
     'gdos': 'action_gdos',
 }
 
 _intensity_to_workspace = {
-    'chi(q,e)': 'chi',
-    'chi(q,e) magnetic': 'chi_magnetic',
-    'd2sigma/dOmega.de': 'd2sigma',
-    'symmetrised s(q,e)': 'symmetrised',
+    'chi': 'chi',
+    'chi_mag': 'chi_magnetic',
+    'xsec': 'd2sigma',
+    'symm': 'symmetrised',
     'gdos': 'gdos',
 }
 

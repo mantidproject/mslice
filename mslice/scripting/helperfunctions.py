@@ -29,6 +29,8 @@ def header(plot_handler):
         elif 'numpy' in package:
             if isinstance(plot_handler, CutPlot) and (plot_handler.x_log is not True or plot_handler.y_log is not True):
                 continue
+            elif isinstance(plot_handler, SlicePlot):
+                continue
         statements.append('import {} as {}\n'.format(package, PACKAGES[package]))
 
     return statements
@@ -62,16 +64,27 @@ def add_plot_statements(script_lines, plot_handler):
 
 
 def add_slice_plot_statements(script_lines, plot_handler):
-    script_lines.append('slice_ws = mc.Slice(ws)\n\n')
+    slice = plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name]
+    momentum_axis = str(slice.momentum_axis)
+    energy_axis = str(slice.energy_axis)
+    norm = slice.norm is not None
+
+    script_lines.append('slice_ws = mc.Slice(ws, Axis1=\'{}\', Axis2=\'{}\', NormToOne={})\n\n'.format(
+        momentum_axis, energy_axis, norm))
     script_lines.append('fig = plt.gcf()\n')
     script_lines.append('ax = fig.add_subplot(111, projection=\'mslice\')\n')
 
     if plot_handler.default_options['intensity'] is True:
         intensity = _function_to_intensity[plot_handler.default_options['intensity_method']]
-        script_lines.append(
-            'mesh = ax.pcolormesh(slice_ws, cmap=\'{}\', intensity=\'{}\', temperature={})\n'.format(
-                plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name].colourmap, intensity,
-                plot_handler.default_options['temp'] if plot_handler.default_options['temp_dependent'] else None))
+        if plot_handler.default_options['temp_dependent']:
+            script_lines.append(
+                'mesh = ax.pcolormesh(slice_ws, cmap=\'{}\', intensity=\'{}\', temperature={})\n'.format(
+                    plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name].colourmap, intensity,
+                    plot_handler.default_options['temp']))
+        else:
+            script_lines.append(
+                'mesh = ax.pcolormesh(slice_ws, cmap=\'{}\', intensity=\'{}\')\n'.format(
+                    plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name].colourmap, intensity))
     else:
         script_lines.append(
             'mesh = ax.pcolormesh(slice_ws, cmap=\'{}\')\n'.format(
@@ -88,23 +101,7 @@ def add_slice_plot_statements(script_lines, plot_handler):
     script_lines.append('cb.set_label(\'{}\', labelpad=20, rotation=270, picker=5)\n'.format(
         plot_handler.colorbar_label))
 
-    script_lines.append('ax.set_title(\'{}\')\n'.format(plot_handler.title)
-                        if plot_handler.is_changed('title') else '')
-
-    script_lines.append('ax.set_ylabel(\'{}\')\n'.format(plot_handler.y_label)
-                        if plot_handler.is_changed('y_label') else '')
-    script_lines.append('ax.set_xlabel(\'{}\')\n'.format(plot_handler.x_label)
-                        if plot_handler.is_changed('x_label') else '')
-
-    script_lines.append('ax.grid({}, axis=\'y\')\n'.format(plot_handler.y_grid)
-                        if plot_handler.is_changed('y_grid') else '')
-    script_lines.append('ax.grid({}, axis=\'x\')\n'.format(plot_handler.x_grid)
-                        if plot_handler.is_changed('x_grid') else '')
-
-    script_lines.append('ax.set_ylim(bottom={}, top={})\n'.format(*plot_handler.y_range)
-                        if plot_handler.is_changed('y_range') else '')
-    script_lines.append('ax.set_xlim(left={}, right={})\n'.format(*plot_handler.x_range)
-                        if plot_handler.is_changed('x_range') else '')
+    add_plot_options(script_lines, plot_handler)
 
 
 def add_overplot_statements(script_lines, plot_handler):
@@ -145,23 +142,7 @@ def add_cut_plot_statements(script_lines, plot_handler):
     script_lines.append('ax = fig.add_subplot(111, projection=\'mslice\')\n\n')
 
     add_cut_lines(script_lines, plot_handler)
-
-    script_lines.append('ax.set_title(\'{}\')\n'.format(plot_handler.title))
-
-    script_lines.append('ax.set_ylabel(\'{}\')\n'.format(plot_handler.y_label)
-                        if plot_handler.is_changed('y_label') else '')
-    script_lines.append('ax.set_xlabel(\'{}\')\n'.format(plot_handler.x_label)
-                        if plot_handler.is_changed('x_label') else '')
-
-    script_lines.append('ax.grid({}, axis=\'y\')\n'.format(plot_handler.y_grid)
-                        if plot_handler.is_changed('y_grid') else '')
-    script_lines.append('ax.grid({}, axis=\'x\')\n'.format(plot_handler.x_grid)
-                        if plot_handler.is_changed('x_grid') else '')
-
-    script_lines.append('ax.set_ylim(bottom={}, top={})\n'.format(*plot_handler.y_range)
-                        if plot_handler.is_changed('y_range') else '')
-    script_lines.append('ax.set_xlim(left={}, right={})\n'.format(*plot_handler.x_range)
-                        if plot_handler.is_changed('x_range') else '')
+    add_plot_options(script_lines, plot_handler)
 
     script_lines.append('ax.set_xscale(\'symlog\', linthreshx=pow(10, np.floor(np.log10({}))))\n'.format(
         plot_handler.default_options['xmin']) if plot_handler.is_changed('x_log') else '')
@@ -187,8 +168,8 @@ def add_cut_lines_with_width(errorbars, script_lines, cut):
     while cut_start != cut_end:
         cut.integration_axis.start = cut_start
         cut.integration_axis.end = cut_end
-        cut_axis = cut.cut_axis.to_string()
-        integration_axis = cut.integration_axis.to_string()
+        cut_axis = str(cut.cut_axis)
+        integration_axis = str(cut.integration_axis)
 
         script_lines.append('cut_ws_{} = mc.Cut(ws, CutAxis=\'{}\', IntegrationAxis=\'{}\', '
                             'NormToOne={})\n'.format(i, cut_axis, integration_axis, norm_to_one))
@@ -200,7 +181,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cut):
         width = errorbar.lines[0]._linewidth
         label = errorbar._label
 
-        if intensity_range is not (None, None):
+        if intensity_range != (None, None):
             script_lines.append(
                 'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
                 'lw=\'{}\', intensity_range={})\n\n'.format(i, axis_units, label, colour, marker, style, width,
@@ -213,3 +194,22 @@ def add_cut_lines_with_width(errorbars, script_lines, cut):
         cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
         i += 1
     cut.reset_integration_axis(cut.start, cut.end)
+
+
+def add_plot_options(script_lines, plot_handler):
+    script_lines.append('ax.set_title(\'{}\')\n'.format(plot_handler.title))
+
+    script_lines.append('ax.set_ylabel(\'{}\')\n'.format(plot_handler.y_label)
+                        if plot_handler.is_changed('y_label') else '')
+    script_lines.append('ax.set_xlabel(\'{}\')\n'.format(plot_handler.x_label)
+                        if plot_handler.is_changed('x_label') else '')
+
+    script_lines.append('ax.grid({}, axis=\'y\')\n'.format(plot_handler.y_grid)
+                        if plot_handler.is_changed('y_grid') else '')
+    script_lines.append('ax.grid({}, axis=\'x\')\n'.format(plot_handler.x_grid)
+                        if plot_handler.is_changed('x_grid') else '')
+
+    script_lines.append('ax.set_ylim(bottom={}, top={})\n'.format(*plot_handler.y_range)
+                        if plot_handler.is_changed('y_range') else '')
+    script_lines.append('ax.set_xlim(left={}, right={})\n'.format(*plot_handler.x_range)
+                        if plot_handler.is_changed('x_range') else '')

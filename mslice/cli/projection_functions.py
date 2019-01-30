@@ -18,6 +18,7 @@ from mslice.views.cut_plotter import PICKER_TOL_PTS as CUT_PICKER_TOL_PTS
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 
+@plt.set_category(plt.CATEGORY_CUT)
 def PlotCutMsliceProjection(axes, workspace, *args, **kwargs):
     """
     Same as the cli PlotCut but returns the relevant axes object.
@@ -58,6 +59,7 @@ def PlotCutMsliceProjection(axes, workspace, *args, **kwargs):
     return axes.lines
 
 
+@plt.set_category(plt.CATEGORY_SLICE)
 def PlotSliceMsliceProjection(axes, workspace, *args, **kwargs):
     """
     Same as the CLI PlotSlice but returns the relevant axes object.
@@ -70,6 +72,7 @@ def PlotSliceMsliceProjection(axes, workspace, *args, **kwargs):
     if is_gui():
         cli_slice_plotter_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
     else:
+        # Needed so the figure manager knows about the slice plot handler
         create_slice_figure(workspace.name[2:], get_slice_plotter_presenter())
 
     slice_cache = get_slice_plotter_presenter().get_slice_cache(workspace)
