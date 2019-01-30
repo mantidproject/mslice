@@ -103,7 +103,7 @@ class MainWindow(MainView, QMainWindow):
         if tab_to_show:
             self.tabWidget_2.setCurrentIndex(tab_to_show[0])
             for tab_index in tab_to_show:
-                    self.tabWidget_2.setTabEnabled(tab_index, True)
+                self.tabWidget_2.setTabEnabled(tab_index, True)
         else:
             self.tabWidget_2.hide()
 

@@ -17,7 +17,7 @@ _function_to_intensity = {
     'show_d2sigma': 'd2sigma/dOmega.de',
     'show_symmetrised': 'symmetrised s(q,e)',
     'show_gdos': 'gdos',
-    }
+}
 
 _intensity_to_action = {
     's(q,e)': 'action_sqe',
