@@ -105,5 +105,4 @@ def PlotSliceMsliceProjection(axes, workspace, *args, **kwargs):
     axes.set_ylabel(get_display_name(y_axis.units, comment), picker=SLICE_PICKER_TOL_PTS)
     axes.set_xlim(x_axis.start, x_axis.end)
     axes.set_ylim(y_axis.start, y_axis.end)
-
     return image

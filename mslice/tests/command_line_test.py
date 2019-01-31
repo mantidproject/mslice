@@ -19,6 +19,7 @@ from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
+
 class CommandLineTest(unittest.TestCase):
 
     def create_workspace(self, name):
@@ -166,7 +167,7 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_workspace('test_plot_slice_cli')
         slice_ws = Slice(workspace)
         PlotSlice(slice_ws)
-        spp.plot_from_cache(workspace).assert_called()
+        spp.plot_from_cache.assert_called()
 
     @mock.patch('mslice.cli._mslice_commands.PlotSlice')
     @mock.patch('mslice.app.presenters.cli_slice_plotter_presenter')
@@ -174,7 +175,7 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_pixel_workspace('test_plot_slice_non_psd_cli')
         slice_ws = Slice(workspace)
         PlotSlice(slice_ws)
-        spp.plot_from_cache(workspace).assert_called()
+        spp.plot_from_cache.assert_called()
 
     @mock.patch('mslice.app.presenters.cli_cut_plotter_presenter')
     def test_plot_cut(self, cpp):
