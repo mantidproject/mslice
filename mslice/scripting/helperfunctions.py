@@ -67,7 +67,7 @@ def add_slice_plot_statements(script_lines, plot_handler):
     slice = plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name]
     momentum_axis = str(slice.momentum_axis)
     energy_axis = str(slice.energy_axis)
-    norm = slice.norm is not None
+    norm = slice.norm.vmin == 0.0 and slice.norm.vmax == 1.0
 
     script_lines.append('slice_ws = mc.Slice(ws, Axis1=\'{}\', Axis2=\'{}\', NormToOne={})\n\n'.format(
         momentum_axis, energy_axis, norm))
