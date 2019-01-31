@@ -8,7 +8,7 @@ from mslice.models.projection.powder.mantid_projection_calculator import MantidP
 from . import is_gui
 from mslice import app
 
-# Separate presenters for cli
+# Separate presenters for the CLI
 cli_cut_plotter_presenter = CutPlotterPresenter()
 cli_slice_plotter_presenter = SlicePlotterPresenter()
 cli_dataloader_presenter = DataLoaderPresenter(CLIDataLoaderWidget())

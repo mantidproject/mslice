@@ -4,22 +4,19 @@ from __future__ import (absolute_import, division, print_function)
 import os.path as ospath
 
 import matplotlib as mpl
-
-from mslice.app.presenters import (get_slice_plotter_presenter, get_cut_plotter_presenter, get_dataloader_presenter,
-                                   get_powder_presenter)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, rename_workspace
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cmap import DEFAULT_CMAP
-
+import mslice.app as app
+from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.plotting.plot_window.slice_plot import SlicePlot
-from mslice.cli.projection_functions import PlotSliceMsliceProjection, PlotCutMsliceProjection
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
                                         _check_workspace_type)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
-from mslice.scripting import generate_script
+from mslice.workspace.histogram_workspace import HistogramWorkspace
+
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
@@ -69,6 +66,8 @@ def Load(Filename, OutputWorkspace=None):
     :param Filename:  full path to input file (string)
     :return:
     """
+    from mslice.app.presenters import get_dataloader_presenter
+
     if not isinstance(Filename, string_types):
         raise RuntimeError('path given to load must be a string')
     if not ospath.exists(Filename):
@@ -83,6 +82,7 @@ def Load(Filename, OutputWorkspace=None):
 
 
 def GenerateScript(InputWorkspace, path):
+    from mslice.scripting import generate_script
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     generate_script(None, ws_name=workspace, filename=path)
@@ -99,6 +99,7 @@ def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
     :param Units: The energy units (string) [default: 'meV']
     :return:
     """
+    from mslice.app.presenters import get_powder_presenter
 
     _check_workspace_name(InputWorkspace)
     return get_powder_presenter().calc_projection(InputWorkspace, Axis1, Axis2, Units)
@@ -119,7 +120,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     :param NormToOne: if true the slice will be normalized to one.
     :return:
     """
-
+    from mslice.app.presenters import get_slice_plotter_presenter
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, PixelWorkspace)
@@ -144,6 +145,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     :param NormToOne: if true the cut will be normalized to one.
     :return:
     """
+    from mslice.app.presenters import get_cut_plotter_presenter
 
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
@@ -169,8 +171,17 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     :param Colormap: Colormap name as a string. Default is 'viridis'.
     :return:
     """
+    from mslice.app.presenters import cli_slice_plotter_presenter
+    _check_workspace_name(InputWorkspace)
+    workspace = get_workspace_handle(InputWorkspace)
+    _check_workspace_type(workspace, HistogramWorkspace)
 
-    PlotSliceMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, Colormap)
+    # slice cache needed from main slice plotter presenter
+    if is_gui():
+        cli_slice_plotter_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
+    cli_slice_plotter_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
+    cli_slice_plotter_presenter.change_colourmap(workspace.name, Colormap)
+    cli_slice_plotter_presenter.plot_from_cache(workspace)
 
     return GlobalFigureManager._active_figure
 
@@ -186,8 +197,18 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     :param PlotOver: if true the cut will be plotted on an existing figure.
     :return:
     """
+    from mslice.app.presenters import cli_cut_plotter_presenter
+    _check_workspace_name(InputWorkspace)
+    workspace = get_workspace_handle(InputWorkspace)
+    if not isinstance(workspace, HistogramWorkspace):
+        raise RuntimeError("Incorrect workspace type.")
 
-    PlotCutMsliceProjection(InputWorkspace, IntensityStart, IntensityEnd, PlotOver)
+    if IntensityStart == 0 and IntensityEnd == 0:
+        intensity_range = None
+    else:
+        intensity_range = (IntensityStart, IntensityEnd)
+    cli_cut_plotter_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range,
+                                                      plot_over=PlotOver)
 
     return GlobalFigureManager._active_figure
 
@@ -206,7 +227,7 @@ def ConvertToChi(figure_number):
     :param figure_number: The slice plot figure number returned when the plot was made.
     :return:
     """
-
+    from mslice.plotting.plot_window.slice_plot import SlicePlot
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_chi_qe.trigger()
@@ -220,7 +241,7 @@ def ConvertToChiMag(figure_number):
         :param figure_number: The slice plot figure number returned when the plot was made.
         :return:
         """
-
+    from mslice.plotting.plot_window.slice_plot import SlicePlot
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_chi_qe_magnetic.trigger()
@@ -234,7 +255,7 @@ def ConvertToCrossSection(figure_number):
         :param figure_number: The slice plot figure number returned when the plot was made.
         :return:
         """
-
+    from mslice.plotting.plot_window.slice_plot import SlicePlot
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_d2sig_dw_de.trigger()
@@ -248,7 +269,7 @@ def SymmetriseSQE(figure_number):
         :param figure_number: The slice plot figure number returned when the plot was made.
         :return:
         """
-
+    from mslice.plotting.plot_window.slice_plot import SlicePlot
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_symmetrised_sqe.trigger()
@@ -262,7 +283,7 @@ def ConvertToGDOS(figure_number):
         :param figure_number: The slice plot figure number returned when the plot was made.
         :return:
         """
-
+    from mslice.plotting.plot_window.slice_plot import SlicePlot
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_gdos.trigger()

@@ -6,12 +6,11 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _intensity_to_action, \
     _intensity_to_workspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.app.presenters import cli_slice_plotter_presenter, is_gui
+from mslice.app import is_gui
 from mslice.util.mantid.mantid_algorithms import Transpose
 from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mantid.plots import plotfunctions
-from mslice.app.presenters import get_slice_plotter_presenter, get_cut_plotter_presenter
 from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
 from mslice.views.cut_plotter import PICKER_TOL_PTS as CUT_PICKER_TOL_PTS
@@ -23,7 +22,7 @@ def PlotCutMsliceProjection(axes, workspace, *args, **kwargs):
     """
     Same as the cli PlotCut but returns the relevant axes object.
     """
-
+    from mslice.app.presenters import get_cut_plotter_presenter
     cur_fig = plt.gcf()
     cur_canvas = cur_fig.canvas
 
@@ -36,7 +35,7 @@ def PlotCutMsliceProjection(axes, workspace, *args, **kwargs):
 
     plot_over = kwargs.pop('plot_over', True)
     intensity_range = kwargs.pop('intensity_range', (None, None))
-    x_units = kwargs.pop('x_units', None)
+    x_units = kwargs.pop('x_units', 'None')
     legend = kwargs.pop('label', None)
     legend = workspace.name if legend is None else legend
 
@@ -64,6 +63,7 @@ def PlotSliceMsliceProjection(axes, workspace, *args, **kwargs):
     """
     Same as the CLI PlotSlice but returns the relevant axes object.
     """
+    from mslice.app.presenters import get_slice_plotter_presenter, cli_slice_plotter_presenter
     _check_workspace_name(workspace)
     workspace = get_workspace_handle(workspace)
     _check_workspace_type(workspace, HistogramWorkspace)

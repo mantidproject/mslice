@@ -4,7 +4,6 @@ import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 
 import mslice.cli._mslice_commands as mc
-import matplotlib.pyplot as plt
 from mslice.workspace import wrap_workspace
 
 
@@ -25,27 +24,26 @@ class CLIProjectionTest(unittest.TestCase):
         workspace.e_fixed = 10
         return workspace
 
-    @mock.patch('mslice.cli.projection_functions.cli_cut_plotter_presenter')
-    def test_that_mslice_projection_plot_cut_works_correctly(self, cut_presenter):
-        cut_presenter.plot_cut_from_workspace = mock.MagicMock()
-        fig, ax = plt.subplots(subplot_kw={'projection': 'mslice'})
+    @mock.patch('mslice.cli.projection_functions.plt')
+    @mock.patch('mslice.cli.projection_functions.plotfunctions')
+    def test_that_mslice_projection_plot_cut_works_correctly(self, plotfunctions, plt):
+        fig = plt.gcf()
+        ax = fig.add_subplot(111, projection='mslice')
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = mc.Cut(workspace)
 
-        ax.plot(cut)
+        ax.errorbar(cut)
 
-        intensity_range = None
-        PlotOver = False
-        cut_presenter.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=intensity_range,
-                                                                      plot_over=PlotOver)
+        plotfunctions.errorbar.assert_called()
 
-    @mock.patch('mslice.cli.projection_functions.cli_slice_plotter_presenter')
-    def test_that_mslice_projection_slice_cut_works_correctly(self, slice_presenter):
-        slice_presenter.plot_from_cache = mock.MagicMock()
-        fig, ax = plt.subplots(subplot_kw={'projection': 'mslice'})
+    @mock.patch('mslice.cli.projection_functions.plt')
+    @mock.patch('mslice.cli.projection_functions.plotfunctions')
+    def test_that_mslice_projection_slice_cut_works_correctly(self, plotfunctions, plt):
+        fig = plt.gcf()
+        ax = fig.add_subplot(111, projection='mslice')
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         slice_ws = mc.Slice(workspace)
 
         ax.pcolormesh(slice_ws)
 
-        slice_presenter.plot_from_cache.assert_called_once_with(slice_ws)
+        plotfunctions.pcolormesh.assert_called()

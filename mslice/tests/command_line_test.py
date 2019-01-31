@@ -66,7 +66,7 @@ class CommandLineTest(unittest.TestCase):
         return workspace
 
     @mock.patch('mslice.cli._mslice_commands.get_workspace_handle')
-    @mock.patch('mslice.cli._mslice_commands.get_dataloader_presenter')
+    @mock.patch('mslice.app.presenters.get_dataloader_presenter')
     @mock.patch('mslice.cli._mslice_commands.ospath.exists')
     def test_load(self, ospath_mock, get_dlp, get_workspace_mock):
         ospath_mock.exists.return_value = True
@@ -76,7 +76,7 @@ class CommandLineTest(unittest.TestCase):
         get_dlp().load_workspace.assert_called_once_with([path])
         get_workspace_mock.assert_called_with(path)
 
-    @mock.patch('mslice.cli._mslice_commands.get_powder_presenter')
+    @mock.patch('mslice.cli.app.presenters.get_powder_presenter')
     def test_projection(self,  get_pp):
         get_pp.return_value = PowderProjectionPresenter(mock.create_autospec(PowderView), MantidProjectionCalculator())
         get_pp().register_master(mock.create_autospec(MainPresenterInterface))
@@ -89,14 +89,14 @@ class CommandLineTest(unittest.TestCase):
         self.assertAlmostEqual(signal[0][11], 0.1753, 4)
         self.assertAlmostEqual(signal[0][28], 0.4248, 4)
 
-    @mock.patch('mslice.cli._mslice_commands.get_powder_presenter')
+    @mock.patch('mslice.cli.app.presenters.get_powder_presenter')
     def test_projection_fail_non_PSD(self, get_pp):
         get_pp.return_value = PowderProjectionPresenter(mock.create_autospec(PowderView), MantidProjectionCalculator())
         workspace = self.create_workspace('test_projection_cli')
         with self.assertRaises(RuntimeError):
             MakeProjection(workspace, '|Q|', 'DeltaE')
 
-    @mock.patch('mslice.cli._mslice_commands.get_slice_plotter_presenter')
+    @mock.patch('mslice.cli.app.presenters.get_slice_plotter_presenter')
     def test_slice_non_psd(self, get_spp):
         get_spp.return_value = SlicePlotterPresenter()
         workspace = self.create_workspace('test_slice_cli')
@@ -106,7 +106,7 @@ class CommandLineTest(unittest.TestCase):
         self.assertAlmostEqual(0.4250, signal[1][10], 4)
         self.assertAlmostEqual(0.9250, signal[4][11], 4)
 
-    @mock.patch('mslice.cli._mslice_commands.get_slice_plotter_presenter')
+    @mock.patch('mslice.cli.app.presenters.get_slice_plotter_presenter')
     def test_slice_non_psd_axes_specified(self, get_spp):
         get_spp.return_value = SlicePlotterPresenter()
         workspace = self.create_workspace('test_slice_cli_axes')
@@ -116,7 +116,7 @@ class CommandLineTest(unittest.TestCase):
         self.assertAlmostEqual(0.4250, signal[2][0], 4)
         self.assertAlmostEqual(0.9250, signal[5][1], 4)
 
-    @mock.patch('mslice.cli._mslice_commands.get_cut_plotter_presenter')
+    @mock.patch('mslice.app.presenters.get_cut_plotter_presenter')
     def test_cut_non_psd(self, get_cpp):
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_workspace('test_workspace_cut_cli')
@@ -126,7 +126,7 @@ class CommandLineTest(unittest.TestCase):
         self.assertAlmostEqual(1.1299, signal[5], 4)
         self.assertAlmostEqual(1.375, signal[8], 4)
 
-    @mock.patch('mslice.cli._mslice_commands.get_slice_plotter_presenter')
+    @mock.patch('mslice.cli.app.presenters.get_slice_plotter_presenter')
     def test_slice_psd(self, get_spp):
         get_spp.return_value = SlicePlotterPresenter()
         workspace = self.create_pixel_workspace('test_slice_psd_cli')
@@ -137,7 +137,7 @@ class CommandLineTest(unittest.TestCase):
         self.assertEqual(110, signal[3][7])
         self.assertEqual(105, signal[5][6])
 
-    @mock.patch('mslice.cli._mslice_commands.get_cut_plotter_presenter')
+    @mock.patch('mslice.cli.app.presenters.get_cut_plotter_presenter')
     def test_cut_psd(self, get_cpp):
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_pixel_workspace('test_workspace_cut_psd_cli')
@@ -148,44 +148,49 @@ class CommandLineTest(unittest.TestCase):
         self.assertEqual(192, signal[29])
         self.assertEqual(429, signal[15])
 
-    @mock.patch('mslice.cli._mslice_commands.get_slice_plotter_presenter')
+    @mock.patch('mslice.cli.app.presenters.get_slice_plotter_presenter')
     def test_slice_fail_workspace_type(self, get_spp):
         get_spp.return_value = SlicePlotterPresenter()
         workspace = self.create_histo_workspace('test_slice_fail_type_cli')
         with self.assertRaises(RuntimeError):
             Slice(workspace)
 
-    @mock.patch('mslice.cli._mslice_commands.get_cut_plotter_presenter')
+    @mock.patch('mslice.app.presenters.get_cut_plotter_presenter')
     def test_cut_fail_workspace_type(self, get_cpp):
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_histo_workspace('test_cut_fail_type_cli')
         with self.assertRaises(RuntimeError):
             Cut(workspace)
 
-    @mock.patch('mslice.cli._mslice_commands.PlotSliceMsliceProjection')
-    def test_plot_slice(self, plot_slice):
-        slice_ws = Slice(self.create_pixel_workspace('test_plot_slice_cli'))
+    @mock.patch('mslice.cli._mslice_commands.PlotSlice')
+    @mock.patch('mslice.app.presenters.cli_slice_plotter_presenter')
+    def test_plot_slice(self, spp, PlotSlice):
+        workspace = self.create_workspace('test_plot_slice_cli')
+        slice_ws = Slice(workspace)
         PlotSlice(slice_ws)
-        plot_slice.assert_called_once_with(slice_ws, "", "", DEFAULT_CMAP)
+        spp.plot_from_cache(workspace).assert_called()
 
-    @mock.patch('mslice.cli._mslice_commands.PlotSliceMsliceProjection')
-    def test_plot_slice_non_psd(self, plot_slice):
-        slice_ws = Slice(self.create_workspace('test_plot_slice_non_psd_cli'))
+    @mock.patch('mslice.cli._mslice_commands.PlotSlice')
+    @mock.patch('mslice.app.presenters.cli_slice_plotter_presenter')
+    def test_plot_slice_non_psd(self, spp, PlotSlice):
+        workspace = self.create_pixel_workspace('test_plot_slice_non_psd_cli')
+        slice_ws = Slice(workspace)
         PlotSlice(slice_ws)
-        plot_slice.assert_called_once_with(slice_ws, "", "", DEFAULT_CMAP)
+        spp.plot_from_cache(workspace).assert_called()
 
-    @mock.patch('mslice.cli._mslice_commands.PlotCutMsliceProjection')
-    def test_plot_cut(self, plot_cut):
-        cut = Cut(self.create_pixel_workspace('test_plot_cut_cli'))
+    @mock.patch('mslice.app.presenters.cli_cut_plotter_presenter')
+    def test_plot_cut(self, cpp):
+        workspace = self.create_pixel_workspace('test_plot_cut_cli')
+        cut = Cut(workspace)
         PlotCut(cut)
-        plot_cut.assert_called_once_with(cut, 0, 0, False)
+        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
 
-    @mock.patch('mslice.cli._mslice_commands.PlotCutMsliceProjection')
-    def test_plot_cut_non_psd(self, plot_cut):
+    @mock.patch('mslice.app.presenters.cli_cut_plotter_presenter')
+    def test_plot_cut_non_psd(self, cpp):
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        plot_cut.assert_called_once_with(cut, 0, 0, False)
+        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_keep_figure_works_for_last_figure_number(self, gfm):

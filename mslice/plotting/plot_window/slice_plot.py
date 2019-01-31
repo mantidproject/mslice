@@ -316,18 +316,21 @@ class SlicePlot(IPlot):
                     return
             else:
                 slice_plotter_method(self.ws_name)
-            self.change_axis_scale(cbar_range, cbar_log)
-            self.x_range = x_range
-            self.y_range = y_range
-            self.title = title
-            self.manager.update_grid()
-            self._update_lines()
-            self._canvas.draw()
+            self.update_canvas(cbar_range, cbar_log, x_range, y_range, title)
         else:
             action.setChecked(True)
         # Reset current active figure
         if last_active_figure_number is not None:
             self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+
+    def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
+        self.change_axis_scale(cbar_range, cbar_log)
+        self.x_range = x_range
+        self.y_range = y_range
+        self.title = title
+        self.manager.update_grid()
+        self._update_lines()
+        self._canvas.draw()
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         try:
@@ -355,6 +358,7 @@ class SlicePlot(IPlot):
                     self.default_options['temp'] = temp_value
                     self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
             slice_plotter_method(self.ws_name)
+        return True
 
     def ask_sample_temperature_field(self, ws_name):
         text = 'Sample Temperature not found. Select the sample temperature field or enter a value in Kelvin:'

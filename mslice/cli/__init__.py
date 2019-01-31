@@ -4,14 +4,13 @@ import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.plotting.pyplot import *  # noqa: F401
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
-from mslice.cli.helperfunctions import is_slice, is_cut, HistogramWorkspace
+from mslice.cli.helperfunctions import is_slice, is_cut
 from ._mslice_commands import *  # noqa: F401
 from mslice.app import is_gui
 from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_type, _get_overplot_key,
                                         _update_overplot_checklist, _update_legend)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.app.presenters import get_slice_plotter_presenter
 
 # This is not compatible with mslice as we use a separate
 # global figure manager see _mslice_commands.Show
@@ -37,6 +36,7 @@ class MSliceAxes(Axes):
             return Axes.pcolormesh(self, *args, **kwargs)
 
     def recoil(self, workspace, element=None, rmm=None):
+        from mslice.app.presenters import get_slice_plotter_presenter
         _check_workspace_name(workspace)
         workspace = get_workspace_handle(workspace)
         _check_workspace_type(workspace, HistogramWorkspace)
@@ -53,6 +53,7 @@ class MSliceAxes(Axes):
         _update_legend()
 
     def bragg(self, workspace, element=None, cif=None):
+        from mslice.app.presenters import get_slice_plotter_presenter
         _check_workspace_name(workspace)
         workspace = get_workspace_handle(workspace)
         _check_workspace_type(workspace, HistogramWorkspace)
