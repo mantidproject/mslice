@@ -4,7 +4,7 @@ import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 
-from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
+from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, KeepFigure, MakeCurrent,
                                          ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE,
                                          ConvertToGDOS)
 from mslice.plotting.plot_window.slice_plot import SlicePlot
