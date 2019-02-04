@@ -16,6 +16,8 @@ from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.app.presenters import cli_slice_plotter_presenter
+from mslice.app.presenters import cli_cut_plotter_presenter
 
 # -----------------------------------------------------------------------------
 # Command functions
@@ -171,7 +173,6 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     :param Colormap: Colormap name as a string. Default is 'viridis'.
     :return:
     """
-    from mslice.app.presenters import cli_slice_plotter_presenter
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, HistogramWorkspace)
@@ -197,7 +198,6 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     :param PlotOver: if true the cut will be plotted on an existing figure.
     :return:
     """
-    from mslice.app.presenters import cli_cut_plotter_presenter
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, HistogramWorkspace):

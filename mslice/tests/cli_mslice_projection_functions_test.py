@@ -5,6 +5,7 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 
 import mslice.cli._mslice_commands as mc
 from mslice.workspace import wrap_workspace
+import mslice.plotting.pyplot as plt
 
 
 class CLIProjectionTest(unittest.TestCase):
@@ -24,9 +25,8 @@ class CLIProjectionTest(unittest.TestCase):
         workspace.e_fixed = 10
         return workspace
 
-    @mock.patch('mslice.cli.projection_functions.plt')
     @mock.patch('mslice.cli.projection_functions.plotfunctions')
-    def test_that_mslice_projection_plot_cut_works_correctly(self, plotfunctions, plt):
+    def test_that_mslice_projection_plot_cut_works_correctly(self, plotfunctions):
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection='mslice')
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
@@ -36,9 +36,8 @@ class CLIProjectionTest(unittest.TestCase):
 
         plotfunctions.errorbar.assert_called()
 
-    @mock.patch('mslice.cli.projection_functions.plt')
     @mock.patch('mslice.cli.projection_functions.plotfunctions')
-    def test_that_mslice_projection_slice_cut_works_correctly(self, plotfunctions, plt):
+    def test_that_mslice_projection_slice_cut_works_correctly(self, plotfunctions):
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection='mslice')
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
