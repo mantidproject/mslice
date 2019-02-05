@@ -28,6 +28,7 @@ class CLIProjectionTest(unittest.TestCase):
     @mock.patch('mslice.cli.projection_functions.plotfunctions')
     def test_that_mslice_projection_plot_cut_works_correctly(self, plotfunctions):
         fig = plt.gcf()
+        fig.add_subplot = mock.MagicMock()
         ax = fig.add_subplot(111, projection='mslice')
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = mc.Cut(workspace)
@@ -39,6 +40,7 @@ class CLIProjectionTest(unittest.TestCase):
     @mock.patch('mslice.cli.projection_functions.plotfunctions')
     def test_that_mslice_projection_slice_cut_works_correctly(self, plotfunctions):
         fig = plt.gcf()
+        fig.add_subplot = mock.MagicMock()
         ax = fig.add_subplot(111, projection='mslice')
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         slice_ws = mc.Slice(workspace)
