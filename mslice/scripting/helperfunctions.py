@@ -110,6 +110,8 @@ def add_overplot_statements(script_lines, plot_handler):
 
     for line in line_artists:
         label = line._label
+        if 'nolegend' in label:
+            continue
         key = get_recoil_key(label)
         rmm = int(label.split()[-1]) if "Relative" in label else None
         element = label if rmm is None else None

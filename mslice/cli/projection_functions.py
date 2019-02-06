@@ -93,7 +93,7 @@ def PlotSliceMsliceProjection(axes, workspace, *args, **kwargs):
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
-    image = plotfunctions.pcolormesh(axes, workspace.raw_ws, *args, **kwargs)
+    plotfunctions.pcolormesh(axes, workspace.raw_ws, *args, **kwargs)
     axes.set_title(workspace.name[2:], picker=SLICE_PICKER_TOL_PTS)
     x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
     y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
@@ -105,4 +105,4 @@ def PlotSliceMsliceProjection(axes, workspace, *args, **kwargs):
     axes.set_ylabel(get_display_name(y_axis.units, comment), picker=SLICE_PICKER_TOL_PTS)
     axes.set_xlim(x_axis.start, x_axis.end)
     axes.set_ylim(y_axis.start, y_axis.end)
-    return image
+    return axes.collections[0]
