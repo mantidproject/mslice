@@ -85,6 +85,8 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def add_slice_plot(self, slice_plotter_presenter, workspace):
         if self._plot_handler is None:
+            # Move the top right corner of all slice plot windows to the left of the screen centre by 1.05
+            # the window width and above the screen center by half the window height
             self.move_window(self.window.width() * 1.05, self.window.height() / 2)
         else:
             self._plot_handler.disconnect(self.window)
@@ -92,6 +94,8 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def add_cut_plot(self, cut_plotter_presenter, workspace):
         if self._plot_handler is None:
+            # Move the top right corner of all cut plot windows to the left of the screen centre by 0.05
+            # the window width and above the screen center by half the window height
             self.move_window(self.window.width() * -0.05, self.window.height() / 2)
         else:
             self._plot_handler.disconnect(self.window)
