@@ -186,12 +186,12 @@ def add_cut_lines_with_width(errorbars, script_lines, cut):
         if intensity_range != (None, None):
             script_lines.append(
                 'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
-                'lw=\'{}\', intensity_range={})\n\n'.format(i, axis_units, label, colour, marker, style, width,
+                'lw={}, intensity_range={})\n\n'.format(i, axis_units, label, colour, marker, style, width,
                                                             intensity_range))
         else:
             script_lines.append(
                 'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
-                'lw=\'{}\')\n\n'.format(i, axis_units, label, colour, marker, style, width))
+                'lw={})\n\n'.format(i, axis_units, label, colour, marker, style, width))
 
         cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
         i += 1
