@@ -4,7 +4,7 @@ import mslice.plotting.pyplot as plt
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _intensity_to_action, \
-    _intensity_to_workspace
+    _intensity_to_workspace, _function_to_intensity, _save_default_options
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
 from mslice.util.mantid.mantid_algorithms import Transpose
@@ -36,10 +36,10 @@ def errorbar(axes, workspace, *args, **kwargs):
     plot_over = kwargs.pop('plot_over', True)
     intensity_range = kwargs.pop('intensity_range', (None, None))
     x_units = kwargs.pop('x_units', 'None')
-    legend = kwargs.pop('label', None)
-    legend = workspace.name if legend is None else legend
+    label = kwargs.pop('label', None)
+    label = workspace.name if label is None else label
 
-    plotfunctions.errorbar(axes, workspace.raw_ws, label=legend, *args, **kwargs)
+    plotfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
 
     axes.set_ylim(*intensity_range) if intensity_range is not None else axes.autoscale()
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
@@ -51,10 +51,8 @@ def errorbar(axes, workspace, *args, **kwargs):
         cur_canvas.set_window_title(workspace.name)
         cur_canvas.manager.update_grid()
     if not cur_canvas.manager.has_plot_handler():
-        plot_handler = cur_canvas.manager.add_cut_plot(presenter, workspace.name.rsplit('_', 1)[0])
-        plot_handler.save_default_options()
+        cur_canvas.manager.add_cut_plot(presenter, workspace.name.rsplit('_', 1)[0])
     cur_fig.canvas.draw()
-
     return axes.lines
 
 
@@ -86,10 +84,23 @@ def pcolormesh(axes, workspace, *args, **kwargs):
     if intensity is not None and intensity != 's(q,e)':
         workspace = getattr(slice_cache, _intensity_to_workspace[intensity])
         plot_window = GlobalFigureManager.get_active_figure().window
-        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+        plot_handler = GlobalFigureManager.get_active_figure().plot_handler
         intensity_action = getattr(plot_window, _intensity_to_action[intensity])
         plot_handler.set_intensity(intensity_action)
         intensity_action.setChecked(True)
+
+        # Set intensity properties for generated script to use
+        if not is_gui():
+            cache = plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name]
+            for key, value in _function_to_intensity.items():
+                if value == intensity:
+                    intensity_method = key
+                    break
+            plot_handler.intensity = True
+            plot_handler.intensity_method = intensity_method
+            plot_handler.temp = temperature
+            plot_handler.temp_dependent = True if temperature is not None else False
+            cache.colourmap = kwargs.get('cmap')
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
@@ -105,4 +116,4 @@ def pcolormesh(axes, workspace, *args, **kwargs):
     axes.set_ylabel(get_display_name(y_axis.units, comment), picker=SLICE_PICKER_TOL_PTS)
     axes.set_xlim(x_axis.start, x_axis.end)
     axes.set_ylim(y_axis.start, y_axis.end)
-    return axes.collections[0]
+    return axes.collections[0]  # Quadmesh object

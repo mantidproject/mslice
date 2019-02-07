@@ -30,9 +30,16 @@ class PlotWindow(QtWidgets.QMainWindow):
     def __init__(self, manager, parent=None):
         super(PlotWindow, self).__init__(parent)
         self.setup_ui(manager)
+        self._first_time_show = False
 
     def closeEvent(self, _):
         self.canvas.manager.window_closing()
+
+    def showEvent(self, evt):
+        if not self._first_time_show:
+            self.canvas.manager.plot_handler.save_default_options()
+            self._first_time_show = True
+        super(PlotWindow, self).showEvent(evt)
 
     def setup_ui(self, manager):
         # canvas

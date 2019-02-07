@@ -16,10 +16,9 @@ def plot_cached_slice(slice_workspace, slice_cache):
 def create_slice_figure(workspace_name, presenter):
     fig_canvas = plt.gcf().canvas
     fig_canvas.set_window_title(workspace_name)
-    plot_handler = fig_canvas.manager.add_slice_plot(presenter, workspace_name)
+    fig_canvas.manager.add_slice_plot(presenter, workspace_name)
     fig_canvas.manager.update_grid()
     plt.draw_all()
-    return plot_handler
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
@@ -34,8 +33,8 @@ def _show_plot(slice_cache, workspace):
 
     # Because the axis is cleared, RectangleSelector needs to use the new axis
     # otherwise it can't be used after doing an intensity plot (as it clears the axes)
-    if cur_fig.canvas.manager._plot_handler.icut is not None:
-        cur_fig.canvas.manager._plot_handler.icut.rect.ax = ax
+    if cur_fig.canvas.manager.plot_handler.icut is not None:
+        cur_fig.canvas.manager.plot_handler.icut.rect.ax = ax
 
     cur_fig.canvas.draw_idle()
     cur_fig.show()

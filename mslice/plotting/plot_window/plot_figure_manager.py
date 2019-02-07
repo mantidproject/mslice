@@ -31,7 +31,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window = PlotWindow(manager=weakref.proxy(self))
         self.window.resize(800, 600)
 
-        self._plot_handler = None
+        self.plot_handler = None
         self._picking = None
         self._button_pressed = None
 
@@ -58,8 +58,8 @@ class PlotFigureManagerQT(QtCore.QObject):
         QAppThreadCall(_show)()
 
     def window_closing(self):
-        if self._plot_handler is not None:
-            self._plot_handler.window_closing()
+        if self.plot_handler is not None:
+            self.plot_handler.window_closing()
         plt.close(self.number)
 
     def resize(self, width, height):
@@ -90,9 +90,9 @@ class PlotFigureManagerQT(QtCore.QObject):
             # and slices from overlapping
             self.move_window(self.window.width() * 1.05, self.window.height() / 2)
         else:
-            self._plot_handler.disconnect(self.window)
-        self._plot_handler = SlicePlot(self, slice_plotter_presenter, workspace)
-        return self._plot_handler
+            self.plot_handler.disconnect(self.window)
+        self.plot_handler = SlicePlot(self, slice_plotter_presenter, workspace)
+        return self.plot_handler
 
     def add_cut_plot(self, cut_plotter_presenter, workspace):
         if self._plot_handler is None:
@@ -101,22 +101,22 @@ class PlotFigureManagerQT(QtCore.QObject):
             # and slices from overlapping
             self.move_window(self.window.width() * -0.05, self.window.height() / 2)
         else:
-            self._plot_handler.disconnect(self.window)
-        self._plot_handler = CutPlot(self, cut_plotter_presenter, workspace)
-        return self._plot_handler
+            self.plot_handler.disconnect(self.window)
+        self.plot_handler = CutPlot(self, cut_plotter_presenter, workspace)
+        return self.plot_handler
 
     def has_plot_handler(self):
-        return self._plot_handler is not None
+        return self.plot_handler is not None
 
     def set_cut_background(self, background):
-        self._plot_handler.background = background
+        self.plot_handler.background = background
 
     def get_cut_background(self):
-        return self._plot_handler.background
+        return self.plot_handler.background
 
     def is_icut(self, is_icut):
-        if self._plot_handler is not None:
-            self._plot_handler.is_icut(is_icut)
+        if self.plot_handler is not None:
+            self.plot_handler.is_icut(is_icut)
 
     def picking_connected(self, connect):
         if connect:
@@ -133,21 +133,21 @@ class PlotFigureManagerQT(QtCore.QObject):
     def _toggle_legend(self):
         axes = self.canvas.figure.gca()
         if axes.legend_ is None:
-            self._plot_handler.update_legend()
+            self.plot_handler.update_legend()
         else:
             axes.legend_ = None
         self.canvas.draw()
 
     def plot_clicked(self, event):
         if event.dblclick or event.button == 3:
-            self._plot_handler.plot_clicked(event.x, event.y)
+            self.plot_handler.plot_clicked(event.x, event.y)
 
     def object_clicked(self, event):
         if event.mouseevent.dblclick or event.mouseevent.button == 3:
-            self._plot_handler.object_clicked(event.artist)
+            self.plot_handler.object_clicked(event.artist)
 
     def _plot_options(self):
-        self._plot_handler.plot_options()
+        self.plot_handler.plot_options()
 
     def print_plot(self):
         printer = QtWidgets.QPrinter()
@@ -164,7 +164,7 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def save_plot(self):
         file_path, save_name, ext = get_save_directory(save_as_image=True)
-        workspace = self._plot_handler.ws_name
+        workspace = self.plot_handler.ws_name
         try:
             save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
@@ -180,7 +180,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             else:
                 raise RuntimeError(e)
         except KeyError:   # Could be case of interactive cuts when the workspace has not been saved yet
-            workspace = self._plot_handler.save_icut()
+            workspace = self.plot_handler.save_icut()
             save_workspaces([workspace], file_path, save_name, ext)
 
     def save_image(self, path, resolution=300):

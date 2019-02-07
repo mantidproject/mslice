@@ -37,14 +37,21 @@ _intensity_to_workspace = {
 }
 
 
+def _save_default_options():
+    # To save plot options for generated python script/cli
+    plot_handler = GlobalFigureManager.get_active_figure().plot_handler
+    if plot_handler is not None:
+        plot_handler.save_default_options()
+
+
 def _update_legend():
-    plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+    plot_handler = GlobalFigureManager.get_active_figure().plot_handler
     plot_handler.update_legend()
 
 
 def _update_overplot_checklist(key):
     if isinstance(key, int) and key > 4:
-        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+        plot_handler = GlobalFigureManager.get_active_figure().plot_handler
         plot_handler._arb_nuclei_rmm = key
         key = 'Arbitrary Nuclei'
     else:
