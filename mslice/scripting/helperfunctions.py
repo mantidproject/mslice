@@ -187,7 +187,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cut):
             script_lines.append(
                 'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
                 'lw={}, intensity_range={})\n\n'.format(i, axis_units, label, colour, marker, style, width,
-                                                            intensity_range))
+                                                        intensity_range))
         else:
             script_lines.append(
                 'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
