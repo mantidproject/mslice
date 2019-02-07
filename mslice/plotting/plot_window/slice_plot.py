@@ -14,7 +14,6 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
-
 from mslice.scripting import generate_script
 
 
@@ -36,6 +35,11 @@ class SlicePlot(IPlot):
         self.icut_event = [None, None]
 
         self.setup_connections(self.plot_window)
+
+        self.intensity = False
+        self.intensity_method = False
+        self.temp_dependent = False
+        self.temp = None
         self.default_options = {}
 
     def save_default_options(self):
@@ -43,15 +47,19 @@ class SlicePlot(IPlot):
             'colorbar_label': self.colorbar_label,
             'colorbar_log': self.colorbar_log,
             'colorbar_range': self.colorbar_range,
-            'title': self.title,
-            'x_label': self.x_label,
-            'x_grid': self.x_grid,
-            'x_range': self.x_range,
-            'y_label': self.y_label,
-            'y_grid': self.y_grid,
-            'y_range': self.y_range,
-            'intensity': False,
-            'temp': None,
+            'intensity': self.intensity,
+            'intensity_method': self.intensity_method,
+            'temp': self.temp,
+            'temp_dependent': self.temp_dependent,
+
+            'title': self.ws_name,
+            'x_label': '$|Q|$ ($\mathrm{\AA}^{-1}$)',
+            'x_grid': False,
+            'x_range': (0.27356, 11.03510),
+            'y_label': 'Energy Transfer (meV)',
+            'y_grid': False,
+            'y_range': (-30.0, 58.2),
+
         }
 
     def setup_connections(self, plot_window):
@@ -173,8 +181,8 @@ class SlicePlot(IPlot):
         else:
             axes.legend_ = None  # remove legend
 
-        if self._canvas.manager._plot_handler.icut is not None:
-            self._canvas.manager._plot_handler.icut.rect.ax = axes
+        if self._canvas.manager.plot_handler.icut is not None:
+            self._canvas.manager.plot_handler.icut.rect.ax = axes
 
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
@@ -300,8 +308,11 @@ class SlicePlot(IPlot):
         self.manager.report_as_current()
 
         self.default_options['temp_dependent'] = temp_dependent
+        self.temp_dependent = temp_dependent
         self.default_options['intensity'] = True
+        self.intensity = True
         self.default_options['intensity_method'] = slice_plotter_method.__name__
+        self.intensity_method = slice_plotter_method.__name__
 
         if action.isChecked():
             previous = self.selected_intensity()
@@ -356,6 +367,7 @@ class SlicePlot(IPlot):
                     return False
                 else:
                     self.default_options['temp'] = temp_value
+                    self.temp = temp_value
                     self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
             slice_plotter_method(self.ws_name)
         return True

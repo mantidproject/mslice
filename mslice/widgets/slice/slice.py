@@ -232,8 +232,8 @@ class SliceWidget(SliceView, QWidget):
         self.cmbSliceColormap.setEnabled(True)
 
     def set_validators(self):
-        line_edits = [self.lneSliceXStart, self.lneSliceXEnd, self.lneSliceXStep,self.lneSliceYStart,self.lneSliceYEnd,
-                      self.lneSliceYStep, self.lneSliceIntensityStart,self.lneSliceIntensityEnd]
+        line_edits = [self.lneSliceXStart, self.lneSliceXEnd, self.lneSliceXStep, self.lneSliceYStart,
+                      self.lneSliceYEnd, self.lneSliceYStep, self.lneSliceIntensityStart, self.lneSliceIntensityEnd]
         for line_edit in line_edits:
             line_edit.setValidator(QDoubleValidator())
 

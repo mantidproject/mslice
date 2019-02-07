@@ -41,10 +41,10 @@ class CutPlot(IPlot):
         self.default_options = {
             'title': self.title,
             'x_label': self.x_label,
-            'x_grid': self.x_grid,
+            'x_grid': False,
             'x_range': self.x_range,
             'y_label': self.y_label,
-            'y_grid': self.y_grid,
+            'y_grid': False,
             'y_range': self.y_range,
             'legend': self.show_legends,
             'x_log': self.x_log,

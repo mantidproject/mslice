@@ -221,7 +221,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         ConvertToChi(1)
@@ -233,7 +233,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         ConvertToChiMag(1)
@@ -245,7 +245,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         ConvertToCrossSection(1)
@@ -257,7 +257,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         SymmetriseSQE(1)
@@ -269,7 +269,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         ConvertToGDOS(1)

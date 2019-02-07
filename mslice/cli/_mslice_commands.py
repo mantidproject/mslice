@@ -228,7 +228,7 @@ def ConvertToChi(figure_number):
     :return:
     """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_chi_qe.trigger()
     else:
@@ -242,7 +242,7 @@ def ConvertToChiMag(figure_number):
         :return:
         """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_chi_qe_magnetic.trigger()
     else:
@@ -256,7 +256,7 @@ def ConvertToCrossSection(figure_number):
         :return:
         """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_d2sig_dw_de.trigger()
     else:
@@ -270,7 +270,7 @@ def SymmetriseSQE(figure_number):
         :return:
         """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_symmetrised_sqe.trigger()
     else:
@@ -284,7 +284,7 @@ def ConvertToGDOS(figure_number):
         :return:
         """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_gdos.trigger()
     else:
