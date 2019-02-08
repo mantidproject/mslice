@@ -39,16 +39,16 @@ class CutPlot(IPlot):
 
     def save_default_options(self):
         self.default_options = {
-            'title': self.title,
-            'x_label': self.x_label,
+            'legend': True,
+            'x_log': False,
+            'y_log': False,
+            'title': self.ws_name,
+            'x_label': '$|Q|$ ($\mathrm{\AA}^{-1}$)',
             'x_grid': False,
-            'x_range': self.x_range,
-            'y_label': self.y_label,
+            'x_range': (None, None),
+            'y_label': 'Energy Transfer (meV)',
             'y_grid': False,
-            'y_range': self.y_range,
-            'legend': self.show_legends,
-            'x_log': self.x_log,
-            'y_log': self.y_log
+            'y_range': (None, None),
         }
 
     def setup_connections(self, plot_window):

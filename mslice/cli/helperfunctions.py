@@ -5,6 +5,7 @@ from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.models.cut.cut import Cut
 
 _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
                   'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
@@ -35,6 +36,26 @@ _intensity_to_workspace = {
     'symm': 'symmetrised',
     'gdos': 'gdos',
 }
+
+
+def _update_cache(cut_presenter, CutAxis, IntegrationAxis, NormToOne):
+    cut_list = cut_presenter._cut_cache_list
+    int_axis = Axis(*IntegrationAxis.split(','))
+    cut_axis = Axis(*CutAxis.split(','))
+    width = None if int_axis.end - int_axis.start == 0 else str(int_axis.end - int_axis.start)
+    if len(cut_list) == 0:
+        cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
+        cut_list.append(cut)
+    else:
+        for cut in cut_list:
+            if str(cut.cut_axis) == str(cut_axis) and cut.width == float(width) and cut.norm_to_one == NormToOne:
+                if cut.integration_axis.start > int_axis.start:
+                    cut.integration_axis = int_axis.start
+                if cut.integration_axis.end < int_axis.end:
+                    cut.integration_axis.end = int_axis.end
+            else:
+                cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
+                cut_list.append(cut)
 
 
 def _save_default_options():

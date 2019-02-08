@@ -12,10 +12,19 @@ class CutPlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._cut_cache = {}
+        self._cut_cache_list = []  # List of all currently displayed cuts created with plot_over set to True
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
         self._cut_cache[workspace.name] = cut
+
+        # If plot over is True you want to save all plotted cuts for use by the cli
+        if len(self._cut_cache_list) == 0 or plot_over:
+            self._cut_cache_list.append(cut)
+        if not plot_over:
+            self._cut_cache_list[:] = []
+            self._cut_cache_list.append(cut)
+
         if cut.width is not None:
             self._plot_with_width(workspace, cut, plot_over)
         elif save_only:

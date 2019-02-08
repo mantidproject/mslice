@@ -1,15 +1,15 @@
 class Axis(object):
     def __init__(self, units, start, end, step):
         self.units = units
-        self.start = start
-        self.end = end
-        self.step = step
+        self.start = float(start)
+        self.end = float(end)
+        self.step = float(step)
 
     def to_dict(self):
         return {'start': self.start, 'end': self.end, 'step': self.step, 'units': self.units}
 
     def __str__(self):
-        return "{}, {}, {}, {}".format(self.units, self.start, self.end, self.step)
+        return "{},{},{},{}".format(self.units, self.start, self.end, self.step)
 
     def __eq__(self, other):
         # This is required for Unit testing

@@ -66,12 +66,12 @@ def add_plot_statements(script_lines, plot_handler):
 def add_slice_plot_statements(script_lines, plot_handler):
     default_opts = plot_handler.default_options
     cache = plot_handler._slice_plotter_presenter._slice_cache
-    
+
     slice = cache[plot_handler.ws_name]
     momentum_axis = str(slice.momentum_axis)
     energy_axis = str(slice.energy_axis)
     norm = slice.norm_to_one
-    
+
     script_lines.append('slice_ws = mc.Slice(ws, Axis1=\'{}\', Axis2=\'{}\', NormToOne={})\n\n'.format(
         momentum_axis, energy_axis, norm))
     script_lines.append('fig = plt.gcf()\n')
@@ -90,7 +90,7 @@ def add_slice_plot_statements(script_lines, plot_handler):
     else:
         script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap=\'{}\')\n'.format(
             cache[plot_handler.ws_name].colourmap))
-    
+
     script_lines.append('mesh.set_clim({}, {})\n'.format(*plot_handler.colorbar_range))
     bottom = plot_handler.colorbar_range[0]
     top = plot_handler.colorbar_range[1]
@@ -155,48 +155,50 @@ def add_cut_plot_statements(script_lines, plot_handler):
 
 
 def add_cut_lines(script_lines, plot_handler):
-    cut = plot_handler._cut_plotter_presenter._cut_cache[plot_handler.ws_name]
+    cuts = plot_handler._cut_plotter_presenter._cut_cache_list
     errorbars = plot_handler._canvas.figure.gca().containers
-    add_cut_lines_with_width(errorbars, script_lines, cut)
+    add_cut_lines_with_width(errorbars, script_lines, cuts)
 
 
-def add_cut_lines_with_width(errorbars, script_lines, cut):
-    integration_start = cut.integration_axis.start
-    integration_end = cut.integration_axis.end
-    cut_start, cut_end = integration_start, min(integration_start + cut.width, integration_end)
-    intensity_range = (cut.intensity_start, cut.intensity_end)
-    axis_units = cut.cut_axis.units
-    norm_to_one = cut.norm_to_one
+def add_cut_lines_with_width(errorbars, script_lines, cuts):
     i = 0
-    while cut_start != cut_end:
-        cut.integration_axis.start = cut_start
-        cut.integration_axis.end = cut_end
-        cut_axis = str(cut.cut_axis)
-        integration_axis = str(cut.integration_axis)
+    for cut in cuts:
+        integration_start = cut.integration_axis.start
+        integration_end = cut.integration_axis.end
+        cut_start, cut_end = integration_start, min(integration_start + cut.width, integration_end)
+        intensity_range = (cut.intensity_start, cut.intensity_end)
+        axis_units = cut.cut_axis.units
+        norm_to_one = cut.norm_to_one
 
-        script_lines.append('cut_ws_{} = mc.Cut(ws, CutAxis=\'{}\', IntegrationAxis=\'{}\', '
-                            'NormToOne={})\n'.format(i, cut_axis, integration_axis, norm_to_one))
+        while cut_start != cut_end and i < len(errorbars):
+            cut.integration_axis.start = cut_start
+            cut.integration_axis.end = cut_end
+            cut_axis = str(cut.cut_axis)
+            integration_axis = str(cut.integration_axis)
 
-        errorbar = errorbars[i]
-        colour = errorbar.lines[0]._color
-        marker = errorbar.lines[0]._marker._marker
-        style = errorbar.lines[0]._linestyle
-        width = errorbar.lines[0]._linewidth
-        label = errorbar._label
+            script_lines.append('cut_ws_{} = mc.Cut(ws, CutAxis=\'{}\', IntegrationAxis=\'{}\', '
+                                'NormToOne={})\n'.format(i, cut_axis, integration_axis, norm_to_one))
 
-        if intensity_range != (None, None):
-            script_lines.append(
-                'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
-                'lw={}, intensity_range={})\n\n'.format(i, axis_units, label, colour, marker, style, width,
-                                                        intensity_range))
-        else:
-            script_lines.append(
-                'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
-                'lw={})\n\n'.format(i, axis_units, label, colour, marker, style, width))
+            errorbar = errorbars[i]
+            colour = errorbar.lines[0]._color
+            marker = errorbar.lines[0]._marker._marker
+            style = errorbar.lines[0]._linestyle
+            width = errorbar.lines[0]._linewidth
+            label = errorbar._label
 
-        cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
-        i += 1
-    cut.reset_integration_axis(cut.start, cut.end)
+            if intensity_range != (None, None):
+                script_lines.append(
+                    'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
+                    'lw={}, intensity_range={})\n\n'.format(i, axis_units, label, colour, marker, style, width,
+                                                            intensity_range))
+            else:
+                script_lines.append(
+                    'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
+                    'lw={})\n\n'.format(i, axis_units, label, colour, marker, style, width))
+
+            cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
+            i += 1
+        cut.reset_integration_axis(cut.start, cut.end)
 
 
 def add_plot_options(script_lines, plot_handler):
