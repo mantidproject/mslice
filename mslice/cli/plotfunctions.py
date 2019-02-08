@@ -4,7 +4,7 @@ import mslice.plotting.pyplot as plt
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _intensity_to_action, \
-    _intensity_to_workspace, _function_to_intensity, _save_default_options
+    _intensity_to_workspace, _function_to_intensity
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
 from mslice.util.mantid.mantid_algorithms import Transpose
@@ -91,7 +91,6 @@ def pcolormesh(axes, workspace, *args, **kwargs):
 
         # Set intensity properties for generated script to use
         if not is_gui():
-            cache = plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name]
             for key, value in _function_to_intensity.items():
                 if value == intensity:
                     intensity_method = key
@@ -100,7 +99,7 @@ def pcolormesh(axes, workspace, *args, **kwargs):
             plot_handler.intensity_method = intensity_method
             plot_handler.temp = temperature
             plot_handler.temp_dependent = True if temperature is not None else False
-            cache.colourmap = kwargs.get('cmap')
+            plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name].colourmap = kwargs.get('cmap')
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
