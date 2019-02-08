@@ -4,15 +4,13 @@ import weakref
 import six
 from mslice.util.qt.QtCore import Qt
 from mslice.util.qt import QtCore, QtGui, QtWidgets
-from mslice.util.qt.qapp import create_qapp_if_required
-
+from mslice.util.qt.qapp import create_qapp_if_required, QAppThreadCall
 from mslice.models.workspacemanager.file_io import get_save_directory
 from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
 from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 import mslice.plotting.pyplot as plt
-from mslice.util.qt.qapp import QAppThreadCall
 
 
 class PlotFigureManagerQT(QtCore.QObject):
@@ -86,16 +84,23 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window.flag_as_current()
 
     def add_slice_plot(self, slice_plotter_presenter, workspace):
-        if self.plot_handler is None:
-            self.move_window(-self.window.width() / 2, 0)
+        if self._plot_handler is None:
+            # Move the top right corner of all slice plot windows to the left of the screen centre by 1.05
+            # the window width and above the screen center by half the window height to prevent cuts/interactive cuts
+            # and slices from overlapping
+            self.move_window(self.window.width() * 1.05, self.window.height() / 2)
         else:
             self.plot_handler.disconnect(self.window)
         self.plot_handler = SlicePlot(self, slice_plotter_presenter, workspace)
         return self.plot_handler
 
     def add_cut_plot(self, cut_plotter_presenter, workspace):
-        if self.plot_handler is None:
-            self.move_window(self.window.width() / 2, 0)
+        if self._plot_handler is None:
+            # Move the top right corner of all cut plot windows to the left of the screen centre by 0.05
+            # the window width and above the screen center by half the window height to prevent cuts/interactive cuts
+            # and slices from overlapping
+            self.move_window(self.window.width() * -0.05, self.window.height() / 2)
+
         else:
             self.plot_handler.disconnect(self.window)
         self.plot_handler = CutPlot(self, cut_plotter_presenter, workspace)
@@ -196,8 +201,8 @@ class PlotFigureManagerQT(QtCore.QObject):
             self.canvas.figure.gca().grid(True, axis='y')
 
     def move_window(self, x, y):
-        window = self.window
-        window.move(window.pos().x() + x, window.pos().y() + y)
+        center = QtWidgets.QDesktopWidget().screenGeometry().center()
+        self.window.move(center.x() - x, center.y() - y)
 
     def get_window_title(self):
         return six.text_type(self.window.windowTitle())
