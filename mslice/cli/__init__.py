@@ -23,16 +23,16 @@ class MSliceAxes(Axes):
     name = 'mslice'
 
     def errorbar(self, *args, **kwargs):
-        from mslice.cli.projection_functions import PlotCutMsliceProjection
+        from mslice.cli.projection_functions import errorbar
         if is_cut(*args):
-            return PlotCutMsliceProjection(self, *args, **kwargs)
+            return errorbar(self, *args, **kwargs)
         else:
             return Axes.errorbar(self, *args, **kwargs)
 
     def pcolormesh(self, *args, **kwargs):
-        from mslice.cli.projection_functions import PlotSliceMsliceProjection
+        from mslice.cli.projection_functions import pcolormesh
         if is_slice(*args):
-            return PlotSliceMsliceProjection(self, *args, **kwargs)
+            return pcolormesh(self, *args, **kwargs)
         else:
             return Axes.pcolormesh(self, *args, **kwargs)
 

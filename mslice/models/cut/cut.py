@@ -8,12 +8,12 @@ class Cut(object):
         self.intensity_start = intensity_start
         self.intensity_end = intensity_end
         self.norm_to_one = norm_to_one
-        self.width = width
         self.icut = None
         # These are here to save the integration range as the integration axis is
         # changed when a cut with a width is performed
         self.start = integration_axis.start
         self.end = integration_axis.end
+        self.width = width
 
     def reset_integration_axis(self, start, end):
         self.integration_axis.start = start
@@ -82,5 +82,7 @@ class Cut(object):
                 self._width = float(width_str)
             except ValueError:
                 raise ValueError("Invalid width")
+        elif width_str is '':
+            self._width = self.end - self.start
         else:
             self._width = None

@@ -18,7 +18,7 @@ from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 
 @plt.set_category(plt.CATEGORY_CUT)
-def PlotCutMsliceProjection(axes, workspace, *args, **kwargs):
+def errorbar(axes, workspace, *args, **kwargs):
     """
     Same as the cli PlotCut but returns the relevant axes object.
     """
@@ -59,7 +59,7 @@ def PlotCutMsliceProjection(axes, workspace, *args, **kwargs):
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
-def PlotSliceMsliceProjection(axes, workspace, *args, **kwargs):
+def pcolormesh(axes, workspace, *args, **kwargs):
     """
     Same as the CLI PlotSlice but returns the relevant axes object.
     """

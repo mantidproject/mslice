@@ -6,7 +6,7 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 import mslice.cli._mslice_commands as mc
 from mslice.workspace import wrap_workspace
 import mslice.plotting.pyplot as plt
-from mslice.cli.projection_functions import PlotSliceMsliceProjection, PlotCutMsliceProjection
+from mslice.cli.projection_functions import pcolormesh, errorbar
 
 
 class CLIProjectionTest(unittest.TestCase):
@@ -61,7 +61,7 @@ class CLIProjectionTest(unittest.TestCase):
         workspace = self.create_workspace('cut')
         cut = mc.Cut(workspace)
 
-        return_value = PlotCutMsliceProjection(ax, cut)
+        return_value = errorbar(ax, cut)
         self.assertEqual(ax.lines, return_value)
 
     def test_that_plot_slice_mslice_projection_works_correctly(self):
@@ -71,5 +71,5 @@ class CLIProjectionTest(unittest.TestCase):
         workspace = self.create_workspace('slice')
         slice = mc.Slice(workspace)
 
-        return_value = PlotSliceMsliceProjection(ax, slice)
+        return_value = pcolormesh(ax, slice)
         self.assertEqual(ax.collections[0], return_value)

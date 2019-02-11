@@ -4,7 +4,8 @@ from __future__ import (absolute_import, division, print_function)
 import os.path as ospath
 
 import matplotlib as mpl
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, rename_workspace
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, rename_workspace, \
+    get_visible_workspace_names, get_workspace_name # noqa: F401
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cmap import DEFAULT_CMAP
 import mslice.app as app
