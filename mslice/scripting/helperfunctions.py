@@ -90,7 +90,7 @@ def add_slice_plot_statements(script_lines, plot_handler):
     else:
         script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap=\'{}\')\n'.format(
             cache[plot_handler.ws_name].colourmap))
-    
+
     script_lines.append("mesh.set_clim({}, {})\n".format(*plot_handler.colorbar_range))
     if plot_handler.colorbar_log:
         min, max = plot_handler.colorbar_range[0], plot_handler.colorbar_range[1]
