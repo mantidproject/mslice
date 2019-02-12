@@ -53,12 +53,12 @@ class SlicePlot(IPlot):
             'temp_dependent': self.temp_dependent,
 
             'title': self.ws_name,
-            'x_label': '$|Q|$ ($\mathrm{\AA}^{-1}$)',
+            'x_label': r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
             'x_grid': False,
-            'x_range': (0.27356, 11.03510),
+            'x_range': self.x_range,
             'y_label': 'Energy Transfer (meV)',
             'y_grid': False,
-            'y_range': (-30.0, 58.2),
+            'y_range': self.y_range,
 
         }
 
@@ -109,8 +109,8 @@ class SlicePlot(IPlot):
         plot_window.action_tantalum.triggered.connect(
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
-        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, None, self.plot_window,
-                                                                 self))
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, self, None,
+                                                                 self.plot_window))
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()

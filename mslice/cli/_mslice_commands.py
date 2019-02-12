@@ -88,8 +88,8 @@ def GenerateScript(InputWorkspace, filename):
     from mslice.scripting import generate_script
     _check_workspace_name(InputWorkspace)
     workspace_name = get_workspace_handle(InputWorkspace).name[2:]
-    plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
-    generate_script(ws_name=workspace_name, filename=filename, plot_handler=plot_handler)
+    plot_handler = GlobalFigureManager.get_active_figure().plot_handler
+    generate_script(ws_name=workspace_name, plot_handler=plot_handler, filename=filename)
 
 
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):

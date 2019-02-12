@@ -67,7 +67,7 @@ def pcolormesh(axes, workspace, *args, **kwargs):
     _check_workspace_type(workspace, HistogramWorkspace)
 
     # slice cache needed from main slice plotter presenter
-    if is_gui() and GlobalFigureManager.get_active_figure()._plot_handler is not None:
+    if is_gui() and GlobalFigureManager.get_active_figure().plot_handler is not None:
         cli_slice_plotter_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
     else:
         # Needed so the figure manager knows about the slice plot handler
