@@ -28,7 +28,9 @@ class CLIProjectionTest(unittest.TestCase):
 
     @mock.patch('matplotlib.axes.Axes.errorbar')
     @mock.patch('mslice.cli.plotfunctions.errorbar')
-    def test_that_mslice_projection_errorbar_works_correctly(self, plot_cut, errorbar):
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
+    def test_that_mslice_projection_errorbar_works_correctly(self, is_gui, plot_cut, errorbar):
+        is_gui.return_value = True
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection='mslice')
         workspace = self.create_workspace('cut')
@@ -54,7 +56,9 @@ class CLIProjectionTest(unittest.TestCase):
         ax.pcolormesh('not_workspace')
         pcolormesh.assert_called()
 
-    def test_that_plot_cut_mslice_projection_works_correctly(self):
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
+    def test_that_plot_cut_mslice_projection_works_correctly(self, is_gui):
+        is_gui.return_value = True
         fig = plt.gcf()
         fig.add_subplot = mock.MagicMock()
         ax = fig.add_subplot(111, projection='mslice')

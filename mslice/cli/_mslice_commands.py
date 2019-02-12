@@ -12,7 +12,7 @@ import mslice.app as app
 from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
-                                        _check_workspace_type)
+                                        _check_workspace_type, _update_cache)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
@@ -88,8 +88,8 @@ def GenerateScript(InputWorkspace, filename):
     from mslice.scripting import generate_script
     _check_workspace_name(InputWorkspace)
     workspace_name = get_workspace_handle(InputWorkspace).name[2:]
-    plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
-    generate_script(ws_name=workspace_name, filename=filename, plot_handler=plot_handler)
+    plot_handler = GlobalFigureManager.get_active_figure().plot_handler
+    generate_script(ws_name=workspace_name, plot_handler=plot_handler, filename=filename)
 
 
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
@@ -121,7 +121,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
             Either a string in format '<name>, <start>, <end>, <step_size>' e.g.
             'DeltaE,0,100,5'  or just the name e.g. 'DeltaE'. In that case, the
             start and end will default to the range in the data.
-    :param NormToOne: if true the slice will be normalized to one.
+    :param NormToOne: if True the slice will be normalized to one.
     :return:
     """
     from mslice.app.presenters import get_slice_plotter_presenter
@@ -146,7 +146,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
             'DeltaE,0,100,5' (step_size may be omitted for the integration axis)
             or just the name e.g. 'DeltaE'. In that case, the start and end will
             default to the full range of the data.
-    :param NormToOne: if true the cut will be normalized to one.
+    :param NormToOne: if True the cut will be normalized to one.
     :return:
     """
     from mslice.app.presenters import get_cut_plotter_presenter
@@ -158,8 +158,11 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, store=True)
-
     get_cut_plotter_presenter().update_main_window()
+
+    # Create the cut for use by the plot window in a generated script
+    if not is_gui():
+        _update_cache(get_cut_plotter_presenter(), CutAxis, IntegrationAxis, NormToOne)
 
     return cut
 
@@ -230,7 +233,7 @@ def ConvertToChi(figure_number):
     :return:
     """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_chi_qe.trigger()
     else:
@@ -244,7 +247,7 @@ def ConvertToChiMag(figure_number):
         :return:
         """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_chi_qe_magnetic.trigger()
     else:
@@ -258,7 +261,7 @@ def ConvertToCrossSection(figure_number):
         :return:
         """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_d2sig_dw_de.trigger()
     else:
@@ -272,7 +275,7 @@ def SymmetriseSQE(figure_number):
         :return:
         """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_symmetrised_sqe.trigger()
     else:
@@ -286,7 +289,7 @@ def ConvertToGDOS(figure_number):
         :return:
         """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
-    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number)._plot_handler
+    plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_gdos.trigger()
     else:

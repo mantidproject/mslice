@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
+import mock
 from mslice.workspace import wrap_workspace
 from mslice.cli.helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
     _check_workspace_name, _check_workspace_type, is_slice, is_cut
@@ -111,7 +112,9 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             is_slice(hist_ws)
 
-    def test_that_is_cut_works_as_expected(self):
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
+    def test_that_is_cut_works_as_expected(self, is_gui):
+        is_gui.return_value = True
         workspace = self.create_workspace('workspace')
         cut_ws = Cut(workspace)
         slice_ws = Slice(workspace)

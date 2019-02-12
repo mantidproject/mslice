@@ -27,13 +27,13 @@ class SlicePlotterPresenter(PresenterUtility):
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
         self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
+        self._slice_cache[selected_ws.name].norm_to_one = norm_to_one
         return slice
 
     def plot_from_cache(self, workspace):
         ws_name = workspace.name.lstrip('__')
-        slice_plot = create_slice_figure(ws_name, self)
+        create_slice_figure(ws_name, self)
         self.show_scattering_function(ws_name)
-        slice_plot.save_default_options()
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):
         workspace_name = workspace_name.lstrip('__')

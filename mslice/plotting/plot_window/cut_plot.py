@@ -39,16 +39,16 @@ class CutPlot(IPlot):
 
     def save_default_options(self):
         self.default_options = {
-            'title': self.title,
-            'x_label': self.x_label,
-            'x_grid': self.x_grid,
-            'x_range': self.x_range,
-            'y_label': self.y_label,
-            'y_grid': self.y_grid,
-            'y_range': self.y_range,
-            'legend': self.show_legends,
-            'x_log': self.x_log,
-            'y_log': self.y_log
+            'legend': True,
+            'x_log': False,
+            'y_log': False,
+            'title': self.ws_name,
+            'x_label': r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
+            'x_grid': False,
+            'x_range': (None, None),
+            'y_label': 'Energy Transfer (meV)',
+            'y_grid': False,
+            'y_range': (None, None),
         }
 
     def setup_connections(self, plot_window):
@@ -59,8 +59,8 @@ class CutPlot(IPlot):
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
-        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, None, self.plot_window,
-                                                                 self))
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, self, None,
+                                                                 self.plot_window))
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()

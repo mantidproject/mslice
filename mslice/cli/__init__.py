@@ -45,7 +45,7 @@ class MSliceAxes(Axes):
         key = _get_overplot_key(element, rmm)
 
         if rmm is not None:
-            plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+            plot_handler = GlobalFigureManager.get_active_figure().plot_handler
             plot_handler._arb_nuclei_rmm = rmm
 
         get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=True, cif=None)
@@ -68,7 +68,7 @@ class MSliceAxes(Axes):
     def grid(self, b=None, which='major', axis='both', **kwargs):
         Axes.grid(self, b, which, axis, **kwargs)
 
-        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+        plot_handler = GlobalFigureManager.get_active_figure().plot_handler
         if plot_handler is not None and not is_gui():
             if axis == 'x':
                 plot_handler.manager._xgrid = b

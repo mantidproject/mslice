@@ -115,8 +115,10 @@ class CommandLineTest(unittest.TestCase):
         self.assertAlmostEqual(0.4250, signal[2][0], 4)
         self.assertAlmostEqual(0.9250, signal[5][1], 4)
 
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.app.presenters.get_cut_plotter_presenter')
-    def test_cut_non_psd(self, get_cpp):
+    def test_cut_non_psd(self, get_cpp, is_gui):
+        is_gui.return_value = True
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_workspace('test_workspace_cut_cli')
         result = Cut(workspace)
@@ -136,8 +138,10 @@ class CommandLineTest(unittest.TestCase):
         self.assertEqual(110, signal[3][7])
         self.assertEqual(105, signal[5][6])
 
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.app.presenters.get_cut_plotter_presenter')
-    def test_cut_psd(self, get_cpp):
+    def test_cut_psd(self, get_cpp, is_gui):
+        is_gui.return_value = True
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_pixel_workspace('test_workspace_cut_psd_cli')
         result = Cut(workspace)
@@ -173,15 +177,19 @@ class CommandLineTest(unittest.TestCase):
         PlotSlice(slice_ws)
         spp.plot_from_cache(slice_ws)
 
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
-    def test_plot_cut(self, cpp):
+    def test_plot_cut(self, cpp, is_gui):
+        is_gui.return_value = True
         workspace = self.create_pixel_workspace('test_plot_cut_cli')
         cut = Cut(workspace)
         PlotCut(cut)
         cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
 
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
-    def test_plot_cut_non_psd(self, cpp):
+    def test_plot_cut_non_psd(self, cpp, is_gui):
+        is_gui.return_value = True
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
         PlotCut(cut)
@@ -197,6 +205,7 @@ class CommandLineTest(unittest.TestCase):
         KeepFigure(1)
         gfm.set_figure_as_kept.assert_called_with(1)
 
+
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_make_current_works_on_last_figure_number(self, gfm):
         gfm.set_figure_as_current = mock.Mock()
@@ -205,8 +214,10 @@ class CommandLineTest(unittest.TestCase):
 
         gfm.set_figure_as_current.assert_called_with(None)
 
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
-    def test_that_make_current_works_on_figure_number(self, gfm):
+    def test_that_make_current_works_on_figure_number(self, gfm, is_gui):
+        is_gui.return_value = True
         gfm.set_figure_as_current = mock.Mock()
         workspace = self.create_workspace('test_make_current')
         cut_ws = Cut(workspace)
@@ -221,7 +232,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         ConvertToChi(1)
@@ -233,7 +244,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         ConvertToChiMag(1)
@@ -245,7 +256,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         ConvertToCrossSection(1)
@@ -257,7 +268,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         SymmetriseSQE(1)
@@ -269,7 +280,7 @@ class CommandLineTest(unittest.TestCase):
         figure_mock = mock.MagicMock()
         plot_handler_mock = mock.MagicMock(spec=SlicePlot)
         plot_handler_mock.plot_window = mock.MagicMock()
-        figure_mock._plot_handler = plot_handler_mock
+        figure_mock.plot_handler = plot_handler_mock
         gfm.get_figure_by_number = mock.Mock(return_value=figure_mock)
 
         ConvertToGDOS(1)

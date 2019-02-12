@@ -4,7 +4,7 @@ from mslice.util.qt import QtWidgets
 from mslice.scripting.helperfunctions import add_plot_statements, cleanup
 
 
-def generate_script(ws_name, filename=None, window=None, plot_handler=None):
+def generate_script(ws_name, plot_handler, filename=None, window=None):
     if filename is None:
         path = QtWidgets.QFileDialog.getSaveFileName(window, 'Save File')
         if not path:
