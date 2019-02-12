@@ -6,7 +6,7 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 import mslice.cli._mslice_commands as mc
 from mslice.workspace import wrap_workspace
 import mslice.plotting.pyplot as plt
-from mslice.cli.projection_functions import pcolormesh, errorbar
+from mslice.cli.plotfunctions import pcolormesh, errorbar
 
 
 class CLIProjectionTest(unittest.TestCase):
@@ -27,7 +27,7 @@ class CLIProjectionTest(unittest.TestCase):
         return workspace
 
     @mock.patch('matplotlib.axes.Axes.errorbar')
-    @mock.patch('mslice.cli.projection_functions.PlotCutMsliceProjection')
+    @mock.patch('mslice.cli.projection_functions.errorbar')
     def test_that_mslice_projection_errorbar_works_correctly(self, plot_cut, errorbar):
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection='mslice')
@@ -41,7 +41,7 @@ class CLIProjectionTest(unittest.TestCase):
         errorbar.assert_called()
 
     @mock.patch('matplotlib.axes.Axes.pcolormesh')
-    @mock.patch('mslice.cli.projection_functions.PlotSliceMsliceProjection')
+    @mock.patch('mslice.cli.projection_functions.pcolormesh')
     def test_that_mslice_projection_pcolormesh_works_correctly(self, plot_slice, pcolormesh):
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection='mslice')

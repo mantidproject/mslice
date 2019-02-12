@@ -4,7 +4,7 @@ from __future__ import (absolute_import, division, print_function)
 import os.path as ospath
 
 import matplotlib as mpl
-from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, rename_workspace, # noqa: F401
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, rename_workspace,  # noqa: F401
     get_visible_workspace_names, get_workspace_name)  # noqa: F401
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.cmap import DEFAULT_CMAP
@@ -84,11 +84,12 @@ def Load(Filename, OutputWorkspace=None):
     return get_workspace_handle(name)
 
 
-def GenerateScript(InputWorkspace, path):
+def GenerateScript(InputWorkspace, filename):
     from mslice.scripting import generate_script
     _check_workspace_name(InputWorkspace)
-    workspace = get_workspace_handle(InputWorkspace)
-    generate_script(None, ws_name=workspace, filename=path)
+    workspace_name = get_workspace_handle(InputWorkspace).name[2:]
+    plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+    generate_script(ws_name=workspace_name, filename=filename, plot_handler=plot_handler)
 
 
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
