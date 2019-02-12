@@ -47,8 +47,9 @@ class SlicePlotTest(unittest.TestCase):
 
     def test_lines_redrawn_on_intensity_change(self):
         self.slice_plot.toggle_overplot_line(self.slice_plot.plot_window.action_helium, 4, True, True)
-        colorbar_range=PropertyMock(return_value=(0,10))
+        colorbar_range = PropertyMock(return_value=(0, 10))
         type(self.slice_plot).colorbar_range = colorbar_range
+        self.slice_plotter.show_dynamical_susceptibility.__name__ = 'foo'
         self.slice_plot.show_intensity_plot(self.plot_figure.action_chi_qe,
                                             self.slice_plotter.show_dynamical_susceptibility,
                                             True)

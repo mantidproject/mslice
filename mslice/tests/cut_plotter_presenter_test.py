@@ -45,7 +45,9 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.cut_plotter_presenter.run_cut('workspace', cut_cache)
         self.assertEqual(4, compute_cut_mock.call_count)
         self.assertEqual(4, plot_cut_impl_mock.call_count)
-        self.assertEqual(75, cut_cache.integration_axis.start)
+        # 0.0 now because the integration_axis is reset when a cut is made to allow
+        # the script generator use the same cut intervals
+        self.assertEqual(0.0, cut_cache.integration_axis.start)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.compute_cut')

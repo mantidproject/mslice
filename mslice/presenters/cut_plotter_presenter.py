@@ -29,7 +29,7 @@ class CutPlotterPresenter(PresenterUtility):
         cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, store)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start,
                                  integration_axis.end)
-        plot_cut_impl(cut_ws, self, cut_axis.units, (cut.intensity_start, cut.intensity_end), plot_over, legend)
+        plot_cut_impl(cut_ws, cut_axis.units, (cut.intensity_start, cut.intensity_end), plot_over, legend)
         if update_main:
             self.set_is_icut(workspace.name, False)
             self.update_main_window()
@@ -46,6 +46,7 @@ class CutPlotterPresenter(PresenterUtility):
             cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
+        cut.reset_integration_axis(cut.start, cut.end)
 
     def save_cut_to_workspace(self, workspace, cut):
         compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one)
@@ -60,7 +61,7 @@ class CutPlotterPresenter(PresenterUtility):
     def plot_cut_from_workspace(self, workspace, intensity_range=None, plot_over=False):
 
         workspace = get_workspace_handle(workspace)
-        lines = plot_cut_impl(workspace, self, workspace.raw_ws.getDimension(0).getUnits(),
+        lines = plot_cut_impl(workspace, workspace.raw_ws.getDimension(0).getUnits(),
                               intensity_range=intensity_range, plot_over=plot_over)
         return lines
 

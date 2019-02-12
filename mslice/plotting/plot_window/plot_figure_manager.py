@@ -92,6 +92,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         else:
             self._plot_handler.disconnect(self.window)
         self._plot_handler = SlicePlot(self, slice_plotter_presenter, workspace)
+        return self._plot_handler
 
     def add_cut_plot(self, cut_plotter_presenter, workspace):
         if self._plot_handler is None:
@@ -102,6 +103,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         else:
             self._plot_handler.disconnect(self.window)
         self._plot_handler = CutPlot(self, cut_plotter_presenter, workspace)
+        return self._plot_handler
 
     def has_plot_handler(self):
         return self._plot_handler is not None

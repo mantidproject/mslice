@@ -35,6 +35,7 @@ class CutPlotTest(unittest.TestCase):
         self.assertEqual(self.cut_plot.y_range, (1, 7))
 
     def test_change_scale_log(self):
+        self.cut_plot.save_default_options()
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
         line = MagicMock()

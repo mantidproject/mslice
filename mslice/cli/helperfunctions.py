@@ -4,6 +4,68 @@ from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
+
+_overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
+                  'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
+                  'CIF file': 'CIF file'}
+
+_function_to_intensity = {
+    'show_scattering_function': 's(q,e)',
+    'show_dynamical_susceptibility': 'chi',
+    'show_dynamical_susceptibility_magnetic': 'chi_mag',
+    'show_d2sigma': 'xsec',
+    'show_symmetrised': 'symm',
+    'show_gdos': 'gdos',
+}
+
+_intensity_to_action = {
+    's(q,e)': 'action_sqe',
+    'chi': 'action_chi_qe',
+    'chi_mag': 'action_chi_qe_magnetic',
+    'xsec': 'action_d2sig_dw_de',
+    'symm': 'action_symmetrised_sqe',
+    'gdos': 'action_gdos',
+}
+
+_intensity_to_workspace = {
+    'chi': 'chi',
+    'chi_mag': 'chi_magnetic',
+    'xsec': 'd2sigma',
+    'symm': 'symmetrised',
+    'gdos': 'gdos',
+}
+
+
+def _update_legend():
+    plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+    plot_handler.update_legend()
+
+
+def _update_overplot_checklist(key):
+    if isinstance(key, int) and key > 4:
+        plot_handler = GlobalFigureManager.get_active_figure()._plot_handler
+        plot_handler._arb_nuclei_rmm = key
+        key = 'Arbitrary Nuclei'
+    else:
+        for element, value in _overplot_keys.items():
+            if value == key:
+                key = element
+
+    window = GlobalFigureManager.get_active_figure().window
+    getattr(window, 'action_' + key.replace(' ', '_').lower()).setChecked(True)
+
+
+def _get_overplot_key(element, rmm):
+
+    if element is not None and rmm is not None:
+        raise RuntimeError('Cannot use both element name and relative molecular mass')
+    if element is None and rmm is None:
+        raise RuntimeError('An element name or relative molecular mass is required')
+
+    if rmm is None:
+        return _overplot_keys[element.capitalize()]
+    return rmm
 
 
 def _string_to_axis(string):

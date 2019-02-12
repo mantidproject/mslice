@@ -1,3 +1,4 @@
+from functools import partial
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 import warnings
@@ -8,6 +9,8 @@ from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
+
+from mslice.scripting import generate_script
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -32,6 +35,21 @@ class CutPlot(IPlot):
         self.ws_name = workspace_name
         self._lines = self.line_containers()
         self.setup_connections(self.plot_window)
+        self.default_options = None
+
+    def save_default_options(self):
+        self.default_options = {
+            'title': self.title,
+            'x_label': self.x_label,
+            'x_grid': self.x_grid,
+            'x_range': self.x_range,
+            'y_label': self.y_label,
+            'y_grid': self.y_grid,
+            'y_range': self.y_range,
+            'legend': self.show_legends,
+            'x_log': self.x_log,
+            'y_log': self.y_log
+        }
 
     def setup_connections(self, plot_window):
         plot_window.menu_intensity.setDisabled(True)
@@ -41,6 +59,8 @@ class CutPlot(IPlot):
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, None, self.plot_window,
+                                                                 self))
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
@@ -103,6 +123,7 @@ class CutPlot(IPlot):
             xmin = xy_config['x_range'][0]
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
             min = get_min(xdata, absolute_minimum=0.)
+            self.default_options['xmin'] = min
             current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(min))))
             if xmin > 0:
                 xy_config['x_range'] = (xmin, xy_config['x_range'][1])
@@ -112,6 +133,7 @@ class CutPlot(IPlot):
             ymin = xy_config['y_range'][0]
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
             min = get_min(ydata, absolute_minimum=0.)
+            self.default_options['ymin'] = min
             current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(min))))
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
@@ -358,3 +380,6 @@ class CutPlot(IPlot):
     @y_grid.setter
     def y_grid(self, value):
         self.manager.y_grid = value
+
+    def is_changed(self, item):
+        return self.default_options[item] != getattr(self, item)

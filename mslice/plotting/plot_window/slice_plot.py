@@ -15,6 +15,8 @@ from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 
+from mslice.scripting import generate_script
+
 
 class SlicePlot(IPlot):
 
@@ -34,54 +36,73 @@ class SlicePlot(IPlot):
         self.icut_event = [None, None]
 
         self.setup_connections(self.plot_window)
+        self.default_options = {}
 
-    def setup_connections(self, plot_figure):
-        plot_figure.action_interactive_cuts.setVisible(True)
-        plot_figure.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
-        plot_figure.action_save_cut.setVisible(False)
-        plot_figure.action_save_cut.triggered.connect(self.save_icut)
-        plot_figure.action_flip_axis.setVisible(False)
-        plot_figure.action_flip_axis.triggered.connect(self.flip_icut)
+    def save_default_options(self):
+        self.default_options = {
+            'colorbar_label': self.colorbar_label,
+            'colorbar_log': self.colorbar_log,
+            'colorbar_range': self.colorbar_range,
+            'title': self.title,
+            'x_label': self.x_label,
+            'x_grid': self.x_grid,
+            'x_range': self.x_range,
+            'y_label': self.y_label,
+            'y_grid': self.y_grid,
+            'y_range': self.y_range,
+            'intensity': False,
+            'temp': None,
+        }
 
-        plot_figure.action_sqe.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_sqe,
+    def setup_connections(self, plot_window):
+        plot_window.action_interactive_cuts.setVisible(True)
+        plot_window.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
+        plot_window.action_save_cut.setVisible(False)
+        plot_window.action_save_cut.triggered.connect(self.save_icut)
+        plot_window.action_flip_axis.setVisible(False)
+        plot_window.action_flip_axis.triggered.connect(self.flip_icut)
+
+        plot_window.action_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_sqe,
                     self._slice_plotter_presenter.show_scattering_function, False))
 
-        plot_figure.action_chi_qe.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_chi_qe,
+        plot_window.action_chi_qe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_chi_qe,
                     self._slice_plotter_presenter.show_dynamical_susceptibility, True))
 
-        plot_figure.action_chi_qe_magnetic.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_chi_qe_magnetic,
+        plot_window.action_chi_qe_magnetic.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_chi_qe_magnetic,
                     self._slice_plotter_presenter.show_dynamical_susceptibility_magnetic, True))
 
-        plot_figure.action_d2sig_dw_de.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_d2sig_dw_de,
+        plot_window.action_d2sig_dw_de.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
                     self._slice_plotter_presenter.show_d2sigma, False))
 
-        plot_figure.action_symmetrised_sqe.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_symmetrised_sqe,
+        plot_window.action_symmetrised_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_symmetrised_sqe,
                     self._slice_plotter_presenter.show_symmetrised, True))
 
-        plot_figure.action_gdos.triggered.connect(
-            partial(self.show_intensity_plot, plot_figure.action_gdos, self._slice_plotter_presenter.show_gdos, True))
+        plot_window.action_gdos.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_gdos, self._slice_plotter_presenter.show_gdos, True))
 
-        plot_figure.action_hydrogen.triggered.connect(
+        plot_window.action_hydrogen.triggered.connect(
             partial(self.toggle_overplot_line, 1, True))
-        plot_figure.action_deuterium.triggered.connect(
+        plot_window.action_deuterium.triggered.connect(
             partial(self.toggle_overplot_line, 2, True))
-        plot_figure.action_helium.triggered.connect(
+        plot_window.action_helium.triggered.connect(
             partial(self.toggle_overplot_line, 4, True))
-        plot_figure.action_arbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
-        plot_figure.action_aluminium.triggered.connect(
+        plot_window.action_arbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
+        plot_window.action_aluminium.triggered.connect(
             partial(self.toggle_overplot_line, 'Aluminium', False))
-        plot_figure.action_copper.triggered.connect(
+        plot_window.action_copper.triggered.connect(
             partial(self.toggle_overplot_line, 'Copper', False))
-        plot_figure.action_niobium.triggered.connect(
+        plot_window.action_niobium.triggered.connect(
             partial(self.toggle_overplot_line, 'Niobium', False))
-        plot_figure.action_tantalum.triggered.connect(
+        plot_window.action_tantalum.triggered.connect(
             partial(self.toggle_overplot_line, 'Tantalum', False))
-        plot_figure.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
+        plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, None, self.plot_window,
+                                                                 self))
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()
@@ -263,9 +284,9 @@ class SlicePlot(IPlot):
 
     def selected_intensity(self):
         options = self.plot_window.menu_intensity.actions()
-        for op in options:
-            if op.isChecked():
-                return op
+        for option in options:
+            if option.isChecked():
+                return option
 
     def set_intensity(self, intensity):
         self._reset_intensity()
@@ -277,6 +298,10 @@ class SlicePlot(IPlot):
             last_active_figure_number = self.manager._current_figs.get_active_figure().number
 
         self.manager.report_as_current()
+
+        self.default_options['temp_dependent'] = temp_dependent
+        self.default_options['intensity'] = True
+        self.default_options['intensity_method'] = slice_plotter_method.__name__
 
         if action.isChecked():
             previous = self.selected_intensity()
@@ -291,18 +316,21 @@ class SlicePlot(IPlot):
                     return
             else:
                 slice_plotter_method(self.ws_name)
-            self.change_axis_scale(cbar_range, cbar_log)
-            self.x_range = x_range
-            self.y_range = y_range
-            self.title = title
-            self.manager.update_grid()
-            self._update_lines()
-            self._canvas.draw()
+            self.update_canvas(cbar_range, cbar_log, x_range, y_range, title)
         else:
             action.setChecked(True)
         # Reset current active figure
         if last_active_figure_number is not None:
             self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+
+    def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
+        self.change_axis_scale(cbar_range, cbar_log)
+        self.x_range = x_range
+        self.y_range = y_range
+        self.title = title
+        self.manager.update_grid()
+        self._update_lines()
+        self._canvas.draw()
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         try:
@@ -327,6 +355,7 @@ class SlicePlot(IPlot):
                     self.set_intensity(previous)
                     return False
                 else:
+                    self.default_options['temp'] = temp_value
                     self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
             slice_plotter_method(self.ws_name)
         return True
@@ -482,3 +511,6 @@ class SlicePlot(IPlot):
     @y_grid.setter
     def y_grid(self, value):
         self.manager.y_grid = value
+
+    def is_changed(self, item):
+        return self.default_options[item] != getattr(self, item)

@@ -37,6 +37,7 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         with show_busy(self._slice_view):
             if command == Command.DisplaySlice:
                 self._display_slice()
+
             else:
                 raise ValueError("Slice Plotter Presenter received an unrecognised command")
 
