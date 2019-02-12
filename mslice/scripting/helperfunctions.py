@@ -162,8 +162,7 @@ def add_cut_lines(script_lines, plot_handler):
 
 def add_cut_lines_with_width(errorbars, script_lines, cuts):
     """Adds the cut statements for each interval of the cuts that were plotted"""
-    i = 0
-    for cut in cuts:
+    for index, cut in enumerate(cuts):
         integration_start = cut.integration_axis.start
         integration_end = cut.integration_axis.end
         cut_start, cut_end = integration_start, min(integration_start + cut.width, integration_end)
@@ -171,16 +170,16 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts):
         axis_units = cut.cut_axis.units
         norm_to_one = cut.norm_to_one
 
-        while cut_start != cut_end and i < len(errorbars):
+        while cut_start != cut_end and index < len(errorbars):
             cut.integration_axis.start = cut_start
             cut.integration_axis.end = cut_end
             cut_axis = str(cut.cut_axis)
             integration_axis = str(cut.integration_axis)
 
             script_lines.append('cut_ws_{} = mc.Cut(ws, CutAxis=\'{}\', IntegrationAxis=\'{}\', '
-                                'NormToOne={})\n'.format(i, cut_axis, integration_axis, norm_to_one))
+                                'NormToOne={})\n'.format(index, cut_axis, integration_axis, norm_to_one))
 
-            errorbar = errorbars[i]
+            errorbar = errorbars[index]
             colour = errorbar.lines[0]._color
             marker = errorbar.lines[0]._marker._marker
             style = errorbar.lines[0]._linestyle
@@ -190,15 +189,14 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts):
             if intensity_range != (None, None):
                 script_lines.append(
                     'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
-                    'lw={}, intensity_range={})\n\n'.format(i, axis_units, label, colour, marker, style, width,
+                    'lw={}, intensity_range={})\n\n'.format(index, axis_units, label, colour, marker, style, width,
                                                             intensity_range))
             else:
                 script_lines.append(
                     'ax.errorbar(cut_ws_{}, x_units=\'{}\', label=\'{}\', color=\'{}\', marker=\'{}\', ls=\'{}\', '
-                    'lw={})\n\n'.format(i, axis_units, label, colour, marker, style, width))
+                    'lw={})\n\n'.format(index, axis_units, label, colour, marker, style, width))
 
             cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
-            i += 1
         cut.reset_integration_axis(cut.start, cut.end)
 
 
