@@ -57,7 +57,7 @@ def _update_cache(cut_presenter, CutAxis, IntegrationAxis, NormToOne):
             else:
                 cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
                 cut_list.append(cut)
-                
+
 
 def _update_legend():
     plot_handler = GlobalFigureManager.get_active_figure().plot_handler
