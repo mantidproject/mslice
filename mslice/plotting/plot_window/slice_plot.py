@@ -59,7 +59,6 @@ class SlicePlot(IPlot):
             'y_label': 'Energy Transfer (meV)',
             'y_grid': False,
             'y_range': self.y_range,
-
         }
 
     def setup_connections(self, plot_window):
