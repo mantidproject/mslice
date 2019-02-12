@@ -39,6 +39,7 @@ _intensity_to_workspace = {
 
 
 def _update_cache(cut_presenter, CutAxis, IntegrationAxis, NormToOne):
+    """Creates a list of all cuts used to create a particular cut. This is required when plot over is used."""
     cut_list = cut_presenter._cut_cache_list
     int_axis = Axis(*IntegrationAxis.split(','))
     cut_axis = Axis(*CutAxis.split(','))
@@ -56,14 +57,7 @@ def _update_cache(cut_presenter, CutAxis, IntegrationAxis, NormToOne):
             else:
                 cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
                 cut_list.append(cut)
-
-
-def _save_default_options():
-    # To save plot options for generated python script/cli
-    plot_handler = GlobalFigureManager.get_active_figure().plot_handler
-    if plot_handler is not None:
-        plot_handler.save_default_options()
-
+                
 
 def _update_legend():
     plot_handler = GlobalFigureManager.get_active_figure().plot_handler
