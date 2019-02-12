@@ -27,7 +27,7 @@ class CLIProjectionTest(unittest.TestCase):
         return workspace
 
     @mock.patch('matplotlib.axes.Axes.errorbar')
-    @mock.patch('mslice.cli.projection_functions.errorbar')
+    @mock.patch('mslice.cli.plotfunctions.errorbar')
     def test_that_mslice_projection_errorbar_works_correctly(self, plot_cut, errorbar):
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection='mslice')
@@ -41,7 +41,7 @@ class CLIProjectionTest(unittest.TestCase):
         errorbar.assert_called()
 
     @mock.patch('matplotlib.axes.Axes.pcolormesh')
-    @mock.patch('mslice.cli.projection_functions.pcolormesh')
+    @mock.patch('mslice.cli.plotfunctions.pcolormesh')
     def test_that_mslice_projection_pcolormesh_works_correctly(self, plot_slice, pcolormesh):
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection='mslice')
