@@ -16,6 +16,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
+        cut.workspace_name = workspace.name
         self._cut_cache[workspace.name] = cut
 
         # If plot over is True you want to save all plotted cuts for use by the cli
@@ -31,6 +32,13 @@ class CutPlotterPresenter(PresenterUtility):
             self.save_cut_to_workspace(workspace, cut)
         else:
             self._plot_cut(workspace, cut, plot_over)
+
+    # def more_than_one_workspace_used_in_plot(self):
+    #     last_cut = self._cut_cache_list[0]
+    #     for cut in self._cut_cache_list[1:]:
+    #         if last_cut.workspace_name != cut.workspace_name:
+    #             return True
+    #     return False
 
     def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True):
         cut_axis = cut.cut_axis
