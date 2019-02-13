@@ -20,6 +20,11 @@ from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app.presenters import cli_slice_plotter_presenter
 from mslice.app.presenters import cli_cut_plotter_presenter
 
+from mslice.util.mantid import in_mantidplot
+
+if in_mantidplot():
+    from mslice.util.mantid.mantid_algorithms import *
+
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
