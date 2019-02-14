@@ -13,7 +13,7 @@ def cleanup(script_lines):
     Removes data preprocessing lines from the workspace history script.
     i.e All lines before the script was first loaded
     """
-    for line in script_lines[-1:]:
+    for line in reversed(script_lines):
         if line.startswith("Load"):
             index = script_lines.index(line)
             return script_lines[index:]

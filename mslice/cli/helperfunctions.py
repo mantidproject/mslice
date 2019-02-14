@@ -154,6 +154,8 @@ def is_slice(*args):
     Checks if args[0] is a WorkspaceBase or HistogramWorkspace
     """
     if len(args) > 0:
+        if isinstance(args[0], HistogramWorkspace) and args[0].is_PSD:
+            return True
         if isinstance(args[0], HistogramWorkspace):
             raise ValueError('Warning: To plot a cut use the plot function instead!')
         elif isinstance(args[0], Workspace):
