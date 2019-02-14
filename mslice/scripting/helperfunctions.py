@@ -179,7 +179,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, plot_handler):
             style = errorbar.lines[0]._linestyle
             width = errorbar.lines[0]._linewidth
             label = errorbar._label
-            
+
             if more_than_one_ws:
                 script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
                                     'NormToOne={})\n'.format(index, cut.workspace_name, cut_axis, integration_axis,
