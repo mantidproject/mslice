@@ -92,7 +92,7 @@ def GenerateScript(InputWorkspace, filename):
     generate_script(ws_name=workspace_name, plot_handler=plot_handler, filename=filename)
 
 
-def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
+def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV', OutputWorkspace=None, Limits=None):
     """
     Calculate projections of workspace
 
