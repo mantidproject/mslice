@@ -55,7 +55,7 @@ class CutWidgetPresenter(PresenterUtility):
             self._cut_view.display_error(str(e))
             return
         for workspace in selected_workspaces:
-            self._cut_plotter_presenter.run_cut(workspace, params, plot_over=plot_over, save_only=save_only)
+            self._cut_plotter_presenter.run_cut(workspace, Cut(*params), plot_over=plot_over, save_only=save_only)
             plot_over = True  # The first plot will respect which button the user pressed. The rest will over plot
 
     def _parse_step(self):
@@ -84,7 +84,7 @@ class CutWidgetPresenter(PresenterUtility):
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
         width = self._cut_view.get_integration_width()
-        return Cut(cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width)
+        return cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width
 
     def _set_minimum_step(self, workspace, axis):
         """Gets axes limits and then sets the minimumStep dictionary with those values"""
