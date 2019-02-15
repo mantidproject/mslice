@@ -109,7 +109,7 @@ class SlicePlot(IPlot):
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
         plot_window.action_gen_script.triggered.connect(partial(generate_script, self.ws_name, self, None,
-                                                                 self.plot_window))
+                                                                self.plot_window))
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()
