@@ -23,7 +23,7 @@ from mslice.app.presenters import cli_cut_plotter_presenter
 from mslice.util.mantid import in_mantidplot
 
 if in_mantidplot():
-    from mslice.util.mantid.mantid_algorithms import *
+    from mslice.util.mantid.mantid_algorithms import *  # noqa: F401
 
 # -----------------------------------------------------------------------------
 # Command functions
