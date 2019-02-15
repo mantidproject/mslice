@@ -108,7 +108,7 @@ class SlicePlot(IPlot):
         plot_window.action_tantalum.triggered.connect(
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
-        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, self, None,
+        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, None, self,
                                                                  self.plot_window))
 
     def disconnect(self, plot_window):
