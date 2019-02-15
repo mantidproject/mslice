@@ -59,7 +59,7 @@ class CutPlot(IPlot):
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
-        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, self, None,
+        plot_window.action_gen_script.triggered.connect(partial(generate_script, self.ws_name, self, None,
                                                                  self.plot_window))
 
     def disconnect(self, plot_window):
@@ -229,6 +229,7 @@ class CutPlot(IPlot):
         self.plot_window.action_keep.setVisible(not is_icut)
         self.plot_window.action_make_current.setVisible(not is_icut)
         self.plot_window.action_flip_axis.setVisible(is_icut)
+        self.plot_window.action_gen_script.setVisible(not is_icut)
 
         self.plot_window.show()
 
