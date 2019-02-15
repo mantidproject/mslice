@@ -49,6 +49,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.btnhome.clicked.connect(self.go_to_home)
         self.btnload.clicked.connect(partial(self.load, False))
         self.btnmerge.clicked.connect(partial(self.load, True))
+        self.btnrefresh.clicked.connect(self.reload_model)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace:
@@ -74,6 +75,20 @@ class DataLoaderWidget(QWidget):  # and some view interface
             self._update_from_path()
         else:
             self._display_error("Invalid file path")
+
+    def reload_model(self):
+        # Redefines the QFileSystemModel - hopefully to refresh and changes not caught because of filesystem issues
+        self.file_system = QFileSystemModel()
+        self.root_path = self.directory.absolutePath()
+        self.file_system.setRootPath(self.root_path)
+        self.file_system.setNameFilters(MSLICE_EXTENSIONS)
+        self.file_system.setNameFilterDisables(False)
+        self.table_view.setModel(self.file_system)
+        self.table_view.setRootIndex(self.file_system.index(self.root_path))
+        self.table_view.setColumnWidth(0, 320)
+        self.table_view.setColumnWidth(1, 0)
+        self.table_view.setColumnWidth(3, 140)
+        self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
