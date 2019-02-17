@@ -36,6 +36,7 @@ class CutPlot(IPlot):
         self._lines = self.line_containers()
         self.setup_connections(self.plot_window)
         self.default_options = None
+        self._waterfall_offsets = [0, 0]
 
     def save_default_options(self):
         self.default_options = {
@@ -61,6 +62,9 @@ class CutPlot(IPlot):
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
         plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, None, self,
                                                                  self.plot_window))
+        plot_window.action_waterfall.triggered.connect(self.toggle_waterfall)
+        plot_window.waterfall_x_edt.editingFinished.connect(self.change_waterfall)
+        plot_window.waterfall_y_edt.editingFinished.connect(self.change_waterfall)
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
@@ -229,6 +233,7 @@ class CutPlot(IPlot):
         self.plot_window.action_keep.setVisible(not is_icut)
         self.plot_window.action_make_current.setVisible(not is_icut)
         self.plot_window.action_flip_axis.setVisible(is_icut)
+        self.plot_window.action_waterfall.setVisible(not is_icut)
 
         self.plot_window.show()
 
@@ -294,6 +299,32 @@ class CutPlot(IPlot):
         except KeyError:
             self._lines_visible[line_index] = True
             return True
+
+    def toggle_waterfall(self):
+        if self.plot_window.is_waterfall:
+            self._apply_offset(self.plot_window.waterfall_x, self.plot_window.waterfall_y)
+        else:
+            self._apply_offset(-self._waterfall_offsets[0], -self._waterfall_offsets[1])
+            self._apply_offset(0., 0.)
+        self._canvas.draw()
+
+    def change_waterfall(self):
+        self._apply_offset(-self._waterfall_offsets[0], -self._waterfall_offsets[1])
+        self._waterfall_offsets = [self.plot_window.waterfall_x, self.plot_window.waterfall_y]
+        self._apply_offset(self._waterfall_offsets[0], self._waterfall_offsets[1])
+        self._canvas.draw()
+
+    def _apply_offset(self, x, y):
+        from matplotlib.lines import Line2D
+        from matplotlib.collections import LineCollection
+        for ind, line_containers in enumerate(self._canvas.figure.gca().containers):
+            for line in line_containers.get_children():
+                if isinstance(line, Line2D):
+                    line.set_xdata(line.get_xdata() + ind * x)
+                    line.set_ydata(line.get_ydata() + ind * y)
+                elif isinstance(line, LineCollection):
+                    line.set_offset_position('data')
+                    line.set_offsets((ind * x, ind * y))
 
     @property
     def x_log(self):
