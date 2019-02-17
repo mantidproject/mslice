@@ -75,5 +75,14 @@ class MSliceAxes(Axes):
             elif axis == 'y':
                 plot_handler.manager._ygrid = b
 
+    def set_waterfall(self, isWaterfall=True, x_offset=0, y_offset=0):
+        """ Change the plot to/from a waterfall """
+        plot_handler = GlobalFigureManager.get_active_figure().plot_handler
+        if isWaterfall != plot_handler.waterfall:
+            plot_handler.waterfall = isWaterfall
+            plot_handler.waterfall_x = x_offset
+            plot_handler.waterfall_y = y_offset
+            plot_handler.toggle_waterfall()
+
 
 register_projection(MSliceAxes)

@@ -50,6 +50,7 @@ class CutPlot(IPlot):
             'y_label': 'Energy Transfer (meV)',
             'y_grid': False,
             'y_range': (None, None),
+            'waterfall': False,
         }
 
     def setup_connections(self, plot_window):
@@ -303,7 +304,7 @@ class CutPlot(IPlot):
             return True
 
     def toggle_waterfall(self):
-        if self.plot_window.is_waterfall:
+        if self.waterfall:
             self._apply_offset(self.plot_window.waterfall_x, self.plot_window.waterfall_y)
         else:
             self._apply_offset(0., 0.)
@@ -424,6 +425,30 @@ class CutPlot(IPlot):
     @y_grid.setter
     def y_grid(self, value):
         self.manager.y_grid = value
+
+    @property
+    def waterfall(self):
+        return self.plot_window.waterfall
+
+    @waterfall.setter
+    def waterfall(self, value):
+        self.plot_window.waterfall = value
+
+    @property
+    def waterfall_x(self):
+        return self.plot_window.waterfall_x
+
+    @waterfall_x.setter
+    def waterfall_x(self, value):
+        self.plot_window.waterfall_x = value
+
+    @property
+    def waterfall_y(self):
+        return self.plot_window.waterfall_y
+
+    @waterfall_y.setter
+    def waterfall_y(self, value):
+        self.plot_window.waterfall_y = value
 
     def is_changed(self, item):
         return self.default_options[item] != getattr(self, item)

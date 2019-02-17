@@ -166,7 +166,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.waterfall_y_edt_act.setVisible(False)
 
     def toggle_waterfall_edit(self):
-        is_waterfall = self.is_waterfall
+        is_waterfall = self.waterfall
         self.waterfall_x_lbl_act.setVisible(is_waterfall)
         self.waterfall_y_lbl_act.setVisible(is_waterfall)
         self.waterfall_x_edt_act.setVisible(is_waterfall)
@@ -197,16 +197,29 @@ class PlotWindow(QtWidgets.QMainWindow):
             pass
 
     @property
-    def is_waterfall(self):
+    def waterfall(self):
         return self.action_waterfall.isChecked() and self.action_waterfall.isVisible()
+
+    @waterfall.setter
+    def waterfall(self, value):
+        self.action_waterfall.setChecked(value)
+        self.toggle_waterfall_edit()
 
     @property
     def waterfall_x(self):
         return float(self.waterfall_x_edt.text())
 
+    @waterfall_x.setter
+    def waterfall_x(self, value):
+        self.waterfall_x_edt.setText(str(value))
+
     @property
     def waterfall_y(self):
         return float(self.waterfall_y_edt.text())
+
+    @waterfall_y.setter
+    def waterfall_y(self, value):
+        self.waterfall_y_edt.setText(str(value))
 
 def create_attribute_name(text):
     """Create the name of an action attribute based on the text"""
