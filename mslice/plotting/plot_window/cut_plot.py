@@ -36,7 +36,7 @@ class CutPlot(IPlot):
         self._lines = self.line_containers()
         self.setup_connections(self.plot_window)
         self.default_options = None
-        self._waterfall_offsets = [0, 0]
+        self._waterfall_cache = {}
 
     def save_default_options(self):
         self.default_options = {
@@ -63,12 +63,14 @@ class CutPlot(IPlot):
         plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, None, self,
                                                                  self.plot_window))
         plot_window.action_waterfall.triggered.connect(self.toggle_waterfall)
-        plot_window.waterfall_x_edt.editingFinished.connect(self.change_waterfall)
-        plot_window.waterfall_y_edt.editingFinished.connect(self.change_waterfall)
+        plot_window.waterfall_x_edt.editingFinished.connect(self.toggle_waterfall)
+        plot_window.waterfall_y_edt.editingFinished.connect(self.toggle_waterfall)
+        self.mpl_axes_changed = self._canvas.figure.gca().add_callback(self.on_newplot)
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
         plot_window.action_flip_axis.triggered.disconnect()
+        self._canvas.figure.gca().remove_callack(self.mpl_axes_changed)
 
     def window_closing(self):
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
@@ -304,14 +306,7 @@ class CutPlot(IPlot):
         if self.plot_window.is_waterfall:
             self._apply_offset(self.plot_window.waterfall_x, self.plot_window.waterfall_y)
         else:
-            self._apply_offset(-self._waterfall_offsets[0], -self._waterfall_offsets[1])
             self._apply_offset(0., 0.)
-        self._canvas.draw()
-
-    def change_waterfall(self):
-        self._apply_offset(-self._waterfall_offsets[0], -self._waterfall_offsets[1])
-        self._waterfall_offsets = [self.plot_window.waterfall_x, self.plot_window.waterfall_y]
-        self._apply_offset(self._waterfall_offsets[0], self._waterfall_offsets[1])
         self._canvas.draw()
 
     def _apply_offset(self, x, y):
@@ -320,11 +315,29 @@ class CutPlot(IPlot):
         for ind, line_containers in enumerate(self._canvas.figure.gca().containers):
             for line in line_containers.get_children():
                 if isinstance(line, Line2D):
-                    line.set_xdata(line.get_xdata() + ind * x)
-                    line.set_ydata(line.get_ydata() + ind * y)
+                    if line not in self._waterfall_cache:
+                        self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
+                    line.set_xdata(self._waterfall_cache[line][0] + ind * x)
+                    line.set_ydata(self._waterfall_cache[line][1] + ind * y)
                 elif isinstance(line, LineCollection):
                     line.set_offset_position('data')
                     line.set_offsets((ind * x, ind * y))
+
+    def on_newplot(self, ax):
+        # This callback should be activated by a call to errorbar
+        from matplotlib.lines import Line2D
+        new_line = False
+        all_lines = [line for container in self._canvas.figure.gca().containers for line in container.get_children()]
+        for cached_lines in list(self._waterfall_cache.keys()):
+            if cached_lines not in all_lines:
+                self._waterfall_cache.pop(cached_lines)
+        for line in all_lines:
+            if isinstance(line, Line2D):
+                if line not in self._waterfall_cache:
+                    self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
+                    new_line = True
+        if new_line:
+            self.toggle_waterfall()
 
     @property
     def x_log(self):

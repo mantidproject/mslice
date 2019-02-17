@@ -166,7 +166,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.waterfall_y_edt_act.setVisible(False)
 
     def toggle_waterfall_edit(self):
-        is_waterfall = self.is_waterfall and self.action_waterfall.isVisible()
+        is_waterfall = self.is_waterfall
         self.waterfall_x_lbl_act.setVisible(is_waterfall)
         self.waterfall_y_lbl_act.setVisible(is_waterfall)
         self.waterfall_x_edt_act.setVisible(is_waterfall)
@@ -198,7 +198,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     @property
     def is_waterfall(self):
-        return self.action_waterfall.isChecked()
+        return self.action_waterfall.isChecked() and self.action_waterfall.isVisible()
 
     @property
     def waterfall_x(self):
