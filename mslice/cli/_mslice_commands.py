@@ -89,7 +89,7 @@ def GenerateScript(InputWorkspace, filename):
     _check_workspace_name(InputWorkspace)
     workspace_name = get_workspace_handle(InputWorkspace).name[2:]
     plot_handler = GlobalFigureManager.get_active_figure().plot_handler
-    generate_script(ws_name=workspace_name, plot_handler=plot_handler, filename=filename)
+    generate_script(ws_name=workspace_name, filename=filename, plot_handler=plot_handler)
 
 
 def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV', OutputWorkspace=None, Limits=None):
@@ -162,7 +162,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
 
     # Create the cut for use by the plot window in a generated script
     if not is_gui():
-        _update_cache(get_cut_plotter_presenter(), CutAxis, IntegrationAxis, NormToOne)
+        _update_cache(get_cut_plotter_presenter(), workspace.name, CutAxis, IntegrationAxis, NormToOne)
 
     return cut
 

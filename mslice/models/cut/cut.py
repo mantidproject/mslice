@@ -1,4 +1,3 @@
-
 class Cut(object):
     """Groups parameters needed to cut and validates them"""
 
@@ -14,10 +13,19 @@ class Cut(object):
         self.start = integration_axis.start
         self.end = integration_axis.end
         self.width = width
+        self.workspace_name = 'None'
 
     def reset_integration_axis(self, start, end):
         self.integration_axis.start = start
         self.integration_axis.end = end
+
+    @property
+    def workspace_name(self):
+        return self._workspace_name
+
+    @workspace_name.setter
+    def workspace_name(self, ws_name):
+        self._workspace_name = ws_name.replace(".", "_")
 
     @property
     def cut_axis(self):

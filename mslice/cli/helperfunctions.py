@@ -38,26 +38,31 @@ _intensity_to_workspace = {
 }
 
 
-def _update_cache(cut_presenter, CutAxis, IntegrationAxis, NormToOne):
+def _update_cache(cut_presenter, ws_name, CutAxis, IntegrationAxis, NormToOne):
     """Creates a list of all cuts used to create a particular cut. This is required when plot over is used."""
     cut_list = cut_presenter._cut_cache_list
+    cut_cache = cut_presenter._cut_cache
     int_axis = Axis(*IntegrationAxis.split(','))
     cut_axis = Axis(*CutAxis.split(','))
     width = None if int_axis.end - int_axis.start == 0 else str(int_axis.end - int_axis.start)
     if len(cut_list) == 0:
         cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
+        cut.workspace_name = ws_name
         cut_list.append(cut)
+        cut_cache[ws_name] = cut
     else:
         for cut in cut_list:
-            if str(cut.cut_axis) == str(cut_axis) and cut.width == float(width) and cut.norm_to_one == NormToOne:
+            if str(cut.cut_axis) == str(cut_axis) and cut.width == float(width) and cut.norm_to_one == NormToOne\
+                    and cut.workspace_name == ws_name:
                 if cut.integration_axis.start > int_axis.start:
                     cut.integration_axis = int_axis.start
                 if cut.integration_axis.end < int_axis.end:
                     cut.integration_axis.end = int_axis.end
-            else:
-                cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
-                cut_list.append(cut)
-
+                return
+    cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
+    cut.workspace_name = ws_name
+    cut_list.append(cut)
+    cut_cache[ws_name] = cut
 
 def _update_legend():
     plot_handler = GlobalFigureManager.get_active_figure().plot_handler
