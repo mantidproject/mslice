@@ -48,10 +48,8 @@ def add_plot_statements(script_lines, plot_handler):
 
     add_header(script_lines, plot_handler)
 
-    for line_index, line in enumerate(script_lines):
-        if "#" not in line and "import" not in line:
-            script_lines[line_index] = "ws = mc.{}\n".format(line)
-    script_lines.insert(len(script_lines) - 1, "\n")
+    script_lines.append('fig = plt.gcf()\n')
+    script_lines.append('ax = fig.add_subplot(111, projection="mslice")\n')
 
     if plot_handler is not None:
         if isinstance(plot_handler, SlicePlot):

@@ -22,15 +22,21 @@ def generate_script(ws_name, filename=None, plot_handler=None, window=None):
 
 def preprocess_lines(ws_name, plot_handler):
     from mslice.plotting.plot_window.cut_plot import CutPlot
+    script_lines = []
 
     if isinstance(plot_handler, CutPlot) and len(get_cut_plotter_presenter()._cut_cache) > 1:
-        script_lines = []
-        for workspace_name in get_cut_plotter_presenter()._cut_cache:
-            ws = get_workspace_handle(workspace_name).raw_ws
-            script_lines += ["\nws_{} = mc.".format(workspace_name.replace(".", "_"))] + cleanup(
-                GeneratePythonScript(ws).split('\n'))
+        cut_cache = get_cut_plotter_presenter()._cut_cache
+        cache_list = get_cut_plotter_presenter()._cut_cache_list
+        for workspace_name in cut_cache:
+            if any([workspace_name.replace(".", "_") == cut.workspace_name for cut in cache_list]):
+                ws = get_workspace_handle(workspace_name).raw_ws
+                lines = cleanup(GeneratePythonScript(ws).split('\n'))
+                for line in lines:
+                    script_lines += ["\nws_{} = mc.".format(workspace_name.replace(".", "_")) + line]
     else:
         ws = get_workspace_handle(ws_name).raw_ws
-        script_lines = ["\nws = mc."] + cleanup(GeneratePythonScript(ws).split('\n'))
+        lines = cleanup(GeneratePythonScript(ws).split('\n'))
+        for line in lines:
+            script_lines += ["\nws = mc." + line]
 
     return script_lines
