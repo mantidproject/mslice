@@ -79,7 +79,6 @@ class MSliceAxes(Axes):
         """ Change the plot to/from a waterfall """
         from mslice.plotting.plot_window.cut_plot import CutPlot
         plot_handler = GlobalFigureManager.get_active_figure().plot_handler
-        print(plot_handler)
         if isinstance(plot_handler, CutPlot):
             plot_handler.waterfall = isWaterfall
             if x_offset is not None:
