@@ -40,38 +40,38 @@ def preprocess_lines(ws_name, plot_handler):
 def generate_script_lines(raw_ws, workspace_name):
     lines = []
     ws_name = workspace_name.replace(".", "_")
-    alg_history = raw_ws.getHistory().getAlgorithmHistories()[::-1]
+    alg_history = reversed(raw_ws.getHistory().getAlgorithmHistories())
     for algorithm in alg_history:
         alg_name = algorithm.name()
         kwargs = get_algorithm_kwargs(algorithm, ws_name)
-        if alg_name != 'Load':
-            lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
-        else:
-            lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
+        lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
+        if alg_name == 'Load':
             break
-    return lines[::-1]
+    return reversed(lines)
 
 
 def get_algorithm_kwargs(algorithm, workspace_name):
     arguments = []
-    if algorithm.name() == "Load":
-        for property in algorithm.getProperties():
-            if property.name() == "Filename":
-                arguments = ["{}='{}'".format(property.name(), property.value())]
-    elif algorithm.name() == "MakeProjection":
-        for property in algorithm.getProperties():
-            if not property.isDefault():
-                if property.name() == "InputWorkspace":
-                    arguments += ["{}=ws_{}".format(property.name(), workspace_name)]
-                elif property.name() == "OutputWorkspace" or property.name() == "Limits":
+    for prop in algorithm.getProperties():
+        if not prop.isDefault():
+            if algorithm.name() == "Load":
+                if prop.name() == "Filename":
+                    arguments = ["{}='{}'".format(prop.name(), prop.value())]
+                elif prop.name() == "OutputWorkspace" or prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
                     pass
+            elif algorithm.name() == "MakeProjection":
+                    if prop.name() == "InputWorkspace":
+                        arguments += ["{}=ws_{}".format(prop.name(), workspace_name)]
+                    elif prop.name() == "OutputWorkspace" or prop.name() == "Limits":
+                        pass
+                    else:
+                        if isinstance(prop.value(), str):
+                            arguments += ["{}='{}'".format(prop.name(), prop.value())]
+                        else:
+                            arguments += ["{}={}".format(prop.name(), prop.value())]
+            else:
+                if isinstance(prop.value(), str):
+                    arguments += ["{}='{}'".format(prop.name(), prop.value())]
                 else:
-                    arguments += ["{}='{}'".format(property.name(), property.value())]
-    else:
-        for property in algorithm.getProperties():
-            if not property.isDefault():
-                if property.name() == "Filename":
-                    arguments = ["{}='{}'".format(property.name(), property.value())]
-                else:
-                    arguments += ["{}=ws_{}".format(property.name(), property.value())]
+                    arguments += ["{}={}".format(prop.name(), prop.value())]
     return ", ".join(arguments)

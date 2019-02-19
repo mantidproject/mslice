@@ -142,12 +142,11 @@ def add_cut_plot_statements(script_lines, plot_handler):
 def add_cut_lines(script_lines, plot_handler):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_list
     errorbars = plot_handler._canvas.figure.gca().containers
-    add_cut_lines_with_width(errorbars, script_lines, cuts, plot_handler)
+    add_cut_lines_with_width(errorbars, script_lines, cuts)
 
 
-def add_cut_lines_with_width(errorbars, script_lines, cuts, plot_handler):
+def add_cut_lines_with_width(errorbars, script_lines, cuts):
     """Adds the cut statements for each interval of the cuts that were plotted"""
-    #more_than_one_ws = len(plot_handler._cut_plotter_presenter._cut_cache) > 1
     index = 0  # Required as we run through the loop multiple times for each cut
     for cut in cuts:
         integration_start = cut.integration_axis.start
