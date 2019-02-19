@@ -171,8 +171,8 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, plot_handler):
             label = errorbar._label
 
             script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
-                                    'NormToOne={})\n'.format(index, cut.workspace_name, cut_axis, integration_axis,
-                                                             norm_to_one))
+                                'NormToOne={})\n'.format(index, cut.workspace_name, cut_axis, integration_axis,
+                                                         norm_to_one))
 
             if intensity_range != (None, None):
                 script_lines.append(
