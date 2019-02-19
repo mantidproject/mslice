@@ -1,7 +1,6 @@
-from mantid.simpleapi import GeneratePythonScript
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.qt import QtWidgets
-from mslice.scripting.helperfunctions import add_plot_statements, cleanup
+from mslice.scripting.helperfunctions import add_plot_statements
 from mslice.app.presenters import get_cut_plotter_presenter
 
 
@@ -30,13 +29,49 @@ def preprocess_lines(ws_name, plot_handler):
         for workspace_name in cut_cache:
             if any([workspace_name.replace(".", "_") == cut.workspace_name for cut in cache_list]):
                 ws = get_workspace_handle(workspace_name).raw_ws
-                lines = cleanup(GeneratePythonScript(ws).split('\n'))
-                for line in lines:
-                    script_lines += ["\nws_{} = mc.".format(workspace_name.replace(".", "_")) + line]
+                script_lines += generate_script_lines(ws, workspace_name)
     else:
         ws = get_workspace_handle(ws_name).raw_ws
-        lines = cleanup(GeneratePythonScript(ws).split('\n'))
-        for line in lines:
-            script_lines += ["\nws = mc." + line]
+        script_lines += generate_script_lines(ws, ws_name)
 
     return script_lines
+
+
+def generate_script_lines(raw_ws, workspace_name):
+    lines = []
+    ws_name = workspace_name.replace(".", "_")
+    alg_history = raw_ws.getHistory().getAlgorithmHistories()[::-1]
+    for algorithm in alg_history:
+        alg_name = algorithm.name()
+        kwargs = get_algorithm_kwargs(algorithm, ws_name)
+        if alg_name != 'Load':
+            lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
+        else:
+            lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
+            break
+    return lines[::-1]
+
+
+def get_algorithm_kwargs(algorithm, workspace_name):
+    arguments = []
+    if algorithm.name() == "Load":
+        for property in algorithm.getProperties():
+            if property.name() == "Filename":
+                arguments = ["{}='{}'".format(property.name(), property.value())]
+    elif algorithm.name() == "MakeProjection":
+        for property in algorithm.getProperties():
+            if not property.isDefault():
+                if property.name() == "InputWorkspace":
+                    arguments += ["{}=ws_{}".format(property.name(), workspace_name)]
+                elif property.name() == "OutputWorkspace" or property.name() == "Limits":
+                    pass
+                else:
+                    arguments += ["{}='{}'".format(property.name(), property.value())]
+    else:
+        for property in algorithm.getProperties():
+            if not property.isDefault():
+                if property.name() == "Filename":
+                    arguments = ["{}='{}'".format(property.name(), property.value())]
+                else:
+                    arguments += ["{}=ws_{}".format(property.name(), property.value())]
+    return ", ".join(arguments)

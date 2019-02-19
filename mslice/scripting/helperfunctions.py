@@ -2,21 +2,10 @@ from datetime import datetime
 from mslice.cli.helperfunctions import _function_to_intensity
 from mslice.models.labels import get_recoil_key
 
-COMMON_PACKAGES = ["import mslice.cli as mc", "import mslice.plotting.pyplot as plt\n"]
+COMMON_PACKAGES = ["import mslice.cli as mc", "import mslice.plotting.pyplot as plt\n\n"]
 MPL_COLORS_IMPORT = ["\nimport matplotlib.colors as colors\n"]
 NUMPY_IMPORT = ["\nimport numpy as np\n"]
 LOG_SCALE_MIN = 0.001
-
-
-def cleanup(script_lines):
-    """
-    Removes data preprocessing lines from the workspace history script.
-    i.e All lines before the script was first loaded
-    """
-    for line in reversed(script_lines):
-        if line.startswith("Load"):
-            index = script_lines.index(line)
-            return script_lines[index:]
 
 
 def header(plot_handler):
@@ -72,8 +61,8 @@ def add_slice_plot_statements(script_lines, plot_handler):
     energy_axis = str(slice.energy_axis)
     norm = slice.norm_to_one
 
-    script_lines.append('slice_ws = mc.Slice(ws, Axis1="{}", Axis2="{}", NormToOne={})\n\n'.format(
-        momentum_axis, energy_axis, norm))
+    script_lines.append('slice_ws = mc.Slice(ws_{}, Axis1="{}", Axis2="{}", NormToOne={})\n\n'.format(
+        plot_handler.ws_name.replace(".", "_"), momentum_axis, energy_axis, norm))
 
     if default_opts['intensity'] is True:
         intensity = _function_to_intensity[default_opts['intensity_method']]
@@ -158,7 +147,7 @@ def add_cut_lines(script_lines, plot_handler):
 
 def add_cut_lines_with_width(errorbars, script_lines, cuts, plot_handler):
     """Adds the cut statements for each interval of the cuts that were plotted"""
-    more_than_one_ws = len(plot_handler._cut_plotter_presenter._cut_cache) > 1
+    #more_than_one_ws = len(plot_handler._cut_plotter_presenter._cut_cache) > 1
     index = 0  # Required as we run through the loop multiple times for each cut
     for cut in cuts:
         integration_start = cut.integration_axis.start
@@ -181,13 +170,9 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, plot_handler):
             width = errorbar.lines[0]._linewidth
             label = errorbar._label
 
-            if more_than_one_ws:
-                script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
+            script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
                                     'NormToOne={})\n'.format(index, cut.workspace_name, cut_axis, integration_axis,
                                                              norm_to_one))
-            else:
-                script_lines.append('cut_ws_{} = mc.Cut(ws, CutAxis="{}", IntegrationAxis="{}", '
-                                    'NormToOne={})\n'.format(index, cut_axis, integration_axis, norm_to_one))
 
             if intensity_range != (None, None):
                 script_lines.append(
