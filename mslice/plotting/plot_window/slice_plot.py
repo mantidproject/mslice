@@ -130,6 +130,7 @@ class SlicePlot(IPlot):
         plot_window.action_niobium.triggered.disconnect()
         plot_window.action_tantalum.triggered.disconnect()
         plot_window.action_cif_file.triggered.disconnect()
+        plot_window.action_gen_script.triggered.disconnect()
 
     def window_closing(self):
         # nothing to do

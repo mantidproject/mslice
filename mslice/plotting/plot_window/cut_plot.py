@@ -66,6 +66,7 @@ class CutPlot(IPlot):
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
         plot_window.action_flip_axis.triggered.disconnect()
+        plot_window.action_gen_script.triggered.disconnect()
 
     def window_closing(self):
         icut = self._cut_plotter_presenter.get_icut(self.ws_name)
