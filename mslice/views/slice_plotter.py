@@ -38,6 +38,11 @@ def _show_plot(slice_cache, workspace):
 
     cur_fig.canvas.draw_idle()
     cur_fig.show()
+    # This ensures that another slice plotted in the same window saves the plot options
+    # as the plot window's showEvent is called only once. The equivalent command is left
+    # in the showEvent for use by the CLI.
+    if cur_fig.canvas.manager.plot_handler.default_options is None:
+        cur_fig.canvas.manager.plot_handler.save_default_options()
 
 
 def set_colorbar_label(label):

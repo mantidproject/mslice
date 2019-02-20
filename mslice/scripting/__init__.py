@@ -60,15 +60,15 @@ def get_algorithm_kwargs(algorithm, workspace_name):
                 elif prop.name() == "OutputWorkspace" or prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
                     pass
             elif algorithm.name() == "MakeProjection":
-                    if prop.name() == "InputWorkspace":
-                        arguments += ["{}=ws_{}".format(prop.name(), workspace_name)]
-                    elif prop.name() == "OutputWorkspace" or prop.name() == "Limits":
-                        pass
+                if prop.name() == "InputWorkspace":
+                    arguments += ["{}=ws_{}".format(prop.name(), workspace_name)]
+                elif prop.name() == "OutputWorkspace" or prop.name() == "Limits":
+                    pass
+                else:
+                    if isinstance(prop.value(), str):
+                        arguments += ["{}='{}'".format(prop.name(), prop.value())]
                     else:
-                        if isinstance(prop.value(), str):
-                            arguments += ["{}='{}'".format(prop.name(), prop.value())]
-                        else:
-                            arguments += ["{}={}".format(prop.name(), prop.value())]
+                        arguments += ["{}={}".format(prop.name(), prop.value())]
             else:
                 if isinstance(prop.value(), str):
                     arguments += ["{}='{}'".format(prop.name(), prop.value())]

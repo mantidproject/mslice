@@ -40,7 +40,7 @@ class SlicePlot(IPlot):
         self.intensity_method = False
         self.temp_dependent = False
         self.temp = None
-        self.default_options = {}
+        self.default_options = None
 
     def save_default_options(self):
         self.default_options = {
