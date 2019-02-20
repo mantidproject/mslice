@@ -29,8 +29,10 @@ def wrap_algorithm(algorithm):
             result = wrap_workspace(result, output_name)
             if store:
                 add_workspace(result, output_name)
-                from mslice.app.presenters import get_slice_plotter_presenter
-                get_slice_plotter_presenter().update_displayed_workspaces()
+                from mslice.app import is_gui
+                if is_gui():
+                    from mslice.app.presenters import get_slice_plotter_presenter
+                    get_slice_plotter_presenter().update_displayed_workspaces()
         return result
     return alg_wrapper
 
