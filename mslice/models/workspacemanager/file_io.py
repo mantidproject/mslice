@@ -54,13 +54,13 @@ def save_nexus(workspace, path, is_slice):
 
 
 def save_ascii(workspace, path, is_slice):
-    if isinstance(workspace, HistogramWorkspace):
-        if is_slice:
-            _save_slice_to_ascii(workspace, path)
-        else:
-            _save_cut_to_ascii(workspace, workspace.name, path)
+    if is_slice:
+        _save_slice_to_ascii(workspace, path)
     else:
-        SaveAscii(InputWorkspace=workspace, Filename=path)
+        if isinstance(workspace, HistogramWorkspace):
+            _save_cut_to_ascii(workspace, workspace.name, path)
+        else:
+            SaveAscii(InputWorkspace=workspace, Filename=path)
 
 
 def save_matlab(workspace, path, is_slice):
@@ -100,7 +100,15 @@ def _save_cut_to_ascii(workspace, ws_name, output_path):
 
 def _save_slice_to_ascii(workspace, output_path):
     header = 'MSlice Slice of workspace "%s"' % (workspace.name)
-    x, y, e = _get_slice_mdhisto_xye(workspace.raw_ws)
+    if isinstance(workspace, HistogramWorkspace):
+        x, y, e = _get_slice_mdhisto_xye(workspace.raw_ws)
+    else:
+        x = []
+        for dim in [workspace.raw_ws.getDimension(i) for i in range(2)]:
+            x.append(np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())[np.newaxis])
+        x[1] = x[1].T
+        y = workspace.raw_ws.extractY()
+        e = workspace.raw_ws.extractE()
     dim_sz = [workspace.raw_ws.getDimension(i).getNBins() for i in range(workspace.raw_ws.getNumDims())]
     nbins = np.prod(dim_sz)
     x = [np.reshape(x0, nbins) for x0 in np.broadcast_arrays(*x)]
