@@ -19,12 +19,18 @@ def wrap_algorithm(algorithm):
         if 'OutputWorkspace' in kwargs:
             output_name = kwargs['OutputWorkspace']
         store = kwargs.pop('store', True)
+        for ws in [k for k in kwargs.keys() if isinstance(kwargs[k], MsliceWorkspace)]:
+            if 'Input' not in ws and 'Output' not in ws:
+                kwargs[ws] = _name_or_wrapper_to_workspace(kwargs[ws])
+        args = tuple([_name_or_wrapper_to_workspace(arg) if isinstance(arg, MsliceWorkspace) else arg for arg in args])
 
         result = algorithm(*args, StoreInADS=False, **kwargs)
         if isinstance(result, Workspace):
             result = wrap_workspace(result, output_name)
             if store:
                 add_workspace(result, output_name)
+                from mslice.app.presenters import get_slice_plotter_presenter
+                get_slice_plotter_presenter().update_displayed_workspaces()
         return result
     return alg_wrapper
 
