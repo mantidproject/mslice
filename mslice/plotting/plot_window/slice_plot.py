@@ -40,7 +40,7 @@ class SlicePlot(IPlot):
         self.intensity_method = False
         self.temp_dependent = False
         self.temp = None
-        self.default_options = {}
+        self.default_options = None
 
     def save_default_options(self):
         self.default_options = {
@@ -108,8 +108,8 @@ class SlicePlot(IPlot):
         plot_window.action_tantalum.triggered.connect(
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
-        plot_window.action_gen_history.triggered.connect(partial(generate_script, self.ws_name, None, self,
-                                                                 self.plot_window))
+        plot_window.action_gen_script.triggered.connect(partial(generate_script, self.ws_name, None, self,
+                                                                self.plot_window))
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()
@@ -130,6 +130,7 @@ class SlicePlot(IPlot):
         plot_window.action_niobium.triggered.disconnect()
         plot_window.action_tantalum.triggered.disconnect()
         plot_window.action_cif_file.triggered.disconnect()
+        plot_window.action_gen_script.triggered.disconnect()
 
     def window_closing(self):
         # nothing to do

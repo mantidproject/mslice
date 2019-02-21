@@ -109,18 +109,15 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         return_value = is_slice(slice_ws)
         self.assertEqual(return_value, True)
 
-        with self.assertRaises(ValueError):
-            is_slice(hist_ws)
+        return_value = is_slice(hist_ws)
+        self.assertEqual(return_value, True)
+
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     def test_that_is_cut_works_as_expected(self, is_gui):
         is_gui.return_value = True
         workspace = self.create_workspace('workspace')
         cut_ws = Cut(workspace)
-        slice_ws = Slice(workspace)
 
         return_value = is_cut(cut_ws)
         self.assertEqual(return_value, True)
-
-        with self.assertRaises(ValueError):
-            is_cut(slice_ws)
