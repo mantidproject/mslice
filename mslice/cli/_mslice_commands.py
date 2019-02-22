@@ -20,6 +20,11 @@ from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app.presenters import cli_slice_plotter_presenter
 from mslice.app.presenters import cli_cut_plotter_presenter
 
+from mslice.util.mantid import in_mantidplot
+
+if in_mantidplot():
+    from mslice.util.mantid.mantid_algorithms import *  # noqa: F401
+
 # -----------------------------------------------------------------------------
 # Command functions
 # -----------------------------------------------------------------------------
@@ -73,13 +78,20 @@ def Load(Filename, OutputWorkspace=None):
 
     if not isinstance(Filename, string_types):
         raise RuntimeError('path given to load must be a string')
+    merge = False
     if not ospath.exists(Filename):
-        raise RuntimeError('could not find the path %s' % Filename)
+        if all([ospath.exists(f) for f in Filename.split('+')]):
+            merge = True
+        else:
+            raise RuntimeError('could not find the path %s' % Filename)
 
-    get_dataloader_presenter().load_workspace([Filename])
+    get_dataloader_presenter().load_workspace([Filename], merge)
     name = ospath.splitext(ospath.basename(Filename))[0]
     if OutputWorkspace is not None:
-        name = rename_workspace(workspace=ospath.splitext(ospath.basename(Filename))[0], new_name=OutputWorkspace).name
+        old_name = ospath.splitext(ospath.basename(Filename))[0]
+        if merge:
+            old_name = old_name + '_merged'
+        name = rename_workspace(workspace=old_name, new_name=OutputWorkspace).name
 
     return get_workspace_handle(name)
 

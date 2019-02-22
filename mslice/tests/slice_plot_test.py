@@ -46,6 +46,7 @@ class SlicePlotTest(unittest.TestCase):
         image.set_clim.assert_called_once_with((0, 15))
 
     def test_lines_redrawn_on_intensity_change(self):
+        self.slice_plot.save_default_options()
         self.slice_plot.toggle_overplot_line(self.slice_plot.plot_window.action_helium, 4, True, True)
         colorbar_range = PropertyMock(return_value=(0, 10))
         type(self.slice_plot).colorbar_range = colorbar_range

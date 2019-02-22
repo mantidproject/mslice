@@ -81,8 +81,8 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.setMenuBar(self.menubar)
 
     def add_file_actions(self, menu):
-        self.action_gen_history = add_action(menu, self, "Generate Script")
-        menu.addAction(self.action_gen_history)
+        self.action_gen_script = add_action(menu, self, "Generate Script")
+        menu.addAction(self.action_gen_script)
 
         self.action_quit = add_action(menu, self, "Close")
         menu.addAction(self.action_quit)

@@ -68,11 +68,23 @@ class CommandLineTest(unittest.TestCase):
     @mock.patch('mslice.app.presenters.get_dataloader_presenter')
     @mock.patch('mslice.cli._mslice_commands.ospath.exists')
     def test_load(self, ospath_mock, get_dlp, get_workspace_mock):
-        ospath_mock.exists.return_value = True
+        ospath_mock.return_value = True
         path = 'made_up_path'
         Load(path)
 
-        get_dlp().load_workspace.assert_called_once_with([path])
+        get_dlp().load_workspace.assert_called_once_with([path], False)
+        get_workspace_mock.assert_called_with(path)
+
+    @mock.patch('mslice.cli._mslice_commands.get_workspace_handle')
+    @mock.patch('mslice.app.presenters.get_dataloader_presenter')
+    @mock.patch('mslice.cli._mslice_commands.ospath')
+    def test_load_merge(self, ospath_mock, get_dlp, get_workspace_mock):
+        path = 'made_up_path+another_made_up_path'
+        ospath_mock.exists.side_effect = [False, True, True]
+        ospath_mock.splitext.return_value = [path]
+        Load(path)
+
+        get_dlp().load_workspace.assert_called_once_with([path], True)
         get_workspace_mock.assert_called_with(path)
 
     @mock.patch('mslice.app.presenters.get_powder_presenter')

@@ -23,20 +23,10 @@ class DataLoaderWidget(QWidget):  # and some view interface
         QWidget.__init__(self, parent)
         load_ui(__file__, 'dataloader.ui', self)
 
-        self.file_system = QFileSystemModel()
         self.directory = QDir(os.path.expanduser('~'))
-        path = self.directory.absolutePath()
-        self.root_path = path
-        self.file_system.setRootPath(path)
-        self.file_system.setNameFilters(MSLICE_EXTENSIONS)
-        self.file_system.setNameFilterDisables(False)
-        self.table_view.setModel(self.file_system)
-        self.table_view.setRootIndex(self.file_system.index(path))
-        self.txtpath.setText(path)
-        self.table_view.setColumnWidth(0, 320)
-        self.table_view.setColumnWidth(1, 0)
-        self.table_view.setColumnWidth(3, 140)
-        self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self._sort_column = 0
+        self.reload_model()
+        self.txtpath.setText(self.directory.absolutePath())
         self._presenter = DataLoaderPresenter(self)
         self.btnload.setEnabled(False)
         self.btnmerge.setEnabled(False)
@@ -49,6 +39,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.btnhome.clicked.connect(self.go_to_home)
         self.btnload.clicked.connect(partial(self.load, False))
         self.btnmerge.clicked.connect(partial(self.load, True))
+        self.btnrefresh.clicked.connect(self.reload_model)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace:
@@ -75,6 +66,22 @@ class DataLoaderWidget(QWidget):  # and some view interface
         else:
             self._display_error("Invalid file path")
 
+    def reload_model(self):
+        # Redefines the QFileSystemModel - hopefully to refresh any changes not caught because of filesystem issues
+        self.file_system = QFileSystemModel()
+        self.root_path = self.directory.absolutePath()
+        self.file_system.setRootPath(self.root_path)
+        self.file_system.setNameFilters(MSLICE_EXTENSIONS)
+        self.file_system.setNameFilterDisables(False)
+        self.table_view.setModel(self.file_system)
+        self.table_view.setRootIndex(self.file_system.index(self.root_path))
+        self.table_view.setColumnWidth(0, 320)    # Make name wide
+        self.table_view.setColumnHidden(1, True)  # Hide size column
+        self.table_view.setColumnHidden(2, True)  # Hide type column
+        self.table_view.setColumnWidth(3, 140)    # Show date modified
+        self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.sort_files(self._sort_column)
+
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
         try:
@@ -96,6 +103,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self._presenter.load_workspace(self.get_selected_file_paths(), merge)
 
     def sort_files(self, column):
+        self._sort_column = column
         self.table_view.sortByColumn(column, column % 2)  # descending order for size/modified, ascending for name/type
 
     def go_to_home(self):

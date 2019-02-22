@@ -68,11 +68,12 @@ class CutPlotterPresenter(PresenterUtility):
             self.plot_cut_from_workspace(workspace_name, plot_over)
             plot_over = True  # plot over if multiple workspaces selected
 
-    def plot_cut_from_workspace(self, workspace, intensity_range=None, plot_over=False):
+    def plot_cut_from_workspace(self, workspace, plot_over=False, intensity_range=None):
 
         workspace = get_workspace_handle(workspace)
         lines = plot_cut_impl(workspace, workspace.raw_ws.getDimension(0).getUnits(),
                               intensity_range=intensity_range, plot_over=plot_over)
+        self.set_is_icut(workspace.name, False)
         return lines
 
     def plot_interactive_cut(self, workspace, cut_axis, integration_axis, store):
