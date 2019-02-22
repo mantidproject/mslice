@@ -198,7 +198,8 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     @property
     def waterfall(self):
-        return (self.action_waterfall.isChecked() and self.action_waterfall.isVisible()
+        return (self.action_waterfall.isChecked()
+                and self.action_waterfall.isVisible()
                 and self.action_waterfall.isEnabled())
 
     @waterfall.setter
