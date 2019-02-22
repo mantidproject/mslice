@@ -6,7 +6,7 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHisto
 
 from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
                                          ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE,
-                                         ConvertToGDOS)
+                                         ConvertToGDOS, GenerateScript)
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
@@ -87,6 +87,17 @@ class CommandLineTest(unittest.TestCase):
         self.assertAlmostEqual(signal[0][0], 0, 4)
         self.assertAlmostEqual(signal[0][11], 0.1753, 4)
         self.assertAlmostEqual(signal[0][28], 0.4248, 4)
+
+    @mock.patch('mslice.scripting.generate_script')
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_generate_script_works_as_expected(self, gfm, generate_script):
+        workspace = self.create_workspace('__test')
+        filename = 'filename'
+        plot_handler = gfm.get_active_figure().plot_handler
+
+        GenerateScript(InputWorkspace=workspace, filename=filename)
+
+        generate_script.assert_called_once_with(ws_name=workspace.name[2:], filename=filename, plot_handler=plot_handler)
 
     @mock.patch('mslice.app.presenters.get_powder_presenter')
     def test_projection_fail_non_PSD(self, get_pp):

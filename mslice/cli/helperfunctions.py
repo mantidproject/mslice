@@ -58,11 +58,15 @@ def _update_cache(cut_presenter, ws_name, CutAxis, IntegrationAxis, NormToOne):
                     cut.integration_axis = int_axis.start
                 if cut.integration_axis.end < int_axis.end:
                     cut.integration_axis.end = int_axis.end
+                cut.start = cut.integration_axis.start
+                cut.end = cut.integration_axis.end
+                cut.reset_integration_axis(cut.start, cut.end)
                 return
-    cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
-    cut.workspace_name = ws_name
-    cut_list.append(cut)
-    cut_cache[ws_name] = cut
+        cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
+        cut.workspace_name = ws_name
+        cut_list.append(cut)
+        cut_cache[ws_name] = cut
+
 
 def _update_legend():
     plot_handler = GlobalFigureManager.get_active_figure().plot_handler
