@@ -330,7 +330,11 @@ class CutPlot(IPlot):
         # This callback should be activated by a call to errorbar
         from matplotlib.lines import Line2D
         new_line = False
-        all_lines = [line for container in self._canvas.figure.gca().containers for line in container.get_children()]
+        line_containers = self._canvas.figure.gca().containers
+        num_lines = len(line_containers)
+        self.plot_window.action_waterfall.setEnabled(num_lines > 1)
+        self.plot_window.toggle_waterfall_edit()
+        all_lines = [line for container in line_containers for line in container.get_children()]
         for cached_lines in list(self._waterfall_cache.keys()):
             if cached_lines not in all_lines:
                 self._waterfall_cache.pop(cached_lines)
@@ -339,7 +343,7 @@ class CutPlot(IPlot):
                 if line not in self._waterfall_cache:
                     self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
                     new_line = True
-        if new_line:
+        if new_line and num_lines > 1:
             self.toggle_waterfall()
 
     @property
