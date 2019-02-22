@@ -68,6 +68,7 @@ class SlicePlot(IPlot):
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
+        plot_window.action_waterfall.setVisible(False)
 
         plot_window.action_sqe.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_sqe,

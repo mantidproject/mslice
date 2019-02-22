@@ -75,5 +75,19 @@ class MSliceAxes(Axes):
             elif axis == 'y':
                 plot_handler.manager._ygrid = b
 
+    def set_waterfall(self, isWaterfall=True, x_offset=None, y_offset=None):
+        """ Change the plot to/from a waterfall """
+        from mslice.plotting.plot_window.cut_plot import CutPlot
+        plot_handler = GlobalFigureManager.get_active_figure().plot_handler
+        if isinstance(plot_handler, CutPlot):
+            plot_handler.waterfall = isWaterfall
+            if x_offset is not None:
+                plot_handler.waterfall_x = x_offset
+            if y_offset is not None:
+                plot_handler.waterfall_y = y_offset
+            plot_handler.toggle_waterfall()
+        else:
+            raise RuntimeError('Waterfall plots may only be applied to cuts')
+
 
 register_projection(MSliceAxes)

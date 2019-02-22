@@ -209,3 +209,9 @@ def add_plot_options(script_lines, plot_handler):
 
     if plot_handler.is_changed("x_range"):
         script_lines.append("ax.set_xlim(left={}, right={})\n".format(*plot_handler.x_range))
+
+    from mslice.plotting.plot_window.cut_plot import CutPlot
+    if isinstance(plot_handler, CutPlot) and plot_handler.is_changed("waterfall"):
+        script_lines.append("ax.set_waterfall({}, x_offset={}, y_offset={})\n".format(plot_handler.waterfall,
+                                                                                      plot_handler.waterfall_x,
+                                                                                      plot_handler.waterfall_y))

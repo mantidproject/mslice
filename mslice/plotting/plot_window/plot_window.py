@@ -4,7 +4,7 @@ from matplotlib.figure import Figure
 import qtawesome as qta
 
 from mslice.plotting.backend import get_canvas_and_toolbar_cls
-from mslice.util.qt import QtCore, QtWidgets
+from mslice.util.qt import QtCore, QtWidgets, QtGui
 
 FigureCanvas, NavigationToolbar2QT = get_canvas_and_toolbar_cls()
 
@@ -134,11 +134,43 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.action_plot_options = add_action(toolbar, self, "Plot Options", icon_name='fa.cog')
 
         toolbar.addSeparator()
+        self.action_waterfall = add_action(toolbar, self, "Waterfall", checkable=True)
+        self.add_waterfall_edit(self.toolbar)
+        self.action_waterfall.triggered.connect(self.toggle_waterfall_edit)
+        self.action_waterfall.changed.connect(self.toggle_waterfall_edit)
         self.action_interactive_cuts = add_action(toolbar, self,  "Interactive Cuts", checkable=True)
         # options for interactive cuts only
         self.action_save_cut = add_action(toolbar, self,  "Save Cut to Workspace")
         self.action_flip_axis = add_action(toolbar, self,  "Flip Integration Axis",
                                            icon_name='fa.retweet')
+
+    def add_waterfall_edit(self, parent):
+        self.waterfall_x_lbl = QtWidgets.QLabel("x:", parent)
+        self.waterfall_y_lbl = QtWidgets.QLabel("y:", parent)
+        self.waterfall_x_edt = QtWidgets.QLineEdit("0", parent)
+        self.waterfall_y_edt = QtWidgets.QLineEdit("0", parent)
+        sz = self.waterfall_x_edt.sizeHint()
+        sz.setWidth(60)
+        self.waterfall_x_edt.setMaximumSize(sz)
+        self.waterfall_y_edt.setMaximumSize(sz)
+        validator = QtGui.QDoubleValidator(self)
+        self.waterfall_x_edt.setValidator(validator)
+        self.waterfall_y_edt.setValidator(validator)
+        self.waterfall_x_lbl_act = parent.addWidget(self.waterfall_x_lbl)
+        self.waterfall_x_edt_act = parent.addWidget(self.waterfall_x_edt)
+        self.waterfall_y_lbl_act = parent.addWidget(self.waterfall_y_lbl)
+        self.waterfall_y_edt_act = parent.addWidget(self.waterfall_y_edt)
+        self.waterfall_x_lbl_act.setVisible(False)
+        self.waterfall_y_lbl_act.setVisible(False)
+        self.waterfall_x_edt_act.setVisible(False)
+        self.waterfall_y_edt_act.setVisible(False)
+
+    def toggle_waterfall_edit(self):
+        is_waterfall = self.waterfall
+        self.waterfall_x_lbl_act.setVisible(is_waterfall)
+        self.waterfall_y_lbl_act.setVisible(is_waterfall)
+        self.waterfall_x_edt_act.setVisible(is_waterfall)
+        self.waterfall_y_edt_act.setVisible(is_waterfall)
 
     def create_status_bar(self):
         self.statusbar = QtWidgets.QStatusBar(self)
@@ -164,6 +196,32 @@ class PlotWindow(QtWidgets.QMainWindow):
         except AttributeError:
             pass
 
+    @property
+    def waterfall(self):
+        return (self.action_waterfall.isChecked()
+                and self.action_waterfall.isVisible()
+                and self.action_waterfall.isEnabled())
+
+    @waterfall.setter
+    def waterfall(self, value):
+        self.action_waterfall.setChecked(value)
+        self.toggle_waterfall_edit()
+
+    @property
+    def waterfall_x(self):
+        return float(self.waterfall_x_edt.text())
+
+    @waterfall_x.setter
+    def waterfall_x(self, value):
+        self.waterfall_x_edt.setText(str(value))
+
+    @property
+    def waterfall_y(self):
+        return float(self.waterfall_y_edt.text())
+
+    @waterfall_y.setter
+    def waterfall_y(self, value):
+        self.waterfall_y_edt.setText(str(value))
 
 def create_attribute_name(text):
     """Create the name of an action attribute based on the text"""

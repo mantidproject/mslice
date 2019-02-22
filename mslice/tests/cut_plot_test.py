@@ -77,3 +77,14 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.update_legend()
         self.assertTrue(self.cut_plot._legends_visible[0])
         self.axes.legend.assert_called_with([line], ['some_label'], fontsize=ANY)
+
+    def test_waterfall(self):
+        self.cut_plot._apply_offset = MagicMock()
+        self.cut_plot.waterfall = True
+        self.cut_plot.waterfall_x = 1
+        self.cut_plot.waterfall_y = 2
+        self.cut_plot.toggle_waterfall()
+        self.cut_plot._apply_offset.assert_called_with(1, 2)
+        self.cut_plot.waterfall = False
+        self.cut_plot.toggle_waterfall()
+        self.cut_plot._apply_offset.assert_called_with(0, 0)
