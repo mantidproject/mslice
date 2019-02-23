@@ -17,6 +17,11 @@ from mslice.workspace.histogram_workspace import HistogramWorkspace
 # global figure manager see _mslice_commands.Show
 del show  # noqa: F821
 
+# For units conversion we need to register with matplotlib
+from mslice.plotting import units
+import matplotlib.units as mpl_units
+mpl_units.registry[units.EnergyTransferUnits] = units.EnergyTransferConverter()
+mpl_units.registry[units.MomentumTransferUnits] = units.MomentumTransferConverter()
 
 # MSlice Matplotlib Projection
 class MSliceAxes(Axes):

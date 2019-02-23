@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import mslice.plotting.pyplot as plt
 import mslice.app as app
+import numpy as np
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _intensity_to_action, \
     _intensity_to_workspace, _function_to_intensity
@@ -15,7 +16,9 @@ from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
 from mslice.views.cut_plotter import PICKER_TOL_PTS as CUT_PICKER_TOL_PTS
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-
+from mslice.plotting import units
+from mantid.plots.helperfunctions import get_normalization, get_md_data1d, get_wksp_index_dist_and_label, \
+    get_spectrum, get_md_data2d_bin_bounds, get_data_uneven_flag, get_distribution, get_matrix_2d_data
 
 @plt.set_category(plt.CATEGORY_CUT)
 def errorbar(axes, workspace, *args, **kwargs):
@@ -39,7 +42,16 @@ def errorbar(axes, workspace, *args, **kwargs):
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
 
-    plotfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
+    if isinstance(workspace, HistogramWorkspace):
+        (normalization, kwargs) = get_normalization(workspace.raw_ws, **kwargs)
+        (x, y, dy) = get_md_data1d(workspace.raw_ws, normalization)
+        dx = None
+    else:
+        (wkspIndex, distribution, kwargs) = get_wksp_index_dist_and_label(workspace.raw_ws, **kwargs)
+        (x, y, dy, dx) = get_spectrum(workspace.raw_ws, wkspIndex, distribution, withDy=True, withDx=True)
+    if 'DeltaE' in x_units:
+        x = [units.EnergyTransferUnits(v) for v in x]
+    axes.errorbar(x, y, dy, dx, *args, label=label, **kwargs)
 
     axes.set_ylim(*intensity_range) if intensity_range is not None else axes.autoscale()
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
@@ -104,10 +116,27 @@ def pcolormesh(axes, workspace, *args, **kwargs):
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
-    plotfunctions.pcolormesh(axes, workspace.raw_ws, *args, **kwargs)
-    axes.set_title(workspace.name[2:], picker=SLICE_PICKER_TOL_PTS)
+
     x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
     y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
+    if isinstance(workspace, HistogramWorkspace):
+        (normalization, kwargs) = get_normalization(workspace.raw_ws, **kwargs)
+        x, y, z = get_md_data2d_bin_bounds(workspace.raw_ws, normalization)
+    else:
+        (aligned, kwargs) = get_data_uneven_flag(workspace.raw_ws, **kwargs)
+        (distribution, kwargs) = get_distribution(workspace.raw_ws, **kwargs)
+        if aligned:
+            kwargs['pcolortype'] = 'mesh'
+            return plotfunctions._pcolorpieces(axes, workspace.raw_ws, distribution, *args, **kwargs)
+        else:
+            (x, y, z) = get_matrix_2d_data(workspace.raw_ws, distribution, histogram2D=True)
+    if 'DeltaE' in x_axis.units:
+        x = x.astype(np.dtype(units.EnergyTransferUnits))
+    if 'DeltaE' in y_axis.units:
+        y = y.astype(np.dtype(units.EnergyTransferUnits))
+    axes.pcolormesh(x, y, z, *args, **kwargs)
+
+    axes.set_title(workspace.name[2:], picker=SLICE_PICKER_TOL_PTS)
     comment = get_comment(str(workspace.name))
     axes.get_xaxis().set_units(x_axis.units)
     axes.get_yaxis().set_units(y_axis.units)
