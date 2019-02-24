@@ -79,6 +79,8 @@ class MainWindow(MainView, QMainWindow):
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
         self.action_quit.triggered.connect(self.close)
+        self.actionmeV.triggered.connect(self.set_meV_default)
+        self.actioncm.triggered.connect(self.set_cm_default)
 
     def setup_save(self):
         menu = QMenu()
@@ -174,3 +176,13 @@ class MainWindow(MainView, QMainWindow):
         else:
             return
         QApplication.processEvents()
+
+    def set_meV_default(self):
+        self.actioncm.setChecked(False)
+        self.wgtCut.set_energy_units_default('meV')
+        self.wgtSlice.set_units_default('meV')
+
+    def set_cm_default(self):
+        self.actionmeV.setChecked(False)
+        self.wgtCut.set_energy_units_default('cm-1')
+        self.wgtSlice.set_units_default('cm-1')

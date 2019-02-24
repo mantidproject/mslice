@@ -136,7 +136,7 @@ def add_cut_plot_statements(script_lines, plot_handler):
         default_opts["xmin"]) if plot_handler.is_changed("x_log") else "")
 
     script_lines.append("ax.set_yscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
-        default_opts["ymin"]) if plot_handler.is_changed("x_log") else "")
+        default_opts["ymin"]) if plot_handler.is_changed("y_log") else "")
 
 
 def add_cut_lines(script_lines, plot_handler):

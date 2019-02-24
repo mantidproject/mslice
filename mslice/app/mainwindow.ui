@@ -310,11 +310,44 @@
     </property>
     <addaction name="action_quit"/>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <widget class="QMenu" name="menuDefault_Energy_Units">
+     <property name="title">
+      <string>Default Energy Units</string>
+     </property>
+     <addaction name="actionmeV"/>
+     <addaction name="actioncm"/>
+    </widget>
+    <addaction name="menuDefault_Energy_Units"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuOptions"/>
   </widget>
   <action name="action_quit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionmeV">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>meV</string>
+   </property>
+  </action>
+  <action name="actioncm">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>cm-1</string>
    </property>
   </action>
  </widget>

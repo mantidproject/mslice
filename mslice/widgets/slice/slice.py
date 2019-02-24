@@ -36,10 +36,11 @@ class SliceWidget(SliceView, QWidget):
         self._minimumStep = {}
         self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))
         self.lneSliceYStep.editingFinished.connect(lambda: self._step_edited('y', self.lneSliceYStep))
-        self.enable_units_choice(False)
         self.cmbSliceXAxis.currentIndexChanged.connect(lambda ind: self._change_axes(1, ind))
         self.cmbSliceYAxis.currentIndexChanged.connect(lambda ind: self._change_axes(2, ind))
         self.set_validators()
+        self._en_default = 'meV'
+        self._en_unit_index = {'meV':0, 'cm-1':1}
 
     def get_presenter(self):
         return self._presenter
@@ -82,16 +83,6 @@ class SliceWidget(SliceView, QWidget):
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
-
-    def enable_units_choice(self, enabled):
-        if enabled:
-            # TODO implement conversion from meV to cm-1
-            pass
-            #self.cmbSliceUnits.show()
-            #self.label_16.show()
-        else:
-            self.cmbSliceUnits.hide()
-            self.label_16.hide()
 
     def get_units(self):
         return self.cmbSliceUnits.currentText()
@@ -199,6 +190,7 @@ class SliceWidget(SliceView, QWidget):
         self.lneSliceIntensityStart.setText("")
         self.lneSliceIntensityEnd.setText("")
         self.rdoSliceNormToOne.setChecked(0)
+        self.cmbSliceUnits.setCurrentIndex(self._en_unit_index[self._en_default])
         self._minimumStep = {}
 
     def disable(self):
@@ -215,6 +207,7 @@ class SliceWidget(SliceView, QWidget):
         self.rdoSliceNormToOne.setEnabled(False)
         self.btnSliceDisplay.setEnabled(False)
         self.cmbSliceColormap.setEnabled(False)
+        self.cmbSliceUnits.setEnabled(False)
 
     def enable(self):
         self.cmbSliceXAxis.setEnabled(True)
@@ -230,12 +223,16 @@ class SliceWidget(SliceView, QWidget):
         self.rdoSliceNormToOne.setEnabled(True)
         self.btnSliceDisplay.setEnabled(True)
         self.cmbSliceColormap.setEnabled(True)
+        self.cmbSliceUnits.setEnabled(True)
 
     def set_validators(self):
         line_edits = [self.lneSliceXStart, self.lneSliceXEnd, self.lneSliceXStep, self.lneSliceYStart,
                       self.lneSliceYEnd, self.lneSliceYStep, self.lneSliceIntensityStart, self.lneSliceIntensityEnd]
         for line_edit in line_edits:
             line_edit.setValidator(QDoubleValidator())
+
+    def set_units_default(self, val):
+        self._en_default = val
 
     def clear_displayed_error(self):
         self._display_error("")

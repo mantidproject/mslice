@@ -40,6 +40,8 @@ class CutWidget(CutView, QWidget):
         self.lneCutStep.editingFinished.connect(self._step_edited)
         self.enable_integration_axis(False)
         self.set_validators()
+        self._en_default = 'meV'
+        self._en_unit_index = {'meV':0, 'cm-1':1}
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -122,6 +124,12 @@ class CutWidget(CutView, QWidget):
     def get_smoothing(self):
         return str(self.lneCutSmoothing.text())
 
+    def get_energy_units(self):
+        return self.cmbCutEUnits.currentText()
+
+    def set_energy_units_default(self, val):
+        self._en_default = val
+
     def set_cut_axis(self, axis_name):
         index = [ind for ind in range(self.cmbCutAxis.count()) if str(self.cmbCutAxis.itemText(ind)) == axis_name]
         if index:
@@ -172,6 +180,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutIntegrationWidth.setText("")
         self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
+        self.cmbCutEUnits.setCurrentIndex(self._en_unit_index[self._en_default])
 
     def is_fields_cleared(self):
         current_fields = self.get_input_fields()
@@ -191,6 +200,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutIntegrationWidth.setText(saved_input['integration_width'])
         self.lneCutSmoothing.setText(saved_input['smoothing'])
         self.rdoCutNormToOne.setChecked(saved_input['normtounity'])
+        self.cmbCutEUnits.setCurrentIndex(self._en_unit_index[saved_input['energy_unit']])
 
     def get_input_fields(self):
         saved_input = dict()
@@ -203,6 +213,7 @@ class CutWidget(CutView, QWidget):
         saved_input['integration_width'] = self.get_integration_width()
         saved_input['smoothing'] = self.get_smoothing()
         saved_input['normtounity'] = self.get_intensity_is_norm_to_one()
+        saved_input['energy_unit'] = self.get_energy_units()
         return saved_input
 
     def enable(self):
@@ -210,6 +221,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutEnd.setEnabled(True)
         self.lneCutStep.setEnabled(True)
         self.cmbCutAxis.setEnabled(True)
+        self.cmbCutEUnits.setEnabled(True)
 
         self.lneCutIntegrationStart.setEnabled(True)
         self.lneCutIntegrationEnd.setEnabled(True)
@@ -232,6 +244,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutEnd.setEnabled(False)
         self.lneCutStep.setEnabled(False)
         self.cmbCutAxis.setEnabled(False)
+        self.cmbCutEUnits.setEnabled(False)
 
         self.lneCutIntegrationStart.setEnabled(False)
         self.lneCutIntegrationEnd.setEnabled(False)

@@ -111,7 +111,6 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             workspace_selection = workspace_selection[0]
 
             self._slice_view.enable()
-            self._slice_view.enable_units_choice(non_psd)
             axis = get_available_axes(get_workspace_handle(workspace_selection))
             self._slice_view.populate_slice_x_options(axis)
             self._slice_view.populate_slice_y_options(axis[::-1])
