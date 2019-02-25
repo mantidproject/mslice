@@ -1,5 +1,6 @@
 class Axis(object):
-    def __init__(self, units, start, end, step):
+    def __init__(self, units, start, end, step, e_unit='meV'):
+        self.scale = 8.06554 if ('cm' in e_unit and 'DeltaE' in units) else 1.
         self.units = units
         self.start = float(start)
         self.end = float(end)
@@ -22,7 +23,7 @@ class Axis(object):
 
     @property
     def start(self):
-        return self._start
+        return self._start / self.scale
 
     @start.setter
     def start(self, value):
@@ -37,7 +38,7 @@ class Axis(object):
 
     @property
     def end(self):
-        return self._end
+        return self._end / self.scale
 
     @end.setter
     def end(self, value):
@@ -56,7 +57,7 @@ class Axis(object):
 
     @property
     def step(self):
-        return self._step
+        return self._step / self.scale
 
     @step.setter
     def step(self, value):
