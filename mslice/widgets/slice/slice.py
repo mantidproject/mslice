@@ -38,7 +38,9 @@ class SliceWidget(SliceView, QWidget):
         self.lneSliceYStep.editingFinished.connect(lambda: self._step_edited('y', self.lneSliceYStep))
         self.cmbSliceXAxis.currentIndexChanged.connect(lambda ind: self._change_axes(1, ind))
         self.cmbSliceYAxis.currentIndexChanged.connect(lambda ind: self._change_axes(2, ind))
+        self.cmbSliceUnits.currentIndexChanged.connect(self._change_unit)
         self.set_validators()
+        self._old_en = 'meV'
         self._en_default = 'meV'
         self._en_unit_index = {'meV':0, 'cm-1':1}
 
@@ -81,11 +83,36 @@ class SliceWidget(SliceView, QWidget):
             axes_set[other_axis](new_index)
         self._presenter.populate_slice_params()
 
+    def _scale_tuple(self, fac, *args):
+        return (str(float(x) * fac) for x in args) if all(args) else args
+
+    def _change_unit(self):
+        if 'DeltaE' in self.get_slice_x_axis():
+            x_start, x_end, x_step = self.get_slice_x_start(), self.get_slice_x_end(), self.get_slice_x_step()
+            if self._old_en != self.get_units():
+                if 'cm' in self._old_en:
+                    x_start, x_end, x_step = self._scale_tuple(1. / 8.06554, x_start, x_end, x_step)
+                else:
+                    x_start, x_end, x_step = self._scale_tuple(8.06554, x_start, x_end, x_step)
+            self.populate_slice_x_params(x_start, x_end, x_step)
+        else:
+            y_start, y_end, y_step = self.get_slice_y_start(), self.get_slice_y_end(), self.get_slice_y_step()
+            if self._old_en != self.get_units():
+                if 'cm' in self._old_en:
+                    y_start, y_end, y_step = self._scale_tuple(1. / 8.06554, y_start, y_end, y_step)
+                else:
+                    y_start, y_end, y_step = self._scale_tuple(8.06554, y_start, y_end, y_step)
+            self.populate_slice_y_params(y_start, y_end, y_step)
+        self._old_en = self.get_units()
+
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
 
     def get_units(self):
         return self.cmbSliceUnits.currentText()
+
+    def set_units(self, en_unit):
+        self.cmbSliceUnits.setCurrentIndex(self._en_unit_index[en_unit])
 
     def get_slice_x_axis(self):
         return str(self.cmbSliceXAxis.currentText())
@@ -231,8 +258,8 @@ class SliceWidget(SliceView, QWidget):
         for line_edit in line_edits:
             line_edit.setValidator(QDoubleValidator())
 
-    def set_units_default(self, val):
-        self._en_default = val
+    def set_energy_default(self, en_default):
+        self._en_default = en_default
 
     def clear_displayed_error(self):
         self._display_error("")

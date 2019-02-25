@@ -17,15 +17,15 @@ class SlicePlotterPresenter(PresenterUtility):
         self._slice_cache = {}
         self._sample_temp_fields = []
 
-    def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
+    def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap, e_units):
         workspace = get_workspace_handle(selected_ws)
-        self.create_slice(workspace, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap)
+        self.create_slice(workspace, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap, e_units)
         self.plot_from_cache(workspace)
 
-    def create_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
+    def create_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap, e_units):
         sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
-        slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
+        slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one, e_units)
         self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
         self._slice_cache[selected_ws.name].norm_to_one = norm_to_one
         return slice

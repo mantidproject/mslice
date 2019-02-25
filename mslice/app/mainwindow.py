@@ -12,6 +12,8 @@ from mslice.widgets.workspacemanager import TAB_2D, TAB_EVENT, TAB_HISTO, TAB_NO
 from mslice.widgets.workspacemanager.command import Command as ws_command
 from mslice.widgets.cut.command import Command as cut_command
 
+from functools import partial
+
 TAB_SLICE = 1
 TAB_CUT = 2
 TAB_POWDER = 0
@@ -79,8 +81,8 @@ class MainWindow(MainView, QMainWindow):
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
         self.action_quit.triggered.connect(self.close)
-        self.actionmeV.triggered.connect(self.set_meV_default)
-        self.actioncm.triggered.connect(self.set_cm_default)
+        self.actionmeV.triggered.connect(partial(self.set_energy_default, self.actionmeV, self.actioncm))
+        self.actioncm.triggered.connect(partial(self.set_energy_default, self.actioncm, self.actionmeV))
 
     def setup_save(self):
         menu = QMenu()
@@ -177,12 +179,12 @@ class MainWindow(MainView, QMainWindow):
             return
         QApplication.processEvents()
 
-    def set_meV_default(self):
-        self.actioncm.setChecked(False)
-        self.wgtCut.set_energy_units_default('meV')
-        self.wgtSlice.set_units_default('meV')
+    def get_energy_default(self):
+        return 'meV' if self.actionmeV.isChecked() else 'cm-1'
 
-    def set_cm_default(self):
-        self.actionmeV.setChecked(False)
-        self.wgtCut.set_energy_units_default('cm-1')
-        self.wgtSlice.set_units_default('cm-1')
+    def set_energy_default(self, action_trigger, action_other):
+        if action_trigger.isChecked():
+            action_other.setChecked(False)
+        else:
+            action_other.setChecked(True)
+        self._presenter.set_energy_default(self.get_energy_default())

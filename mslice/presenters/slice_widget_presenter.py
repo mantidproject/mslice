@@ -27,6 +27,7 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         self._slice_view = slice_view
         self._main_presenter = None
         self._slice_plotter_presenter = None
+        self._en_default = 'meV'
 
     def set_slice_plotter_presenter(self, slice_plotter_presenter):
         self._slice_plotter_presenter = slice_plotter_presenter
@@ -56,9 +57,10 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
         norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
         colourmap = self._slice_view.get_slice_colourmap()
+        e_units = self._slice_view.get_units()
 
         self._plot_slice(selected_workspace, x_axis, y_axis, intensity_start, intensity_end,
-                         norm_to_one, colourmap)
+                         norm_to_one, colourmap, e_units)
 
     def _plot_slice(self, *args):
         try:
@@ -107,9 +109,7 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
         else:
-            non_psd = all([not get_workspace_handle(ws).is_PSD for ws in workspace_selection])
             workspace_selection = workspace_selection[0]
-
             self._slice_view.enable()
             axis = get_available_axes(get_workspace_handle(workspace_selection))
             self._slice_view.populate_slice_x_options(axis)
@@ -125,9 +125,19 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
         else:
+            if 'cm' in self._slice_view.get_units():
+                if 'DeltaE' in self._slice_view.get_slice_x_axis():
+                    x_min, x_max, x_step = (x * 8.06554 for x in (x_min, x_max, x_step))
+                else:
+                    y_min, y_max, y_step = (x * 8.06554 for x in (y_min, y_max, y_step))
             self._slice_view.enable()
             self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
             self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])
 
     def update_workspaces(self):
         self._main_presenter.update_displayed_workspaces()
+
+    def set_energy_default(self, en_default):
+        self._en_default = en_default
+        self._slice_view.set_energy_default(en_default)
+        self._slice_view.set_units(en_default)

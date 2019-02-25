@@ -26,11 +26,11 @@ crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.
                      'Tantalum': ['3.3013 3.3013 3.3013', 'I m -3 m', 'Ta 0 0 0 1.0 0.05']}
 
 
-def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
+def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one, e_units):
     workspace = get_workspace_handle(selected_workspace)
     slice = mantid_algorithms.Slice(OutputWorkspace='__' + workspace.name, InputWorkspace=workspace,
                                     XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
-                                    EMode=workspace.e_mode, NormToOne=norm_to_one)
+                                    EMode=workspace.e_mode, NormToOne=norm_to_one, EnergyUnit=e_units)
     propagate_properties(workspace, slice)
     if norm_to_one:
         slice = _norm_to_one(slice)
