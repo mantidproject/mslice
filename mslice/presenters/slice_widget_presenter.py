@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
+from mslice.models.units import EnergyUnits
 from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice_functions import is_sliceable
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -125,11 +126,12 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
         else:
-            if 'cm' in self._slice_view.get_units():
+            e_units = EnergyUnits(self._slice_view.get_units())
+            if e_units.factor_from_meV() != 1.:
                 if 'DeltaE' in self._slice_view.get_slice_x_axis():
-                    x_min, x_max, x_step = (x * 8.06554 for x in (x_min, x_max, x_step))
+                    x_min, x_max, x_step = e_units.from_meV(x_min, x_max, x_step)
                 else:
-                    y_min, y_max, y_step = (x * 8.06554 for x in (y_min, y_max, y_step))
+                    y_min, y_max, y_step = e_units.from_meV(y_min, y_max, y_step)
             self._slice_view.enable()
             self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
             self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])

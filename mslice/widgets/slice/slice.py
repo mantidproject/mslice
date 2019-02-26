@@ -10,6 +10,7 @@ from mslice.util.qt.QtGui import QDoubleValidator
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
 
+from mslice.models.units import EnergyUnits
 from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
 from mslice.views.interfaces.slice_view import SliceView
 from .command import Command
@@ -40,9 +41,8 @@ class SliceWidget(SliceView, QWidget):
         self.cmbSliceYAxis.currentIndexChanged.connect(lambda ind: self._change_axes(2, ind))
         self.cmbSliceUnits.currentIndexChanged.connect(self._change_unit)
         self.set_validators()
-        self._old_en = 'meV'
+        self._old_en = EnergyUnits('meV')
         self._en_default = 'meV'
-        self._en_unit_index = {'meV':0, 'cm-1':1}
 
     def get_presenter(self):
         return self._presenter
@@ -83,27 +83,18 @@ class SliceWidget(SliceView, QWidget):
             axes_set[other_axis](new_index)
         self._presenter.populate_slice_params()
 
-    def _scale_tuple(self, fac, *args):
-        return (str(float(x) * fac) for x in args) if all(args) else args
-
     def _change_unit(self):
-        if 'DeltaE' in self.get_slice_x_axis():
-            x_start, x_end, x_step = self.get_slice_x_start(), self.get_slice_x_end(), self.get_slice_x_step()
-            if self._old_en != self.get_units():
-                if 'cm' in self._old_en:
-                    x_start, x_end, x_step = self._scale_tuple(1. / 8.06554, x_start, x_end, x_step)
-                else:
-                    x_start, x_end, x_step = self._scale_tuple(8.06554, x_start, x_end, x_step)
-            self.populate_slice_x_params(x_start, x_end, x_step)
-        else:
-            y_start, y_end, y_step = self.get_slice_y_start(), self.get_slice_y_end(), self.get_slice_y_step()
-            if self._old_en != self.get_units():
-                if 'cm' in self._old_en:
-                    y_start, y_end, y_step = self._scale_tuple(1. / 8.06554, y_start, y_end, y_step)
-                else:
-                    y_start, y_end, y_step = self._scale_tuple(8.06554, y_start, y_end, y_step)
-            self.populate_slice_y_params(y_start, y_end, y_step)
-        self._old_en = self.get_units()
+        new_unit = self.get_units()
+        if self._old_en.factor_to(new_unit) != 1.:
+            if 'DeltaE' in self.get_slice_x_axis():
+                x_start, x_end, x_step = self.get_slice_x_start(), self.get_slice_x_end(), self.get_slice_x_step()
+                x_start, x_end, x_step = self._old_en.convert_to(new_unit, x_start, x_end, x_step)
+                self.populate_slice_x_params(x_start, x_end, x_step)
+            elif 'DeltaE' in self.get_slice_y_axis():
+                y_start, y_end, y_step = self.get_slice_y_start(), self.get_slice_y_end(), self.get_slice_y_step()
+                y_start, y_end, y_step = self._old_en.convert_to(new_unit, y_start, y_end, y_step)
+                self.populate_slice_y_params(y_start, y_end, y_step)
+        self._old_en = EnergyUnits(new_unit)
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
@@ -112,7 +103,7 @@ class SliceWidget(SliceView, QWidget):
         return self.cmbSliceUnits.currentText()
 
     def set_units(self, en_unit):
-        self.cmbSliceUnits.setCurrentIndex(self._en_unit_index[en_unit])
+        self.cmbSliceUnits.setCurrentIndex(EnergyUnits.get_index(en_unit))
 
     def get_slice_x_axis(self):
         return str(self.cmbSliceXAxis.currentText())
@@ -217,7 +208,7 @@ class SliceWidget(SliceView, QWidget):
         self.lneSliceIntensityStart.setText("")
         self.lneSliceIntensityEnd.setText("")
         self.rdoSliceNormToOne.setChecked(0)
-        self.cmbSliceUnits.setCurrentIndex(self._en_unit_index[self._en_default])
+        self.cmbSliceUnits.setCurrentIndex(EnergyUnits.get_index(self._en_default))
         self._minimumStep = {}
 
     def disable(self):

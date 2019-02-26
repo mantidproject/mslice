@@ -3,6 +3,7 @@ from mantid.kernel import Direction, StringMandatoryValidator, PropertyManagerPr
 from mantid.simpleapi import BinMD, Rebin2D, ConvertSpectrumAxis, SofQW3, TransformMD, ScaleX
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.axis import Axis
+from mslice.models.units import EnergyUnits
 
 
 class Slice(PythonAlgorithm):
@@ -22,6 +23,7 @@ class Slice(PythonAlgorithm):
     def PyExec(self):
         workspace = self.getProperty('InputWorkspace').value
         e_unit = self.getProperty('EnergyUnit').value
+        e_scale = EnergyUnits(e_unit).factor_from_meV()
         x_dict = self.getProperty('XAxis').value
         x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value, e_unit)
         y_dict = self.getProperty('YAxis').value
@@ -30,15 +32,15 @@ class Slice(PythonAlgorithm):
         if self.getProperty('PSD').value:
             slice = self._compute_slice_PSD(workspace, x_axis, y_axis, norm_to_one)
             e_axis = 0 if 'DeltaE' in x_axis.units else (1 if 'DeltaE' in y_axis.units else None)
-            if 'cm' in e_unit and e_axis is not None:
-                scale = [1, 8.06554] if e_axis == 1 else [8.06544, 1]
+            if e_axis is not None and e_scale != 1.:
+                scale = [1., e_scale] if e_axis == 1 else [e_scale, 1.]
                 slice = TransformMD(InputWorkspace=slice, Scaling=scale)
                 slice.setComment('MSlice_in_wavenumber')
         else:
             e_mode = self.getProperty('EMode').value
             slice = self._compute_slice_nonPSD(workspace, x_axis, y_axis, e_mode, norm_to_one)
-            if 'cm' in e_unit:
-                slice = ScaleX(InputWorkspace=slice, Factor=8.06554, Operation='Multiply', StoreInADS=False)
+            if e_scale != 1.:
+                slice = ScaleX(InputWorkspace=slice, Factor=e_scale, Operation='Multiply', StoreInADS=False)
                 slice.setComment('MSlice_in_wavenumber')
         self.setProperty('OutputWorkspace', slice)
 
