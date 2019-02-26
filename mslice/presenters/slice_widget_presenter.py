@@ -58,10 +58,9 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
         norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
         colourmap = self._slice_view.get_slice_colourmap()
-        e_units = self._slice_view.get_units()
 
         self._plot_slice(selected_workspace, x_axis, y_axis, intensity_start, intensity_end,
-                         norm_to_one, colourmap, e_units)
+                         norm_to_one, colourmap)
 
     def _plot_slice(self, *args):
         try:
@@ -85,11 +84,13 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def _x_axis(self):
         return Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
-                    self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step())
+                    self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step(),
+                    self._slice_view.get_units())
 
     def _y_axis(self):
         return Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
-                    self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step())
+                    self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step(),
+                    self._slice_view.get_units())
 
     def _intensity(self):
         intensity_start = self._slice_view.get_slice_intensity_start()

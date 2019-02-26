@@ -2,6 +2,7 @@ from mslice.models.units import EnergyUnits
 
 class Axis(object):
     def __init__(self, units, start, end, step, e_unit='meV'):
+        self.e_unit = str(e_unit)
         self.scale = EnergyUnits(e_unit).factor_to_meV() if ('DeltaE' in units) else 1.
         self.units = units
         self.start = float(start)
@@ -9,7 +10,7 @@ class Axis(object):
         self.step = float(step)
 
     def to_dict(self):
-        return {'start': self.start, 'end': self.end, 'step': self.step, 'units': self.units}
+        return {'start': self.start, 'end': self.end, 'step': self.step, 'units': self.units, 'e_unit': self.e_unit}
 
     def __str__(self):
         return "{},{},{},{}".format(self.units, self.start, self.end, self.step)
@@ -25,7 +26,7 @@ class Axis(object):
 
     @property
     def start(self):
-        return self._start * self.scale
+        return self._start
 
     @start.setter
     def start(self, value):
@@ -40,7 +41,7 @@ class Axis(object):
 
     @property
     def end(self):
-        return self._end * self.scale
+        return self._end
 
     @end.setter
     def end(self, value):
@@ -59,7 +60,7 @@ class Axis(object):
 
     @property
     def step(self):
-        return self._step * self.scale
+        return self._step
 
     @step.setter
     def step(self, value):
@@ -67,3 +68,16 @@ class Axis(object):
             self._step = float(value)
         except ValueError:
             raise ValueError("Invalid axis parameter on {}: Step {} is not a valid float!".format(self.units, value))
+
+    @property
+    def start_meV(self):
+        return self._start * self.scale
+
+    @property
+    def end_meV(self):
+        return self._end * self.scale
+
+    @property
+    def step_meV(self):
+        return self._step * self.scale
+
