@@ -260,3 +260,9 @@ class CutWidgetPresenterTest(unittest.TestCase):
             call(selected_workspaces[1], mock.ANY, save_only=False, plot_over=True),
         ]
         cut_plotter_presenter.run_cut.assert_has_calls(call_list)
+
+    def test_set_energy_default(self):
+        cut_widget_presenter = CutWidgetPresenter(self.view)
+        cut_widget_presenter.set_energy_default("meV")
+        self.view.set_energy_units.assert_called_once()
+        self.view.set_energy_units_default.assert_called_once()

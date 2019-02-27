@@ -44,3 +44,8 @@ class MainPresenterInterface(object):
     @abc.abstractmethod
     def show_tab_for_workspace(self, ws):
         pass
+
+    @abc.abstractmethod
+    def subscribe_to_energy_default_monitor(self, client):
+        pass
+

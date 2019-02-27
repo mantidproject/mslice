@@ -15,7 +15,7 @@ class MainPresenterTests(unittest.TestCase):
         self.workspace_presenter = mock.create_autospec(WorkspaceManagerPresenterInterface)
         self.workspace_presenter.get_selected_workspaces = mock.Mock(return_value=SELECTED_WORKSPACES)
 
-    def test_consturctor_sucess(self):
+    def test_constructor_sucess(self):
         subpresenters = [mock.Mock() for i in range(10)]
         main_presenter = MainPresenter(self.mainview, *subpresenters)
         for presenter in subpresenters:
@@ -60,3 +60,22 @@ class MainPresenterTests(unittest.TestCase):
         main_presenter.register_workspace_selector(self.workspace_presenter)
         main_presenter.update_displayed_workspaces()
         self.workspace_presenter.update_displayed_workspaces.assert_called_with()
+
+    def test_set_energy_default(self):
+        main_presenter = MainPresenter(self.mainview)
+        clients = [[mock.Mock(), True], [mock.Mock(), False], [mock.Mock(), True]]
+        for client, enable in clients:
+            if not enable:
+                client.set_energy_default = mock.NonCallableMagicMock()
+            main_presenter.subscribe_to_energy_default_monitor(client)
+        
+        for client, enable in clients:
+            client.set_energy_default.assert_not_called()
+
+        main_presenter.set_energy_default('meV')
+        for client, enable in clients:
+            if enable:
+                client.set_energy_default.assert_called_once()
+            else:
+                client.set_energy_default.assert_not_called()
+

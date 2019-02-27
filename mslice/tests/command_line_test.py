@@ -228,7 +228,8 @@ class CommandLineTest(unittest.TestCase):
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
-    def test_that_make_current_works_on_figure_number(self, gfm, is_gui):
+    @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
+    def test_that_make_current_works_on_figure_number(self, cpp, gfm, is_gui):
         is_gui.return_value = True
         gfm.set_figure_as_current = mock.Mock()
         workspace = self.create_workspace('test_make_current')

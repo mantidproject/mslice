@@ -165,11 +165,19 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         dims = ['dim1', 'dim2']
         get_available_axes_mock.return_value = dims
         get_axis_range_mock.return_value = (0, 1, 0.1)
+        self.slice_view.get_units = mock.Mock(side_effect=['meV', 'cm-1', 'cm-1'])
         slice_widget_presenter.workspace_selection_changed()
+        assert (self.slice_view.get_slice_x_axis.call_count == 1)
         assert (self.slice_view.populate_slice_x_options.called)
         assert (self.slice_view.populate_slice_y_options.called)
         assert (get_available_axes_mock.called)
         assert (get_axis_range_mock.called)
+        # Test energy unit conversion is different for second call
+        slice_widget_presenter.workspace_selection_changed()
+        self.slice_view.get_slice_x_axis.assert_called()
+        self.slice_view.get_slice_x_axis.return_value = 'DeltaE'
+        slice_widget_presenter.workspace_selection_changed()
+        assert (self.slice_view.get_slice_x_axis.call_count == 5)
         # Test error handling
         get_axis_range_mock.side_effect = KeyError
         slice_widget_presenter.workspace_selection_changed()
@@ -188,3 +196,9 @@ class SliceWidgetPresenterTest(unittest.TestCase):
                 pass
             self.slice_view.clear_displayed_error.assert_called()
             self.slice_view.reset_mock()
+
+    def test_set_energy_default(self):
+        slice_presenter = SliceWidgetPresenter(self.slice_view)
+        slice_presenter.set_energy_default("meV")
+        self.slice_view.set_units.assert_called_once()
+        self.slice_view.set_energy_default.assert_called_once()

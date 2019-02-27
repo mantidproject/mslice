@@ -151,8 +151,8 @@ class CutWidget(CutView, QWidget):
     def set_energy_units(self, unit):
         self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(unit))
 
-    def set_energy_units_default(self, val):
-        self._en_default = val
+    def set_energy_units_default(self, unit):
+        self._en_default = unit
 
     def set_cut_axis(self, axis_name):
         index = [ind for ind in range(self.cmbCutAxis.count()) if str(self.cmbCutAxis.itemText(ind)) == axis_name]
