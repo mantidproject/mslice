@@ -1,5 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
-from .base import WorkspaceBase
+from .base import WorkspaceBase, attribute_from_comment
 from .histo_mixin import HistoMixin
 from .workspace_mixin import WorkspaceMixin
 from .workspace import Workspace
@@ -19,10 +19,13 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         self.name = name
         self._cut_params = {}
         self.is_PSD = None
+        self.axes = []
+        attribute_from_comment(self, mantid_ws)
 
     def rewrap(self, ws):
         new_ws = HistogramWorkspace(ws, self.name)
         new_ws.is_PSD = self.is_PSD
+        new_ws.axes = self.axes
         return new_ws
 
     def convert_to_matrix(self):

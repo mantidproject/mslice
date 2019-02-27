@@ -39,7 +39,7 @@ class CutPlotterPresenter(PresenterUtility):
         cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, store)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start,
                                  integration_axis.end)
-        plot_cut_impl(cut_ws, cut_axis.units, (cut.intensity_start, cut.intensity_end), plot_over, legend)
+        plot_cut_impl(cut_ws, (cut.intensity_start, cut.intensity_end), plot_over, legend)
         if update_main:
             self.set_is_icut(workspace.name, False)
             self.update_main_window()
@@ -71,8 +71,7 @@ class CutPlotterPresenter(PresenterUtility):
     def plot_cut_from_workspace(self, workspace, plot_over=False, intensity_range=None):
 
         workspace = get_workspace_handle(workspace)
-        lines = plot_cut_impl(workspace, workspace.raw_ws.getDimension(0).getUnits(),
-                              intensity_range=intensity_range, plot_over=plot_over)
+        lines = plot_cut_impl(workspace, intensity_range=intensity_range, plot_over=plot_over)
         self.set_is_icut(workspace.name, False)
         return lines
 

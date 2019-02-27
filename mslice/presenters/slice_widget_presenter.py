@@ -130,9 +130,9 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             e_units = EnergyUnits(self._slice_view.get_units())
             if e_units.factor_from_meV() != 1.:
                 if 'DeltaE' in self._slice_view.get_slice_x_axis():
-                    x_min, x_max, x_step = e_units.from_meV(x_min, x_max, x_step)
+                    x_min, x_max, x_step = (float(v) for v in e_units.from_meV(x_min, x_max, x_step))
                 else:
-                    y_min, y_max, y_step = e_units.from_meV(y_min, y_max, y_step)
+                    y_min, y_max, y_step = (float(v) for v in e_units.from_meV(y_min, y_max, y_step))
             self._slice_view.enable()
             self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
             self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])

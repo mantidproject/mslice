@@ -4,6 +4,7 @@ from mantid.simpleapi import BinMD, Rebin2D, ConvertSpectrumAxis, SofQW3, Transf
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.axis import Axis
 from mslice.models.units import EnergyUnits
+from mslice.workspace.base import attribute_to_comment
 
 
 class Slice(PythonAlgorithm):
@@ -33,13 +34,12 @@ class Slice(PythonAlgorithm):
             if e_axis is not None and e_scale != 1.:
                 scale = [1., e_scale] if e_axis == 1 else [e_scale, 1.]
                 slice = TransformMD(InputWorkspace=slice, Scaling=scale)
-                slice.setComment('MSlice_in_wavenumber')
         else:
             e_mode = self.getProperty('EMode').value
             slice = self._compute_slice_nonPSD(workspace, x_axis, y_axis, e_mode, norm_to_one)
             if e_scale != 1.:
                 slice = ScaleX(InputWorkspace=slice, Factor=e_scale, Operation='Multiply', StoreInADS=False)
-                slice.setComment('MSlice_in_wavenumber')
+        attribute_to_comment({'axes': [x_axis, y_axis]}, slice)
         self.setProperty('OutputWorkspace', slice)
 
     def category(self):

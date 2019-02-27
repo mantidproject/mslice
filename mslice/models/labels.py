@@ -2,6 +2,7 @@
 
 from __future__ import (absolute_import, division, print_function)
 from mslice.util import MPL_COMPAT
+from mslice.models.units import EnergyUnits
 
 CUT_INTENSITY_LABEL = 'Signal/#Events'
 recoil_labels = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium'}
@@ -21,19 +22,16 @@ def get_recoil_key(label):
     return label
 
 
-def get_display_name(axisUnits, comment=None):
-    if 'DeltaE' in axisUnits:
+def get_display_name(axis):
+    if 'DeltaE' in axis.units:
+        return EnergyUnits(axis.e_unit).label()
+    elif 'MomentumTransfer' in axis.units or '|Q|' in axis.units:
         # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX
-        if MPL_COMPAT:
-            return 'Energy Transfer ' + ('(cm-1)' if (comment and 'wavenumber' in comment) else '(meV)')
-        else:
-            return 'Energy Transfer ' + ('(cm$^{-1}$)' if (comment and 'wavenumber' in comment) else '(meV)')
-    elif 'MomentumTransfer' in axisUnits or '|Q|' in axisUnits:
         return '|Q| (recip. Ang.)' if MPL_COMPAT else r'$|Q|$ ($\mathrm{\AA}^{-1}$)'
-    elif '2Theta' in axisUnits:
+    elif '2Theta' in axis.units:
         return 'Scattering Angle (degrees)' if MPL_COMPAT else r'Scattering Angle 2$\theta$ ($^{\circ}$)'
     else:
-        return axisUnits
+        return axis.units
 
 
 def generate_legend(workspace_name, integrated_dim, integration_start, integration_end):

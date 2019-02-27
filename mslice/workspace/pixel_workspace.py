@@ -1,5 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
-from .base import WorkspaceBase
+from .base import WorkspaceBase, attribute_from_comment
 from .histogram_workspace import HistogramWorkspace
 from .pixel_mixin import PixelMixin
 from .workspace_mixin import WorkspaceMixin
@@ -27,10 +27,13 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
         self.is_PSD = None
         self.e_mode = None
         self.e_fixed = None
+        self.axes = []
+        attribute_from_comment(self, mantid_ws)
 
     def rewrap(self, ws):
         new_ws = PixelWorkspace(ws, self.name)
         new_ws.is_PSD = self.is_PSD
         new_ws.e_mode = self.e_mode
         new_ws.e_fixed = self.e_fixed
+        new_ws.axes = self.axes
         return new_ws

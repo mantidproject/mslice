@@ -1,10 +1,12 @@
 
 from mantid.api import PythonAlgorithm, WorkspaceProperty
 from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator
-from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3
+from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
+from mslice.models.units import EnergyUnits
+from mslice.workspace.base import attribute_to_comment
 from .cut_normalisation import normalize_workspace
 
 
@@ -24,13 +26,18 @@ class Cut(PythonAlgorithm):
     def PyExec(self):
         workspace = self.getProperty('InputWorkspace').value
         cut_dict = self.getProperty('CutAxis').value
-        cut_axis = Axis(cut_dict['units'].value, cut_dict['start'].value, cut_dict['end'].value, cut_dict['step'].value)
+        cut_axis = Axis(cut_dict['units'].value, cut_dict['start'].value, cut_dict['end'].value, cut_dict['step'].value,
+                        cut_dict['e_unit'].value)
         int_dict = self.getProperty('IntegrationAxis').value
-        int_axis = Axis(int_dict['units'].value, int_dict['start'].value, int_dict['end'].value, int_dict['step'].value)
+        int_axis = Axis(int_dict['units'].value, int_dict['start'].value, int_dict['end'].value, int_dict['step'].value,
+                        int_dict['e_unit'].value)
         e_mode = self.getProperty('EMode').value
         PSD = self.getProperty('PSD').value
         norm_to_one = self.getProperty('NormToOne').value
         cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one)
+        if 'DeltaE' in cut_axis.units and cut_axis.scale != 1.:
+            cut = TransformMD(InputWorkspace=cut, Scaling=[EnergyUnits(cut_axis.e_unit).factor_from_meV()])
+        attribute_to_comment({'axes':[cut_axis, int_axis]}, cut)
         self.setProperty('OutputWorkspace', cut)
 
     def category(self):
@@ -49,18 +56,18 @@ def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_
 def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis):
     fill_in_missing_input(cut_axis, selected_workspace)
     n_steps = get_number_of_steps(cut_axis)
-    cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start, cut_axis.end, n_steps)))
-    integration_binning = integration_axis.units + "," + str(integration_axis.start) + "," + \
-        str(integration_axis.end) + ",1"
+    cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start_meV, cut_axis.end_meV, n_steps)))
+    integration_binning = integration_axis.units + "," + str(integration_axis.start_meV) + "," + \
+        str(integration_axis.end_meV) + ",1"
 
     return BinMD(InputWorkspace=selected_workspace, AxisAligned="1", AlignedDim1=integration_binning,
                  AlignedDim0=cut_binning, StoreInADS=False)
 
 
 def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
-    cut_binning = " ,".join(map(str, (cut_axis.start, cut_axis.step, cut_axis.end)))
-    int_binning = " ,".join(map(str, (integration_axis.start, integration_axis.end - integration_axis.start,
-                                      integration_axis.end)))
+    cut_binning = " ,".join(map(str, (cut_axis.start_meV, cut_axis.step_meV, cut_axis.end_meV)))
+    int_binning = " ,".join(map(str, (integration_axis.start_meV, integration_axis.end_meV - integration_axis.start_meV,
+                                      integration_axis.end_meV)))
     idx = 0
     unit = 'DeltaE'
     name = 'EnergyTransfer'

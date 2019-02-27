@@ -8,7 +8,6 @@ from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_n
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
 from mslice.util.mantid.mantid_algorithms import Transpose
-from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mantid.plots import plotfunctions
 from mslice.views.slice_plotter import create_slice_figure
@@ -35,7 +34,6 @@ def errorbar(axes, workspace, *args, **kwargs):
 
     plot_over = kwargs.pop('plot_over', True)
     intensity_range = kwargs.pop('intensity_range', (None, None))
-    x_units = kwargs.pop('x_units', 'None')
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
 
@@ -45,7 +43,7 @@ def errorbar(axes, workspace, *args, **kwargs):
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
         leg = axes.legend(fontsize='medium')
         leg.draggable()
-    axes.set_xlabel(get_display_name(x_units, get_comment(workspace)), picker=CUT_PICKER_TOL_PTS)
+    axes.set_xlabel(get_display_name(workspace.axes[0]), picker=CUT_PICKER_TOL_PTS)
     axes.set_ylabel(CUT_INTENSITY_LABEL, picker=CUT_PICKER_TOL_PTS)
     if not plot_over:
         cur_canvas.set_window_title(workspace.name)
@@ -108,12 +106,11 @@ def pcolormesh(axes, workspace, *args, **kwargs):
     axes.set_title(workspace.name[2:], picker=SLICE_PICKER_TOL_PTS)
     x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
     y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
-    comment = get_comment(str(workspace.name))
     axes.get_xaxis().set_units(x_axis.units)
     axes.get_yaxis().set_units(y_axis.units)
     # labels
-    axes.set_xlabel(get_display_name(x_axis.units, comment), picker=SLICE_PICKER_TOL_PTS)
-    axes.set_ylabel(get_display_name(y_axis.units, comment), picker=SLICE_PICKER_TOL_PTS)
+    axes.set_xlabel(get_display_name(x_axis), picker=SLICE_PICKER_TOL_PTS)
+    axes.set_ylabel(get_display_name(y_axis), picker=SLICE_PICKER_TOL_PTS)
     axes.set_xlim(x_axis.start, x_axis.end)
     axes.set_ylim(y_axis.start, y_axis.end)
     return axes.collections[0]  # Quadmesh object

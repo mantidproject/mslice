@@ -1,5 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
-from .base import WorkspaceBase
+from .base import WorkspaceBase, attribute_from_comment
 from .workspace_mixin import WorkspaceMixin
 
 from mantid.api import MatrixWorkspace
@@ -20,6 +20,8 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
         self.is_PSD = None
         self.e_mode = None
         self.e_fixed = None
+        self.axes = []
+        attribute_from_comment(self, mantid_ws)
 
     def rewrap(self, mantid_ws):
         new_ws = Workspace(mantid_ws, self.name)
@@ -28,4 +30,5 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
         new_ws.e_fixed = self.e_fixed
         new_ws.ef_defined = self.ef_defined
         new_ws.limits = self.limits
+        new_ws.axes = self.axes
         return new_ws

@@ -1,5 +1,26 @@
 import abc
+import pickle
+import codecs
 from six import add_metaclass
+
+def attribute_from_comment(ws, raw_ws):
+    comstr = raw_ws.getComment()
+    if comstr:
+        try:
+            attrdict = pickle.loads(codecs.decode(comstr.encode(), 'base64'))
+        except ValueError:
+            pass
+        else:
+            raw_ws.setComment(attrdict.pop('comment', ''))
+            for (k, v) in list(attrdict.items()):
+                if hasattr(ws, k):
+                    setattr(ws, k, v)
+
+def attribute_to_comment(attrdict, raw_ws):
+    comstr = raw_ws.getComment()
+    if 'comment' not in attrdict.keys() and comstr:
+        attrdict['comment'] = comstr
+    raw_ws.setComment(str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()))
 
 
 @add_metaclass(abc.ABCMeta)

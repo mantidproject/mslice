@@ -80,4 +80,3 @@ class Axis(object):
     @property
     def step_meV(self):
         return self._step * self.scale
-

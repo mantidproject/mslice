@@ -25,6 +25,7 @@ class CutWidgetPresenter(PresenterUtility):
         self._previous_cut = None
         self._previous_axis = None
         self._minimumStep = dict()
+        self._en_default = 'meV'
 
     def set_cut_plotter_presenter(self, cut_plotter_presenter):
         self._cut_plotter_presenter = cut_plotter_presenter
@@ -73,11 +74,12 @@ class CutWidgetPresenter(PresenterUtility):
 
     def _parse_input(self):
         """Gets values entered by user. Validation is performed by the CutCache object."""
+        e_units = self._cut_view.get_energy_units()
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
-                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
+                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step(), e_units)
 
         integration_axis = Axis(self._cut_view.get_integration_axis(), self._cut_view.get_integration_start(),
-                                self._cut_view.get_integration_end(), 0.)
+                                self._cut_view.get_integration_end(), 0., e_units)
 
         intensity_start = self._cut_view.get_intensity_start()
         intensity_end = self._cut_view.get_intensity_end()
@@ -183,3 +185,8 @@ class CutWidgetPresenter(PresenterUtility):
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)
         self.update_integration_axis()
+
+    def set_energy_default(self, en_default):
+        self._en_default = en_default
+        self._cut_view.set_energy_units_default(en_default)
+        self._cut_view.set_energy_units(en_default)
