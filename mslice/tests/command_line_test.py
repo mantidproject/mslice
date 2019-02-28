@@ -96,9 +96,9 @@ class CommandLineTest(unittest.TestCase):
         result = MakeProjection(workspace, '|Q|', 'DeltaE')
         signal = result.get_signal()
         self.assertEqual(type(result), PixelWorkspace)
-        self.assertAlmostEqual(signal[0][0], 0, 4)
-        self.assertAlmostEqual(signal[0][11], 0.1753, 4)
-        self.assertAlmostEqual(signal[0][28], 0.4248, 4)
+        self.assertAlmostEqual(signal[0][0], 0, 3)
+        self.assertAlmostEqual(signal[0][11], 0.1753, 3)
+        self.assertAlmostEqual(signal[0][28], 0.4248, 3)
 
     @mock.patch('mslice.app.presenters.get_powder_presenter')
     def test_projection_fail_non_PSD(self, get_pp):
@@ -114,8 +114,8 @@ class CommandLineTest(unittest.TestCase):
         result = Slice(workspace)
         signal = result.get_signal()
         self.assertEqual(type(result), Workspace)
-        self.assertAlmostEqual(0.4250, signal[1][10], 4)
-        self.assertAlmostEqual(0.9250, signal[4][11], 4)
+        self.assertAlmostEqual(0.4250, signal[1][10], 3)
+        self.assertAlmostEqual(0.9250, signal[4][11], 3)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_non_psd_axes_specified(self, get_spp):
@@ -124,8 +124,8 @@ class CommandLineTest(unittest.TestCase):
         result = Slice(workspace, 'DeltaE,0,15,1', '|Q|,0,3,0.1')
         signal = result.get_signal()
         self.assertEqual(type(result), Workspace)
-        self.assertAlmostEqual(0.4250, signal[2][0], 4)
-        self.assertAlmostEqual(0.9250, signal[5][1], 4)
+        self.assertAlmostEqual(0.4250, signal[2][0], 3)
+        self.assertAlmostEqual(0.9250, signal[5][1], 3)
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.app.presenters.get_cut_plotter_presenter')
@@ -136,8 +136,8 @@ class CommandLineTest(unittest.TestCase):
         result = Cut(workspace)
         signal = result.get_signal()
         self.assertEqual(type(result), HistogramWorkspace)
-        self.assertAlmostEqual(1.1299, signal[5], 4)
-        self.assertAlmostEqual(1.375, signal[8], 4)
+        self.assertAlmostEqual(1.1299, signal[5], 3)
+        self.assertAlmostEqual(1.375, signal[8], 3)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_psd(self, get_spp):
