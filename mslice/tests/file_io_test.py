@@ -73,8 +73,6 @@ class FileIOTest(unittest.TestCase):
     def test_save_directory_cancelled(self, file_dialog_mock):
         file_dialog_mock.return_value = self.mock_dialog
         self.mock_dialog.exec_.return_value = False
-        with self.assertRaises(RuntimeError):
-            get_save_directory()
         self.mock_dialog.selectedFiles.assert_not_called()
         self.mock_dialog.selectedFilter.assert_not_called()
 

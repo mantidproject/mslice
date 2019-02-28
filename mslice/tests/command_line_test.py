@@ -189,20 +189,20 @@ class CommandLineTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             Cut(workspace)
 
-    @mock.patch('mslice.cli._mslice_commands.cli_slice_plotter_presenter')
-    def test_plot_slice(self, spp):
+    def test_plot_slice(self):
         slice_ws = Slice(self.create_pixel_workspace('test_plot_slice_cli'))
-        PlotSlice(slice_ws)
-        spp.plot_from_cache(slice_ws)
+        with mock.patch('mslice.app.presenters.cli_slice_plotter_presenter') as spp:
+            PlotSlice(slice_ws)
+        spp.plot_from_cache.assert_called_once_with(slice_ws)
 
-    @mock.patch('mslice.cli._mslice_commands.cli_slice_plotter_presenter')
-    def test_plot_slice_non_psd(self, spp):
+    def test_plot_slice_non_psd(self):
         slice_ws = Slice(self.create_workspace('test_plot_slice_non_psd_cli'))
-        PlotSlice(slice_ws)
-        spp.plot_from_cache(slice_ws)
+        with mock.patch('mslice.app.presenters.cli_slice_plotter_presenter') as spp:
+            PlotSlice(slice_ws)
+        spp.plot_from_cache.assert_called_once_with(slice_ws)
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
-    @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
+    @mock.patch('mslice.app.presenters.cli_cut_plotter_presenter')
     def test_plot_cut(self, cpp, is_gui):
         is_gui.return_value = True
         workspace = self.create_pixel_workspace('test_plot_cut_cli')
@@ -211,7 +211,7 @@ class CommandLineTest(unittest.TestCase):
         cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
-    @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
+    @mock.patch('mslice.app.presenters.cli_cut_plotter_presenter')
     def test_plot_cut_non_psd(self, cpp, is_gui):
         is_gui.return_value = True
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
@@ -221,8 +221,7 @@ class CommandLineTest(unittest.TestCase):
 
     @mock.patch('mantid.plots.plotfunctions.errorbar')
     @mock.patch('mslice.cli._mslice_commands.is_gui')
-    @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
-    def test_errorbar_command(self, cpp, is_gui, mantid_errorbar):
+    def test_errorbar_command(self, is_gui, mantid_errorbar):
         is_gui.return_value = True
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
@@ -260,7 +259,7 @@ class CommandLineTest(unittest.TestCase):
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
-    @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
+    @mock.patch('mslice.app.presenters.cli_cut_plotter_presenter')
     def test_that_make_current_works_on_figure_number(self, cpp, gfm, is_gui):
         is_gui.return_value = True
         gfm.set_figure_as_current = mock.Mock()
