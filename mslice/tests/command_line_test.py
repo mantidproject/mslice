@@ -96,9 +96,9 @@ class CommandLineTest(unittest.TestCase):
         result = MakeProjection(workspace, '|Q|', 'DeltaE')
         signal = result.get_signal()
         self.assertEqual(type(result), PixelWorkspace)
-        self.assertAlmostEqual(signal[0][0], 0, 3)
+        self.assertAlmostEqual(signal[0][0], 0, 2)
         self.assertAlmostEqual(signal[0][11], 0.175, 2)
-        self.assertAlmostEqual(signal[0][28], 0.4248, 3)
+        self.assertAlmostEqual(signal[0][28], 0.4248, 2)
 
     @mock.patch('mslice.app.presenters.get_powder_presenter')
     def test_projection_fail_non_PSD(self, get_pp):
@@ -136,8 +136,8 @@ class CommandLineTest(unittest.TestCase):
         result = Cut(workspace)
         signal = result.get_signal()
         self.assertEqual(type(result), HistogramWorkspace)
-        self.assertAlmostEqual(1.129, signal[5], 3)
-        self.assertAlmostEqual(1.375, signal[8], 3)
+        self.assertAlmostEqual(1.129, signal[5], 2)
+        self.assertAlmostEqual(1.375, signal[8], 2)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_psd(self, get_spp):
