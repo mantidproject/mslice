@@ -53,7 +53,6 @@ def add_plot_statements(script_lines, plot_handler):
 
 
 def add_slice_plot_statements(script_lines, plot_handler):
-    default_opts = plot_handler.default_options
     cache = plot_handler._slice_plotter_presenter._slice_cache
 
     slice = cache[plot_handler.ws_name]
@@ -64,25 +63,22 @@ def add_slice_plot_statements(script_lines, plot_handler):
     script_lines.append('slice_ws = mc.Slice(ws_{}, Axis1="{}", Axis2="{}", NormToOne={})\n\n'.format(
         plot_handler.ws_name.replace(".", "_"), momentum_axis, energy_axis, norm))
 
-    if default_opts['intensity'] is True:
-        intensity = _function_to_intensity[default_opts['intensity_method']]
-        if default_opts['temp_dependent']:
-            script_lines.append(
-                'mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}", temperature={})\n'.format(
-                    cache[plot_handler.ws_name].colourmap, intensity,
-                    default_opts['temp']))
+    if plot_handler.intensity is True:
+        intensity = _function_to_intensity[plot_handler.intensity_method]
+        if plot_handler.temp_dependent:
+            script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}", temperature={})\n'.format(
+                cache[plot_handler.ws_name].colourmap, intensity, plot_handler.temp))
         else:
             script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}")\n'.format(
                 cache[plot_handler.ws_name].colourmap, intensity))
     else:
-        script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap="{}")\n'.format(
-            cache[plot_handler.ws_name].colourmap))
+        script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap="{}")\n'.format(cache[plot_handler.ws_name].colourmap))
 
     script_lines.append("mesh.set_clim({}, {})\n".format(*plot_handler.colorbar_range))
     if plot_handler.colorbar_log:
-        min, max = plot_handler.colorbar_range[0], plot_handler.colorbar_range[1]
+        min, maximum = plot_handler.colorbar_range[0], plot_handler.colorbar_range[1]
         min = max(min, LOG_SCALE_MIN)
-        script_lines.append("mesh.set_norm(colors.LogNorm({}, {}))\n".format(min, max))
+        script_lines.append("mesh.set_norm(colors.LogNorm({}, {}))\n".format(min, maximum))
 
     script_lines.append("cb = plt.colorbar(mesh, ax=ax)\n")
     script_lines.append("cb.set_label('{}', labelpad=20, rotation=270, picker=5)\n".format(plot_handler.colorbar_label))
@@ -106,37 +102,30 @@ def add_overplot_statements(script_lines, plot_handler):
 
         if recoil:
             if element is None:
-                script_lines.append(
-                    "ax.recoil(workspace='{}', rmm={})\n".format(
-                        plot_handler.ws_name, rmm))
+                script_lines.append("ax.recoil(workspace='{}', rmm={})\n".format(plot_handler.ws_name, rmm))
             else:
-                script_lines.append(
-                    "ax.recoil(workspace='{}', element='{}')\n".format(
-                        plot_handler.ws_name, element))
+                script_lines.append("ax.recoil(workspace='{}', element='{}')\n".format(plot_handler.ws_name, element))
         else:
             if cif is None:
-                script_lines.append(
-                    "ax.bragg(workspace='{}', element='{}')\n".format(
-                        plot_handler.ws_name, element))
+                script_lines.append("ax.bragg(workspace='{}', element='{}')\n".format(plot_handler.ws_name, element))
 
             else:
-                script_lines.append(
-                    "ax.bragg(workspace='{}', cif='{}')\n".format(
-                        plot_handler.ws_name, cif))
+                script_lines.append("ax.bragg(workspace='{}', cif='{}')\n".format(plot_handler.ws_name, cif))
 
 
 def add_cut_plot_statements(script_lines, plot_handler):
     """Adds cut specific statements to the script"""
-    default_opts = plot_handler.default_options
 
     add_cut_lines(script_lines, plot_handler)
     add_plot_options(script_lines, plot_handler)
 
-    script_lines.append("ax.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
-        default_opts["xmin"]) if plot_handler.is_changed("x_log") else "")
+    if plot_handler.is_changed("x_log"):
+        script_lines.append("ax.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
+            plot_handler.x_axis_min))
 
-    script_lines.append("ax.set_yscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
-        default_opts["ymin"]) if plot_handler.is_changed("x_log") else "")
+    if plot_handler.is_changed("y_log"):
+        script_lines.append("ax.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10({}))))\n".format(
+            plot_handler.y_axis_min))
 
 
 def add_cut_lines(script_lines, plot_handler):
