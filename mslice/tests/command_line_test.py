@@ -97,7 +97,7 @@ class CommandLineTest(unittest.TestCase):
         signal = result.get_signal()
         self.assertEqual(type(result), PixelWorkspace)
         self.assertAlmostEqual(signal[0][0], 0, 3)
-        self.assertAlmostEqual(signal[0][11], 0.1753, 3)
+        self.assertAlmostEqual(signal[0][11], 0.175, 2)
         self.assertAlmostEqual(signal[0][28], 0.4248, 3)
 
     @mock.patch('mslice.app.presenters.get_powder_presenter')
@@ -136,7 +136,7 @@ class CommandLineTest(unittest.TestCase):
         result = Cut(workspace)
         signal = result.get_signal()
         self.assertEqual(type(result), HistogramWorkspace)
-        self.assertAlmostEqual(1.1299, signal[5], 3)
+        self.assertAlmostEqual(1.129, signal[5], 3)
         self.assertAlmostEqual(1.375, signal[8], 3)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
