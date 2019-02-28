@@ -114,8 +114,8 @@ class CommandLineTest(unittest.TestCase):
         result = Slice(workspace)
         signal = result.get_signal()
         self.assertEqual(type(result), Workspace)
-        self.assertAlmostEqual(0.4250, signal[1][10], 3)
-        self.assertAlmostEqual(0.9250, signal[4][11], 3)
+        self.assertAlmostEqual(0.425, signal[1][10], 2)
+        self.assertAlmostEqual(0.925, signal[4][11], 2)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_non_psd_axes_specified(self, get_spp):
@@ -124,8 +124,8 @@ class CommandLineTest(unittest.TestCase):
         result = Slice(workspace, 'DeltaE,0,15,1', '|Q|,0,3,0.1')
         signal = result.get_signal()
         self.assertEqual(type(result), Workspace)
-        self.assertAlmostEqual(0.4250, signal[2][0], 3)
-        self.assertAlmostEqual(0.9250, signal[5][1], 3)
+        self.assertAlmostEqual(0.425, signal[2][0], 2)
+        self.assertAlmostEqual(0.925, signal[5][1], 2)
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.app.presenters.get_cut_plotter_presenter')
