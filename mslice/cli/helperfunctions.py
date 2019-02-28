@@ -97,21 +97,22 @@ def _get_overplot_key(element, rmm):
 
 def _string_to_axis(string):
     axis = string.split(',')
-    if len(axis) != 4:
-        raise ValueError('axis should be specified in format <name>,<start>,<end>,<step_size>')
-    return Axis(axis[0], axis[1], axis[2], axis[3])
+    if len(axis) != 4 and len(axis) != 5:
+        raise ValueError('axis should be specified in format <name>,<start>,<end>,<step_size>(,<e_unit>)')
+    return Axis(axis[0], axis[1], axis[2], axis[3]) if len(axis) == 4 else Axis(*axis)
 
 
 def _string_to_integration_axis(string):
     """Allows step to be omitted and set to default value"""
     axis_str = string.split(',')
     if len(axis_str) < 3:
-        raise ValueError('axis should be specified in format <name>,<start>,<end>')
-    valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], 0)
-    try:
-        valid_axis.step = axis_str[3]
-    except IndexError:
-        valid_axis.step = valid_axis.end - valid_axis.start
+        raise ValueError('axis should be specified in format <name>,<start>,<end>(,<step>,<e_unit>)')
+    elif len(axis_str) == 3:
+        valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], str(float(axis_str[2]) - float(axis_str[1])))
+    elif len(axis_str) == 4:
+        valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], axis_str[3])
+    else:
+        valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], axis_str[3], axis_str[4])
     return valid_axis
 
 

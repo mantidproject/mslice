@@ -133,6 +133,8 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
             Either a string in format '<name>, <start>, <end>, <step_size>' e.g.
             'DeltaE,0,100,5'  or just the name e.g. 'DeltaE'. In that case, the
             start and end will default to the range in the data.
+            Optionally you can also specify the energy unit at the end e.g.
+            '<name>, <start>, <end>, <step>, cm-1'. Recognised energy units are 'meV' (default) and 'cm-1'
     :param NormToOne: if True the slice will be normalized to one.
     :return:
     """
@@ -158,6 +160,9 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
             'DeltaE,0,100,5' (step_size may be omitted for the integration axis)
             or just the name e.g. 'DeltaE'. In that case, the start and end will
             default to the full range of the data.
+            Optionally you can also specify the energy unit at the end e.g.
+            '<name>, <start>, <end>, <step>, cm-1', or '<name>, <start>, <end>, meV'
+            Recognised energy units are 'meV' (default) and 'cm-1'
     :param NormToOne: if True the cut will be normalized to one.
     :return:
     """

@@ -2,8 +2,8 @@ from mslice.models.units import EnergyUnits
 
 class Axis(object):
     def __init__(self, units, start, end, step, e_unit='meV'):
-        self.e_unit = str(e_unit)
-        self.scale = EnergyUnits(e_unit).factor_to_meV() if ('DeltaE' in units) else 1.
+        self.e_unit = str(e_unit).strip()
+        self.scale = EnergyUnits(self.e_unit).factor_to_meV() if ('DeltaE' in units) else 1.
         self.units = units
         self.start = float(start)
         self.end = float(end)
@@ -13,7 +13,8 @@ class Axis(object):
         return {'start': self.start, 'end': self.end, 'step': self.step, 'units': self.units, 'e_unit': self.e_unit}
 
     def __str__(self):
-        return "{},{},{},{}".format(self.units, self.start, self.end, self.step)
+        return "{},{},{},{}{}".format(self.units, self.start, self.end, self.step,
+                                      ",{}".format(self.e_unit) if self.not_meV else "")
 
     def __eq__(self, other):
         # This is required for Unit testing
@@ -22,7 +23,13 @@ class Axis(object):
 
     def __repr__(self):
         info = (self.units, self.start, self.end, self.step)
+        if self.not_meV:
+            info += (self.e_unit,)
         return "Axis(" + " ,".join(map(repr, info)) + ")"
+
+    @property
+    def not_meV(self):
+        return "DeltaE" in self.units and "meV" not in self.e_unit
 
     @property
     def start(self):

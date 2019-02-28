@@ -68,7 +68,7 @@ class MainPresenterTests(unittest.TestCase):
             if not enable:
                 client.set_energy_default = mock.NonCallableMagicMock()
             main_presenter.subscribe_to_energy_default_monitor(client)
-        
+
         for client, enable in clients:
             client.set_energy_default.assert_not_called()
 
@@ -78,4 +78,3 @@ class MainPresenterTests(unittest.TestCase):
                 client.set_energy_default.assert_called_once()
             else:
                 client.set_energy_default.assert_not_called()
-

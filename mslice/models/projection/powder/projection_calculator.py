@@ -8,9 +8,5 @@ class ProjectionCalculator(object):
         pass
 
     @abc.abstractmethod
-    def available_units(self):
-        pass
-
-    @abc.abstractmethod
-    def calculate_projection(self, input_workspace, axis1, axis2, units):
+    def calculate_projection(self, input_workspace, axis1, axis2):
         pass

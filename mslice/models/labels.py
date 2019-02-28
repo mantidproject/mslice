@@ -11,8 +11,6 @@ recoil_labels = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium'}
 MOD_Q_LABEL = '|Q|'
 THETA_LABEL = '2Theta'
 DELTA_E_LABEL = 'DeltaE'
-MEV_LABEL = 'meV'
-WAVENUMBER_LABEL = 'cm-1'
 
 
 def get_recoil_key(label):

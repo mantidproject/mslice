@@ -16,7 +16,6 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.powder_view = mock.create_autospec(PowderView)
         self.projection_calculator = mock.create_autospec(ProjectionCalculator)
         self.projection_calculator.configure_mock(**{'available_axes.return_value': ['|Q|', '2Theta', 'DeltaE']})
-        self.projection_calculator.configure_mock(**{'available_units.return_value': ['meV', 'cm-1']})
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview = mock.create_autospec(MainView)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)

@@ -48,4 +48,3 @@ class MainPresenterInterface(object):
     @abc.abstractmethod
     def subscribe_to_energy_default_monitor(self, client):
         pass
-

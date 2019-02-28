@@ -39,7 +39,7 @@ def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
 
 def axis_values(axis):
     """Compute a numpy array of bins for the given axis values"""
-    return np.linspace(axis.start, axis.end, get_number_of_steps(axis))
+    return np.linspace(axis.start_meV, axis.end_meV, get_number_of_steps(axis))
 
 
 def compute_boltzmann_dist(sample_temp, delta_e):

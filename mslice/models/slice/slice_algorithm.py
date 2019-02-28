@@ -26,17 +26,19 @@ class Slice(PythonAlgorithm):
         x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value, x_dict['e_unit'].value)
         y_dict = self.getProperty('YAxis').value
         y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value, y_dict['e_unit'].value)
-        e_scale = EnergyUnits(x_axis.e_unit).factor_from_meV()
+        e_axis = 0 if 'DeltaE' in x_axis.units else (1 if 'DeltaE' in y_axis.units else None)
+        if e_axis is not None:
+            e_scale = EnergyUnits(x_axis.e_unit if e_axis == 0 else y_axis.e_unit).factor_from_meV()
         norm_to_one = self.getProperty('NormToOne')
         if self.getProperty('PSD').value:
             slice = self._compute_slice_PSD(workspace, x_axis, y_axis, norm_to_one)
-            e_axis = 0 if 'DeltaE' in x_axis.units else (1 if 'DeltaE' in y_axis.units else None)
             if e_axis is not None and e_scale != 1.:
                 scale = [1., e_scale] if e_axis == 1 else [e_scale, 1.]
                 slice = TransformMD(InputWorkspace=slice, Scaling=scale)
         else:
             e_mode = self.getProperty('EMode').value
             slice = self._compute_slice_nonPSD(workspace, x_axis, y_axis, e_mode, norm_to_one)
+            # For non-PSD data one of the axes *must* be DeltaE
             if e_scale != 1.:
                 slice = ScaleX(InputWorkspace=slice, Factor=e_scale, Operation='Multiply', StoreInADS=False)
         attribute_to_comment({'axes': [x_axis, y_axis]}, slice)

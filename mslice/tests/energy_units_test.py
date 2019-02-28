@@ -6,7 +6,7 @@ class EnergyUnitsTest(unittest.TestCase):
 
     def test_success(self):
         en_unit = EnergyUnits('meV')
-        # the "meV" unit *must* be defined by this class as it is used in 
+        # the "meV" unit *must* be defined by this class as it is used in
         # all algorithms used by MSlice. Other units may be defined as desired
         self.assertEqual(en_unit.factor_from_meV(), 1.)
         self.assertEqual(en_unit.factor_to_meV(), 1.)

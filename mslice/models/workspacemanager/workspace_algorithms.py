@@ -11,11 +11,13 @@ import os.path
 import numpy as np
 from scipy import constants
 
+from mantid.api import WorkspaceUnitValidator
+
 from mslice.models.axis import Axis
 
 from mslice.util.mantid.algorithm_wrapper import add_to_ads, wrap_in_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
-from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus
+from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -158,6 +160,8 @@ def load(filename, output_workspace):
     workspace.e_mode = get_EMode(workspace.raw_ws)
     if workspace.e_mode == 'Indirect':
         processEfixed(workspace)
+    if WorkspaceUnitValidator("DeltaE_inWavenumber").isValid(workspace.raw_ws) == '':
+        workspace = ConvertUnits(InputWorkspace=workspace, Target="DeltaE", OutputWorkspace=workspace.name)
     _processLoadedWSLimits(workspace)
     return workspace
 

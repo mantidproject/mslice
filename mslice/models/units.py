@@ -9,7 +9,7 @@ from mslice.util import MPL_COMPAT
 
 def _scale_string_or_float(value, scale):
     try:
-        return '{:.2f}'.format(float(value) * scale)
+        return '{:.5f}'.format(float(value) * scale)
     except (ValueError, TypeError):
         return value
 

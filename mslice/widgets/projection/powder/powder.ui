@@ -45,16 +45,6 @@
         <item row="1" column="1">
          <widget class="QComboBox" name="cmbPowderU2"/>
         </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Units</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QComboBox" name="cmbPowderUnits"/>
-        </item>
         <item row="2" column="1">
          <widget class="QPushButton" name="btnPowderCalculateProjection">
           <property name="text">
@@ -71,13 +61,13 @@
     <widget class="QLabel" name="error_msg">
      <property name="minimumSize">
       <size>
-       <width>200</width>
+       <width>400</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>200</width>
+       <width>400</width>
        <height>16777215</height>
       </size>
      </property>

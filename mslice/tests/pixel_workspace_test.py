@@ -84,4 +84,3 @@ class PixelWorkspaceTest(unittest.TestCase):
         new_workspace = PixelWorkspace(self.workspace.raw_ws, 'new')
         assert (hasattr(new_workspace, 'axes'))
         assert (new_workspace.axes == self.attr['axes'])
-

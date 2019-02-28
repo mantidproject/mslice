@@ -70,6 +70,7 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         cache_mock = mock.MagicMock()
         slice_presenter._slice_cache['workspace'] = cache_mock
         type(cache_mock).overplot_lines = mock.MagicMock()
+        cache_mock.energy_axis.e_unit = 'meV'
 
         slice_presenter.add_overplot_line('workspace', recoil_key, True)
         compute_recoil_mock.assert_called_once()
