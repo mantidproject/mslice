@@ -4,7 +4,7 @@ from mantid.simpleapi import BinMD, Rebin2D, ConvertSpectrumAxis, SofQW3, Transf
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.axis import Axis
 from mslice.models.units import EnergyUnits
-from mslice.workspace.base import attribute_to_comment
+from mslice.workspace.helperfunctions import attribute_to_comment
 
 
 class Slice(PythonAlgorithm):

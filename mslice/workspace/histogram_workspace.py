@@ -1,8 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
-from .base import WorkspaceBase, attribute_from_comment
+from .base import WorkspaceBase
 from .histo_mixin import HistoMixin
 from .workspace_mixin import WorkspaceMixin
 from .workspace import Workspace
+from .helperfunctions import attribute_from_comment, attribute_to_comment
 
 from mantid.api import IMDHistoWorkspace
 from mantid.simpleapi import ConvertMDHistoToMatrixWorkspace, Scale, ConvertToDistribution
@@ -36,3 +37,14 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         ws_conv = Scale(ws_conv, bin_size, OutputWorkspace=self.name, StoreInADS=False)
         ConvertToDistribution(ws_conv, StoreInADS=False)
         return Workspace(ws_conv, self.name)
+
+    def save_attributes(self):
+        attrdict = {}
+        comstr = self.raw_ws.getComment()
+        for k, v in [['comment', comstr], ['axes', self.axes]]:
+            if k:
+                attrdict[k] = v
+        attribute_to_comment(attrdict, self.raw_ws)
+
+    def remove_comment_attributes(self):
+        attribute_from_comment(None, self.raw_ws)

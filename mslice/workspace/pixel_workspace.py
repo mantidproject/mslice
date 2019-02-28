@@ -1,8 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
-from .base import WorkspaceBase, attribute_from_comment
+from .base import WorkspaceBase
 from .histogram_workspace import HistogramWorkspace
 from .pixel_mixin import PixelMixin
 from .workspace_mixin import WorkspaceMixin
+from .helperfunctions import attribute_from_comment, attribute_to_comment
 
 from mantid.api import IMDEventWorkspace
 
@@ -37,3 +38,14 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
         new_ws.e_fixed = self.e_fixed
         new_ws.axes = self.axes
         return new_ws
+
+    def save_attributes(self):
+        attrdict = {}
+        comstr = self.raw_ws.getComment()
+        for k, v in [['comment', comstr], ['axes', self.axes]]:
+            if k:
+                attrdict[k] = v
+        attribute_to_comment(attrdict, self.raw_ws)
+
+    def remove_comment_attributes(self):
+        attribute_from_comment(None, self.raw_ws)

@@ -5,6 +5,7 @@ from mslice.util.qt.QtWidgets import QFileDialog
 from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace, SaveAscii, SaveMD, SaveNexus
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.helperfunctions import WrapWorkspaceAttribute
 
 import numpy as np
 from scipy.io import savemat
@@ -46,11 +47,12 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 def save_nexus(workspace, path, is_slice):
     if isinstance(workspace, HistogramWorkspace):
         if is_slice:
-            SaveMD(InputWorkspace=get_workspace_handle(workspace.name[2:]), Filename=path)
-        else:
-            SaveMD(InputWorkspace=workspace, Filename=path)
+            workspace = get_workspace_handle(workspace.name[2:])
+        save_alg = SaveMD
     else:
-        SaveNexus(InputWorkspace=workspace, Filename=path)
+        save_alg = SaveNexus
+    with WrapWorkspaceAttribute(workspace):
+        save_alg(InputWorkspace=workspace, Filename=path)
 
 
 def save_ascii(workspace, path, is_slice):

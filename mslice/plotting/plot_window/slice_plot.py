@@ -442,6 +442,9 @@ class SlicePlot(IPlot):
     def flip_icut(self):
         self.icut.flip_axis()
 
+    def get_slice_cache(self):
+        return self._slice_plotter_presenter.get_slice_cache(self.ws_name)
+
     def update_workspaces(self):
         self._slice_plotter_presenter.update_displayed_workspaces()
 

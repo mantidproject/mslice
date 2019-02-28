@@ -57,7 +57,7 @@ class SlicePlotterPresenter(PresenterUtility):
         self._slice_cache[slice.name[2:]] = Slice(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     def get_slice_cache(self, workspace):
-        return self._slice_cache[workspace.name[2:]]
+        return self._slice_cache[workspace.name[2:] if hasattr(workspace, 'name') else workspace]
 
     def show_scattering_function(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]

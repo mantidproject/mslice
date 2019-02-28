@@ -6,7 +6,7 @@ from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace,
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
 from mslice.models.units import EnergyUnits
-from mslice.workspace.base import attribute_to_comment
+from mslice.workspace.helperfunctions import attribute_to_comment
 from .cut_normalisation import normalize_workspace
 
 

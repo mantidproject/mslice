@@ -52,7 +52,7 @@ class BaseWorkspaceTest(unittest.TestCase):
         self.assertTrue((result == expected_values).all())
 
     def set_attribute(self):
-        from mslice.workspace.base import attribute_to_comment
+        from mslice.workspace.helperfunctions import attribute_to_comment
         self.attr = {'axes':[1, object]}
         attribute_to_comment(self.attr, self.workspace.raw_ws)
 

@@ -13,6 +13,7 @@ class InteractiveCut(object):
         self.slice_plot = slice_plot
         self._canvas = canvas
         self._ws_title = ws_title
+        self._en_unit = slice_plot.get_slice_cache().energy_axis.e_unit
 
         self.horizontal = None
         self.connect_event = [None, None, None, None]
@@ -41,7 +42,7 @@ class InteractiveCut(object):
             ax, integration_start, integration_end = self.get_cut_parameters((x1, y1), (x2, y2))
             units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
                 self._canvas.figure.gca().get_xaxis().units
-            integration_axis = Axis(units, integration_start, integration_end, 0)
+            integration_axis = Axis(units, integration_start, integration_end, 0, self._en_unit)
             self._cut_plotter_presenter.plot_interactive_cut(str(self._ws_title), ax, integration_axis, store)
             self._cut_plotter_presenter.store_icut(self._ws_title, self)
 
@@ -51,7 +52,7 @@ class InteractiveCut(object):
         units = self._canvas.figure.gca().get_xaxis().units if self.horizontal else \
             self._canvas.figure.gca().get_yaxis().units
         step = get_limits(get_workspace_handle(self._ws_title), units)[2]
-        ax = Axis(units, start, end, step)
+        ax = Axis(units, start, end, step, self._en_unit)
         integration_start = pos1[self.horizontal]
         integration_end = pos2[self.horizontal]
         return ax, integration_start, integration_end
