@@ -7,9 +7,27 @@ import mslice.cli._mslice_commands as mc
 from mslice.workspace import wrap_workspace
 import mslice.plotting.pyplot as plt
 from mslice.cli.plotfunctions import pcolormesh, errorbar
-
+from mslice.cli.helperfunctions import _get_overplot_key
 
 class CLIProjectionTest(unittest.TestCase):
+
+    def setUp(self):
+
+        self.ax = None
+        self.cut = None
+        self.slice = None
+        self.workspace = None
+
+        @mock.patch('mslice.cli._mslice_commands.Slice')
+        @mock.patch('mslice.cli._mslice_commands.Cut')
+        def set_up(self, Cut, Slice):
+            fig = plt.gcf()
+            self.ax = fig.add_subplot(111, projection='mslice')
+            self.workspace = self.create_workspace('workspace')
+            self.cut = Cut(self.workspace)
+            self.slice = Slice(self.workspace)
+
+        set_up(self)
 
     def create_workspace(self, name):
         workspace = CreateSampleWorkspace(OutputWorkspace=name, NumBanks=1, BankPixelWidth=5, XMin=0.1,
@@ -31,49 +49,93 @@ class CLIProjectionTest(unittest.TestCase):
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     def test_that_mslice_projection_errorbar_works_correctly(self, is_gui, plot_cut, errorbar):
         is_gui.return_value = True
-        fig = plt.gcf()
-        ax = fig.add_subplot(111, projection='mslice')
-        workspace = self.create_workspace('cut')
-        cut = mc.Cut(workspace)
 
-        ax.errorbar(cut)
+        self.ax.errorbar(self.cut)
         plot_cut.assert_called()
 
-        ax.errorbar('not_workspace')
+        self.ax.errorbar('not_workspace')
         errorbar.assert_called()
 
     @mock.patch('matplotlib.axes.Axes.pcolormesh')
     @mock.patch('mslice.cli.plotfunctions.pcolormesh')
     def test_that_mslice_projection_pcolormesh_works_correctly(self, plot_slice, pcolormesh):
-        fig = plt.gcf()
-        ax = fig.add_subplot(111, projection='mslice')
-        workspace = self.create_workspace('slice')
-        slice = mc.Slice(workspace)
-
-        ax.pcolormesh(slice)
+        self.ax.pcolormesh(self.slice)
         plot_slice.assert_called()
 
-        ax.pcolormesh('not_workspace')
+        self.ax.pcolormesh('not_workspace')
         pcolormesh.assert_called()
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     def test_that_plot_cut_mslice_projection_works_correctly(self, is_gui):
         is_gui.return_value = True
-        fig = plt.gcf()
-        fig.add_subplot = mock.MagicMock()
-        ax = fig.add_subplot(111, projection='mslice')
-        workspace = self.create_workspace('cut')
-        cut = mc.Cut(workspace)
+        cut = mc.Cut(self.workspace)
 
-        return_value = errorbar(ax, cut)
-        self.assertEqual(ax.lines, return_value)
+        return_value = errorbar(self.ax, cut)
+        self.assertEqual(self.ax.lines, return_value)
 
     def test_that_plot_slice_mslice_projection_works_correctly(self):
-        fig = plt.gcf()
-        fig.add_subplot = mock.MagicMock()
-        ax = fig.add_subplot(111, projection='mslice')
-        workspace = self.create_workspace('slice')
-        slice = mc.Slice(workspace)
+        slice = mc.Slice(self.workspace)
 
-        return_value = pcolormesh(ax, slice)
-        self.assertEqual(ax.collections[0], return_value)
+        return_value = pcolormesh(self.ax, slice)
+        self.assertEqual(self.ax.collections[0], return_value)
+
+    @mock.patch('mslice.cli._update_overplot_checklist')
+    @mock.patch('mslice.cli._update_legend')
+    @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
+    def test_that_recoil_works_as_expected_without_relative_molecular_mass(self, get_spp, update_legend, update_check):
+        element = 'Hydrogen'
+        key = _get_overplot_key(element, rmm=None)
+
+        self.ax.recoil(self.workspace, element, rmm=None)
+
+        get_spp().add_overplot_line.assert_called_with(self.workspace.name, key, recoil=True, cif=None)
+        update_legend.assert_called_once_with()
+        update_check.assert_called_with(key)
+
+    @mock.patch('mslice.cli.GlobalFigureManager')
+    @mock.patch('mslice.cli._update_overplot_checklist')
+    @mock.patch('mslice.cli._update_legend')
+    @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
+    def test_that_recoil_works_as_expected_with_relative_molecular_mass(self, spp, update_legend, update_check, gfm):
+        rmm = 34
+        key = _get_overplot_key(element=None, rmm=rmm)
+        plot_handler = gfm.get_active_figure().plot_handler
+
+        self.ax.recoil(self.workspace, rmm=rmm)
+
+        spp().add_overplot_line.assert_called_with(self.workspace.name, key, recoil=True, cif=None)
+        update_legend.assert_called_once_with()
+        update_check.assert_called_with(key)
+        plot_handler._arb_nuclei_rmm = rmm
+
+    @mock.patch('mslice.cli._update_overplot_checklist')
+    @mock.patch('mslice.cli._update_legend')
+    @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
+    def test_that_bragg_works_as_expected_without_cif(self, get_spp, update_legend, update_check):
+        element = 'Tantalum'
+        key = _get_overplot_key(element, rmm=None)
+
+        self.ax.bragg(self.workspace, element)
+
+        get_spp().add_overplot_line.assert_called_with(self.workspace.name, key, recoil=False, cif=None)
+        update_legend.assert_called_once_with()
+        update_check.assert_called_with(key)
+
+    @mock.patch('mslice.cli.is_gui')
+    @mock.patch('mslice.cli.GlobalFigureManager')
+    @mock.patch('matplotlib.axes.Axes.grid')
+    def test_that_grid_works_as_expected(self, grid, gfm, is_gui):
+        plot_handler = gfm.get_active_figure().plot_handler
+        is_gui.return_value = False
+        b = True
+        which = 'major'
+
+        self.ax.grid(b=b, which=which, axis='x')
+        grid.assert_called_with(self.ax, b, which, 'x')
+        self.assertEqual(plot_handler.manager._xgrid, b)
+
+        self.ax.grid(b=b, which=which, axis='y')
+        grid.assert_called_with(self.ax, b, which, 'y')
+        self.assertEqual(plot_handler.manager._xgrid, b)
+
+

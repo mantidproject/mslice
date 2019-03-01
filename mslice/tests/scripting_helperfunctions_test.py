@@ -112,7 +112,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         self.assertIn('slice_ws = mc.Slice(ws_{}, Axis1="{}", Axis2="{}", NormToOne={})\n\n'.format(
             plot_handler.ws_name.replace(".", "_"), momentum_axis, energy_axis, norm), script_lines)
         self.assertIn('mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}", temperature={})\n'.format(
-                     cache[plot_handler.ws_name].colourmap, intensity, plot_handler.temp), script_lines)
+            cache[plot_handler.ws_name].colourmap, intensity, plot_handler.temp), script_lines)
         self.assertIn("cb = plt.colorbar(mesh, ax=ax)\n", script_lines)
         self.assertIn("cb.set_label('{}', labelpad=20, rotation=270, picker=5)\n".format(plot_handler.colorbar_label),
                       script_lines)

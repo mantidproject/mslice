@@ -2,8 +2,7 @@ import unittest
 import mock
 import numpy as np
 from mslice.workspace import wrap_workspace
-from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
-                              ConvertToMD)
+from mantid.simpleapi import AddSampleLog, CreateSampleWorkspace
 
 
 class ScriptingTest(unittest.TestCase):
