@@ -55,6 +55,9 @@ class GlobalFigureManager(object):
     _active_figure = None
     _last_active_figure = None
     _figures = {}
+    # If the following attribute is True, "Make Current" will be disabled for all open figures. This will be used for
+    # the interactive cut window to stop other windows being made current whilst the interactive cut is active.
+    _disable_make_current = False
 
     @classmethod
     def destroy(cls, num):
@@ -271,6 +274,10 @@ class GlobalFigureManager(object):
 
     @classmethod
     def set_figure_as_current(cls, num=None):
+        if cls._disable_make_current:
+            cls.broadcast(None)
+            return
+
         if num is None:
             if cls._last_active_figure is None:
                 num = cls.get_active_figure().number
@@ -310,6 +317,14 @@ class GlobalFigureManager(object):
                 cls._figures[figure].flag_as_current()
             else:
                 cls._figures[figure].flag_as_kept()
+
+    @classmethod
+    def disable_make_current(cls, category=None):
+        cls._disable_make_current = True
+
+    @classmethod
+    def enable_make_current(cls, category=None):
+        cls._disable_make_current = False
 
     @classmethod
     def all_figure_numbers(cls):

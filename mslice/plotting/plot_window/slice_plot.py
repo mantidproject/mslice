@@ -432,6 +432,8 @@ class SlicePlot(IPlot):
         if self.icut is not None:
             self.icut.clear()
             self.icut = None
+            from mslice.plotting.pyplot import GlobalFigureManager
+            GlobalFigureManager.enable_make_current()
         else:
             self.icut = InteractiveCut(self, self._canvas, self.ws_name)
 
