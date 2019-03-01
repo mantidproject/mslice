@@ -40,7 +40,7 @@ _intensity_to_workspace = {
 
 def _update_cache(cut_presenter, ws_name, CutAxis, IntegrationAxis, NormToOne):
     """Creates a list of all cuts used to create a particular cut. This is required when plot over is used."""
-    cut_list = cut_presenter._cut_cache_list
+    cut_list = cut_presenter._cut_cache_dict
     cut_cache = cut_presenter._cut_cache
     int_axis = Axis(*IntegrationAxis.split(','))
     cut_axis = Axis(*CutAxis.split(','))
