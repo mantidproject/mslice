@@ -85,21 +85,12 @@ class CutPlotterPresenterTest(unittest.TestCase):
         get_ws_handle_mock.return_value = mock_ws
         cut_axis = Axis("units", "0", "100", "1")
         integration_axis = Axis("units", 0.0, 100.0, 0)
-        self.cut_plotter_presenter.plot_interactive_cut('workspace', cut_axis, integration_axis, False)
+        cut = Cut(cut_axis, integration_axis, None, None)
+        self.cut_plotter_presenter.plot_interactive_cut('workspace', cut, False)
 
         self.assertEqual(1, compute_cut_mock.call_count)
         self.assertEqual(1, plot_cut_impl_mock.call_count)
         self.assertEqual(1, draw_interact_mock.call_count)
-
-    def test_store_icut(self):
-        self.cut_plotter_presenter.set_is_icut = mock.MagicMock()
-        mock_ws = mock.MagicMock()
-        mock_ws.icut = 'icut'
-        mock_ws.name = 'workspace'
-        mock_icut = mock.MagicMock()
-        self.cut_plotter_presenter._cut_cache = {'workspace': mock_ws}
-        self.cut_plotter_presenter.store_icut(mock_ws.name, mock_icut)
-        self.cut_plotter_presenter.set_is_icut.assert_called_once_with(mock_ws.name, True)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.cut_figure_exists')
     def test_set_is_icut(self, cut_figure_exists):
@@ -111,17 +102,12 @@ class CutPlotterPresenterTest(unittest.TestCase):
 
         self.cut_plotter_presenter.set_is_icut(mock_ws.name, False)
 
-    def test_get_icut(self):
-        mock_ws = mock.MagicMock()
-        mock_ws.name = 'workspace'
-        mock_ws.icut = 'icut'
-
-        self.cut_plotter_presenter._cut_cache = {}
-        return_value = self.cut_plotter_presenter.get_icut('workspace')
+    def test_store_and_get_icut(self):
+        return_value = self.cut_plotter_presenter.get_icut()
         self.assertEquals(return_value, None)
 
-        self.cut_plotter_presenter._cut_cache = {mock_ws.name: mock_ws}
-        return_value = self.cut_plotter_presenter.get_icut('workspace')
+        self.cut_plotter_presenter.store_icut('icut')
+        return_value = self.cut_plotter_presenter.get_icut()
         self.assertEquals(return_value, 'icut')
 
     def test_workspace_selection_changed(self):

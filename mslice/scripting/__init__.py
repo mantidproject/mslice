@@ -7,25 +7,28 @@ from mslice.app.presenters import get_cut_plotter_presenter
 def generate_script(ws_name, filename=None, plot_handler=None, window=None):
     if filename is None:
         path = QtWidgets.QFileDialog.getSaveFileName(window, 'Save File')
+        if isinstance(path, tuple):
+            path = path[0]
         if not path:
             return
         filename = path + '{}'.format('' if path.endswith('.py') else '.py')
     else:
         filename = filename + '{}'.format('' if filename.endswith('.py') else '.py')
 
-    script_lines = preprocess_lines(ws_name, plot_handler)
-    script_lines = add_plot_statements(script_lines, plot_handler)
+    ax = window.canvas.figure.axes[0]
+    script_lines = preprocess_lines(ws_name, plot_handler, ax)
+    script_lines = add_plot_statements(script_lines, plot_handler, ax)
     with open(filename, 'w') as generated_script:
         generated_script.writelines(script_lines)
 
 
-def preprocess_lines(ws_name, plot_handler):
+def preprocess_lines(ws_name, plot_handler, ax):
     from mslice.plotting.plot_window.cut_plot import CutPlot
     script_lines = []
 
     if isinstance(plot_handler, CutPlot) and len(get_cut_plotter_presenter()._cut_cache) > 1:
         cut_cache = get_cut_plotter_presenter()._cut_cache
-        cache_list = get_cut_plotter_presenter()._cut_cache_list
+        cache_list = get_cut_plotter_presenter()._cut_cache_dict[ax]
         for workspace_name in cut_cache:
             if any([workspace_name.replace(".", "_") == cut.workspace_name for cut in cache_list]):
                 ws = get_workspace_handle(workspace_name).raw_ws

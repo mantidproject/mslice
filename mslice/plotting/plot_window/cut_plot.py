@@ -75,7 +75,7 @@ class CutPlot(IPlot):
         self._canvas.figure.gca().remove_callack(self.mpl_axes_changed)
 
     def window_closing(self):
-        icut = self._cut_plotter_presenter.get_icut(self.ws_name)
+        icut = self._cut_plotter_presenter.get_icut()
         if icut is not None:
             icut.window_closing()
             self.manager.button_pressed_connected(False)
@@ -243,11 +243,11 @@ class CutPlot(IPlot):
         self.plot_window.show()
 
     def save_icut(self):
-        icut = self._cut_plotter_presenter.get_icut(self.ws_name)
+        icut = self._cut_plotter_presenter.get_icut()
         return icut.save_cut()
 
     def flip_icut(self):
-        icut = self._cut_plotter_presenter.get_icut(self.ws_name)
+        icut = self._cut_plotter_presenter.get_icut()
         icut.flip_axis()
 
     def _get_line_index(self, line):
