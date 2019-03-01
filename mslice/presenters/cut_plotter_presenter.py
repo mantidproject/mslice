@@ -1,6 +1,5 @@
 from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists
 from mslice.models.cut.cut_functions import compute_cut
-from mslice.models.cut.cut import Cut
 from mslice.models.labels import generate_legend
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 import mslice.plotting.pyplot as plt
@@ -11,6 +10,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     def __init__(self):
         self._main_presenter = None
+        self._interactive_cut_cache = None
         self._cut_cache = {}
         self._cut_cache_list = []  # List of all currently displayed cuts created with plot_over set to True
 
@@ -19,12 +19,7 @@ class CutPlotterPresenter(PresenterUtility):
         cut.workspace_name = workspace.name
         self._cut_cache[workspace.name] = cut
 
-        # If plot over is True you want to save all plotted cuts for use by the cli
-        if len(self._cut_cache_list) == 0 or plot_over:
-            self._cut_cache_list.append(cut)
-        if not plot_over:
-            self._cut_cache_list[:] = []
-            self._cut_cache_list.append(cut)
+        self.save_cache(cut, plot_over)
 
         if cut.width is not None:
             self._plot_with_width(workspace, cut, plot_over)
@@ -41,7 +36,7 @@ class CutPlotterPresenter(PresenterUtility):
                                  integration_axis.end)
         plot_cut_impl(cut_ws, cut_axis.units, (cut.intensity_start, cut.intensity_end), plot_over, legend)
         if update_main:
-            self.set_is_icut(workspace.name, False)
+            self.set_is_icut(False)
             self.update_main_window()
 
     def _plot_with_width(self, workspace, cut, plot_over):
@@ -58,6 +53,14 @@ class CutPlotterPresenter(PresenterUtility):
             plot_over = True
         cut.reset_integration_axis(cut.start, cut.end)
 
+    def save_cache(self, cut, plot_over=False):
+        # If plot over is True you want to save all plotted cuts for use by the cli
+        if len(self._cut_cache_list) == 0 or plot_over:
+            self._cut_cache_list.append(cut)
+        if not plot_over:
+            self._cut_cache_list[:] = []
+            self._cut_cache_list.append(cut)
+
     def save_cut_to_workspace(self, workspace, cut):
         compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one)
         self._main_presenter.update_displayed_workspaces()
@@ -73,31 +76,23 @@ class CutPlotterPresenter(PresenterUtility):
         workspace = get_workspace_handle(workspace)
         lines = plot_cut_impl(workspace, workspace.raw_ws.getDimension(0).getUnits(),
                               intensity_range=intensity_range, plot_over=plot_over)
-        self.set_is_icut(workspace.name, False)
+        self.set_is_icut(False)
         return lines
 
-    def plot_interactive_cut(self, workspace, cut_axis, integration_axis, store):
+    def plot_interactive_cut(self, workspace, cut, store):
         workspace = get_workspace_handle(workspace)
-        cut = Cut(cut_axis, integration_axis, None, None)
-        self._cut_cache[workspace.name] = cut
         self._plot_cut(workspace, cut, False, store, update_main=False)
         draw_interactive_cut(workspace)
 
-    def store_icut(self, workspace_name, icut):
-        self.set_is_icut(workspace_name, True)
-        self._cut_cache[workspace_name].icut = icut
+    def store_icut(self, icut):
+        self._interactive_cut_cache = icut
 
-    def set_is_icut(self, workspace_name, is_icut):
-        if not is_icut and workspace_name in self._cut_cache:
-            self._cut_cache[workspace_name].icut = None
+    def set_is_icut(self, is_icut):
         if cut_figure_exists():
             plt.gcf().canvas.manager.is_icut(is_icut)
 
-    def get_icut(self, workspace_name):
-        try:
-            return self._cut_cache[workspace_name].icut
-        except KeyError:
-            return None
+    def get_icut(self):
+        return self._interactive_cut_cache
 
     def update_main_window(self):
         if self._main_presenter is not None:
