@@ -12,14 +12,12 @@ class CutPlotterPresenter(PresenterUtility):
         self._main_presenter = None
         self._interactive_cut_cache = None
         self._cut_cache = {}
-        self._cut_cache_list = []  # List of all currently displayed cuts created with plot_over set to True
+        self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
         cut.workspace_name = workspace.name
         self._cut_cache[workspace.name] = cut
-
-        self.save_cache(cut, plot_over)
 
         if cut.width is not None:
             self._plot_with_width(workspace, cut, plot_over)
@@ -27,6 +25,9 @@ class CutPlotterPresenter(PresenterUtility):
             self.save_cut_to_workspace(workspace, cut)
         else:
             self._plot_cut(workspace, cut, plot_over)
+
+        # Cached cuts are saved to a dict indexed by the axes references - ensures each window has its own list
+        self.save_cache(plt.gca(), cut, plot_over)
 
     def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True):
         cut_axis = cut.cut_axis
@@ -53,13 +54,15 @@ class CutPlotterPresenter(PresenterUtility):
             plot_over = True
         cut.reset_integration_axis(cut.start, cut.end)
 
-    def save_cache(self, cut, plot_over=False):
+    def save_cache(self, ax, cut, plot_over=False):
         # If plot over is True you want to save all plotted cuts for use by the cli
-        if len(self._cut_cache_list) == 0 or plot_over:
-            self._cut_cache_list.append(cut)
+        if ax not in self._cut_cache_dict.keys():
+            self._cut_cache_dict[ax] = []
+        if len(self._cut_cache_dict[ax]) == 0 or plot_over:
+            self._cut_cache_dict[ax].append(cut)
         if not plot_over:
-            self._cut_cache_list[:] = []
-            self._cut_cache_list.append(cut)
+            self._cut_cache_dict[ax][:] = []
+            self._cut_cache_dict[ax].append(cut)
 
     def save_cut_to_workspace(self, workspace, cut):
         compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one)
