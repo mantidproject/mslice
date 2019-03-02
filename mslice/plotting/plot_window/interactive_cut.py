@@ -1,6 +1,7 @@
 from matplotlib.widgets import RectangleSelector
 
 from mslice.models.axis import Axis
+from mslice.models.cut.cut import Cut
 from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -17,7 +18,12 @@ class InteractiveCut(object):
 
         self.horizontal = None
         self.connect_event = [None, None, None, None]
+        # We need to access the CutPlotterPresenter instance of the particular CutPlot (window) we are using
+        # But there is no way to get without changing the active category then calling the GlobalFigureManager.
+        # So we create a new temporary here. After the first time we plot a 1D plot, the correct category is set
+        # and we can get the correct CutPlot instance and its CutPlotterPresenter
         self._cut_plotter_presenter = CutPlotterPresenter()
+        self._is_initial_cut_plotter_presenter = True
         self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
         self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
@@ -43,8 +49,15 @@ class InteractiveCut(object):
             units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
                 self._canvas.figure.gca().get_xaxis().units
             integration_axis = Axis(units, integration_start, integration_end, 0, self._en_unit)
-            self._cut_plotter_presenter.plot_interactive_cut(str(self._ws_title), ax, integration_axis, store)
-            self._cut_plotter_presenter.store_icut(self._ws_title, self)
+            cut = Cut(ax, integration_axis, None, None)
+            self._cut_plotter_presenter.plot_interactive_cut(str(self._ws_title), cut, store)
+            self._cut_plotter_presenter.set_is_icut(True)
+            if self._is_initial_cut_plotter_presenter:
+                # First time we've plotted a 1D cut - get the true CutPlotterPresenter
+                from mslice.plotting.pyplot import GlobalFigureManager
+                self._cut_plotter_presenter = GlobalFigureManager.get_active_figure().plot_handler._cut_plotter_presenter
+                self._is_initial_cut_plotter_presenter = False
+            self._cut_plotter_presenter.store_icut(self)
 
     def get_cut_parameters(self, pos1, pos2):
         start = pos1[not self.horizontal]
@@ -81,7 +94,7 @@ class InteractiveCut(object):
         self.slice_plot.update_workspaces()
 
     def clear(self):
-        self._cut_plotter_presenter.set_is_icut(self._ws_title, False)
+        self._cut_plotter_presenter.set_is_icut(False)
         self.rect.set_active(False)
         for event in self.connect_event:
             self._canvas.mpl_disconnect(event)

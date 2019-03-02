@@ -30,7 +30,7 @@ def add_header(script_lines, plot_handler):
     script_lines.append("\n")
 
 
-def add_plot_statements(script_lines, plot_handler):
+def add_plot_statements(script_lines, plot_handler, ax):
     """Adds plot statements to the script lines used to generate the python script"""
     from mslice.plotting.plot_window.slice_plot import SlicePlot
     from mslice.plotting.plot_window.cut_plot import CutPlot
@@ -45,7 +45,7 @@ def add_plot_statements(script_lines, plot_handler):
             add_slice_plot_statements(script_lines, plot_handler)
             add_overplot_statements(script_lines, plot_handler)
         elif isinstance(plot_handler, CutPlot):
-            add_cut_plot_statements(script_lines, plot_handler)
+            add_cut_plot_statements(script_lines, plot_handler, ax)
 
         script_lines.append("mc.Show()\n")
 
@@ -125,11 +125,11 @@ def add_overplot_statements(script_lines, plot_handler):
                         plot_handler.ws_name, cif))
 
 
-def add_cut_plot_statements(script_lines, plot_handler):
+def add_cut_plot_statements(script_lines, plot_handler, ax):
     """Adds cut specific statements to the script"""
     default_opts = plot_handler.default_options
 
-    add_cut_lines(script_lines, plot_handler)
+    add_cut_lines(script_lines, plot_handler, ax)
     add_plot_options(script_lines, plot_handler)
 
     script_lines.append("ax.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
@@ -139,8 +139,8 @@ def add_cut_plot_statements(script_lines, plot_handler):
         default_opts["ymin"]) if plot_handler.is_changed("y_log") else "")
 
 
-def add_cut_lines(script_lines, plot_handler):
-    cuts = plot_handler._cut_plotter_presenter._cut_cache_list
+def add_cut_lines(script_lines, plot_handler, ax):
+    cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
     add_cut_lines_with_width(errorbars, script_lines, cuts)
 
