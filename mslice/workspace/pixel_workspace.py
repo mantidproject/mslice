@@ -3,7 +3,7 @@ from .base import WorkspaceBase
 from .histogram_workspace import HistogramWorkspace
 from .pixel_mixin import PixelMixin
 from .workspace_mixin import WorkspaceMixin
-from .helperfunctions import attribute_from_comment, attribute_to_comment
+from .helperfunctions import attribute_from_log, attribute_to_log
 
 from mantid.api import IMDEventWorkspace
 
@@ -29,7 +29,7 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
         self.e_mode = None
         self.e_fixed = None
         self.axes = []
-        attribute_from_comment(self, mantid_ws)
+        attribute_from_log(self, mantid_ws)
 
     def rewrap(self, ws):
         new_ws = PixelWorkspace(ws, self.name)
@@ -45,7 +45,7 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
         for k, v in [['comment', comstr], ['axes', self.axes]]:
             if k:
                 attrdict[k] = v
-        attribute_to_comment(attrdict, self.raw_ws)
+        attribute_to_log(attrdict, self.raw_ws)
 
-    def remove_comment_attributes(self):
-        attribute_from_comment(None, self.raw_ws)
+    def remove_saved_attributes(self):
+        attribute_from_log(None, self.raw_ws)

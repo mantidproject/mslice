@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from .base import WorkspaceBase
 from .workspace_mixin import WorkspaceMixin
-from .helperfunctions import attribute_from_comment, attribute_to_comment
+from .helperfunctions import attribute_from_log, attribute_to_log
 
 from mantid.api import MatrixWorkspace
 
@@ -22,7 +22,7 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
         self.e_mode = None
         self.e_fixed = None
         self.axes = []
-        attribute_from_comment(self, mantid_ws)
+        attribute_from_log(self, mantid_ws)
 
     def rewrap(self, mantid_ws):
         new_ws = Workspace(mantid_ws, self.name)
@@ -36,11 +36,10 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
 
     def save_attributes(self):
         attrdict = {}
-        comstr = self.raw_ws.getComment()
-        for k, v in [['comment', comstr], ['axes', self.axes]]:
+        for k, v in [['axes', self.axes]]:
             if k:
                 attrdict[k] = v
-        attribute_to_comment(attrdict, self.raw_ws)
+        attribute_to_log(attrdict, self.raw_ws)
 
-    def remove_comment_attributes(self):
-        attribute_from_comment(None, self.raw_ws)
+    def remove_saved_attributes(self):
+        attribute_from_log(None, self.raw_ws)

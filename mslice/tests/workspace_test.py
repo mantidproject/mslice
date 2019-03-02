@@ -52,9 +52,9 @@ class BaseWorkspaceTest(unittest.TestCase):
         self.assertTrue((result == expected_values).all())
 
     def set_attribute(self):
-        from mslice.workspace.helperfunctions import attribute_to_comment
+        from mslice.workspace.helperfunctions import attribute_to_log
         self.attr = {'axes':[1, object]}
-        attribute_to_comment(self.attr, self.workspace.raw_ws)
+        attribute_to_log(self.attr, self.workspace.raw_ws)
 
     def check_attribute_propagation(self, new_workspace):
         assert (hasattr(new_workspace, 'axes'))

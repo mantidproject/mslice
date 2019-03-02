@@ -4,7 +4,7 @@ from mantid.simpleapi import BinMD, Rebin2D, ConvertSpectrumAxis, SofQW3, Transf
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.axis import Axis
 from mslice.models.units import EnergyUnits
-from mslice.workspace.helperfunctions import attribute_to_comment
+from mslice.workspace.helperfunctions import attribute_to_log
 
 
 class Slice(PythonAlgorithm):
@@ -41,7 +41,7 @@ class Slice(PythonAlgorithm):
             # For non-PSD data one of the axes *must* be DeltaE
             if e_scale != 1.:
                 slice = ScaleX(InputWorkspace=slice, Factor=e_scale, Operation='Multiply', StoreInADS=False)
-        attribute_to_comment({'axes': [x_axis, y_axis]}, slice)
+        attribute_to_log({'axes': [x_axis, y_axis]}, slice)
         self.setProperty('OutputWorkspace', slice)
 
     def category(self):

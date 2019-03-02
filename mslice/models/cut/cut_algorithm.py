@@ -1,12 +1,13 @@
 
 from mantid.api import PythonAlgorithm, WorkspaceProperty
 from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator
-from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD
+from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, \
+                             ConvertToMD, DeleteWorkspace
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
 from mslice.models.units import EnergyUnits
-from mslice.workspace.helperfunctions import attribute_to_comment
+from mslice.workspace.helperfunctions import attribute_to_log
 from .cut_normalisation import normalize_workspace
 
 
@@ -37,7 +38,7 @@ class Cut(PythonAlgorithm):
         cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one)
         if 'DeltaE' in cut_axis.units and cut_axis.scale != 1.:
             cut = TransformMD(InputWorkspace=cut, Scaling=[EnergyUnits(cut_axis.e_unit).factor_from_meV()])
-        attribute_to_comment({'axes':[cut_axis, int_axis]}, cut)
+        attribute_to_log({'axes':[cut_axis, int_axis]}, cut)
         self.setProperty('OutputWorkspace', cut)
 
     def category(self):
@@ -87,9 +88,16 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
         ws_out = _cut_nonPSD_theta(int_binning, cut_binning, selected_workspace)
     xdim = ws_out.getDimension(idx)
     extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
-    return CreateMDHistoWorkspace(SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(), Dimensionality=1,
-                                  Extents=extents, NumberOfBins=xdim.getNBins(), Names=name, Units=unit,
-                                  StoreInADS=False)
+
+    # Hack to (deep) copy log data (ExperimentInfo)
+    _tmpws = ConvertToMD(ws_out, EnableLogging=False, StoreInADS=False, PreprocDetectorsWS='-')
+    ws_out = CreateMDHistoWorkspace(SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(), Dimensionality=1,
+                                    Extents=extents, NumberOfBins=xdim.getNBins(), Names=name, Units=unit,
+                                    StoreInADS=False)
+    ws_out.copyExperimentInfos(_tmpws)
+    DeleteWorkspace(_tmpws, EnableLogging=False)
+
+    return ws_out
 
 
 def _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace):

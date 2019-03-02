@@ -1,10 +1,14 @@
 import pickle
 import codecs
 
-def attribute_from_comment(ws, raw_ws):
+def attribute_from_log(ws, raw_ws):
     try:
-        comstr = raw_ws.getComment()
+        runinfo = raw_ws.run()
     except AttributeError:
+        runinfo = raw_ws.getExperimentInfo(0).run()
+    try:
+        comstr = runinfo.getProperty('MSlice').value
+    except RuntimeError:
         comstr = ''
     if comstr:
         try:
@@ -12,25 +16,35 @@ def attribute_from_comment(ws, raw_ws):
         except ValueError:
             pass
         else:
-            raw_ws.setComment(attrdict.pop('comment', ''))
             for (k, v) in list(attrdict.items()):
                 if hasattr(ws, k):
                     setattr(ws, k, v)
 
-def attribute_to_comment(attrdict, raw_ws):
+def attribute_to_log(attrdict, raw_ws, append=False):
     try:
-        comstr = raw_ws.getComment()
-        if 'comment' not in attrdict.keys() and comstr:
-            attrdict['comment'] = comstr
-        raw_ws.setComment(str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()))
+        runinfo = raw_ws.run()
     except AttributeError:
-        pass
+        runinfo = raw_ws.getExperimentInfo(0).run()
+    if not append:
+        runinfo.addProperty('MSlice', str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()), True)
+    else:
+        try:
+            comstr = runinfo.getProperty('MSlice').value
+        except RuntimeError:
+            pass
+        else:
+            prevdict = pickle.loads(codecs.decode(comstr.encode(), 'base64'))
+            for (k, v) in list(prevdict.items()):
+                if k not in attrdict:
+                    attrdict[k] = v
+        runinfo.addProperty('MSlice', str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()), True)
+
 
 class WrapWorkspaceAttribute(object):
 
     def __init__(self, workspace):
         self.workspace = workspace if (hasattr(workspace, 'save_attributes')
-                                       and hasattr(workspace, 'remove_comment_attributes')) else None
+                                       and hasattr(workspace, 'remove_saved_attributes')) else None
 
     def __enter__(self):
         if self.workspace:
@@ -39,5 +53,5 @@ class WrapWorkspaceAttribute(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.workspace:
-            self.workspace.remove_comment_attributes()
+            self.workspace.remove_saved_attributes()
         return True

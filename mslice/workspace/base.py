@@ -54,5 +54,5 @@ class WorkspaceBase(object):
         return
 
     @abc.abstractmethod
-    def remove_comment_attributes(self):
+    def remove_saved_attributes(self):
         return
