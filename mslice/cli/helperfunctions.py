@@ -45,6 +45,7 @@ def _update_cache(cut_presenter, ws_name, CutAxis, IntegrationAxis, NormToOne):
     cut_axis = Axis(*CutAxis.split(','))
     width = None if int_axis.end - int_axis.start == 0 else str(int_axis.end - int_axis.start)
     cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
+    cut.workspace_name = ws_name
     cut_presenter.save_cache(plt.gca(), cut, True)
     cut_presenter._cut_cache[ws_name] = cut
 
