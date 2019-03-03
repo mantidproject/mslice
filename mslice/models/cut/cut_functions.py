@@ -18,6 +18,7 @@ def compute_cut(workspace, cut_axis, integration_axis, is_norm, store=True):
     cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, store=store, InputWorkspace=workspace,
                                 CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
                                 EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=is_norm)
+    cut.parent = workspace.name
     return cut
 
 

@@ -9,6 +9,7 @@ from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
 from mslice.util.mantid.mantid_algorithms import Transpose
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
+from mslice.models.cut.cut import Cut
 from mantid.plots import plotfunctions
 from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
@@ -52,6 +53,11 @@ def errorbar(axes, workspace, *args, **kwargs):
         cur_canvas.manager.add_cut_plot(presenter, workspace.name.rsplit('_', 1)[0])
     cur_fig.canvas.draw()
     axes.pchanged()  # This call is to let the waterfall callback know to update
+
+    cut = Cut(workspace.axes[0], workspace.axes[1], intensity_range[0], intensity_range[1], workspace.norm_to_one, width='')
+    cut.workspace_name = workspace.parent
+    presenter.save_cache(axes, cut, plot_over)
+
     return axes.lines
 
 

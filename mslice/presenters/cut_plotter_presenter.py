@@ -26,9 +26,6 @@ class CutPlotterPresenter(PresenterUtility):
         else:
             self._plot_cut(workspace, cut, plot_over)
 
-        # Cached cuts are saved to a dict indexed by the axes references - ensures each window has its own list
-        self.save_cache(plt.gca(), cut, plot_over)
-
     def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis

@@ -12,7 +12,7 @@ import mslice.app as app
 from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
-                                        _check_workspace_type, _update_cache)
+                                        _check_workspace_type)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
@@ -176,9 +176,6 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, store=True)
     get_cut_plotter_presenter().update_main_window()
-
-    # Create the cut for use by the plot window in a generated script
-    _update_cache(get_cut_plotter_presenter(), workspace.name, cut_axis, integration_axis, NormToOne)
 
     return cut
 
