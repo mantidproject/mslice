@@ -29,7 +29,8 @@ class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
         self.e_mode = None
         self.e_fixed = None
         self.axes = []
-        attribute_from_log(self, mantid_ws)
+        if isinstance(mantid_ws, IMDEventWorkspace):
+            attribute_from_log(self, mantid_ws)
 
     def rewrap(self, ws):
         new_ws = PixelWorkspace(ws, self.name)
