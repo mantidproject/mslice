@@ -4,7 +4,7 @@ import mslice.plotting.pyplot as plt
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _intensity_to_action, \
-    _intensity_to_workspace, _function_to_intensity
+    _intensity_to_workspace, _function_to_intensity, _rescale_energy_cut_plot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
 from mslice.util.mantid.mantid_algorithms import Transpose
@@ -38,13 +38,26 @@ def errorbar(axes, workspace, *args, **kwargs):
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
 
+    cut_axis, int_axis = tuple(workspace.axes)
+    # Checks that current cut has consistent units with previous
+    if plot_over:
+        cached_cuts = presenter.get_cache(axes)
+        if cached_cuts:
+            if (cut_axis.units != cached_cuts[0].cut_axis.units):
+                raise ValueError('Cut axes not consistent with current plot. '
+                                 'Expected {}, got {}'.format(cached_cuts[0].cut_axis.units, cut_axis.units))
+            # Checks whether we should do an energy unit conversion
+            if 'DeltaE' in cut_axis.units and cut_axis.e_unit != cached_cuts[0].cut_axis.e_unit:
+                _rescale_energy_cut_plot(presenter, cached_cuts, cut_axis.e_unit)
+
     plotfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
 
     axes.set_ylim(*intensity_range) if intensity_range is not None else axes.autoscale()
+    intensity_min, intensity_max = axes.get_ylim()
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
         leg = axes.legend(fontsize='medium')
         leg.draggable()
-    axes.set_xlabel(get_display_name(workspace.axes[0]), picker=CUT_PICKER_TOL_PTS)
+    axes.set_xlabel(get_display_name(cut_axis), picker=CUT_PICKER_TOL_PTS)
     axes.set_ylabel(CUT_INTENSITY_LABEL, picker=CUT_PICKER_TOL_PTS)
     if not plot_over:
         cur_canvas.set_window_title(workspace.name)
@@ -54,7 +67,7 @@ def errorbar(axes, workspace, *args, **kwargs):
     cur_fig.canvas.draw()
     axes.pchanged()  # This call is to let the waterfall callback know to update
 
-    cut = Cut(workspace.axes[0], workspace.axes[1], intensity_range[0], intensity_range[1], workspace.norm_to_one, width='')
+    cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='')
     cut.workspace_name = workspace.parent
     presenter.save_cache(axes, cut, plot_over)
 

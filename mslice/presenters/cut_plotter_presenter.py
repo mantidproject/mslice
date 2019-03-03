@@ -61,6 +61,9 @@ class CutPlotterPresenter(PresenterUtility):
             self._cut_cache_dict[ax][:] = []
             self._cut_cache_dict[ax].append(cut)
 
+    def get_cache(self, ax):
+        return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
+
     def save_cut_to_workspace(self, workspace, cut):
         compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one)
         self._main_presenter.update_displayed_workspaces()

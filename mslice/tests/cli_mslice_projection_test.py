@@ -62,6 +62,7 @@ class CLIProjectionTest(unittest.TestCase):
         fig = plt.gcf()
         fig.add_subplot = mock.MagicMock()
         ax = fig.add_subplot(111, projection='mslice')
+        ax.get_ylim.return_value = (0., 1.)
         workspace = self.create_workspace('cut')
         cut = mc.Cut(workspace)
 

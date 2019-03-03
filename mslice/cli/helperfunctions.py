@@ -5,7 +5,6 @@ from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.models.cut.cut import Cut
 
 _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
                   'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
@@ -126,6 +125,12 @@ def _check_workspace_type(workspace, correct_type):
     else:
         if not isinstance(workspace, MatrixWorkspace):
             raise RuntimeError("Incorrect workspace type.")
+
+def _rescale_energy_cut_plot(presenter, cuts, new_e_unit):
+    """Given a CutPlotterPresenter and a set of cached cuts, rescales the workspaces to a different energy-unit and replot"""
+    for id, cut in enumerate(cuts):
+        cut.cut_axis.e_unit = new_e_unit
+        presenter.run_cut(cut.workspace_raw_name, cut, plot_over=id > 0)
 
 
 # Arguments Validation

@@ -64,6 +64,7 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_intensity_end.return_value = intensity_end
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
         self.slice_view.get_slice_colourmap.return_value = colourmap
+        self.slice_view.get_units.return_value = 'meV'
         plot_info = ("plot_data", "boundaries", "colormap", "norm")
         self.slice_plotter_presenter.plot_slice = mock.Mock(return_value=plot_info)
         self.slice_plotter_presenter.validate_intensity = mock.Mock(return_value=(7.0, 8.0))
@@ -112,6 +113,7 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         self.slice_view.get_slice_is_norm_to_one.return_value = norm_to_one
         self.slice_view.get_slice_smoothing.return_value = smoothing
         self.slice_view.get_slice_colourmap.return_value = colourmap
+        self.slice_view.get_units.return_value = 'meV'
         plot_info = ("plot_data", "boundaries", "colormap", "norm")
         self.slice_plotter_presenter.plot_slice = mock.Mock(return_value=plot_info)
         self.slice_plotter_presenter.validate_intensity = mock.Mock(return_value=(7.0, 8.0))
