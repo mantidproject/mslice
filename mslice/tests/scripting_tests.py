@@ -43,6 +43,9 @@ class ScriptingTest(unittest.TestCase):
     @mock.patch('mslice.scripting.generate_script_lines')
     @mock.patch('mslice.scripting.get_cut_plotter_presenter')
     def test_that_preprocess_lines_works_as_expected_for_multiple_cuts(self, get_cpp, gen_lines, workspace_handle):
+        fig = mock.MagicMock()
+        ax = fig.add_subplot(111, projection='mslice')
+
         plot_handler = mock.MagicMock(spec=CutPlot)
         ws_name1 = "ws1"
         ws_name2 = "ws2"
@@ -51,12 +54,12 @@ class ScriptingTest(unittest.TestCase):
         cut2 = Cut(Axis('|Q|', '1', '4', '1'), Axis('DelataE', '-1', '1', '0'), None, None, True, '2')
         cut2.workspace_name = ws_name2
         get_cpp()._cut_cache = {ws_name1: cut1, ws_name2: cut2}
-        get_cpp()._cut_cache_list = [cut1, cut2]
+        get_cpp()._cut_cache_dict = {ax: [cut1, cut2]}
 
         ws1 = workspace_handle(ws_name1).raw_ws
         ws2 = workspace_handle(ws_name2).raw_ws
 
-        preprocess_lines(ws_name2, plot_handler)
+        preprocess_lines(ws_name2, plot_handler, ax)
 
         self.assertIn(mock.call(ws1, ws_name1), gen_lines.call_args_list)
         self.assertIn(mock.call(ws2, ws_name2), gen_lines.call_args_list)
@@ -70,7 +73,10 @@ class ScriptingTest(unittest.TestCase):
         ws_name1 = "ws1"
         ws1 = workspace_handle(ws_name1).raw_ws
 
-        preprocess_lines(ws_name1, plot_handler)
+        fig = mock.MagicMock()
+        ax = fig.add_subplot(111, projection='mslice')
+
+        preprocess_lines(ws_name1, plot_handler, ax)
 
         self.assertIn(mock.call(ws1, ws_name1), gen_lines.call_args_list)
         self.assertEqual(1, gen_lines.call_count)

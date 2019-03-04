@@ -1,5 +1,5 @@
 [flake8]
-ignore = E2,E3,F403
+ignore = E2,E3,F403,W503
 exclude =
     docs/source/conf.py,
     *_ui.py,

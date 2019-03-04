@@ -9,6 +9,7 @@ import mslice.plotting.pyplot as plt
 from mslice.cli.plotfunctions import pcolormesh, errorbar
 from mslice.cli.helperfunctions import _get_overplot_key
 
+
 class CLIProjectionTest(unittest.TestCase):
 
     def setUp(self):
@@ -70,8 +71,12 @@ class CLIProjectionTest(unittest.TestCase):
         is_gui.return_value = True
         cut = mc.Cut(self.workspace)
 
-        return_value = errorbar(self.ax, cut)
-        self.assertEqual(self.ax.lines, return_value)
+        fig = mock.MagicMock()
+        ax = fig.add_subplot(111, projection='mslice')
+
+        return_value = errorbar(ax, cut)
+        self.assertEqual(ax.lines, return_value)
+        ax.pchanged.assert_called()
 
     def test_that_plot_slice_mslice_projection_works_correctly(self):
         slice = mc.Slice(self.workspace)
@@ -137,3 +142,19 @@ class CLIProjectionTest(unittest.TestCase):
         self.ax.grid(b=b, which=which, axis='y')
         grid.assert_called_with(self.ax, b, which, 'y')
         self.assertEqual(plot_handler.manager._xgrid, b)
+
+    def test_that_waterfall_command_works(self):
+        from mslice.plotting.plot_window.cut_plot import CutPlot
+        active_figure = mock.MagicMock()
+        active_figure.plot_handler = mock.MagicMock(spec=CutPlot)
+
+        fig = plt.gcf()
+        ax = fig.add_subplot(111, projection='mslice')
+        with mock.patch('mslice.cli._mslice_commands.GlobalFigureManager.get_active_figure') as gaf:
+            gaf.return_value = active_figure
+            ax.set_waterfall(True, x_offset=1, y_offset=2)
+
+        self.assertEqual(active_figure.plot_handler.waterfall, True)
+        self.assertEqual(active_figure.plot_handler.waterfall_x, 1)
+        self.assertEqual(active_figure.plot_handler.waterfall_y, 2)
+        active_figure.plot_handler.toggle_waterfall.assert_called()

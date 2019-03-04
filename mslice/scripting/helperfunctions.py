@@ -30,7 +30,7 @@ def add_header(script_lines, plot_handler):
     script_lines.append("\n")
 
 
-def add_plot_statements(script_lines, plot_handler):
+def add_plot_statements(script_lines, plot_handler, ax):
     """Adds plot statements to the script lines used to generate the python script"""
     from mslice.plotting.plot_window.slice_plot import SlicePlot
     from mslice.plotting.plot_window.cut_plot import CutPlot
@@ -45,7 +45,7 @@ def add_plot_statements(script_lines, plot_handler):
             add_slice_plot_statements(script_lines, plot_handler)
             add_overplot_statements(script_lines, plot_handler)
         elif isinstance(plot_handler, CutPlot):
-            add_cut_plot_statements(script_lines, plot_handler)
+            add_cut_plot_statements(script_lines, plot_handler, ax)
 
         script_lines.append("mc.Show()\n")
 
@@ -113,10 +113,10 @@ def add_overplot_statements(script_lines, plot_handler):
                 script_lines.append("ax.bragg(workspace='{}', cif='{}')\n".format(plot_handler.ws_name, cif))
 
 
-def add_cut_plot_statements(script_lines, plot_handler):
+def add_cut_plot_statements(script_lines, plot_handler, ax):
     """Adds cut specific statements to the script"""
 
-    add_cut_lines(script_lines, plot_handler)
+    add_cut_lines(script_lines, plot_handler, ax)
     add_plot_options(script_lines, plot_handler)
 
     if plot_handler.is_changed("x_log"):
@@ -128,8 +128,8 @@ def add_cut_plot_statements(script_lines, plot_handler):
             plot_handler.y_axis_min))
 
 
-def add_cut_lines(script_lines, plot_handler):
-    cuts = plot_handler._cut_plotter_presenter._cut_cache_list
+def add_cut_lines(script_lines, plot_handler, ax):
+    cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
     add_cut_lines_with_width(errorbars, script_lines, cuts)
 
@@ -198,3 +198,9 @@ def add_plot_options(script_lines, plot_handler):
 
     if plot_handler.is_changed("x_range"):
         script_lines.append("ax.set_xlim(left={}, right={})\n".format(*plot_handler.x_range))
+
+    from mslice.plotting.plot_window.cut_plot import CutPlot
+    if isinstance(plot_handler, CutPlot) and plot_handler.is_changed("waterfall"):
+        script_lines.append("ax.set_waterfall({}, x_offset={}, y_offset={})\n".format(plot_handler.waterfall,
+                                                                                      plot_handler.waterfall_x,
+                                                                                      plot_handler.waterfall_y))

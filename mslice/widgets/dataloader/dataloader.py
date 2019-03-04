@@ -24,6 +24,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         load_ui(__file__, 'dataloader.ui', self)
 
         self.directory = QDir(os.path.expanduser('~'))
+        self._sort_column = 0
         self.reload_model()
         self.txtpath.setText(self.directory.absolutePath())
         self._presenter = DataLoaderPresenter(self)
@@ -79,6 +80,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.table_view.setColumnHidden(2, True)  # Hide type column
         self.table_view.setColumnWidth(3, 140)    # Show date modified
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.sort_files(self._sort_column)
 
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
@@ -101,6 +103,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self._presenter.load_workspace(self.get_selected_file_paths(), merge)
 
     def sort_files(self, column):
+        self._sort_column = column
         self.table_view.sortByColumn(column, column % 2)  # descending order for size/modified, ascending for name/type
 
     def go_to_home(self):

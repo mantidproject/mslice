@@ -68,11 +68,23 @@ class CommandLineTest(unittest.TestCase):
     @mock.patch('mslice.app.presenters.get_dataloader_presenter')
     @mock.patch('mslice.cli._mslice_commands.ospath.exists')
     def test_load(self, ospath_mock, get_dlp, get_workspace_mock):
-        ospath_mock.exists.return_value = True
+        ospath_mock.return_value = True
         path = 'made_up_path'
         Load(path)
 
-        get_dlp().load_workspace.assert_called_once_with([path])
+        get_dlp().load_workspace.assert_called_once_with([path], False)
+        get_workspace_mock.assert_called_with(path)
+
+    @mock.patch('mslice.cli._mslice_commands.get_workspace_handle')
+    @mock.patch('mslice.app.presenters.get_dataloader_presenter')
+    @mock.patch('mslice.cli._mslice_commands.ospath')
+    def test_load_merge(self, ospath_mock, get_dlp, get_workspace_mock):
+        path = 'made_up_path+another_made_up_path'
+        ospath_mock.exists.side_effect = [False, True, True]
+        ospath_mock.splitext.return_value = [path]
+        Load(path)
+
+        get_dlp().load_workspace.assert_called_once_with([path], True)
         get_workspace_mock.assert_called_with(path)
 
     @mock.patch('mslice.app.presenters.get_powder_presenter')
@@ -84,9 +96,9 @@ class CommandLineTest(unittest.TestCase):
         result = MakeProjection(workspace, '|Q|', 'DeltaE')
         signal = result.get_signal()
         self.assertEqual(type(result), PixelWorkspace)
-        self.assertAlmostEqual(signal[0][0], 0, 4)
-        self.assertAlmostEqual(signal[0][11], 0.1753, 4)
-        self.assertAlmostEqual(signal[0][28], 0.4248, 4)
+        self.assertAlmostEqual(signal[0][0], 0, 2)
+        self.assertAlmostEqual(signal[0][11], 0.175, 2)
+        self.assertAlmostEqual(signal[0][28], 0.4248, 2)
 
     @mock.patch('mslice.scripting.generate_script')
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
@@ -113,8 +125,8 @@ class CommandLineTest(unittest.TestCase):
         result = Slice(workspace)
         signal = result.get_signal()
         self.assertEqual(type(result), Workspace)
-        self.assertAlmostEqual(0.4250, signal[1][10], 4)
-        self.assertAlmostEqual(0.9250, signal[4][11], 4)
+        self.assertAlmostEqual(0.425, signal[1][10], 2)
+        self.assertAlmostEqual(0.925, signal[4][11], 2)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_non_psd_axes_specified(self, get_spp):
@@ -123,8 +135,8 @@ class CommandLineTest(unittest.TestCase):
         result = Slice(workspace, 'DeltaE,0,15,1', '|Q|,0,3,0.1')
         signal = result.get_signal()
         self.assertEqual(type(result), Workspace)
-        self.assertAlmostEqual(0.4250, signal[2][0], 4)
-        self.assertAlmostEqual(0.9250, signal[5][1], 4)
+        self.assertAlmostEqual(0.425, signal[2][0], 2)
+        self.assertAlmostEqual(0.925, signal[5][1], 2)
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.app.presenters.get_cut_plotter_presenter')
@@ -135,8 +147,8 @@ class CommandLineTest(unittest.TestCase):
         result = Cut(workspace)
         signal = result.get_signal()
         self.assertEqual(type(result), HistogramWorkspace)
-        self.assertAlmostEqual(1.1299, signal[5], 4)
-        self.assertAlmostEqual(1.375, signal[8], 4)
+        self.assertAlmostEqual(1.129, signal[5], 2)
+        self.assertAlmostEqual(1.375, signal[8], 2)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_psd(self, get_spp):

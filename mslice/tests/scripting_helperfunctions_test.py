@@ -66,10 +66,13 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         plot_handler = mock.MagicMock(spec=CutPlot)
         script_lines = []
 
-        add_plot_statements(script_lines, plot_handler)
+        fig = mock.MagicMock()
+        ax = fig.add_subplot(111, projection='mslice')
+
+        add_plot_statements(script_lines, plot_handler, ax)
 
         add_header.assert_called_once_with(script_lines, plot_handler)
-        add_cut.assert_called_once_with(script_lines, plot_handler)
+        add_cut.assert_called_once_with(script_lines, plot_handler, ax)
 
         self.assertIn("mc.Show()\n", script_lines)
         self.assertIn('fig = plt.gcf()\n', script_lines)
@@ -82,7 +85,10 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         plot_handler = mock.MagicMock(spec=SlicePlot)
         script_lines = []
 
-        add_plot_statements(script_lines, plot_handler)
+        fig = mock.MagicMock()
+        ax = fig.add_subplot(111, projection='mslice')
+
+        add_plot_statements(script_lines, plot_handler, ax)
 
         add_header.assert_called_once_with(script_lines, plot_handler)
         add_slice.assert_called_once_with(script_lines, plot_handler)
@@ -193,9 +199,12 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         plot_handler.add_mock_spec(CutPlot)
         script_lines = []
 
-        add_cut_plot_statements(script_lines, plot_handler)
+        fig = mock.MagicMock()
+        ax = fig.add_subplot(111, projection='mslice')
 
-        add_cut_lines.assert_called_once_with(script_lines, plot_handler)
+        add_cut_plot_statements(script_lines, plot_handler, ax)
+
+        add_cut_lines.assert_called_once_with(script_lines, plot_handler, ax)
         add_plot_options.assert_called_once_with(script_lines, plot_handler)
 
         self.assertIn("ax.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
@@ -207,15 +216,18 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
     @mock.patch('mslice.scripting.helperfunctions.add_cut_lines_with_width')
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_cut_lines_works_as_expected(self, gfm, add_cut_lines_with_width):
+        fig = mock.MagicMock()
+        ax = fig.add_subplot(111, projection='mslice')
+
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(CutPlot)
 
         script_lines = []
 
-        cuts = plot_handler._cut_plotter_presenter._cut_cache_list
-        errorbars = plot_handler._canvas.figure.gca().containers
+        add_cut_lines(script_lines, plot_handler, ax)
 
-        add_cut_lines(script_lines, plot_handler)
+        cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
+        errorbars = plot_handler._canvas.figure.gca().containers
 
         add_cut_lines_with_width.assert_called_once_with(errorbars, script_lines, cuts)
 
