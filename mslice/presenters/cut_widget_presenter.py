@@ -39,9 +39,9 @@ class CutWidgetPresenter(PresenterUtility):
             elif command == Command.PlotOver:
                 self._cut(plot_over=True)
             elif command == Command.PlotFromWorkspace:
-                self._cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over=False)
+                self._cut_from_workspace(plot_over=False)
             elif command == Command.PlotOverFromWorkspace:
-                self._cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over=True)
+                self._cut_from_workspace(plot_over=True)
             elif command == Command.SaveToWorkspace:
                 self._cut(save_only=True)
             elif command == Command.AxisChanged:
@@ -56,8 +56,17 @@ class CutWidgetPresenter(PresenterUtility):
             self._cut_view.display_error(str(e))
             return
         for workspace in selected_workspaces:
-            self._cut_plotter_presenter.run_cut(workspace, Cut(*params), plot_over=plot_over, save_only=save_only)
+            try:
+                self._cut_plotter_presenter.run_cut(workspace, Cut(*params), plot_over=plot_over, save_only=save_only)
+            except RuntimeError as e:
+                self._cut_view.display_error(e.message)
             plot_over = True  # The first plot will respect which button the user pressed. The rest will over plot
+
+    def _cut_from_workspace(self, plot_over):
+        try:
+            self._cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over)
+        except RuntimeError as e:
+            self._cut_view.display_error(e.message)
 
     def _parse_step(self):
         step = self._cut_view.get_cut_axis_step()

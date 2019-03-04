@@ -32,7 +32,8 @@ class CutPlotterPresenter(PresenterUtility):
         cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, store)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start,
                                  integration_axis.end)
-        plot_cut_impl(cut_ws, (cut.intensity_start, cut.intensity_end), plot_over, legend)
+        en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
+        plot_cut_impl(cut_ws, (cut.intensity_start, cut.intensity_end), plot_over, legend, en_conversion)
         if update_main:
             self.set_is_icut(False)
             self.update_main_window()

@@ -69,3 +69,6 @@ class MainPresenter(MainPresenterInterface):
     def set_energy_default(self, en_default):
         for listener in self._energy_default_listener:
             listener.set_energy_default(en_default)
+
+    def is_energy_conversion_allowed(self):
+        return self._mainView.is_energy_conversion_allowed()

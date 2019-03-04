@@ -37,6 +37,7 @@ def errorbar(axes, workspace, *args, **kwargs):
     intensity_range = kwargs.pop('intensity_range', (None, None))
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
+    en_conversion_allowed = kwargs.pop('en_conversion', True)
 
     cut_axis, int_axis = tuple(workspace.axes)
     # Checks that current cut has consistent units with previous
@@ -44,11 +45,15 @@ def errorbar(axes, workspace, *args, **kwargs):
         cached_cuts = presenter.get_cache(axes)
         if cached_cuts:
             if (cut_axis.units != cached_cuts[0].cut_axis.units):
-                raise ValueError('Cut axes not consistent with current plot. '
-                                 'Expected {}, got {}'.format(cached_cuts[0].cut_axis.units, cut_axis.units))
+                raise RuntimeError('Cut axes not consistent with current plot. '
+                                   'Expected {}, got {}'.format(cached_cuts[0].cut_axis.units, cut_axis.units))
             # Checks whether we should do an energy unit conversion
             if 'DeltaE' in cut_axis.units and cut_axis.e_unit != cached_cuts[0].cut_axis.e_unit:
-                _rescale_energy_cut_plot(presenter, cached_cuts, cut_axis.e_unit)
+                if en_conversion_allowed:
+                    _rescale_energy_cut_plot(presenter, cached_cuts, cut_axis.e_unit)
+                else:
+                    raise RuntimeError('Wrong energy unit for cut. '
+                                       'Expected {}, got {}'.format(cached_cuts[0].cut_axis.e_unit, cut_axis.e_unit))
 
     plotfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
 

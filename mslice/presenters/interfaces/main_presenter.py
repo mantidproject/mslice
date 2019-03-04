@@ -48,3 +48,7 @@ class MainPresenterInterface(object):
     @abc.abstractmethod
     def subscribe_to_energy_default_monitor(self, client):
         pass
+
+    @abc.abstractmethod
+    def is_energy_conversion_allowed(self):
+        pass

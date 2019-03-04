@@ -91,6 +91,9 @@ class MainWindow(MainView, QMainWindow):
             self._en_default_actions.append(action)
         self._en_default_actions[0].setChecked(True)
 
+        self.actionEUnitConvEnabled.triggered.connect(partial(self.set_energy_conversion, True))
+        self.actionEUnitConvDisabled.triggered.connect(partial(self.set_energy_conversion, False))
+
     def setup_save(self):
         menu = QMenu()
         menu.addAction("Nexus (*.nxs)", lambda: self.button_save('Nexus'))
@@ -204,3 +207,12 @@ class MainWindow(MainView, QMainWindow):
             else:
                 self._en_default_actions[0].setChecked(True)
         self._presenter.set_energy_default(self.get_energy_default())
+
+    def set_energy_conversion(self, EnabledClicked):
+        if EnabledClicked:
+            self.actionEUnitConvDisabled.setChecked(not self.actionEUnitConvEnabled.isChecked())
+        else:
+            self.actionEUnitConvEnabled.setChecked(not self.actionEUnitConvDisabled.isChecked())
+
+    def is_energy_conversion_allowed(self):
+        return self.actionEUnitConvEnabled.isChecked()
