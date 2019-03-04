@@ -45,6 +45,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 try:
                     if file_paths[i].endswith('.txt'):
                         load_from_ascii(file_paths[i], ws_name)
+                        allChecked = True
                     else:
                         load(filename=file_paths[i], output_workspace=ws_name)
                 except ValueError as e:

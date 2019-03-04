@@ -7,6 +7,7 @@ from tempfile import gettempdir
 import unittest
 from mantid.simpleapi import CreateMDHistoWorkspace
 
+from mslice.models.axis import Axis
 from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.file_io import _save_cut_to_ascii, _save_slice_to_ascii, get_save_directory
 from mslice.workspace.histogram_workspace import HistogramWorkspace
@@ -83,6 +84,7 @@ class FileIOTest(unittest.TestCase):
         raw_ws = CreateMDHistoWorkspace(SignalInput=[1, 2], ErrorInput=[4, 5], Dimensionality=1, Extents=[-1, 5],
                                         NumberOfBins=2, Names='Dim1', Units="units", OutputWorkspace=ws_name)
         ws = HistogramWorkspace(raw_ws, ws_name)
+        ws.axes = [Axis('DeltaE',0,1,0.1), Axis('Q',0,2,0.2)]
         _save_cut_to_ascii(ws, ws_name, "some_path")
         output_method.assert_called_once()
         self.assertEqual(output_method.call_args[0][0], 'some_path')
@@ -94,6 +96,7 @@ class FileIOTest(unittest.TestCase):
                                         Extents=[-10, 10, -10, 10], NumberOfBins='2,2', Names='Dim1,Dim2',
                                         Units="units1,units2", OutputWorkspace='workspace')
         ws = HistogramWorkspace(raw_ws, 'workspace')
+        ws.axes = [Axis('DeltaE',0,1,0.1), Axis('Q',0,2,0.2)]
         _save_slice_to_ascii(ws, "path1")
         output_method.assert_called_once()
         self.assertEqual(output_method.call_args[0][0], 'path1')
