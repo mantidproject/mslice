@@ -137,5 +137,3 @@ class CLIProjectionTest(unittest.TestCase):
         self.ax.grid(b=b, which=which, axis='y')
         grid.assert_called_with(self.ax, b, which, 'y')
         self.assertEqual(plot_handler.manager._xgrid, b)
-
-
