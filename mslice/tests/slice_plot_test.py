@@ -19,6 +19,17 @@ class SlicePlotTest(unittest.TestCase):
         canvas.figure.gca = MagicMock(return_value=self.axes)
         self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
 
+    def test_that_is_changed_works_correctly(self):
+        self.slice_plot.default_options = {}
+
+        self.slice_plot.default_options['y_grid'] = False
+        self.slice_plot.y_grid = False
+        self.slice_plot.default_options['x_grid'] = False
+        self.slice_plot.x_grid = True
+
+        self.assertEqual(self.slice_plot.is_changed('y_grid'), False)
+        self.assertEqual(self.slice_plot.is_changed('x_grid'), True)
+
     def test_change_logarithmic(self):
         image = MagicMock()
         norm = PropertyMock(return_value=colors.Normalize)
@@ -77,7 +88,7 @@ class SlicePlotTest(unittest.TestCase):
         self.slice_plotter.add_overplot_line.assert_not_called()
 
     def test_update_legend(self):
-        line1 = Line2D([], [],label='line1')
+        line1 = Line2D([], [], label='line1')
         line2 = Line2D([], [], label='line2')
         line3 = Line2D([], [], label='line_not_to_show1')
         line4 = Line2D([], [], label='')

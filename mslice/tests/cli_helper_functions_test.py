@@ -5,8 +5,11 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHisto
 import mock
 from mslice.workspace import wrap_workspace
 from mslice.cli.helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
-    _check_workspace_name, _check_workspace_type, is_slice, is_cut
+    _check_workspace_name, _check_workspace_type, is_slice, is_cut, _get_overplot_key, _update_overplot_checklist, \
+    _update_legend
 from mslice.cli._mslice_commands import Cut, Slice
+from mslice.app.presenters import get_cut_plotter_presenter
+from mslice.models.cut.cut import Cut as cut_model
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -55,6 +58,44 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         workspace = wrap_workspace(workspace, name)
         workspace.is_PSD = True
         return workspace
+
+    @mock.patch('mslice.plotting.globalfiguremanager.GlobalFigureManager.get_active_figure')
+    def test_that_update_overplot_checklist_works_as_expected_with_elements(self, gaf):
+        key = 1  # Hydrogen
+        _update_overplot_checklist(key)
+
+        gaf().window.action_hydrogen.setChecked.assert_called_once_with(True)
+
+    @mock.patch('mslice.plotting.globalfiguremanager.GlobalFigureManager.get_active_figure')
+    def test_that_update_overplot_checklist_works_as_expected_with_arb_nuclei(self, gaf):
+        key = 23  # Arbitrary Nuclei
+        _update_overplot_checklist(key)
+
+        gaf().window.action_arbitrary_nuclei.setChecked.assert_called_once_with(True)
+
+    def test_that_get_overplot_key_works_as_expected_with_invalid_parameters(self):
+        element, rmn = 'Hydrogen', 23
+        with self.assertRaises(RuntimeError):
+            _get_overplot_key(element, rmn)
+
+        element, rmn = None, None
+        with self.assertRaises(RuntimeError):
+            _get_overplot_key(element, rmn)
+
+    def test_that_get_overplot_key_works_as_expected_with_elements(self):
+        element, rmn = 'Hydrogen', None
+        return_value = _get_overplot_key(element, rmn)
+        self.assertEqual(return_value, 1)
+
+    def test_that_get_overplot_keys_works_as_expectec_with_rmn(self):
+        element, rmn = None, 23
+        return_value = _get_overplot_key(element, rmn)
+        self.assertEqual(return_value, rmn)
+
+    @mock.patch('mslice.plotting.globalfiguremanager.GlobalFigureManager.get_active_figure')
+    def test_that_update_legend_works_as_expected(self, gaf):
+        _update_legend()
+        gaf().plot_handler.update_legend.assert_called_once()
 
     def test_that_string_to_axis_works_as_expected(self):
         string = "name,1,5,0.1"
@@ -111,7 +152,6 @@ class CLIHelperFunctionsTest(unittest.TestCase):
 
         return_value = is_slice(hist_ws)
         self.assertEqual(return_value, True)
-
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     def test_that_is_cut_works_as_expected(self, is_gui):
