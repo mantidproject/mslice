@@ -38,11 +38,9 @@ _intensity_to_workspace = {
 }
 
 
-def _update_cache(cut_presenter, ws_name, CutAxis, IntegrationAxis, NormToOne):
+def _update_cache(cut_presenter, ws_name, cut_axis, int_axis, NormToOne):
     """Creates a list of all cuts used to create a particular cut. This is required when plot over is used."""
     import mslice.plotting.pyplot as plt
-    int_axis = Axis(*IntegrationAxis.split(','))
-    cut_axis = Axis(*CutAxis.split(','))
     width = None if int_axis.end - int_axis.start == 0 else str(int_axis.end - int_axis.start)
     cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
     cut_presenter.save_cache(plt.gca(), cut, True)

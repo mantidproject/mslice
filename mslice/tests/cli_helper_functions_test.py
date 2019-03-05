@@ -59,21 +59,19 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         workspace.is_PSD = True
         return workspace
 
-    @mock.patch('mslice.cli.helperfunctions.GlobalFigureManager')
-    def test_that_update_overplot_checklist_works_as_expected_with_elements(self, gfm):
-        window = gfm.get_active_figure().window
+    @mock.patch('mslice.plotting.globalfiguremanager.GlobalFigureManager.get_active_figure')
+    def test_that_update_overplot_checklist_works_as_expected_with_elements(self, gaf):
         key = 1  # Hydrogen
         _update_overplot_checklist(key)
 
-        window.action_hydrogen.setChecked.assert_called_once_with(True)
+        gaf().window.action_hydrogen.setChecked.assert_called_once_with(True)
 
-    @mock.patch('mslice.cli.helperfunctions.GlobalFigureManager')
-    def test_that_update_overplot_checklist_works_as_expected_with_arb_nuclei(self, gfm):
-        window = gfm.get_active_figure().window
+    @mock.patch('mslice.plotting.globalfiguremanager.GlobalFigureManager.get_active_figure')
+    def test_that_update_overplot_checklist_works_as_expected_with_arb_nuclei(self, gaf):
         key = 23  # Arbitrary Nuclei
         _update_overplot_checklist(key)
 
-        window.action_arbitrary_nuclei.setChecked.assert_called_once_with(True)
+        gaf().window.action_arbitrary_nuclei.setChecked.assert_called_once_with(True)
 
     def test_that_get_overplot_key_works_as_expected_with_invalid_parameters(self):
         element, rmn = 'Hydrogen', 23
@@ -94,11 +92,10 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         return_value = _get_overplot_key(element, rmn)
         self.assertEqual(return_value, rmn)
 
-    @mock.patch('mslice.cli.helperfunctions.GlobalFigureManager')
-    def test_that_update_legend_works_as_expected(self, gfm):
-        plot_handler = gfm.get_active_figure().plot_handler
+    @mock.patch('mslice.plotting.globalfiguremanager.GlobalFigureManager.get_active_figure')
+    def test_that_update_legend_works_as_expected(self, gaf):
         _update_legend()
-        plot_handler.update_legend.assert_called_once()
+        gaf().plot_handler.update_legend.assert_called_once()
 
     def test_that_update_cache_works_as_expected_with_different_workspaces(self):
         norm_to_one = False
@@ -112,16 +109,16 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         cut_axis2 = Axis('|Q|', '0', '3', '1')
         integration_axis2 = Axis('DeltaE', '-2', '1', '0')
 
-        _update_cache(presenter, workspace.name, str(cut_axis), str(integration_axis), norm_to_one)
-        _update_cache(presenter, workspace2.name, str(cut_axis2), str(integration_axis2), norm_to_one)
+        with mock.patch('mslice.plotting.pyplot') as plt:
+            ax = plt.gca()
+            _update_cache(presenter, workspace.name, cut_axis, integration_axis, norm_to_one)
+            _update_cache(presenter, workspace2.name, cut_axis2, integration_axis2, norm_to_one)
 
         cut = cut_model(cut_axis, integration_axis, None, None, norm_to_one=norm_to_one, width='2')
-        cut.workspace_name = 'test'
         cut2 = cut_model(cut_axis2, integration_axis2, None, None, norm_to_one=norm_to_one, width='3')
-        cut2.workspace_name = 'test2'
 
-        self.assertEqual(cut.__dict__, presenter._cut_cache_list[0].__dict__)
-        self.assertEqual(cut2.__dict__, presenter._cut_cache_list[1].__dict__)
+        self.assertEqual(cut.__dict__, presenter._cut_cache_dict[ax][0].__dict__)
+        self.assertEqual(cut2.__dict__, presenter._cut_cache_dict[ax][1].__dict__)
 
     def test_that_update_cache_works_as_expected_with_the_same_workspace(self):
         norm_to_one = False
@@ -131,15 +128,15 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         cut_axis = Axis('|Q|', '0', '10', '5')
         integration_axis = Axis('DeltaE', '-1', '0', '0')
         integration_axis2 = Axis('DeltaE', '0', '1', '0')
-        cumulative = Axis('DeltaE', '-1', '1', '0')
 
-        _update_cache(presenter, workspace.name, str(cut_axis), str(integration_axis), norm_to_one)
-        _update_cache(presenter, workspace.name, str(cut_axis), str(integration_axis2), norm_to_one)
+        with mock.patch('mslice.plotting.pyplot') as plt:
+            ax = plt.gca()
+            _update_cache(presenter, workspace.name, cut_axis, integration_axis, norm_to_one)
+            _update_cache(presenter, workspace.name, cut_axis, integration_axis2, norm_to_one)
 
-        cut = cut_model(cut_axis, cumulative, None, None, norm_to_one=norm_to_one, width='1')
-        cut.workspace_name = 'test'
+        cut = cut_model(cut_axis, integration_axis, None, None, norm_to_one=norm_to_one, width='1')
 
-        self.assertEqual(cut.__dict__, presenter._cut_cache_list[0].__dict__)
+        self.assertEqual(cut.__dict__, presenter._cut_cache_dict[ax][0].__dict__)
 
     def test_that_string_to_axis_works_as_expected(self):
         string = "name,1,5,0.1"

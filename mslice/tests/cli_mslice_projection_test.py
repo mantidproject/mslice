@@ -19,16 +19,11 @@ class CLIProjectionTest(unittest.TestCase):
         self.slice = None
         self.workspace = None
 
-        @mock.patch('mslice.cli._mslice_commands.Slice')
-        @mock.patch('mslice.cli._mslice_commands.Cut')
-        def set_up(self, Cut, Slice):
-            fig = plt.gcf()
-            self.ax = fig.add_subplot(111, projection='mslice')
-            self.workspace = self.create_workspace('workspace')
-            self.cut = Cut(self.workspace)
-            self.slice = Slice(self.workspace)
-
-        set_up(self)
+        fig = plt.gcf()
+        self.ax = fig.add_subplot(111, projection='mslice')
+        self.workspace = self.create_workspace('workspace')
+        self.cut = mc.Cut(self.workspace)
+        self.slice = mc.Slice(self.workspace)
 
     def create_workspace(self, name):
         workspace = CreateSampleWorkspace(OutputWorkspace=name, NumBanks=1, BankPixelWidth=5, XMin=0.1,
