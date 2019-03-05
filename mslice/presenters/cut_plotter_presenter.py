@@ -11,13 +11,11 @@ class CutPlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._interactive_cut_cache = None
-        self._cut_cache = {}
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
         cut.workspace_name = workspace.name
-        self._cut_cache[workspace.name] = cut
 
         if cut.width is not None:
             self._plot_with_width(workspace, cut, plot_over)

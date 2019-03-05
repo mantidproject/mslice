@@ -25,13 +25,13 @@ def generate_script(ws_name, filename=None, plot_handler=None, window=None):
 def preprocess_lines(ws_name, plot_handler, ax):
     from mslice.plotting.plot_window.cut_plot import CutPlot
     script_lines = []
-    cut_cache = get_cut_plotter_presenter()._cut_cache
-    if isinstance(plot_handler, CutPlot) and len(cut_cache) > 1:
+    if isinstance(plot_handler, CutPlot):
         cache_list = get_cut_plotter_presenter()._cut_cache_dict[ax]
-        for workspace_name in cut_cache:
-            if any([workspace_name.replace(".", "_") == cut.workspace_name for cut in cache_list]):
-                ws = get_workspace_handle(workspace_name).raw_ws
-                script_lines += generate_script_lines(ws, workspace_name)
+        ws_list = {}    # use a dict to ensure unique workspaces
+        for workspace_name in [cut.workspace_raw_name for cut in cache_list]:
+            ws_list[get_workspace_handle(workspace_name).raw_ws] = workspace_name
+        for ws, workspace_name in list(ws_list.items()):
+            script_lines += generate_script_lines(ws, workspace_name)
     else:
         ws = get_workspace_handle(ws_name).raw_ws
         script_lines += generate_script_lines(ws, ws_name)

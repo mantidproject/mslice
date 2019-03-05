@@ -128,9 +128,11 @@ def _check_workspace_type(workspace, correct_type):
 
 def _rescale_energy_cut_plot(presenter, cuts, new_e_unit):
     """Given a CutPlotterPresenter and a set of cached cuts, rescales the workspaces to a different energy-unit and replot"""
-    for id, cut in enumerate(cuts):
+    import copy
+    cuts_copy = copy.deepcopy(cuts)  # Because run_cut will overwrite the cuts cache for plot_over=True
+    for id, cut in enumerate(cuts_copy):
         cut.cut_axis.e_unit = new_e_unit
-        presenter.run_cut(cut.workspace_raw_name, cut, plot_over=id > 0)
+        presenter.run_cut(cut.workspace_raw_name, cut, plot_over=(id > 0))
 
 
 # Arguments Validation

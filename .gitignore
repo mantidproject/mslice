@@ -102,3 +102,10 @@ ENV/
 # Data files
 *.nxs
 *.nxspe
+
+# Diff files
+*.diff
+
+# Vim files
+*.swp
+*.swo

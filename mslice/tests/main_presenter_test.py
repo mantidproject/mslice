@@ -78,3 +78,8 @@ class MainPresenterTests(unittest.TestCase):
                 client.set_energy_default.assert_called_once()
             else:
                 client.set_energy_default.assert_not_called()
+
+    def test_energy_conversion_options(self):
+        main_presenter = MainPresenter(self.mainview)
+        main_presenter.is_energy_conversion_allowed()
+        self.mainview.is_energy_conversion_allowed.assert_called()
