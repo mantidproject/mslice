@@ -174,7 +174,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
 
     # Create the cut for use by the plot window in a generated script
     if not is_gui():
-        _update_cache(get_cut_plotter_presenter(), workspace.name, CutAxis, IntegrationAxis, NormToOne)
+        _update_cache(get_cut_plotter_presenter(), workspace.name, cut_axis, integration_axis, NormToOne)
 
     return cut
 

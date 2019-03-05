@@ -18,6 +18,17 @@ class CutPlotTest(unittest.TestCase):
         self.canvas.figure.gca = MagicMock(return_value=self.axes)
         self.cut_plot = CutPlot(self.plot_figure, self.cut_plotter, "workspace")
 
+    def test_that_is_changed_works_correctly(self):
+        self.cut_plot.default_options = {}
+
+        self.cut_plot.default_options['y_grid'] = False
+        self.cut_plot.y_grid = False
+        self.cut_plot.default_options['x_grid'] = False
+        self.cut_plot.x_grid = True
+
+        self.assertEqual(self.cut_plot.is_changed('y_grid'), False)
+        self.assertEqual(self.cut_plot.is_changed('x_grid'), True)
+
     def test_get_min(self):
         data = [np.array([3, 6, 10]), np.array([3, 2, 7])]
         self.assertEqual(get_min(data), 2)

@@ -25,9 +25,8 @@ def generate_script(ws_name, filename=None, plot_handler=None, window=None):
 def preprocess_lines(ws_name, plot_handler, ax):
     from mslice.plotting.plot_window.cut_plot import CutPlot
     script_lines = []
-
-    if isinstance(plot_handler, CutPlot) and len(get_cut_plotter_presenter()._cut_cache) > 1:
-        cut_cache = get_cut_plotter_presenter()._cut_cache
+    cut_cache = get_cut_plotter_presenter()._cut_cache
+    if isinstance(plot_handler, CutPlot) and len(cut_cache) > 1:
         cache_list = get_cut_plotter_presenter()._cut_cache_dict[ax]
         for workspace_name in cut_cache:
             if any([workspace_name.replace(".", "_") == cut.workspace_name for cut in cache_list]):
@@ -43,8 +42,8 @@ def preprocess_lines(ws_name, plot_handler, ax):
 def generate_script_lines(raw_ws, workspace_name):
     lines = []
     ws_name = workspace_name.replace(".", "_")
-    alg_history = reversed(raw_ws.getHistory().getAlgorithmHistories())
-    for algorithm in alg_history:
+    alg_history = raw_ws.getHistory().getAlgorithmHistories()
+    for algorithm in reversed(alg_history):
         alg_name = algorithm.name()
         kwargs = get_algorithm_kwargs(algorithm, ws_name)
         lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
