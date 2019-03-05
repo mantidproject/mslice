@@ -21,11 +21,15 @@ class Cut(object):
 
     @property
     def workspace_name(self):
-        return self._workspace_name
+        return self._workspace_name.replace(".", "_")
 
     @workspace_name.setter
     def workspace_name(self, ws_name):
-        self._workspace_name = ws_name.replace(".", "_")
+        self._workspace_name = ws_name
+
+    @property
+    def workspace_raw_name(self):
+        return self._workspace_name
 
     @property
     def cut_axis(self):

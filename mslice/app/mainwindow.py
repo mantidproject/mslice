@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QMenu
 
+from mslice.models.units import EnergyUnits
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
@@ -11,6 +12,9 @@ from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 from mslice.widgets.workspacemanager import TAB_2D, TAB_EVENT, TAB_HISTO, TAB_NONPSD
 from mslice.widgets.workspacemanager.command import Command as ws_command
 from mslice.widgets.cut.command import Command as cut_command
+from mslice.plotting.plot_window.plot_window import add_action
+
+from functools import partial
 
 TAB_SLICE = 1
 TAB_CUT = 2
@@ -79,6 +83,16 @@ class MainWindow(MainView, QMainWindow):
         self.wgtPowder.busy.connect(self.show_busy)
         self.data_loading.busy.connect(self.show_busy)
         self.action_quit.triggered.connect(self.close)
+
+        self._en_default_actions = []
+        for e_unit in EnergyUnits.get_all_units():
+            action = add_action(self.menuDefault_Energy_Units, self, e_unit, checkable=True)
+            action.triggered.connect(partial(self.set_energy_default, action))
+            self._en_default_actions.append(action)
+        self._en_default_actions[0].setChecked(True)
+
+        self.actionEUnitConvEnabled.triggered.connect(partial(self.set_energy_conversion, True))
+        self.actionEUnitConvDisabled.triggered.connect(partial(self.set_energy_conversion, False))
 
     def setup_save(self):
         menu = QMenu()
@@ -174,3 +188,31 @@ class MainWindow(MainView, QMainWindow):
         else:
             return
         QApplication.processEvents()
+
+    def get_energy_default(self):
+        return [action.text() for action in self._en_default_actions if action.isChecked()][0]
+
+    def set_energy_default(self, this_action):
+        if this_action.isChecked():
+            for action in self._en_default_actions:
+                # Only one unit can be set as default at a time
+                if action == this_action:
+                    action.setChecked(True)
+                else:
+                    action.setChecked(False)
+        else:
+            # User unchecked this action - either go back to first or set another action as default
+            if this_action == self._en_default_actions[0]:
+                self._en_default_actions[1].setChecked(True)
+            else:
+                self._en_default_actions[0].setChecked(True)
+        self._presenter.set_energy_default(self.get_energy_default())
+
+    def set_energy_conversion(self, EnabledClicked):
+        if EnabledClicked:
+            self.actionEUnitConvDisabled.setChecked(not self.actionEUnitConvEnabled.isChecked())
+        else:
+            self.actionEUnitConvEnabled.setChecked(not self.actionEUnitConvDisabled.isChecked())
+
+    def is_energy_conversion_allowed(self):
+        return self.actionEUnitConvEnabled.isChecked()

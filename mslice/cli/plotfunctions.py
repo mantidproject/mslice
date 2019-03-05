@@ -4,12 +4,12 @@ import mslice.plotting.pyplot as plt
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _intensity_to_action, \
-    _intensity_to_workspace, _function_to_intensity
+    _intensity_to_workspace, _function_to_intensity, _rescale_energy_cut_plot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
 from mslice.util.mantid.mantid_algorithms import Transpose
-from mslice.models.workspacemanager.workspace_algorithms import get_comment
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
+from mslice.models.cut.cut import Cut
 from mantid.plots import plotfunctions
 from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
@@ -35,25 +35,47 @@ def errorbar(axes, workspace, *args, **kwargs):
 
     plot_over = kwargs.pop('plot_over', True)
     intensity_range = kwargs.pop('intensity_range', (None, None))
-    x_units = kwargs.pop('x_units', 'None')
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
+    en_conversion_allowed = kwargs.pop('en_conversion', True)
+
+    cut_axis, int_axis = tuple(workspace.axes)
+    # Checks that current cut has consistent units with previous
+    if plot_over:
+        cached_cuts = presenter.get_cache(axes)
+        if cached_cuts:
+            if (cut_axis.units != cached_cuts[0].cut_axis.units):
+                raise RuntimeError('Cut axes not consistent with current plot. '
+                                   'Expected {}, got {}'.format(cached_cuts[0].cut_axis.units, cut_axis.units))
+            # Checks whether we should do an energy unit conversion
+            if 'DeltaE' in cut_axis.units and cut_axis.e_unit != cached_cuts[0].cut_axis.e_unit:
+                if en_conversion_allowed:
+                    _rescale_energy_cut_plot(presenter, cached_cuts, cut_axis.e_unit)
+                else:
+                    raise RuntimeError('Wrong energy unit for cut. '
+                                       'Expected {}, got {}'.format(cached_cuts[0].cut_axis.e_unit, cut_axis.e_unit))
 
     plotfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
 
     axes.set_ylim(*intensity_range) if intensity_range is not None else axes.autoscale()
+    intensity_min, intensity_max = axes.get_ylim()
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
         leg = axes.legend(fontsize='medium')
         leg.draggable()
-    axes.set_xlabel(get_display_name(x_units, get_comment(workspace)), picker=CUT_PICKER_TOL_PTS)
+    axes.set_xlabel(get_display_name(cut_axis), picker=CUT_PICKER_TOL_PTS)
     axes.set_ylabel(CUT_INTENSITY_LABEL, picker=CUT_PICKER_TOL_PTS)
     if not plot_over:
         cur_canvas.set_window_title(workspace.name)
         cur_canvas.manager.update_grid()
     if not cur_canvas.manager.has_plot_handler():
-        cur_canvas.manager.add_cut_plot(presenter, workspace.name.rsplit('_', 1)[0])
+        cur_canvas.manager.add_cut_plot(presenter, workspace.name)
     cur_fig.canvas.draw()
     axes.pchanged()  # This call is to let the waterfall callback know to update
+
+    cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='')
+    cut.workspace_name = workspace.parent
+    presenter.save_cache(axes, cut, plot_over)
+
     return axes.lines
 
 
@@ -108,12 +130,11 @@ def pcolormesh(axes, workspace, *args, **kwargs):
     axes.set_title(workspace.name[2:], picker=SLICE_PICKER_TOL_PTS)
     x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
     y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
-    comment = get_comment(str(workspace.name))
     axes.get_xaxis().set_units(x_axis.units)
     axes.get_yaxis().set_units(y_axis.units)
     # labels
-    axes.set_xlabel(get_display_name(x_axis.units, comment), picker=SLICE_PICKER_TOL_PTS)
-    axes.set_ylabel(get_display_name(y_axis.units, comment), picker=SLICE_PICKER_TOL_PTS)
+    axes.set_xlabel(get_display_name(x_axis), picker=SLICE_PICKER_TOL_PTS)
+    axes.set_ylabel(get_display_name(y_axis), picker=SLICE_PICKER_TOL_PTS)
     axes.set_xlim(x_axis.start, x_axis.end)
     axes.set_ylim(y_axis.start, y_axis.end)
     return axes.collections[0]  # Quadmesh object

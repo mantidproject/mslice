@@ -13,6 +13,8 @@ from mslice.util.qt.QtWidgets import QWidget
 from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
 
 from mslice.views.interfaces.cut_view import CutView
+
+from mslice.models.units import EnergyUnits
 from .command import Command
 
 
@@ -40,6 +42,9 @@ class CutWidget(CutView, QWidget):
         self.lneCutStep.editingFinished.connect(self._step_edited)
         self.enable_integration_axis(False)
         self.set_validators()
+        self._en = EnergyUnits('meV')
+        self._en_default = 'meV'
+        self.cmbCutEUnits.currentIndexChanged.connect(self._changed_unit)
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -49,19 +54,37 @@ class CutWidget(CutView, QWidget):
 
     def _step_edited(self):
         """Checks that user inputted step size is not too small."""
-        if self._minimumStep:
+        if self.get_minimum_step():
             try:
                 value = float(self.lneCutStep.text())
             except ValueError:
                 value = 0.0
                 self.display_error('Invalid cut step parameter. Using default.')
             if value == 0.0:
-                self.lneCutStep.setText('%.5f' % (self._minimumStep))
+                self.lneCutStep.setText('%.5f' % (self.get_minimum_step()))
                 self.display_error('Setting step size to default.')
-            elif value < (self._minimumStep / 100.):
+            elif value < (self.get_minimum_step() / 100.):
                 self.display_error('Step size too small!')
                 return False
         return True
+
+    def _changed_unit(self):
+        new_unit = self.get_energy_units()
+        if self._en.factor_to(new_unit) != 1.:
+            if 'DeltaE' in self.get_cut_axis():
+                cut_start, cut_end, cut_step = self._en.convert_to(new_unit,
+                                                                   self.get_cut_axis_start(),
+                                                                   self.get_cut_axis_end(),
+                                                                   self.get_cut_axis_step())
+                self.populate_cut_params(cut_start, cut_end, cut_step)
+            elif 'DeltaE' in self.get_integration_axis():
+                int_start, int_end, int_width = self._en.convert_to(new_unit,
+                                                                    self.get_integration_start(),
+                                                                    self.get_integration_end(),
+                                                                    self.get_integration_width())
+                self.populate_integration_params(int_start, int_end)
+                self.lneCutIntegrationWidth.setText(int_width)
+        self._en = EnergyUnits(new_unit)
 
     def display_error(self, error_string):
         self.error_occurred.emit(error_string)
@@ -122,6 +145,15 @@ class CutWidget(CutView, QWidget):
     def get_smoothing(self):
         return str(self.lneCutSmoothing.text())
 
+    def get_energy_units(self):
+        return self.cmbCutEUnits.currentText()
+
+    def set_energy_units(self, unit):
+        self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(unit))
+
+    def set_energy_units_default(self, unit):
+        self._en_default = unit
+
     def set_cut_axis(self, axis_name):
         index = [ind for ind in range(self.cmbCutAxis.count()) if str(self.cmbCutAxis.itemText(ind)) == axis_name]
         if index:
@@ -130,10 +162,15 @@ class CutWidget(CutView, QWidget):
             self.cmbCutAxis.blockSignals(False)
 
     def set_minimum_step(self, value):
+        # Sets the minimum step size for this cut which if cut axis is DeltaE is always in meV
         self._minimumStep = value
 
     def get_minimum_step(self):
-        return self._minimumStep
+        # Returns the minimum step size in the current energy unit if cut axis is DeltaE
+        if 'DeltaE' in self.get_cut_axis():
+            return self._minimumStep * self._en.factor_from_meV()
+        else:
+            return self._minimumStep
 
     def populate_cut_axis_options(self, options):
         self.cmbCutAxis.blockSignals(True)
@@ -172,6 +209,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutIntegrationWidth.setText("")
         self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
+        self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(self._en_default))
 
     def is_fields_cleared(self):
         current_fields = self.get_input_fields()
@@ -191,18 +229,23 @@ class CutWidget(CutView, QWidget):
         self.lneCutIntegrationWidth.setText(saved_input['integration_width'])
         self.lneCutSmoothing.setText(saved_input['smoothing'])
         self.rdoCutNormToOne.setChecked(saved_input['normtounity'])
+        self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(saved_input['energy_unit']))
 
     def get_input_fields(self):
         saved_input = dict()
         saved_input['axes'] = [str(self.cmbCutAxis.itemText(ind)) for ind in range(self.cmbCutAxis.count())]
-        saved_input['cut_parameters'] = [self.get_cut_axis_start(),
-                                         self.get_cut_axis_end(),
-                                         self.get_cut_axis_step()]
-        saved_input['integration_range'] = [self.get_integration_start(),
-                                            self.get_integration_end()]
-        saved_input['integration_width'] = self.get_integration_width()
+        cut_params = (self.get_cut_axis_start(), self.get_cut_axis_end(), self.get_cut_axis_step())
+        int_params = (self.get_integration_start(), self.get_integration_end(), self.get_integration_width())
+        if 'DeltaE' in self.get_cut_axis():
+            cut_params = list(self._en.to_meV(*cut_params))
+        if 'DeltaE' in self.get_integration_axis():
+            int_params = list(self._en.to_meV(*int_params))
+        saved_input['cut_parameters'] = list(cut_params)
+        saved_input['integration_range'] = list(int_params)[:2]
+        saved_input['integration_width'] = list(int_params)[2]
         saved_input['smoothing'] = self.get_smoothing()
         saved_input['normtounity'] = self.get_intensity_is_norm_to_one()
+        saved_input['energy_unit'] = self.get_energy_units()
         return saved_input
 
     def enable(self):
@@ -210,6 +253,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutEnd.setEnabled(True)
         self.lneCutStep.setEnabled(True)
         self.cmbCutAxis.setEnabled(True)
+        self.cmbCutEUnits.setEnabled(True)
 
         self.lneCutIntegrationStart.setEnabled(True)
         self.lneCutIntegrationEnd.setEnabled(True)
@@ -232,6 +276,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutEnd.setEnabled(False)
         self.lneCutStep.setEnabled(False)
         self.cmbCutAxis.setEnabled(False)
+        self.cmbCutEUnits.setEnabled(False)
 
         self.lneCutIntegrationStart.setEnabled(False)
         self.lneCutIntegrationEnd.setEnabled(False)

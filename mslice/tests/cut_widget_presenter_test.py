@@ -128,6 +128,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         self.view.get_intensity_end = mock.Mock(return_value=intensity_end)
         self.view.get_intensity_is_norm_to_one = mock.Mock(return_value=is_norm)
         self.view.get_integration_width = mock.Mock(return_value=width)
+        self.view.get_energy_units = mock.Mock(return_value=axis.e_unit)
 
     def test_cut_no_workspaces_selected_fail(self):
         cut_widget_presenter = CutWidgetPresenter(self.view)
@@ -260,3 +261,9 @@ class CutWidgetPresenterTest(unittest.TestCase):
             call(selected_workspaces[1], mock.ANY, save_only=False, plot_over=True),
         ]
         cut_plotter_presenter.run_cut.assert_has_calls(call_list)
+
+    def test_set_energy_default(self):
+        cut_widget_presenter = CutWidgetPresenter(self.view)
+        cut_widget_presenter.set_energy_default("meV")
+        self.view.set_energy_units.assert_called_once()
+        self.view.set_energy_units_default.assert_called_once()

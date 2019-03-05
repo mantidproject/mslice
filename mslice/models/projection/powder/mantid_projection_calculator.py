@@ -4,16 +4,13 @@ from mslice.models.workspacemanager.workspace_algorithms import propagate_proper
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.util.mantid import mantid_algorithms
-from ...labels import DELTA_E_LABEL, MEV_LABEL, MOD_Q_LABEL, WAVENUMBER_LABEL, THETA_LABEL
+from ...labels import DELTA_E_LABEL, MOD_Q_LABEL, THETA_LABEL
 
 
 class MantidProjectionCalculator(ProjectionCalculator):
 
     def available_axes(self):
         return [MOD_Q_LABEL, THETA_LABEL, DELTA_E_LABEL]
-
-    def available_units(self):
-        return [MEV_LABEL, WAVENUMBER_LABEL]
 
     def validate_workspace(self, ws):
         workspace = get_workspace_handle(ws)
@@ -25,7 +22,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
             raise TypeError('Input workspace for projection calculation must be a reduced '
                             'data workspace with a spectra and energy transfer axis.')
 
-    def calculate_projection(self, input_workspace, axis1, axis2, units):
+    def calculate_projection(self, input_workspace, axis1, axis2):
         """Calculate the projection workspace AND return a python handle to it"""
         workspace = get_workspace_handle(input_workspace)
         if not workspace.is_PSD:
@@ -43,11 +40,9 @@ class MantidProjectionCalculator(ProjectionCalculator):
         else:
             raise NotImplementedError(" Axis '%s' not recognised. Must be '|Q|' or '2Theta'." % (axis1 if
                                       axis1 != DELTA_E_LABEL else axis2))
-        if units == WAVENUMBER_LABEL:
-            output_workspace_name += '_cm'
 
         new_ws = mantid_algorithms.MakeProjection(OutputWorkspace=output_workspace_name, InputWorkspace=workspace,
-                                                  Axis1=axis1, Axis2=axis2, Units=units, EMode=workspace.e_mode,
+                                                  Axis1=axis1, Axis2=axis2, EMode=workspace.e_mode,
                                                   Limits=workspace.limits['MomentumTransfer'],
                                                   ProjectionType=projection_type)
         propagate_properties(workspace, new_ws)

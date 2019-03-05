@@ -109,8 +109,7 @@ class SlicePlot(IPlot):
         plot_window.action_tantalum.triggered.connect(
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
-        plot_window.action_gen_script.triggered.connect(partial(generate_script, self.ws_name, None, self,
-                                                                self.plot_window))
+        plot_window.action_gen_script.triggered.connect(self.generate_script)
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()
@@ -442,8 +441,17 @@ class SlicePlot(IPlot):
     def flip_icut(self):
         self.icut.flip_axis()
 
+    def get_slice_cache(self):
+        return self._slice_plotter_presenter.get_slice_cache(self.ws_name)
+
     def update_workspaces(self):
         self._slice_plotter_presenter.update_displayed_workspaces()
+
+    def generate_script(self):
+        try:
+            generate_script(self.ws_name, None, self, self.plot_window)
+        except Exception as e:
+            self.plot_window.display_error(e.message)
 
     @property
     def colorbar_label(self):

@@ -8,6 +8,7 @@ class MainPresenter(MainPresenterInterface):
     def __init__(self, main_view, *subpresenters):
         self._mainView = main_view
         self._selected_workspace_listener = []
+        self._energy_default_listener = []
         for presenter in subpresenters:
             presenter.register_master(self)
 
@@ -53,10 +54,21 @@ class MainPresenter(MainPresenterInterface):
     def subscribe_to_workspace_selection_monitor(self, client):
         """Subcscribe a client to be notified when selected workspaces change
         client.workspace_selection_changed() will be called whenever the selected workspaces change"""
-        if isinstance(getattr(client, "workspace_selection_changed",None), collections.Callable):
+        if isinstance(getattr(client, "workspace_selection_changed", None), collections.Callable):
             self._selected_workspace_listener.append(client)
         else:
             raise TypeError("The client trying to subscribe does not implement the method 'workspace_selection_changed'")
 
     def register_workspace_selector(self, workspace_selector):
         self._workspace_presenter = workspace_selector
+
+    def subscribe_to_energy_default_monitor(self, client):
+        if isinstance(getattr(client, "set_energy_default", None), collections.Callable):
+            self._energy_default_listener.append(client)
+
+    def set_energy_default(self, en_default):
+        for listener in self._energy_default_listener:
+            listener.set_energy_default(en_default)
+
+    def is_energy_conversion_allowed(self):
+        return self._mainView.is_energy_conversion_allowed()

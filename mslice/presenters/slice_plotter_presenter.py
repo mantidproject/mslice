@@ -57,7 +57,7 @@ class SlicePlotterPresenter(PresenterUtility):
         self._slice_cache[slice.name[2:]] = Slice(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     def get_slice_cache(self, workspace):
-        return self._slice_cache[workspace.name[2:]]
+        return self._slice_cache[workspace.name[2:] if hasattr(workspace, 'name') else workspace]
 
     def show_scattering_function(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
@@ -96,6 +96,10 @@ class SlicePlotterPresenter(PresenterUtility):
             x, y = compute_recoil_line(workspace_name, cache.momentum_axis, key)
         else:
             x, y = compute_powder_line(workspace_name, cache.momentum_axis, key, cif_file=cif)
+        if 'meV' not in cache.energy_axis.e_unit:
+            from mslice.models.units import EnergyUnits
+            import numpy as np
+            y = np.array(y) * EnergyUnits(cache.energy_axis.e_unit).factor_from_meV()
         cache.overplot_lines[key] = plot_overplot_line(x, y, key, recoil, cache)
 
     def validate_intensity(self, intensity_start, intensity_end):

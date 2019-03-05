@@ -277,8 +277,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
                 0, 'ws_name', cuts[0].cut_axis, cuts[0].integration_axis, cuts[0].norm_to_one), script_lines)
 
         self.assertIn(
-            'ax.errorbar(cut_ws_{}, x_units="{}", label="{}", color="{}", marker="{}", ls="{}", lw={})\n\n'.format(
-                0, '|Q|', 'errorbar_label', 'blue', None, '-', 1.5), script_lines)
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={})\n\n'.format(
+                0, 'errorbar_label', 'blue', None, '-', 1.5), script_lines)
 
     def test_that_add_cut_lines_with_width_works_as_expected_with_intensity_range(self):
         x_data, y_data = np.arange(0, 10), np.arange(0, 10)
@@ -293,8 +293,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_cut_lines_with_width(errorbars, script_lines, cuts)
 
         self.assertIn(
-            'ax.errorbar(cut_ws_{}, x_units="{}", label="{}", color="{}", marker="{}", ls="{}", lw={}, '
-            'intensity_range={})\n\n'.format(0, '|Q|', 'errorbar_label', 'blue', None, '-', 1.5, (1.0, 2.0)),
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
+            'intensity_range={})\n\n'.format(0, 'errorbar_label', 'blue', None, '-', 1.5, (1.0, 2.0)),
             script_lines)
 
     def test_that_add_cut_lines_with_width_works_as_expected_with_multiple_cuts(self):

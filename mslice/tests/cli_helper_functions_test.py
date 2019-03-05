@@ -6,10 +6,8 @@ import mock
 from mslice.workspace import wrap_workspace
 from mslice.cli.helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
     _check_workspace_name, _check_workspace_type, is_slice, is_cut, _get_overplot_key, _update_overplot_checklist, \
-    _update_legend, _update_cache
+    _update_legend
 from mslice.cli._mslice_commands import Cut, Slice
-from mslice.app.presenters import get_cut_plotter_presenter
-from mslice.models.cut.cut import Cut as cut_model
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -96,47 +94,6 @@ class CLIHelperFunctionsTest(unittest.TestCase):
     def test_that_update_legend_works_as_expected(self, gaf):
         _update_legend()
         gaf().plot_handler.update_legend.assert_called_once()
-
-    def test_that_update_cache_works_as_expected_with_different_workspaces(self):
-        norm_to_one = False
-        presenter = get_cut_plotter_presenter()
-
-        workspace = self.create_workspace('test')
-        cut_axis = Axis('|Q|', '0', '10', '5')
-        integration_axis = Axis('DeltaE', '-1', '1', '0')
-
-        workspace2 = self.create_workspace('test2')
-        cut_axis2 = Axis('|Q|', '0', '3', '1')
-        integration_axis2 = Axis('DeltaE', '-2', '1', '0')
-
-        with mock.patch('mslice.plotting.pyplot') as plt:
-            ax = plt.gca()
-            _update_cache(presenter, workspace.name, cut_axis, integration_axis, norm_to_one)
-            _update_cache(presenter, workspace2.name, cut_axis2, integration_axis2, norm_to_one)
-
-        cut = cut_model(cut_axis, integration_axis, None, None, norm_to_one=norm_to_one, width='2')
-        cut2 = cut_model(cut_axis2, integration_axis2, None, None, norm_to_one=norm_to_one, width='3')
-
-        self.assertEqual(cut.__dict__, presenter._cut_cache_dict[ax][0].__dict__)
-        self.assertEqual(cut2.__dict__, presenter._cut_cache_dict[ax][1].__dict__)
-
-    def test_that_update_cache_works_as_expected_with_the_same_workspace(self):
-        norm_to_one = False
-        presenter = get_cut_plotter_presenter()
-
-        workspace = self.create_workspace('test')
-        cut_axis = Axis('|Q|', '0', '10', '5')
-        integration_axis = Axis('DeltaE', '-1', '0', '0')
-        integration_axis2 = Axis('DeltaE', '0', '1', '0')
-
-        with mock.patch('mslice.plotting.pyplot') as plt:
-            ax = plt.gca()
-            _update_cache(presenter, workspace.name, cut_axis, integration_axis, norm_to_one)
-            _update_cache(presenter, workspace.name, cut_axis, integration_axis2, norm_to_one)
-
-        cut = cut_model(cut_axis, integration_axis, None, None, norm_to_one=norm_to_one, width='1')
-
-        self.assertEqual(cut.__dict__, presenter._cut_cache_dict[ax][0].__dict__)
 
     def test_that_string_to_axis_works_as_expected(self):
         string = "name,1,5,0.1"

@@ -7,6 +7,7 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHisto
 from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
                                          ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE,
                                          ConvertToGDOS, GenerateScript)
+from mslice.cli.plotfunctions import errorbar
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
@@ -218,6 +219,26 @@ class CommandLineTest(unittest.TestCase):
         PlotCut(cut)
         cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
 
+    @mock.patch('mantid.plots.plotfunctions.errorbar')
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
+    @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
+    def test_errorbar_command(self, cpp, is_gui, mantid_errorbar):
+        is_gui.return_value = True
+        workspace = self.create_workspace('test_plot_cut_non_psd_cli')
+        cut = Cut(workspace)
+        from matplotlib.axes import Axes
+        ax = mock.Mock(spec=Axes)
+        ax.get_ylim.return_value = (0., 1.)
+        ax.lines = mock.Mock
+
+        errorbar(ax, cut, plot_over=False)
+        mantid_errorbar.assert_called_once_with(ax, cut.raw_ws, label=cut.name)
+
+        with mock.patch('mslice.app.presenters.get_cut_plotter_presenter') as get_cpp:
+            get_cpp().get_cache().__getitem__().cut_axis.units = '|Q|'
+            errorbar(ax, cut, plot_over=True)
+            get_cpp().get_cache.assert_called()
+
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_keep_figure_works_for_last_figure_number(self, gfm):
         KeepFigure()
@@ -239,7 +260,8 @@ class CommandLineTest(unittest.TestCase):
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
-    def test_that_make_current_works_on_figure_number(self, gfm, is_gui):
+    @mock.patch('mslice.cli._mslice_commands.cli_cut_plotter_presenter')
+    def test_that_make_current_works_on_figure_number(self, cpp, gfm, is_gui):
         is_gui.return_value = True
         gfm.set_figure_as_current = mock.Mock()
         workspace = self.create_workspace('test_make_current')

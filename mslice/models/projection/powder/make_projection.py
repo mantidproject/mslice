@@ -2,9 +2,8 @@ from __future__ import (absolute_import, division, print_function)
 import uuid
 from mantid.api import PythonAlgorithm, MatrixWorkspaceProperty, IMDEventWorkspaceProperty
 from mantid.kernel import FloatArrayProperty, Direction, StringMandatoryValidator
-from mantid.simpleapi import (DeleteWorkspace, TransformMD, SliceMD, PreprocessDetectorsToMD, ConvertToMD, SofQW3,
-                              ConvertSpectrumAxis)
-from ...labels import DELTA_E_LABEL, MEV_LABEL, MOD_Q_LABEL, WAVENUMBER_LABEL, THETA_LABEL
+from mantid.simpleapi import (DeleteWorkspace, SliceMD, PreprocessDetectorsToMD, ConvertToMD, SofQW3, ConvertSpectrumAxis)
+from ...labels import DELTA_E_LABEL, MOD_Q_LABEL, THETA_LABEL
 
 class MakeProjection(PythonAlgorithm):
 
@@ -12,7 +11,6 @@ class MakeProjection(PythonAlgorithm):
         self.declareProperty(MatrixWorkspaceProperty('InputWorkspace', "", direction=Direction.Input))
         self.declareProperty('Axis1', "", StringMandatoryValidator())
         self.declareProperty('Axis2', "", StringMandatoryValidator())
-        self.declareProperty('Units', "", StringMandatoryValidator())
         self.declareProperty(FloatArrayProperty('Limits', direction=Direction.Input))
         self.declareProperty('EMode', "Direct", StringMandatoryValidator())
         self.declareProperty('ProjectionType', "QE", StringMandatoryValidator(), doc='Q or Theta projection')
@@ -23,7 +21,6 @@ class MakeProjection(PythonAlgorithm):
         input_workspace  = self.getProperty('InputWorkspace').value
         axis1 = self.getProperty('Axis1').value
         axis2 = self.getProperty('Axis2').value
-        units = self.getProperty('Units').value
         emode = self.getProperty('EMode').value
         projection_type = self.getProperty('ProjectionType').value
 
@@ -31,13 +28,6 @@ class MakeProjection(PythonAlgorithm):
             new_ws = self._calcQEproj(input_workspace, emode, axis1, axis2)
         else:
             new_ws = self._calcThetaEproj(input_workspace, emode, axis1, axis2)
-        # Now scale the energy axis if required - ConvertToMD always gives DeltaE in meV
-        if units == WAVENUMBER_LABEL:
-            scale = [1, 8.06554] if axis2 == DELTA_E_LABEL else [8.06544, 1]
-            new_ws = TransformMD(InputWorkspace=new_ws, Scaling=scale)
-            new_ws.setComment('MSlice_in_wavenumber')
-        elif units != MEV_LABEL:
-            raise NotImplementedError("Unit %s not recognised. Only 'meV' and 'cm-1' implemented." % (units))
         self.setProperty('OutputWorkspace', new_ws)
 
 

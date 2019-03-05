@@ -4,3 +4,6 @@ class MainView(object):
 
     def get_presenter(self):
         pass
+
+    def is_energy_conversion_allowed(self):
+        pass

@@ -7,6 +7,7 @@ class PresenterUtility(object):
         assert (isinstance(main_presenter, MainPresenterInterface))
         self._main_presenter = main_presenter
         self._main_presenter.subscribe_to_workspace_selection_monitor(self)
+        self._main_presenter.subscribe_to_energy_default_monitor(self)
 
     def _to_float(self, x):
         return None if x == "" else float(x)

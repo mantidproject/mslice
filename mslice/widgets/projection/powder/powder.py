@@ -68,7 +68,6 @@ class PowderWidget(PowderView, QWidget):
         # Signals are blocked to prevent self._u1_changed being called here (it would be false alarm)
         self.cmbPowderU1.blockSignals(True)
         self.cmbPowderU1.clear()
-        # Assuming that u1 and u2 both have the same possible units.
         self._name_to_index = {}
         for idx, value in enumerate(u1_options):
             self.cmbPowderU1.addItem(value)
@@ -82,14 +81,6 @@ class PowderWidget(PowderView, QWidget):
         for value in u2_options:
             self.cmbPowderU2.addItem(value)
         self.cmbPowderU2.blockSignals(False)
-
-    def populate_powder_projection_units(self, powder_projection_units):
-        self.cmbPowderUnits.clear()
-        for unit in powder_projection_units:
-            self.cmbPowderUnits.addItem(unit)
-
-    def get_powder_units(self):
-        return str(self.cmbPowderUnits.currentText())
 
     def disable_calculate_projections(self, disable):
         self.groupBox.setDisabled(disable)

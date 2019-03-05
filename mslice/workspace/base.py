@@ -48,3 +48,11 @@ class WorkspaceBase(object):
     @abc.abstractmethod
     def __neg__(self):
         return
+
+    @abc.abstractmethod
+    def save_attributes(self):
+        return
+
+    @abc.abstractmethod
+    def remove_saved_attributes(self):
+        return

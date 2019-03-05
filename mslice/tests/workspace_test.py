@@ -51,6 +51,14 @@ class BaseWorkspaceTest(unittest.TestCase):
         result.sort()
         self.assertTrue((result == expected_values).all())
 
+    def set_attribute(self):
+        from mslice.workspace.helperfunctions import attribute_to_log
+        self.attr = {'axes':[1, object]}
+        attribute_to_log(self.attr, self.workspace.raw_ws)
+
+    def check_attribute_propagation(self, new_workspace):
+        assert (hasattr(new_workspace, 'axes'))
+        assert (new_workspace.axes == self.attr['axes'])
 
 class WorkspaceTest(BaseWorkspaceTest):
 
@@ -97,3 +105,8 @@ class WorkspaceTest(BaseWorkspaceTest):
         result = result.get_signal()
         expected_values = np.multiply(list_to_add, 2)
         self.assertTrue((result == expected_values).all())
+
+    def test_attribute_propagation(self):
+        self.set_attribute()
+        new_workspace = Workspace(self.workspace.raw_ws, 'new')
+        self.check_attribute_propagation(new_workspace)

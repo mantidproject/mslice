@@ -4,7 +4,10 @@ from mantid.api import MDNormalization
 from mslice.util.qt.QtWidgets import QFileDialog
 from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace, SaveAscii, SaveMD, SaveNexus
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.axis import Axis
+from mslice.models.labels import get_display_name
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.helperfunctions import WrapWorkspaceAttribute
 
 import numpy as np
 from scipy.io import savemat
@@ -46,11 +49,12 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 def save_nexus(workspace, path, is_slice):
     if isinstance(workspace, HistogramWorkspace):
         if is_slice:
-            SaveMD(InputWorkspace=get_workspace_handle(workspace.name[2:]), Filename=path)
-        else:
-            SaveMD(InputWorkspace=workspace, Filename=path)
+            workspace = get_workspace_handle(workspace.name[2:])
+        save_alg = SaveMD
     else:
-        SaveNexus(InputWorkspace=workspace, Filename=path)
+        save_alg = SaveNexus
+    with WrapWorkspaceAttribute(workspace):
+        save_alg(InputWorkspace=workspace, Filename=path)
 
 
 def save_ascii(workspace, path, is_slice):
@@ -64,44 +68,48 @@ def save_ascii(workspace, path, is_slice):
 
 
 def save_matlab(workspace, path, is_slice):
+    labels = {}
     if isinstance(workspace, HistogramWorkspace):
         if is_slice:
             x, y, e = _get_slice_mdhisto_xye(workspace.raw_ws)
+            labels = {'x': get_display_name(workspace.axes[0]), 'y': get_display_name(workspace.axes[1])}
         else:
             x, y, e = _get_md_histo_xye(workspace.raw_ws)
+            labels = {'x': get_display_name(workspace.axes[0])}
     else:
         if is_slice:
             x = []
             for dim in [workspace.raw_ws.getDimension(i) for i in range(2)]:
                 x.append(np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins()))
+            # We're saving a 2D RebinnedWorkspace which always has DeltaE along x
+            ix = [i for i, ax in enumerate(workspace.axes) if 'DeltaE' in ax.units][0]
+            iy = 0 if ix == 1 else 1
+            labels = {'x': get_display_name(workspace.axes[ix]), 'y': get_display_name(workspace.axes[iy])}
         else:
             x = workspace.raw_ws.extractX()
         y = workspace.raw_ws.extractY()
         e = workspace.raw_ws.extractE()
-    mdict = {'x': x, 'y': y, 'e': e}
+    mdict = {'x': x, 'y': y, 'e': e, 'labels':labels}
     savemat(path, mdict=mdict)
 
 
 def _save_cut_to_ascii(workspace, ws_name, output_path):
     # get integration ranges from the name
-    int_ranges = ws_name[ws_name.find('('):]
-    int_start = int_ranges[1:int_ranges.find(',')]
-    int_end = int_ranges[int_ranges.find(',')+1:-1]
-    ws_name = ws_name[:ws_name.find('_cut')]
-
-    dim = workspace.raw_ws.getDimension(0)
-    units = dim.getUnits()
+    cut_axis, integration_axis = tuple(workspace.axes)
 
     x, y, e = _get_md_histo_xye(workspace.raw_ws)
-    header = 'MSlice Cut of workspace "%s" along "%s" between %s and %s' % (ws_name, units, int_start, int_end)
+    header = 'MSlice Cut of workspace "{}"\n'.format(workspace.parent)
+    header += 'Cut axis: {}\n'.format(cut_axis)
+    header += 'Integration axis: {}\n'.format(integration_axis)
+    header += '({}) (Signal) (Error)'.format(get_display_name(cut_axis))
     out_data = np.c_[x, y, e]
     _output_data_to_ascii(output_path, out_data, header)
 
 
 def _save_slice_to_ascii(workspace, output_path):
-    header = 'MSlice Slice of workspace "%s"' % (workspace.name)
     if isinstance(workspace, HistogramWorkspace):
         x, y, e = _get_slice_mdhisto_xye(workspace.raw_ws)
+        ix, iy = (0, 1)
     else:
         x = []
         for dim in [workspace.raw_ws.getDimension(i) for i in range(2)]:
@@ -109,26 +117,39 @@ def _save_slice_to_ascii(workspace, output_path):
         x[1] = x[1].T
         y = workspace.raw_ws.extractY()
         e = workspace.raw_ws.extractE()
+        ix = [i for i, ax in enumerate(workspace.axes) if 'DeltaE' in ax.units][0]
+        iy = 0 if ix == 1 else 1
     dim_sz = [workspace.raw_ws.getDimension(i).getNBins() for i in range(workspace.raw_ws.getNumDims())]
     nbins = np.prod(dim_sz)
     x = [np.reshape(x0, nbins) for x0 in np.broadcast_arrays(*x)]
     y = np.reshape(y, nbins)
     e = np.reshape(e, nbins)
     out_data = np.column_stack(tuple(x+[y, e]))
+    labels = {'x': get_display_name(workspace.axes[ix]), 'y': get_display_name(workspace.axes[iy])}
+    header = 'MSlice Slice of workspace "%s"' % (workspace.name)
+    header += '\n({}) ({}) (Signal) (Error)'.format(labels['x'], labels['y'])
     _output_data_to_ascii(output_path, out_data, header)
 
 
 def load_from_ascii(file_path, ws_name):
     file = open(file_path, 'r')
-    header = file.readline()
+    line = file.readline()
+    header = ''
+    while line.startswith('#'):
+        header += line
+        line = file.readline()
+    cut_axis_str = header[header.find('Cut axis: ')+10:]
+    cut_axis = Axis(*cut_axis_str[:cut_axis_str.find('\n')].split(','))
+    integration_axis_str = header[header.find('Integration axis: ')+17:]
+    integration_axis = Axis(*integration_axis_str[:integration_axis_str.find('\n')].split(','))
     if not header.startswith("# MSlice Cut"):
         raise ValueError
     x, y, e = np.loadtxt(file).transpose()
     extents = str(np.min(x)) + ',' + str(np.max(x))
     nbins = len(x)
-    units = header[header.find('along "'):header.find('" between')]
-    CreateMDHistoWorkspace(output_name=ws_name, SignalInput=y, ErrorInput=e, Dimensionality=1,
-                           Extents=extents, NumberOfBins=nbins, Names='Dim1', Units=units)
+    ws_out = CreateMDHistoWorkspace(OutputWorkspace=ws_name, SignalInput=y, ErrorInput=e, Dimensionality=1,
+                                    Extents=extents, NumberOfBins=nbins, Names='Dim1', Units=cut_axis.units)
+    ws_out.axes = [cut_axis, integration_axis]
 
 
 def _get_md_histo_xye(histo_ws):

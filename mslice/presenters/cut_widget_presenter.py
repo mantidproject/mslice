@@ -25,6 +25,7 @@ class CutWidgetPresenter(PresenterUtility):
         self._previous_cut = None
         self._previous_axis = None
         self._minimumStep = dict()
+        self._en_default = 'meV'
 
     def set_cut_plotter_presenter(self, cut_plotter_presenter):
         self._cut_plotter_presenter = cut_plotter_presenter
@@ -38,9 +39,9 @@ class CutWidgetPresenter(PresenterUtility):
             elif command == Command.PlotOver:
                 self._cut(plot_over=True)
             elif command == Command.PlotFromWorkspace:
-                self._cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over=False)
+                self._cut_from_workspace(plot_over=False)
             elif command == Command.PlotOverFromWorkspace:
-                self._cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over=True)
+                self._cut_from_workspace(plot_over=True)
             elif command == Command.SaveToWorkspace:
                 self._cut(save_only=True)
             elif command == Command.AxisChanged:
@@ -55,8 +56,17 @@ class CutWidgetPresenter(PresenterUtility):
             self._cut_view.display_error(str(e))
             return
         for workspace in selected_workspaces:
-            self._cut_plotter_presenter.run_cut(workspace, Cut(*params), plot_over=plot_over, save_only=save_only)
+            try:
+                self._cut_plotter_presenter.run_cut(workspace, Cut(*params), plot_over=plot_over, save_only=save_only)
+            except RuntimeError as e:
+                self._cut_view.display_error(e.message)
             plot_over = True  # The first plot will respect which button the user pressed. The rest will over plot
+
+    def _cut_from_workspace(self, plot_over):
+        try:
+            self._cut_plotter_presenter.plot_cut_from_selected_workspace(plot_over)
+        except RuntimeError as e:
+            self._cut_view.display_error(e.message)
 
     def _parse_step(self):
         step = self._cut_view.get_cut_axis_step()
@@ -73,11 +83,12 @@ class CutWidgetPresenter(PresenterUtility):
 
     def _parse_input(self):
         """Gets values entered by user. Validation is performed by the CutCache object."""
+        e_units = self._cut_view.get_energy_units()
         cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
-                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step())
+                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step(), e_units)
 
         integration_axis = Axis(self._cut_view.get_integration_axis(), self._cut_view.get_integration_start(),
-                                self._cut_view.get_integration_end(), 0.)
+                                self._cut_view.get_integration_end(), 0., e_units)
 
         intensity_start = self._cut_view.get_intensity_start()
         intensity_end = self._cut_view.get_intensity_end()
@@ -183,3 +194,8 @@ class CutWidgetPresenter(PresenterUtility):
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]
         self._cut_view.set_minimum_step(min_step)
         self.update_integration_axis()
+
+    def set_energy_default(self, en_default):
+        self._en_default = en_default
+        self._cut_view.set_energy_units_default(en_default)
+        self._cut_view.set_energy_units(en_default)

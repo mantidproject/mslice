@@ -138,12 +138,14 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
             for item_index in range(current_list.count()):
                 current_list.item(item_index).setSelected(False)
             for this_index in (index if hasattr(index, "__iter__") else [index]):
-                current_list.item(this_index).setSelected(True)
+                if this_index >= 0:
+                    current_list.item(this_index).setSelected(True)
         else:
             for item_index in range(current_list.count()):
                 current_list.setItemSelected(current_list.item(item_index), False)
             for this_index in (index if hasattr(index, "__iter__") else [index]):
-                current_list.setItemSelected(current_list.item(this_index), True)
+                if this_index >= 0:
+                    current_list.setItemSelected(current_list.item(this_index), True)
 
     def get_workspace_index(self, ws_name):
         current_list = self.current_list()

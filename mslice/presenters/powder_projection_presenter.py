@@ -20,11 +20,9 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
 
         #Add rest of options
         self._available_axes = projection_calculator.available_axes()
-        self._available_units = projection_calculator.available_units()
         self._powder_view.populate_powder_u1(self._available_axes)
         self._powder_view.populate_powder_u2(self._available_axes)
         self._powder_view.set_powder_u2(self._available_axes[-1])
-        self._powder_view.populate_powder_projection_units(self._available_units)
         self._main_presenter = None
 
     def notify(self, command):
@@ -48,14 +46,13 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         if not selected_workspaces:
             self._powder_view.display_message_box("No workspace is selected")
             return
-        units = self._powder_view.get_powder_units()
         outws = []
         for workspace in selected_workspaces:
-            outws.append(self.calc_projection(workspace, axis1, axis2, units, quiet=True))
+            outws.append(self.calc_projection(workspace, axis1, axis2, quiet=True))
         self.after_projection(outws)
 
-    def calc_projection(self, workspace, axis1, axis2, units, quiet=False):
-        proj_ws = self._projection_calculator.calculate_projection(workspace, axis1, axis2, units)
+    def calc_projection(self, workspace, axis1, axis2, quiet=False):
+        proj_ws = self._projection_calculator.calculate_projection(workspace, axis1, axis2)
         if not quiet:
             self.after_projection([proj_ws])
         return proj_ws

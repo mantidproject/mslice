@@ -29,9 +29,6 @@ class PowderView(object):
     def get_powder_u2(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    def get_powder_units(self):
-        raise NotImplementedError("This method must be implemented in a concrete view before being called")
-
     def set_powder_u1(self, name):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 

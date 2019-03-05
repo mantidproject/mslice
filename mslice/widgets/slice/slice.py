@@ -10,6 +10,7 @@ from mslice.util.qt.QtGui import QDoubleValidator
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
 
+from mslice.models.units import EnergyUnits
 from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
 from mslice.views.interfaces.slice_view import SliceView
 from .command import Command
@@ -36,10 +37,12 @@ class SliceWidget(SliceView, QWidget):
         self._minimumStep = {}
         self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))
         self.lneSliceYStep.editingFinished.connect(lambda: self._step_edited('y', self.lneSliceYStep))
-        self.enable_units_choice(False)
         self.cmbSliceXAxis.currentIndexChanged.connect(lambda ind: self._change_axes(1, ind))
         self.cmbSliceYAxis.currentIndexChanged.connect(lambda ind: self._change_axes(2, ind))
+        self.cmbSliceUnits.currentIndexChanged.connect(self._change_unit)
         self.set_validators()
+        self._old_en = EnergyUnits('meV')
+        self._en_default = 'meV'
 
     def get_presenter(self):
         return self._presenter
@@ -80,21 +83,27 @@ class SliceWidget(SliceView, QWidget):
             axes_set[other_axis](new_index)
         self._presenter.populate_slice_params()
 
+    def _change_unit(self):
+        new_unit = self.get_units()
+        if self._old_en.factor_to(new_unit) != 1.:
+            if 'DeltaE' in self.get_slice_x_axis():
+                x_start, x_end, x_step = self.get_slice_x_start(), self.get_slice_x_end(), self.get_slice_x_step()
+                x_start, x_end, x_step = self._old_en.convert_to(new_unit, x_start, x_end, x_step)
+                self.populate_slice_x_params(x_start, x_end, x_step)
+            elif 'DeltaE' in self.get_slice_y_axis():
+                y_start, y_end, y_step = self.get_slice_y_start(), self.get_slice_y_end(), self.get_slice_y_step()
+                y_start, y_end, y_step = self._old_en.convert_to(new_unit, y_start, y_end, y_step)
+                self.populate_slice_y_params(y_start, y_end, y_step)
+        self._old_en = EnergyUnits(new_unit)
+
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
 
-    def enable_units_choice(self, enabled):
-        if enabled:
-            # TODO implement conversion from meV to cm-1
-            pass
-            #self.cmbSliceUnits.show()
-            #self.label_16.show()
-        else:
-            self.cmbSliceUnits.hide()
-            self.label_16.hide()
-
     def get_units(self):
         return self.cmbSliceUnits.currentText()
+
+    def set_units(self, en_unit):
+        self.cmbSliceUnits.setCurrentIndex(EnergyUnits.get_index(en_unit))
 
     def get_slice_x_axis(self):
         return str(self.cmbSliceXAxis.currentText())
@@ -199,6 +208,7 @@ class SliceWidget(SliceView, QWidget):
         self.lneSliceIntensityStart.setText("")
         self.lneSliceIntensityEnd.setText("")
         self.rdoSliceNormToOne.setChecked(0)
+        self.cmbSliceUnits.setCurrentIndex(EnergyUnits.get_index(self._en_default))
         self._minimumStep = {}
 
     def disable(self):
@@ -215,6 +225,7 @@ class SliceWidget(SliceView, QWidget):
         self.rdoSliceNormToOne.setEnabled(False)
         self.btnSliceDisplay.setEnabled(False)
         self.cmbSliceColormap.setEnabled(False)
+        self.cmbSliceUnits.setEnabled(False)
 
     def enable(self):
         self.cmbSliceXAxis.setEnabled(True)
@@ -230,12 +241,16 @@ class SliceWidget(SliceView, QWidget):
         self.rdoSliceNormToOne.setEnabled(True)
         self.btnSliceDisplay.setEnabled(True)
         self.cmbSliceColormap.setEnabled(True)
+        self.cmbSliceUnits.setEnabled(True)
 
     def set_validators(self):
         line_edits = [self.lneSliceXStart, self.lneSliceXEnd, self.lneSliceXStep, self.lneSliceYStart,
                       self.lneSliceYEnd, self.lneSliceYStep, self.lneSliceIntensityStart, self.lneSliceIntensityEnd]
         for line_edit in line_edits:
             line_edit.setValidator(QDoubleValidator())
+
+    def set_energy_default(self, en_default):
+        self._en_default = en_default
 
     def clear_displayed_error(self):
         self._display_error("")

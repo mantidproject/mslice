@@ -56,6 +56,15 @@ class CutView:
     def get_minimum_step(self):
         pass
 
+    def get_energy_units(self):
+        pass
+
+    def set_energy_units(self, unit):
+        pass
+
+    def set_energy_units_default(self, unit):
+        pass
+
     def display_error(self, string):
         pass
 

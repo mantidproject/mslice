@@ -5,7 +5,6 @@ from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.models.cut.cut import Cut
 
 _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
                   'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
@@ -36,15 +35,6 @@ _intensity_to_workspace = {
     'symm': 'symmetrised',
     'gdos': 'gdos',
 }
-
-
-def _update_cache(cut_presenter, ws_name, cut_axis, int_axis, NormToOne):
-    """Creates a list of all cuts used to create a particular cut. This is required when plot over is used."""
-    import mslice.plotting.pyplot as plt
-    width = None if int_axis.end - int_axis.start == 0 else str(int_axis.end - int_axis.start)
-    cut = Cut(cut_axis, int_axis, None, None, NormToOne, width)
-    cut_presenter.save_cache(plt.gca(), cut, True)
-    cut_presenter._cut_cache[ws_name] = cut
 
 
 def _update_legend():
@@ -80,21 +70,22 @@ def _get_overplot_key(element, rmm):
 
 def _string_to_axis(string):
     axis = string.split(',')
-    if len(axis) != 4:
-        raise ValueError('axis should be specified in format <name>,<start>,<end>,<step_size>')
-    return Axis(axis[0], axis[1], axis[2], axis[3])
+    if len(axis) != 4 and len(axis) != 5:
+        raise ValueError('axis should be specified in format <name>,<start>,<end>,<step_size>(,<e_unit>)')
+    return Axis(axis[0], axis[1], axis[2], axis[3]) if len(axis) == 4 else Axis(*axis)
 
 
 def _string_to_integration_axis(string):
     """Allows step to be omitted and set to default value"""
     axis_str = string.split(',')
     if len(axis_str) < 3:
-        raise ValueError('axis should be specified in format <name>,<start>,<end>')
-    valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], 0)
-    try:
-        valid_axis.step = axis_str[3]
-    except IndexError:
-        valid_axis.step = valid_axis.end - valid_axis.start
+        raise ValueError('axis should be specified in format <name>,<start>,<end>(,<step>,<e_unit>)')
+    elif len(axis_str) == 3:
+        valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], str(float(axis_str[2]) - float(axis_str[1])))
+    elif len(axis_str) == 4:
+        valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], axis_str[3])
+    else:
+        valid_axis = Axis(axis_str[0], axis_str[1], axis_str[2], axis_str[3], axis_str[4])
     return valid_axis
 
 
@@ -134,6 +125,14 @@ def _check_workspace_type(workspace, correct_type):
     else:
         if not isinstance(workspace, MatrixWorkspace):
             raise RuntimeError("Incorrect workspace type.")
+
+def _rescale_energy_cut_plot(presenter, cuts, new_e_unit):
+    """Given a CutPlotterPresenter and a set of cached cuts, rescales the workspaces to a different energy-unit and replot"""
+    import copy
+    cuts_copy = copy.deepcopy(cuts)  # Because run_cut will overwrite the cuts cache for plot_over=True
+    for id, cut in enumerate(cuts_copy):
+        cut.cut_axis.e_unit = new_e_unit
+        presenter.run_cut(cut.workspace_raw_name, cut, plot_over=(id > 0))
 
 
 # Arguments Validation

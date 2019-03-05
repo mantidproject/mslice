@@ -68,6 +68,7 @@ class CLIProjectionTest(unittest.TestCase):
 
         fig = mock.MagicMock()
         ax = fig.add_subplot(111, projection='mslice')
+        ax.get_ylim.return_value = (0., 1.)
 
         return_value = errorbar(ax, cut)
         self.assertEqual(ax.lines, return_value)

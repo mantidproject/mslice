@@ -4,6 +4,7 @@ from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
+import mslice.plotting.globalfiguremanager as gfm
 
 
 class CutPlotterPresenterTest(unittest.TestCase):
@@ -11,8 +12,8 @@ class CutPlotterPresenterTest(unittest.TestCase):
     def setUp(self):
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.cut_plotter_presenter = CutPlotterPresenter()
-        self.cut_plotter_presenter.set_is_icut = mock.MagicMock()
         self.cut_plotter_presenter.register_master(self.main_presenter)
+        gfm.GlobalFigureManager.activate_category(gfm.CATEGORY_CUT)
 
     def create_cut_cache(self):
         axis = Axis("units", "0", "100", "1")
@@ -94,13 +95,9 @@ class CutPlotterPresenterTest(unittest.TestCase):
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.cut_figure_exists')
     def test_set_is_icut(self, cut_figure_exists):
-        mock_ws = mock.MagicMock()
-        mock_ws.name = 'workspace'
-
-        self.cut_plotter_presenter._cut_cache = {mock_ws.name: 'workspace'}
         cut_figure_exists.return_value = True
 
-        self.cut_plotter_presenter.set_is_icut(mock_ws.name, False)
+        self.cut_plotter_presenter.set_is_icut(False)
 
     def test_store_and_get_icut(self):
         return_value = self.cut_plotter_presenter.get_icut()

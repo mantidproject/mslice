@@ -144,6 +144,27 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="4">
+      <widget class="QLabel" name="labCutEUnits">
+       <property name="text">
+        <string>en</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="5">
+      <widget class="QComboBox" name="cmbCutEUnits">
+       <item>
+        <property name="text">
+         <string>meV</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>cm-1</string>
+        </property>
+       </item>
+      </widget>
+     </item>
      <item row="3" column="6" colspan="2">
       <widget class="QPushButton" name="btnCutPlot">
        <property name="text">

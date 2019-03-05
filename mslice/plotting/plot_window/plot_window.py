@@ -185,6 +185,11 @@ class PlotWindow(QtWidgets.QMainWindow):
         # The QActionGroup ensures the other is not checked
         self.action_make_current.setChecked(True)
 
+    def display_error(self, error_text):
+        # Displays an error message box
+        err_box = QtWidgets.QErrorMessage(self)
+        err_box.showMessage(error_text)
+
     def disable_action(self, key):
         """
         Disable the action based on the string key

@@ -61,3 +61,8 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
     def test_add_invalid_list(self):
         invalid_list = np.linspace(0, -6, 3)
         self.assertRaises(RuntimeError, lambda: self.workspace + invalid_list)
+
+    def test_attribute_propagation(self):
+        self.set_attribute()
+        new_workspace = HistogramWorkspace(self.workspace.raw_ws, 'new')
+        self.check_attribute_propagation(new_workspace)

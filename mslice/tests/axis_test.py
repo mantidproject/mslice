@@ -36,3 +36,12 @@ class AxisTest(unittest.TestCase):
     def test_invalid_start_greater_than_end(self):
         with self.assertRaises(ValueError):
             Axis('x', '1', '0', '.1')
+
+    def test_energy_units(self):
+        with self.assertRaises(ValueError):
+            Axis('DeltaE', '0', '5', '1', 'not_an_energy')
+        axis = Axis('DeltaE', '0', '5', '1', 'cm-1')
+        self.assertNotEqual(axis.scale, 1)
+        self.assertAlmostEqual(axis.start_meV, axis.start * axis.scale, 3)
+        self.assertAlmostEqual(axis.end_meV, axis.end * axis.scale, 3)
+        self.assertAlmostEqual(axis.step_meV, axis.step * axis.scale, 3)

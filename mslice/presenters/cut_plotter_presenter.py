@@ -11,13 +11,11 @@ class CutPlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._interactive_cut_cache = None
-        self._cut_cache = {}
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
         cut.workspace_name = workspace.name
-        self._cut_cache[workspace.name] = cut
 
         if cut.width is not None:
             self._plot_with_width(workspace, cut, plot_over)
@@ -26,15 +24,13 @@ class CutPlotterPresenter(PresenterUtility):
         else:
             self._plot_cut(workspace, cut, plot_over)
 
-        # Cached cuts are saved to a dict indexed by the axes references - ensures each window has its own list
-        self.save_cache(plt.gca(), cut, plot_over)
-
     def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
         cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, store)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start, integration_axis.end)
-        plot_cut_impl(cut_ws, cut_axis.units, (cut.intensity_start, cut.intensity_end), plot_over, legend)
+        en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
+        plot_cut_impl(cut_ws, (cut.intensity_start, cut.intensity_end), plot_over, legend, en_conversion)
         if update_main:
             self.set_is_icut(False)
             self.update_main_window()
@@ -63,6 +59,9 @@ class CutPlotterPresenter(PresenterUtility):
             self._cut_cache_dict[ax][:] = []
             self._cut_cache_dict[ax].append(cut)
 
+    def get_cache(self, ax):
+        return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
+
     def save_cut_to_workspace(self, workspace, cut):
         compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one)
         self._main_presenter.update_displayed_workspaces()
@@ -75,8 +74,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     def plot_cut_from_workspace(self, workspace, plot_over=False, intensity_range=None):
         workspace = get_workspace_handle(workspace)
-        lines = plot_cut_impl(workspace, workspace.raw_ws.getDimension(0).getUnits(),
-                              intensity_range=intensity_range, plot_over=plot_over)
+        lines = plot_cut_impl(workspace, intensity_range=intensity_range, plot_over=plot_over)
         self.set_is_icut(False)
         return lines
 

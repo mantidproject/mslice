@@ -28,7 +28,7 @@ def draw_interactive_cut(workspace):
 
 
 @plt.set_category(plt.CATEGORY_CUT)
-def plot_cut_impl(workspace, x_units, intensity_range=None, plot_over=False, legend=None):
+def plot_cut_impl(workspace, intensity_range=None, plot_over=False, legend=None, en_conversion=True):
     if not plot_over:
         plt.cla()
 
@@ -36,7 +36,7 @@ def plot_cut_impl(workspace, x_units, intensity_range=None, plot_over=False, leg
     ax = cur_fig.add_subplot(111, projection='mslice')
     legend = workspace.name if legend is None else legend
     ax.errorbar(workspace, 'o-', label=legend, picker=PICKER_TOL_PTS, intensity_range=intensity_range,
-                plot_over=plot_over, x_units=x_units)
+                plot_over=plot_over, en_conversion=en_conversion)
 
     return ax.lines
 

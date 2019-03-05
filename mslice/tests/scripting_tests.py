@@ -53,16 +53,16 @@ class ScriptingTest(unittest.TestCase):
         cut1.workspace_name = ws_name1
         cut2 = Cut(Axis('|Q|', '1', '4', '1'), Axis('DelataE', '-1', '1', '0'), None, None, True, '2')
         cut2.workspace_name = ws_name2
-        get_cpp()._cut_cache = {ws_name1: cut1, ws_name2: cut2}
         get_cpp()._cut_cache_dict = {ax: [cut1, cut2]}
 
-        ws1 = workspace_handle(ws_name1).raw_ws
-        ws2 = workspace_handle(ws_name2).raw_ws
+        ws1 = mock.Mock()
+        ws2 = mock.Mock()
 
+        workspace_handle.side_effect = [ws1, ws2]
         preprocess_lines(ws_name2, plot_handler, ax)
 
-        self.assertIn(mock.call(ws1, ws_name1), gen_lines.call_args_list)
-        self.assertIn(mock.call(ws2, ws_name2), gen_lines.call_args_list)
+        self.assertIn(mock.call(ws1.raw_ws, ws_name1), gen_lines.call_args_list)
+        self.assertIn(mock.call(ws2.raw_ws, ws_name2), gen_lines.call_args_list)
         self.assertEqual(2, gen_lines.call_count)
 
 

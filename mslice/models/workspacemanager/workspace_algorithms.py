@@ -11,14 +11,17 @@ import os.path
 import numpy as np
 from scipy import constants
 
+from mantid.api import WorkspaceUnitValidator
+from mantid.api import MatrixWorkspace
+
 from mslice.models.axis import Axis
 
 from mslice.util.mantid.algorithm_wrapper import add_to_ads, wrap_in_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
-from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus
+from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.workspace.workspace import Workspace as MatrixWorkspace
+from mslice.workspace.workspace import Workspace
 
 # -----------------------------------------------------------------------------
 # Classes and functions
@@ -63,7 +66,7 @@ def _processLoadedWSLimits(workspace):
         return
     if isinstance(workspace, PixelWorkspace):
         process_limits_event(workspace)
-    elif isinstance(workspace, MatrixWorkspace):
+    elif isinstance(workspace, Workspace):
         process_limits(workspace)
 
 
@@ -158,6 +161,10 @@ def load(filename, output_workspace):
     workspace.e_mode = get_EMode(workspace.raw_ws)
     if workspace.e_mode == 'Indirect':
         processEfixed(workspace)
+    if (isinstance(workspace.raw_ws, MatrixWorkspace)
+            and WorkspaceUnitValidator("DeltaE_inWavenumber").isValid(workspace.raw_ws)) == '':
+        workspace = ConvertUnits(InputWorkspace=workspace, Target="DeltaE", EMode=workspace.e_mode,
+                                 OutputWorkspace=workspace.name)
     _processLoadedWSLimits(workspace)
     return workspace
 
@@ -240,7 +247,7 @@ def _save_single_ws(workspace, save_name, save_method, path, extension, slice_no
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
     workspace = get_workspace_handle(workspace)
-    non_psd_slice = slice_nonpsd and isinstance(workspace, MatrixWorkspace) and not workspace.is_PSD
+    non_psd_slice = slice_nonpsd and isinstance(workspace, Workspace) and not workspace.is_PSD
     if is_pixel_workspace(workspace) or non_psd_slice:
         slice = True
         workspace = _get_slice_mdhisto(workspace, get_workspace_name(workspace))

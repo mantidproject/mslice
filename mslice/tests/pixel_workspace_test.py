@@ -76,3 +76,11 @@ class PixelWorkspaceTest(unittest.TestCase):
         self.assertAlmostEqual(0, result[0][0], 8)
         self.assertAlmostEqual(13, result[1][47], 8)
         self.assertAlmostEqual(35, result[3][52], 8)
+
+    def test_attribute_propagation(self):
+        from mslice.workspace.helperfunctions import attribute_to_log
+        self.attr = {'axes':[1, object]}
+        attribute_to_log(self.attr, self.workspace.raw_ws)
+        new_workspace = PixelWorkspace(self.workspace.raw_ws, 'new')
+        assert (hasattr(new_workspace, 'axes'))
+        assert (new_workspace.axes == self.attr['axes'])

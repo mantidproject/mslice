@@ -53,6 +53,15 @@ class SliceView:
     def get_slice_colourmap(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
+    def get_units(self):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def set_units(self, en_unit):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
+    def set_energy_default(self, en_default):
+        raise NotImplementedError("This method must be implemented in a concrete view before being called")
+
     def error_invalid_x_params(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
