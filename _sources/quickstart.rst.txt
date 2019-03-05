@@ -169,3 +169,27 @@ as usual.
 
 .. image:: images/quickstart/subtract_slice.png
    :scale: 80 %
+
+
+Energy transfer units
+---------------------
+
+By default MSlice uses ``meV`` as the unit for energy transfer, with the convention that positive energy transfer 
+corresponds neutron energy loss. In addition to this, MSlice also supports cm\ :sup:`-1` (wavenumbers), denoted ``cm-1``.
+
+You can choose the desired unit using the ``en`` drop-down comboboxes in the **Cut** and **Slice** tabs.
+
+.. image:: images/quickstart/en_units_combo.png
+
+Alternatively you can also set a default energy unit using the ``Options`` menu item
+
+.. image:: images/quickstart/en_units_defaults.png
+
+This default energy unit will be applied to Cut and Slice tabs for new workspaces. The cut tab for old workspaces will have
+the previous energy unit if you've made a cut of that workspace before (together with the other parameters of the cut).
+
+Finally, if you first plot a cut using one energy unit (say ``meV``) but then *over-plot* another energy cut using a different
+unit (say ``cm-1``), MSlice will automatically convert the previous cuts to the new energy unit (``cm-1`` in this case), and
+replot everything in the new unit. If you don't want this behaviour, you can turn it off in the ``Options`` menu:
+
+.. image:: images/quickstart/en_units_conversion.png

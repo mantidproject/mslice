@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>1. Quick Start &#8212; MSlice 1.0.0 documentation</title>
+    <title>1. Quick Start &#8212; MSlice 1.2.0.dev0 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0.0',
+        VERSION:     '1.2.0.dev0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="index.html" title="MSlice for Mantid"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">MSlice 1.0.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">MSlice 1.2.0.dev0 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -55,6 +55,7 @@
 <li><a class="reference internal" href="#plotting-a-cut">1.6. Plotting a Cut</a></li>
 <li><a class="reference internal" href="#keep-make-current">1.7. Keep / Make Current</a></li>
 <li><a class="reference internal" href="#manipulating-workspaces">1.8. Manipulating Workspaces</a></li>
+<li><a class="reference internal" href="#energy-transfer-units">1.9. Energy transfer units</a></li>
 </ul>
 </li>
 </ul>
@@ -215,6 +216,21 @@ a self-shielding factor of <code class="docutils literal"><span class="pre">1.00
 as usual.</p>
 <a class="reference internal image-reference" href="_images/subtract_slice.png"><img alt="_images/subtract_slice.png" src="_images/subtract_slice.png" style="width: 645.6px; height: 794.4000000000001px;" /></a>
 </div>
+<div class="section" id="energy-transfer-units">
+<h2>1.9. Energy transfer units<a class="headerlink" href="#energy-transfer-units" title="Permalink to this headline">¶</a></h2>
+<p>By default MSlice uses <code class="docutils literal"><span class="pre">meV</span></code> as the unit for energy transfer, with the convention that positive energy transfer
+corresponds neutron energy loss. In addition to this, MSlice also supports cm<sup>-1</sup> (wavenumbers), denoted <code class="docutils literal"><span class="pre">cm-1</span></code>.</p>
+<p>You can choose the desired unit using the <code class="docutils literal"><span class="pre">en</span></code> drop-down comboboxes in the <strong>Cut</strong> and <strong>Slice</strong> tabs.</p>
+<img alt="_images/en_units_combo.png" src="_images/en_units_combo.png" />
+<p>Alternatively you can also set a default energy unit using the <code class="docutils literal"><span class="pre">Options</span></code> menu item</p>
+<img alt="_images/en_units_defaults.png" src="_images/en_units_defaults.png" />
+<p>This default energy unit will be applied to Cut and Slice tabs for new workspaces. The cut tab for old workspaces will have
+the previous energy unit if you’ve made a cut of that workspace before (together with the other parameters of the cut).</p>
+<p>Finally, if you first plot a cut using one energy unit (say <code class="docutils literal"><span class="pre">meV</span></code>) but then <em>over-plot</em> another energy cut using a different
+unit (say <code class="docutils literal"><span class="pre">cm-1</span></code>), MSlice will automatically convert the previous cuts to the new energy unit (<code class="docutils literal"><span class="pre">cm-1</span></code> in this case), and
+replot everything in the new unit. If you don’t want this behaviour, you can turn it off in the <code class="docutils literal"><span class="pre">Options</span></code> menu:</p>
+<img alt="_images/en_units_conversion.png" src="_images/en_units_conversion.png" />
+</div>
 </div>
 
 
@@ -235,7 +251,7 @@ as usual.</p>
         <li class="right" >
           <a href="index.html" title="MSlice for Mantid"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">MSlice 1.0.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">MSlice 1.2.0.dev0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

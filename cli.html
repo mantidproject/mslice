@@ -1,0 +1,271 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>4. Command Line Interface &#8212; MSlice 1.2.0.dev0 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2.0.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="3. Taking Slices" href="slicing.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="slicing.html" title="3. Taking Slices"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MSlice 1.2.0.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4. Command Line Interface</a><ul>
+<li><a class="reference internal" href="#generating-scripts">4.1. Generating scripts</a></li>
+<li><a class="reference internal" href="#plotting-using-matplotlib-interface">4.2. Plotting using Matplotlib interface</a></li>
+<li><a class="reference internal" href="#plotting-using-mslice-specific-commands">4.3. Plotting using MSlice specific commands</a></li>
+<li><a class="reference internal" href="#algebraic-manipulation-of-workspaces">4.4. Algebraic Manipulation of Workspaces</a></li>
+<li><a class="reference internal" href="#examples">4.5. Examples</a><ul>
+<li><a class="reference internal" href="#loading-and-cutting-slicing">4.5.1. Loading and Cutting / Slicing</a></li>
+<li><a class="reference internal" href="#plotting-a-series-of-cuts">4.5.2. Plotting a series of cuts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="slicing.html"
+                        title="previous chapter">3. Taking Slices</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cli.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="command-line-interface">
+<h1>4. Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="generating-scripts">
+<h2>4.1. Generating scripts<a class="headerlink" href="#generating-scripts" title="Permalink to this headline">¶</a></h2>
+<p>Each MSlice plot window has an option in the <code class="docutils literal"><span class="pre">File</span></code> menu to generate a script that would reproduce the plot. This will include the
+full history of the workspace which provides the data for the plot, and additionally any graphical changes to the plot above the
+default (e.g. if the axes titles or limits have been changed or additional information such as recoil or Bragg lines added).</p>
+<img alt="_images/generate_script_menu.png" src="_images/generate_script_menu.png" />
+<p>Generated scripts may be run from the MantidPlot script window (accessible using <code class="docutils literal"><span class="pre">F3</span></code>).</p>
+<p>Alternatively, the script can also be run from the IPython console in the MSlice GUI using the <code class="docutils literal"><span class="pre">import</span></code> directive and the <code class="docutils literal"><span class="pre">reload</span></code>
+(<code class="docutils literal"><span class="pre">importlib.reload</span></code> in Python 3) function. For example, the first time the script is run, do:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">script_name</span>
+</pre></div>
+</div>
+<p>For a script named <code class="docutils literal"><span class="pre">script_name.py</span></code> which is on the Python path. Subsequently, if you change the script and want to re-run it,
+you can do:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">reload</span><span class="p">(</span><span class="n">script_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plotting-using-matplotlib-interface">
+<h2>4.2. Plotting using Matplotlib interface<a class="headerlink" href="#plotting-using-matplotlib-interface" title="Permalink to this headline">¶</a></h2>
+<p>Whilst MSlice uses Matplotlib to render all the plots, it has its own type of figure windows in order to accommodate additional
+features such as the keep / make current functionality and interactive plots. The MSlice specific figures <em>do not</em> support multiple
+plots per figure (subplots) and will not work in a Jupyter notebook. However, MSlice is also able to plot to a generic Matplotlib
+figure.</p>
+<p>To plot a 1D cut using the MSlice figures use:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mslice.cli</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">mslice.plotting.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;data.nxspe&#39;</span><span class="p">)</span>
+<span class="n">cut_ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Cut</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s1">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s1">&#39;DeltaE, -1, 1&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;mslice&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">cut_ws</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;ok&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">mc</span><span class="o">.</span><span class="n">Show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To plot the same cut using a plain Matplotlib figure use:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mslice.cli</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;data.nxspe&#39;</span><span class="p">)</span>
+<span class="n">cut_ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Cut</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s1">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s1">&#39;DeltaE, -1, 1&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;mslice&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">cut_ws</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;ok&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>E.g. the only difference is that you must use the <code class="docutils literal"><span class="pre">matplotlib.pyplot</span></code> package instead of the <code class="docutils literal"><span class="pre">mslice.plotting.pyplot</span></code> package
+and call <code class="docutils literal"><span class="pre">fig.show()</span></code> at the end instead of <code class="docutils literal"><span class="pre">mc.Show()</span></code>. In both cases, all the standard object-oriented Matplotlib functions
+(such as <code class="docutils literal"><span class="pre">set_title</span></code>, <code class="docutils literal"><span class="pre">set_xlabel</span></code>, <code class="docutils literal"><span class="pre">set_xlim</span></code> etc.) are accepted. Note that also in both cases you must specify the
+<code class="docutils literal"><span class="pre">projection='mslice'</span></code> keyword argument to <code class="docutils literal"><span class="pre">add_subplot</span></code>, because this lets the Matplotlib <code class="docutils literal"><span class="pre">errorbar</span></code> function recognise an
+MSlice workspace. Finally, please also that the MSlice override of <code class="docutils literal"><span class="pre">pyplot</span></code> <em>does not</em> support the <code class="docutils literal"><span class="pre">fig,</span> <span class="pre">ax</span> <span class="pre">=</span> <span class="pre">plt.subplots()</span></code>
+syntax.</p>
+<p>You must also use <code class="docutils literal"><span class="pre">errorbar</span></code> to plot a 1D cut, and <code class="docutils literal"><span class="pre">pcolormesh</span></code> to plot a 2D slice. No other Matplotlib plotting function are
+aware of MSlice workspaces (even with the <code class="docutils literal"><span class="pre">projection='mslice'</span></code> argument).</p>
+<p>An example of plotting a slice:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mslice.cli</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;data.nxspe&#39;</span><span class="p">)</span>
+<span class="n">slice_ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Slice</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s1">&#39;|Q|, 0, 10, 0.01&#39;</span><span class="p">,</span> <span class="s1">&#39;DeltaE, -5, 55, 0.5&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;mslice&#39;</span><span class="p">)</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">cut_ws</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;ok&#39;</span><span class="p">)</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">cb</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plotting-using-mslice-specific-commands">
+<h2>4.3. Plotting using MSlice specific commands<a class="headerlink" href="#plotting-using-mslice-specific-commands" title="Permalink to this headline">¶</a></h2>
+<p>In addition to using the Matplotlib-style object-oriented interface (defining a <code class="docutils literal"><span class="pre">figure</span></code> and then <code class="docutils literal"><span class="pre">add_subplot</span></code>), there are
+also MSlice functions which will wrap these commands and plot to an MSlice figure (e.g. does not work in Jupyter, does not support
+multiple subplots, but has all the GUI tools (overplot recoil lines / Bragg peaks, interactive cuts, etc.). These commands, whilst
+shorter, are not as flexible as the Matplotlib object-oriented interface, however.</p>
+<p>To plot a cut and then a slice:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mslice.cli</span> <span class="k">as</span> <span class="nn">mc</span>
+
+<span class="n">ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;data.nxspe&#39;</span><span class="p">)</span>
+<span class="n">wsq</span> <span class="o">=</span> <span class="n">ws</span><span class="o">.</span><span class="n">Cut</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s1">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s1">&#39;DeltaE, -1, 1&#39;</span><span class="p">)</span>
+<span class="n">mc</span><span class="o">.</span><span class="n">PlotCut</span><span class="p">(</span><span class="n">wsq</span><span class="p">)</span>
+
+<span class="n">ws2d</span> <span class="o">=</span> <span class="n">ws</span><span class="o">.</span><span class="n">Slice</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s1">&#39;|Q|, 0, 10, 0.01&#39;</span><span class="p">,</span> <span class="s1">&#39;DeltaE, -5, 55, 0.5&#39;</span><span class="p">)</span>
+<span class="n">mc</span><span class="o">.</span><span class="n">PlotSlice</span><span class="p">(</span><span class="n">ws2d</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="algebraic-manipulation-of-workspaces">
+<h2>4.4. Algebraic Manipulation of Workspaces<a class="headerlink" href="#algebraic-manipulation-of-workspaces" title="Permalink to this headline">¶</a></h2>
+<p>The MSlice workspaces support standard algebraic manipulations in a similar way to normal Mantid workspaces. Loaded <cite>nxs</cite> or
+<code class="docutils literal"><span class="pre">nxspe</span></code> files are created as a <code class="docutils literal"><span class="pre">Workspace</span></code>. For <strong>PSD</strong> (one-to-one mapped) files, these are first converted into a
+<code class="docutils literal"><span class="pre">PixelWorkspace</span></code> using a “Calculate Projection” step before they can be plotted. The slices and cuts produced either directly
+from the loaded <code class="docutils literal"><span class="pre">Workspace</span></code> (if in <strong>non-PSD</strong> mode, e.g. for a rings-mapped file) or from the <code class="docutils literal"><span class="pre">PixelWorkspace</span></code> are
+<code class="docutils literal"><span class="pre">HistogramWorkspace</span></code>s.</p>
+<p>Operations performed on <code class="docutils literal"><span class="pre">Workspaces</span></code>s and <code class="docutils literal"><span class="pre">HistogramWorkspaces</span></code>s are done per bin, so only operations with a matching sized
+workspace, or with a scalar is allowed. For <code class="docutils literal"><span class="pre">PixelWorkspace</span></code> (which are based on Mantid’s <code class="docutils literal"><span class="pre">MDEventWorkspace</span></code> which does not
+allow many algebraic manipulations), a fine grained slice is first created (generating an internal <code class="docutils literal"><span class="pre">HistogramWorkspace</span></code>) and
+then the algebraic operation is applied to this fine grained slice. Thus it is recommended to perform any algebraic manipulation
+on the loaded <code class="docutils literal"><span class="pre">Workspace</span></code> prior to conversion (using <code class="docutils literal"><span class="pre">MakeProjection</span></code>) to a <code class="docutils literal"><span class="pre">PixelWorkspace</span></code> for cutting / slicing and
+plotting.</p>
+<p>For example:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mslice.cli</span> <span class="k">as</span> <span class="nn">mc</span>
+
+<span class="n">ws1</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;data.nxspe&#39;</span><span class="p">)</span>
+<span class="n">ws2</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;background.nxspe&#39;</span><span class="p">)</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="n">ws1</span> <span class="o">-</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">ws2</span>
+<span class="n">mc</span><span class="o">.</span><span class="n">PlotSlice</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">Slice</span><span class="p">(</span><span class="n">ws</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>4.5. Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="loading-and-cutting-slicing">
+<h3>4.5.1. Loading and Cutting / Slicing<a class="headerlink" href="#loading-and-cutting-slicing" title="Permalink to this headline">¶</a></h3>
+<p>To load and plot a slice in <img class="math" src="_images/math/f37952523e95841ce81d125203d04becdc541e95.png" alt="|Q|" style="vertical-align: -5px"/> and energy transfer, and a cut along <img class="math" src="_images/math/f37952523e95841ce81d125203d04becdc541e95.png" alt="|Q|" style="vertical-align: -5px"/>, integrating over <img class="math" src="_images/math/b971f1a8f06f06a6dc4788ff27012ed32630edae.png" alt="-1\leq E\leq 1" style="vertical-align: -3px"/>:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mslice.cli</span> <span class="k">as</span> <span class="nn">mc</span>
+
+<span class="n">ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;data.nxspe&#39;</span><span class="p">)</span>
+<span class="n">wsq</span> <span class="o">=</span> <span class="n">ws</span><span class="o">.</span><span class="n">Cut</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s1">&#39;|Q|&#39;</span><span class="p">,</span> <span class="s1">&#39;DeltaE, -1, 1&#39;</span><span class="p">)</span>
+<span class="n">mc</span><span class="o">.</span><span class="n">PlotCut</span><span class="p">(</span><span class="n">wsq</span><span class="p">)</span>
+
+<span class="n">ws2d</span> <span class="o">=</span> <span class="n">ws</span><span class="o">.</span><span class="n">Slice</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s1">&#39;|Q|, 0, 10, 0.01&#39;</span><span class="p">,</span> <span class="s1">&#39;DeltaE, -5, 55, 0.5&#39;</span><span class="p">)</span>
+<span class="n">mc</span><span class="o">.</span><span class="n">PlotSlice</span><span class="p">(</span><span class="n">ws2d</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the above <code class="docutils literal"><span class="pre">Slice</span></code> function rebins the data between <img class="math" src="_images/math/cd86a90190a8cbfabada1b8df52ec3f94ec2c9f6.png" alt="0\leq |Q|\leq 10" style="vertical-align: -5px"/> in steps of 0.01 <img class="math" src="_images/math/4603bf965745ffc90437ff200c6ee50336781081.png" alt="\mathrm{\AA}^{-1}" style="vertical-align: -1px"/>
+and between <img class="math" src="_images/math/39873a6a631b51ae7f306de987dbe7fec0cc4c59.png" alt="-5\leq E\leq 55" style="vertical-align: -3px"/> in steps of 0.5 meV.</p>
+</div>
+<div class="section" id="plotting-a-series-of-cuts">
+<h3>4.5.2. Plotting a series of cuts<a class="headerlink" href="#plotting-a-series-of-cuts" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mslice.cli</span> <span class="k">as</span> <span class="nn">m</span>
+
+<span class="c1"># Plot a series of energy cuts at different Q (similar to putting something in the width box in GUI).</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;data.nxspe&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">qq</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">PlotCut</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">Cut</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="s1">&#39;DeltaE&#39;</span><span class="p">,</span> <span class="s1">&#39;|Q|, </span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">qq</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">qq</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)),</span> <span class="n">PlotOver</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Loads a series of datasets at different temperatures and plots the energy cuts at low energy</span>
+<span class="n">runs</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">103154</span><span class="p">,</span> <span class="mi">103158</span><span class="p">)</span>
+<span class="n">wss</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">rr</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">:</span>
+    <span class="n">wss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;SEQ_</span><span class="si">%06d</span><span class="s1">_powder.nxspe&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rr</span><span class="p">)))</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">PlotCut</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">Cut</span><span class="p">(</span><span class="n">wss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;DeltaE&#39;</span><span class="p">,</span> <span class="s1">&#39;|Q|, 0, 2&#39;</span><span class="p">),</span> <span class="n">PlotOver</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="slicing.html" title="3. Taking Slices"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">MSlice 1.2.0.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Mantid Project.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

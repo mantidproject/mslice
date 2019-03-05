@@ -20,6 +20,7 @@ single crystal data is currently planned.
    quickstart
    cutting
    slicing
+   cli
 
 
 Indices and tables
