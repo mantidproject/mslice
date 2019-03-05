@@ -42,8 +42,6 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
                 path += file_dialog.selectedFilter()[-5:-1]
             ext = path[path.rfind('.'):]
             return os.path.dirname(path), os.path.basename(path), ext
-        else:
-            raise RuntimeError("dialog cancelled")
 
 
 def save_nexus(workspace, path, is_slice):
