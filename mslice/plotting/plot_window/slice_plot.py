@@ -162,24 +162,8 @@ class SlicePlot(IPlot):
         self._canvas.draw()
 
     def update_legend(self):
-        lines = []
-        labels = []
         axes = self._canvas.figure.gca()
-        line_artists = [artist for artist in axes.get_children() if isinstance(artist, Line2D)]
-        for line in line_artists:
-            if str(line.get_linestyle()) != 'None' and line.get_label() != '':
-                lines.append(line)
-                labels.append(line.get_label())
-        if len(lines) > 0:
-            legend = axes.legend(lines, labels, fontsize='small')
-            for legline, line in zip(legend.get_lines(), lines):
-                legline.set_picker(5)
-                self._legend_dict[legline] = line
-            for label, line in zip(legend.get_texts(), lines):
-                label.set_picker(5)
-                self._legend_dict[label] = line
-        else:
-            axes.legend_ = None  # remove legend
+        axes.legend().draggable()
 
         if self._canvas.manager.plot_handler.icut is not None:
             self._canvas.manager.plot_handler.icut.rect.ax = axes
