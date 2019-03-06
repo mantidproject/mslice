@@ -114,9 +114,9 @@ class PlotFigureManagerQT(QtCore.QObject):
     def get_cut_background(self):
         return self.plot_handler.background
 
-    def is_icut(self, is_icut):
+    def set_is_icut(self, is_icut):
         if self.plot_handler is not None:
-            self.plot_handler.is_icut(is_icut)
+            self.plot_handler.set_is_icut(is_icut)
 
     def picking_connected(self, connect):
         if connect:

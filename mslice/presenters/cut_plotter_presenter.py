@@ -88,7 +88,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     def set_is_icut(self, is_icut):
         if cut_figure_exists():
-            plt.gcf().canvas.manager.is_icut(is_icut)
+            plt.gcf().canvas.manager.set_is_icut(is_icut)
 
     def get_icut(self):
         return self._interactive_cut_cache
