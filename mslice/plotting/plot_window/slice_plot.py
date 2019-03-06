@@ -5,7 +5,6 @@ from mslice.util.qt.QtCore import Qt
 
 import os.path as path
 import matplotlib.colors as colors
-from matplotlib.lines import Line2D
 
 from mslice.models.colors import to_hex
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter

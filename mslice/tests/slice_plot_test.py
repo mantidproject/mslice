@@ -1,9 +1,7 @@
-from mock import MagicMock, patch, PropertyMock, ANY
+from mock import MagicMock, patch, PropertyMock
 import unittest
 
 from matplotlib import colors
-from matplotlib.lines import Line2D
-from matplotlib.text import Text
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 
 
@@ -87,24 +85,12 @@ class SlicePlotTest(unittest.TestCase):
         self.slice_plot.arbitrary_recoil_line()
         self.slice_plotter.add_overplot_line.assert_not_called()
 
-    def test_update_legend(self):
-        line1 = Line2D([], [], label='line1')
-        line2 = Line2D([], [], label='line2')
-        line3 = Line2D([], [], label='line_not_to_show1')
-        line4 = Line2D([], [], label='')
-        line3.set_linestyle('None')
-        line1_text = Text('line1')
-        line2_text = Text('line2')
-
-        get_legend_mock = MagicMock()
-        get_legend_mock.get_lines = MagicMock(return_value=[line1, line2])
-        get_legend_mock.get_texts = MagicMock(return_value=[line1_text, line2_text])
-        self.axes.get_children = MagicMock(return_value=[line1, line2, line3, line4, "nonsense", 4])
-        self.axes.legend = MagicMock(return_value=get_legend_mock)
+    def test_update_legend_in_icut_mode(self):
+        self.slice_plot._canvas.manager.plot_handler.icut = MagicMock()
 
         self.slice_plot.update_legend()
-        self.axes.legend.assert_called_with([line1, line2], ['line1', 'line2'], fontsize=ANY)
-        self.assertEqual(self.slice_plot._legend_dict[line1], line1)
-        self.assertEqual(self.slice_plot._legend_dict[line2], line2)
-        self.assertEqual(self.slice_plot._legend_dict[line1_text], line1)
-        self.assertEqual(self.slice_plot._legend_dict[line2_text], line2)
+
+        self.axes.legend.assert_called_once()
+        self.axes.legend().draggable.assert_called_once()
+
+        self.assertEquals(self.slice_plot._canvas.manager.plot_handler.icut.rect.ax, self.axes)
