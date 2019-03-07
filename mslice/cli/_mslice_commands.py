@@ -17,8 +17,6 @@ from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.app.presenters import cli_slice_plotter_presenter
-from mslice.app.presenters import cli_cut_plotter_presenter
 
 from mslice.util.mantid import in_mantidplot
 
@@ -196,6 +194,7 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
     _check_workspace_type(workspace, HistogramWorkspace)
 
     # slice cache needed from main slice plotter presenter
+    from mslice.app.presenters import cli_slice_plotter_presenter
     if is_gui():
         cli_slice_plotter_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
     cli_slice_plotter_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
@@ -225,6 +224,7 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
         intensity_range = None
     else:
         intensity_range = (IntensityStart, IntensityEnd)
+    from mslice.app.presenters import cli_cut_plotter_presenter
     cli_cut_plotter_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range,
                                                       plot_over=PlotOver)
 

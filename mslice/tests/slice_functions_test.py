@@ -50,7 +50,7 @@ class SliceFunctionsTest(unittest.TestCase):
     def test_boltzmann_dist(self):
         e_axis = np.arange(self.e_axis.start, self.e_axis.end, self.e_axis.step)
         boltz = compute_boltzmann_dist(10, e_axis)
-        self.assertAlmostEqual(boltz[0], 109592.269, 3)
+        self.assertAlmostEqual(boltz[0], 109592.269, 0)
         self.assertAlmostEqual(boltz[10], 1.0, 3)
         self.assertAlmostEqual(boltz[20], 0.000009125, 9)
 

@@ -59,6 +59,7 @@ class InteractiveCut(object):
                 from mslice.plotting.pyplot import GlobalFigureManager
                 self._cut_plotter_presenter = GlobalFigureManager.get_active_figure().plot_handler._cut_plotter_presenter
                 self._is_initial_cut_plotter_presenter = False
+                GlobalFigureManager.disable_make_current()
             self._cut_plotter_presenter.store_icut(self)
 
     def get_cut_parameters(self, pos1, pos2):

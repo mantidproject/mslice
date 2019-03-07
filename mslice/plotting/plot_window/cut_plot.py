@@ -36,6 +36,7 @@ class CutPlot(IPlot):
         self.setup_connections(self.plot_window)
         self.default_options = None
         self._waterfall_cache = {}
+        self._is_icut = False
 
     def save_default_options(self):
         self.default_options = {
@@ -74,7 +75,7 @@ class CutPlot(IPlot):
 
     def window_closing(self):
         icut = self._cut_plotter_presenter.get_icut()
-        if icut is not None:
+        if icut is not None and self._is_icut:
             icut.window_closing()
             self.manager.button_pressed_connected(False)
             self.manager.picking_connected(False)
@@ -225,7 +226,7 @@ class CutPlot(IPlot):
             for element in error_bar_elements:
                 element.set_alpha(1)
 
-    def is_icut(self, is_icut):
+    def set_is_icut(self, is_icut):
         self.manager.button_pressed_connected(not is_icut)
         self.manager.picking_connected(not is_icut)
 
@@ -239,6 +240,7 @@ class CutPlot(IPlot):
         self.plot_window.action_waterfall.setVisible(not is_icut)
 
         self.plot_window.show()
+        self._is_icut = is_icut
 
     def save_icut(self):
         icut = self._cut_plotter_presenter.get_icut()
