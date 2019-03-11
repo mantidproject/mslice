@@ -81,8 +81,12 @@ class Slice(PythonAlgorithm):
         ebin = '%f, %f, %f' % (axes[e_axis].start_meV, axes[e_axis].step_meV, axes[e_axis].end_meV)
         qbin = '%f, %f, %f' % (axes[q_axis].start_meV, axes[q_axis].step_meV, axes[q_axis].end_meV)
         if axes[q_axis].units == '|Q|':
-            thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin, EMode=e_mode,
-                               StoreInADS=False)
+            if 'Indirect' in e_mode and workspace.run().hasProperty('Efix'):
+                thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin, EMode=e_mode,
+                                   StoreInADS=False, EFixed=workspace.run().getProperty('Efix').value)
+            else:
+                thisslice = SofQW3(InputWorkspace=workspace, QAxisBinning=qbin, EAxisBinning=ebin, EMode=e_mode,
+                                   StoreInADS=False)
         elif axes[q_axis].units == '2Theta':
             thisslice = ConvertSpectrumAxis(InputWorkspace=workspace, Target='Theta', StoreInADS=False)
             thisslice = Rebin2D(InputWorkspace=thisslice, Axis1Binning=ebin, Axis2Binning=qbin, StoreInADS=False)

@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 import os
 
 from .busy import show_busy
-from mslice.models.workspacemanager.workspace_algorithms import load
+from mslice.models.workspacemanager.workspace_algorithms import load, get_limits
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_visible_workspace_names
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -74,6 +74,8 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
             Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi, self._EfCache)
             self._EfCache = Ef
             ws.e_fixed = Ef
+            ws.raw_ws.run().addProperty('Efix', Ef, True)
+            get_limits(ws_name, 'DeltaE')  # This is call needed to process the limits.
             return allChecked
 
     def _confirm_workspace_overwrite(self, ws_name):

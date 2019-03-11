@@ -9,6 +9,7 @@ from mock import call, patch, PropertyMock
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.widgets.dataloader.dataloader import DataLoaderWidget
+from mslice.workspace.workspace import Workspace
 
 
 class DataLoaderTest(unittest.TestCase):
@@ -20,15 +21,16 @@ class DataLoaderTest(unittest.TestCase):
         self.presenter = DataLoaderPresenter(self.view)
         self.presenter.register_master(self.main_presenter)
 
+    @patch('mslice.models.workspacemanager.workspace_algorithms.process_limits')
     @patch('mslice.presenters.data_loader_presenter.load')
     @patch('mslice.presenters.data_loader_presenter.get_workspace_handle')
-    def test_load_one_workspace(self, get_ws_handle_mock, load_mock):
+    def test_load_one_workspace(self, get_ws_handle_mock, load_mock, process_limits):
         # Create a view that will return a path on call to get_workspace_to_load_path
         tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
         path_to_nexus = join(tempdir, 'cde.nxs')
         workspace_name = 'cde'
         self.view.get_workspace_efixed = mock.Mock(return_value=(1.845, False))
-        ws_mock = mock.Mock()
+        ws_mock = mock.Mock(spec=Workspace)
         get_ws_handle_mock.return_value = ws_mock
         e_fixed = PropertyMock()
         e_mode = PropertyMock(return_value="Indirect")
@@ -37,9 +39,15 @@ class DataLoaderTest(unittest.TestCase):
         type(ws_mock).e_mode = e_mode
         type(ws_mock).ef_defined = ef_defined
 
-        self.presenter.load_workspace([path_to_nexus])
+        with patch('mslice.models.workspacemanager.workspace_algorithms.get_workspace_handle') as gwh:
+            gwh.return_value = ws_mock
+            limits = PropertyMock(side_effect=({} if i < 2 else {'DeltaE':[-1, 1]} for i in range(6)))
+            type(ws_mock).limits = limits
+            e_fixed.return_value = 1.845
+            self.presenter.load_workspace([path_to_nexus])
         load_mock.assert_called_with(filename=path_to_nexus, output_workspace=workspace_name)
-        e_fixed.assert_called_once_with(1.845)
+        e_fixed.assert_has_calls([call(1.845), call()])
+        process_limits.assert_called_once_with(ws_mock)
         self.main_presenter.show_workspace_manager_tab.assert_called_once()
         self.main_presenter.show_tab_for_workspace.assert_called_once()
         self.main_presenter.update_displayed_workspaces.assert_called_once()
