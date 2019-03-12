@@ -51,6 +51,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._subtract_workspace()
             elif command == Command.SaveToADS:
                 self._save_to_ads()
+            elif command == Command.ComposeWorkspace:
+                self._workspace_manager_view._display_error('Please select a Compose action from the dropdown menu')
+            elif command == Command.Scale:
+                pass
+            elif command == Command.Bose:
+                pass
             else:
                 raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
 

@@ -22,3 +22,5 @@ class Command(object):
     RenameWorkspace = 1000
     CombineWorkspace = 1010
     SelectionChanged = -1799
+    Scale = 20
+    Bose = 21
