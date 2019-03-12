@@ -77,7 +77,7 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
         idx = 1
         unit = 'MomentumTransfer'
         name = '|Q|'
-    elif cut_axis.units == 'Degrees':
+    elif cut_axis.units == 'Degrees' or cut_axis.units == '2Theta':
         ws_out = _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace)
         idx = 1
         unit = 'Degrees'

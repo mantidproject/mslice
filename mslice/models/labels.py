@@ -26,7 +26,7 @@ def get_display_name(axis):
     elif 'MomentumTransfer' in axis.units or '|Q|' in axis.units:
         # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX
         return '|Q| (recip. Ang.)' if MPL_COMPAT else r'$|Q|$ ($\mathrm{\AA}^{-1}$)'
-    elif '2Theta' in axis.units:
+    elif 'Degrees' in axis.units or '2Theta' in axis.units:
         return 'Scattering Angle (degrees)' if MPL_COMPAT else r'Scattering Angle 2$\theta$ ($^{\circ}$)'
     else:
         return axis.units

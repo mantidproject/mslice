@@ -52,7 +52,7 @@ class SlicePlotterPresenter(PresenterUtility):
         self._main_presenter.update_displayed_workspaces()
 
     def _cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
-        rotated = x_axis.units not in ['MomentumTransfer', 'Degrees', '|Q|']
+        rotated = x_axis.units not in ['MomentumTransfer', 'Degrees', '2Theta', '|Q|']
         (q_axis, e_axis) = (x_axis, y_axis) if not rotated else (y_axis, x_axis)
         self._slice_cache[slice.name[2:]] = Slice(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
