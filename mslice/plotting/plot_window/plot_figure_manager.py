@@ -42,6 +42,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window.action_keep.triggered.connect(self.report_as_kept)
         self.window.action_make_current.triggered.connect(self.report_as_current)
         self.window.action_save_image.triggered.connect(self.save_plot)
+        self.window.action_copy_image.triggered.connect(self.copy_plot)
         self.window.action_print_plot.triggered.connect(self.print_plot)
         self.window.action_plot_options.triggered.connect(self._plot_options)
         self.window.action_toggle_legends.triggered.connect(self._toggle_legend)
@@ -185,6 +186,12 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def save_image(self, path, resolution=300):
         self.canvas.figure.savefig(path, dpi=resolution)
+
+    def copy_plot(self):
+        import io
+        buf = io.BytesIO()
+        self.canvas.figure.savefig(buf, dpi=300)
+        QtWidgets.QApplication.clipboard().setImage(QtGui.QImage.fromData(buf.getvalue()))
 
     def error_box(self, message):
         error_box = QtWidgets.QMessageBox(self)
