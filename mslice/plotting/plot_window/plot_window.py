@@ -130,6 +130,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.keep_make_current_seperator = toolbar.addSeparator()
 
         self.action_save_image = add_action(toolbar, self, "Save Image", icon_name='fa.save')
+        self.action_copy_image = add_action(toolbar, self, "Copy Image", icon_name='fa.copy')
         self.action_print_plot = add_action(toolbar, self,  "Print", icon_name='fa.print')
         self.action_plot_options = add_action(toolbar, self, "Plot Options", icon_name='fa.cog')
 
