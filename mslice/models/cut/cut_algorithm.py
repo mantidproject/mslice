@@ -2,7 +2,7 @@
 from mantid.api import PythonAlgorithm, WorkspaceProperty
 from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator
 from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, \
-    ConvertToMD, DeleteWorkspace
+    ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
@@ -90,10 +90,15 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
     extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
 
     # Hack to (deep) copy log data (ExperimentInfo)
-    _tmpws = ConvertToMD(ws_out, EnableLogging=False, StoreInADS=False, PreprocDetectorsWS='-')
+    _tmpws = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-1, 1, 1], UnitX='DeltaE', OutputWorkspace=name,
+                                       EnableLogging=False)
+    CopyLogs(ws_out, _tmpws, EnableLogging=False)
+    AddSampleLog(_tmpws, LogName='Ei', LogText='3.', LogType='Number', EnableLogging=False)
+    _tmpws = ConvertToMD(_tmpws, EnableLogging=False, StoreInADS=False, PreprocDetectorsWS='-',
+                         QDimensions='|Q|', dEAnalysisMode='Direct')
     ws_out = CreateMDHistoWorkspace(SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(), Dimensionality=1,
                                     Extents=extents, NumberOfBins=xdim.getNBins(), Names=name, Units=unit,
-                                    StoreInADS=False)
+                                    StoreInADS=False, EnableLogging=False)
     ws_out.copyExperimentInfos(_tmpws)
     DeleteWorkspace(_tmpws, EnableLogging=False)
 
@@ -111,6 +116,10 @@ def _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace):
 
 
 def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace):
-    ws_out = SofQW3(InputWorkspace=selected_workspace, OutputWorkspace='out', EMode=emode, QAxisBinning=q_binning,
-                    EAxisBinning=e_binning, StoreInADS=False)
+    if 'Indirect' in emode and selected_workspace.run().hasProperty('Efix'):
+        ws_out = SofQW3(InputWorkspace=selected_workspace, QAxisBinning=q_binning, EAxisBinning=e_binning, EMode=emode,
+                        StoreInADS=False, EFixed=selected_workspace.run().getProperty('Efix').value)
+    else:
+        ws_out = SofQW3(InputWorkspace=selected_workspace, OutputWorkspace='out', EMode=emode, QAxisBinning=q_binning,
+                        EAxisBinning=e_binning, StoreInADS=False)
     return ws_out
