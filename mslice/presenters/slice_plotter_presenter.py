@@ -4,6 +4,7 @@ from mslice.models.slice.slice_functions import (compute_slice, sample_temperatu
                                                  compute_powder_line)
 from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice import Slice
+from mslice.models.labels import is_momentum, is_twotheta
 from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, remove_line,
                                         plot_overplot_line, create_slice_figure)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -52,7 +53,7 @@ class SlicePlotterPresenter(PresenterUtility):
         self._main_presenter.update_displayed_workspaces()
 
     def _cache_slice(self, slice, colourmap, norm, sample_temp, x_axis, y_axis):
-        rotated = x_axis.units not in ['MomentumTransfer', 'Degrees', '2Theta', '|Q|']
+        rotated = not is_twotheta(x_axis.units) and not is_momentum(x_axis.units)
         (q_axis, e_axis) = (x_axis, y_axis) if not rotated else (y_axis, x_axis)
         self._slice_cache[slice.name[2:]] = Slice(slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 

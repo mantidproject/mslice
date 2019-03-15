@@ -8,6 +8,7 @@ from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionCon
 from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
+from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid.mantid_algorithms import LoadCIF, CloneWorkspace
@@ -153,11 +154,11 @@ def get_sample_temperature_from_string(string):
 def compute_recoil_line(ws_name, axis, relative_mass=1):
     efixed = get_workspace_handle(ws_name).e_fixed
     x_axis = np.arange(axis.start, axis.end, axis.step)
-    if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
+    if is_momentum(axis.units):
         momentum_transfer = x_axis
         line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\
             (constants.elementary_charge / 1000)
-    elif axis.units == 'Degrees' or axis.units == '2Theta':
+    elif is_twotheta(axis.units):
         tth = x_axis * np.pi / 180.
         if 'Direct' in get_workspace_handle(ws_name).e_mode:
             line = efixed * (2 - 2 * np.cos(tth)) / (relative_mass + 1 - np.cos(tth))
@@ -170,9 +171,9 @@ def compute_recoil_line(ws_name, axis, relative_mass=1):
 
 def compute_powder_line(ws_name, axis, element, cif_file=False):
     efixed = get_workspace_handle(ws_name).e_fixed
-    if axis.units == 'MomentumTransfer' or axis.units == '|Q|':
+    if is_momentum(axis.units):
         x0 = _compute_powder_line_momentum(ws_name, axis, element, cif_file)
-    elif axis.units == 'Degrees' or axis.units == '2Theta':
+    elif is_twotheta(axis.units):
         x0 = _compute_powder_line_degrees(ws_name, axis, element, efixed, cif_file)
     else:
         raise RuntimeError("units of axis not recognised")
