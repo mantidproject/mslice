@@ -6,6 +6,7 @@ from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace,
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
+from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.units import EnergyUnits
 from mslice.workspace.helperfunctions import attribute_to_log
 from .cut_normalisation import normalize_workspace
@@ -72,12 +73,12 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
     idx = 0
     unit = 'DeltaE'
     name = 'EnergyTransfer'
-    if cut_axis.units == '|Q|':
+    if is_momentum(cut_axis.units):
         ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace)
         idx = 1
         unit = 'MomentumTransfer'
         name = '|Q|'
-    elif cut_axis.units == 'Degrees':
+    elif is_twotheta(cut_axis.units):
         ws_out = _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace)
         idx = 1
         unit = 'Degrees'
