@@ -18,10 +18,7 @@ from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
-from mslice.util.mantid import in_mantidplot
-
-if in_mantidplot():
-    from mslice.util.mantid.mantid_algorithms import *  # noqa: F401
+from mslice.util.mantid.mantid_algorithms import *  # noqa: F401
 
 # -----------------------------------------------------------------------------
 # Command functions

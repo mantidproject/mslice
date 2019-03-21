@@ -197,14 +197,14 @@ def add_workspace_runs(selected_ws):
 
 
 def subtract(workspaces, background_ws, ssf):
-    bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = Scale(OutputWorkspace='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf)
+    with wrap_in_ads([get_workspace_handle(str(background_ws))]):
+        scaled_bg_ws = Scale(OutputWorkspace='scaled_bg_ws', store=False, InputWorkspace=str(background_ws), Factor=ssf)
     try:
         for ws_name in workspaces:
-            ws = get_workspace_handle(ws_name)
-            result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
-                           RHSWorkspace=scaled_bg_ws.raw_ws)
-            propagate_properties(ws, result)
+            with wrap_in_ads([get_workspace_handle(ws_name), scaled_bg_ws]):
+                result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws_name,
+                               RHSWorkspace=scaled_bg_ws.name)
+            propagate_properties(get_workspace_handle(ws_name), result)
     except ValueError as e:
         raise ValueError(e)
 

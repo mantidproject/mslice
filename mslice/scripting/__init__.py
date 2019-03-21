@@ -1,7 +1,9 @@
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+import ctypes
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_visible_workspace_names
 from mslice.util.qt import QtWidgets
 from mslice.scripting.helperfunctions import add_plot_statements
 from mslice.app.presenters import get_cut_plotter_presenter
+from mslice.workspace.base import WorkspaceBase
 
 
 def generate_script(ws_name, filename=None, plot_handler=None, window=None):
@@ -38,42 +40,52 @@ def preprocess_lines(ws_name, plot_handler, ax):
 
     return script_lines
 
+def _get_c_address(mslice_workspace):
+    # Hack to get the c-address of the shared pointer to the workspace object (assumes a boost.python.class and CPython)
+    if isinstance(mslice_workspace, WorkspaceBase):
+        return ctypes.cast(id(mslice_workspace.raw_ws), ctypes.POINTER(ctypes.c_void_p))[8]
 
 def generate_script_lines(raw_ws, workspace_name):
     lines = []
     ws_name = workspace_name.replace(".", "_")
     alg_history = raw_ws.getHistory().getAlgorithmHistories()
-    for algorithm in reversed(alg_history):
+    existing_ws_refs = []
+    current_ws_refs = {'__TMP{:016x}'.format(_get_c_address(get_workspace_handle(ws))).upper(): ws.replace(".", "_")
+                       for ws in get_visible_workspace_names()}
+    for algorithm in alg_history:
         alg_name = algorithm.name()
-        kwargs = get_algorithm_kwargs(algorithm, ws_name)
-        lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
-        if alg_name == 'Load':
-            break
-    return reversed(lines)
+        kwargs, output_ws = get_algorithm_kwargs(algorithm, ws_name, existing_ws_refs)
+        ws_ref = [ws_ref for ws_ref in current_ws_refs.keys() if ws_ref in kwargs]
+        for ref in ws_ref:
+            kwargs = kwargs.replace("'{}'".format(ref), current_ws_refs[ref])
+        if output_ws is not None and output_ws != ws_name:
+            lines += ["{} = mc.{}({})\n".format(output_ws, alg_name, kwargs)]
+            existing_ws_refs.append(output_ws)
+        else:
+            lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
+    return lines
 
 
-def get_algorithm_kwargs(algorithm, workspace_name):
+def get_algorithm_kwargs(algorithm, workspace_name, existing_ws_refs):
     arguments = []
+    output_ws = None
     for prop in algorithm.getProperties():
         if not prop.isDefault():
+            if prop.name() == "OutputWorkspace":
+                output_ws = prop.value().replace(".", "_")
             if algorithm.name() == "Load":
                 if prop.name() == "Filename":
-                    arguments = ["{}='{}'".format(prop.name(), prop.value())]
-                elif prop.name() == "OutputWorkspace" or prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
-                    pass
-            elif algorithm.name() == "MakeProjection":
-                if prop.name() == "InputWorkspace":
-                    arguments += ["{}=ws_{}".format(prop.name(), workspace_name)]
-                elif prop.name() == "OutputWorkspace" or prop.name() == "Limits":
-                    pass
-                else:
-                    if isinstance(prop.value(), str):
-                        arguments += ["{}='{}'".format(prop.name(), prop.value())]
-                    else:
-                        arguments += ["{}={}".format(prop.name(), prop.value())]
-            else:
-                if isinstance(prop.value(), str):
                     arguments += ["{}='{}'".format(prop.name(), prop.value())]
-                else:
-                    arguments += ["{}={}".format(prop.name(), prop.value())]
-    return ", ".join(arguments)
+                    continue
+                elif prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
+                    continue
+            elif algorithm.name() == "MakeProjection":
+                if prop.name() == "Limits" or prop.name() == "OutputWorkspace" or prop.name() == "ProjectionType":
+                    continue
+            if prop.value().replace(".", "_") in existing_ws_refs:
+                arguments += ["{}={}".format(prop.name(), prop.value().replace(".", "_"))]
+            elif isinstance(prop.value(), str):
+                arguments += ["{}='{}'".format(prop.name(), prop.value())]
+            else:
+                arguments += ["{}={}".format(prop.name(), prop.value())]
+    return ", ".join(arguments), output_ws

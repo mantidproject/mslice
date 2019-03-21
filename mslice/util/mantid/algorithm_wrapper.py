@@ -7,26 +7,36 @@ from mantid.api import AnalysisDataService, Workspace
 
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as MsliceWorkspace
+from mslice.workspace.workspace import Workspace as MsliceWorkspace2D
 
 
 def wrap_algorithm(algorithm):
     def alg_wrapper(*args, **kwargs):
         output_name = ''
+        input_workspace = None
         if 'InputWorkspace' in kwargs:
+            input_workspace = kwargs['InputWorkspace']
             kwargs['InputWorkspace'] = _name_or_wrapper_to_workspace(kwargs['InputWorkspace'])
         elif len(args) > 0:
+            input_workspace = args[0]
             args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
         if 'OutputWorkspace' in kwargs:
             output_name = kwargs['OutputWorkspace']
         store = kwargs.pop('store', True)
         for ws in [k for k in kwargs.keys() if isinstance(kwargs[k], MsliceWorkspace)]:
+            if input_workspace is None and 'LHS' in ws:
+                input_workspace = kwargs[ws]
             if 'Input' not in ws and 'Output' not in ws:
                 kwargs[ws] = _name_or_wrapper_to_workspace(kwargs[ws])
         args = tuple([_name_or_wrapper_to_workspace(arg) if isinstance(arg, MsliceWorkspace) else arg for arg in args])
 
         result = algorithm(*args, StoreInADS=False, **kwargs)
         if isinstance(result, Workspace):
-            result = wrap_workspace(result, output_name)
+            if isinstance(input_workspace, MsliceWorkspace2D) and isinstance(result, type(input_workspace.raw_ws)):
+                result = get_workspace_handle(input_workspace).rewrap(result)
+                result.name = output_name
+            else:
+                result = wrap_workspace(result, output_name)
             if store:
                 add_workspace(result, output_name)
                 from mslice.app import is_gui
