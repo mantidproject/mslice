@@ -96,6 +96,11 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
     AddSampleLog(_tmpws, LogName='Ei', LogText='3.', LogType='Number', EnableLogging=False)
     _tmpws = ConvertToMD(_tmpws, EnableLogging=False, StoreInADS=False, PreprocDetectorsWS='-',
                          QDimensions='|Q|', dEAnalysisMode='Direct')
+    # TODO: Refactor the above code after Mantid framework has been changed to avoid the hack.
+    # The above lines create an empty MD workspace with the same logs as the calculated Workspace2D output of the
+    # cut algorithms. These logs are then copied (using copyExperimentInfos below) to the generated MDHistoWorkspace
+    # Ideally we should be able to use the CopyLogs algorithm between a Workspace2D and MD workspace or
+    # copyExperimentInfos should understand a Workspace2D input, either of which will need changes to Mantid.
     ws_out = CreateMDHistoWorkspace(SignalInput=ws_out.extractY(), ErrorInput=ws_out.extractE(), Dimensionality=1,
                                     Extents=extents, NumberOfBins=xdim.getNBins(), Names=name, Units=unit,
                                     StoreInADS=False, EnableLogging=False)
