@@ -61,9 +61,10 @@ def processEfixed(workspace):
 def _processLoadedWSLimits(workspace):
     """ Processes an (angle-deltaE) workspace to get the limits and step size in angle, energy and |Q| """
     # For cases, e.g. indirect, where EFixed has not been set yet, return calculate later.
-    workspace.e_fixed = get_EFixed(workspace.raw_ws)
     if workspace.e_fixed is None:
-        return
+        workspace.e_fixed = get_EFixed(workspace.raw_ws)
+        if workspace.e_fixed is None:
+            return
     if isinstance(workspace, PixelWorkspace):
         process_limits_event(workspace)
     elif isinstance(workspace, Workspace):
