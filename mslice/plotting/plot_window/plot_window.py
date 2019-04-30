@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from matplotlib.figure import Figure
-import qtawesome as qta
+from mantidqt.icons import get_icon
 
 from mslice.plotting.backend import get_canvas_and_toolbar_cls
 from mslice.util.qt import QtCore, QtWidgets, QtGui
@@ -115,9 +115,9 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     def add_toolbar_actions(self, toolbar):
         self.action_zoom_in = add_action(toolbar, self,  "Zoom In", on_triggered=self.stock_toolbar.zoom,
-                                         icon_name='fa.search-plus', checkable=True)
+                                         icon_name='mdi.magnify-plus-outline', checkable=True)
         self.action_zoom_out = add_action(toolbar, self,  "Zoom Out", on_triggered=self.stock_toolbar.back,
-                                          icon_name='fa.search-minus', checkable=False)
+                                          icon_name='mdi.magnify-minus-outline', checkable=False)
         self.action_toggle_legends = add_action(toolbar, self, "Legends", checkable=True,
                                                 checked=True)
         toolbar.addSeparator()
@@ -129,10 +129,10 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.keep_make_current_group.addAction(self.action_make_current)
         self.keep_make_current_seperator = toolbar.addSeparator()
 
-        self.action_save_image = add_action(toolbar, self, "Save Image", icon_name='fa.save')
-        self.action_copy_image = add_action(toolbar, self, "Copy Image", icon_name='fa.copy')
-        self.action_print_plot = add_action(toolbar, self,  "Print", icon_name='fa.print')
-        self.action_plot_options = add_action(toolbar, self, "Plot Options", icon_name='fa.cog')
+        self.action_save_image = add_action(toolbar, self, "Save Image", icon_name='mdi.content-save')
+        self.action_copy_image = add_action(toolbar, self, "Copy Image", icon_name='mdi.content-copy')
+        self.action_print_plot = add_action(toolbar, self,  "Print", icon_name='mdi.printer')
+        self.action_plot_options = add_action(toolbar, self, "Plot Options", icon_name='mdi.settings')
 
         toolbar.addSeparator()
         self.action_waterfall = add_action(toolbar, self, "Waterfall", checkable=True)
@@ -143,7 +143,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         # options for interactive cuts only
         self.action_save_cut = add_action(toolbar, self,  "Save Cut to Workspace")
         self.action_flip_axis = add_action(toolbar, self,  "Flip Integration Axis",
-                                           icon_name='fa.retweet')
+                                           icon_name='mdi.twitter-retweet')
 
     def add_waterfall_edit(self, parent):
         self.waterfall_x_lbl = QtWidgets.QLabel("x:", parent)
@@ -240,7 +240,7 @@ def add_action(holder, parent, text, on_triggered=None, icon_name=None,
     holder"""
     action = QtWidgets.QAction(text, parent)
     if icon_name is not None:
-        action.setIcon(qta.icon(icon_name))
+        action.setIcon(get_icon(icon_name, "black", 1.3))
     action.setCheckable(checkable)
     action.setChecked(checked)
     action.setVisible(visible)
