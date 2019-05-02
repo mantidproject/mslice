@@ -76,11 +76,12 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.table_view.setModel(self.file_system)
         self.table_view.setRootIndex(self.file_system.index(self.root_path))
         self.table_view.setColumnWidth(0, 320)    # Make name wide
-        self.table_view.setColumnHidden(1, True)  # Hide size column
-        self.table_view.setColumnHidden(2, True)  # Hide type column
+        self.table_view.setColumnWidth(1, 123)
+        self.table_view.setColumnWidth(2, 123)
         self.table_view.setColumnWidth(3, 140)    # Show date modified
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.sort_files(self._sort_column)
+        self.table_view.horizontalHeader().swapSections(1, 3)  # Swap the type and date modified columns
 
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
