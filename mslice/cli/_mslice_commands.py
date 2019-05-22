@@ -13,7 +13,7 @@ import mslice.app as app
 from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
-                                        _check_workspace_type, is_slice)
+                                        _check_workspace_type, is_slice, is_cut)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
@@ -96,15 +96,12 @@ def Load(Filename, OutputWorkspace=None):
 
 
 def SaveAscii(InputWorkspace, Path):
-    isslice = False
-    if is_slice(InputWorkspace):
-        isslice = True
     if isinstance(InputWorkspace, str):
         _check_workspace_name(InputWorkspace)
         workspace = get_workspace_handle(InputWorkspace)
-        save_ascii(workspace, Path, isslice)
+        save_ascii(workspace, Path, is_slice(workspace))
     else:
-        save_ascii(InputWorkspace, Path, isslice)
+        save_ascii(InputWorkspace, Path, is_slice(InputWorkspace))
 
 
 def GenerateScript(InputWorkspace, filename):
