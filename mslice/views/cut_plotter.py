@@ -37,6 +37,11 @@ def plot_cut_impl(workspace, intensity_range=None, plot_over=False, legend=None,
     legend = workspace.name if legend is None else legend
     ax.errorbar(workspace, 'o-', label=legend, picker=PICKER_TOL_PTS, intensity_range=intensity_range,
                 plot_over=plot_over, en_conversion=en_conversion)
+    if plot_over:
+        cur_fig.canvas.manager.plot_handler.ws_list.append(workspace.name)
+    else:
+        cur_fig.canvas.manager.plot_handler.ws_list = [workspace.name]
+
 
     return ax.lines
 
