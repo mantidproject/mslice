@@ -11,7 +11,7 @@ from mslice.workspace.workspace import Workspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from .command import Command
-from .subtract_input_box import SubtractInputBox
+from .input_boxes import SubtractInputBox, ScaleInputBox
 from . import TAB_2D, TAB_EVENT, TAB_HISTO
 
 
@@ -125,6 +125,13 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         sub_input = SubtractInputBox(self.listWorkspaces2D, self)
         if sub_input.exec_():
             return sub_input.user_input()
+        else:
+            raise RuntimeError('dialog cancelled')
+
+    def scale_input(self, is_bose=False):
+        scale_input = ScaleInputBox(is_bose, self)
+        if scale_input.exec_():
+            return scale_input.user_input()
         else:
             raise RuntimeError('dialog cancelled')
 
