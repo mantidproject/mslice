@@ -272,6 +272,67 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         assert(not self.view.error_select_more_than_one_workspaces.called)
         combine_ws_mock.assert_called_once_with(selected_workspaces, selected_workspaces[0]+'_combined')
 
+    @patch('mslice.presenters.workspace_manager_presenter.scale_workspaces')
+    def test_scale_workspace(self, scale_ws_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        selected_workspaces = ['ws1', 'ws2']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.view.scale_input = mock.Mock(return_value=(0.5, None))
+
+        self.presenter.notify(Command.Scale)
+        self.view.get_workspace_selected.assert_called()
+        self.view.scale_input.assert_called()
+        assert(not self.view.error_select_more_than_one_workspaces.called)
+        scale_ws_mock.assert_called_once_with(selected_workspaces, scale_factor=0.5)
+
+    @patch('mslice.presenters.workspace_manager_presenter.scale_workspaces')
+    def test_rebose_workspace(self, scale_ws_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        selected_workspaces = ['ws1', 'ws2']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.view.scale_input = mock.Mock(return_value=(250, 2))
+
+        self.presenter.notify(Command.Bose)
+        self.view.get_workspace_selected.assert_called()
+        self.view.scale_input.assert_called()
+        assert(not self.view.error_select_more_than_one_workspaces.called)
+        scale_ws_mock.assert_called_once_with(selected_workspaces, from_temp=250, to_temp=2)
+
+    @patch('mslice.presenters.workspace_manager_presenter.scale_workspaces')
+    def test_scale_workspace_errors(self, scale_ws_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        selected_workspaces = ['ws1', 'ws2']
+
+        self.view.get_workspace_selected = mock.Mock(return_value=[])
+        self.presenter.notify(Command.Scale)
+        self.view.get_workspace_selected.assert_called_once_with()
+        self.view.error_select_one_or_more_workspaces.assert_called_once_with()
+
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.view.scale_input = mock.Mock(side_effect=RuntimeError())
+        self.presenter.notify(Command.Scale)
+        self.view.get_workspace_selected.assert_called()
+        self.view.scale_input.assert_called()
+        assert(not self.view.error_select_more_than_one_workspaces.called)
+        assert(not scale_ws_mock.called)
+
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.view.scale_input = mock.Mock(return_value=(0.5, None))
+        self.view._display_error = mock.Mock()
+        scale_ws_mock.side_effect = ValueError()
+        self.presenter.notify(Command.Scale)
+        self.view.get_workspace_selected.assert_called()
+        self.view.scale_input.assert_called()
+        assert(not self.view.error_select_more_than_one_workspaces.called)
+        scale_ws_mock.assert_called_once_with(selected_workspaces, scale_factor=0.5)
+        self.view._display_error.assert_called()
+
+    def test_compose_error(self):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        self.view._display_error = mock.Mock()
+        self.presenter.notify(Command.ComposeWorkspace)
+        self.view._display_error.assert_called()
+
 
 if __name__ == '__main__':
     unittest.main()

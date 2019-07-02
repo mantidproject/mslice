@@ -18,7 +18,7 @@ from mslice.models.axis import Axis
 
 from mslice.util.mantid.algorithm_wrapper import add_to_ads, wrap_in_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
-from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits, Rebose
+from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace
@@ -210,15 +210,19 @@ def subtract(workspaces, background_ws, ssf):
         raise ValueError(e)
 
 
+def rebose_single(ws, from_temp, to_temp):
+    from mslice.util.mantid.mantid_algorithms import Rebose
+    results = Rebose(InputWorkspace=ws.raw_ws, CurrentTemperature=from_temp, TargetTemperature=to_temp,
+                     OutputWorkspace=ws_name+'_bosed')
+    propagate_properties(ws, results)
+    return results
+
 def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None):
     if scale_factor is None:
         if from_temp is None or to_temp is None:
             raise ValueError('You must specify all inputs (scale factor or both temperatures)')
         for ws_name in workspaces:
-            ws = get_workspace_handle(ws_name)
-            results = Rebose(InputWorkspace=ws.raw_ws, CurrentTemperature=from_temp, TargetTemperature=to_temp,
-                             OutputWorkspace=ws_name+'_bosed')
-            propagate_properties(ws, results)
+            rebose_single(ws_name, from_temp, to_temp)
     else:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
