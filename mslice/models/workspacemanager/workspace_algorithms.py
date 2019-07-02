@@ -10,6 +10,7 @@ import os.path
 
 import numpy as np
 from scipy import constants
+from uuid import uuid4
 
 from mantid.api import WorkspaceUnitValidator
 from mantid.api import MatrixWorkspace
@@ -198,7 +199,8 @@ def add_workspace_runs(selected_ws):
 
 def subtract(workspaces, background_ws, ssf):
     with wrap_in_ads([get_workspace_handle(str(background_ws))]):
-        scaled_bg_ws = Scale(OutputWorkspace='scaled_bg_ws', store=False, InputWorkspace=str(background_ws), Factor=ssf)
+        scaled_bg_ws = Scale(OutputWorkspace='__MSL'+ str(background_ws) + '_scaled', 
+                             InputWorkspace=str(background_ws), Factor=ssf)
     try:
         for ws_name in workspaces:
             with wrap_in_ads([get_workspace_handle(ws_name), scaled_bg_ws]):

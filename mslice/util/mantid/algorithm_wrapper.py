@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from contextlib import contextmanager
+from uuid import uuid4
 
 from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle
 from mantid.api import AnalysisDataService, Workspace
@@ -30,7 +31,13 @@ def wrap_algorithm(algorithm):
                 kwargs[ws] = _name_or_wrapper_to_workspace(kwargs[ws])
         args = tuple([_name_or_wrapper_to_workspace(arg) if isinstance(arg, MsliceWorkspace) else arg for arg in args])
 
-        result = algorithm(*args, StoreInADS=False, **kwargs)
+        if not store:
+            if 'OutputWorkspace' in kwargs:
+                kwargs['OutputWorkspace'] = '__MSL' + kwargs['OutputWorkspace']
+            else:
+                kwargs['OutputWorkspace'] = '__MSLTMP' + str(uuid4())[:8]
+
+        result = algorithm(*args, **kwargs)
         if isinstance(result, Workspace):
             if isinstance(input_workspace, MsliceWorkspace2D) and isinstance(result, type(input_workspace.raw_ws)):
                 result = get_workspace_handle(input_workspace).rewrap(result)

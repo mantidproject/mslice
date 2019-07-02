@@ -98,9 +98,7 @@ class ScriptingTest(unittest.TestCase):
         raw_ws.getHistory().getAlgorithmHistories.return_value = [load_alg, make_projection_alg]
         get_alg_kwargs.return_value = ('some args', 'workspace')
 
-        with mock.patch('mslice.scripting._get_c_address') as get_addr:
-            get_addr.return_value = ''
-            script_lines = generate_script_lines(raw_ws, ws_name)
+        script_lines = generate_script_lines(raw_ws, ws_name)
         self.assertEquals(get_alg_kwargs.call_count, 2)
 
         self.assertIn(mock.call(load_alg, []), get_alg_kwargs.call_args_list)
@@ -127,9 +125,7 @@ class ScriptingTest(unittest.TestCase):
 
         raw_ws.getHistory().getAlgorithmHistories.return_value = [some_other_alg, load_alg]
 
-        with mock.patch('mslice.scripting._get_c_address') as get_addr:
-            get_addr.return_value = ''
-            script_lines = generate_script_lines(raw_ws, ws_name)
+        script_lines = generate_script_lines(raw_ws, ws_name)
 
         self.assertIn(mock.call(load_alg, []), get_alg_kwargs.call_args_list)
         self.assertEquals(get_alg_kwargs.call_count, 2)
@@ -230,16 +226,3 @@ class ScriptingTest(unittest.TestCase):
         args, output_ws = get_algorithm_kwargs(some_alg, 'workspace_name')
 
         self.assertIn("{}='{}'".format("SomeProp", "string"), args)
-
-    def test_get_c_address(self):
-        ws_lhs = self.create_workspace('lhs_ws')
-        ws_rhs = self.create_workspace('rhs_ws')
-
-        from mslice.cli import Scale, Minus
-        ws_rhs_scaled = Scale(ws_rhs, 0.5)
-        ws_subtracted = Minus(ws_lhs, ws_rhs_scaled)
-        from mslice.models.workspacemanager.workspace_provider import add_workspace
-        add_workspace(ws_rhs_scaled, 'ws_rhs_scaled')
-
-        lines = generate_script_lines(ws_subtracted.raw_ws, 'lhs_ws_subtracted')
-        self.assertTrue(all(['__TMP' not in line for line in lines]))
