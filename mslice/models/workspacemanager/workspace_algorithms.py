@@ -212,8 +212,9 @@ def subtract(workspaces, background_ws, ssf):
 
 def rebose_single(ws, from_temp, to_temp):
     from mslice.util.mantid.mantid_algorithms import Rebose
-    results = Rebose(InputWorkspace=ws.raw_ws, CurrentTemperature=from_temp, TargetTemperature=to_temp,
-                     OutputWorkspace=ws_name+'_bosed')
+    ws = get_workspace_handle(ws)
+    results = Rebose(InputWorkspace=ws, CurrentTemperature=from_temp, TargetTemperature=to_temp,
+                     OutputWorkspace=ws.name+'_bosed')
     propagate_properties(ws, results)
     return results
 
