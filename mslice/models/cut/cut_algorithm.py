@@ -56,6 +56,8 @@ def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_
 
 
 def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis):
+    cut_axis.units = cut_axis.units.replace('2Theta', 'Degrees')
+    integration_axis.units = integration_axis.units.replace('2Theta', 'Degrees')
     fill_in_missing_input(cut_axis, selected_workspace)
     n_steps = get_number_of_steps(cut_axis)
     cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start_meV, cut_axis.end_meV, n_steps)))

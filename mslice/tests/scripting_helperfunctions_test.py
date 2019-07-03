@@ -241,8 +241,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_plot_options(script_lines, plot_handler)
 
         self.assertIn("ax.set_title('{}')\n".format(plot_handler.title), script_lines)
-        self.assertIn("ax.set_ylabel('{}')\n".format(plot_handler.y_label), script_lines)
-        self.assertIn("ax.set_xlabel('{}')\n".format(plot_handler.x_label), script_lines)
+        self.assertIn("ax.set_ylabel(r'{}')\n".format(plot_handler.y_label), script_lines)
+        self.assertIn("ax.set_xlabel(r'{}')\n".format(plot_handler.x_label), script_lines)
         self.assertIn("ax.grid({}, axis='y')\n".format(plot_handler.y_grid), script_lines)
         self.assertIn("ax.grid({}, axis='x')\n".format(plot_handler.x_grid), script_lines)
         self.assertIn("ax.set_ylim(bottom={}, top={})\n".format(*plot_handler.y_range), script_lines)

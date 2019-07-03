@@ -89,20 +89,23 @@ class ScriptingTest(unittest.TestCase):
 
         load_alg = mock.MagicMock()
         load_alg.name.return_value = 'Load'
+        load_alg_prop_filename = mock.MagicMock()
+        load_alg_prop_filename.name.return_value = "Filename"
 
         make_projection_alg = mock.MagicMock()
         make_projection_alg.name.return_value = 'MakeProjection'
 
         raw_ws.getHistory().getAlgorithmHistories.return_value = [load_alg, make_projection_alg]
+        get_alg_kwargs.return_value = ('some args', 'workspace')
 
         script_lines = generate_script_lines(raw_ws, ws_name)
         self.assertEquals(get_alg_kwargs.call_count, 2)
 
-        self.assertIn(mock.call(load_alg, ws_name), get_alg_kwargs.call_args_list)
-        self.assertIn(mock.call(make_projection_alg, ws_name), get_alg_kwargs.call_args_list)
+        self.assertIn(mock.call(load_alg, []), get_alg_kwargs.call_args_list)
+        self.assertIn(mock.call(make_projection_alg, []), get_alg_kwargs.call_args_list)
 
-        make_projection_kwargs = get_alg_kwargs(make_projection_alg, ws_name)
-        load_kwargs = get_alg_kwargs(load_alg, ws_name)
+        make_projection_kwargs, output_ws = get_alg_kwargs(make_projection_alg, ws_name)
+        load_kwargs, output_ws = get_alg_kwargs(load_alg, ws_name)
 
         self.assertIn("ws_{} = mc.{}({})\n".format(ws_name, load_alg.name(), load_kwargs), script_lines)
         self.assertIn("ws_{} = mc.{}({})\n".format(ws_name, make_projection_alg.name(),
@@ -118,15 +121,16 @@ class ScriptingTest(unittest.TestCase):
         load_alg.name.return_value = 'Load'
         some_other_alg = mock.MagicMock()
         some_other_alg.name.return_value = 'SomeOtherAlgorithm'
+        get_alg_kwargs.return_value = ('some args', 'workspace')
 
         raw_ws.getHistory().getAlgorithmHistories.return_value = [some_other_alg, load_alg]
 
         script_lines = generate_script_lines(raw_ws, ws_name)
 
-        self.assertIn(mock.call(load_alg, ws_name), get_alg_kwargs.call_args_list)
-        self.assertEquals(get_alg_kwargs.call_count, 1)
+        self.assertIn(mock.call(load_alg, []), get_alg_kwargs.call_args_list)
+        self.assertEquals(get_alg_kwargs.call_count, 2)
 
-        load_kwargs = get_alg_kwargs(load_alg, ws_name)
+        load_kwargs, output_ws = get_alg_kwargs(load_alg, ws_name)
         self.assertIn("ws_{} = mc.{}({})\n".format(ws_name, load_alg.name(), load_kwargs), script_lines)
 
     def test_that_get_algorithm_kwargs_works_as_expected_with_load(self):
@@ -137,16 +141,11 @@ class ScriptingTest(unittest.TestCase):
         load_alg_prop_filename.name.return_value = "Filename"
         load_alg_prop_filename.isDefault.return_value = False
 
-        load_alg_prop_workspace = mock.MagicMock()
-        load_alg_prop_workspace.name.return_value = "OutputWorkspace"
-        load_alg_prop_workspace.isDefault.return_value = False
+        load_alg.getProperties.return_value = [load_alg_prop_filename]
 
-        load_alg.getProperties.return_value = [load_alg_prop_workspace, load_alg_prop_filename]
-
-        arguments = get_algorithm_kwargs(load_alg, 'workspace_name')
+        arguments, output_ws = get_algorithm_kwargs(load_alg, [])
 
         self.assertIn("{}='{}'".format("Filename", load_alg_prop_filename.value()), arguments)
-        self.assertNotIn("{}='{}'".format("OutputWorkspace", load_alg_prop_workspace.value()), arguments)
 
     def test_that_get_algorithm_kwargs_works_as_expected_with_make_projection(self):
         make_proj_alg = mock.MagicMock()
@@ -154,6 +153,7 @@ class ScriptingTest(unittest.TestCase):
 
         make_proj_alg_prop_input_ws = mock.MagicMock()
         make_proj_alg_prop_input_ws.name.return_value = "InputWorkspace"
+        make_proj_alg_prop_input_ws.value.return_value = "workspace_name"
         make_proj_alg_prop_input_ws.isDefault.return_value = False
 
         make_proj_alg_prop_output_ws = mock.MagicMock()
@@ -162,10 +162,10 @@ class ScriptingTest(unittest.TestCase):
 
         make_proj_alg.getProperties.return_value = [make_proj_alg_prop_output_ws, make_proj_alg_prop_input_ws]
 
-        args = get_algorithm_kwargs(make_proj_alg, 'workspace_name')
+        args, output_ws = get_algorithm_kwargs(make_proj_alg, ['workspace_name'])
 
         self.assertNotIn("{}='{}'".format("OutputWorkspace", make_proj_alg_prop_output_ws.value()), args)
-        self.assertIn("{}=ws_{}".format("InputWorkspace", 'workspace_name'), args)
+        self.assertIn("{}={}".format("InputWorkspace", 'workspace_name'), args)
 
     def test_that_get_algorithm_kwargs_works_as_expected_with_make_projection_using_string_property_value(self):
         make_proj_alg = mock.MagicMock()
@@ -178,7 +178,7 @@ class ScriptingTest(unittest.TestCase):
 
         make_proj_alg.getProperties.return_value = [make_proj_alg_prop]
 
-        args = get_algorithm_kwargs(make_proj_alg, 'workspace_name')
+        args, output_ws = get_algorithm_kwargs(make_proj_alg, 'workspace_name')
 
         self.assertIn("{}='{}'".format("SomeProp", "string"), args)
 
@@ -193,7 +193,7 @@ class ScriptingTest(unittest.TestCase):
 
         make_proj_alg.getProperties.return_value = [make_proj_alg_prop]
 
-        args = get_algorithm_kwargs(make_proj_alg, 'workspace_name')
+        args, output_ws = get_algorithm_kwargs(make_proj_alg, 'workspace_name')
 
         self.assertIn("{}={}".format("SomeProp", 12), args)
 
@@ -208,7 +208,7 @@ class ScriptingTest(unittest.TestCase):
 
         some_alg.getProperties.return_value = [some_alg_prop]
 
-        args = get_algorithm_kwargs(some_alg, 'workspace_name')
+        args, output_ws = get_algorithm_kwargs(some_alg, 'workspace_name')
 
         self.assertIn("{}={}".format("SomeProp", 12), args)
 
@@ -223,6 +223,6 @@ class ScriptingTest(unittest.TestCase):
 
         some_alg.getProperties.return_value = [some_alg_prop]
 
-        args = get_algorithm_kwargs(some_alg, 'workspace_name')
+        args, output_ws = get_algorithm_kwargs(some_alg, 'workspace_name')
 
         self.assertIn("{}='{}'".format("SomeProp", "string"), args)

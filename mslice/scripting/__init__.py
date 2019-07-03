@@ -2,6 +2,7 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.util.qt import QtWidgets
 from mslice.scripting.helperfunctions import add_plot_statements
 from mslice.app.presenters import get_cut_plotter_presenter
+from six import string_types
 
 
 def generate_script(ws_name, filename=None, plot_handler=None, window=None):
@@ -43,37 +44,44 @@ def generate_script_lines(raw_ws, workspace_name):
     lines = []
     ws_name = workspace_name.replace(".", "_")
     alg_history = raw_ws.getHistory().getAlgorithmHistories()
-    for algorithm in reversed(alg_history):
+    existing_ws_refs = []
+    for algorithm in alg_history:
         alg_name = algorithm.name()
-        kwargs = get_algorithm_kwargs(algorithm, ws_name)
-        lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
-        if alg_name == 'Load':
-            break
-    return reversed(lines)
+        kwargs, output_ws = get_algorithm_kwargs(algorithm, existing_ws_refs)
+        if (output_ws is not None and output_ws != ws_name):
+            lines += ["{} = mc.{}({})\n".format(output_ws, alg_name, kwargs)]
+            existing_ws_refs.append(output_ws)
+        else:
+            lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
+    return lines
 
 
-def get_algorithm_kwargs(algorithm, workspace_name):
+def get_algorithm_kwargs(algorithm, existing_ws_refs):
     arguments = []
+    output_ws = None
     for prop in algorithm.getProperties():
         if not prop.isDefault():
+            pval = prop.value()
+            if isinstance(pval, string_types):
+                pval = pval.replace("__MSL", "").replace("_HIDDEN", "")
+            if prop.name() == "OutputWorkspace":
+                output_ws = pval.replace(".", "_")
+                if "_HIDDEN" in prop.value():
+                    arguments += ["store=False"]
+                    continue
             if algorithm.name() == "Load":
                 if prop.name() == "Filename":
-                    arguments = ["{}='{}'".format(prop.name(), prop.value())]
-                elif prop.name() == "OutputWorkspace" or prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
-                    pass
+                    arguments += ["{}='{}'".format(prop.name(), pval)]
+                    continue
+                elif prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
+                    continue
             elif algorithm.name() == "MakeProjection":
-                if prop.name() == "InputWorkspace":
-                    arguments += ["{}=ws_{}".format(prop.name(), workspace_name)]
-                elif prop.name() == "OutputWorkspace" or prop.name() == "Limits":
-                    pass
-                else:
-                    if isinstance(prop.value(), str):
-                        arguments += ["{}='{}'".format(prop.name(), prop.value())]
-                    else:
-                        arguments += ["{}={}".format(prop.name(), prop.value())]
+                if prop.name() == "Limits" or prop.name() == "OutputWorkspace" or prop.name() == "ProjectionType":
+                    continue
+            if isinstance(pval, str) and pval.replace(".", "_") in existing_ws_refs:
+                arguments += ["{}={}".format(prop.name(), pval.replace(".", "_"))]
+            elif isinstance(prop.value(), str):
+                arguments += ["{}='{}'".format(prop.name(), pval)]
             else:
-                if isinstance(prop.value(), str):
-                    arguments += ["{}='{}'".format(prop.name(), prop.value())]
-                else:
-                    arguments += ["{}={}".format(prop.name(), prop.value())]
-    return ", ".join(arguments)
+                arguments += ["{}={}".format(prop.name(), pval)]
+    return ", ".join(arguments), output_ws

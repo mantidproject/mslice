@@ -16,7 +16,7 @@ from mantid.api import MatrixWorkspace
 
 from mslice.models.axis import Axis
 
-from mslice.util.mantid.algorithm_wrapper import add_to_ads, wrap_in_ads
+from mslice.util.mantid.algorithm_wrapper import add_to_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
 from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -173,8 +173,7 @@ def load(filename, output_workspace):
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
     workspace_names = [workspace.name for workspace in workspaces]
-    with wrap_in_ads(workspaces):
-        ws = MergeMD(OutputWorkspace=new_name, InputWorkspaces=workspace_names)
+    ws = MergeMD(OutputWorkspace=new_name, InputWorkspaces=workspace_names)
     propagate_properties(workspaces[0], ws)
     # Set limits for result workspace. Use precalculated step size, otherwise get limits directly from Mantid workspace
     ax1 = ws.raw_ws.getDimension(0)
@@ -191,23 +190,41 @@ def combine_workspace(selected_workspaces, new_name):
 
 def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
-    workspaces = [get_workspace_handle(ws) for ws in selected_ws]
-    with wrap_in_ads(workspaces):
-        sum_ws = MergeRuns(OutputWorkspace=out_ws_name, InputWorkspaces=selected_ws)
+    sum_ws = MergeRuns(OutputWorkspace=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
-    bg_ws = get_workspace_handle(str(background_ws)).raw_ws
-    scaled_bg_ws = Scale(OutputWorkspace='scaled_bg_ws', store=False, InputWorkspace=bg_ws, Factor=ssf)
+    scaled_bg_ws = Scale(OutputWorkspace=str(background_ws) + '_scaled',
+                         InputWorkspace=str(background_ws), Factor=ssf, store=False)
     try:
         for ws_name in workspaces:
-            ws = get_workspace_handle(ws_name)
-            result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws.raw_ws,
-                           RHSWorkspace=scaled_bg_ws.raw_ws)
-            propagate_properties(ws, result)
+            result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws_name,
+                           RHSWorkspace=scaled_bg_ws)
+            propagate_properties(get_workspace_handle(ws_name), result)
     except ValueError as e:
         raise ValueError(e)
+
+
+def rebose_single(ws, from_temp, to_temp):
+    from mslice.util.mantid.mantid_algorithms import Rebose
+    ws = get_workspace_handle(ws)
+    results = Rebose(InputWorkspace=ws, CurrentTemperature=from_temp, TargetTemperature=to_temp,
+                     OutputWorkspace=ws.name+'_bosed')
+    propagate_properties(ws, results)
+    return results
+
+def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None):
+    if scale_factor is None:
+        if from_temp is None or to_temp is None:
+            raise ValueError('You must specify all inputs (scale factor or both temperatures)')
+        for ws_name in workspaces:
+            rebose_single(ws_name, from_temp, to_temp)
+    else:
+        for ws_name in workspaces:
+            ws = get_workspace_handle(ws_name)
+            result = Scale(InputWorkspace=ws.raw_ws, Factor=scale_factor, OutputWorkspace=ws_name+'_scaled')
+            propagate_properties(ws, result)
 
 
 def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
@@ -238,8 +255,7 @@ def export_workspace_to_ads(workspace):
     """
     workspace = get_workspace_handle(workspace)
     if isinstance(workspace, HistogramWorkspace):
-        with wrap_in_ads([workspace]):
-            workspace = workspace.convert_to_matrix()
+        workspace = workspace.convert_to_matrix()
     add_to_ads(workspace)
 
 
