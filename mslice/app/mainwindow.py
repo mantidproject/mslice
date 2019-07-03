@@ -27,7 +27,7 @@ TAB_POWDER = 0
 
 class MainWindow(MainView, QMainWindow):
 
-    def __init__(self, in_mantidplot=False):
+    def __init__(self, in_mantid=False):
         QMainWindow.__init__(self)
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
@@ -42,8 +42,13 @@ class MainWindow(MainView, QMainWindow):
                                   TAB_EVENT: [self.btnMerge],
                                   TAB_HISTO: [self.btnPlot, self.btnOverplot],
                                   TAB_NONPSD: [self.btnAdd, self.btnSubtract]}
-        if in_mantidplot:
+        if in_mantid:
             self.buttons_to_enable[TAB_HISTO] += [self.btnSaveToADS]
+            from mslice.util.mantid import in_mantidplot
+            if in_mantidplot():
+                self.btnSaveToADS.setText('Save to MantidPlot')
+            else:
+                self.btnSaveToADS.setText('Save to Workbench')
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         self.dataloader_presenter = self.data_loading.get_presenter()
