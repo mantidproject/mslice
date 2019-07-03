@@ -206,6 +206,27 @@ def subtract(workspaces, background_ws, ssf):
         raise ValueError(e)
 
 
+def rebose_single(ws, from_temp, to_temp):
+    from mslice.util.mantid.mantid_algorithms import Rebose
+    ws = get_workspace_handle(ws)
+    results = Rebose(InputWorkspace=ws, CurrentTemperature=from_temp, TargetTemperature=to_temp,
+                     OutputWorkspace=ws.name+'_bosed')
+    propagate_properties(ws, results)
+    return results
+
+def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None):
+    if scale_factor is None:
+        if from_temp is None or to_temp is None:
+            raise ValueError('You must specify all inputs (scale factor or both temperatures)')
+        for ws_name in workspaces:
+            rebose_single(ws_name, from_temp, to_temp)
+    else:
+        for ws_name in workspaces:
+            ws = get_workspace_handle(ws_name)
+            result = Scale(InputWorkspace=ws.raw_ws, Factor=scale_factor, OutputWorkspace=ws_name+'_scaled')
+            propagate_properties(ws, result)
+
+
 def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
     """
     :param workspaces: list of workspaces to save

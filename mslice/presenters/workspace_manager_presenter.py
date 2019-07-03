@@ -7,7 +7,7 @@ from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
 from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads, subtract,
                                                                  is_pixel_workspace, combine_workspace,
-                                                                 add_workspace_runs)
+                                                                 add_workspace_runs, scale_workspaces)
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
                                                                get_workspace_name, delete_workspace, rename_workspace)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
@@ -51,6 +51,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._subtract_workspace()
             elif command == Command.SaveToADS:
                 self._save_to_ads()
+            elif command == Command.ComposeWorkspace:
+                self._workspace_manager_view._display_error('Please select a Compose action from the dropdown menu')
+            elif command == Command.Scale:
+                self._scale_workspace()
+            elif command == Command.Bose:
+                self._scale_workspace(is_bose=True)
             else:
                 raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
 
@@ -180,6 +186,24 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         try:
             subtract(selected_workspaces, background_ws, ssf)
+        except ValueError as e:
+            self._workspace_manager_view._display_error(str(e))
+        self.update_displayed_workspaces()
+
+    def _scale_workspace(self, is_bose=False):
+        selected_workspaces = self._workspace_manager_view.get_workspace_selected()
+        if not selected_workspaces:
+            self._workspace_manager_view.error_select_one_or_more_workspaces()
+            return
+        try:
+            retvals = self._workspace_manager_view.scale_input(is_bose=is_bose)
+        except RuntimeError:
+            return
+        try:
+            if is_bose:
+                scale_workspaces(selected_workspaces, from_temp=retvals[0], to_temp=retvals[1])
+            else:
+                scale_workspaces(selected_workspaces, scale_factor=retvals[0])
         except ValueError as e:
             self._workspace_manager_view._display_error(str(e))
         self.update_displayed_workspaces()

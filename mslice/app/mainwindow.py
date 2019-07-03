@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QMenu
+from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QMenu, QStackedLayout
 
 from mslice.models.units import EnergyUnits
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
@@ -38,12 +38,21 @@ class MainWindow(MainView, QMainWindow):
                              TAB_HISTO: [],
                              TAB_NONPSD: [TAB_SLICE, TAB_CUT]}
 
-        self.buttons_to_enable = {TAB_2D: [self.btnAdd, self.btnSubtract],
+        self.buttons_to_enable = {TAB_2D: [self.btnAdd, self.btnSubtract, self.composeFrame],
                                   TAB_EVENT: [self.btnMerge],
                                   TAB_HISTO: [self.btnPlot, self.btnOverplot],
-                                  TAB_NONPSD: [self.btnAdd, self.btnSubtract]}
+                                  TAB_NONPSD: [self.btnAdd, self.btnSubtract, self.composeFrame]}
         if in_mantidplot:
             self.buttons_to_enable[TAB_HISTO] += [self.btnSaveToADS]
+
+        self.stack_to_show = {TAB_2D: 1,
+                              TAB_EVENT: 0,
+                              TAB_HISTO: 0,
+                              TAB_NONPSD: 1}
+
+        self.composeCommand = {'Compose': ws_command.ComposeWorkspace,
+                               'Scale': ws_command.Scale,
+                               'Bose': ws_command.Bose}
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         self.dataloader_presenter = self.data_loading.get_presenter()
@@ -60,6 +69,7 @@ class MainWindow(MainView, QMainWindow):
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.setup_save()
+        self.setup_compose_button()
         self.btnSave.clicked.connect(self.button_save)
         self.btnAdd.clicked.connect(self.button_add)
         self.btnRename.clicked.connect(self.button_rename)
@@ -69,7 +79,7 @@ class MainWindow(MainView, QMainWindow):
         self.btnPlot.clicked.connect(self.button_plot)
         self.btnOverplot.clicked.connect(self.button_overplot)
         self.btnSaveToADS.clicked.connect(self.button_savetoads)
-        self.btnHistory.hide()
+        self.btnCompose.clicked.connect(self.button_compose)
         self.ws_tab_changed(0)
 
         self.wgtCut.error_occurred.connect(self.show_error)
@@ -101,6 +111,17 @@ class MainWindow(MainView, QMainWindow):
         menu.addAction("Matlab (*.mat)", lambda: self.button_save('Matlab'))
         self.btnSave.setMenu(menu)
 
+    def setup_compose_button(self):
+        self.stackLayout = QStackedLayout(self.stackFrame)
+        self.stackLayout.addWidget(self.btnSaveToADS)
+        self.stackLayout.addWidget(self.composeFrame)
+        self.stackFrame.setLayout(self.stackLayout)
+        menu = QMenu()
+        menu.addAction("Scale", lambda: self.button_compose('Scale'))
+        menu.addAction("Bose", lambda: self.button_compose('Bose'))
+        self.btnComposeMenu.setMenu(menu)
+        self.btnComposeMenu.setMaximumWidth(10)
+
     def change_main_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)
 
@@ -123,7 +144,9 @@ class MainWindow(MainView, QMainWindow):
 
     def enable_buttons(self, tab):
         """Enables correct buttons based on workspace tab"""
-        variable_buttons = [self.btnAdd, self.btnSubtract, self.btnMerge, self.btnPlot, self.btnOverplot, self.btnSaveToADS]
+        self.stackLayout.setCurrentIndex(self.stack_to_show[tab])
+        variable_buttons = [self.btnAdd, self.btnSubtract, self.btnMerge, self.btnPlot, self.btnOverplot,
+                            self.btnSaveToADS, self.composeFrame]
         for button in variable_buttons:
             button.hide()
         for button in self.buttons_to_enable[tab]:
@@ -155,6 +178,11 @@ class MainWindow(MainView, QMainWindow):
 
     def button_savetoads(self):
         self.workspace_presenter.notify(ws_command.SaveToADS)
+
+    def button_compose(self, value=False):
+        if value:
+            self.btnCompose.setText(value)
+        self.workspace_presenter.notify(self.composeCommand[str(self.btnCompose.text())])
 
     def init_ui(self):
         self.setup_ipython()

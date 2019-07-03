@@ -4,9 +4,9 @@ from __future__ import (absolute_import, division, print_function)
 import os.path as ospath
 
 import matplotlib as mpl
-from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, rename_workspace,  # noqa: F401
-    get_visible_workspace_names, get_workspace_name)  # noqa: F401
+from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, rename_workspace)
 from mslice.models.cut.cut_functions import compute_cut
+from mslice.models.workspacemanager.workspace_algorithms import rebose_single
 from mslice.models.cmap import DEFAULT_CMAP
 import mslice.app as app
 from mslice.app import is_gui
@@ -17,6 +17,7 @@ from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.workspace import Workspace as MSliceWorkspace
 
 from mslice.util.mantid.mantid_algorithms import *  # noqa: F401
 
@@ -173,6 +174,26 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     get_cut_plotter_presenter().update_main_window()
 
     return cut
+
+
+def Rebose(InputWorkspace, CurrentTemperature=300, TargetTemperature=5, OutputWorkspace=None):
+    """
+    Rescales a workspace by the Bose temperature factor from one temperature to another
+    :param InputWorkspace: Workspace to rescale. The parameter can be either a python
+                      handle to the workspace OR the workspace name as a string.
+    :param CurrentTemperature: The current temperature of the data in Kelvin
+    :param TargetTemperature: The desired rescaled temperature of the data in Kelvin
+    :return:
+    """
+    _check_workspace_name(InputWorkspace)
+    workspace = get_workspace_handle(InputWorkspace)
+    if not isinstance(workspace, MSliceWorkspace):
+        raise RuntimeError("Incorrect workspace type.")
+    scaled = rebose_single(workspace, from_temp=float(CurrentTemperature), to_temp=float(TargetTemperature))
+    if OutputWorkspace is not None:
+        rename_workspace(scaled, OutputWorkspace)
+
+    return scaled
 
 
 def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAULT_CMAP):
