@@ -60,10 +60,12 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
     output_ws = None
     for prop in algorithm.getProperties():
         if not prop.isDefault():
-            pval = prop.value().replace("__MSL", "") if isinstance(prop.value(), string_types) else prop.value()
+            pval = prop.value()
+            if isinstance(pval, string_types):
+                pval = pval.replace("__MSL", "").replace("_HIDDEN", "")
             if prop.name() == "OutputWorkspace":
                 output_ws = pval.replace(".", "_")
-                if "__MSL" in prop.value():
+                if "_HIDDEN" in prop.value():
                     arguments += ["store=False"]
                     continue
             if algorithm.name() == "Load":

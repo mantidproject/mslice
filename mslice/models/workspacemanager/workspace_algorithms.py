@@ -17,7 +17,7 @@ from mantid.api import MatrixWorkspace
 
 from mslice.models.axis import Axis
 
-from mslice.util.mantid.algorithm_wrapper import add_to_ads, wrap_in_ads
+from mslice.util.mantid.algorithm_wrapper import add_to_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
 from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -173,8 +173,7 @@ def load(filename, output_workspace):
 def combine_workspace(selected_workspaces, new_name):
     workspaces = [get_workspace_handle(ws) for ws in selected_workspaces]
     workspace_names = [workspace.name for workspace in workspaces]
-    with wrap_in_ads(workspaces):
-        ws = MergeMD(OutputWorkspace=new_name, InputWorkspaces=workspace_names)
+    ws = MergeMD(OutputWorkspace=new_name, InputWorkspaces=workspace_names)
     propagate_properties(workspaces[0], ws)
     # Set limits for result workspace. Use precalculated step size, otherwise get limits directly from Mantid workspace
     ax1 = ws.raw_ws.getDimension(0)
@@ -192,20 +191,17 @@ def combine_workspace(selected_workspaces, new_name):
 def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
     workspaces = [get_workspace_handle(ws) for ws in selected_ws]
-    with wrap_in_ads(workspaces):
-        sum_ws = MergeRuns(OutputWorkspace=out_ws_name, InputWorkspaces=selected_ws)
+    sum_ws = MergeRuns(OutputWorkspace=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
-    with wrap_in_ads([get_workspace_handle(str(background_ws))]):
-        scaled_bg_ws = Scale(OutputWorkspace='__MSL'+ str(background_ws) + '_scaled', 
-                             InputWorkspace=str(background_ws), Factor=ssf)
+    scaled_bg_ws = Scale(OutputWorkspace=str(background_ws) + '_scaled',
+                         InputWorkspace=str(background_ws), Factor=ssf, store=False)
     try:
         for ws_name in workspaces:
-            with wrap_in_ads([get_workspace_handle(ws_name), scaled_bg_ws]):
-                result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws_name,
-                               RHSWorkspace=scaled_bg_ws.name)
+            result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws_name,
+                           RHSWorkspace=scaled_bg_ws)
             propagate_properties(get_workspace_handle(ws_name), result)
     except ValueError as e:
         raise ValueError(e)
@@ -239,8 +235,7 @@ def export_workspace_to_ads(workspace):
     """
     workspace = get_workspace_handle(workspace)
     if isinstance(workspace, HistogramWorkspace):
-        with wrap_in_ads([workspace]):
-            workspace = workspace.convert_to_matrix()
+        workspace = workspace.convert_to_matrix()
     add_to_ads(workspace)
 
 

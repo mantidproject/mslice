@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from contextlib import contextmanager
 from uuid import uuid4
+from six import string_types
 
 from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle
 from mantid.api import AnalysisDataService, Workspace
@@ -22,7 +23,7 @@ def wrap_algorithm(algorithm):
             input_workspace = args[0]
             args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
         if 'OutputWorkspace' in kwargs:
-            output_name = kwargs['OutputWorkspace']
+            output_name = kwargs.pop('OutputWorkspace')
         store = kwargs.pop('store', True)
         for ws in [k for k in kwargs.keys() if isinstance(kwargs[k], MsliceWorkspace)]:
             if input_workspace is None and 'LHS' in ws:
@@ -30,14 +31,17 @@ def wrap_algorithm(algorithm):
             if 'Input' not in ws and 'Output' not in ws:
                 kwargs[ws] = _name_or_wrapper_to_workspace(kwargs[ws])
         args = tuple([_name_or_wrapper_to_workspace(arg) if isinstance(arg, MsliceWorkspace) else arg for arg in args])
+        if 'InputWorkspaces' in kwargs:
+            kwargs['InputWorkspaces'] = [_name_or_wrapper_to_workspace(arg) for arg in kwargs['InputWorkspaces']]
+        for ky in [k for k in kwargs.keys() if 'Workspace' in k]:
+            if isinstance(kwargs[ky], string_types) and '__MSL' not in kwargs[ky]:
+                kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
 
+        ads_name = '__MSL' + output_name if output_name else '__MSLTMP' + str(uuid4())[:8]
         if not store:
-            if 'OutputWorkspace' in kwargs:
-                kwargs['OutputWorkspace'] = '__MSL' + kwargs['OutputWorkspace']
-            else:
-                kwargs['OutputWorkspace'] = '__MSLTMP' + str(uuid4())[:8]
+            ads_name += '_HIDDEN'
 
-        result = algorithm(*args, **kwargs)
+        result = algorithm(*args, OutputWorkspace=ads_name, **kwargs)
         if isinstance(result, Workspace):
             if isinstance(input_workspace, MsliceWorkspace2D) and isinstance(result, type(input_workspace.raw_ws)):
                 result = get_workspace_handle(input_workspace).rewrap(result)
@@ -57,20 +61,10 @@ def wrap_algorithm(algorithm):
 def _name_or_wrapper_to_workspace(input_ws):
     if isinstance(input_ws, MsliceWorkspace):
         return input_ws.raw_ws
-    elif isinstance(input_ws, str):
+    elif isinstance(input_ws, string_types):
         return get_workspace_handle(input_ws).raw_ws
     else:
         return input_ws
-
-
-@contextmanager
-def wrap_in_ads(workspaces):
-    """Need to wrap some algorithm calls because they don't like input workspaces that aren't in the ADS..."""
-    for workspace in workspaces:
-        AnalysisDataService.Instance().addOrReplace(workspace.name, workspace.raw_ws)
-    yield
-    for workspace in workspaces:
-        AnalysisDataService.Instance().remove(workspace.name)
 
 
 def add_to_ads(workspaces):
