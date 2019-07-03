@@ -10,7 +10,6 @@ import os.path
 
 import numpy as np
 from scipy import constants
-from uuid import uuid4
 
 from mantid.api import WorkspaceUnitValidator
 from mantid.api import MatrixWorkspace
@@ -190,7 +189,6 @@ def combine_workspace(selected_workspaces, new_name):
 
 def add_workspace_runs(selected_ws):
     out_ws_name = selected_ws[0] + '_sum'
-    workspaces = [get_workspace_handle(ws) for ws in selected_ws]
     sum_ws = MergeRuns(OutputWorkspace=out_ws_name, InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 

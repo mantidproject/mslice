@@ -1,4 +1,4 @@
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_visible_workspace_names
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.qt import QtWidgets
 from mslice.scripting.helperfunctions import add_plot_statements
 from mslice.app.presenters import get_cut_plotter_presenter
@@ -38,6 +38,7 @@ def preprocess_lines(ws_name, plot_handler, ax):
         script_lines += generate_script_lines(ws, ws_name)
 
     return script_lines
+
 
 def generate_script_lines(raw_ws, workspace_name):
     lines = []
