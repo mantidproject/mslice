@@ -65,7 +65,7 @@ echo "CheckMantidVersion.OnStartup = 0" >> $userprops
 ${script_dir}/create_virtualenv.sh ${py_exe} ${venv_dir}
 source ${venv_dir}/bin/activate
 # ensure mantid is on the python path
-export PYTHONPATH=/opt/${pkg_name}/bin
+export PYTHONPATH=/opt/${pkg_name}/bin:/opt/${pkg_name}/lib
 
 # ------------------------------------------------------------------------------
 # installation
