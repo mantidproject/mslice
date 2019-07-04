@@ -144,7 +144,7 @@ def is_slice(*args):
     """
     if not isinstance(args[0], Workspace) or is_cut(*args):
         return False
-    if isinstance(args[0], Workspace) or args[0].getNumDims() == 2:
+    if isinstance(args[0], Workspace) or args[0]._raw_ws.getNumDims() == 2:
         return True
 
 
@@ -152,7 +152,7 @@ def is_cut(*args):
     """
     Checks if args[0] is a HistogramWorkspace
     """
-    if isinstance(args[0], HistogramWorkspace):
+    if isinstance(args[0], HistogramWorkspace) and args[0]._raw_ws.getNumDims() == 1:
         return True
     else:
         return False
