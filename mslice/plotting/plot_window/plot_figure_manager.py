@@ -165,7 +165,10 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def save_plot(self):
         file_path, save_name, ext = get_save_directory(save_as_image=True)
-        workspaces = self.plot_handler.ws_list
+        if hasattr(self.plot_handler, 'ws_list'):
+            workspaces = self.plot_handler.ws_list
+        else:
+            workspaces = [self.plot_handler.ws_name]
         try:
             save_workspaces(workspaces, file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
