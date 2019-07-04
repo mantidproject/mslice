@@ -5,7 +5,7 @@ import os.path as ospath
 
 import matplotlib as mpl
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, rename_workspace)
-from mslice.models.workspacemanager.file_io import save_ascii
+from mslice.models.workspacemanager.file_io import save_ascii, save_matlab, save_nexus
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.workspacemanager.workspace_algorithms import rebose_single
 from mslice.models.cmap import DEFAULT_CMAP
@@ -93,13 +93,26 @@ def Load(Filename, OutputWorkspace=None):
     return get_workspace_handle(name)
 
 
-def SaveAscii(InputWorkspace, Path):
+def SaveData(InputWorkspace, Path, format='ascii'):
     if isinstance(InputWorkspace, str):
         _check_workspace_name(InputWorkspace)
         workspace = get_workspace_handle(InputWorkspace)
-        save_ascii(workspace, Path, is_slice(workspace))
     else:
-        save_ascii(InputWorkspace, Path, is_slice(InputWorkspace))
+        workspace = InputWorkspace
+    save_fun = {'ascii': save_ascii, 'matlab': save_matlab, 'nexus': save_nexus}
+    save_fun[format](workspace, Path, is_slice(workspace))
+
+
+def SaveAscii(InputWorkspace, Path):
+    SaveData(InputWorkspace, Path, format='ascii')
+
+
+def SaveMatlab(InputWorkspace, Path):
+    SaveData(InputWorkspace, Path, format='matlab')
+
+
+def SaveNexus(InputWorkspace, Path):
+    SaveData(InputWorkspace, Path, format='nexus')
 
 
 def GenerateScript(InputWorkspace, filename):
