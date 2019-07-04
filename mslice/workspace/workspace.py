@@ -32,6 +32,7 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
         new_ws.ef_defined = self.ef_defined
         new_ws.limits = self.limits
         new_ws.axes = self.axes
+        attribute_from_log(new_ws, mantid_ws)
         return new_ws
 
     def save_attributes(self):
