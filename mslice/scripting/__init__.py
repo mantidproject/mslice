@@ -55,20 +55,28 @@ def generate_script_lines(raw_ws, workspace_name):
             lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
     return lines
 
+def _parse_prop(prop):
+    pval = prop.value()
+    pname = prop.name()
+    hidden = False
+    output_ws = None
+    if isinstance(pval, string_types):
+        pval = pval.replace("__MSL", "").replace("_HIDDEN", "")
+    if prop.name() == "OutputWorkspace":
+        output_ws = pval.replace(".", "_")
+        if "_HIDDEN" in prop.value():
+            hidden = True
+    return pname, pval, output_ws, hidden
 
 def get_algorithm_kwargs(algorithm, existing_ws_refs):
     arguments = []
     output_ws = None
     for prop in algorithm.getProperties():
         if not prop.isDefault():
-            pval = prop.value()
-            if isinstance(pval, string_types):
-                pval = pval.replace("__MSL", "").replace("_HIDDEN", "")
-            if prop.name() == "OutputWorkspace":
-                output_ws = pval.replace(".", "_")
-                if "_HIDDEN" in prop.value():
-                    arguments += ["store=False"]
-                    continue
+            pname, pval, output_ws, hidden = _parse_prop(prop)
+            if hidden:
+                arguments += ["store=False"]
+                continue
             if algorithm.name() == "Load":
                 if prop.name() == "Filename":
                     arguments += ["{}='{}'".format(prop.name(), pval)]

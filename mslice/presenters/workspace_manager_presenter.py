@@ -21,6 +21,21 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view = workspace_view
         self._main_presenter = None
         self._psd = True
+        self._command_map = {
+            Command.SaveSelectedWorkspaceNexus: lambda: self._save_selected_workspace('.nxs'),
+            Command.SaveSelectedWorkspaceAscii: lambda: self._save_selected_workspace('.txt'),
+            Command.SaveSelectedWorkspaceMatlab: lambda: self._save_selected_workspace('.mat'),
+            Command.RemoveSelectedWorkspaces: self._remove_selected_workspaces,
+            Command.RenameWorkspace: self._rename_workspace,
+            Command.CombineWorkspace: self._combine_workspace,
+            Command.SelectionChanged: self._broadcast_selected_workspaces,
+            Command.Add: self._add_workspaces,
+            Command.Subtract: self._subtract_workspace,
+            Command.SaveToADS: self._save_to_ads,
+            Command.ComposeWorkspace:
+                lambda: self._workspace_manager_view._display_error('Please select a Compose action from the dropdown menu'),
+            Command.Scale: self._scale_workspace,
+            Command.Bose: lambda: self._scale_workspace(is_bose=True)}
 
     def register_master(self, main_presenter):
         assert (isinstance(main_presenter, MainPresenterInterface))
@@ -31,32 +46,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def notify(self, command):
         self._clear_displayed_error()
         with show_busy(self._workspace_manager_view):
-            if command == Command.SaveSelectedWorkspaceNexus:
-                self._save_selected_workspace('.nxs')
-            elif command == Command.SaveSelectedWorkspaceAscii:
-                self._save_selected_workspace('.txt')
-            elif command == Command.SaveSelectedWorkspaceMatlab:
-                self._save_selected_workspace('.mat')
-            elif command == Command.RemoveSelectedWorkspaces:
-                self._remove_selected_workspaces()
-            elif command == Command.RenameWorkspace:
-                self._rename_workspace()
-            elif command == Command.CombineWorkspace:
-                self._combine_workspace()
-            elif command == Command.SelectionChanged:
-                self._broadcast_selected_workspaces()
-            elif command == Command.Add:
-                self._add_workspaces()
-            elif command == Command.Subtract:
-                self._subtract_workspace()
-            elif command == Command.SaveToADS:
-                self._save_to_ads()
-            elif command == Command.ComposeWorkspace:
-                self._workspace_manager_view._display_error('Please select a Compose action from the dropdown menu')
-            elif command == Command.Scale:
-                self._scale_workspace()
-            elif command == Command.Bose:
-                self._scale_workspace(is_bose=True)
+            if command in self._command_map.keys():
+                self._command_map[command]()
             else:
                 raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
 
