@@ -2,7 +2,7 @@
 and entry points.
 """
 import mslice.util.mantid.init_mantid # noqa: F401
-from mslice.util.mantid import in_mantidplot
+from mslice.util.mantid import in_mantid
 from mslice.util.qt import QT_VERSION
 from mslice.util.qt.qapp import create_qapp_if_required
 
@@ -34,5 +34,5 @@ def show_gui():
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow
-        MAIN_WINDOW = MainWindow(in_mantidplot())
+        MAIN_WINDOW = MainWindow(in_mantid())
     MAIN_WINDOW.show()

@@ -181,10 +181,10 @@ def add_plot_options(script_lines, plot_handler):
     script_lines.append("ax.set_title('{}')\n".format(plot_handler.title))
 
     if plot_handler.is_changed("y_label"):
-        script_lines.append("ax.set_ylabel('{}')\n".format(plot_handler.y_label))
+        script_lines.append("ax.set_ylabel(r'{}')\n".format(plot_handler.y_label))
 
     if plot_handler.is_changed("x_label"):
-        script_lines.append("ax.set_xlabel('{}')\n".format(plot_handler.x_label))
+        script_lines.append("ax.set_xlabel(r'{}')\n".format(plot_handler.x_label))
 
     if plot_handler.is_changed("y_grid"):
         script_lines.append("ax.grid({}, axis='y')\n".format(plot_handler.y_grid))
