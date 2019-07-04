@@ -399,7 +399,6 @@ class SlicePlot(IPlot):
             self.plot_window.action_keep.trigger()
             self.plot_window.action_keep.setEnabled(False)
             self.plot_window.action_make_current.setEnabled(False)
-            self.plot_window.action_save_cut.setVisible(True)
             self.plot_window.action_flip_axis.setVisible(True)
             self._canvas.setCursor(Qt.CrossCursor)
         else:
