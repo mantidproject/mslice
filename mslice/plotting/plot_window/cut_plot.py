@@ -5,7 +5,7 @@ import numpy as np
 
 from mslice.models.colors import to_hex
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
-from mslice.presenters.quick_options_presenter import quick_options
+from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
 
@@ -389,7 +389,10 @@ class CutPlot(IPlot):
 
     @title.setter
     def title(self, value):
-        self.manager.title = value
+        if check_latex(value):
+            self.manager.title = value
+        else:
+            self.plot_window.display_error("invalid latex string")
 
     @property
     def x_label(self):
@@ -397,7 +400,10 @@ class CutPlot(IPlot):
 
     @x_label.setter
     def x_label(self, value):
-        self.manager.x_label = value
+        if check_latex(value):
+            self.manager.x_label = value
+        else:
+            self.plot_window.display_error("invalid latex string")
 
     @property
     def y_label(self):
@@ -405,7 +411,10 @@ class CutPlot(IPlot):
 
     @y_label.setter
     def y_label(self, value):
-        self.manager.y_label = value
+        if check_latex(value):
+            self.manager.y_label = value
+        else:
+            self.plot_window.display_error("invalid latex string")
 
     @property
     def x_range(self):

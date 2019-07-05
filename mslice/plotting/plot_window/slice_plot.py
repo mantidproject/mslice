@@ -8,7 +8,7 @@ import matplotlib.colors as colors
 
 from mslice.models.colors import to_hex
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
-from mslice.presenters.quick_options_presenter import quick_options
+from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
@@ -469,7 +469,10 @@ class SlicePlot(IPlot):
 
     @title.setter
     def title(self, value):
-        self.manager.title = value
+        if check_latex(value):
+            self.manager.title = value
+        else:
+            self.plot_window.display_error("invalid latex string")
 
     @property
     def x_label(self):
@@ -477,7 +480,10 @@ class SlicePlot(IPlot):
 
     @x_label.setter
     def x_label(self, value):
-        self.manager.x_label = value
+        if check_latex(value):
+            self.manager.x_label = value
+        else:
+            self.plot_window.display_error("invalid latex string")
 
     @property
     def y_label(self):
@@ -485,7 +491,10 @@ class SlicePlot(IPlot):
 
     @y_label.setter
     def y_label(self, value):
-        self.manager.y_label = value
+        if check_latex(value):
+            self.manager.y_label = value
+        else:
+            self.plot_window.display_error("invalid latex string")
 
     @property
     def x_range(self):

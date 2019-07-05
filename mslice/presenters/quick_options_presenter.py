@@ -47,19 +47,23 @@ def _set_axis_options(view, target, model, has_logarithmic, grid):
         setattr(model, target[:-5] + 'grid', view.grid_state)
 
 
-def _set_label(view, target):
-    label = view.label
-    if '$' in label:
+def check_latex(value):
+    if '$' in value:
         from matplotlib.mathtext import MathTextParser
         parser = MathTextParser('ps')
         try:
-            parser.parse(label)
+            parser.parse(value)
         except ValueError:
-            QuickError('Invalid LaTeX in label string')
-        else:
-            target.set_text(label)
-    else:
+            return False
+    return True
+
+
+def _set_label(view, target):
+    label = view.label
+    if check_latex(label):
         target.set_text(label)
+    else:
+        QuickError('Invalid LaTeX in label string')
 
 
 def _set_line_options(view, model, line):
