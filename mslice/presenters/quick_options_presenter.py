@@ -1,6 +1,6 @@
 from six import string_types
 from matplotlib import text
-from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
+from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions, QuickError
 
 
 def quick_options(target, model, has_logarithmic=None):
@@ -47,8 +47,23 @@ def _set_axis_options(view, target, model, has_logarithmic, grid):
         setattr(model, target[:-5] + 'grid', view.grid_state)
 
 
+def check_latex(value):
+    if '$' in value:
+        from matplotlib.mathtext import MathTextParser
+        parser = MathTextParser('ps')
+        try:
+            parser.parse(value)
+        except ValueError:
+            return False
+    return True
+
+
 def _set_label(view, target):
-    target.set_text(view.label)
+    label = view.label
+    if check_latex(label):
+        target.set_text(label)
+    else:
+        QuickError('Invalid LaTeX in label string')
 
 
 def _set_line_options(view, model, line):

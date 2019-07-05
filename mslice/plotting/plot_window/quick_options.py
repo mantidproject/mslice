@@ -130,3 +130,11 @@ class QuickLineOptions(QuickOptions):
     @property
     def legend(self):
         return self.line_widget.legend
+
+
+def QuickError(message):
+    error_box = QtWidgets.QMessageBox()
+    error_box.setWindowTitle("Error")
+    error_box.setIcon(QtWidgets.QMessageBox.Warning)
+    error_box.setText(message)
+    error_box.exec_()
