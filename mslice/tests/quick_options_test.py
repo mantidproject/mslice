@@ -178,6 +178,14 @@ class QuickLabelTest(unittest.TestCase):
         quick_options(self.target, self.model)
         self.target.set_text.assert_not_called()
 
+    @patch('mslice.presenters.quick_options_presenter.QuickError')
+    def test_latex(self, quickerror, quick_label_options_view):
+        type(self.view).label = PropertyMock(return_value="$\a$")
+        quick_label_options_view.return_value = self.view
+        self.view.exec_ = MagicMock(return_value=True)
+        quick_options(self.target, self.model)
+        quickerror.assert_called()
+        self.target.set_text.assert_not_called()
 
 @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
 class QuickLineTest(unittest.TestCase):
