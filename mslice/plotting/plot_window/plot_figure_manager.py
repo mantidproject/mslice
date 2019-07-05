@@ -198,7 +198,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         error_box.setWindowTitle("Error")
         error_box.setIcon(QtWidgets.QMessageBox.Warning)
         error_box.setText(message)
-        error_box.show()
+        error_box.exec_()
 
     def update_grid(self):
         if self._xgrid:

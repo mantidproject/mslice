@@ -162,7 +162,9 @@ class SlicePlot(IPlot):
 
     def update_legend(self):
         axes = self._canvas.figure.gca()
-        axes.legend().draggable()
+        lgn = axes.legend()
+        if lgn:
+            lgn.draggable()
 
         if self._canvas.manager.plot_handler.icut is not None:
             self._canvas.manager.plot_handler.icut.rect.ax = axes
