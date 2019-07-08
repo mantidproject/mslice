@@ -10,6 +10,7 @@ import os.path
 
 import numpy as np
 from scipy import constants
+from six import string_types
 
 from mantid.api import WorkspaceUnitValidator
 from mantid.api import MatrixWorkspace
@@ -244,8 +245,19 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
         save_method = save_matlab
     else:
         raise RuntimeError("unrecognised file extension")
-    for workspace in workspaces:
-        _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd)
+    if isinstance(save_name, string_types):
+        if len(workspaces) == 1:
+            save_names = [save_name]
+        else:
+            from os.path import splitext
+            name, _ = splitext(save_name)
+            save_names = ['{}_{:03d}{}'.format(name, idx+1, extension) for idx in range(len(workspaces))]
+    else:
+        save_names = [save_name] if not hasattr(save_name, '__iter__') else save_name
+        if len(save_names) != len(workspaces):
+            save_names = [None] * len(workspaces)
+    for workspace, save_name_single in zip(workspaces, save_names):
+        _save_single_ws(workspace, save_name_single, save_method, path, extension, slice_nonpsd)
 
 
 def export_workspace_to_ads(workspace):

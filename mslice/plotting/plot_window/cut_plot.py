@@ -32,6 +32,7 @@ class CutPlot(IPlot):
         self._legends_visible = []
         self._legend_dict = {}
         self.ws_name = workspace_name
+        self.ws_list = [workspace_name]
         self._lines = self.line_containers()
         self.setup_connections(self.plot_window)
         self.default_options = None

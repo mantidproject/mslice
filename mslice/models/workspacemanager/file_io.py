@@ -38,8 +38,13 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
             file_dialog.selectNameFilter(ext_to_qtfilter[default_ext])
         if (file_dialog.exec_()):
             path = str(file_dialog.selectedFiles()[0])
-            if '.' not in path: # add extension unless there's one in the name
-                path += file_dialog.selectedFilter()[-5:-1]
+            filename = os.path.basename(path)
+            if '.' not in filename: # add extension unless there's one in the name
+                try:
+                    sel = file_dialog.selectedFilter()
+                except AttributeError:   # Qt5 only has selectedNameFilter
+                    sel = str(file_dialog.selectedNameFilter())
+                path += sel[-5:-1]
             ext = path[path.rfind('.'):]
             return os.path.dirname(path), os.path.basename(path), ext
 

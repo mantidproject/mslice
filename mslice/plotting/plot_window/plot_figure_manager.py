@@ -165,9 +165,12 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def save_plot(self):
         file_path, save_name, ext = get_save_directory(save_as_image=True)
-        workspace = self.plot_handler.ws_name
+        if hasattr(self.plot_handler, 'ws_list'):
+            workspaces = self.plot_handler.ws_list
+        else:
+            workspaces = [self.plot_handler.ws_name]
         try:
-            save_workspaces([workspace], file_path, save_name, ext, slice_nonpsd=True)
+            save_workspaces(workspaces, file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
             if str(e) == "unrecognised file extension":
                 if not save_name.endswith(".pdf"):
