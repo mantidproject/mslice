@@ -32,7 +32,7 @@ def _parse_ws_names(args, kwargs):
     return (input_workspace, output_name, args, kwargs)
 
 def _alg_has_outputws(wrapped_alg):
-    alg = AlgorithmManager.create(wrapped_alg.func_name)
+    alg = AlgorithmManager.create(wrapped_alg.__name__)
     return any(['OutputWorkspace' in prop.name for prop in alg.getProperties()])
 
 def wrap_algorithm(algorithm):
