@@ -5,6 +5,7 @@ import os.path as ospath
 
 import matplotlib as mpl
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, rename_workspace)
+from mslice.models.workspacemanager.file_io import save_ascii, save_matlab, save_nexus
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.workspacemanager.workspace_algorithms import rebose_single
 from mslice.models.cmap import DEFAULT_CMAP
@@ -12,7 +13,7 @@ import mslice.app as app
 from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
-                                        _check_workspace_type)
+                                        _check_workspace_type, is_slice)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
@@ -90,6 +91,28 @@ def Load(Filename, OutputWorkspace=None):
         name = rename_workspace(workspace=old_name, new_name=OutputWorkspace).name
 
     return get_workspace_handle(name)
+
+
+def SaveData(InputWorkspace, Path, format='ascii'):
+    if isinstance(InputWorkspace, str):
+        _check_workspace_name(InputWorkspace)
+        workspace = get_workspace_handle(InputWorkspace)
+    else:
+        workspace = InputWorkspace
+    save_fun = {'ascii': save_ascii, 'matlab': save_matlab, 'nexus': save_nexus}
+    save_fun[format](workspace, Path, is_slice(workspace))
+
+
+def SaveAscii(InputWorkspace, Path):
+    SaveData(InputWorkspace, Path, format='ascii')
+
+
+def SaveMatlab(InputWorkspace, Path):
+    SaveData(InputWorkspace, Path, format='matlab')
+
+
+def SaveNexus(InputWorkspace, Path):
+    SaveData(InputWorkspace, Path, format='nexus')
 
 
 def GenerateScript(InputWorkspace, filename):

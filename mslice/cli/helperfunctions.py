@@ -126,8 +126,10 @@ def _check_workspace_type(workspace, correct_type):
         if not isinstance(workspace, MatrixWorkspace):
             raise RuntimeError("Incorrect workspace type.")
 
+
 def _rescale_energy_cut_plot(presenter, cuts, new_e_unit):
-    """Given a CutPlotterPresenter and a set of cached cuts, rescales the workspaces to a different energy-unit and replot"""
+    """Given a CutPlotterPresenter and a set of cached cuts,
+    rescales the workspaces to a different energy-unit and replot"""
     import copy
     cuts_copy = copy.deepcopy(cuts)  # Because run_cut will overwrite the cuts cache for plot_over=True
     for id, cut in enumerate(cuts_copy):
@@ -140,9 +142,9 @@ def is_slice(*args):
     """
     Checks if args[0] is a WorkspaceBase or HistogramWorkspace
     """
-    if not (isinstance(args[0], Workspace) or isinstance(args[0], HistogramWorkspace)):
+    if not isinstance(args[0], Workspace) or is_cut(*args):
         return False
-    if isinstance(args[0], Workspace) or args[0].getNumDims() == 2:
+    if isinstance(args[0], Workspace) or args[0]._raw_ws.getNumDims() == 2:
         return True
 
 
@@ -150,7 +152,7 @@ def is_cut(*args):
     """
     Checks if args[0] is a HistogramWorkspace
     """
-    if isinstance(args[0], HistogramWorkspace):
+    if isinstance(args[0], HistogramWorkspace) and args[0]._raw_ws.getNumDims() == 1:
         return True
     else:
         return False
