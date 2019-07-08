@@ -10,8 +10,9 @@ from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresen
 from mslice.views.interfaces.mainview import MainView
 from mslice.views.interfaces.workspace_view import WorkspaceView
 from mslice.widgets.workspacemanager.command import Command
-from mslice.workspace import wrap_workspace
-from mantid.simpleapi import AddSampleLog, CreateWorkspace, CreateSimulationWorkspace, ConvertToMD, CloneWorkspace
+from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
+from mslice.util.mantid.mantid_algorithms import AddSampleLog, CreateWorkspace, CreateSimulationWorkspace,\
+    ConvertToMD, CloneWorkspace
 
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):
@@ -21,18 +22,16 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         x = np.linspace(0, 99, 100)
         y = x * 1
         e = y * 0 + 2
-        cls.m_workspace = wrap_workspace(CreateWorkspace(x, y, e, OutputWorkspace="m_ws"), 'm_ws')
+        cls.m_workspace = CreateWorkspace(x, y, e, OutputWorkspace="m_ws")
 
-        sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
-                                                  UnitX='DeltaE', OutputWorkspace='ws1')
-        AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
-        cls.px_workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="ws1", QDimensions='|Q|',
+        cls.sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
+                                                      UnitX='DeltaE', OutputWorkspace='ws0')
+        AddSampleLog(cls.sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
+        cls.px_workspace = ConvertToMD(InputWorkspace=cls.sim_workspace, OutputWorkspace="ws1", QDimensions='|Q|',
                                        dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                        SplitInto='50,50')
         cls.px_workspace_clone = CloneWorkspace(InputWorkspace=cls.px_workspace, OutputWorkspace='ws2',
                                                 StoreInADS=False)
-        cls.px_workspace = wrap_workspace(cls.px_workspace, 'ws1')
-        cls.px_workspace_clone = wrap_workspace(cls.px_workspace_clone, 'ws2')
 
     def setUp(self):
         self.view = mock.create_autospec(spec=WorkspaceView)
@@ -65,6 +64,25 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         save_dir_mock.assert_called_once_with(multiple_files=False, save_as_image=False,
                                               default_ext='.nxs')
         save_ws_mock.assert_called_once_with([workspace_to_save], path_to_save_to, 'file1', '.nxs')
+
+        # Test save failure
+        save_ws_mock.side_effect = RuntimeError()
+        self.view.error_unable_to_save = mock.Mock()
+        self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
+        self.view.error_unable_to_save.assert_called_once_with()
+
+        # Test user cancellation
+        save_dir_mock.reset_mock()
+        save_ws_mock.reset_mock()
+        save_dir_mock.side_effect = RuntimeError('dialog cancelled')
+        self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
+        save_ws_mock.assert_not_called()
+
+        # Test other dialog failure
+        save_dir_mock.side_effect = RuntimeError()
+        with self.assertRaises(RuntimeError):
+            self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
+        save_ws_mock.assert_not_called()
 
     @patch('mslice.presenters.workspace_manager_presenter.get_save_directory')
     @patch('mslice.presenters.workspace_manager_presenter.save_workspaces')
@@ -148,8 +166,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def test_remove_workspace(self, delete_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a workspace that reports a single selected workspace on calls to get_workspace_selected
-        workspace_to_be_removed = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1'),
-                                                 'file1')
+        workspace_to_be_removed = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1')
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_be_removed])
         self.view.display_loaded_workspaces = mock.Mock()
 
@@ -162,8 +179,8 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
     def test_remove_multiple_workspaces(self, delete_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports 3 selected workspaces on calls to get_workspace_selected
-        workspace1 = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1'), 'file1')
-        workspace2 = wrap_workspace(CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file2'), 'file2')
+        workspace1 = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1')
+        workspace2 = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file2')
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace1, workspace2])
 
         self.presenter.notify(Command.RemoveSelectedWorkspaces)
@@ -189,6 +206,29 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.register_master(self.main_presenter)
         self.presenter.notify(Command.SelectionChanged)
         self.main_presenter.notify_workspace_selection_changed()
+
+    def test_workspace2d_nonpsd_selection(self):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        self.presenter.register_master(self.main_presenter)
+        self.view.get_workspace_selected = mock.Mock(return_value=[self.m_workspace])
+        self.view.current_tab = mock.Mock(return_value=TAB_2D)
+        self.view.tab_changed = mock.Mock()
+        self.presenter._psd = True
+        self.presenter.notify(Command.SelectionChanged)
+        self.main_presenter.notify_workspace_selection_changed()
+        self.view.tab_changed.emit.assert_called_once_with(TAB_NONPSD)
+
+    def test_workspace2d_psd_selection(self):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        self.presenter.register_master(self.main_presenter)
+        self.view.current_tab = mock.Mock(return_value=TAB_2D)
+        self.view.get_workspace_selected = mock.Mock(return_value=[self.sim_workspace])
+        self.sim_workspace.is_PSD = mock.Mock(return_value=True)
+        self.view.tab_changed = mock.Mock()
+        self.presenter._psd = False
+        self.presenter.notify(Command.SelectionChanged)
+        self.main_presenter.notify_workspace_selection_changed()
+        self.view.tab_changed.emit.assert_called_once_with(TAB_2D)
 
     def test_call_presenter_with_unknown_command(self):
         self.presenter = WorkspaceManagerPresenter(self.view)
@@ -271,6 +311,9 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called()
         assert(not self.view.error_select_more_than_one_workspaces.called)
         combine_ws_mock.assert_called_once_with(selected_workspaces, selected_workspaces[0]+'_combined')
+
+    def test_add_workspaces(self):
+        self.presenter = WorkspaceManagerPresenter(self.view)
 
     @patch('mslice.presenters.workspace_manager_presenter.scale_workspaces')
     def test_scale_workspace(self, scale_ws_mock):
