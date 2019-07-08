@@ -81,6 +81,11 @@ class SliceWidget(SliceView, QWidget):
         if axes[curr_axis] == axes[other_axis]:
             new_index = (index[other_axis] + 1) % num_items
             axes_set[other_axis](new_index)
+        if 'DeltaE' not in axes:
+            iDeltaE = [[id for id in range(cmb.count()) if 'DeltaE' in str(cmb.itemText(id))]
+                       for cmb in [self.cmbSliceXAxis, self.cmbSliceYAxis]]
+            if len(iDeltaE[other_axis]) > 0:
+                axes_set[other_axis](iDeltaE[other_axis][0])
         self._presenter.populate_slice_params()
 
     def _change_unit(self):
