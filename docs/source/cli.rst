@@ -92,8 +92,8 @@ An example of plotting a slice:
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='mslice')
-    mesh = ax.pcolormesh(cut_ws, fmt='ok')
-    mesh.set_clim(0, 0.1)
+    mesh = ax.pcolormesh(slice_ws, cmap='coolwarm')
+    mesh.set_clim(0, 1)
     cb = plt.colorbar(mesh, ax=ax)
 
     fig.show()
@@ -114,10 +114,10 @@ To plot a cut and then a slice:
     import mslice.cli as mc
 
     ws = mc.Load('data.nxspe')
-    wsq = ws.Cut(ws, '|Q|', 'DeltaE, -1, 1')
+    wsq = mc.Cut(ws, '|Q|', 'DeltaE, -1, 1')
     mc.PlotCut(wsq)
     
-    ws2d = ws.Slice(ws, '|Q|, 0, 10, 0.01', 'DeltaE, -5, 55, 0.5')
+    ws2d = mc.Slice(ws, '|Q|, 0, 10, 0.01', 'DeltaE, -5, 55, 0.5')
     mc.PlotSlice(ws2d)
 
 
@@ -162,10 +162,10 @@ To load and plot a slice in :math:`|Q|` and energy transfer, and a cut along :ma
     import mslice.cli as mc
 
     ws = mc.Load('data.nxspe')
-    wsq = ws.Cut(ws, '|Q|', 'DeltaE, -1, 1')
+    wsq = mc.Cut(ws, '|Q|', 'DeltaE, -1, 1')
     mc.PlotCut(wsq)
     
-    ws2d = ws.Slice(ws, '|Q|, 0, 10, 0.01', 'DeltaE, -5, 55, 0.5')
+    ws2d = mc.Slice(ws, '|Q|, 0, 10, 0.01', 'DeltaE, -5, 55, 0.5')
     mc.PlotSlice(ws2d)
 
 In the above ``Slice`` function rebins the data between :math:`0\leq |Q|\leq 10` in steps of 0.01 :math:`\mathrm{\AA}^{-1}` 
