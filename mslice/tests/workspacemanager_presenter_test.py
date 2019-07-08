@@ -273,6 +273,17 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     @patch('mslice.presenters.workspace_manager_presenter.combine_workspace')
     @patch('mslice.presenters.workspace_manager_presenter.is_pixel_workspace')
+    def test_combine_workspace_no_ws(self, is_pixel_ws_mock, combine_ws_mock):
+        # Checks that it will fail if only no workspaces are selected.
+        is_pixel_ws_mock.return_value = True
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        selected_workspaces = []
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.presenter.notify(Command.CombineWorkspace)
+        self.view.error_select_more_than_one_workspaces.assert_called_once_with()
+
+    @patch('mslice.presenters.workspace_manager_presenter.combine_workspace')
+    @patch('mslice.presenters.workspace_manager_presenter.is_pixel_workspace')
     def test_combine_workspace_single_ws(self, is_pixel_ws_mock, combine_ws_mock):
         # Checks that it will fail if only one workspace is selected.
         is_pixel_ws_mock.return_value = True
@@ -312,8 +323,52 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         assert(not self.view.error_select_more_than_one_workspaces.called)
         combine_ws_mock.assert_called_once_with(selected_workspaces, selected_workspaces[0]+'_combined')
 
-    def test_add_workspaces(self):
+    @patch('mslice.presenters.workspace_manager_presenter.add_workspace_runs')
+    def test_add_workspaces(self, add_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
+        self.view.get_workspace_selected = mock.Mock(return_value=[])
+        self.presenter.notify(Command.Add)
+        self.view.error_select_one_or_more_workspaces.assert_called_once_with()
+
+        self.view.get_workspace_selected.return_value = ['ws1']
+        self.view.add_workspace_dialog.return_value = 'ws2'
+        self.view._display_error = mock.Mock()
+        add_ws_mock.side_effect = ValueError('incompatible workspace')
+        self.presenter.notify(Command.Add)
+        add_ws_mock.assert_called_once_with(['ws1', 'ws2'])
+        self.view._display_error.assert_called_once_with('incompatible workspace')
+
+    @patch('mslice.presenters.workspace_manager_presenter.subtract')
+    def test_subtract_workspaces(self, subtract_ws_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        self.view.get_workspace_selected = mock.Mock(return_value=[])
+        self.presenter.notify(Command.Subtract)
+        self.view.error_select_one_or_more_workspaces.assert_called_once_with()
+
+        self.view.get_workspace_selected.return_value = ['ws1']
+        self.view.subtraction_input = mock.Mock(side_effect=RuntimeError)
+        self.presenter.notify(Command.Subtract)
+        subtract_ws_mock.assert_not_called()
+
+        self.view.subtraction_input.side_effect = None
+        self.view.subtraction_input.return_value = ('ws2', 0.5)
+        self.view._display_error = mock.Mock()
+        subtract_ws_mock.side_effect = ValueError('incompatible workspace')
+        self.presenter.notify(Command.Subtract)
+        subtract_ws_mock.assert_called_once_with(['ws1'], 'ws2', 0.5)
+        self.view._display_error.assert_called_once_with('incompatible workspace')
+
+    @patch('mslice.presenters.workspace_manager_presenter.export_workspace_to_ads')
+    def test_save_to_ads(self, export_to_ads_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        selected_workspaces = ['ws1', 'ws2']
+        self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
+        self.presenter.notify(Command.SaveToADS)
+        export_to_ads_mock.assert_has_calls([mock.call(ws) for ws in selected_workspaces])
+
+        self.view.get_workspace_selected.return_value = []
+        self.presenter.notify(Command.SaveToADS)
+        self.view.error_select_one_or_more_workspaces.assert_called_once_with()
 
     @patch('mslice.presenters.workspace_manager_presenter.scale_workspaces')
     def test_scale_workspace(self, scale_ws_mock):
