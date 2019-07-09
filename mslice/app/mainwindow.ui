@@ -424,8 +424,16 @@
      <addaction name="actionEUnitConvEnabled"/>
      <addaction name="actionEUnitConvDisabled"/>
     </widget>
+    <widget class="QMenu" name="menuCutAlgo">
+     <property name="title">
+      <string>Cut algorithm</string>
+     </property>
+     <addaction name="actionCutAlgoRebin"/>
+     <addaction name="actionCutAlgoIntegration"/>
+    </widget>
     <addaction name="menuDefault_Energy_Units"/>
     <addaction name="menuEUnitConv"/>
+    <addaction name="menuCutAlgo"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOptions"/>
@@ -452,6 +460,25 @@
    </property>
    <property name="text">
     <string>Disabled</string>
+   </property>
+  </action>
+  <action name="actionCutAlgoRebin">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Rebin</string>
+   </property>
+  </action>
+  <action name="actionCutAlgoIntegration">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Integration</string>
    </property>
   </action>
  </widget>

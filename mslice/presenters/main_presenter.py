@@ -72,3 +72,6 @@ class MainPresenter(MainPresenterInterface):
 
     def is_energy_conversion_allowed(self):
         return self._mainView.is_energy_conversion_allowed()
+
+    def get_cut_algorithm(self):
+        return self._mainView.get_cut_algorithm()

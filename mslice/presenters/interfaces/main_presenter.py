@@ -52,3 +52,7 @@ class MainPresenterInterface(object):
     @abc.abstractmethod
     def is_energy_conversion_allowed(self):
         pass
+
+    @abc.abstractmethod
+    def get_cut_algorithm(self):
+        pass

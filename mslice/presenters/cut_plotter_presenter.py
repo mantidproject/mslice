@@ -27,7 +27,8 @@ class CutPlotterPresenter(PresenterUtility):
     def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
-        cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, store)
+        algo = self._main_presenter.get_cut_algorithm() if self._main_presenter is not None else 'Rebin'
+        cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, algo, store)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start, integration_axis.end)
         en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
         plot_cut_impl(cut_ws, (cut.intensity_start, cut.intensity_end), plot_over, legend, en_conversion)
@@ -63,7 +64,8 @@ class CutPlotterPresenter(PresenterUtility):
         return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
 
     def save_cut_to_workspace(self, workspace, cut):
-        compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one)
+        algo = self._main_presenter.get_cut_algorithm() if self._main_presenter is not None else 'Rebin'
+        compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one, algo)
         self._main_presenter.update_displayed_workspaces()
 
     def plot_cut_from_selected_workspace(self, plot_over=False):
