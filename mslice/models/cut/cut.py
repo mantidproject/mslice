@@ -1,7 +1,8 @@
 class Cut(object):
     """Groups parameters needed to cut and validates them"""
 
-    def __init__(self, cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one=False, width=None):
+    def __init__(self, cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one=False, width=None,
+                 algorithm='Rebin'):
         self.cut_axis = cut_axis
         self.integration_axis = integration_axis
         self.intensity_start = intensity_start
@@ -13,6 +14,7 @@ class Cut(object):
         self.start = integration_axis.start
         self.end = integration_axis.end
         self.width = width
+        self.algorithm = algorithm
         self.workspace_name = 'None'
 
     def reset_integration_axis(self, start, end):
@@ -98,3 +100,11 @@ class Cut(object):
             self._width = self.end - self.start
         else:
             self._width = None
+
+    @property
+    def algorithm(self):
+        return self._algorithm
+
+    @algorithm.setter
+    def algorithm(self, algo):
+        self._algorithm = algo

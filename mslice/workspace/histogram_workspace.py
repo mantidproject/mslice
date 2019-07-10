@@ -23,6 +23,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         self.axes = []
         self.norm_to_one = False
         self.parent = None
+        self.algorithm = []
         attribute_from_log(self, mantid_ws)
 
     def rewrap(self, ws):

@@ -143,6 +143,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts):
         cut_start, cut_end = integration_start, min(integration_start + cut.width, integration_end)
         intensity_range = (cut.intensity_start, cut.intensity_end)
         norm_to_one = cut.norm_to_one
+        algo_str = '' if 'Rebin' in cut.algorithm else ', Algorithm="{}"'.format(cut.algorithm)
 
         while cut_start != cut_end and index < len(errorbars):
             cut.integration_axis.start = cut_start
@@ -158,8 +159,8 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts):
             label = errorbar._label
 
             script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
-                                'NormToOne={})\n'.format(index, cut.workspace_name, cut_axis, integration_axis,
-                                                         norm_to_one))
+                                'NormToOne={}{})\n'.format(index, cut.workspace_name, cut_axis, integration_axis,
+                                                           norm_to_one, algo_str))
 
             if intensity_range != (None, None):
                 script_lines.append(

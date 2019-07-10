@@ -167,7 +167,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     return get_slice_plotter_presenter().create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
 
 
-def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
+def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin'):
     """
     Cuts workspace.
     :param InputWorkspace: Workspace to cut. The parameter can be either a python
@@ -193,7 +193,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False):
     cut_axis = _process_axis(CutAxis, 0, workspace)
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
-    cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, store=True)
+    cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True)
     get_cut_plotter_presenter().update_main_window()
 
     return cut
