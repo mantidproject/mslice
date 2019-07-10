@@ -61,6 +61,7 @@ class SlicePlot(IPlot):
         }
 
     def setup_connections(self, plot_window):
+        plot_window.redraw.connect(self._canvas.draw)
         plot_window.action_interactive_cuts.setVisible(True)
         plot_window.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
         plot_window.action_save_cut.setVisible(False)
@@ -145,11 +146,11 @@ class SlicePlot(IPlot):
         if bounds['x_label'] < y < bounds['title']:
             if bounds['y_label'] < x < bounds['colorbar_label']:
                 if y < bounds['x_range']:
-                    quick_options('x_range', self)
+                    quick_options('x_range', self, redraw_signal=self.plot_window.redraw)
                 elif x < bounds['y_range']:
-                    quick_options('y_range', self)
+                    quick_options('y_range', self, redraw_signal=self.plot_window.redraw)
                 elif x > bounds['colorbar_range']:
-                    quick_options('colorbar_range', self, self.colorbar_log)
+                    quick_options('colorbar_range', self, self.colorbar_log, redraw_signal=self.plot_window.redraw)
             self._canvas.draw()
 
     def object_clicked(self, target):

@@ -27,6 +27,8 @@ class MatplotlibQTCanvas(FigureCanvas):
 class PlotWindow(QtWidgets.QMainWindow):
     """The plot window that holds a matplotlib figure"""
 
+    redraw = QtCore.Signal(bool)
+
     def __init__(self, manager, parent=None):
         super(PlotWindow, self).__init__(parent)
         self.setup_ui(manager)
@@ -240,7 +242,7 @@ def add_action(holder, parent, text, on_triggered=None, icon_name=None,
     holder"""
     action = QtWidgets.QAction(text, parent)
     if icon_name is not None:
-        action.setIcon(get_icon(icon_name, "black", 1.3))
+        action.setIcon(get_icon(icon_name))
     action.setCheckable(checkable)
     action.setChecked(checked)
     action.setVisible(visible)

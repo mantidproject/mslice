@@ -6,6 +6,8 @@ from mslice.util.qt.QtCore import Signal
 
 class QuickOptions(QtWidgets.QDialog):
 
+    ok_clicked = Signal(bool)
+
     def __init__(self):
         super(QuickOptions, self).__init__()
         self.layout = QtWidgets.QVBoxLayout()
@@ -17,11 +19,12 @@ class QuickOptions(QtWidgets.QDialog):
         self.button_row.addWidget(self.cancel_button)
         self.ok_button.clicked.connect(self.accept)
         self.cancel_button.clicked.connect(self.reject)
+        self.keep_open = QtWidgets.QCheckBox('Keep open')
 
 
 class QuickAxisOptions(QuickOptions):
 
-    def __init__(self, target, existing_values, grid, log):
+    def __init__(self, target, existing_values, grid, log, redraw_signal):
         super(QuickAxisOptions, self).__init__()
         self.setWindowTitle("Edit " + target)
         self.log = log
@@ -52,6 +55,16 @@ class QuickAxisOptions(QuickOptions):
             row4.addWidget(self.log_scale)
             self.layout.addLayout(row4)
         self.layout.addLayout(self.button_row)
+        self.layout.addWidget(self.keep_open)
+        self.ok_button.clicked.disconnect()
+        self.ok_button.clicked.connect(self._ok_clicked)
+        self.redraw_signal = redraw_signal
+
+    def _ok_clicked(self):
+        self.ok_clicked.emit(True)
+        self.redraw_signal.emit(True)
+        if not self.is_kept_open:
+            self.accept()
 
     @property
     def range_min(self):
@@ -65,6 +78,9 @@ class QuickAxisOptions(QuickOptions):
     def grid_state(self):
         return self.grid.checkState()
 
+    @property
+    def is_kept_open(self):
+        return self.keep_open.isChecked()
 
 class QuickLabelOptions(QuickOptions):
 

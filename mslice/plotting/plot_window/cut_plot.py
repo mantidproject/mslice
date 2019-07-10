@@ -92,9 +92,9 @@ class CutPlot(IPlot):
         if bounds['x_label'] < y < bounds['title']:
             if bounds['y_label'] < x:
                 if y < bounds['x_range']:
-                    quick_options('x_range', self, self.x_log)
+                    quick_options('x_range', self, self.x_log, redraw_signal=self.plot_window.redraw)
                 elif x < bounds['y_range']:
-                    quick_options('y_range', self, self.y_log)
+                    quick_options('y_range', self, self.y_log, redraw_signal=self.plot_window.redraw)
             self._canvas.draw()
 
     def object_clicked(self, target):
