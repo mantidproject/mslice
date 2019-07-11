@@ -4,7 +4,7 @@ from uuid import uuid4
 from six import string_types
 
 from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle
-from mantid.api import AnalysisDataService, Workspace
+from mantid.api import AnalysisDataService, AlgorithmManager, Workspace
 
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as MsliceWorkspace
@@ -31,6 +31,10 @@ def _parse_ws_names(args, kwargs):
 
     return (input_workspace, output_name, args, kwargs)
 
+def _alg_has_outputws(wrapped_alg):
+    alg = AlgorithmManager.create(wrapped_alg.__name__)
+    return any(['OutputWorkspace' in prop.name for prop in alg.getProperties()])
+
 def wrap_algorithm(algorithm):
     def alg_wrapper(*args, **kwargs):
 
@@ -45,12 +49,15 @@ def wrap_algorithm(algorithm):
             if isinstance(kwargs[ky], string_types) and '__MSL' not in kwargs[ky]:
                 kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
 
-        ads_name = '__MSL' + output_name if output_name else '__MSLTMP' + str(uuid4())[:8]
-        store = kwargs.pop('store', True)
-        if not store:
-            ads_name += '_HIDDEN'
+        if _alg_has_outputws(algorithm):
+            ads_name = '__MSL' + output_name if output_name else '__MSLTMP' + str(uuid4())[:8]
+            store = kwargs.pop('store', True)
+            if not store:
+                ads_name += '_HIDDEN'
+            result = algorithm(*args, OutputWorkspace=ads_name, **kwargs)
+        else:
+            result = algorithm(*args, **kwargs)
 
-        result = algorithm(*args, OutputWorkspace=ads_name, **kwargs)
         if isinstance(result, Workspace):
             if isinstance(input_workspace, MsliceWorkspace2D) and isinstance(result, type(input_workspace.raw_ws)):
                 result = get_workspace_handle(input_workspace).rewrap(result)

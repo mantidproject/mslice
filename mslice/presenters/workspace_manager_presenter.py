@@ -78,12 +78,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             # Default is PSD mode, if changed to a non-2D-workspace the GUI resets to the PSD ("Powder") tab
             self._psd = True
 
-    def _confirm_workspace_overwrite(self, ws_name):
-        if ws_name in get_visible_workspace_names():
-            return self._workspace_manager_view.confirm_overwrite_workspace()
-        else:
-            return True
-
     def _save_selected_workspace(self, extension=None):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
         if not selected_workspaces:
