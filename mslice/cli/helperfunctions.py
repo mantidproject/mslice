@@ -152,7 +152,8 @@ def is_cut(*args):
     """
     Checks if args[0] is a HistogramWorkspace
     """
-    if isinstance(args[0], HistogramWorkspace) and args[0]._raw_ws.getNumDims() == 1:
+    if isinstance(args[0], HistogramWorkspace) and \
+            sum([args[0].raw_ws.getDimension(i).getNBins() != 1 for i in range(args[0]._raw_ws.getNumDims())]) == 1:
         return True
     else:
         return False
