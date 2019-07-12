@@ -27,7 +27,7 @@ class MatplotlibQTCanvas(FigureCanvas):
 class PlotWindow(QtWidgets.QMainWindow):
     """The plot window that holds a matplotlib figure"""
 
-    redraw = QtCore.Signal(bool)
+    redraw = QtCore.Signal()
 
     def __init__(self, manager, parent=None):
         super(PlotWindow, self).__init__(parent)

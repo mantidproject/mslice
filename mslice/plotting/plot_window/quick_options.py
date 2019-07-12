@@ -6,7 +6,7 @@ from mslice.util.qt.QtCore import Signal
 
 class QuickOptions(QtWidgets.QDialog):
 
-    ok_clicked = Signal(bool)
+    ok_clicked = Signal()
 
     def __init__(self):
         super(QuickOptions, self).__init__()
@@ -61,8 +61,8 @@ class QuickAxisOptions(QuickOptions):
         self.redraw_signal = redraw_signal
 
     def _ok_clicked(self):
-        self.ok_clicked.emit(True)
-        self.redraw_signal.emit(True)
+        self.ok_clicked.emit()
+        self.redraw_signal.emit()
         if not self.is_kept_open:
             self.accept()
 

@@ -17,8 +17,9 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     yRangeEdited = Signal()
     xGridEdited = Signal()
     yGridEdited = Signal()
+    ok_clicked = Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
 
@@ -29,10 +30,17 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.lneXMax.editingFinished.connect(self.xRangeEdited)
         self.lneYMin.editingFinished.connect(self.yRangeEdited)
         self.lneYMax.editingFinished.connect(self.yRangeEdited)
-        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.accepted.connect(self._ok_clicked)
         self.buttonBox.rejected.connect(self.reject)
         self.chkXGrid.stateChanged.connect(self.xGridEdited)
         self.chkYGrid.stateChanged.connect(self.yGridEdited)
+        self.redraw_signal = redraw_signal
+
+    def _ok_clicked(self):
+        self.ok_clicked.emit()
+        self.redraw_signal.emit()
+        if not self.is_kept_open:
+            self.accept()
 
     @property
     def x_range(self):
@@ -110,14 +118,18 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     def y_grid(self, value):
         self.chkYGrid.setChecked(value)
 
+    @property
+    def is_kept_open(self):
+        return self.keep_open.isChecked()
+
 
 class SlicePlotOptions(PlotOptionsDialog):
 
     cRangeEdited = Signal()
     cLogEdited = Signal()
 
-    def __init__(self):
-        super(SlicePlotOptions, self).__init__()
+    def __init__(self, redraw_signal=None):
+        super(SlicePlotOptions, self).__init__(redraw_signal=redraw_signal)
         self.chkXLog.hide()
         self.chkYLog.hide()
         self.cut_options.hide()
@@ -160,8 +172,8 @@ class CutPlotOptions(PlotOptionsDialog):
     yLogEdited = Signal()
     showLegendsEdited = Signal()
 
-    def __init__(self):
-        super(CutPlotOptions, self).__init__()
+    def __init__(self, redraw_signal=None):
+        super(CutPlotOptions, self).__init__(redraw_signal=redraw_signal)
         self._line_widgets = []
         self.groupBox_4.hide()
 
