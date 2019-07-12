@@ -82,7 +82,7 @@ def Load(Filename, OutputWorkspace=None):
         else:
             raise RuntimeError('could not find the path %s' % Filename)
 
-    get_dataloader_presenter().load_workspace([Filename], merge)
+    get_dataloader_presenter().load_workspace([Filename], merge, force_overwrite=-1)
     name = ospath.splitext(ospath.basename(Filename))[0]
     if OutputWorkspace is not None:
         old_name = ospath.splitext(ospath.basename(Filename))[0]
