@@ -51,7 +51,7 @@ class QuickOptionsTest(unittest.TestCase):
     def test_axis(self, axis_options_mock):
         target = "x_axis"
         quick_options(target, self.model)
-        axis_options_mock.assert_called_once_with(target, self.model, None)
+        axis_options_mock.assert_called_once_with(target, self.model, None, None)
 
     @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
     def test_line_slice(self, qlo_mock):
@@ -101,14 +101,17 @@ class QuickOptionsTest(unittest.TestCase):
                              {'shown': True, 'color': '#0000ff', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': True, 'error_bar': False})
 
-    @patch.object(QuickAxisOptions, '__init__', lambda v, w, x, y, z: None)
-    @patch.object(QuickAxisOptions, 'exec_', lambda x: True)
+    @patch.object(QuickAxisOptions, '__init__', lambda u, v, w, x, y, z: None)
     @patch.object(QuickAxisOptions, 'range_min', PropertyMock(return_value='0'))
     @patch.object(QuickAxisOptions, 'range_max', PropertyMock(return_value='10'))
     @patch.object(QuickAxisOptions, 'grid_state', PropertyMock(return_value=True))
+    @patch.object(QuickAxisOptions, 'ok_clicked', PropertyMock())
+    @patch.object(QuickAxisOptions, 'show', PropertyMock())
     def test_axis_with_grid(self):
         self.target = 'y_range'
-        quick_options(self.target, self.model)
+        qopt = quick_options(self.target, self.model)
+        qopt.redraw_signal = PropertyMock()
+        qopt.ok_clicked.connect.call_args[0][0]()  # Call the connected signal directly
         self.assertEquals(self.model.y_grid, True)
 
 
@@ -131,16 +134,18 @@ class QuickAxisTest(unittest.TestCase):
 
     def test_accept(self, quick_axis_options_view):
         quick_axis_options_view.return_value = self.view
-        self.view.exec_ = MagicMock(return_value=True)
-        quick_axis_options('x_range', self.model)
+        qopt = quick_axis_options('x_range', self.model)
+        qopt.redraw_signal = PropertyMock()
+        qopt.ok_clicked.connect.call_args[0][0]()  # Call the connected signal directly
         self.assertEquals(self.model.x_range, (5, 10))
         self.assertEquals(self.model.x_grid, True)
 
     def test_reject(self, quick_axis_options_view):
         quick_axis_options_view.return_value = self.view
-        self.view.exec_ = MagicMock(return_value=False)
         self.view.set_range = Mock()
-        quick_axis_options('x_range', self.model)
+        qopt = quick_axis_options('x_range', self.model)
+        qopt.redraw_signal = PropertyMock()
+        qopt.reject()
         self.view.set_range.assert_not_called()
         self.view.set_grid.assert_not_called()
 
@@ -150,7 +155,9 @@ class QuickAxisTest(unittest.TestCase):
         colorbar_log = PropertyMock()
         type(self.model).colorbar_log = colorbar_log
         self.view.log_scale.isChecked = Mock()
-        quick_axis_options('colorbar_range', self.model, True)
+        qopt = quick_axis_options('colorbar_range', self.model, True)
+        qopt.redraw_signal = PropertyMock()
+        qopt.ok_clicked.connect.call_args[0][0]()  # Call the connected signal directly
         self.view.log_scale.isChecked.assert_called_once()
         colorbar_log.assert_called_once()
 

@@ -8,7 +8,7 @@ def quick_options(target, model, has_logarithmic=None, redraw_signal=None):
     if isinstance(target, text.Text):
         quick_label_options(target)
     elif isinstance(target, string_types):
-        quick_axis_options(target, model, has_logarithmic, redraw_signal)
+        return quick_axis_options(target, model, has_logarithmic, redraw_signal)
     else:
         quick_line_options(target, model)
 
@@ -26,6 +26,7 @@ def quick_axis_options(target, model, has_logarithmic=None, redraw_signal=None):
     view = QuickAxisOptions(target, getattr(model, target), grid, has_logarithmic, redraw_signal)
     view.ok_clicked.connect(lambda: _set_axis_options(view, target, model, has_logarithmic, grid))
     view.show()
+    return view
 
 
 def quick_line_options(target, model):
@@ -40,6 +41,7 @@ def _run_quick_options(view, update_model_function, *args):
 
 
 def _set_axis_options(view, target, model, has_logarithmic, grid):
+    print('setting axis options')
     range = (float(view.range_min), float(view.range_max))
     setattr(model, target, range)
     if has_logarithmic is not None:
