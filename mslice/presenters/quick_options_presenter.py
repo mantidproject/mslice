@@ -41,7 +41,6 @@ def _run_quick_options(view, update_model_function, *args):
 
 
 def _set_axis_options(view, target, model, has_logarithmic, grid):
-    print('setting axis options')
     range = (float(view.range_min), float(view.range_max))
     setattr(model, target, range)
     if has_logarithmic is not None:
