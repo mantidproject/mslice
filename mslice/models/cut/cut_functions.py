@@ -13,11 +13,12 @@ def output_workspace_name(selected_workspace, integration_start, integration_end
         integration_end) + ")"
 
 
-def compute_cut(workspace, cut_axis, integration_axis, is_norm, store=True):
+def compute_cut(workspace, cut_axis, integration_axis, is_norm, algo='Rebin', store=True):
     out_ws_name = output_workspace_name(workspace.name, integration_axis.start, integration_axis.end)
     cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, store=store, InputWorkspace=workspace,
                                 CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
-                                EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=is_norm)
+                                EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=is_norm,
+                                Algorithm=algo)
     cut.parent = workspace.name
     return cut
 

@@ -1,8 +1,9 @@
+import numpy as np
 
 from mantid.api import PythonAlgorithm, WorkspaceProperty
-from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator
+from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator, StringListValidator
 from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, \
-    ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs
+    ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs, Integration, Rebin, Transpose
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
@@ -23,6 +24,7 @@ class Cut(PythonAlgorithm):
         self.declareProperty('EMode', 'Direct', StringMandatoryValidator())
         self.declareProperty('PSD', False)
         self.declareProperty('NormToOne', False)
+        self.declareProperty('Algorithm', 'Rebin', StringListValidator(['Rebin', 'Integration']))
         self.declareProperty(WorkspaceProperty('OutputWorkspace', '', direction=Direction.Output))
 
     def PyExec(self):
@@ -36,20 +38,21 @@ class Cut(PythonAlgorithm):
         e_mode = self.getProperty('EMode').value
         PSD = self.getProperty('PSD').value
         norm_to_one = self.getProperty('NormToOne').value
-        cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one)
+        algo = self.getProperty('Algorithm').value
+        cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one, algo)
         if 'DeltaE' in cut_axis.units and cut_axis.scale != 1.:
             cut = TransformMD(InputWorkspace=cut, Scaling=[EnergyUnits(cut_axis.e_unit).factor_from_meV()])
-        attribute_to_log({'axes':[cut_axis, int_axis], 'norm_to_one':norm_to_one}, cut)
+        attribute_to_log({'axes':[cut_axis, int_axis], 'norm_to_one':norm_to_one, 'algorithm': algo}, cut)
         self.setProperty('OutputWorkspace', cut)
 
     def category(self):
         return 'MSlice'
 
-def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_norm):
+def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_norm, algo):
     if PSD:
         cut = _compute_cut_PSD(selected_workspace, cut_axis, integration_axis)
     else:
-        cut = _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, e_mode)
+        cut = _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, e_mode, algo)
     if is_norm:
         normalize_workspace(cut)
     return cut
@@ -68,27 +71,27 @@ def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis):
                  AlignedDim0=cut_binning, StoreInADS=False)
 
 
-def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
+def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, algo):
     cut_binning = " ,".join(map(str, (cut_axis.start_meV, cut_axis.step_meV, cut_axis.end_meV)))
     int_binning = " ,".join(map(str, (integration_axis.start_meV, integration_axis.end_meV - integration_axis.start_meV,
                                       integration_axis.end_meV)))
-    idx = 0
+    idx = 0 if 'Rebin' in algo else 1
     unit = 'DeltaE'
     name = 'EnergyTransfer'
     if is_momentum(cut_axis.units):
-        ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace)
+        ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace, algo)
         idx = 1
         unit = 'MomentumTransfer'
         name = '|Q|'
     elif is_twotheta(cut_axis.units):
-        ws_out = _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace)
-        idx = 1
+        ws_out = _cut_nonPSD_theta(int_binning, cut_binning, selected_workspace, algo)
+        idx = 1 if 'Rebin' in algo else 0
         unit = 'Degrees'
         name = 'Theta'
     elif integration_axis.units == '|Q|':
-        ws_out = _cut_nonPSD_momentum(int_binning, cut_binning, emode, selected_workspace)
+        ws_out = _cut_nonPSD_momentum(int_binning, cut_binning, emode, selected_workspace, algo)
     else:
-        ws_out = _cut_nonPSD_theta(int_binning, cut_binning, selected_workspace)
+        ws_out = _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace, algo)
     xdim = ws_out.getDimension(idx)
     extents = " ,".join(map(str, (xdim.getMinimum(), xdim.getMaximum())))
 
@@ -113,21 +116,48 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode):
     return ws_out
 
 
-def _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace):
+def _cut_nonPSD_theta(ax1_binning, ax2_binning, selected_workspace, algo):
 
-    converted_nonpsd = ConvertSpectrumAxis( OutputWorkspace='__convToTheta', InputWorkspace=selected_workspace,
-                                            Target='theta', StoreInADS=False)
+    converted_nonpsd = ConvertSpectrumAxis(InputWorkspace=selected_workspace, Target='theta', StoreInADS=False)
 
-    ws_out = Rebin2D(InputWorkspace=converted_nonpsd, Axis1Binning=int_binning, Axis2Binning=cut_binning,
-                     StoreInADS=False)
+    if 'Integration' in algo:
+        ax1 = [float(x1) for x1 in ax1_binning.split(',')]
+        ax2 = [float(x2) for x2 in ax2_binning.split(',')]
+        if np.abs((ax1[2]-ax1[0]) - ax1[1]) < 0.0001:
+            ws_out = Integration(InputWorkspace=converted_nonpsd, RangeLower=ax1[0], RangeUpper=ax1[2], EnableLogging=False)
+            ws_out = Transpose(InputWorkspace=ws_out, EnableLogging=False)
+            ws_out = Rebin(InputWorkspace=ws_out, Params=ax2_binning, EnableLogging=False)
+        else:
+            ws_out = Rebin(InputWorkspace=converted_nonpsd, Params=ax1_binning, EnableLogging=False)
+            ws_out = Transpose(InputWorkspace=ws_out, EnableLogging=False)
+            ws_out = Integration(InputWorkspace=ws_out, RangeLower=ax2[0], RangeUpper=ax2[2], EnableLogging=False)
+    else:
+        ws_out = Rebin2D(InputWorkspace=converted_nonpsd, Axis1Binning=ax1_binning, Axis2Binning=ax2_binning,
+                         StoreInADS=False, UseFractionalArea=True, EnableLogging=False)
     return ws_out
 
-
-def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace):
+def _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace):
     if 'Indirect' in emode and selected_workspace.run().hasProperty('Efix'):
         ws_out = SofQW3(InputWorkspace=selected_workspace, QAxisBinning=q_binning, EAxisBinning=e_binning, EMode=emode,
-                        StoreInADS=False, EFixed=selected_workspace.run().getProperty('Efix').value)
+                        StoreInADS=False, EFixed=selected_workspace.run().getProperty('Efix').value, EnableLogging=False)
     else:
         ws_out = SofQW3(InputWorkspace=selected_workspace, OutputWorkspace='out', EMode=emode, QAxisBinning=q_binning,
-                        EAxisBinning=e_binning, StoreInADS=False)
+                        EAxisBinning=e_binning, StoreInADS=False, EnableLogging=False)
+    return ws_out
+
+def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace, algo):
+    if 'Integration' in algo:
+        qbins = [float(q) for q in q_binning.split(',')]
+        ebins = [float(e) for e in e_binning.split(',')]
+        if np.abs((qbins[2]-qbins[0]) - qbins[1]) < 0.0001:
+            qbinstr = ','.join(map(str, [qbins[0], (qbins[2]-qbins[0])/100., qbins[2]]))
+            ws_out = _cut_indirect_or_direct(qbinstr, e_binning, emode, selected_workspace)
+            ws_out = Transpose(InputWorkspace=ws_out, EnableLogging=False)
+            ws_out = Integration(InputWorkspace=ws_out, RangeLower=qbins[0], RangeUpper=qbins[2], EnableLogging=False)
+        else:
+            ebinstr = ','.join(map(str, [ebins[0], (ebins[2]-ebins[0])/100., ebins[2]]))
+            ws_out = _cut_indirect_or_direct(q_binning, ebinstr, emode, selected_workspace)
+            ws_out = Integration(InputWorkspace=ws_out, RangeLower=ebins[0], RangeUpper=ebins[2], EnableLogging=False)
+    else:
+        ws_out = _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace)
     return ws_out

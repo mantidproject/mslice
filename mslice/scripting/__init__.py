@@ -45,6 +45,17 @@ def generate_script_lines(raw_ws, workspace_name):
     ws_name = workspace_name.replace(".", "_")
     alg_history = raw_ws.getHistory().getAlgorithmHistories()
     existing_ws_refs = []
+
+    # Loop back from end to see if we have a Save / Load pair and truncate at the load if so
+    prev_algo = alg_history[-1]
+    for idx, algorithm in reversed(list(enumerate(alg_history[:-1]))):
+        new_algo = algorithm
+        if 'Save' in new_algo.name() and 'Load' in prev_algo.name():
+            alg_history = alg_history[idx+1:]
+            break
+        else:
+            prev_algo = new_algo
+
     for algorithm in alg_history:
         alg_name = algorithm.name()
         kwargs, output_ws = get_algorithm_kwargs(algorithm, existing_ws_refs)

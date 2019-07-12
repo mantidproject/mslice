@@ -267,3 +267,22 @@ class CutWidgetPresenterTest(unittest.TestCase):
         cut_widget_presenter.set_energy_default("meV")
         self.view.set_energy_units.assert_called_once()
         self.view.set_energy_units_default.assert_called_once()
+
+    @patch('mslice.presenters.cut_widget_presenter.Cut')
+    def test_cut_integration_algorithm(self, mock_cut_obj):
+        cut_widget_presenter = CutWidgetPresenter(self.view)
+        cut_widget_presenter.register_master(self.main_presenter)
+        cut_plotter_presenter = mock.MagicMock()
+        cut_plotter_presenter.run_cut = mock.Mock()
+        cut_widget_presenter.set_cut_plotter_presenter(cut_plotter_presenter)
+        integrated_axis, integration_start, integration_end, width = ('integrated axis', 3, 8, "")
+        intensity_start, intensity_end, is_norm, workspace = (11, 30, True, 'ws1')
+        axis = Axis("units", "0", "100", "1")
+        integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
+        self._create_cut(axis, integration_axis, integration_start, integration_end, width,
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+        self.main_presenter.get_cut_algorithm = mock.Mock(return_value='Integration')
+        cut_widget_presenter.notify(Command.Plot)
+        self.view.display_error.assert_not_called()
+        mock_cut_obj.assert_called_once_with(axis, integration_axis, intensity_start, intensity_end,
+                                             is_norm, width, 'Integration')

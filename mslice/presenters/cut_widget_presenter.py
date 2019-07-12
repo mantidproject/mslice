@@ -95,7 +95,8 @@ class CutWidgetPresenter(PresenterUtility):
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
         width = self._cut_view.get_integration_width()
-        return cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width
+        algo = self._main_presenter.get_cut_algorithm() if self._main_presenter is not None else 'Rebin'
+        return cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width, algo
 
     def _set_minimum_step(self, workspace, axis):
         """Gets axes limits and then sets the minimumStep dictionary with those values"""
