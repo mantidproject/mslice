@@ -82,12 +82,12 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, a
         ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace, algo)
         idx = 1
         unit = 'MomentumTransfer'
-        name = '|Q|'
+        name = '__MSL_|Q|'
     elif is_twotheta(cut_axis.units):
         ws_out = _cut_nonPSD_theta(int_binning, cut_binning, selected_workspace, algo)
         idx = 1 if 'Rebin' in algo else 0
         unit = 'Degrees'
-        name = 'Theta'
+        name = '__MSL_Theta'
     elif integration_axis.units == '|Q|':
         ws_out = _cut_nonPSD_momentum(int_binning, cut_binning, emode, selected_workspace, algo)
     else:
