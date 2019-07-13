@@ -77,7 +77,7 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, a
                                       integration_axis.end_meV)))
     idx = 0 if 'Rebin' in algo else 1
     unit = 'DeltaE'
-    name = 'EnergyTransfer'
+    name = '__MSL_EnergyTransfer'
     if is_momentum(cut_axis.units):
         ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace, algo)
         idx = 1
