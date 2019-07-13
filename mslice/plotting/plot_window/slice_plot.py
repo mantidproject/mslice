@@ -109,6 +109,7 @@ class SlicePlot(IPlot):
             partial(self.toggle_overplot_line, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
         plot_window.action_gen_script.triggered.connect(self.generate_script)
+        plot_window.action_gen_script_clipboard.triggered.connect(lambda: self.generate_script(clipboard=True))
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()
@@ -433,9 +434,9 @@ class SlicePlot(IPlot):
     def update_workspaces(self):
         self._slice_plotter_presenter.update_displayed_workspaces()
 
-    def generate_script(self):
+    def generate_script(self, clipboard=False):
         try:
-            generate_script(self.ws_name, None, self, self.plot_window)
+            generate_script(self.ws_name, None, self, self.plot_window, clipboard)
         except Exception as e:
             self.plot_window.display_error(e.message)
 

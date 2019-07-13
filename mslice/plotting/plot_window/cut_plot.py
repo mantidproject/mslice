@@ -63,6 +63,7 @@ class CutPlot(IPlot):
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
         plot_window.action_gen_script.triggered.connect(self.generate_script)
+        plot_window.action_gen_script_clipboard.triggered.connect(lambda: self.generate_script(clipboard=True))
         plot_window.action_waterfall.triggered.connect(self.toggle_waterfall)
         plot_window.waterfall_x_edt.editingFinished.connect(self.toggle_waterfall)
         plot_window.waterfall_y_edt.editingFinished.connect(self.toggle_waterfall)
@@ -347,9 +348,9 @@ class CutPlot(IPlot):
         if new_line and num_lines > 1:
             self.toggle_waterfall()
 
-    def generate_script(self):
+    def generate_script(self, clipboard=False):
         try:
-            generate_script(self.ws_name, None, self, self.plot_window)
+            generate_script(self.ws_name, None, self, self.plot_window, clipboard)
         except Exception as e:
             # We don't want any exceptions raised in the GUI as could crash the GUI
             self.plot_window.display_error(e.message)

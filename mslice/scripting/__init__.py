@@ -5,22 +5,25 @@ from mslice.app.presenters import get_cut_plotter_presenter
 from six import string_types
 
 
-def generate_script(ws_name, filename=None, plot_handler=None, window=None):
-    if filename is None:
+def generate_script(ws_name, filename=None, plot_handler=None, window=None, clipboard=False):
+    if filename is None and not clipboard:
         path = QtWidgets.QFileDialog.getSaveFileName(window, 'Save File')
         if isinstance(path, tuple):
             path = path[0]
         if not path:
             return
         filename = path + '{}'.format('' if path.endswith('.py') else '.py')
-    else:
+    elif not clipboard:
         filename = filename + '{}'.format('' if filename.endswith('.py') else '.py')
 
     ax = window.canvas.figure.axes[0]
     script_lines = preprocess_lines(ws_name, plot_handler, ax)
     script_lines = add_plot_statements(script_lines, plot_handler, ax)
-    with open(filename, 'w') as generated_script:
-        generated_script.writelines(script_lines)
+    if clipboard:
+        QtWidgets.QApplication.clipboard().setText(''.join(script_lines))
+    else:
+        with open(filename, 'w') as generated_script:
+            generated_script.writelines(script_lines)
 
 
 def preprocess_lines(ws_name, plot_handler, ax):
