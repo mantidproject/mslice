@@ -37,6 +37,8 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
 
         self._view.cLogEdited.connect(self._set_colorbar_log)
         self._view.cRangeEdited.connect(self._set_c_range)
+        self._view.ok_clicked.connect(self.get_new_config)
+        self._view.show()
 
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_grid', 'y_grid',
@@ -45,16 +47,12 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
             setattr(self._view, p, getattr(self._model, p))
 
     def get_new_config(self):
-        dialog_accepted = self._view.exec_()
-        if not dialog_accepted:
-            return None
         if self._color_config['modified']:
             self._model.change_axis_scale(self._color_config['c_range'], self._color_config['log'])
         for key, value in list(self._modified_values.items()):
             setattr(self._model, key, value)
         self._model.x_range = self._xy_config['x_range']
         self._model.y_range = self._xy_config['y_range']
-        return True
 
     def _set_c_range(self):
         self._color_config['c_range'] = self._view.colorbar_range
@@ -78,6 +76,9 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         line_options = self._model.get_all_line_options()
         self._view.set_line_options(line_options)
 
+        self._view.ok_clicked.connect(self.get_new_config)
+        self._view.show()
+
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log',
                       'x_grid', 'y_grid', 'show_legends']
@@ -85,13 +86,9 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
             setattr(self._view, p, getattr(self._model, p))
 
     def get_new_config(self):
-        dialog_accepted = self._view.exec_()
-        if not dialog_accepted:
-            return None
         if self._xy_config['modified']:
             self._model.change_axis_scale(self._xy_config)
         for key, value in list(self._modified_values.items()):
             setattr(self._model, key, value)
         line_options = self._view.get_line_options()
         self._model.set_all_line_options(line_options)
-        return True

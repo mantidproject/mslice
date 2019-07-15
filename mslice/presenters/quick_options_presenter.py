@@ -3,12 +3,12 @@ from matplotlib import text
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions, QuickError
 
 
-def quick_options(target, model, has_logarithmic=None):
+def quick_options(target, model, has_logarithmic=None, redraw_signal=None):
     """Find which quick_options to use based on type of target"""
     if isinstance(target, text.Text):
         quick_label_options(target)
     elif isinstance(target, string_types):
-        quick_axis_options(target, model, has_logarithmic)
+        return quick_axis_options(target, model, has_logarithmic, redraw_signal)
     else:
         quick_line_options(target, model)
 
@@ -18,13 +18,15 @@ def quick_label_options(target):
     _run_quick_options(view, _set_label, target)
 
 
-def quick_axis_options(target, model, has_logarithmic=None):
+def quick_axis_options(target, model, has_logarithmic=None, redraw_signal=None):
     if target[:1] == 'x' or target[:1] == 'y':
         grid = getattr(model, target[:-5] + 'grid')
     else:
         grid = None
-    view = QuickAxisOptions(target, getattr(model, target), grid, has_logarithmic)
-    _run_quick_options(view, _set_axis_options, target, model, has_logarithmic, grid)
+    view = QuickAxisOptions(target, getattr(model, target), grid, has_logarithmic, redraw_signal)
+    view.ok_clicked.connect(lambda: _set_axis_options(view, target, model, has_logarithmic, grid))
+    view.show()
+    return view
 
 
 def quick_line_options(target, model):

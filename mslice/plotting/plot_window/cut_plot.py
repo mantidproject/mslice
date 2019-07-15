@@ -55,6 +55,7 @@ class CutPlot(IPlot):
         }
 
     def setup_connections(self, plot_window):
+        plot_window.redraw.connect(self._canvas.draw)
         plot_window.menu_intensity.setDisabled(True)
         plot_window.menu_information.setDisabled(True)
         plot_window.action_interactive_cuts.setVisible(False)
@@ -83,18 +84,16 @@ class CutPlot(IPlot):
         self._canvas.figure.clf()
 
     def plot_options(self):
-        new_config = CutPlotOptionsPresenter(CutPlotOptions(), self).get_new_config()
-        if new_config:
-            self._canvas.draw()
+        CutPlotOptionsPresenter(CutPlotOptions(redraw_signal=self.plot_window.redraw), self)
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
         if bounds['x_label'] < y < bounds['title']:
             if bounds['y_label'] < x:
                 if y < bounds['x_range']:
-                    quick_options('x_range', self, self.x_log)
+                    quick_options('x_range', self, self.x_log, redraw_signal=self.plot_window.redraw)
                 elif x < bounds['y_range']:
-                    quick_options('y_range', self, self.y_log)
+                    quick_options('y_range', self, self.y_log, redraw_signal=self.plot_window.redraw)
             self._canvas.draw()
 
     def object_clicked(self, target):
