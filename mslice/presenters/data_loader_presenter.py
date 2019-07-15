@@ -17,11 +17,12 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         self._main_presenter = None
         self._EfCache = None
 
-    def load_workspace(self, file_paths, merge=False):
+    def load_workspace(self, file_paths, merge=False, force_overwrite=False):
         """
         Loads one or more workspaces.
         :param file_paths: list of paths to files to load
         :param merge: boolean - whether to combine files into a single workspace
+        :param force_overwrite: int - 0: asks for overwrite, 1 always overwrite, -1 never overwrite
         """
         with show_busy(self._view):
             ws_names = [os.path.splitext(os.path.basename(base))[0] for base in file_paths]
@@ -31,15 +32,15 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                     return
                 ws_names = [ws_names[0] + '_merged']
                 file_paths = ['+'.join(file_paths)]
-            self._load_ws(file_paths, ws_names)
+            self._load_ws(file_paths, ws_names, force_overwrite)
 
-    def _load_ws(self, file_paths, ws_names):
+    def _load_ws(self, file_paths, ws_names, force_overwrite):
         not_loaded = []
         not_opened = []
         multi = len(ws_names) > 1
         allChecked = False
         for i, ws_name in enumerate(ws_names):
-            if not self._confirm_workspace_overwrite(ws_name):
+            if not self._confirm_workspace_overwrite(ws_name, force_overwrite):
                 not_loaded.append(ws_name)
             else:
                 try:
@@ -78,9 +79,12 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
             get_limits(ws_name, 'DeltaE')  # This is call needed to process the limits.
             return allChecked
 
-    def _confirm_workspace_overwrite(self, ws_name):
+    def _confirm_workspace_overwrite(self, ws_name, force_overwrite):
         if ws_name in get_visible_workspace_names():
-            return self._view.confirm_overwrite_workspace()
+            if force_overwrite == 0:
+                return self._view.confirm_overwrite_workspace()
+            else:
+                return force_overwrite == 1
         else:
             return True
 

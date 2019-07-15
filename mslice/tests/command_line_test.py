@@ -73,7 +73,7 @@ class CommandLineTest(unittest.TestCase):
         path = 'made_up_path'
         Load(path)
 
-        get_dlp().load_workspace.assert_called_once_with([path], False)
+        get_dlp().load_workspace.assert_called_once_with([path], False, force_overwrite=-1)
         get_workspace_mock.assert_called_with(path)
 
     @mock.patch('mslice.cli._mslice_commands.get_workspace_handle')
@@ -85,7 +85,7 @@ class CommandLineTest(unittest.TestCase):
         ospath_mock.splitext.return_value = [path]
         Load(path)
 
-        get_dlp().load_workspace.assert_called_once_with([path], True)
+        get_dlp().load_workspace.assert_called_once_with([path], True, force_overwrite=-1)
         get_workspace_mock.assert_called_with(path)
 
     @mock.patch('mslice.app.presenters.get_powder_presenter')
