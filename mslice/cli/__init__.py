@@ -12,11 +12,13 @@ from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.app import in_mantid as is_in_mantid
 
 # This is not compatible with mslice as we use a separate
 # global figure manager see _mslice_commands.Show
 del show  # noqa: F821
 
+in_mantid = is_in_mantid()
 
 # MSlice Matplotlib Projection
 class MSliceAxes(Axes):
@@ -86,6 +88,9 @@ class MSliceAxes(Axes):
             if y_offset is not None:
                 plot_handler.waterfall_y = y_offset
             plot_handler.toggle_waterfall()
+            global in_mantid
+            if in_mantid:
+                plot_handler.plot_window.action_waterfall.setVisible(False)
         else:
             raise RuntimeError('Waterfall plots may only be applied to cuts')
 
