@@ -47,6 +47,8 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
                 path += sel[-5:-1]
             ext = path[path.rfind('.'):]
             return os.path.dirname(path), os.path.basename(path), ext
+        else:
+            return None, None, None
 
 
 def save_nexus(workspace, path, is_slice):
