@@ -89,4 +89,5 @@ def add_to_ads(workspaces):
     except TypeError:
         workspaces = [workspaces]
     for workspace in workspaces:
-        AnalysisDataService.Instance().addOrReplace(workspace.name, workspace.raw_ws)
+        startid = (5 if workspace.name.startswith('__mat') else 2) if workspace.name.startswith('__') else 0
+        AnalysisDataService.Instance().addOrReplace(workspace.name[startid:], workspace.raw_ws)
