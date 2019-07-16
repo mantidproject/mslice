@@ -11,6 +11,7 @@ from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_
                                         _update_overplot_checklist, _update_legend)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.util.qt.qapp import call_in_qapp_thread
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 # This is not compatible with mslice as we use a separate
@@ -75,6 +76,7 @@ class MSliceAxes(Axes):
             elif axis == 'y':
                 plot_handler.manager._ygrid = b
 
+    @call_in_qapp_thread
     def set_waterfall(self, isWaterfall=True, x_offset=None, y_offset=None):
         """ Change the plot to/from a waterfall """
         from mslice.plotting.plot_window.cut_plot import CutPlot

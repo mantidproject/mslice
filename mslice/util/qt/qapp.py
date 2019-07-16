@@ -7,6 +7,7 @@
 #  This file is part of the mantid workbench.
 #
 from __future__ import (absolute_import, unicode_literals)
+from functools import wraps
 import sys
 
 from mslice.util.qt.QtCore import Qt, QMetaObject, QObject, QThread, Slot
@@ -74,6 +75,18 @@ class QAppThreadCall(QObject):
         self._result = None
         self._exc_info = None
 
+
+def call_in_qapp_thread(func):
+    """
+    Decorator to force a call onto the QApplication thread
+    :param func: The function to decorate
+    :return The wrapped function
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return QAppThreadCall(func)(*args, **kwargs)
+
+    return wrapper
 
 def create_qapp_if_required():
     """
