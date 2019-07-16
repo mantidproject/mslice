@@ -4,7 +4,7 @@ import weakref
 import six
 from mslice.util.qt.QtCore import Qt
 from mslice.util.qt import QtCore, QtGui, QtWidgets
-from mslice.util.qt.qapp import create_qapp_if_required, QAppThreadCall
+from mslice.util.qt.qapp import create_qapp_if_required, call_in_qapp_thread
 from mslice.models.workspacemanager.file_io import get_save_directory
 from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
 from mslice.plotting.plot_window.plot_window import PlotWindow
@@ -51,12 +51,11 @@ class PlotFigureManagerQT(QtCore.QObject):
 
         self.window.raise_()
 
+    @call_in_qapp_thread
     def show(self):
-        def _show():
-            self.window.show()
-            self.window.activateWindow()
-            self.window.raise_()
-        QAppThreadCall(_show)()
+        self.window.show()
+        self.window.activateWindow()
+        self.window.raise_()
 
     def window_closing(self):
         if self.plot_handler is not None:
