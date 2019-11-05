@@ -5,6 +5,7 @@ from .workspace_mixin import WorkspaceMixin
 from .helperfunctions import attribute_from_log, attribute_to_log
 
 from mantid.api import IMDHistoWorkspace
+from mantid.simpleapi import DeleteWorkspace
 
 
 class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
@@ -30,6 +31,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         new_ws.axes = self.axes
         return new_ws
 
+
     def convert_to_matrix(self):
         from mslice.util.mantid.mantid_algorithms import ConvertMDHistoToMatrixWorkspace, Scale, ConvertToDistribution
         ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization',
@@ -50,3 +52,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
 
     def remove_saved_attributes(self):
         attribute_from_log(None, self.raw_ws)
+
+    def __del__(self):
+        if hasattr(self, '_raw_ws') and self._raw_ws.name().endswith('_HIDDEN'):
+            DeleteWorkspace(self._raw_ws)
