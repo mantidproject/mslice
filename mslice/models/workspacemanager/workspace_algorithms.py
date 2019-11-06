@@ -18,7 +18,7 @@ from mantid.api import MatrixWorkspace
 from mslice.models.axis import Axis
 
 from mslice.util.mantid.algorithm_wrapper import add_to_ads
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name, delete_workspace
 from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
@@ -160,14 +160,18 @@ def _get_theta_for_limits_event(ws):
 
 def load(filename, output_workspace):
     workspace = Load(OutputWorkspace=output_workspace, Filename=filename)
-    workspace.e_mode = get_EMode(workspace.raw_ws)
-    if workspace.e_mode == 'Indirect':
-        processEfixed(workspace)
-    if (isinstance(workspace.raw_ws, MatrixWorkspace)
-            and WorkspaceUnitValidator("DeltaE_inWavenumber").isValid(workspace.raw_ws)) == '':
-        workspace = ConvertUnits(InputWorkspace=workspace, Target="DeltaE", EMode=workspace.e_mode,
-                                 OutputWorkspace=workspace.name)
-    _processLoadedWSLimits(workspace)
+    try:
+        workspace.e_mode = get_EMode(workspace.raw_ws)
+        if workspace.e_mode == 'Indirect':
+            processEfixed(workspace)
+        if (isinstance(workspace.raw_ws, MatrixWorkspace)
+                and WorkspaceUnitValidator("DeltaE_inWavenumber").isValid(workspace.raw_ws)) == '':
+            workspace = ConvertUnits(InputWorkspace=workspace, Target="DeltaE", EMode=workspace.e_mode,
+                                     OutputWorkspace=workspace.name)
+        _processLoadedWSLimits(workspace)
+    except: # noqa: E722
+        delete_workspace(workspace)
+        raise
     return workspace
 
 
