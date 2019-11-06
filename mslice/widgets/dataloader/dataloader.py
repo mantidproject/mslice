@@ -26,6 +26,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.directory = QDir(os.path.expanduser('~'))
         self._sort_column = 0
         self.reload_model()
+        self.table_view.horizontalHeader().swapSections(1, 3)  # Swap the type and date modified columns
         self.txtpath.setText(self.directory.absolutePath())
         self._presenter = DataLoaderPresenter(self)
         self.btnload.setEnabled(False)
@@ -81,7 +82,6 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.table_view.setColumnWidth(3, 140)    # Show date modified
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.sort_files(self._sort_column)
-        self.table_view.horizontalHeader().swapSections(1, 3)  # Swap the type and date modified columns
 
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
