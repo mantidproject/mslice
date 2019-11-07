@@ -4,6 +4,7 @@ from .workspace_mixin import WorkspaceMixin
 from .helperfunctions import attribute_from_log, attribute_to_log
 
 from mantid.api import MatrixWorkspace
+from mantid.simpleapi import DeleteWorkspace
 
 
 class Workspace(WorkspaceMixin, WorkspaceBase):
@@ -44,3 +45,7 @@ class Workspace(WorkspaceMixin, WorkspaceBase):
 
     def remove_saved_attributes(self):
         attribute_from_log(None, self.raw_ws)
+
+    def __del__(self):
+        if hasattr(self, '_raw_ws') and self._raw_ws.name().endswith('_HIDDEN'):
+            DeleteWorkspace(self._raw_ws)
