@@ -71,7 +71,7 @@ class SlicePlotterPresenter(PresenterUtility):
     def show_dynamical_susceptibility_magnetic(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]
         plot_cached_slice(slice_cache, slice_cache.chi_magnetic)
-        set_colorbar_label('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$')
+        set_colorbar_label('chi\'\'(Q,E) |F(Q)|$^2$ ($mu_B$ $meV^{-1} sr^{-1} f.u.^{-1}$)')
 
     def show_d2sigma(self, workspace_name):
         slice_cache = self._slice_cache[workspace_name]

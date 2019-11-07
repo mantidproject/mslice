@@ -30,7 +30,7 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 
         filter = "Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat)"
         if save_as_image:
-            filter += ";; Image (*.png);; PDF (*.pdf)"
+            filter = "Image (*.png);; PDF (*.pdf);; " + filter
         file_dialog.setNameFilter(filter)
 
         if default_ext:

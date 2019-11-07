@@ -41,7 +41,7 @@ class FileIOTest(unittest.TestCase):
 
         directory, file_name, extension = get_save_directory(save_as_image=True)
         self.mock_dialog.setNameFilter.assert_called_once_with(
-            "Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat);; Image (*.png);; PDF (*.pdf)")
+            "Image (*.png);; PDF (*.pdf);; Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat)")
         self.mock_dialog.exec_.assert_called_once()
         self.assertEqual(directory, self.tempdir)
         self.assertEqual(file_name, 'some_file.png')
