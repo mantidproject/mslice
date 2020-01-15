@@ -7,6 +7,7 @@ from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_n
     _intensity_to_workspace, _function_to_intensity, _rescale_energy_cut_plot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
+from mslice.util.compat import legend_set_draggable
 from mslice.util.mantid.mantid_algorithms import Transpose
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mslice.models.cut.cut import Cut
@@ -61,7 +62,7 @@ def errorbar(axes, workspace, *args, **kwargs):
     intensity_min, intensity_max = axes.get_ylim()
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
         leg = axes.legend(fontsize='medium')
-        leg.draggable()
+        legend_set_draggable(leg, True)
     axes.set_xlabel(get_display_name(cut_axis), picker=CUT_PICKER_TOL_PTS)
     axes.set_ylabel(CUT_INTENSITY_LABEL, picker=CUT_PICKER_TOL_PTS)
     if not plot_over:

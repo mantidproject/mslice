@@ -2,6 +2,7 @@ from mock import MagicMock, patch, PropertyMock
 import unittest
 
 from matplotlib import colors
+from matplotlib.legend import Legend
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 
 
@@ -91,6 +92,13 @@ class SlicePlotTest(unittest.TestCase):
         self.slice_plot.update_legend()
 
         self.axes.legend.assert_called_once()
-        self.axes.legend().draggable.assert_called_once()
+        if hasattr(Legend, "set_draggable"):
+            self.axes.legend().set_draggable.assert_called_once()
+        else:
+            self.axes.legend().draggable.assert_called_once()
 
-        self.assertEquals(self.slice_plot._canvas.manager.plot_handler.icut.rect.ax, self.axes)
+        self.assertEqual(self.slice_plot._canvas.manager.plot_handler.icut.rect.ax, self.axes)
+
+
+if __name__ == '__main__':
+    unittest.main()

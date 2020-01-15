@@ -14,6 +14,7 @@ from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 from mslice.scripting import generate_script
+from mslice.util.compat import legend_set_draggable
 
 
 class SlicePlot(IPlot):
@@ -164,7 +165,7 @@ class SlicePlot(IPlot):
         axes = self._canvas.figure.gca()
         lgn = axes.legend()
         if lgn:
-            lgn.draggable()
+            legend_set_draggable(lgn, True)
 
         if self._canvas.manager.plot_handler.icut is not None:
             self._canvas.manager.plot_handler.icut.rect.ax = axes
