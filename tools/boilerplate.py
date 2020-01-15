@@ -322,7 +322,7 @@ def boilerplate_gen():
                     msg = 'Axes method %s has kwarg named %s' % (func, reserved)
                     raise ValueError(msg)
 
-            yield fmt % locals()
+            yield fmt % locals() + '\n'
 
     cmaps = (
         'autumn',

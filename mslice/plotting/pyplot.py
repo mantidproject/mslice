@@ -3985,5 +3985,4 @@ def spectral():
                     )
     set_cmap("spectral")
 
-
 _setup_pyplot_info_docstrings()
