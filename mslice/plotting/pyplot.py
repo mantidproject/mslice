@@ -51,15 +51,19 @@ from matplotlib.text import Text, Annotation
 from matplotlib.patches import Polygon, Rectangle, Circle, Arrow
 from matplotlib.widgets import SubplotTool, Button, Slider, Widget
 
-from matplotlib.ticker import TickHelper, Formatter, FixedFormatter, NullFormatter,\
-        FuncFormatter, FormatStrFormatter, ScalarFormatter,\
-        LogFormatter, LogFormatterExponent, LogFormatterMathtext,\
-        Locator, IndexLocator, FixedLocator, NullLocator,\
-        LinearLocator, LogLocator, AutoLocator, MultipleLocator,\
-        MaxNLocator
+from matplotlib.ticker import (TickHelper, Formatter, FixedFormatter,
+                               NullFormatter, FuncFormatter,
+                               FormatStrFormatter, ScalarFormatter,
+                               LogFormatter, LogFormatterExponent,
+                               LogFormatterMathtext, Locator, IndexLocator,
+                               FixedLocator, NullLocator,
+                               LinearLocator, LogLocator, AutoLocator,
+                               MultipleLocator, MaxNLocator)
 
 from mslice.plotting.globalfiguremanager import set_category
-from mslice.plotting.globalfiguremanager import CATEGORY_CUT, CATEGORY_SLICE, GlobalFigureManager
+from mslice.plotting.globalfiguremanager import (CATEGORY_CUT,
+                                                 CATEGORY_SLICE,
+                                                 GlobalFigureManager)
 
 # Handles matplotlib older than 1.5
 try:
@@ -67,14 +71,15 @@ try:
 except ImportError:
     def _string_to_bool(val):
         if isinstance(val, six.string_types):
-             return 'on' in val.lower()
+            return 'on' in val.lower()
         return val
 
-## Global ##
+# Global
 
 
 def draw_if_interactive():
-    # We will always draw because mslice might be running without matplotlib interactive
+    # We will always draw because mslice might be running without
+    # matplotlib interactive
     for fig in GlobalFigureManager.all_figures():
         fig.canvas.draw()
 
@@ -271,7 +276,7 @@ def sci(im):
     gca()._sci(im)
 
 
-## Any Artist ##
+# Any Artist
 
 
 # (getp is simply imported)
@@ -353,7 +358,7 @@ def xkcd(scale=1, length=100, randomness=2):
     return dummy_ctx()
 
 
-## Figures ##
+# Figures #
 
 def figure(num=None):
     return GlobalFigureManager.get_figure_number(num).figure
@@ -515,7 +520,7 @@ def waitforbuttonpress(*args, **kwargs):
     return gcf().waitforbuttonpress(*args, **kwargs)
 
 
-## Putting things in figures ##
+# Putting things in figures
 
 
 @docstring.copy_dedent(Figure.text)
@@ -571,12 +576,13 @@ def figlegend(*args, **kwargs):
     return gcf().legend(*args, **kwargs)
 
 
-## Figure and Axes hybrid ##
+# Figure and Axes hybrid
 
 _hold_msg = """pyplot.hold is deprecated.
     Future behavior will be consistent with the long-time default:
     plot commands add elements without first clearing the
     Axes and/or Figure."""
+
 
 @deprecated("2.0", message=_hold_msg)
 def hold(b=None):
@@ -612,6 +618,7 @@ def hold(b=None):
     # a second warning, but "Oh, well...".
     rc('axes', hold=b)
 
+
 @deprecated("2.0", message=_hold_msg)
 def ishold():
     """
@@ -638,7 +645,7 @@ def over(func, *args, **kwargs):
     func(*args, **kwargs)
     ax._hold = h
 
-## Axes ##
+# Axes
 
 
 def axes(arg=None, **kwargs):
@@ -718,7 +725,8 @@ def axes(arg=None, **kwargs):
 def delaxes(ax=None):
     """
     Remove the given `Axes` *ax* from the current figure. If *ax* is *None*,
-    the current axes is removed. A KeyError is raised if the axes doesn't exist.
+    the current axes is removed. A KeyError is raised if the axes doesn't
+    exist.
     """
     if ax is None:
         ax = gca()
@@ -795,7 +803,8 @@ def subplot(*args, **kwargs):
           # first, the plot (and its axes) previously created, will be removed
           plt.subplot(211)
           plt.plot(range(12))
-          plt.subplot(212, facecolor='y') # creates 2nd subplot with yellow background
+          plt.subplot(212, facecolor='y') # creates 2nd subplot with yellow
+          background
 
        If you do not want this behavior, use the
        :meth:`~matplotlib.figure.Figure.add_subplot` method or the
@@ -832,8 +841,8 @@ def subplot(*args, **kwargs):
 
     """
     # if subplot called without arguments, create subplot(1,1,1)
-    if len(args)==0:
-        args=(1,1,1)
+    if len(args) == 0:
+        args = (1, 1, 1)
 
     # This check was added because it is very easy to type
     # subplot(1, 2, False) when subplots(1, 2, False) was intended
@@ -841,7 +850,7 @@ def subplot(*args, **kwargs):
     # ever occur, but mysterious behavior can result because what was
     # intended to be the sharex argument is instead treated as a
     # subplot index for subplot()
-    if len(args) >= 3 and isinstance(args[2], bool) :
+    if len(args) >= 3 and isinstance(args[2], bool):
         warnings.warn("The subplot index argument to subplot() appears"
                       " to be a boolean. Did you intend to use subplots()?")
 
@@ -850,10 +859,12 @@ def subplot(*args, **kwargs):
     bbox = a.bbox
     byebye = []
     for other in fig.axes:
-        if other==a: continue
+        if other == a:
+            continue
         if bbox.fully_overlaps(other.bbox):
             byebye.append(other)
-    for ax in byebye: delaxes(ax)
+    for ax in byebye:
+        delaxes(ax)
 
     return a
 
@@ -1053,7 +1064,7 @@ def twinx(ax=None):
           For an example
     """
     if ax is None:
-        ax=gca()
+        ax = gca()
     ax1 = ax.twinx()
     return ax1
 
@@ -1066,7 +1077,7 @@ def twiny(ax=None):
     returned.
     """
     if ax is None:
-        ax=gca()
+        ax = gca()
     ax1 = ax.twiny()
     return ax1
 
@@ -1088,8 +1099,9 @@ def subplots_adjust(*args, **kwargs):
       top = 0.9      # the top of the subplots of the figure
       wspace = 0.2   # the amount of width reserved for space between subplots,
                      # expressed as a fraction of the average axis width
-      hspace = 0.2   # the amount of height reserved for space between subplots,
-                     # expressed as a fraction of the average axis height
+      hspace = 0.2   # the amount of height reserved for space between
+                     # subplots, expressed as a fraction of the average axis
+                     # height
 
     The actual defaults are controlled by the rc file
     """
@@ -1103,7 +1115,7 @@ def subplot_tool(targetfig=None):
 
     A :class:`matplotlib.widgets.SubplotTool` instance is returned.
     """
-    tbar = rcParams['toolbar'] # turn off the navigation toolbar for the toolfig
+    tbar = rcParams['toolbar']  # turn off the navigation toolbar for toolfig
     rcParams['toolbar'] = 'None'
     if targetfig is None:
         manager = get_current_fig_manager()
@@ -1111,12 +1123,14 @@ def subplot_tool(targetfig=None):
     else:
         # find the manager for this figure
         for manager in GlobalFigureManager._figures:
-            if manager.canvas.figure==targetfig: break
-        else: raise RuntimeError('Could not find manager for targetfig')
+            if manager.canvas.figure == targetfig:
+                break
+        else:
+            raise RuntimeError('Could not find manager for targetfig')
 
-    toolfig = figure(figsize=(6,3))
+    toolfig = figure(figsize=(6, 3))
     toolfig.subplots_adjust(top=0.9)
-    ret =  SubplotTool(targetfig, toolfig)
+    ret = SubplotTool(targetfig, toolfig)
     rcParams['toolbar'] = tbar
     GlobalFigureManager.set_active(manager)  # restore the current figure
     return ret
@@ -1129,7 +1143,8 @@ def tight_layout(pad=1.08, h_pad=None, w_pad=None, rect=None):
     Parameters
     ----------
     pad : float
-        padding between the figure edge and the edges of subplots, as a fraction of the font-size.
+        padding between the figure edge and the edges of subplots,
+        as a fraction of the font-size.
     h_pad, w_pad : float
         padding (height/width) between edges of adjacent subplots.
         Defaults to `pad_inches`.
@@ -1203,7 +1218,7 @@ def title(s, *args, **kwargs):
     """
     return gca().set_title(s, *args, **kwargs)
 
-## Axis ##
+# Axis
 
 
 def axis(*v, **kwargs):
@@ -1252,8 +1267,8 @@ def axis(*v, **kwargs):
 
       >>> axis('normal')
 
-    are deprecated. They restore default behavior; axis limits are automatically
-    scaled to make the data fit comfortably within the plot box.
+    are deprecated. They restore default behavior; axis limits are
+    automatically scaled to make the data fit comfortably within the plot box.
 
     if ``len(*v)==0``, you can pass in *xmin*, *xmax*, *ymin*, *ymax*
     as kwargs selectively to alter just those limits without changing
@@ -1503,7 +1518,8 @@ def xticks(*args, **kwargs):
     elif len(args) == 2:
         locs = ax.set_xticks(args[0])
         labels = ax.set_xticklabels(args[1], **kwargs)
-    else: raise TypeError('Illegal number of arguments to xticks')
+    else:
+        raise TypeError('Illegal number of arguments to xticks')
     if len(kwargs):
         for l in labels:
             l.update(kwargs)
@@ -1582,7 +1598,8 @@ def yticks(*args, **kwargs):
     elif len(args) == 2:
         locs = ax.set_yticks(args[0])
         labels = ax.set_yticklabels(args[1], **kwargs)
-    else: raise TypeError('Illegal number of arguments to yticks')
+    else:
+        raise TypeError('Illegal number of arguments to yticks')
     if len(kwargs):
         for l in labels:
             l.update(kwargs)
@@ -1642,14 +1659,14 @@ def rgrids(*args, **kwargs):
     ax = gca()
     if not isinstance(ax, PolarAxes):
         raise RuntimeError('rgrids only defined for polar axes')
-    if len(args)==0:
+    if len(args) == 0:
         lines = ax.yaxis.get_gridlines()
         labels = ax.yaxis.get_ticklabels()
     else:
         lines, labels = ax.set_rgrids(*args, **kwargs)
 
-    return ( silent_list('Line2D rgridline', lines),
-             silent_list('Text rgridlabel', labels) )
+    return (silent_list('Line2D rgridline', lines),
+            silent_list('Text rgridlabel', labels))
 
 
 def thetagrids(*args, **kwargs):
@@ -1702,7 +1719,7 @@ def thetagrids(*args, **kwargs):
     ax = gca()
     if not isinstance(ax, PolarAxes):
         raise RuntimeError('rgrids only defined for polar axes')
-    if len(args)==0:
+    if len(args) == 0:
         lines = ax.xaxis.get_ticklines()
         labels = ax.xaxis.get_ticklabels()
     else:
@@ -1800,7 +1817,8 @@ def colormaps():
     """
     Matplotlib provides a number of colormaps, and others can be added using
     :func:`~matplotlib.cm.register_cmap`.  This function documents the built-in
-    colormaps, and will also return a list of all registered colormaps if called.
+    colormaps, and will also return a list of all registered colormaps if
+    called.
 
     You can set the colormap for an image, pcolor, scatter, etc,
     using a keyword argument::
@@ -2100,7 +2118,7 @@ def colorbar(mappable=None, cax=None, ax=None, **kw):
     if ax is None:
         ax = gca()
 
-    ret = gcf().colorbar(mappable, cax = cax, ax=ax, **kw)
+    ret = gcf().colorbar(mappable, cax=cax, ax=ax, **kw)
     return ret
 
 
@@ -2193,9 +2211,10 @@ def matshow(A, fignum=None, **kw):
     if fignum is False or fignum is 0:
         ax = gca()
     else:
-        # Extract actual aspect ratio of array and make appropriately sized figure
+        # Extract actual aspect ratio of array and make appropriately sized
+        # figure
         fig = figure(fignum, figsize=figaspect(A))
-        ax  = fig.add_axes([0.15, 0.09, 0.775, 0.775])
+        ax = fig.add_axes([0.15, 0.09, 0.775, 0.775])
 
     im = ax.matshow(A, **kw)
     sci(im)
@@ -2285,7 +2304,7 @@ def plotfile(fname, cols=(0,), plotfuncs=None,
     else:
         fig = gcf()
 
-    if len(cols)<1:
+    if len(cols) < 1:
         raise ValueError('must have at least one column of data')
 
     if plotfuncs is None:
@@ -2309,22 +2328,22 @@ def plotfile(fname, cols=(0,), plotfuncs=None,
     xname, x = getname_val(cols[0])
     ynamelist = []
 
-    if len(cols)==1:
-        ax1 = fig.add_subplot(1,1,1)
+    if len(cols) == 1:
+        ax1 = fig.add_subplot(1, 1, 1)
         funcname = plotfuncs.get(cols[0], 'plot')
         func = getattr(ax1, funcname)
         func(x, **kwargs)
         ax1.set_ylabel(xname)
     else:
         N = len(cols)
-        for i in range(1,N):
+        for i in range(1, N):
             if subplots:
-                if i==1:
-                    ax = ax1 = fig.add_subplot(N-1,1,i)
+                if i == 1:
+                    ax = ax1 = fig.add_subplot(N-1, 1, i)
                 else:
-                    ax = fig.add_subplot(N-1,1,i, sharex=ax1)
-            elif i==1:
-                ax = fig.add_subplot(1,1,1)
+                    ax = fig.add_subplot(N-1, 1, i, sharex=ax1)
+            elif i == 1:
+                ax = fig.add_subplot(1, 1, 1)
 
             yname, y = getname_val(cols[i])
             ynamelist.append(yname)
@@ -2343,14 +2362,13 @@ def plotfile(fname, cols=(0,), plotfuncs=None,
     if not subplots:
         ax.legend(ynamelist, loc='best')
 
-    if xname=='date':
+    if xname == 'date':
         fig.autofmt_xdate()
 
 
 def _autogen_docstring(base):
     """Autogenerated wrappers will get their docstring from a base function
     with an addendum."""
-    # msg = "\n\nAdditional kwargs: hold = [True|False] overrides default hold state"
     msg = ''
     addendum = docstring.Appender(msg, '\n\n')
     return lambda func: addendum(docstring.copy_dedent(base)(func))
@@ -2359,7 +2377,8 @@ def _autogen_docstring(base):
 # This function cannot be generated by boilerplate.py because it may
 # return an image or a line.
 @_autogen_docstring(Axes.spy)
-def spy(Z, precision=0, marker=None, markersize=None, aspect='equal', **kwargs):
+def spy(Z, precision=0, marker=None, markersize=None, aspect='equal',
+        **kwargs):
     ax = gca()
     hold = kwargs.pop('hold', None)
     # allow callers to override the hold state by passing hold=True|False
@@ -2378,6 +2397,7 @@ def spy(Z, precision=0, marker=None, markersize=None, aspect='equal', **kwargs):
         sci(ret)
     return ret
 
+
 # just to be safe.  Interactive mode can be turned on without
 # calling `plt.ion()` so register it again here.
 # This is safe because multiple calls to `install_repl_displayhook`
@@ -2385,7 +2405,7 @@ def spy(Z, precision=0, marker=None, markersize=None, aspect='equal', **kwargs):
 # to determine if they should trigger a draw.
 install_repl_displayhook()
 
-################# REMAINING CONTENT GENERATED BY boilerplate.py ##############
+# ################ REMAINING CONTENT GENERATED BY boilerplate.py ##############
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
