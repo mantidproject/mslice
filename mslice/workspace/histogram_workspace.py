@@ -54,5 +54,11 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         attribute_from_log(None, self.raw_ws)
 
     def __del__(self):
-        if hasattr(self, '_raw_ws') and self._raw_ws.name().endswith('_HIDDEN'):
-            DeleteWorkspace(self._raw_ws)
+        try:
+            if hasattr(self, '_raw_ws') and self._raw_ws.name().endswith('_HIDDEN'):
+                DeleteWorkspace(self._raw_ws)
+        except RuntimeError:
+            # On exit the workspace can get deleted before __del__ is called
+            # where you receive a RuntimeError: Variable invalidated, data has been deleted.
+            # error
+            pass
