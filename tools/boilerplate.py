@@ -65,7 +65,7 @@ def %(func)s(%(argspec)s):
 
 # Used for misc functions such as cla/legend etc.
 MISC_FN_TEMPLATE = AUTOGEN_MSG + """
-@docstring.copy_dedent(Axes.%(func)s)
+@docstring.copy(Axes.%(func)s)
 def %(func)s(%(argspec)s):
     %(ret)s = gca().%(func)s(%(call)s)
     return %(ret)s
