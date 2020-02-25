@@ -21,6 +21,8 @@ case "$py_ver" in
         echo "Unknown python version requested '$py_ver'"
         exit 1
 esac
+# X server
+XVFB_SERVER_NUM=101
 # Qt4 backends
 export QT_API=pyqt
 export MPLBACKEND=Qt4Agg
@@ -31,6 +33,20 @@ function onexit {
   sudo dpkg --purge ${pkg_name}
 }
 trap onexit EXIT
+
+# ------------------------------------------------------------------------------
+# terminate existing Xvfb sessions
+# ------------------------------------------------------------------------------
+if [ $(command -v xvfb-run) ]; then
+    echo "Terminating existing Xvfb sessions"
+
+    # Kill Xvfb processes
+    killall Xvfb || true
+
+    # Remove Xvfb X server lock files
+    rm -f /tmp/.X${XVFB_SERVER_NUM}-lock
+fi
+
 
 # ------------------------------------------------------------------------------
 # pre-installation
@@ -76,4 +92,5 @@ pip install -r setup-requirements.txt -r install-requirements.txt -r test-requir
 python setup.py flake8
 
 # test
-python setup.py nosetests
+xvfb-run --server-args="-screen 0 640x480x24" \
+  --server-num=${XVFB_SERVER_NUM} python setup.py nosetests
