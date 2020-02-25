@@ -13,13 +13,9 @@ venv_dir=$PWD/venv-${py_ver}
 
 # determine python executable
 case "$py_ver" in
-    py2)
-        py_exe=/usr/bin/python
-        pkg_name=mantidnightly
-    ;;
     py3)
         py_exe=/usr/bin/python3
-        pkg_name=mantidnightly-python3
+        pkg_name=mantidnightly
     ;;
     *)
         echo "Unknown python version requested '$py_ver'"
