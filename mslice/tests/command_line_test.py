@@ -219,7 +219,7 @@ class CommandLineTest(unittest.TestCase):
         PlotCut(cut)
         cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
 
-    @mock.patch('mantid.plots.plotfunctions.errorbar')
+    @mock.patch('mantid.plots.axesfunctions.errorbar')
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     def test_errorbar_command(self, is_gui, mantid_errorbar):
         is_gui.return_value = True
