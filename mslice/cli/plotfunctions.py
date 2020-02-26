@@ -11,7 +11,7 @@ from mslice.util.compat import legend_set_draggable
 from mslice.util.mantid.mantid_algorithms import Transpose
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mslice.models.cut.cut import Cut
-from mantid.plots import plotfunctions
+import mantid.plots.axesfunctions as axesfunctions
 from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
 from mslice.views.cut_plotter import PICKER_TOL_PTS as CUT_PICKER_TOL_PTS
@@ -56,7 +56,7 @@ def errorbar(axes, workspace, *args, **kwargs):
                     raise RuntimeError('Wrong energy unit for cut. '
                                        'Expected {}, got {}'.format(cached_cuts[0].cut_axis.e_unit, cut_axis.e_unit))
 
-    plotfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
+    axesfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
 
     axes.set_ylim(*intensity_range) if intensity_range is not None else axes.autoscale()
     intensity_min, intensity_max = axes.get_ylim()
@@ -128,7 +128,7 @@ def pcolormesh(axes, workspace, *args, **kwargs):
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
-    plotfunctions.pcolormesh(axes, workspace.raw_ws, *args, **kwargs)
+    axesfunctions.pcolormesh(axes, workspace.raw_ws, *args, **kwargs)
     axes.set_title(workspace.name[2:], picker=SLICE_PICKER_TOL_PTS)
     x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
     y_axis = slice_cache.momentum_axis if slice_cache.rotated else slice_cache.energy_axis
