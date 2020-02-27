@@ -162,6 +162,11 @@ class PlotFigureManagerQT(QtCore.QObject):
             painter.drawPixmap(0, 0, pixmap_image)
             painter.end()
 
+    def _get_resolution(self):
+        resolution, _ = QtWidgets.QInputDialog.getDouble(
+            self.window, 'Resolution', 'Enter image resolution (dpi):', min=30, value=300, max=3000)
+        return resolution
+
     def save_plot(self):
         file_path, save_name, ext = get_save_directory(save_as_image=True)
         if file_path is None:
@@ -174,9 +179,16 @@ class PlotFigureManagerQT(QtCore.QObject):
             save_workspaces(workspaces, file_path, save_name, ext, slice_nonpsd=True)
         except RuntimeError as e:
             if str(e) == "unrecognised file extension":
-                if not save_name.endswith(".pdf"):
-                    resolution, confirm = QtWidgets.QInputDialog.getDouble(
-                        self.window, 'Resolution', 'Enter image resolution (dpi):', min=30, value=300, max=3000)
+                supported_image_types = list(self.window.canvas.get_supported_filetypes().keys())
+                if not any([ext.endswith(ft) for ft in supported_image_types]):
+                    if ext.endswith('jpg') or ext.endswith('jpeg'):
+                        resolution = self._get_resolution()
+                        self._save_jpeg_via_qt(resolution, file_path, save_name)
+                    else:
+                        self.error_box('Format {} is not supported. '
+                                       '(Supported formats: {})'.format(ext, supported_image_types))
+                elif not save_name.endswith(".pdf"):
+                    resolution = self._get_resolution()
                     self.save_image(os.path.join(file_path, save_name), resolution)
                 else:
                     self.save_image(os.path.join(file_path, save_name))
@@ -191,14 +203,23 @@ class PlotFigureManagerQT(QtCore.QObject):
     def save_image(self, path, resolution=300):
         self.canvas.figure.savefig(path, dpi=resolution)
 
-    def copy_plot(self):
+    def _get_figure_image_data(self, resolution=300):
         import io
         buf = io.BytesIO()
-        self.canvas.figure.savefig(buf, dpi=300)
+        self.canvas.figure.savefig(buf, dpi=resolution)
+        return buf
+
+    def _save_jpeg_via_qt(self, resolution, file_path, save_name):
+        # Use Qt to convert png to jpeg
+        buf = self._get_figure_image_data(resolution)
+        QtGui.QImage.fromData(buf.getvalue()).save(os.path.join(file_path, save_name))
+
+    def copy_plot(self):
+        buf = self._get_figure_image_data()
         QtWidgets.QApplication.clipboard().setImage(QtGui.QImage.fromData(buf.getvalue()))
 
     def error_box(self, message):
-        error_box = QtWidgets.QMessageBox(self)
+        error_box = QtWidgets.QMessageBox()
         error_box.setWindowTitle("Error")
         error_box.setIcon(QtWidgets.QMessageBox.Warning)
         error_box.setText(message)
