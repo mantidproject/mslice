@@ -31,13 +31,13 @@ class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
         new_ws.axes = self.axes
         return new_ws
 
-
     def convert_to_matrix(self):
         from mslice.util.mantid.mantid_algorithms import ConvertMDHistoToMatrixWorkspace, Scale, ConvertToDistribution
         ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization',
                                                   FindXAxis=False, OutputWorkspace='__mat'+self.name)
         coord = self.get_coordinates()
-        bin_size = coord[coord.keys()[0]][1] - coord[coord.keys()[0]][0]
+        first_dim = coord[self.raw_ws.getDimension(0).getName()]
+        bin_size = first_dim[1] - first_dim[0]
         ws_conv = Scale(ws_conv, bin_size, OutputWorkspace='__mat'+self.name)
         ConvertToDistribution(ws_conv)
         return ws_conv

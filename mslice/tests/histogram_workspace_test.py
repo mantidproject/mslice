@@ -4,6 +4,7 @@ import numpy as np
 from mantid.simpleapi import CreateMDHistoWorkspace
 
 from mslice.tests.workspace_test import BaseWorkspaceTest
+from mslice.models.workspacemanager.workspace_provider import add_workspace, remove_workspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
@@ -21,6 +22,18 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     def test_invalid_workspace(self):
         self.assertRaises(TypeError, lambda: HistogramWorkspace(4, 'name'))
+
+    def test_convert_to_matrix(self):
+        # workspace needs to be registered with mslice for conversion
+        try:
+            add_workspace(self.workspace, self.workspace.name)
+            matrix_ws = self.workspace.convert_to_matrix()
+
+            self.assertEqual(10, matrix_ws.raw_ws.getNumberHistograms())
+            self.assertEqual(10, matrix_ws.raw_ws.getNumberBins())
+        finally:
+            # remove mslice tracking
+            remove_workspace(self.workspace)
 
     def test_get_coordinates(self):
         expected = np.linspace(0, 100, 10)
