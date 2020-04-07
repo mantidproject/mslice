@@ -1,14 +1,14 @@
 from __future__ import (absolute_import, division, print_function)
 from .base import WorkspaceBase
 from .histo_mixin import HistoMixin
-from .workspace_mixin import WorkspaceMixin
+from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
 from .helperfunctions import attribute_from_log, attribute_to_log
 
 from mantid.api import IMDHistoWorkspace
 from mantid.simpleapi import DeleteWorkspace
 
 
-class HistogramWorkspace(HistoMixin, WorkspaceMixin, WorkspaceBase):
+class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase):
     """workspace wrapper for MDHistoWorkspace"""
 
     def __init__(self, mantid_ws, name):

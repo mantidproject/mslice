@@ -26,26 +26,6 @@ class WorkspaceBase(object):
         return
 
     @abc.abstractmethod
-    def __add__(self, other):
-        return
-
-    @abc.abstractmethod
-    def __sub__(self, other):
-        return
-
-    @abc.abstractmethod
-    def __mul__(self, other):
-        return
-
-    @abc.abstractmethod
-    def __truediv__(self, other):
-        return
-
-    @abc.abstractmethod
-    def __pow__(self, other):
-        return
-
-    @abc.abstractmethod
     def __neg__(self):
         return
 

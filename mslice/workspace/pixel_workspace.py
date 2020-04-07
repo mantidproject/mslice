@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from .base import WorkspaceBase
 from .histogram_workspace import HistogramWorkspace
 from .pixel_mixin import PixelMixin
-from .workspace_mixin import WorkspaceMixin
+from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
 from .helperfunctions import attribute_from_log, attribute_to_log
 
 from mantid.api import IMDEventWorkspace
@@ -10,7 +10,7 @@ from mantid.simpleapi import DeleteWorkspace
 
 
 
-class PixelWorkspace(PixelMixin, WorkspaceMixin, WorkspaceBase):
+class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase):
     """workspace wrapper for MDEventWorkspace. Converts to HistogramWorkspace internally."""
 
     def __init__(self, mantid_ws, name):

@@ -1,13 +1,13 @@
 from __future__ import (absolute_import, division, print_function)
 from .base import WorkspaceBase
-from .workspace_mixin import WorkspaceMixin
+from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
 from .helperfunctions import attribute_from_log, attribute_to_log
 
 from mantid.api import MatrixWorkspace
 from mantid.simpleapi import DeleteWorkspace
 
 
-class Workspace(WorkspaceMixin, WorkspaceBase):
+class Workspace(WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase):
     """workspace wrapper for MatrixWorkspace"""
 
     def __init__(self, mantid_ws, name):

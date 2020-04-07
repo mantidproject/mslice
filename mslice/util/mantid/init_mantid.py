@@ -9,6 +9,7 @@ from mslice.models.cut.cut_algorithm import Cut
 from mslice.models.projection.powder.make_projection import MakeProjection
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.models.workspacemanager.rebose_algorithm import Rebose
+from ._workspace_ops import _attach_binary_operators
 
 AlgorithmFactory.subscribe(MakeProjection)
 AlgorithmFactory.subscribe(Slice)
@@ -18,3 +19,5 @@ s_api._create_algorithm_function('MakeProjection', 1, MakeProjection())
 s_api._create_algorithm_function('Slice', 1, Slice())
 s_api._create_algorithm_function('Cut', 1, Cut())
 s_api._create_algorithm_function('Rebose', 1, Rebose())
+
+_attach_binary_operators()
