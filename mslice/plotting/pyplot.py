@@ -21,7 +21,7 @@ import matplotlib.colorbar
 from matplotlib import style
 from matplotlib import interactive
 from matplotlib.cbook import (
-    deprecated, is_numlike, silent_list, warn_deprecated)
+    deprecated, silent_list, warn_deprecated)
 from matplotlib import docstring
 from matplotlib.backend_bases import FigureCanvasBase
 from matplotlib.figure import Figure, figaspect
@@ -1390,20 +1390,20 @@ def ylim(*args, **kwargs):
 
 
 @docstring.dedent_interpd
-def xscale(*args, **kwargs):
+def xscale(value, **kwargs):
     """
     Set the scaling of the x-axis.
 
     Call signature::
 
-        xscale(scale, **kwargs)
+        xscale(value, **kwargs)
 
     Parameters
     ----------
-    scale : [%(scale)s]
+    value : {"linear", "log", "symlog", "logit", ...}
         The scaling type.
     **kwargs
-        Additional parameters depend on *scale*. See Notes.
+        Additional parameters depend on *value*. See Notes.
 
     Notes
     -----
@@ -1414,21 +1414,21 @@ def xscale(*args, **kwargs):
 
     %(scale_docs)s
     """
-    gca().set_xscale(*args, **kwargs)
+    gca().set_xscale(value, **kwargs)
 
 
 @docstring.dedent_interpd
-def yscale(*args, **kwargs):
+def yscale(value, **kwargs):
     """
     Set the scaling of the y-axis.
 
     Call signature::
 
-        yscale(scale, **kwargs)
+        yscale(value, **kwargs)
 
     Parameters
     ----------
-    scale : [%(scale)s]
+    value : {"linear", "log", "symlog", "logit", ...}
         The scaling type.
     **kwargs
         Additional parameters depend on *scale*. See Notes.
@@ -1442,7 +1442,7 @@ def yscale(*args, **kwargs):
 
     %(scale_docs)s
     """
-    gca().set_yscale(*args, **kwargs)
+    gca().set_yscale(value, **kwargs)
 
 
 def xticks(*args, **kwargs):
@@ -2317,7 +2317,7 @@ def plotfile(fname, cols=(0,), plotfuncs=None,
         'return the name and column data for identifier'
         if isinstance(identifier, six.string_types):
             return identifier, r[identifier]
-        elif is_numlike(identifier):
+        elif isinstance(identifier, (numbers.Number, np.number)):
             name = r.dtype.names[int(identifier)]
             return name, r[name]
         else:
