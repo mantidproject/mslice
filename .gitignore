@@ -109,3 +109,6 @@ ENV/
 # Vim files
 *.swp
 *.swo
+
+# vscode files
+.vscode/
