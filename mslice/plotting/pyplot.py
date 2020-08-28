@@ -36,7 +36,7 @@ from matplotlib.artist import setp as _setp
 from matplotlib.axes import Axes, Subplot
 from matplotlib.projections import PolarAxes
 from matplotlib import mlab  # for csv2rec, detrend_none, window_hanning
-from matplotlib.scale import get_scale_docs, get_scale_names
+from matplotlib.scale import get_scale_names
 
 from matplotlib import cm
 from matplotlib.cm import get_cmap, register_cmap

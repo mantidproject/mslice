@@ -4,7 +4,8 @@ import weakref
 import six
 from mslice.util.qt.QtCore import Qt
 from mslice.util.qt import QtCore, QtGui, QtWidgets
-from mslice.util.qt.qapp import create_qapp_if_required, call_in_qapp_thread
+from mslice.util.qt.qapp import (QAppThreadCall, create_qapp_if_required,
+                                 force_method_calls_to_qapp_thread)
 from mslice.models.workspacemanager.file_io import get_save_directory
 from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
 from mslice.plotting.plot_window.plot_window import PlotWindow
@@ -15,7 +16,6 @@ import mslice.plotting.pyplot as plt
 
 class PlotFigureManagerQT(QtCore.QObject):
     """Manage a Qt window along with the keep/make current status"""
-
     def __init__(self, number, current_figs):
         """
         Initialize the object with a figure number and its manager
@@ -27,7 +27,6 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.number = number
         self._current_figs = current_figs
 
-        create_qapp_if_required()
         self.window = PlotWindow(manager=weakref.proxy(self))
         self.window.resize(800, 600)
 
@@ -40,18 +39,19 @@ class PlotFigureManagerQT(QtCore.QObject):
         self._ygrid = False
 
         self.window.action_keep.triggered.connect(self.report_as_kept)
-        self.window.action_make_current.triggered.connect(self.report_as_current)
+        self.window.action_make_current.triggered.connect(
+            self.report_as_current)
         self.window.action_save_image.triggered.connect(self.save_plot)
         self.window.action_copy_image.triggered.connect(self.copy_plot)
         self.window.action_print_plot.triggered.connect(self.print_plot)
         self.window.action_plot_options.triggered.connect(self._plot_options)
-        self.window.action_toggle_legends.triggered.connect(self._toggle_legend)
+        self.window.action_toggle_legends.triggered.connect(
+            self._toggle_legend)
         self.button_pressed_connected(True)
         self.picking_connected(True)
 
         self.window.raise_()
 
-    @call_in_qapp_thread
     def show(self):
         self.window.show()
         self.window.activateWindow()
@@ -88,7 +88,8 @@ class PlotFigureManagerQT(QtCore.QObject):
             # Move the top right corner of all slice plot windows to the left of the screen centre by 1.05
             # the window width and above the screen center by half the window height to prevent cuts/interactive cuts
             # and slices from overlapping
-            self.move_window(self.window.width() * 1.05, self.window.height() / 2)
+            self.move_window(self.window.width() * 1.05,
+                             self.window.height() / 2)
         else:
             self.plot_handler.disconnect(self.window)
         self.plot_handler = SlicePlot(self, slice_plotter_presenter, workspace)
@@ -99,7 +100,8 @@ class PlotFigureManagerQT(QtCore.QObject):
             # Move the top right corner of all cut plot windows to the left of the screen centre by 0.05
             # the window width and above the screen center by half the window height to prevent cuts/interactive cuts
             # and slices from overlapping
-            self.move_window(self.window.width() * -0.05, self.window.height() / 2)
+            self.move_window(self.window.width() * -0.05,
+                             self.window.height() / 2)
         else:
             self.plot_handler.disconnect(self.window)
         self.plot_handler = CutPlot(self, cut_plotter_presenter, workspace)
@@ -120,13 +122,15 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def picking_connected(self, connect):
         if connect:
-            self._picking = self.canvas.mpl_connect('pick_event', self.object_clicked)
+            self._picking = self.canvas.mpl_connect('pick_event',
+                                                    self.object_clicked)
         else:
             self.canvas.mpl_disconnect(self._picking)
 
     def button_pressed_connected(self, connect):
         if connect:
-            self._button_pressed = self.canvas.mpl_connect('button_press_event', self.plot_clicked)
+            self._button_pressed = self.canvas.mpl_connect(
+                'button_press_event', self.plot_clicked)
         else:
             self.canvas.mpl_disconnect(self._button_pressed)
 
@@ -157,17 +161,24 @@ class PlotFigureManagerQT(QtCore.QObject):
         if print_dialog.exec_():
             try:
                 pixmap_image = QtWidgets.QWidget.grab(self.canvas)
-            except AttributeError:   # Qt4 needs to use old grabWidget() method
+            except AttributeError:  # Qt4 needs to use old grabWidget() method
                 pixmap_image = QtGui.QPixmap.grabWidget(self.canvas)
             page_size = printer.pageRect()
-            pixmap_image = pixmap_image.scaled(page_size.width(), page_size.height(), Qt.KeepAspectRatio)
+            pixmap_image = pixmap_image.scaled(page_size.width(),
+                                               page_size.height(),
+                                               Qt.KeepAspectRatio)
             painter = QtGui.QPainter(printer)
             painter.drawPixmap(0, 0, pixmap_image)
             painter.end()
 
     def _get_resolution(self):
         resolution, _ = QtWidgets.QInputDialog.getDouble(
-            self.window, 'Resolution', 'Enter image resolution (dpi):', min=30, value=300, max=3000)
+            self.window,
+            'Resolution',
+            'Enter image resolution (dpi):',
+            min=30,
+            value=300,
+            max=3000)
         return resolution
 
     def save_plot(self):
@@ -179,27 +190,35 @@ class PlotFigureManagerQT(QtCore.QObject):
         else:
             workspaces = [self.plot_handler.ws_name]
         try:
-            save_workspaces(workspaces, file_path, save_name, ext, slice_nonpsd=True)
+            save_workspaces(workspaces,
+                            file_path,
+                            save_name,
+                            ext,
+                            slice_nonpsd=True)
         except RuntimeError as e:
             if str(e) == "unrecognised file extension":
-                supported_image_types = list(self.window.canvas.get_supported_filetypes().keys())
+                supported_image_types = list(
+                    self.window.canvas.get_supported_filetypes().keys())
                 if not any([ext.endswith(ft) for ft in supported_image_types]):
                     if ext.endswith('jpg') or ext.endswith('jpeg'):
                         resolution = self._get_resolution()
-                        self._save_jpeg_via_qt(resolution, file_path, save_name)
+                        self._save_jpeg_via_qt(resolution, file_path,
+                                               save_name)
                     else:
                         self.error_box('Format {} is not supported. '
-                                       '(Supported formats: {})'.format(ext, supported_image_types))
+                                       '(Supported formats: {})'.format(
+                                           ext, supported_image_types))
                 elif not save_name.endswith(".pdf"):
                     resolution = self._get_resolution()
-                    self.save_image(os.path.join(file_path, save_name), resolution)
+                    self.save_image(os.path.join(file_path, save_name),
+                                    resolution)
                 else:
                     self.save_image(os.path.join(file_path, save_name))
             elif str(e) == "dialog cancelled":
                 pass
             else:
                 raise RuntimeError(e)
-        except KeyError:   # Could be case of interactive cuts when the workspace has not been saved yet
+        except KeyError:  # Could be case of interactive cuts when the workspace has not been saved yet
             workspace = self.plot_handler.save_icut()
             save_workspaces([workspace], file_path, save_name, ext)
 
@@ -215,11 +234,13 @@ class PlotFigureManagerQT(QtCore.QObject):
     def _save_jpeg_via_qt(self, resolution, file_path, save_name):
         # Use Qt to convert png to jpeg
         buf = self._get_figure_image_data(resolution)
-        QtGui.QImage.fromData(buf.getvalue()).save(os.path.join(file_path, save_name))
+        QtGui.QImage.fromData(buf.getvalue()).save(
+            os.path.join(file_path, save_name))
 
     def copy_plot(self):
         buf = self._get_figure_image_data()
-        QtWidgets.QApplication.clipboard().setImage(QtGui.QImage.fromData(buf.getvalue()))
+        QtWidgets.QApplication.clipboard().setImage(
+            QtGui.QImage.fromData(buf.getvalue()))
 
     def error_box(self, message):
         error_box = QtWidgets.QMessageBox()
@@ -306,3 +327,16 @@ class PlotFigureManagerQT(QtCore.QObject):
     def y_grid(self, value):
         self._ygrid = value
         self.figure.gca().grid(value, axis='y')
+
+
+def new_plot_figure_manager(num, global_manager):
+    def _new_plot_figure_manager(num, global_manager):
+        """Create a new figure manager instance for the given figure.
+        Forces all public and non-dunder method calls onto the QApplication thread.
+        """
+        return force_method_calls_to_qapp_thread(
+            PlotFigureManagerQT(num, global_manager))
+
+    create_qapp_if_required()
+    # Calls to constructor should be made on the QApplication thread
+    return QAppThreadCall(_new_plot_figure_manager)(num, global_manager)

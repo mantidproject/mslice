@@ -30,9 +30,6 @@ from __future__ import (absolute_import, division, print_function)
 # system imports
 from functools import wraps
 
-# local imports
-from mslice.util.qt.qapp import QAppThreadCall
-
 # Labels for each category
 CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
 
@@ -49,7 +46,10 @@ class GlobalFigureManager(object):
     """
     # if there is a current figure it should be both current and active
     _active_category = None
-    _category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}  # Current_figures receive decorated commands
+    _category_current_figures = {
+        CATEGORY_CUT: None,
+        CATEGORY_SLICE: None
+    }  # Current_figures receive decorated commands
     _figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
     _unclassified_figures = []
     _active_figure = None
@@ -105,7 +105,10 @@ class GlobalFigureManager(object):
         for manager in list(cls._figures.values()):
             manager.destroy()
         cls._active_figure = None
-        cls._category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}
+        cls._category_current_figures = {
+            CATEGORY_CUT: None,
+            CATEGORY_SLICE: None
+        }
         cls._figures.clear()
 
     @classmethod
@@ -126,7 +129,10 @@ class GlobalFigureManager(object):
     def reset(cls):
         """Reset all class variables to initial state. This function exists for testing purposes """
         cls._active_category = None
-        cls._category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}  # Current _figures are overplotted
+        cls._category_current_figures = {
+            CATEGORY_CUT: None,
+            CATEGORY_SLICE: None
+        }  # Current _figures are overplotted
         cls._figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
         cls._unclassified_figures = []
         cls._active_figure = None
@@ -136,12 +142,15 @@ class GlobalFigureManager(object):
     def _new_figure(cls, num=None):
         # local import to avoid circular dependency in figure_manager_test.py
         # mock.patch can't patch a class where the module has already been imported
-        from mslice.plotting.plot_window.plot_figure_manager import PlotFigureManagerQT
+        from mslice.plotting.plot_window.plot_figure_manager import new_plot_figure_manager
         if num is None:
             num = 1
-            while any([num == existing_fig_num for existing_fig_num in cls._figures.keys()]):
+            while any([
+                    num == existing_fig_num
+                    for existing_fig_num in cls._figures.keys()
+            ]):
                 num += 1
-        new_fig = QAppThreadCall(PlotFigureManagerQT)(num, GlobalFigureManager)
+        new_fig = new_plot_figure_manager(num, GlobalFigureManager)
         cls._figures[num] = new_fig
         cls._active_figure = num
         cls._unclassified_figures.append(num)
@@ -169,14 +178,18 @@ class GlobalFigureManager(object):
     def get_active_figure(cls):
         if cls._active_category:
             if cls._active_figure in cls._unclassified_figures:
-                cls.assign_figure_to_category(cls._active_figure, cls._active_category,
+                cls.assign_figure_to_category(cls._active_figure,
+                                              cls._active_category,
                                               make_current=True)
             elif cls._category_current_figures[cls._active_category] is None:
                 _, num = cls._new_figure()
-                cls.assign_figure_to_category(num, cls._active_category, make_current=True)
+                cls.assign_figure_to_category(num,
+                                              cls._active_category,
+                                              make_current=True)
                 cls._active_figure = num
             else:
-                cls._active_figure = cls._category_current_figures[cls._active_category]
+                cls._active_figure = cls._category_current_figures[
+                    cls._active_category]
         else:
             if cls._active_figure is None:
                 fig, num = cls._new_figure()
@@ -235,7 +248,9 @@ class GlobalFigureManager(object):
         try:
             del cls._figures[num]
         except KeyError:
-            raise KeyError('The key "%s" does not exist. The figure cannot be closed' % num)
+            raise KeyError(
+                'The key "%s" does not exist. The figure cannot be closed' %
+                num)
 
     @classmethod
     def get_category(cls, num):
@@ -245,7 +260,8 @@ class GlobalFigureManager(object):
                 figure_category = category
                 break
         else:
-            raise KeyError("Figure no. %i was not found in any category " % num if num else 0)
+            raise KeyError("Figure no. %i was not found in any category " %
+                           num if num else 0)
             # in-line if handles the case num is None
         return figure_category
 
@@ -372,6 +388,7 @@ def set_category(category):
             finally:
                 GlobalFigureManager.deactivate_category()
             return return_value
+
         return wrapper
 
     return activate_impl
