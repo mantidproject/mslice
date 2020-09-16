@@ -127,7 +127,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_only_one_workspace()
             return
         selected_workspace = selected_workspaces[0]
-        new_name = self._workspace_manager_view.get_workspace_new_name()
+        try:
+            new_name = self._workspace_manager_view.get_workspace_new_name()
+        except RuntimeError as e:
+            if str(e) == 'dialog cancelled':
+                return
+            raise RuntimeError(e)
         rename_workspace(selected_workspace, new_name)
         self.update_displayed_workspaces()
 

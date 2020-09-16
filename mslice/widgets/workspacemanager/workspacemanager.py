@@ -166,10 +166,10 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return paths[0] if isinstance(paths, tuple) else [str(filename) for filename in paths]
 
     def get_workspace_new_name(self):
-        name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
+        name, success = QInputDialog.getText(self, "Workspace New Name", "Enter the new name for the workspace :      ")
         # The message above was padded with spaces to allow the whole title to show up
         if not success:
-            raise ValueError('No Valid Name supplied')
+            raise RuntimeError('dialog cancelled')
         return str(name)
 
     def error_select_only_one_workspace(self):
