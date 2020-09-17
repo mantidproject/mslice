@@ -157,8 +157,15 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not selected_ws:
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
-        if len(selected_ws) == 1:
-            selected_ws.append(self._workspace_manager_view.add_workspace_dialog())
+        if len(selected_ws) != 1:
+            return
+        try:
+            new_ws = self._workspace_manager_view.add_workspace_dialog()
+        except RuntimeError as e:
+            if str(e) == 'dialog cancelled':
+                return
+            raise RuntimeError(e)
+        selected_ws.append(new_ws)
         try:
             add_workspace_runs(selected_ws)
         except ValueError as e:

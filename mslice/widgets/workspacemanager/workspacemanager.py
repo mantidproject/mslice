@@ -118,7 +118,8 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         dialog.setLabelText("Choose a workspace to add:")
         dialog.setOptions(QInputDialog.UseListViewForComboBoxItems)
         dialog.setComboBoxItems(items)
-        dialog.exec_()
+        if dialog.exec_() != QInputDialog.Accepted:
+            raise RuntimeError('dialog cancelled')
         return dialog.textValue()
 
     def subtraction_input(self):
