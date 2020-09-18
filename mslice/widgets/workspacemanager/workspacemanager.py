@@ -119,7 +119,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         dialog.setOptions(QInputDialog.UseListViewForComboBoxItems)
         dialog.setComboBoxItems(items)
         if dialog.exec_() != QInputDialog.Accepted:
-            raise RuntimeError('dialog cancelled')
+            return None  # User cancelled dialog
         return dialog.textValue()
 
     def subtraction_input(self):
@@ -170,7 +170,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         name, success = QInputDialog.getText(self, "Workspace New Name", "Enter the new name for the workspace :      ")
         # The message above was padded with spaces to allow the whole title to show up
         if not success:
-            raise RuntimeError('dialog cancelled')
+            return None  # User cancelled dialog
         return str(name)
 
     def error_select_only_one_workspace(self):

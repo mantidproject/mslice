@@ -127,12 +127,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_only_one_workspace()
             return
         selected_workspace = selected_workspaces[0]
-        try:
-            new_name = self._workspace_manager_view.get_workspace_new_name()
-        except RuntimeError as e:
-            if str(e) == 'dialog cancelled':
-                return
-            raise RuntimeError(e)
+        new_name = self._workspace_manager_view.get_workspace_new_name()
+        if new_name is None:
+            return
         rename_workspace(selected_workspace, new_name)
         self.update_displayed_workspaces()
 
@@ -159,12 +156,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         if len(selected_ws) != 1:
             return
-        try:
-            new_ws = self._workspace_manager_view.add_workspace_dialog()
-        except RuntimeError as e:
-            if str(e) == 'dialog cancelled':
-                return
-            raise RuntimeError(e)
+        new_ws = self._workspace_manager_view.add_workspace_dialog()
+        if new_ws is None:
+            return
         selected_ws.append(new_ws)
         try:
             add_workspace_runs(selected_ws)
