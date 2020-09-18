@@ -128,6 +128,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         selected_workspace = selected_workspaces[0]
         new_name = self._workspace_manager_view.get_workspace_new_name()
+        if new_name is None:
+            return
         rename_workspace(selected_workspace, new_name)
         self.update_displayed_workspaces()
 
@@ -152,8 +154,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not selected_ws:
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
-        if len(selected_ws) == 1:
-            selected_ws.append(self._workspace_manager_view.add_workspace_dialog())
+        if len(selected_ws) != 1:
+            return
+        new_ws = self._workspace_manager_view.add_workspace_dialog()
+        if new_ws is None:
+            return
+        selected_ws.append(new_ws)
         try:
             add_workspace_runs(selected_ws)
         except ValueError as e:

@@ -118,7 +118,8 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         dialog.setLabelText("Choose a workspace to add:")
         dialog.setOptions(QInputDialog.UseListViewForComboBoxItems)
         dialog.setComboBoxItems(items)
-        dialog.exec_()
+        if dialog.exec_() != QInputDialog.Accepted:
+            return None  # User cancelled dialog
         return dialog.textValue()
 
     def subtraction_input(self):
@@ -166,10 +167,10 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return paths[0] if isinstance(paths, tuple) else [str(filename) for filename in paths]
 
     def get_workspace_new_name(self):
-        name, success = QInputDialog.getText(self,"Workspace New Name","Enter the new name for the workspace :      ")
+        name, success = QInputDialog.getText(self, "Workspace New Name", "Enter the new name for the workspace :      ")
         # The message above was padded with spaces to allow the whole title to show up
         if not success:
-            raise ValueError('No Valid Name supplied')
+            return None  # User cancelled dialog
         return str(name)
 
     def error_select_only_one_workspace(self):
