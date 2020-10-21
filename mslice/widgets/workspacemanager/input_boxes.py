@@ -1,6 +1,6 @@
 from mslice.util.qt import load_ui
+from mslice.util.qt.validator_helper import double_validator_without_separator
 from mslice.util.qt.QtWidgets import QDialog, QFormLayout, QLabel, QLineEdit, QPushButton
-from mslice.util.qt.QtGui import QDoubleValidator
 
 
 class SubtractInputBox(QDialog):
@@ -16,6 +16,7 @@ class SubtractInputBox(QDialog):
         background_ws = self.listWidget.selectedItems()[0].text()
         return background_ws, self.ssf.value()
 
+
 class ScaleInputBox(QDialog):
 
     def __init__(self, is_bose=False, parent=None):
@@ -24,10 +25,13 @@ class ScaleInputBox(QDialog):
         layout = QFormLayout(self)
         self.text1 = QLabel(self)
         self.text2 = QLabel(self)
+
+        double_validator = double_validator_without_separator()
         self.edit1 = QLineEdit(self)
-        self.edit1.setValidator(QDoubleValidator())
+        self.edit1.setValidator(double_validator)
         self.edit2 = QLineEdit(self)
-        self.edit2.setValidator(QDoubleValidator())
+        self.edit2.setValidator(double_validator)
+
         if is_bose:
             self.text1.setText('Current temperature (K)')
             self.text2.setText('Target temperature (K)')
