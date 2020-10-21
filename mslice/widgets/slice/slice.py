@@ -6,9 +6,9 @@
 from __future__ import (absolute_import, division, print_function)
 
 from mslice.util.qt import load_ui
-from mslice.util.qt.QtGui import QDoubleValidator
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
+from mslice.util.qt.validator_helper import double_validator_without_separator
 
 from mslice.models.units import EnergyUnits
 from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
@@ -251,8 +251,10 @@ class SliceWidget(SliceView, QWidget):
     def set_validators(self):
         line_edits = [self.lneSliceXStart, self.lneSliceXEnd, self.lneSliceXStep, self.lneSliceYStart,
                       self.lneSliceYEnd, self.lneSliceYStep, self.lneSliceIntensityStart, self.lneSliceIntensityEnd]
+
+        double_validator = double_validator_without_separator()
         for line_edit in line_edits:
-            line_edit.setValidator(QDoubleValidator())
+            line_edit.setValidator(double_validator)
 
     def set_energy_default(self, en_default):
         self._en_default = en_default

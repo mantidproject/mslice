@@ -1,6 +1,6 @@
 from mslice.util.qt import load_ui
-from mslice.util.qt.validator_helper import double_validator_without_separator
 from mslice.util.qt.QtWidgets import QDialog, QFormLayout, QLabel, QLineEdit, QPushButton
+from mslice.util.qt.validator_helper import double_validator_without_separator
 
 
 class SubtractInputBox(QDialog):
