@@ -29,6 +29,7 @@ class ScaleInputBox(QDialog):
         double_validator = double_validator_without_separator()
         self.edit1 = QLineEdit(self)
         self.edit1.setValidator(double_validator)
+        self.edit1.setText('1.0')
         self.edit2 = QLineEdit(self)
         self.edit2.setValidator(double_validator)
 
