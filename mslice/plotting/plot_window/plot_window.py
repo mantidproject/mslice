@@ -4,7 +4,8 @@ from matplotlib.figure import Figure
 from mantidqt.icons import get_icon
 
 from mslice.plotting.backend import get_canvas_and_toolbar_cls
-from mslice.util.qt import QtCore, QtWidgets, QtGui
+from mslice.util.qt import QtCore, QtWidgets
+from mslice.util.qt.validator_helper import double_validator_without_separator
 
 FigureCanvas, NavigationToolbar2QT = get_canvas_and_toolbar_cls()
 
@@ -158,7 +159,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         sz.setWidth(60)
         self.waterfall_x_edt.setMaximumSize(sz)
         self.waterfall_y_edt.setMaximumSize(sz)
-        validator = QtGui.QDoubleValidator(self)
+        validator = double_validator_without_separator()
         self.waterfall_x_edt.setValidator(validator)
         self.waterfall_y_edt.setValidator(validator)
         self.waterfall_x_lbl_act = parent.addWidget(self.waterfall_x_lbl)

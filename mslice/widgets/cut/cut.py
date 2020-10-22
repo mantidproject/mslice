@@ -6,9 +6,9 @@
 from __future__ import (absolute_import, division, print_function)
 
 from mslice.util.qt import load_ui
-from mslice.util.qt.QtGui import QDoubleValidator
 from mslice.util.qt.QtCore import Signal
 from mslice.util.qt.QtWidgets import QWidget
+from mslice.util.qt.validator_helper import double_validator_without_separator
 
 from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
 
@@ -303,8 +303,10 @@ class CutWidget(CutView, QWidget):
         line_edits = [self.lneCutStart, self.lneCutEnd, self.lneCutIntegrationStart,
                       self.lneCutIntegrationEnd, self.lneCutIntegrationWidth, self.lneEditCutIntensityStart,
                       self.lneCutIntensityEnd]
+
+        double_validator = double_validator_without_separator()
         for line_edit in line_edits:
-            line_edit.setValidator(QDoubleValidator())
+            line_edit.setValidator(double_validator)
 
     def force_normalization(self):
         self.rdoCutNormToOne.setEnabled(False)
