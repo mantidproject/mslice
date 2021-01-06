@@ -16,7 +16,7 @@ Projection`` (converted to an ``MD Event`` type workspace).
 
 To plot a single cut, fill in values for the cut axis, labelled ``along``, its limits (``from`` and ``to``), and the step
 size. For **non-PSD** datasets you also have to select the axes ``over`` which to integrate, and the integration range.
-One of the cut or integration axis must be *energy transfer* in this case. For **PSD** dataset, the ``Calculate Projection``
+One of the cut or integration axis must be *energy transfer* in this case. For a **PSD** dataset, the ``Calculate Projection``
 step specifies the two axes already. The axis which is not selected to plot ``along`` is implicitly used as the integration
 axis.
 
@@ -65,5 +65,5 @@ From the plot figure window, you can also save the workspace data to the same fo
 addition you can also save the figure as an image, either in ``png`` or ``pdf`` formats.
 
 In order to save a cut from an :ref:`Interactive_Cuts`, you can click the ``Save`` icon (floppy disk) direct on the cut
-window, or first click the ``Save Cut`` button to create an ``MD Histo`` type workspacce and then use the ``Save`` button on
+window, or first click the ``Save Cut`` button to create an ``MD Histo`` type workspace and then use the ``Save`` button on
 that tab.
