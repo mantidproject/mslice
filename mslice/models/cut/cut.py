@@ -91,7 +91,7 @@ class Cut(object):
 
     @width.setter
     def width(self, width_str):
-        if width_str is not None and width_str.strip():
+        if width_str is not None and not width_str.startswith('e') and not width_str.endswith('e') and not width_str.startswith('-') and width_str.strip():
             try:
                 self._width = float(width_str)
             except ValueError:
