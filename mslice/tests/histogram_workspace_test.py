@@ -30,7 +30,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
             matrix_ws = self.workspace.convert_to_matrix()
 
             self.assertEqual(10, matrix_ws.raw_ws.getNumberHistograms())
-			self.assertEqual(10, matrix_ws.raw_ws.blocksize())
+            self.assertEqual(10, matrix_ws.raw_ws.blocksize())
         finally:
             # remove mslice tracking
             remove_workspace(self.workspace)
