@@ -24,8 +24,8 @@ esac
 # X server
 XVFB_SERVER_NUM=101
 # Qt4 backends
-export QT_API=pyqt
-export MPLBACKEND=Qt4Agg
+export QT_API=pyqt5
+export MPLBACKEND=Qt5Agg
 
 function onexit {
   deactivate
