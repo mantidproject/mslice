@@ -262,7 +262,12 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         self.color_label.setText("Color:")
         self.line_color = QtWidgets.QComboBox(self)
         self.line_color.addItems(named_cycle_colors())
-        self.line_color.setCurrentIndex(self.line_color.findText(color_to_name(line_options['color'])))
+        color_index = self.line_color.findText(color_to_name(line_options['color']))
+        if color_index != -1:
+            self.line_color.setCurrentIndex(color_index)
+        else:
+            self.line_color.addItem(color_to_name(line_options['color']))
+            self.line_color.setCurrentIndex(self.line_color.count()-1)
         self.previous_color = self.line_color.currentIndex()
 
         self.style_label = QtWidgets.QLabel(self)
