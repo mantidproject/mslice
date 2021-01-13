@@ -11,9 +11,10 @@ class SubtractInputBox(QDialog):
         for i in range(ws_list.count()):
             item = ws_list.item(i).clone()
             self.listWidget.insertItem(i, item)
+        self.listWidget.setCurrentRow(0)
 
     def user_input(self):
-        background_ws = self.listWidget.selectedItems()[0].text()
+        background_ws = self.listWidget.item(0).text()
         return background_ws, self.ssf.value()
 
 
