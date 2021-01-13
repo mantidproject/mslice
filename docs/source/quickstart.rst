@@ -79,8 +79,8 @@ contain no data and will appear empty (white) in the 2D slice. For more details 
 .. image:: images/quickstart/slice_intensity.png
    :scale: 80 %
 
-Once the slice is displayed (in a separate window), clicking on the plot or colorbar axes will allow you to change the
-plot limits, and whether to use a linear or logarithmic axis. Clicking on the plot or axes titles will allow you to edit
+Once the slice is displayed (in a separate window), double clicking on the plot or colorbar axes will allow you to change the
+plot limits, and whether to use a linear or logarithmic axis. Double clicking on the plot or axes titles will allow you to edit
 them. Both changing the limits and titles can be done using the options menu accessible from the toolbar.
 
 .. _Interactive_Cuts:
