@@ -154,12 +154,11 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         if not selected_ws:
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
-        if len(selected_ws) != 1:
-            return
-        new_ws = self._workspace_manager_view.add_workspace_dialog()
-        if new_ws is None:
-            return
-        selected_ws.append(new_ws)
+        if len(selected_ws) == 1:
+            new_ws = self._workspace_manager_view.add_workspace_dialog()
+            if new_ws is None:
+                return
+            selected_ws.append(new_ws)
         try:
             add_workspace_runs(selected_ws)
         except ValueError as e:
