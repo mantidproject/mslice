@@ -92,10 +92,13 @@ class Cut(object):
     @width.setter
     def width(self, width_str):
         if width_str is not None and width_str.strip():
-            try:
-                self._width = float(width_str)
-            except ValueError:
-                raise ValueError("Invalid width")
+            if width_str.startswith('e') or width_str.endswith('e') or width_str.startswith('-'):
+                self._width = None
+            else:
+                try:
+                    self._width = float(width_str)
+                except ValueError:
+                    raise ValueError("Invalid width")
         elif width_str == '':
             self._width = self.end - self.start
         else:
