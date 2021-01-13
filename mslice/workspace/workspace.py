@@ -47,5 +47,6 @@ class Workspace(WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase):
         attribute_from_log(None, self.raw_ws)
 
     def __del__(self):
-        if hasattr(self, '_raw_ws') and self._raw_ws.name().endswith('_HIDDEN'):
+        if hasattr(self, '_raw_ws') and self._raw_ws.name().endswith('_HIDDEN') and self._raw_ws is not None:
             DeleteWorkspace(self._raw_ws)
+            self._raw_ws = None
