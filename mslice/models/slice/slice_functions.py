@@ -143,12 +143,15 @@ def sample_temperature(ws_name, sample_temp_fields):
 
 
 def get_sample_temperature_from_string(string):
-    pos_k = string.find('K')
-    if pos_k == -1:
-        return None
-    k_string = string[pos_k - 3:pos_k]
-    sample_temp = float(''.join(c for c in k_string if c.isdigit()))
-    return sample_temp
+    if string is not None and string.strip():
+        if string.endswith('K'):
+            string = string[:-1]
+        try:
+            sample_temp = float(string)
+            return sample_temp
+        except ValueError:
+            return None
+    return None
 
 
 def compute_recoil_line(ws_name, axis, relative_mass=1):
@@ -228,4 +231,8 @@ def is_sliceable(workspace):
         return True
     else:
         validator = WorkspaceUnitValidator('DeltaE')
-        return isinstance(ws, Workspace) and validator.isValid(ws.raw_ws) == ''
+        try:
+            isvalid = isinstance(ws, Workspace) and validator.isValid(ws.raw_ws) == ''
+        except RuntimeError:
+            return False
+        return isvalid

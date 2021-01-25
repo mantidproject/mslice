@@ -342,19 +342,22 @@ class SlicePlot(IPlot):
                 self._slice_plotter_presenter.add_sample_temperature_field(temp_value)
                 self._slice_plotter_presenter.update_sample_temperature(self.ws_name)
             else:
-                try:
-                    temp_value = float(temp_value)
-                    if temp_value < 0:
-                        raise ValueError
-                except ValueError:
-                    self.plot_window.error_box("Invalid value entered for sample temperature. Enter a value in Kelvin \
+                if temp_value is not None and temp_value.strip():
+                    if temp_value.endswith('K'):
+                        temp_value = temp_value[:-1]
+                    try:
+                        temp_value = float(temp_value)
+                        if temp_value < 0:
+                            raise ValueError
+                    except ValueError:
+                        self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
                                                or a sample log field.")
-                    self.set_intensity(previous)
-                    return False
-                else:
-                    self.default_options['temp'] = temp_value
-                    self.temp = temp_value
-                    self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
+                        self.set_intensity(previous)
+                        return False
+                    else:
+                        self.default_options['temp'] = temp_value
+                        self.temp = temp_value
+                        self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
             slice_plotter_method(self.ws_name)
         return True
 
