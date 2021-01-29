@@ -1,4 +1,7 @@
 [report]
 omit =
     */mslice/presenters/interfaces/*
+    /mslice/util/mantid/__init__.py
+    /mslice/util/mantid/mantid_algorithms.py
+    /mslice/workspace/base.py
 show_missing = True
