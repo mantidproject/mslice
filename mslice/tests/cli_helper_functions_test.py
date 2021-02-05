@@ -155,7 +155,12 @@ class CLIHelperFunctionsTest(unittest.TestCase):
     def test_that_is_cut_works_as_expected(self, is_gui):
         is_gui.return_value = True
         workspace = self.create_workspace('workspace')
+        psd_workspace = self.create_pixel_workspace('psd_workspace')
         cut_ws = Cut(workspace)
+        cut_psd_ws = Cut(psd_workspace)
 
         return_value = is_cut(cut_ws)
         self.assertEqual(return_value, True)
+
+        return_value = is_cut(cut_psd_ws)
+        self.asserEqual(return_value, True)
