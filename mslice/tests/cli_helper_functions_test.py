@@ -163,4 +163,4 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         self.assertEqual(return_value, True)
 
         return_value = is_cut(cut_psd_ws)
-        self.asserEqual(return_value, True)
+        self.assertEqual(return_value, True)
