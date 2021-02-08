@@ -26,6 +26,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      
+      - name: Use Mantid Nightly
+        uses: mantidnightly@main
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.0.1
@@ -47,4 +50,4 @@ jobs:
       - name: nosetests
         shell: bash -l {0}
         run: |
-          xvfb-run '--server-args=-screen 0 640x480x24' --server-num=101 python setup.py nosetests
+          xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum python setup.py nosetests
