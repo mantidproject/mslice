@@ -7,7 +7,7 @@ on:
   schedule:
     - cron: "* 2 * * *"
     
-  # temporary for development  
+  # temporary for development
   push:
     branches:
       - conda_workflow
@@ -18,7 +18,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  test:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -27,12 +27,24 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2.0.1
+        with:
+          python-version: 3.8
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Other dependencies
+        shell: bash -l {0}
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          sudo apt update -y
+          sudo apt-get install -y xvfb libxcb* libxkb*
+          pip install -r setup-requirements.txt -r install-requirements.txt -r test-requirements.txt
+          
+      - name: Flake8
+        shell: bash -l {0}
+        run: |
+          python setup.py flake8
+          
+      - name: nosetests
+        shell: bash -l {0}
+        run: |
+          xvfb-run '--server-args=-screen 0 640x480x24' --server-num=101 python setup.py nosetests
