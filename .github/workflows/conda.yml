@@ -49,7 +49,7 @@ jobs:
       - name: Flake8
         shell: bash -l {0}
         run: |
-          python setup.py flake8
+          python -m flake8
           
       - name: Coveralls
         shell: bash -l {0}
@@ -58,7 +58,7 @@ jobs:
         run: |
           coveralls
           
-      - name: nosetests
+      - name: Nosetests
         shell: bash -l {0}
         run: |
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum python setup.py nosetests
