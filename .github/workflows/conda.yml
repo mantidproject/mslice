@@ -25,15 +25,16 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout MSlice
+        uses: actions/checkout@v2
         with:
-          fetch-depth: 0
           ref: conda_workflow
       
-      - name: Use Mantid Nightly
+      - name: Checkout Mantid
         uses: actions/checkout@v2
         with:
           repository: mantidproject/mantid
+          path: mantid
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.0.1
