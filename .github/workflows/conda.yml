@@ -45,12 +45,18 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt-get install -y xvfb libxcb* libxkb*
-          pip install -r setup-requirements.txt -r install-requirements.txt -r test-requirements.txt
           
       - name: Flake8
         shell: bash -l {0}
         run: |
           python setup.py flake8
+          
+      - name: Coveralls
+        shell: bash -l {0}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          coveralls
           
       - name: nosetests
         shell: bash -l {0}
