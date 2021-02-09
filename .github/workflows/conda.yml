@@ -35,6 +35,7 @@ jobs:
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.0.1
         with:
+          activate-environment: mslice
           environment-file: environment.yml
           python-version: 3.8
           auto-activate-base: false
@@ -43,7 +44,7 @@ jobs:
         shell: bash -l {0}
         run: |
           sudo apt update -y
-          sudo apt-get install -y xvfb libxcb* libxkb*
+          sudo apt-get install -y xvfb
           
       - name: Flake8
         shell: bash -l {0}
