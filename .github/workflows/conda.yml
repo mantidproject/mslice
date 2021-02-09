@@ -28,7 +28,9 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: Use Mantid Nightly
-        uses: mantidproject/mantid@master
+        uses: actions/checkout@v2
+        with:
+          repository: mantidproject/mantid
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.0.1
