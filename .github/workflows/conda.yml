@@ -38,7 +38,7 @@ jobs:
       - name: Install Mantid
         shell: bash -l {0}
         run: |
-          sudo apg-get update
+          sudo apt-get update
           sudo apt-get install gdebi -y
           sudo apt-get install python3-pycifrw
           export mantiddeb=$(curl -sL https://github.com/mantidproject/download.mantidproject.org/raw/master/releases/nightly.txt | grep ubuntu)
