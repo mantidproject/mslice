@@ -39,12 +39,11 @@ jobs:
         shell: bash -l {0}
         run: |
           python -m pip install --upgrade pip
-          pip install pycifrw
 
       - name: Install Mantid
         shell: bash -l {0}
         run: |
-          sudo apt-get update
+          sudo apt-add-repository ppa:mantid/mantid -y && sudo apt-get update -qq
           sudo apt-get install gdebi -y
           export mantiddeb=$(curl -sL https://github.com/mantidproject/download.mantidproject.org/raw/master/releases/nightly.txt | grep ubuntu)
           wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
