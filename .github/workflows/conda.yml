@@ -39,7 +39,7 @@ jobs:
         shell: bash -l {0}
         run: |
           python -m pip install --upgrade pip
-          pip install python3-pycifrw
+          pip install pycifrw
 
       - name: Install Mantid
         shell: bash -l {0}
