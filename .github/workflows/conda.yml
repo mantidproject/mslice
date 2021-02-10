@@ -54,3 +54,13 @@ jobs:
         shell: bash -l {0}
         run: |
           sudo apt-get install -y xvfb
+
+      - name: Flake8
+        shell: bash -l {0}
+        run: |
+          python setup.py flake8
+
+      - name: Nosetests
+        shell: bash -l {0}
+        run: |
+          xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum python setup.py nosetests
