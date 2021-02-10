@@ -39,4 +39,4 @@ jobs:
         shell: bash -l {0}
         run: |
           wget https://sourceforge.net/projects/mantid/files/Nightly/mantidnightly_6.0.20210208.2323-0ubuntu1~bionic1_amd64.deb/download
-          sudo apt install -f ./mantidnightly_6.0.20210208.2323-0ubuntu1~bionic1_amd64.deb
+          sudo apt install -f ./mantidnightly_6.0.20210208.2323-0ubuntu1_bionic1_amd64.deb
