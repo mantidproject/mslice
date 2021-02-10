@@ -38,5 +38,7 @@ jobs:
       - name: Install Mantid
         shell: bash -l {0}
         run: |
-          wget https://sourceforge.net/projects/mantid/files/Nightly/mantidnightly_6.0.20210208.2323-0ubuntu1~bionic1_amd64.deb/download
-          sudo apt install -f ./mantidnightly_6.0.20210208.2323-0ubuntu1_bionic1_amd64.deb
+          sudo apt-get install gdebi -y
+          export mantiddeb=$(curl -sL https://github.com/mantidproject/download.mantidproject.org/raw/master/releases/nightly.txt | grep ubuntu)
+          wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
+          sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
