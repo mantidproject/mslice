@@ -51,12 +51,12 @@ jobs:
           
       - name: Debug output
         run: |
+          echo "PYTHONPATH=/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $GITHUB_ENV
           conda info
           conda list
           conda config --show-sources
           conda config --show
           printenv | sort
-          echo "PYTHONPATH=/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $GITHUB_ENV
 
       - name: Flake8
         run: |
