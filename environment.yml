@@ -12,6 +12,9 @@ dependencies:
   - pyqt
   - qtawesome
   - qtpy
+  - scipy
   - six
   - pip:
       - coverage
+      - h5py
+      - pyyaml
