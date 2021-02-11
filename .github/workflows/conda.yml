@@ -38,7 +38,7 @@ jobs:
         with:
           activate-environment: mslice
           environment-file: environment.yml
-          python-version: 3.8
+          python-version: 3.6
           auto-activate-base: false
 
       - name: Install Mantid
@@ -48,15 +48,7 @@ jobs:
           export mantiddeb=$(curl -sL https://github.com/mantidproject/download.mantidproject.org/raw/master/releases/nightly.txt | grep ubuntu)
           wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
           sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
-          
-      - name: Debug output
-        run: |
           echo "PYTHONPATH=/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $GITHUB_ENV
-          conda info
-          conda list
-          conda config --show-sources
-          conda config --show
-          printenv | sort
 
       - name: Flake8
         run: |
