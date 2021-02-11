@@ -17,10 +17,13 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # This workflow contains a single job called "test"
   test:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -36,7 +39,6 @@ jobs:
           python-version: 3.8
 
       - name: Install Mantid
-        shell: bash -l {0}
         run: |
           sudo apt-add-repository ppa:mantid/mantid -y && sudo apt-get update -qq
           sudo apt-get install gdebi -y
@@ -45,24 +47,18 @@ jobs:
           sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
           
       - name: Install python dependencies
-        shell: bash -l {0}
         run: |
           python -m pip install --upgrade pip
           pip install -r setup-requirements.txt -r install-requirements.txt -r test-requirements.txt
-          echo "/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $GITHUB_PATH
-          echo $PYTHONPATH
 
       - name: Install other dependencies
-        shell: bash -l {0}
         run: |
           sudo apt-get install -y xvfb
 
       - name: Flake8
-        shell: bash -l {0}
         run: |
           python setup.py flake8
 
       - name: Nosetests
-        shell: bash -l {0}
         run: |
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum python setup.py nosetests
