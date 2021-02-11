@@ -39,6 +39,7 @@ jobs:
           activate-environment: mslice
           environment-file: environment.yml
           python-version: 3.8
+          auto-activate-base: false
 
       - name: Install Mantid
         run: |
