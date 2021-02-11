@@ -50,7 +50,6 @@ jobs:
           
       - name: Debug output
         run: |
-          echo "/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $PATH
           conda info
           conda list
           conda config --show-sources
