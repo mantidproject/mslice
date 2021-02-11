@@ -36,6 +36,7 @@ jobs:
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.0.1
         with:
+        activate-environment: mslice
           environment-file: environment.yml
           python-version: 3.8
 
@@ -56,10 +57,6 @@ jobs:
           printenv | sort
           pwd
           ls
-
-      - name: Install other dependencies
-        run: |
-          sudo apt-get install -y xvfb
 
       - name: Flake8
         run: |
