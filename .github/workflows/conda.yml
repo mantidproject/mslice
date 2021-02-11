@@ -50,6 +50,7 @@ jobs:
           sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
           echo "PYTHONPATH=/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $GITHUB_ENV
           sudo apt-get install libglu1-mesa
+          pip uninstall hdf5
           conda install hdf5
 
       - name: Flake8

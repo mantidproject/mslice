@@ -16,4 +16,5 @@ dependencies:
   - six
   - pip:
       - coverage
+      - h5py
       - pyyaml
