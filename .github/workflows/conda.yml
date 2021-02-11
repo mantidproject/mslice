@@ -48,8 +48,6 @@ jobs:
           
       - name: Install python dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r setup-requirements.txt -r install-requirements.txt -r test-requirements.txt
           conda info
           conda list
           conda config --show-sources
