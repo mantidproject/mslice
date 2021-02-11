@@ -50,7 +50,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r setup-requirements.txt -r install-requirements.txt -r test-requirements.txt
           echo "/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $GITHUB_PATH
-          echo PYTHONPATH
+          python -c 'import sys; print sys.path'
+          echo $PYTHONPATH
 
       - name: Install other dependencies
         shell: bash -l {0}
