@@ -48,15 +48,14 @@ jobs:
           wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
           sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
           
-      - name: Install python dependencies
+      - name: Debug output
         run: |
+          echo "/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $PATH
           conda info
           conda list
           conda config --show-sources
           conda config --show
           printenv | sort
-          pwd
-          ls
 
       - name: Flake8
         run: |
