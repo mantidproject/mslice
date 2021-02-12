@@ -17,6 +17,7 @@ jobs:
         shell: bash -l {0}
 
     steps:
+    # temporary for development (uses conda_workflow branch as environment.yml only present in this branch)
       - name: Checkout MSlice
         uses: actions/checkout@v2
         with:
