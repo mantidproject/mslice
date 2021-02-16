@@ -1,0 +1,21 @@
+name: mslice
+channels:
+  - defaults
+dependencies:
+  - flake8
+  - ipython
+  - matplotlib
+  - mock
+  - nose
+  - numpy
+  - numpy-base
+  - pyqt
+  - qtawesome
+  - qtconsole
+  - qtpy
+  - scipy
+  - six
+  - pip:
+      - coverage
+      - h5py
+      - pyyaml
