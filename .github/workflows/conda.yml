@@ -2,12 +2,7 @@ name: MSlice nightly build
 
 on:
   schedule:
-    - cron: "* 2 * * *"
-    
-  # temporary for development (uses conda_workflow branch as environment.yml only present in this branch)
-  push:
-    branches:
-      - conda_workflow
+    - cron: '* 2 * * *'
 
 jobs:
   test:
@@ -17,11 +12,8 @@ jobs:
         shell: bash -l {0}
 
     steps:
-    # temporary for development (uses conda_workflow branch as environment.yml only present in this branch)
       - name: Checkout MSlice
         uses: actions/checkout@v2
-        with:
-          ref: conda_workflow
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.0.1
