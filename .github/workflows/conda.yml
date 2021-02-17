@@ -2,11 +2,11 @@ name: MSlice nightly build
 
 on:
   schedule:
-    - cron: '* 2 * * *'
+    - cron: '0 2 * * *'
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     defaults:
       run:
         shell: bash -l {0}
