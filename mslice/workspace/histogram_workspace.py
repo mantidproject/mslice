@@ -55,7 +55,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
 
     def __del__(self):
         try:
-            if hasattr(self, '_raw_ws') and self._raw_ws.name().endswith('_HIDDEN') and self._raw_ws is not None:
+            if hasattr(self, '_raw_ws') and self._raw_ws is not None and self._raw_ws.name().endswith('_HIDDEN'):
                 DeleteWorkspace(self._raw_ws)
                 self._raw_ws = None
         except RuntimeError:
