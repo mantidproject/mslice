@@ -348,3 +348,16 @@ def ConvertToGDOS(figure_number):
         plot_handler.plot_window.action_gdos.trigger()
     else:
         print('This function cannot be used on a Cut')
+
+
+def AddWorkspaceToDisplay(workspace, workspace_name):
+    """
+        Add a workspace to the workspace list in the GUI
+        :param workspace: The workspace to add.
+        :param workspace_name: The workspace name.
+        :return:
+        """
+    from mslice.models.workspacemanager.workspace_provider import add_workspace
+    from mslice.app.presenters import get_slice_plotter_presenter
+    add_workspace(workspace, workspace_name)
+    get_slice_plotter_presenter().update_displayed_workspaces()
