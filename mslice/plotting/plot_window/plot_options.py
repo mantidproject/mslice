@@ -345,6 +345,13 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
 
+        if line_options['shown'] is None or line_options['legend'] is None:
+            row5 = QtWidgets.QHBoxLayout()
+            layout.addLayout(row5)
+
+        self.delete_button = QtWidgets.QPushButton("Delete", self)
+        row5.addWidget(self.delete_button)
+
         separator = QtWidgets.QFrame()
         separator.setFrameShape(QtWidgets.QFrame.HLine)
         separator.setFrameShadow(QtWidgets.QFrame.Sunken)
