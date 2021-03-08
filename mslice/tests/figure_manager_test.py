@@ -135,7 +135,9 @@ class CurrentFigureTest(unittest.TestCase):
         mock_figures = [mock.Mock(), mock.Mock()]
         mock_figure_class.side_effect = mock_figures
         fig1 = GlobalFigureManager.get_active_figure()
+        self.assertTrue(GlobalFigureManager.get_active_figure() == fig1)
         fig2 = GlobalFigureManager.get_active_figure()
+        self.assertTrue(GlobalFigureManager.get_active_figure() == fig2)
         GlobalFigureManager.destroy_all()
 
         self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 1)
