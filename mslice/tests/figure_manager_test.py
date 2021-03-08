@@ -138,7 +138,8 @@ class CurrentFigureTest(unittest.TestCase):
         fig2 = GlobalFigureManager.get_active_figure()
         GlobalFigureManager.destroy_all()
 
-        self.assertFalse(GlobalFigureManager.get_all_fig_managers())
+        self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 1)
+        self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 2)
 
     def test_categorizing_of_uncategorized_plot(self, mock_figure_class):
         mock_figures = [mock.Mock(), mock.Mock(), mock.Mock()]
