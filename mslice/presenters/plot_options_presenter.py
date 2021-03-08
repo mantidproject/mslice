@@ -72,6 +72,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._view.showLegendsEdited.connect(partial(self._value_modified, 'show_legends'))
         self._view.xLogEdited.connect(partial(self._xy_config_modified, 'x_log'))
         self._view.yLogEdited.connect(partial(self._xy_config_modified, 'y_log'))
+        self._view.removed_line.connect(self.remove_container)
 
         line_options = self._model.get_all_line_options()
         self._view.set_line_options(line_options)
@@ -84,6 +85,9 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
                       'x_grid', 'y_grid', 'show_legends']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
+
+    def remove_container(self, index):
+        self._model.remove_line_by_index(index)
 
     def get_new_config(self):
         if self._xy_config['modified']:

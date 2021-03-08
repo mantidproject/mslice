@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from six import iteritems
+import functools
 
 import mslice.util.qt.QtWidgets as QtWidgets
 from mslice.models.colors import named_cycle_colors, color_to_name
@@ -171,6 +172,7 @@ class CutPlotOptions(PlotOptionsDialog):
     xLogEdited = Signal()
     yLogEdited = Signal()
     showLegendsEdited = Signal()
+    removed_line = Signal(int)
 
     def __init__(self, redraw_signal=None):
         super(CutPlotOptions, self).__init__(redraw_signal=redraw_signal)
@@ -182,8 +184,9 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
 
     def set_line_options(self, line_options):
-        for line in line_options:
-            line_widget = LegendAndLineOptionsSetter(line, self.color_validator)
+        for i in range(len(line_options)):
+            line_widget = LegendAndLineOptionsSetter(line_options[i], self.color_validator)
+            line_widget.destroyed.connect(functools.partial(self.remove_line_widget, line_widget, i))
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
 
@@ -209,6 +212,10 @@ class CutPlotOptions(PlotOptionsDialog):
         msg_box.setText("Cannot have two lines the same colour.")
         msg_box.exec_()
         return False
+
+    def remove_line_widget(self, selected, index):
+        self._line_widgets.remove(selected)
+        self.removed_line.emit(index)
 
     @property
     def x_log(self):
@@ -349,8 +356,9 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
             row5 = QtWidgets.QHBoxLayout()
             layout.addLayout(row5)
 
-        self.delete_button = QtWidgets.QPushButton("Delete", self)
+        self.delete_button = QtWidgets.QPushButton("Delete Line", self)
         row5.addWidget(self.delete_button)
+        self.delete_button.clicked.connect(self.deleteLater)
 
         separator = QtWidgets.QFrame()
         separator.setFrameShape(QtWidgets.QFrame.HLine)
