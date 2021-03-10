@@ -338,6 +338,6 @@ class CommandLineTest(unittest.TestCase):
         y = x * 1
         e = y * 0 + 2
         testworkspace = CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace")
-        self.assertEqual(2, testworkspace.raw_ws.getNumDims())
+        self.assertEqual(100, testworkspace.blocksize())
         AddWorkspaceToDisplay(testworkspace, "testBaseWorkspace")
         get_spp.update_displayed_workspaces.assert_called_once()
