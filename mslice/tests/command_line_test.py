@@ -10,6 +10,7 @@ from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotC
 from mslice.cli.plotfunctions import errorbar
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
+from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
@@ -331,13 +332,11 @@ class CommandLineTest(unittest.TestCase):
 
         plot_handler_mock.plot_window.action_gdos.trigger.assert_called_once_with()
 
-    @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
-    def test_add_workspace_to_display(self, get_spp):
-        get_spp.return_value = SlicePlotterPresenter()
+    def test_add_workspace_to_display(self):
         x = np.linspace(0, 99, 100)
         y = x * 1
         e = y * 0 + 2
         testworkspace = CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace")
         self.assertEqual(100, testworkspace.blocksize())
         AddWorkspaceToDisplay(testworkspace, "testBaseWorkspace")
-        get_spp.update_displayed_workspaces.assert_called_once()
+        self.assertRaises(TypeError, workspace_exists, testworkspace)
