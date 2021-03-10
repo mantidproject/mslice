@@ -330,3 +330,12 @@ class CommandLineTest(unittest.TestCase):
         ConvertToGDOS(1)
 
         plot_handler_mock.plot_window.action_gdos.trigger.assert_called_once_with()
+
+    @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
+    def test_add_workspace_to_display(self, get_spp):
+        get_spp.return_value = SlicePlotterPresenter()
+        testworkspace = CreateWorkspace(np.linspace(0, 99, 100), np.linspace(0, 99, 100), np.linspace(0, 99, 100), OutputWorkspace="testBaseWorkspace")
+        self.assertEqual(2, testworkspace.raw_ws.getNumDims())
+        AddWorkspaceToDisplay(testworkspace, "testBaseWorkspace")
+        get_spp.update_displayed_workspaces.assert_called_once()
+        #self.update_displayed_workspaces.assert_called_once()
