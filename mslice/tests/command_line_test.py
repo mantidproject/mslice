@@ -2,11 +2,11 @@ import unittest
 import mock
 import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
-                              ConvertToMD)
+                              CreateWorkspace, ConvertToMD)
 
 from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
                                          ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE,
-                                         ConvertToGDOS, GenerateScript)
+                                         ConvertToGDOS, GenerateScript, AddWorkspaceToDisplay)
 from mslice.cli.plotfunctions import errorbar
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
@@ -334,8 +334,10 @@ class CommandLineTest(unittest.TestCase):
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_add_workspace_to_display(self, get_spp):
         get_spp.return_value = SlicePlotterPresenter()
-        testworkspace = CreateWorkspace(np.linspace(0, 99, 100), np.linspace(0, 99, 100), np.linspace(0, 99, 100), OutputWorkspace="testBaseWorkspace")
+        x = np.linspace(0, 99, 100)
+        y = x * 1
+        e = y * 0 + 2
+        testworkspace = CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace")
         self.assertEqual(2, testworkspace.raw_ws.getNumDims())
         AddWorkspaceToDisplay(testworkspace, "testBaseWorkspace")
         get_spp.update_displayed_workspaces.assert_called_once()
-        #self.update_displayed_workspaces.assert_called_once()
