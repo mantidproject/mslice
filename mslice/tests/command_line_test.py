@@ -332,7 +332,9 @@ class CommandLineTest(unittest.TestCase):
 
         plot_handler_mock.plot_window.action_gdos.trigger.assert_called_once_with()
 
-    def test_add_workspace_to_display(self):
+    @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
+    def test_add_workspace_to_display(self, get_spp):
+        get_spp.return_value = SlicePlotterPresenter()
         x = np.linspace(0, 99, 100)
         y = x * 1
         e = y * 0 + 2
