@@ -2,15 +2,13 @@ import unittest
 import mock
 import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
-                              CreateWorkspace, ConvertToMD)
-
+                              ConvertToMD)
 from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
                                          ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE,
-                                         ConvertToGDOS, GenerateScript, AddWorkspaceToDisplay)
+                                         ConvertToGDOS, GenerateScript)
 from mslice.cli.plotfunctions import errorbar
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
-from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
