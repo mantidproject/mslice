@@ -212,7 +212,8 @@ class PlotOptionsPresenterTest(unittest.TestCase):
     def test_remove_line(self):
         self.model.remove_line_by_index = Mock()
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
-
+        line_widget_mock = Mock()
+        self.view.remove_line_widget(line_widget_mock, 3)
         self.model.remove_line_by_index.assert_called_once_with(3)
 
         self.presenter.remove_container(7)
