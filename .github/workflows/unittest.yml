@@ -1,9 +1,6 @@
 name: MSlice unit tests
 
-on: 
-  push:
-    branches:
-      - 549_delete_curve_feature
+on: push
 
 jobs:
   test:
@@ -16,7 +13,7 @@ jobs:
       - name: Checkout MSlice
         uses: actions/checkout@v2
         with:
-          ref: 549_delete_curve_feature
+          fetch-depth: 0
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.0.1
