@@ -134,12 +134,15 @@ class CurrentFigureTest(unittest.TestCase):
     def test_destroy_all(self, mock_figure_class):
         mock_figures = [mock.Mock(), mock.Mock()]
         mock_figure_class.side_effect = mock_figures
+        # Get first figure
         fig1 = GlobalFigureManager.get_active_figure()
         self.assertTrue(GlobalFigureManager.get_active_figure() == fig1)
+        # Get second figure
         fig2 = GlobalFigureManager.get_active_figure()
         self.assertTrue(GlobalFigureManager.get_active_figure() == fig2)
         GlobalFigureManager.destroy_all()
-
+        
+        # check that both figures were destroyed
         self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 1)
         self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 2)
 
