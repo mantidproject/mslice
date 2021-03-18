@@ -141,7 +141,7 @@ class CurrentFigureTest(unittest.TestCase):
         fig2 = GlobalFigureManager.get_active_figure()
         self.assertTrue(GlobalFigureManager.get_active_figure() == fig2)
         GlobalFigureManager.destroy_all()
-        
+
         # check that both figures were destroyed
         self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 1)
         self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 2)
