@@ -62,6 +62,9 @@ class PlotFigureManagerQT(QtCore.QObject):
             self.plot_handler.window_closing()
         plt.close(self.number)
 
+    def destroy(self):
+        self.window.close()
+
     def resize(self, width, height):
         self.window.resize(width, height)
 

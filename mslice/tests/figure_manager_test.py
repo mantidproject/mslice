@@ -131,6 +131,21 @@ class CurrentFigureTest(unittest.TestCase):
         self.assertTrue(fig1 == mock_figures[0])
         self.assertTrue(fig2 == mock_figures[0])
 
+    def test_destroy_all(self, mock_figure_class):
+        mock_figures = [mock.Mock(), mock.Mock()]
+        mock_figure_class.side_effect = mock_figures
+        # Get first figure
+        fig1 = GlobalFigureManager.get_active_figure()
+        self.assertTrue(GlobalFigureManager.get_active_figure() == fig1)
+        # Get second figure
+        fig2 = GlobalFigureManager.get_active_figure()
+        self.assertTrue(GlobalFigureManager.get_active_figure() == fig2)
+        GlobalFigureManager.destroy_all()
+
+        # check that both figures were destroyed
+        self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 1)
+        self.assertRaises(KeyError, GlobalFigureManager.figure_closed, 2)
+
     def test_categorizing_of_uncategorized_plot(self, mock_figure_class):
         mock_figures = [mock.Mock(), mock.Mock(), mock.Mock()]
         fig1_mock_manager = mock.Mock()
