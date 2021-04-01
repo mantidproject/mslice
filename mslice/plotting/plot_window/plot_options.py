@@ -317,6 +317,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         row3.addWidget(self.line_width)
         row3.addWidget(self.marker_label)
         row3.addWidget(self.line_marker)
+        row5 = QtWidgets.QHBoxLayout()
+        layout.addLayout(row5)
 
         if line_options['error_bar'] is not None:
             self.error_bar_checkbox = QtWidgets.QCheckBox("Show Error Bars")
@@ -338,9 +340,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
             self.show_legend.setEnabled(line_options['shown'])
 
-            row5 = QtWidgets.QHBoxLayout()
-            layout.addLayout(row5)
-
             row5.addWidget(self.show_line)
             row4.addWidget(self.show_legend)
 
@@ -351,10 +350,6 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
-
-        if line_options['shown'] is None or line_options['legend'] is None:
-            row5 = QtWidgets.QHBoxLayout()
-            layout.addLayout(row5)
 
         self.delete_button = QtWidgets.QPushButton("Delete Line", self)
         row5.addWidget(self.delete_button)
