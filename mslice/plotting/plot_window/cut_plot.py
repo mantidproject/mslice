@@ -221,8 +221,8 @@ class CutPlot(IPlot):
         containers = self._canvas.figure.gca().containers
         container = containers[line_index]
         container[0].remove()
-        for i in range(2)
-            for line in container[i+1]
+        for i in range(2):
+            for line in container[i+1]:
                 line.remove()
         containers.remove(container)
 
