@@ -41,4 +41,3 @@ jobs:
       - name: Nosetests
         run: |
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum python setup.py nosetests
-
