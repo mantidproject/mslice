@@ -437,7 +437,7 @@ def close(*args):
             GlobalFigureManager.destroy(figManager.num)
     elif len(args) == 1:
         arg = args[0]
-        if arg == 'all':
+        if arg == 'all' or arg == 'All':
             GlobalFigureManager.destroy_all()
         elif isinstance(arg, int):
             GlobalFigureManager.destroy(arg)
