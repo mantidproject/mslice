@@ -222,7 +222,7 @@ class CutPlot(IPlot):
         container = containers[line_index]
         container[0].remove()
         for i in range(2):
-            for line in container[i+1]:
+            for line in container[i + 1]:
                 line.remove()
         containers.remove(container)
 
@@ -308,13 +308,19 @@ class CutPlot(IPlot):
             line_containers[line] = container
         return line_containers
 
-    def get_line_visible(self, line_index):
+    def get_line_visible(self, line_index: int) -> bool:
         try:
-            ret = self._lines_visible[line_index]
-            return ret
+            line_visible = self._lines_visible[line_index]
+            return line_visible
         except KeyError:
-            self._lines_visible[line_index] = True
-            return True
+            try:
+                container = self._canvas.figure.gca().containers[line_index]
+                line = container.get_children()[0]
+                line_visible = line.get_visible()
+            except IndexError:
+                line_visible = True
+            self._lines_visible[line_index] = line_visible
+            return line_visible
 
     def toggle_waterfall(self):
         if self.waterfall:

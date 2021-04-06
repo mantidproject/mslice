@@ -132,6 +132,41 @@ def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
     add_cut_lines_with_width(errorbars, script_lines, cuts)
+    hide_lines(script_lines, plot_handler, ax)
+
+
+def hide_errorbars(script_lines):
+    script_lines.append("elements = container.get_children()[1:] \n")
+    script_lines.append("for element in elements: \n")
+    script_lines.append("    element.set_alpha(0.0) \n\n")
+
+
+def hide_lines(script_lines, plot_handler, ax):
+    """ Check if the line needs to be shown or not (hidden).
+    If the line is hidden, corresponding errorbars and legend
+    are also hidden.
+    """
+    script_lines.append("# hide lines, errorbars, and legends \n")
+    script_lines.append("handles, labels = ax.get_legend_handles_labels() \n")
+    script_lines.append("visible_handles = [] \n")
+    script_lines.append("visible_labels = [] \n\n")
+    idx = -1
+    for container in ax.containers:
+        idx += 1
+        line_options = plot_handler.get_line_options_by_index(idx)
+        if line_options['shown']:
+            # only add handles and labels if the corresponding line is shown
+            script_lines.append(f"handle = handles[{idx:d}] \n")
+            script_lines.append("visible_handles.append(handle[0]) \n")
+            script_lines.append(f"label  = labels[{idx:d}] \n")
+            script_lines.append("visible_labels.append(label) \n\n")
+        else:
+            # Set line visibility to false and alpha of errorbars to 0.0
+            script_lines.append(f"container = ax.containers[{idx:d}] \n")
+            script_lines.append("line = container.get_children()[0] \n")
+            script_lines.append("line.set_visible(False) \n")
+            hide_errorbars(script_lines)
+    script_lines.append("ax.legend(visible_handles, visible_labels, fontsize='medium').set_draggable(True) \n\n")
 
 
 def add_cut_lines_with_width(errorbars, script_lines, cuts):
