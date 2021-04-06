@@ -87,7 +87,9 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
     output_ws = None
     for prop in algorithm.getProperties():
         if not prop.isDefault():
-            pname, pval, output_ws, hidden = _parse_prop(prop)
+            pname, pval, tmp_output_ws, hidden = _parse_prop(prop)
+            if pname == "OutputWorkspace":
+                output_ws = tmp_output_ws
             if hidden:
                 arguments += ["store=False"]
                 continue
