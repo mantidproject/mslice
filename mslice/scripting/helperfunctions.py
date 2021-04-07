@@ -135,10 +135,45 @@ def add_cut_lines(script_lines, plot_handler, ax):
     hide_lines(script_lines, plot_handler, ax)
 
 
-def hide_errorbars(script_lines):
-    script_lines.append("elements = container.get_children()[1:] \n")
-    script_lines.append("for element in elements: \n")
-    script_lines.append("    element.set_alpha(0.0) \n\n")
+def append_handles_and_labels(script_lines):
+    script_lines.append("def append_visible_handle(visible_handles, handles, idx: int):\n")
+    script_lines.append("    handle = handles[idx]\n")
+    script_lines.append("    visible_handles.append(handle[0])\n")
+    script_lines.append("    return None\n\n")
+
+    script_lines.append("def append_visible_label(visible_labels, labels, idx: int):\n")
+    script_lines.append("    label = labels[idx]\n")
+    script_lines.append("    visible_labels.append(label)\n")
+    script_lines.append("    return None\n\n")
+
+    script_lines.append(
+        "def append_visible_handle_and_label(visible_handles, handles, visible_labels, labels, idx: int):\n")
+    script_lines.append("    append_visible_handle(visible_handles, handles, idx)\n")
+    script_lines.append("    append_visible_label(visible_labels, labels, idx)\n")
+    script_lines.append("    return None\n\n")
+
+
+def hide_errorbars_of_a_line(script_lines):
+    script_lines.append("def hide_errorbars_of_a_line(container):\n")
+    script_lines.append("    elements = container.get_children()[1:]\n")
+    script_lines.append("    for element in elements:\n")
+    script_lines.append("        element.set_alpha(0.0)\n")
+    script_lines.append("    return None\n\n")
+
+
+def hide_a_line(script_lines):
+    script_lines.append("def hide_a_line(container):\n")
+    script_lines.append("    line = container.get_children()[0]\n")
+    script_lines.append("    line.set_visible(False)\n")
+    script_lines.append("    return None\n\n")
+
+
+def hide_a_line_and_errorbars(script_lines):
+    script_lines.append("def hide_a_line_and_errorbars(ax, idx: int):\n")
+    script_lines.append("    container = ax.containers[idx]\n")
+    script_lines.append("    hide_a_line(container)\n")
+    script_lines.append("    hide_errorbars_of_a_line(container)\n")
+    script_lines.append("    return None\n\n")
 
 
 def hide_lines(script_lines, plot_handler, ax):
@@ -146,27 +181,27 @@ def hide_lines(script_lines, plot_handler, ax):
     If the line is hidden, corresponding errorbars and legend
     are also hidden.
     """
-    script_lines.append("# hide lines, errorbars, and legends \n")
-    script_lines.append("handles, labels = ax.get_legend_handles_labels() \n")
-    script_lines.append("visible_handles = [] \n")
-    script_lines.append("visible_labels = [] \n\n")
+    script_lines.append("# Definitions of necessary functions\n")
+    hide_a_line(script_lines)
+    hide_errorbars_of_a_line(script_lines)
+    hide_a_line_and_errorbars(script_lines)
+    append_handles_and_labels(script_lines)
+
+    script_lines.append("# hide lines, errorbars, and legends\n")
+    script_lines.append("handles, labels = ax.get_legend_handles_labels()\n")
+    script_lines.append("visible_handles = []\n")
+    script_lines.append("visible_labels = []\n")
     idx = -1
     for container in ax.containers:
         idx += 1
         line_options = plot_handler.get_line_options_by_index(idx)
         if line_options['shown']:
             # only add handles and labels if the corresponding line is shown
-            script_lines.append(f"handle = handles[{idx:d}] \n")
-            script_lines.append("visible_handles.append(handle[0]) \n")
-            script_lines.append(f"label  = labels[{idx:d}] \n")
-            script_lines.append("visible_labels.append(label) \n\n")
+            script_lines.append(
+                f"\nappend_visible_handle_and_label(visible_handles, handles, visible_labels, labels, {idx:d})\n")
         else:
-            # Set line visibility to false and alpha of errorbars to 0.0
-            script_lines.append(f"container = ax.containers[{idx:d}] \n")
-            script_lines.append("line = container.get_children()[0] \n")
-            script_lines.append("line.set_visible(False) \n")
-            hide_errorbars(script_lines)
-    script_lines.append("ax.legend(visible_handles, visible_labels, fontsize='medium').set_draggable(True) \n\n")
+            script_lines.append(f"\nhide_a_line_and_errorbars(ax, {idx:d})\n")
+    script_lines.append("\nax.legend(visible_handles, visible_labels, fontsize='medium').set_draggable(True)\n\n")
 
 
 def add_cut_lines_with_width(errorbars, script_lines, cuts):
