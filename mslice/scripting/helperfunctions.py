@@ -154,25 +154,25 @@ def append_handles_and_labels(script_lines):
 
 
 def hide_errorbars_of_a_line(script_lines):
-    script_lines.append("def hide_errorbars_of_a_line(container):\n")
+    script_lines.append("def show_or_hide_errorbars_of_a_line(container, alpha: float):\n")
     script_lines.append("    elements = container.get_children()[1:]\n")
     script_lines.append("    for element in elements:\n")
-    script_lines.append("        element.set_alpha(0.0)\n")
+    script_lines.append("        element.set_alpha(alpha)\n")
     script_lines.append("    return None\n\n")
 
 
 def hide_a_line(script_lines):
-    script_lines.append("def hide_a_line(container):\n")
+    script_lines.append("def show_or_hide_a_line(container, show_or_hide: bool):\n")
     script_lines.append("    line = container.get_children()[0]\n")
-    script_lines.append("    line.set_visible(False)\n")
+    script_lines.append("    line.set_visible(show_or_hide)\n")
     script_lines.append("    return None\n\n")
 
 
 def hide_a_line_and_errorbars(script_lines):
     script_lines.append("def hide_a_line_and_errorbars(ax, idx: int):\n")
     script_lines.append("    container = ax.containers[idx]\n")
-    script_lines.append("    hide_a_line(container)\n")
-    script_lines.append("    hide_errorbars_of_a_line(container)\n")
+    script_lines.append("    show_or_hide_a_line(container, False)\n")
+    script_lines.append("    show_or_hide_errorbars_of_a_line(container, 0.0)\n")
     script_lines.append("    return None\n\n")
 
 
