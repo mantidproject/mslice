@@ -10,6 +10,15 @@ from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.models.workspacemanager.file_io import load_from_ascii
 
 
+def apply_fixed_final_energy_to_a_valid_workspace(workspace_name, fixed_final_energy: float):
+    workspace_handle = get_workspace_handle(workspace_name)
+    if workspace_handle.e_mode == 'Indirect' and not workspace_handle.ef_defined:
+        workspace_handle.e_fixed = fixed_final_energy
+        workspace_handle.raw_ws.run().addProperty('Efix', fixed_final_energy, True)
+        get_limits(workspace_name, 'DeltaE')  # Necessary to process the limits
+    return None
+
+
 class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
 
     def __init__(self, data_loader_view):
@@ -34,11 +43,6 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 file_paths = ['+'.join(file_paths)]
             self._load_ws(file_paths, ws_names, force_overwrite)
 
-    def apply_fixed_final_energy_to_a_workspace(self, ws_name):
-        ws = get_workspace_handle(ws_name)
-        ws.e_fixed = self._EfCache
-        ws.raw_ws.run().addProperty('Efix', self._EfCache, True)
-        get_limits(ws_name, 'DeltaE')  # Necessary to process the limits
 
     def _load_ws(self, file_paths, ws_names, force_overwrite):
         not_loaded = []
@@ -63,7 +67,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                     if not allChecked:
                         allChecked = self.check_efixed(ws_name, multi)
                     else:
-                        self.apply_fixed_final_energy_to_a_workspace(ws_name)
+                        apply_fixed_final_energy_to_a_valid_workspace(ws_name, self._EfCache)
                     if self._main_presenter is not None:
                         self._main_presenter.show_workspace_manager_tab()
                         self._main_presenter.show_tab_for_workspace(get_workspace_handle(ws_name))
@@ -81,7 +85,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
         if ws.e_mode == 'Indirect' and not ws.ef_defined:
             Ef, allChecked = self._view.get_workspace_efixed(ws_name, multi, self._EfCache)
             self._EfCache = Ef
-            self.apply_fixed_final_energy_to_a_workspace(ws_name)
+            apply_fixed_final_energy_to_a_valid_workspace(ws_name, self._EfCache)
             return allChecked
 
     def _confirm_workspace_overwrite(self, ws_name, force_overwrite):
