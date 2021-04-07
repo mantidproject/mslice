@@ -291,12 +291,12 @@ class CutPlot(IPlot):
     def xy_config(self):
         return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
 
-    def legend_visible(self, index):
+    def legend_visible(self, index: int) -> bool:
         try:
             v = self._legends_visible[index]
         except IndexError:
-            v = True
-            self._legends_visible.append(True)
+            v = self.get_line_visible(index)
+            self._legends_visible.append(v)
         return v
 
     def line_containers(self):
