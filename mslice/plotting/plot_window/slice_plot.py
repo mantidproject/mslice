@@ -341,11 +341,11 @@ class SlicePlot(IPlot):
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.set_intensity(previous)
                 return False
-            temp_value = get_sample_temperature_from_string(temp_value_raw)
             if field:
-                self._slice_plotter_presenter.add_sample_temperature_field(temp_value)
+                self._slice_plotter_presenter.add_sample_temperature_field(temp_value_raw)
                 self._slice_plotter_presenter.update_sample_temperature(self.ws_name)
             else:
+                temp_value = get_sample_temperature_from_string(temp_value_raw)
                 if temp_value is not None:
                     try:
                         temp_value = float(temp_value)
