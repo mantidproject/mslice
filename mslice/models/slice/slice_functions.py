@@ -9,6 +9,7 @@ from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid.mantid_algorithms import LoadCIF, CloneWorkspace
@@ -140,18 +141,6 @@ def sample_temperature(ws_name, sample_temp_fields):
     if isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
         sample_temp = np.mean(sample_temp)
     return sample_temp
-
-
-def get_sample_temperature_from_string(string):
-    if string is not None and string.strip():
-        if string.endswith('K'):
-            string = string[:-1]
-        try:
-            sample_temp = float(string)
-            return sample_temp
-        except ValueError:
-            return None
-    return None
 
 
 def compute_recoil_line(ws_name, axis, relative_mass=1):

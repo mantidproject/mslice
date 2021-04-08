@@ -7,6 +7,7 @@ import os.path as path
 import matplotlib.colors as colors
 
 from mslice.models.colors import to_hex
+from mslice.models.units import get_sample_temperature_from_string
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -330,34 +331,35 @@ class SlicePlot(IPlot):
         self._canvas.draw()
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
+        temp_value_raw = None
+        temp_value = None
         try:
             slice_plotter_method(self.ws_name)
         except ValueError:  # sample temperature not yet set
             try:
-                temp_value, field = self.ask_sample_temperature_field(str(self.ws_name))
+                temp_value_raw, field = self.ask_sample_temperature_field(str(self.ws_name))
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.set_intensity(previous)
                 return False
+            temp_value = get_sample_temperature_from_string(temp_value_raw)
             if field:
                 self._slice_plotter_presenter.add_sample_temperature_field(temp_value)
                 self._slice_plotter_presenter.update_sample_temperature(self.ws_name)
             else:
-                if temp_value is not None and temp_value.strip():
-                    if temp_value.endswith('K'):
-                        temp_value = temp_value[:-1]
+                if temp_value is not None:
                     try:
                         temp_value = float(temp_value)
-                        if temp_value < 0:
-                            raise ValueError
                     except ValueError:
-                        self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
+                        temp_value = None
+                if temp_value is None or temp_value < 0:
+                    self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
                                                or a sample log field.")
-                        self.set_intensity(previous)
-                        return False
-                    else:
-                        self.default_options['temp'] = temp_value
-                        self.temp = temp_value
-                        self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
+                    self.set_intensity(previous)
+                    return False
+                else:
+                    self.default_options['temp'] = temp_value
+                    self.temp = temp_value
+                    self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
             slice_plotter_method(self.ws_name)
         return True
 
