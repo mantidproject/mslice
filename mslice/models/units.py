@@ -13,6 +13,17 @@ def _scale_string_or_float(value, scale):
     except (ValueError, TypeError):
         return value
 
+def get_sample_temperature_from_string(string):
+    if string is not None and string.strip():
+        if string.endswith('K'):
+            string = string[:-1]
+        try:
+            sample_temp = float(string)
+            return sample_temp
+        except ValueError:
+            return None
+    return None
+
 class EnergyUnits(object):
 
     _available_units = ['meV', 'cm-1']

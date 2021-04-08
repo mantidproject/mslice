@@ -9,6 +9,7 @@ from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid.mantid_algorithms import LoadCIF, CloneWorkspace
@@ -142,15 +143,6 @@ def sample_temperature(ws_name, sample_temp_fields):
     return sample_temp
 
 
-def get_sample_temperature_from_string(string):
-    pos_k = string.find('K')
-    if pos_k == -1:
-        return None
-    k_string = string[pos_k - 3:pos_k]
-    sample_temp = float(''.join(c for c in k_string if c.isdigit()))
-    return sample_temp
-
-
 def compute_recoil_line(ws_name, axis, relative_mass=1):
     efixed = get_workspace_handle(ws_name).e_fixed
     x_axis = np.arange(axis.start, axis.end, axis.step)
@@ -228,4 +220,8 @@ def is_sliceable(workspace):
         return True
     else:
         validator = WorkspaceUnitValidator('DeltaE')
-        return isinstance(ws, Workspace) and validator.isValid(ws.raw_ws) == ''
+        try:
+            isvalid = isinstance(ws, Workspace) and validator.isValid(ws.raw_ws) == ''
+        except RuntimeError:
+            return False
+        return isvalid
