@@ -3,7 +3,6 @@ import mock
 import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
-
 from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
                                          ConvertToChi, ConvertToChiMag, ConvertToCrossSection, SymmetriseSQE,
                                          ConvertToGDOS, GenerateScript)
