@@ -57,7 +57,6 @@ def _update_overplot_checklist(key):
 
 
 def _get_overplot_key(element, rmm):
-
     if element is not None and rmm is not None:
         raise RuntimeError('Cannot use both element name and relative molecular mass')
     if element is None and rmm is None:
@@ -157,3 +156,41 @@ def is_cut(*args):
         return True
     else:
         return False
+
+
+def append_visible_handle(visible_handles, handles, idx: int):
+    handle = handles[idx]
+    visible_handles.append(handle[0])
+    return None
+
+
+def append_visible_label(visible_labels, labels, idx: int):
+    label = labels[idx]
+    visible_labels.append(label)
+    return None
+
+
+def append_visible_handle_and_label(visible_handles, handles, visible_labels, labels, idx: int):
+    append_visible_handle(visible_handles, handles, idx)
+    append_visible_label(visible_labels, labels, idx)
+    return None
+
+
+def show_or_hide_errorbars_of_a_line(container, alpha: float):
+    elements = container.get_children()[1:]
+    for element in elements:
+        element.set_alpha(alpha)
+    return None
+
+
+def show_or_hide_a_line(container, show_or_hide: bool):
+    line = container.get_children()[0]
+    line.set_visible(show_or_hide)
+    return None
+
+
+def hide_a_line_and_errorbars(ax, idx: int):
+    container = ax.containers[idx]
+    show_or_hide_a_line(container, False)
+    show_or_hide_errorbars_of_a_line(container, 0.0)
+    return None

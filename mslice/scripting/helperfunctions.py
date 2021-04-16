@@ -132,6 +132,32 @@ def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
     add_cut_lines_with_width(errorbars, script_lines, cuts)
+    hide_lines(script_lines, plot_handler, ax)
+
+
+def hide_lines(script_lines, plot_handler, ax):
+    """ Check if the line needs to be shown or not (hidden).
+    If the line is hidden, corresponding errorbars and legend
+    are also hidden.
+    """
+    script_lines.append("from mslice.cli.helperfunctions import hide_a_line_and_errorbars,"
+                        " append_visible_handle_and_label\n\n")
+
+    script_lines.append("# hide lines, errorbars, and legends\n")
+    script_lines.append("handles, labels = ax.get_legend_handles_labels()\n")
+    script_lines.append("visible_handles = []\n")
+    script_lines.append("visible_labels = []\n")
+    idx = -1
+    for container in ax.containers:
+        idx += 1
+        line_options = plot_handler.get_line_options_by_index(idx)
+        if line_options['shown']:
+            # only add handles and labels if the corresponding line is shown
+            script_lines.append(
+                f"\nappend_visible_handle_and_label(visible_handles, handles, visible_labels, labels, {idx:d})\n")
+        else:
+            script_lines.append(f"\nhide_a_line_and_errorbars(ax, {idx:d})\n")
+    script_lines.append("\nax.legend(visible_handles, visible_labels, fontsize='medium').set_draggable(True)\n\n")
 
 
 def add_cut_lines_with_width(errorbars, script_lines, cuts):
