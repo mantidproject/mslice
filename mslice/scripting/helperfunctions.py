@@ -135,57 +135,13 @@ def add_cut_lines(script_lines, plot_handler, ax):
     hide_lines(script_lines, plot_handler, ax)
 
 
-def append_handles_and_labels(script_lines):
-    script_lines.append("def append_visible_handle(visible_handles, handles, idx: int):\n")
-    script_lines.append("    handle = handles[idx]\n")
-    script_lines.append("    visible_handles.append(handle[0])\n")
-    script_lines.append("    return None\n\n")
-
-    script_lines.append("def append_visible_label(visible_labels, labels, idx: int):\n")
-    script_lines.append("    label = labels[idx]\n")
-    script_lines.append("    visible_labels.append(label)\n")
-    script_lines.append("    return None\n\n")
-
-    script_lines.append(
-        "def append_visible_handle_and_label(visible_handles, handles, visible_labels, labels, idx: int):\n")
-    script_lines.append("    append_visible_handle(visible_handles, handles, idx)\n")
-    script_lines.append("    append_visible_label(visible_labels, labels, idx)\n")
-    script_lines.append("    return None\n\n")
-
-
-def hide_errorbars_of_a_line(script_lines):
-    script_lines.append("def show_or_hide_errorbars_of_a_line(container, alpha: float):\n")
-    script_lines.append("    elements = container.get_children()[1:]\n")
-    script_lines.append("    for element in elements:\n")
-    script_lines.append("        element.set_alpha(alpha)\n")
-    script_lines.append("    return None\n\n")
-
-
-def hide_a_line(script_lines):
-    script_lines.append("def show_or_hide_a_line(container, show_or_hide: bool):\n")
-    script_lines.append("    line = container.get_children()[0]\n")
-    script_lines.append("    line.set_visible(show_or_hide)\n")
-    script_lines.append("    return None\n\n")
-
-
-def hide_a_line_and_errorbars(script_lines):
-    script_lines.append("def hide_a_line_and_errorbars(ax, idx: int):\n")
-    script_lines.append("    container = ax.containers[idx]\n")
-    script_lines.append("    show_or_hide_a_line(container, False)\n")
-    script_lines.append("    show_or_hide_errorbars_of_a_line(container, 0.0)\n")
-    script_lines.append("    return None\n\n")
-
-
 def hide_lines(script_lines, plot_handler, ax):
     """ Check if the line needs to be shown or not (hidden).
     If the line is hidden, corresponding errorbars and legend
     are also hidden.
     """
-    script_lines.append("# Definitions of necessary functions\n")
-    hide_a_line(script_lines)
-    hide_errorbars_of_a_line(script_lines)
-    hide_a_line_and_errorbars(script_lines)
-    append_handles_and_labels(script_lines)
+    script_lines.append("from mslice.cli.helperfunctions import hide_a_line_and_errorbars,"
+                        " append_visible_handle_and_label\n\n")
 
     script_lines.append("# hide lines, errorbars, and legends\n")
     script_lines.append("handles, labels = ax.get_legend_handles_labels()\n")
