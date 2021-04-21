@@ -28,6 +28,11 @@ TAB_POWDER = 0
 class MainWindow(MainView, QMainWindow):
 
     def __init__(self, in_mantid=False):
+        # if 'workbench' in sys.modules:
+        #     from workbench.config import get_window_config
+        #     parent, flags = get_window_config()
+        #     QMainWindow.__init__(self, parent, flags)
+        # else:
         QMainWindow.__init__(self)
         load_ui(__file__, 'mainwindow.ui', self)
         self.init_ui()
