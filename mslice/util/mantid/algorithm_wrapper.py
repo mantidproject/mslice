@@ -18,7 +18,8 @@ def _parse_ws_names(args, kwargs):
         input_workspace = get_workspace_handle(kwargs['InputWorkspace'])
         kwargs['InputWorkspace'] = _name_or_wrapper_to_workspace(kwargs['InputWorkspace'])
     elif len(args) > 0:
-        input_workspace = get_workspace_handle(args[0])
+        if isinstance(args[0], MsliceWorkspace) or isinstance(args[0], string_types):
+            input_workspace = get_workspace_handle(args[0])
         args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
 
     output_name = ''
