@@ -89,7 +89,7 @@ pip install -r setup-requirements.txt -r install-requirements.txt -r test-requir
 # test steps
 # ------------------------------------------------------------------------------
 # flake 8
-python setup.py flake8
+python setup.py flake8 > flake8.log
 
 # test
 xvfb-run --server-args="-screen 0 640x480x24" \
