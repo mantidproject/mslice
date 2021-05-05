@@ -91,7 +91,7 @@ class SlicePlotTest(unittest.TestCase):
 
         self.slice_plot.update_legend()
 
-        self.axes.legend.assert_called_once()
+        self.axes.get_legend.assert_called_once()
         if hasattr(Legend, "set_draggable"):
             self.axes.legend().set_draggable.assert_called_once()
         else:
