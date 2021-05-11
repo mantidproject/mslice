@@ -164,7 +164,7 @@ class SlicePlot(IPlot):
 
     def update_legend(self):
         axes = self._canvas.figure.gca()
-        lgn = axes.legend()
+        lgn = axes.get_legend()
         if lgn:
             legend_set_draggable(lgn, True)
 

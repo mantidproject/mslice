@@ -12,6 +12,18 @@ from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 import mslice.plotting.pyplot as plt
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
+
+
+def release_active_interactive_cuts_on_slice_plots() -> None:
+    for each_figure in GlobalFigureManager.all_figures():
+        plot_handler = each_figure.plot_handler
+        if isinstance(plot_handler, SlicePlot):
+            action_icuts = plot_handler.plot_window.action_interactive_cuts
+            if not action_icuts.isChecked():
+                continue
+            plot_handler.toggle_interactive_cuts()
+            action_icuts.setChecked(False)
 
 
 class PlotFigureManagerQT(QtCore.QObject):
@@ -87,6 +99,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window.flag_as_current()
 
     def add_slice_plot(self, slice_plotter_presenter, workspace):
+        release_active_interactive_cuts_on_slice_plots()
         if self.plot_handler is None:
             # Move the top right corner of all slice plot windows to the left of the screen centre by 1.05
             # the window width and above the screen center by half the window height to prevent cuts/interactive cuts
