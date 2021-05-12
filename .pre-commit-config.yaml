@@ -1,0 +1,21 @@
+default_language_version:
+  python: python3
+
+repos:
+
+  # Run fast code improvement/checks before running PR specific helpers.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 2618198e9658cccb4a53f04af0f7d642109f3b54
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: .patch$
+      - id: check-added-large-files
+        args: ['--maxkb=4096']
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.9
+    hooks:
+      - id: flake8
+        # Have to manually copy this from the .flake8 as flake8 will just ignore the config if the file is passed
+        #args: ['--extend-ignore=E999,F821,E127']
