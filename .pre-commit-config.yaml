@@ -17,5 +17,5 @@ repos:
     rev: 3.7.9
     hooks:
       - id: flake8
-        # Have to manually copy this from the .flake8 as flake8 will just ignore the config if the file is passed
-        #args: ['--extend-ignore=E999,F821,E127']
+      # Have to manually copy this from the .flake8 as flake8 will just ignore the config if the file is passed
+        exclude: tools/boilerplate.py

@@ -41,7 +41,7 @@ Finally, the cut figures have the same ``Keep`` / ``Make Current`` window manage
 Matlab MSlice as the slices. Clicking ``Plot`` will send data to the **Current** figure window, clearing whatever was
 previously plotted there. Clicking ``Plot Over`` sends data to the **Current** figure window but plotting over data already
 there. If you wish to have a fresh plot but to keep the data in a particular plot figure window, click ``Keep``. To make
-a **Kept** figure **Current** again (for example to use ``Plot Over``), click ``Make Current``. 
+a **Kept** figure **Current** again (for example to use ``Plot Over``), click ``Make Current``.
 See :ref:`Keep_/_Make_Current` for more details.
 
 .. image:: images/cutting/cut_options.png
@@ -49,7 +49,7 @@ See :ref:`Keep_/_Make_Current` for more details.
 
 You can edit the axes limits, scale and titles by double-clicking on the relevant axis in the plot window. Clicking on each
 plot line will also allow you to change its colour and symbol. These functionalities are also accessible from the options
-button (the cog symbol) in the plot figure toolbar. 
+button (the cog symbol) in the plot figure toolbar.
 
 Saving cuts
 -----------
@@ -57,7 +57,7 @@ Saving cuts
 Each time you click ``Plot`` or ``Plot Over`` an ``MD Histo`` type workspace is created, and can be accessed from the
 corresponding tab. This workspace can be saved to Nexus (``nxs``), Matlab (``mat``) or ASCII (``txt`` or ``xye``) formats.
 *MSlice* is able to load previously saved Nexus or ASCII cuts from file, but you may only then plot or overplot these cuts
-(further manipulation of the cuts is not allowed, although you may normalise the intensity to unity for the plots). 
+(further manipulation of the cuts is not allowed, although you may normalise the intensity to unity for the plots).
 The ASCII format is a simple three column ``x`` - ``y`` - ``e`` type format. For ``mat`` files, three vectors ``x``
 (coordinate), ``y`` (signal) and ``e`` (uncertainties) are saved.
 
