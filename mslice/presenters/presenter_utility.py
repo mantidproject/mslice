@@ -14,6 +14,6 @@ class PresenterUtility(object):
 
     def _to_int(self, x):
         return None if x == "" else int(x)
-
+  
     def _clear_displayed_error(self, view):
         view.clear_displayed_error()
