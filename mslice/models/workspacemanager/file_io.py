@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import os.path
+from qtpy.QtWidgets import QFileDialog
 from mantid.api import MDNormalization
-from mslice.util.qt.QtWidgets import QFileDialog
 from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace, SaveAscii, SaveMD, SaveNexus
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.axis import Axis

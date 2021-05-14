@@ -2,8 +2,7 @@ import os.path
 import weakref
 
 import six
-from mslice.util.qt.QtCore import Qt
-from mslice.util.qt import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 from mslice.util.qt.qapp import (QAppThreadCall, create_qapp_if_required,
                                  force_method_calls_to_qapp_thread)
 from mslice.models.workspacemanager.file_io import get_save_directory

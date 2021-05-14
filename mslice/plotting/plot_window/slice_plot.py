@@ -1,7 +1,7 @@
 from functools import partial
 
-from mslice.util.qt import QtWidgets
-from mslice.util.qt.QtCore import Qt
+from qtpy import QtWidgets
+from qtpy.QtCore import Qt
 
 import os.path as path
 import matplotlib.colors as colors

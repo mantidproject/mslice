@@ -1,4 +1,4 @@
-from mslice.util.qt.QtWidgets import QComboBox
+from qtpy.QtWidgets import QComboBox
 
 
 class ComboBox(QComboBox):

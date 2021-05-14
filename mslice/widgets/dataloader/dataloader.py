@@ -4,8 +4,8 @@ import os
 
 from functools import partial
 
-from mslice.util.qt.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView, QMessageBox
-from mslice.util.qt.QtCore import Signal, QDir, Qt
+from qtpy.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView, QMessageBox
+from qtpy.QtCore import Signal, QDir, Qt
 
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.util.qt import load_ui

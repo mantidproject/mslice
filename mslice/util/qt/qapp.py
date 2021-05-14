@@ -12,7 +12,7 @@ from functools import wraps
 # make these available in this module for the rest of codebase
 from mantidqt.utils.qt.qappthreadcall import QAppThreadCall, force_method_calls_to_qapp_thread  # noqa: F401
 
-from mslice.util.qt.QtWidgets import QApplication
+from qtpy.QtWidgets import QApplication
 
 # Global QApplication instance reference to keep it alive
 qApp = None

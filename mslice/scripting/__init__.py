@@ -1,5 +1,5 @@
+from qtpy import QtWidgets
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.util.qt import QtWidgets
 from mslice.scripting.helperfunctions import add_plot_statements
 from mslice.app.presenters import get_cut_plotter_presenter
 from six import string_types

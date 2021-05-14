@@ -3,9 +3,9 @@ from __future__ import (absolute_import, division, print_function)
 from six import iteritems
 import functools
 
-import mslice.util.qt.QtWidgets as QtWidgets
+import qtpy.QtWidgets as QtWidgets
+from qtpy.QtCore import Signal
 from mslice.models.colors import named_cycle_colors, color_to_name
-from mslice.util.qt.QtCore import Signal
 from mslice.util.qt import load_ui
 
 

@@ -1,10 +1,11 @@
 from __future__ import (absolute_import, division, print_function)
 
+from qtpy import QtCore, QtWidgets
+
 from matplotlib.figure import Figure
 from mantidqt.icons import get_icon
 
 from mslice.plotting.backend import get_canvas_and_toolbar_cls
-from mslice.util.qt import QtCore, QtWidgets
 from mslice.util.qt.validator_helper import double_validator_without_separator
 
 FigureCanvas, NavigationToolbar2QT = get_canvas_and_toolbar_cls()

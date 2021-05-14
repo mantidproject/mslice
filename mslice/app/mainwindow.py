@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.util.qt.QtWidgets import QApplication, QMainWindow, QLabel, QMenu, QStackedLayout
+from qtpy.QtWidgets import QApplication, QMainWindow, QLabel, QMenu, QStackedLayout
 
 from mslice.models.units import EnergyUnits
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter

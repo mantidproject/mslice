@@ -83,7 +83,6 @@ setup_args = dict(name=NAME,
 setup_args['setup_requires'] = read_requirements_from_file(os.path.join(THIS_DIR, 'setup-requirements.txt'))
 
 # User installation requires the following dependencies
-# PyQt4 cannot be installed from pip so they cannot be added here
 install_requires = setup_args['install_requires'] = \
     read_requirements_from_file(os.path.join(THIS_DIR, 'install-requirements.txt'))
 # Testing requires
