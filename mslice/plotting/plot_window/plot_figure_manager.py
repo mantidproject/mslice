@@ -162,10 +162,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         printer.setOrientation(QtWidgets.QPrinter.Landscape)
         print_dialog = QtWidgets.QPrintDialog(printer)
         if print_dialog.exec_():
-            try:
-                pixmap_image = QtWidgets.QWidget.grab(self.canvas)
-            except AttributeError:  # Qt4 needs to use old grabWidget() method
-                pixmap_image = QtGui.QPixmap.grabWidget(self.canvas)
+            pixmap_image = QtWidgets.QWidget.grab(self.canvas)
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(),
                                                page_size.height(),
