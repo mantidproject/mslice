@@ -4,7 +4,7 @@ Quick Start
 Starting MSlice
 ---------------
 
-MSlice is included in the Mantid distribution so the easiest way to start it is from the **Interfaces** menu in *MantidPlot*.
+MSlice is included in the Mantid distribution so the easiest way to start it is from the **Interfaces** menu in *MantidWorkbench*.
 
 .. image:: images/quickstart/mantid_interfaces_menu.png
 
@@ -12,7 +12,7 @@ The version of *MSlice* distributed with Mantid is the last stable version. Howe
 devlopment to the program, which is available only in the development version on `GitHub`. To get this version, please
 download this `zip <https://github.com/mantidproject/mslice/archive/master.zip>`_ and extract it to a folder on your computer.
 You can then either copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the 
-``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidPlot*, or run the
+``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*, or run the
 the ``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
 you did not install *Mantid* in the default location.
 
