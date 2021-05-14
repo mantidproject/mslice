@@ -2,6 +2,7 @@ import os.path
 import weakref
 
 import six
+from qtpy.QtCore import Qt
 from qtpy import QtCore, QtGui, QtWidgets
 from mslice.util.qt.qapp import (QAppThreadCall, create_qapp_if_required,
                                  force_method_calls_to_qapp_thread)
