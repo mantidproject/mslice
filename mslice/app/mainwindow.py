@@ -49,11 +49,7 @@ class MainWindow(MainView, QMainWindow):
                                   TAB_NONPSD: [self.btnAdd, self.btnSubtract, self.composeFrame]}
         if in_mantid:
             self.buttons_to_enable[TAB_HISTO] += [self.btnSaveToADS]
-            from mslice.util.mantid import in_mantidplot
-            if in_mantidplot():
-                self.btnSaveToADS.setText('Save to MantidPlot')
-            else:
-                self.btnSaveToADS.setText('Save to Workbench')
+            self.btnSaveToADS.setText('Save to Workbench')
 
         self.stack_to_show = {TAB_2D: 1,
                               TAB_EVENT: 0,
