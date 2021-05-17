@@ -1,5 +1,5 @@
-from mslice.util.qt.QtCore import QLocale
-from mslice.util.qt.QtGui import QDoubleValidator
+from qtpy.QtCore import QLocale
+from qtpy.QtGui import QDoubleValidator
 
 
 def double_validator_without_separator():

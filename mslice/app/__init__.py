@@ -5,7 +5,7 @@ import sys
 
 import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.util.mantid import in_mantid
-from mslice.util.qt import QT_VERSION
+from qtpy import QT_VERSION
 from mslice.util.qt.qapp import create_qapp_if_required
 
 

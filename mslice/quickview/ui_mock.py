@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 from getter_ui import Ui_Dialog
-from mslice.util.qt import QtWidgets
+from qtpy import QtWidgets
 
 
 class GetInputFromUser(Ui_Dialog, QtWidgets.QDialog):
