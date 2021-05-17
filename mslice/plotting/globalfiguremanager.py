@@ -69,6 +69,9 @@ class GlobalFigureManager(object):
         """
         if not cls.has_fignum(num):
             return
+        if num in cls._unclassified_figures:
+            cls._unclassified_figures.remove(num)
+            return
         category = cls.get_category(num)
         if cls._active_figure == num:
             cls._active_figure = None
