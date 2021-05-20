@@ -250,7 +250,9 @@ class CutPlot(IPlot):
         self.plot_window.action_gen_script.setVisible(not is_icut)
         self.plot_window.action_waterfall.setVisible(not is_icut)
 
-        self.plot_window.show()
+        self.plot_window.showNormal()
+        self.plot_window.activateWindow()
+        self.plot_window.raise_()
         self._is_icut = is_icut
 
     def save_icut(self):
