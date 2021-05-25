@@ -11,8 +11,9 @@ from mslice.cli._mslice_commands import Cut, Slice
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
-# import matplotlib.pyplot as plt
-# from mslice.cli.helperfunctions import show_or_hide_a_line, show_or_hide_errorbars_of_a_line
+import matplotlib.pyplot as plt
+from mslice.cli.helperfunctions import show_or_hide_a_line
+# , show_or_hide_errorbars_of_a_line
 # from mslice.cli.helperfunctions import append_visible_label, append_visible_handle
 
 
@@ -163,15 +164,15 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         return_value = is_cut(cut_ws)
         self.assertEqual(return_value, True)
 
-#     def test_show_or_hide_a_line(self):
-#         fig, ax = plt.subplots()
-#         ax.errorbar([1], [2], [0.3])
-#         self.assertTrue(ax.lines[0].get_visible())
-#         show_or_hide_a_line(ax.containers[0], False)
-#         self.assertFalse(ax.lines[0].get_visible())
-#         show_or_hide_a_line(ax.containers[0], True)
-#         self.assertTrue(ax.lines[0].get_visible())
-#
+    def test_show_or_hide_a_line(self):
+        fig, ax = plt.subplots()
+        ax.errorbar([1], [2], [0.3])
+        self.assertTrue(ax.lines[0].get_visible())
+        show_or_hide_a_line(ax.containers[0], False)
+        self.assertFalse(ax.lines[0].get_visible())
+        show_or_hide_a_line(ax.containers[0], True)
+        self.assertTrue(ax.lines[0].get_visible())
+
 #     def test_show_or_hide_errorbars_of_a_line(self):
 #         fig, ax = plt.subplots()
 #         ax.errorbar([1], [2], [0.3])
