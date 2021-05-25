@@ -172,6 +172,7 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         self.assertFalse(ax.lines[0].get_visible())
         show_or_hide_a_line(ax.containers[0], True)
         self.assertTrue(ax.lines[0].get_visible())
+        plt.close(fig)
 
 #     def test_show_or_hide_errorbars_of_a_line(self):
 #         fig, ax = plt.subplots()
