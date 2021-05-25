@@ -41,7 +41,10 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     def showEvent(self, evt):
         if not self._first_time_show:
-            self.canvas.manager.plot_handler.save_default_options()
+            try:
+                self.canvas.manager.plot_handler.save_default_options()
+            except AttributeError:
+                pass
             self._first_time_show = True
         super(PlotWindow, self).showEvent(evt)
 
