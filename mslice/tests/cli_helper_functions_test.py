@@ -11,8 +11,9 @@ from mslice.cli._mslice_commands import Cut, Slice
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
-# , show_or_hide_errorbars_of_a_line
-# from mslice.cli.helperfunctions import append_visible_label, append_visible_handle
+import matplotlib.pyplot as plt
+from mslice.cli.helperfunctions import show_or_hide_a_line, show_or_hide_errorbars_of_a_line
+from mslice.cli.helperfunctions import append_visible_label, append_visible_handle
 
 
 class CLIHelperFunctionsTest(unittest.TestCase):
@@ -163,8 +164,6 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         self.assertEqual(return_value, True)
 
     def test_show_or_hide_a_line(self):
-        import matplotlib.pyplot as plt
-        from mslice.cli.helperfunctions import show_or_hide_a_line
         fig, ax = plt.subplots()
         ax.errorbar([1], [2], [0.3])
         self.assertTrue(ax.lines[0].get_visible())
@@ -174,37 +173,40 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         self.assertTrue(ax.lines[0].get_visible())
         plt.close(fig)
 
-#     def test_show_or_hide_errorbars_of_a_line(self):
-#         fig, ax = plt.subplots()
-#         ax.errorbar([1], [2], [0.3])
-#         self.assertTrue(ax.containers[0].get_children()[1:][0].get_alpha() is None)
-#         show_or_hide_errorbars_of_a_line(ax.containers[0], 0.0)
-#         self.assertEqual(ax.containers[0].get_children()[1:][0].get_alpha(), 0.0)
-#         show_or_hide_errorbars_of_a_line(ax.containers[0], 1.0)
-#         self.assertEqual(ax.containers[0].get_children()[1:][0].get_alpha(), 1.0)
-#
-#     def test_append_visible_label(self):
-#         visible_labels = []
-#         fig, ax = plt.subplots()
-#         ax.errorbar([1], [2], [0.3], label="label1")
-#         ax.errorbar([2], [4], [0.6], label="label2")
-#         handles, labels = ax.get_legend_handles_labels()
-#         self.assertEqual(labels[0], "label1")
-#         self.assertEqual(labels[1], "label2")
-#         append_visible_label(visible_labels, labels, 1)
-#         self.assertEqual(visible_labels[0], "label2")
-#
-#     def test_append_visible_handle(self):
-#         visible_handles = []
-#         fig, ax = plt.subplots()
-#         handle1 = ax.errorbar([1], [2], [0.3], label="label1")
-#         handle2 = ax.errorbar([2], [4], [0.6], label="label2")
-#         handles, labels = ax.get_legend_handles_labels()
-#         self.assertEqual(handles[0], handle1)
-#         self.assertEqual(handles[1], handle2)
-#         append_visible_handle(visible_handles, handles, 1)
-#         self.assertEqual(visible_handles[0], handle2[0])
-#
-#
-# if __name__ == "__main__":
-#     unittest.main()
+    def test_show_or_hide_errorbars_of_a_line(self):
+        fig, ax = plt.subplots()
+        ax.errorbar([1], [2], [0.3])
+        self.assertTrue(ax.containers[0].get_children()[1:][0].get_alpha() is None)
+        show_or_hide_errorbars_of_a_line(ax.containers[0], 0.0)
+        self.assertEqual(ax.containers[0].get_children()[1:][0].get_alpha(), 0.0)
+        show_or_hide_errorbars_of_a_line(ax.containers[0], 1.0)
+        self.assertEqual(ax.containers[0].get_children()[1:][0].get_alpha(), 1.0)
+        plt.close(fig)
+
+    def test_append_visible_label(self):
+        visible_labels = []
+        fig, ax = plt.subplots()
+        ax.errorbar([1], [2], [0.3], label="label1")
+        ax.errorbar([2], [4], [0.6], label="label2")
+        handles, labels = ax.get_legend_handles_labels()
+        self.assertEqual(labels[0], "label1")
+        self.assertEqual(labels[1], "label2")
+        append_visible_label(visible_labels, labels, 1)
+        self.assertEqual(visible_labels[0], "label2")
+        plt.close(fig)
+
+    def test_append_visible_handle(self):
+        visible_handles = []
+        fig, ax = plt.subplots()
+        handle1 = ax.errorbar([1], [2], [0.3], label="label1")
+        handle2 = ax.errorbar([2], [4], [0.6], label="label2")
+        handles, labels = ax.get_legend_handles_labels()
+        self.assertEqual(handles[0], handle1)
+        self.assertEqual(handles[1], handle2)
+        append_visible_handle(visible_handles, handles, 1)
+        self.assertEqual(visible_handles[0], handle2[0])
+        plt.close(fig)
+
+
+if __name__ == "__main__":
+    unittest.main()
