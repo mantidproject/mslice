@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
-import mock
+from unittest import mock
 from mslice.workspace import wrap_workspace
 from mslice.cli.helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
     _check_workspace_name, _check_workspace_type, is_slice, is_cut, _get_overplot_key, _update_overplot_checklist, \
@@ -11,8 +11,6 @@ from mslice.cli._mslice_commands import Cut, Slice
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
-import matplotlib.pyplot as plt
-from mslice.cli.helperfunctions import show_or_hide_a_line
 # , show_or_hide_errorbars_of_a_line
 # from mslice.cli.helperfunctions import append_visible_label, append_visible_handle
 
@@ -165,6 +163,8 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         self.assertEqual(return_value, True)
 
     def test_show_or_hide_a_line(self):
+        import matplotlib.pyplot as plt
+        from mslice.cli.helperfunctions import show_or_hide_a_line
         fig, ax = plt.subplots()
         ax.errorbar([1], [2], [0.3])
         self.assertTrue(ax.lines[0].get_visible())
