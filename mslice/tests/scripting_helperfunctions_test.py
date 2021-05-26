@@ -1,8 +1,8 @@
 import unittest
-import mock
+from unittest import mock
 from mslice.scripting.helperfunctions import header, add_header, add_plot_statements, add_slice_plot_statements, \
     COMMON_PACKAGES, MPL_COLORS_IMPORT, NUMPY_IMPORT, add_overplot_statements, add_cut_plot_statements, add_cut_lines, \
-    add_cut_lines_with_width, add_plot_options
+    add_cut_lines_with_width, add_plot_options, hide_lines
 from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.cli.helperfunctions import _function_to_intensity
@@ -327,3 +327,31 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         # Each mc.Cut statement has a corresponding errorbar statement
         self.assertEqual(len(script_lines), 6)
+
+    def test_show_or_hide_containers_in_script(self):
+        fig, ax = plt.subplots()
+        ax.errorbar([1], [2], [0.3], label="label1")
+        ax.errorbar([2], [4], [0.6], label="label2")
+        plot_handler = mock.MagicMock(spec=CutPlot)
+        plot_handler.get_line_visible = mock.MagicMock(side_effect=[False, True])
+        script_lines = []
+        hide_lines(script_lines, plot_handler, ax)
+        self.assertIn("from mslice.cli.helperfunctions import hide_a_line_and_errorbars,"
+                            " append_visible_handle_and_label\n", script_lines)
+        self.assertIn("from mslice.util.compat import legend_set_draggable\n\n", script_lines)
+
+        self.assertIn("# hide lines, errorbars, and legends\n", script_lines)
+        self.assertIn("handles, labels = ax.get_legend_handles_labels()\n", script_lines)
+        self.assertIn("visible_handles = []\n", script_lines)
+        self.assertIn("visible_labels = []\n", script_lines)
+
+        self.assertIn("\nhide_a_line_and_errorbars(ax, 0)\n", script_lines)
+
+        self.assertNotIn("\nhide_a_line_and_errorbars(ax, 1)\n", script_lines)
+        self.assertIn("\nappend_visible_handle_and_label(visible_handles, handles, visible_labels, labels, 1)\n",
+                      script_lines)
+        plt.close(fig)
+
+
+if __name__ == "__main__":
+    unittest.main()
