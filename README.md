@@ -43,4 +43,4 @@ You will also need to edit the run configurations:
 - The startup script is `start_mslice.py`.
 - The `bin` directory of an installed version of Mantid must be on the `PATH`.
 - If you're developing on Windows, the Python interpreter used must be the one shipped with the Mantid installation `MantidInstall/bin/python.exe`.
-- If you're developing on Ubuntu, set the Python Interpreter path to `/usr/bin/python2.7`
+- If you're developing on Ubuntu, set the Python Interpreter path to `/usr/bin/python3.6`
