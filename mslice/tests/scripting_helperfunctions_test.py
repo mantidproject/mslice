@@ -337,7 +337,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         script_lines = []
         hide_lines(script_lines, plot_handler, ax)
         self.assertIn("from mslice.cli.helperfunctions import hide_a_line_and_errorbars,"
-                            " append_visible_handle_and_label\n", script_lines)
+                      " append_visible_handle_and_label\n", script_lines)
         self.assertIn("from mslice.util.compat import legend_set_draggable\n\n", script_lines)
 
         self.assertIn("# hide lines, errorbars, and legends\n", script_lines)
