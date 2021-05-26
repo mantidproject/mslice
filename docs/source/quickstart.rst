@@ -24,25 +24,25 @@ Loading Data
 
 The GUI is divided into two main tabs, a ``Data Loading`` tab which shows the filesystem and allows the user to load reduced
 data files, and a ``Workspace Manager`` which handles the loaded data. To reach a particular data folder you can either
-type the full path to the folder in the edit box, or navigate using the filesystem tree below using either the mouse or 
+type the full path to the folder in the edit box, or navigate using the filesystem tree below using either the mouse or
 keyboard arrow keys and the ``Enter`` key, with ``Backspace`` used for going up a folder level. Typing the first few letters
 of a file or folder name will also jump to its location in the tree.
 
-The filesystem tree only shows files which *MSlice* can load (currently ``nxs``, ``nxspe`` and ``txt`` or ``xye`` files). 
+The filesystem tree only shows files which *MSlice* can load (currently ``nxs``, ``nxspe`` and ``txt`` or ``xye`` files).
 
 Double clicking on a file or pressing ``Enter`` when it is selected will load it. You can select multiple files by holding
 down the ``Shift`` key to select a range or the ``Ctrl`` key to select individual files. These files may then be loaded
 separately using the ``Load Data`` button or summed together into a single workspace using the ``Load and Merge Data``
 button. In the later case, the logs of the datafiles are also combined. (Note that you can also sum loaded workspaces
-together in the ``Workspace Manager`` tab after loading, but in this case the logs are not combined). 
+together in the ``Workspace Manager`` tab after loading, but in this case the logs are not combined).
 
 .. _PSD_and_non-PSD_modes:
 
 PSD and non-PSD modes
 ---------------------
 
-Once the data has been loaded, the GUI will switch to the ``Workspace Manager`` tab and select the loaded workspace(s). 
-MSlice has two operating modes which it selects automatically depending on the type of data which is loaded. For data from 
+Once the data has been loaded, the GUI will switch to the ``Workspace Manager`` tab and select the loaded workspace(s).
+MSlice has two operating modes which it selects automatically depending on the type of data which is loaded. For data from
 spectrometers with position-sensitive detectors which have been reduced preserving the pixel data (for example, autoreduced
 data from SNS or *one2one mapped* data from ISIS), then the **PSD mode** is used. For these types of data, an extra step
 to ``Calculate Projection`` is required before the data can be plotted. This step converts the data into an **MD** (multi-
@@ -91,7 +91,7 @@ Interactive Cuts
 .. image:: images/quickstart/interactive_cuts.png
    :scale: 80 %
 
-From the slice window, you can also select an ``Interactive Cut`` which will allow you to select a region of data to 
+From the slice window, you can also select an ``Interactive Cut`` which will allow you to select a region of data to
 integrate into a 1D and dynamically change this region and the corresponding cut. Clicking ``Interactive Cut`` will
 change the cursor to a cross-hair. You should then select a rectangular region in the 2D slice, after which a separate
 cut window will open showing the 1D cut. The long axis of the selected rectangle is the cut axis, and the short axis
@@ -122,7 +122,7 @@ respectively.
    :scale: 80 %
 
 To overplot multiple datasets, you can select multiple workspaces in the left pane (using ``Shift`` or ``Ctrl``)
-and then give common limits, step sizes and integration range, and click ``Plot``. For more details see 
+and then give common limits, step sizes and integration range, and click ``Plot``. For more details see
 :ref:`Cutting_from_the_GUI`
 
 .. _Keep_/_Make_Current:
@@ -174,7 +174,7 @@ as usual.
 Energy transfer units
 ---------------------
 
-By default MSlice uses ``meV`` as the unit for energy transfer, with the convention that positive energy transfer 
+By default MSlice uses ``meV`` as the unit for energy transfer, with the convention that positive energy transfer
 corresponds neutron energy loss. In addition to this, MSlice also supports cm\ :sup:`-1` (wavenumbers), denoted ``cm-1``.
 
 You can choose the desired unit using the ``en`` drop-down comboboxes in the **Cut** and **Slice** tabs.

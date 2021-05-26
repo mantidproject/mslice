@@ -3,3 +3,4 @@ numpy
 matplotlib>=1.5
 six
 qtawesome
+pre-commit

@@ -9,6 +9,7 @@ dependencies:
   - nose
   - numpy
   - numpy-base
+  - pip
   - pyqt
   - qtawesome
   - qtconsole
@@ -18,4 +19,5 @@ dependencies:
   - pip:
       - coverage
       - h5py
+      - pre-commit
       - pyyaml

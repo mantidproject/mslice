@@ -13,7 +13,7 @@ default (e.g. if the axes titles or limits have been changed or additional infor
 
 Generated scripts may be run from the MantidWorkbench script window.
 
-Alternatively, the script can also be run from the IPython console in the MSlice GUI using the ``import`` directive and the ``reload`` 
+Alternatively, the script can also be run from the IPython console in the MSlice GUI using the ``import`` directive and the ``reload``
 (``importlib.reload`` in Python 3) function. For example, the first time the script is run, do:
 
 .. code:: python
@@ -33,8 +33,8 @@ Plotting using Matplotlib interface
 
 Whilst MSlice uses Matplotlib to render all the plots, it has its own type of figure windows in order to accommodate additional
 features such as the keep / make current functionality and interactive plots. The MSlice specific figures *do not* support multiple
-plots per figure (subplots) and will not work in a Jupyter notebook. However, MSlice is also able to plot to a generic Matplotlib 
-figure. 
+plots per figure (subplots) and will not work in a Jupyter notebook. However, MSlice is also able to plot to a generic Matplotlib
+figure.
 
 To plot a 1D cut using the MSlice figures use:
 
@@ -73,7 +73,7 @@ To plot the same cut using a plain Matplotlib figure use:
 E.g. the only difference is that you must use the ``matplotlib.pyplot`` package instead of the ``mslice.plotting.pyplot`` package
 and call ``fig.show()`` at the end instead of ``mc.Show()``. In both cases, all the standard object-oriented Matplotlib functions
 (such as ``set_title``, ``set_xlabel``, ``set_xlim`` etc.) are accepted. Note that also in both cases you must specify the
-``projection='mslice'`` keyword argument to ``add_subplot``, because this lets the Matplotlib ``errorbar`` function recognise an 
+``projection='mslice'`` keyword argument to ``add_subplot``, because this lets the Matplotlib ``errorbar`` function recognise an
 MSlice workspace. Finally, please also that the MSlice override of ``pyplot`` *does not* support the ``fig, ax = plt.subplots()``
 syntax.
 
@@ -116,7 +116,7 @@ To plot a cut and then a slice:
     ws = mc.Load('data.nxspe')
     wsq = mc.Cut(ws, '|Q|', 'DeltaE, -1, 1')
     mc.PlotCut(wsq)
-    
+
     ws2d = mc.Slice(ws, '|Q|, 0, 10, 0.01', 'DeltaE, -5, 55, 0.5')
     mc.PlotSlice(ws2d)
 
@@ -124,8 +124,8 @@ To plot a cut and then a slice:
 Algebraic Manipulation of Workspaces
 ------------------------------------
 
-The MSlice workspaces support standard algebraic manipulations in a similar way to normal Mantid workspaces. Loaded `nxs` or 
-``nxspe`` files are created as a ``Workspace``. For **PSD** (one-to-one mapped) files, these are first converted into a 
+The MSlice workspaces support standard algebraic manipulations in a similar way to normal Mantid workspaces. Loaded `nxs` or
+``nxspe`` files are created as a ``Workspace``. For **PSD** (one-to-one mapped) files, these are first converted into a
 ``PixelWorkspace`` using a "Calculate Projection" step before they can be plotted. The slices and cuts produced either directly
 from the loaded ``Workspace`` (if in **non-PSD** mode, e.g. for a rings-mapped file) or from the ``PixelWorkspace`` are
 ``HistogramWorkspace``\s.
@@ -134,9 +134,9 @@ Operations performed on ``Workspaces``\s and ``HistogramWorkspaces``\s are done 
 workspace, or with a scalar is allowed. For ``PixelWorkspace`` (which are based on Mantid's ``MDEventWorkspace`` which does not
 allow many algebraic manipulations), a fine grained slice is first created (generating an internal ``HistogramWorkspace``) and
 then the algebraic operation is applied to this fine grained slice. Thus it is recommended to perform any algebraic manipulation
-on the loaded ``Workspace`` prior to conversion (using ``MakeProjection``) to a ``PixelWorkspace`` for cutting / slicing and 
+on the loaded ``Workspace`` prior to conversion (using ``MakeProjection``) to a ``PixelWorkspace`` for cutting / slicing and
 plotting.
-   
+
 For example:
 
 .. code:: python
@@ -164,11 +164,11 @@ To load and plot a slice in :math:`|Q|` and energy transfer, and a cut along :ma
     ws = mc.Load('data.nxspe')
     wsq = mc.Cut(ws, '|Q|', 'DeltaE, -1, 1')
     mc.PlotCut(wsq)
-    
+
     ws2d = mc.Slice(ws, '|Q|, 0, 10, 0.01', 'DeltaE, -5, 55, 0.5')
     mc.PlotSlice(ws2d)
 
-In the above ``Slice`` function rebins the data between :math:`0\leq |Q|\leq 10` in steps of 0.01 :math:`\mathrm{\AA}^{-1}` 
+In the above ``Slice`` function rebins the data between :math:`0\leq |Q|\leq 10` in steps of 0.01 :math:`\mathrm{\AA}^{-1}`
 and between :math:`-5\leq E\leq 55` in steps of 0.5 meV.
 
 Plotting a series of cuts
