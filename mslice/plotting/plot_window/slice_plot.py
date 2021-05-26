@@ -1,7 +1,7 @@
 from functools import partial
 
-from mslice.util.qt import QtWidgets
-from mslice.util.qt.QtCore import Qt
+from qtpy import QtWidgets
+from qtpy.QtCore import Qt
 
 import os.path as path
 import matplotlib.colors as colors
@@ -164,7 +164,7 @@ class SlicePlot(IPlot):
 
     def update_legend(self):
         axes = self._canvas.figure.gca()
-        lgn = axes.legend()
+        lgn = axes.get_legend()
         if lgn:
             legend_set_draggable(lgn, True)
 

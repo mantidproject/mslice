@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division,
                         print_function)
 
 import warnings
-from mslice.util.mantid import in_mantidplot
+from mslice.util.mantid import in_mantid
 
 # Ignore Jupyter/IPython deprecation warnings that we can't do anything about
 warnings.filterwarnings('ignore', category=DeprecationWarning, module='IPython.*')
@@ -38,7 +38,7 @@ class IPythonWidget(RichIPythonWidget):
 
         self.kernel_manager = kernel_manager
         self.kernel_client = kernel_client
-        if not in_mantidplot():
+        if not in_mantid():
             self.execute('from mslice.util.mantid.mantid_algorithms import *', hidden=True)
             self.execute('from mslice.cli import *', hidden=True)
         else:

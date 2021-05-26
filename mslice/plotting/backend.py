@@ -3,7 +3,7 @@ from __future__ import (absolute_import, unicode_literals)
 import importlib
 
 # local imports
-from mslice.util.qt import QT_VERSION
+from qtpy import QT_VERSION
 
 
 def get_canvas_and_toolbar_cls():

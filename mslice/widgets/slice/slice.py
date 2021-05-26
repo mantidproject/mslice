@@ -5,9 +5,9 @@
 # -----------------------------------------------------------------------------
 from __future__ import (absolute_import, division, print_function)
 
+from qtpy.QtCore import Signal
+from qtpy.QtWidgets import QWidget
 from mslice.util.qt import load_ui
-from mslice.util.qt.QtCore import Signal
-from mslice.util.qt.QtWidgets import QWidget
 from mslice.util.qt.validator_helper import double_validator_without_separator
 
 from mslice.models.units import EnergyUnits

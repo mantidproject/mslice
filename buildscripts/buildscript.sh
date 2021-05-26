@@ -23,7 +23,7 @@ case "$py_ver" in
 esac
 # X server
 XVFB_SERVER_NUM=101
-# Qt4 backends
+# Qt5 backends
 export QT_API=pyqt5
 export MPLBACKEND=Qt5Agg
 

@@ -2,7 +2,7 @@
 from __future__ import (absolute_import, division, print_function)
 import re
 from .ui_mock import GetInputFromUser,display_message
-from mslice.util.qt import QtWidgets
+from qtpy import QtWidgets
 
 
 class QuickView(QtWidgets.QWidget):

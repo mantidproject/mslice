@@ -1,7 +1,7 @@
 from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
 
-from mslice.util.qt import QtWidgets
-from mslice.util.qt.QtCore import Signal
+from qtpy import QtWidgets
+from qtpy.QtCore import Signal
 
 
 class QuickOptions(QtWidgets.QDialog):

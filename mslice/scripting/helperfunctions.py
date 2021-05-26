@@ -141,7 +141,8 @@ def hide_lines(script_lines, plot_handler, ax):
     are also hidden.
     """
     script_lines.append("from mslice.cli.helperfunctions import hide_a_line_and_errorbars,"
-                        " append_visible_handle_and_label\n\n")
+                        " append_visible_handle_and_label\n")
+    script_lines.append("from mslice.util.compat import legend_set_draggable\n\n")
 
     script_lines.append("# hide lines, errorbars, and legends\n")
     script_lines.append("handles, labels = ax.get_legend_handles_labels()\n")
@@ -157,7 +158,8 @@ def hide_lines(script_lines, plot_handler, ax):
                 f"\nappend_visible_handle_and_label(visible_handles, handles, visible_labels, labels, {idx:d})\n")
         else:
             script_lines.append(f"\nhide_a_line_and_errorbars(ax, {idx:d})\n")
-    script_lines.append("\nax.legend(visible_handles, visible_labels, fontsize='medium').set_draggable(True)\n\n")
+    script_lines.append("\nlegend_set_draggable(ax.legend(visible_handles, visible_labels,"
+                        " fontsize='medium'), True)\n\n")
 
 
 def add_cut_lines_with_width(errorbars, script_lines, cuts):

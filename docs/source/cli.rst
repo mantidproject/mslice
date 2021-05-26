@@ -11,7 +11,7 @@ default (e.g. if the axes titles or limits have been changed or additional infor
 
 .. image:: images/cli/generate_script_menu.png
 
-Generated scripts may be run from the MantidPlot script window (accessible using ``F3``).
+Generated scripts may be run from the MantidWorkbench script window.
 
 Alternatively, the script can also be run from the IPython console in the MSlice GUI using the ``import`` directive and the ``reload``
 (``importlib.reload`` in Python 3) function. For example, the first time the script is run, do:

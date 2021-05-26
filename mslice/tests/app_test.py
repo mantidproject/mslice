@@ -1,4 +1,4 @@
-from mslice.util.qt import QtWidgets
+from qtpy import QtWidgets
 import unittest
 from mock import patch
 from mslice.app.mainwindow import MainWindow

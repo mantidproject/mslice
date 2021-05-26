@@ -2,8 +2,8 @@ import os.path
 import weakref
 
 import six
-from mslice.util.qt.QtCore import Qt
-from mslice.util.qt import QtCore, QtGui, QtWidgets
+from qtpy.QtCore import Qt
+from qtpy import QtCore, QtGui, QtWidgets
 from mslice.util.qt.qapp import (QAppThreadCall, create_qapp_if_required,
                                  force_method_calls_to_qapp_thread)
 from mslice.models.workspacemanager.file_io import get_save_directory
@@ -12,6 +12,18 @@ from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
 import mslice.plotting.pyplot as plt
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
+
+
+def release_active_interactive_cuts_on_slice_plots() -> None:
+    for each_figure in GlobalFigureManager.all_figures():
+        plot_handler = each_figure.plot_handler
+        if isinstance(plot_handler, SlicePlot):
+            action_icuts = plot_handler.plot_window.action_interactive_cuts
+            if not action_icuts.isChecked():
+                continue
+            plot_handler.toggle_interactive_cuts()
+            action_icuts.setChecked(False)
 
 
 class PlotFigureManagerQT(QtCore.QObject):
@@ -87,6 +99,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window.flag_as_current()
 
     def add_slice_plot(self, slice_plotter_presenter, workspace):
+        release_active_interactive_cuts_on_slice_plots()
         if self.plot_handler is None:
             # Move the top right corner of all slice plot windows to the left of the screen centre by 1.05
             # the window width and above the screen center by half the window height to prevent cuts/interactive cuts
@@ -162,10 +175,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         printer.setOrientation(QtWidgets.QPrinter.Landscape)
         print_dialog = QtWidgets.QPrintDialog(printer)
         if print_dialog.exec_():
-            try:
-                pixmap_image = QtWidgets.QWidget.grab(self.canvas)
-            except AttributeError:  # Qt4 needs to use old grabWidget() method
-                pixmap_image = QtGui.QPixmap.grabWidget(self.canvas)
+            pixmap_image = QtWidgets.QWidget.grab(self.canvas)
             page_size = printer.pageRect()
             pixmap_image = pixmap_image.scaled(page_size.width(),
                                                page_size.height(),
