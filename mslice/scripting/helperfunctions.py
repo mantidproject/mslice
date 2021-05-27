@@ -151,8 +151,8 @@ def hide_lines(script_lines, plot_handler, ax):
     idx = -1
     for container in ax.containers:
         idx += 1
-        line_options = plot_handler.get_line_options_by_index(idx)
-        if line_options['shown']:
+        line_visible = plot_handler.get_line_visible(idx)
+        if line_visible:
             # only add handles and labels if the corresponding line is shown
             script_lines.append(
                 f"\nappend_visible_handle_and_label(visible_handles, handles, visible_labels, labels, {idx:d})\n")
