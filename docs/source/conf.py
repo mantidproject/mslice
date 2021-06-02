@@ -34,9 +34,10 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    'sphinx.ext.pngmath',
+    'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
+    'sphinx.ext.githubpages',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -54,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MSlice'
-copyright = u'2016, Mantid Project'
+copyright = u'2021, Mantid Project'
 author = u'Mantid Project'
 
 # The version info for the project you're documenting, acts as replacement for

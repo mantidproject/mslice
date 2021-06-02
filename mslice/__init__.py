@@ -6,6 +6,6 @@ A PyQt-based version of the MSlice (http://mslice.isis.rl.ac.uk) program based
 on Mantid (http://www.mantidproject.org).
 """
 
-version_info = (1, 2, 0, "dev0")
+version_info = (2, 2, 0)
 __version__ = '.'.join(map(str, version_info))
 __project_url__ = 'https://github.com/mantidproject/mslice'
