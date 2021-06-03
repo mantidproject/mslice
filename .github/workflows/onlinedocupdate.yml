@@ -1,9 +1,9 @@
 name: MSlice online documentation update
 
 on:
-  push
-    #paths:
-      #- 'mslice\__init__.py'
+  push:
+    paths:
+      - 'mslice\__init__.py'
 
 jobs:
   build:
