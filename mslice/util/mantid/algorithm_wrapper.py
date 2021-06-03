@@ -10,30 +10,36 @@ from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as MsliceWorkspace
 from mslice.workspace.workspace import Workspace as MsliceWorkspace2D
 
+
 def _parse_ws_names(args, kwargs):
     input_workspace = None
+
     if 'InputWorkspace' in kwargs:
-        input_workspace = kwargs['InputWorkspace']
+        input_workspace = get_workspace_handle(kwargs['InputWorkspace'])
         kwargs['InputWorkspace'] = _name_or_wrapper_to_workspace(kwargs['InputWorkspace'])
     elif len(args) > 0:
-        input_workspace = args[0]
+        if isinstance(args[0], MsliceWorkspace) or isinstance(args[0], string_types):
+            input_workspace = get_workspace_handle(args[0])
         args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
 
     output_name = ''
     if 'OutputWorkspace' in kwargs:
         output_name = kwargs.pop('OutputWorkspace')
 
-    for ws in [k for k in kwargs.keys() if isinstance(kwargs[k], MsliceWorkspace)]:
-        if input_workspace is None and 'LHS' in ws:
-            input_workspace = kwargs[ws]
-        if 'Input' not in ws and 'Output' not in ws:
-            kwargs[ws] = _name_or_wrapper_to_workspace(kwargs[ws])
+    for key in kwargs.keys():
+        if input_workspace is None and 'LHS' in key:
+            input_workspace = get_workspace_handle(kwargs[key])
+        if 'Input' not in key and 'Output' not in key:
+            if isinstance(kwargs[key], MsliceWorkspace):
+                kwargs[key] = _name_or_wrapper_to_workspace(kwargs[key])
 
-    return (input_workspace, output_name, args, kwargs)
+    return input_workspace, output_name, args, kwargs
+
 
 def _alg_has_outputws(wrapped_alg):
     alg = AlgorithmManager.create(wrapped_alg.__name__)
     return any(['OutputWorkspace' in prop.name for prop in alg.getProperties()])
+
 
 def wrap_algorithm(algorithm):
     def alg_wrapper(*args, **kwargs):
@@ -71,6 +77,7 @@ def wrap_algorithm(algorithm):
                     from mslice.app.presenters import get_slice_plotter_presenter
                     get_slice_plotter_presenter().update_displayed_workspaces()
         return result
+
     return alg_wrapper
 
 
