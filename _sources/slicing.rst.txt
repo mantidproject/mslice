@@ -11,13 +11,13 @@ Slicing from the GUI
 .. image:: images/slicing/calculate_projection.png
 
 Depending on the loaded data type (see :ref:`PSD_and_non-PSD_modes`), the ``Slice`` tab in the ``Workspace Manager``
-may be disabled. If this is the case, your data is in **PSD** mode and you have to first convert it to an ``MD Event`` 
+may be disabled. If this is the case, your data is in **PSD** mode and you have to first convert it to an ``MD Event``
 type workspace for MSlice to make slices and cuts. In the ``Powder`` tab shown above, select the desired axes (either
 *Momentum Transfer* vs *Energy Transfer* or *Scattering Angle* vs *Energy Transfer*) and click ``Calculate Projection``.
 *MSlice* will then switch focus to the ``MD Event`` workspace produced by this step and enable the ``Slice`` and ``Cut``
 tabs. The reason for this intemediate step is to reorganise the large volume pixel data into a form which can be quickly and
 efficiently rebinned into 2D slices and 1D cuts. *MSlice* uses the Mantid `BinMD
-<http://docs.mantidproject.org/nightly/algorithms/BinMD-v1.html>`_ algorithm to rebin the data for slices and cuts.  
+<http://docs.mantidproject.org/nightly/algorithms/BinMD-v1.html>`_ algorithm to rebin the data for slices and cuts.
 For smaller volume **Non-PSD** mode data, *MSlice* uses less efficient algorithms (`Rebin2D
 <http://docs.mantidproject.org/nightly/algorithms/Rebin2D-v1.html>`_ and `SofQWNormalisedPolygon
 <http://docs.mantidproject.org/nightly/algorithms/SofQWNormalisedPolygon-v1.html>`_) to rebin the loaded data directly.
@@ -36,7 +36,7 @@ such that the maximum intensity is unity by checking the ``Norm to 1`` checkbox.
 
 Like with cuts (see :ref:`Cutting_from_the_GUI`), double-clicking on the axes or their titles allows you to change the
 limits of the plots of the text of the titles. Clicking on the cog icon will bring up an ``Options`` dialog which allows you
-to change all these properties simultaneously. 
+to change all these properties simultaneously.
 
 
 Overplotting recoil and powder lines
@@ -74,7 +74,7 @@ given, *MSlice* will compute the mean temperature from the log series.
 The different options are related to the default :math:`S(Q, \omega)` view by:
 
 * The dynamical susceptibility, :math:`\chi''(Q, \omega) = \pi \frac{S(Q, \omega)}{<n+\frac{1}{2}\pm\frac{1}{2}>}`
-* The magnetic dynamical susceptibility 
+* The magnetic dynamical susceptibility
   :math:`\chi''_{\mathrm{mag}}(Q, \omega) = \frac{\pi}{(g_n r_e)^2} \frac{S(Q, \omega)}{<n+\frac{1}{2}\pm\frac{1}{2}>}`
 * The cross-section, :math:`\frac{d^2\sigma}{d\Omega dE} = \frac{k_i}{k_f} S(Q, \omega)`
 * A "symmetrised" :math:`S(Q, \omega)` where the intensities for the neutron energy gain (negative energy) side is
@@ -88,7 +88,7 @@ positive sign) or neutron energy gain (boson anihilation, negative sign). In par
 * :math:`\frac{1}{<n>} = \exp(|E|/k_BT)-1`
 
 :math:`g_n` is the neutron g-factor, and :math:`r_e` is the classical electron radius, with :math:`(g_n r_e)^2` = 291
-milibarn being the total magnetic cross-section for a moment of :math:`1~\mu_B`. 
+milibarn being the total magnetic cross-section for a moment of :math:`1~\mu_B`.
 
 Saving slices to file
 ---------------------
@@ -104,62 +104,62 @@ the floppy disk icon in the slice figure window to save the data. In addition, y
 ..
    From the  Command Line
    ----------------------
-   
+
     *<Docstrings from cli.get_slice and cli.plot_slice should go here>*
-   
+
    Example
    -------
-   
+
    First lets load some data and get the projections ready.
-   
+
    .. testcode::
-   
+
       import cli
       ws = cli.Load('MAR21335_Ei60.00meV.nxs')
       projection = cli.get_projection(ws, '|Q|', 'DelatE')
-   
-   
+
+
    Plotting a simple slice that spans all of the data
-   
+
    ..  testcode::
-   
+
       cli.plot_slice(projection)
-   
+
    Specifying the axis
-   
+
    .. testcode::
-   
+
       cli.plot_slice(projection, '|Q|', 'DeltaE')
-   
+
    Specifying the axis with binning parameters,
-   
+
    .. testcode::
-   
+
       cli.plot_slice(projection, '|Q|,0,10,.5', 'DeltaE,-20,20,1')
-   
+
    Specifiying the binning parameters for a single axis
-   
+
    .. testcode::
-   
+
       cli.plot_slice(projection, '|Q|', 'DeltaE,-20,20,100')
-   
+
    Specifying the intensity range
-   
+
    .. testcode::
-   
+
       cli.plot_slice(projection, '|Q|,0,10,.1', 'DeltaE,-20,20,.5', intensity_min=.2, intensity_max=1)
-   
+
    Normalizing the intensity
-   
+
    .. testcode::
-   
+
       cli.plot_slice(projection, '|Q|,0,10,.1', 'DeltaE,-20,20,.5', normalize=True)
-   
+
    Setting the colormap
        Any valid matplotib colormap object or colormap name maybe passed a a value of the ``colormap`` parameter in
        ``plot_slice``
-   
+
    .. testcode::
-   
+
        cli.plot_slice(projection, colormap='coolwarm')
-   
+

@@ -1,32 +1,23 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>1. Quick Start &#8212; MSlice 1.2.0 documentation</title>
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.2.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>1. Quick Start &#8212; MSlice 2.3.0.dev documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="2. Taking Cuts" href="cutting.html" />
     <link rel="prev" title="MSlice for Mantid" href="index.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -39,12 +30,166 @@
         <li class="right" >
           <a href="index.html" title="MSlice for Mantid"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">MSlice 1.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">MSlice 2.3.0.dev documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Quick Start</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="quick-start">
+<h1><span class="section-number">1. </span>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<section id="starting-mslice">
+<h2><span class="section-number">1.1. </span>Starting MSlice<a class="headerlink" href="#starting-mslice" title="Permalink to this headline">¶</a></h2>
+<p>MSlice is included in the Mantid distribution so the easiest way to start it is from the <strong>Interfaces</strong> menu in <em>MantidWorkbench</em>.</p>
+<img alt="_images/mantid_interfaces_menu.png" src="_images/mantid_interfaces_menu.png" />
+<p>The version of <em>MSlice</em> distributed with Mantid is the last stable version. However, there is currently quite rapid ongoing
+devlopment to the program, which is available only in the development version on <cite>GitHub</cite>. To get this version, please
+download this <a class="reference external" href="https://github.com/mantidproject/mslice/archive/master.zip">zip</a> and extract it to a folder on your computer.
+You can then either copy the <code class="docutils literal notranslate"><span class="pre">mslice</span></code> subfolder (the folder containing a file called <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code>) to the
+<code class="docutils literal notranslate"><span class="pre">scripts/ExternalInterfaces/</span></code> folder of <em>Mantid</em>, which will make the new version accessible from <em>MantidWorkbench</em>, or run the
+the <code class="docutils literal notranslate"><span class="pre">mslicedevel.bat</span></code> (or <code class="docutils literal notranslate"><span class="pre">mslicedevel.sh</span></code> for Linux) script to start <em>MSlice</em>. You may have to edit the file first if
+you did not install <em>Mantid</em> in the default location.</p>
+</section>
+<section id="loading-data">
+<h2><span class="section-number">1.2. </span>Loading Data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="_images/load_tab.png"><img alt="_images/load_tab.png" src="_images/load_tab.png" style="width: 645.6px; height: 291.2px;" /></a>
+<p>The GUI is divided into two main tabs, a <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Loading</span></code> tab which shows the filesystem and allows the user to load reduced
+data files, and a <code class="docutils literal notranslate"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> which handles the loaded data. To reach a particular data folder you can either
+type the full path to the folder in the edit box, or navigate using the filesystem tree below using either the mouse or
+keyboard arrow keys and the <code class="docutils literal notranslate"><span class="pre">Enter</span></code> key, with <code class="docutils literal notranslate"><span class="pre">Backspace</span></code> used for going up a folder level. Typing the first few letters
+of a file or folder name will also jump to its location in the tree.</p>
+<p>The filesystem tree only shows files which <em>MSlice</em> can load (currently <code class="docutils literal notranslate"><span class="pre">nxs</span></code>, <code class="docutils literal notranslate"><span class="pre">nxspe</span></code> and <code class="docutils literal notranslate"><span class="pre">txt</span></code> or <code class="docutils literal notranslate"><span class="pre">xye</span></code> files).</p>
+<p>Double clicking on a file or pressing <code class="docutils literal notranslate"><span class="pre">Enter</span></code> when it is selected will load it. You can select multiple files by holding
+down the <code class="docutils literal notranslate"><span class="pre">Shift</span></code> key to select a range or the <code class="docutils literal notranslate"><span class="pre">Ctrl</span></code> key to select individual files. These files may then be loaded
+separately using the <code class="docutils literal notranslate"><span class="pre">Load</span> <span class="pre">Data</span></code> button or summed together into a single workspace using the <code class="docutils literal notranslate"><span class="pre">Load</span> <span class="pre">and</span> <span class="pre">Merge</span> <span class="pre">Data</span></code>
+button. In the later case, the logs of the datafiles are also combined. (Note that you can also sum loaded workspaces
+together in the <code class="docutils literal notranslate"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> tab after loading, but in this case the logs are not combined).</p>
+</section>
+<section id="psd-and-non-psd-modes">
+<span id="id1"></span><h2><span class="section-number">1.3. </span>PSD and non-PSD modes<a class="headerlink" href="#psd-and-non-psd-modes" title="Permalink to this headline">¶</a></h2>
+<p>Once the data has been loaded, the GUI will switch to the <code class="docutils literal notranslate"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> tab and select the loaded workspace(s).
+MSlice has two operating modes which it selects automatically depending on the type of data which is loaded. For data from
+spectrometers with position-sensitive detectors which have been reduced preserving the pixel data (for example, autoreduced
+data from SNS or <em>one2one mapped</em> data from ISIS), then the <strong>PSD mode</strong> is used. For these types of data, an extra step
+to <code class="docutils literal notranslate"><span class="pre">Calculate</span> <span class="pre">Projection</span></code> is required before the data can be plotted. This step converts the data into an <strong>MD</strong> (multi-
+dimensional) workspace and then uses the fast binning algorithms for these workspace types which <em>Mantid</em> provides. This
+step will also be needed for single-crystal data which will be supported in future.</p>
+<img alt="_images/calc_proj.png" src="_images/calc_proj.png" />
+<p>If you have loaded a <strong>PSD</strong> type dataset, the <code class="docutils literal notranslate"><span class="pre">Slice</span></code> and <code class="docutils literal notranslate"><span class="pre">Cut</span></code> tabs will be disabled, and instead a <code class="docutils literal notranslate"><span class="pre">Powder</span></code> tab
+will be enabled. Please chose the axes you want to plot (either <em>Momentum Transfer</em> - <em>Energy Transfer</em>, or <em>Scattering
+Angle</em> - <em>Energy Transfer</em>) and click <code class="docutils literal notranslate"><span class="pre">Calculate</span> <span class="pre">Projection</span></code>. This will create another workspace in the <code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Event</span></code>
+tab. Selecting it will enable the <code class="docutils literal notranslate"><span class="pre">Slice</span></code> and <code class="docutils literal notranslate"><span class="pre">Cut</span></code> tabs to allow you to plot a 2D slice or 1D cut.</p>
+<p>On the other hand, if you have loaded a <strong>non-PSD</strong> type dataset (either from an instrument without position-sensitive
+detectors or reduced using a <strong>rings map</strong>), then the <code class="docutils literal notranslate"><span class="pre">Powder</span></code> tab will be disabled and you can plot a slice or cut
+directly from the loaded data using the <code class="docutils literal notranslate"><span class="pre">Slice</span></code> and <code class="docutils literal notranslate"><span class="pre">Cut</span></code> tabs. In this case, <em>MSlice</em> uses a fractional rebinning
+algorithm <a class="reference external" href="http://docs.mantidproject.org/nightly/algorithms/SofQWNormalisedPolygon-v1.html">SofQWNormalisedPolygon</a> to
+directly rebin the powder data.</p>
+</section>
+<section id="plotting-a-slice">
+<h2><span class="section-number">1.4. </span>Plotting a Slice<a class="headerlink" href="#plotting-a-slice" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="_images/data_tab.png"><img alt="_images/data_tab.png" src="_images/data_tab.png" style="width: 645.6px; height: 291.2px;" /></a>
+<p>Once the <code class="docutils literal notranslate"><span class="pre">Slice</span></code> tab is enabled (either directly for loaded <strong>non-PSD</strong> data, or after calculating projections for
+<strong>PSD</strong> data) you can click <code class="docutils literal notranslate"><span class="pre">Display</span></code> to show a 2D slice of the data. The default values of the limits of the data and
+step sizes are taken from the input data file. You can change these values and replot. Note that there is a minimum step
+size which is 1/100 of the default step size which is to ensure that the program does not run out of memory for very
+small step sizes (which have large number of points). For step sizes smaller than the data step size, some pixels will
+contain no data and will appear empty (white) in the 2D slice. For more details see <a class="reference internal" href="slicing.html#slicing-from-the-gui"><span class="std std-ref">Slicing from the GUI</span></a>.</p>
+<a class="reference internal image-reference" href="_images/slice_intensity.png"><img alt="_images/slice_intensity.png" src="_images/slice_intensity.png" style="width: 652.8000000000001px; height: 503.20000000000005px;" /></a>
+<p>Once the slice is displayed (in a separate window), double clicking on the plot or colorbar axes will allow you to change the
+plot limits, and whether to use a linear or logarithmic axis. Double clicking on the plot or axes titles will allow you to edit
+them. Both changing the limits and titles can be done using the options menu accessible from the toolbar.</p>
+</section>
+<section id="interactive-cuts">
+<span id="id2"></span><h2><span class="section-number">1.5. </span>Interactive Cuts<a class="headerlink" href="#interactive-cuts" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="_images/interactive_cuts.png"><img alt="_images/interactive_cuts.png" src="_images/interactive_cuts.png" style="width: 1304.0px; height: 503.20000000000005px;" /></a>
+<p>From the slice window, you can also select an <code class="docutils literal notranslate"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> which will allow you to select a region of data to
+integrate into a 1D and dynamically change this region and the corresponding cut. Clicking <code class="docutils literal notranslate"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> will
+change the cursor to a cross-hair. You should then select a rectangular region in the 2D slice, after which a separate
+cut window will open showing the 1D cut. The long axis of the selected rectangle is the cut axis, and the short axis
+the integration axis. For example, if the 2D plot has <em>Momentum Transfer</em> along <em>x</em> and <em>Energy Transfer</em> along <em>y</em>,
+selecting a “tall” (vertical) rectangle will result in a cut along <em>Energy Transfer</em> integrating over some region
+of <em>Momentum Transfer</em>. You can click the rectangular arrows on the toolbar to swap cut and integration axes.</p>
+<p>Dragging the rectangle or changing its size in the slice window will update the cut window. You can also redraw the
+rectangle by clicking outside the current rectangle and dragging. Once you have finished, please click on the
+<code class="docutils literal notranslate"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> again to leave interactive mode. If you leave a slice in interactive cut mode and plot another
+slice, another window will open. Making a cut (see below) whilst the interactive mode is active will overplot on the
+same window as the interactive cut and this cut will be removed when the interactive mode rectangle is moved again.</p>
+</section>
+<section id="plotting-a-cut">
+<h2><span class="section-number">1.6. </span>Plotting a Cut<a class="headerlink" href="#plotting-a-cut" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="_images/cut_q.png"><img alt="_images/cut_q.png" src="_images/cut_q.png" style="width: 645.6px; height: 795.2px;" /></a>
+<p>Instead of an interactive cut, you can use the main GUI to specify more specific limits and step sizes for cuts.
+This will also allow you to overplot multiple cuts from the same dataset with different integration ranges, or
+from different datasets. To overplot multiple ranges, you can also use the <code class="docutils literal notranslate"><span class="pre">width</span></code> parameter. This splits in
+specified integration ranges into chunks of the widths specified. For example, if <code class="docutils literal notranslate"><span class="pre">from</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">to</span></code>
+is <code class="docutils literal notranslate"><span class="pre">10</span></code> and <code class="docutils literal notranslate"><span class="pre">width</span></code> is <code class="docutils literal notranslate"><span class="pre">3</span></code>, <em>Mslice</em> will plot 4 cuts which integrate over [0,3], [3,6], [6,9] and [9,10]
+respectively.</p>
+<a class="reference internal image-reference" href="_images/multi_cut.png"><img alt="_images/multi_cut.png" src="_images/multi_cut.png" style="width: 645.6px; height: 793.6px;" /></a>
+<p>To overplot multiple datasets, you can select multiple workspaces in the left pane (using <code class="docutils literal notranslate"><span class="pre">Shift</span></code> or <code class="docutils literal notranslate"><span class="pre">Ctrl</span></code>)
+and then give common limits, step sizes and integration range, and click <code class="docutils literal notranslate"><span class="pre">Plot</span></code>. For more details see
+<a class="reference internal" href="cutting.html#cutting-from-the-gui"><span class="std std-ref">Cutting from the GUI</span></a></p>
+</section>
+<section id="keep-make-current">
+<span id="id3"></span><h2><span class="section-number">1.7. </span>Keep / Make Current<a class="headerlink" href="#keep-make-current" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/keep.png" src="_images/keep.png" />
+<p>This version of MSlice supports the window management behaviour introduced by the original Matlab MSlice, which is
+controlled by two buttons, <code class="docutils literal notranslate"><span class="pre">Keep</span></code> and <code class="docutils literal notranslate"><span class="pre">Make</span> <span class="pre">Current</span></code>, in the toolbar of every plot window. When you click on <code class="docutils literal notranslate"><span class="pre">Display</span></code>
+or <code class="docutils literal notranslate"><span class="pre">Plot</span></code> on the main GUI, the resulting plot will appear in the <strong>Current</strong> window, over-writing any previous plots in
+that window. If you want to keep the data in a particular window, click <code class="docutils literal notranslate"><span class="pre">Keep</span></code>. Subsequent plots will then open a new
+window. If you subsequently want to overwrite the data on the same particular window, you can make it <strong>Current</strong> again by
+clicking <code class="docutils literal notranslate"><span class="pre">Make</span> <span class="pre">Current</span></code>. In order to overplot new data preserving previous data, use the <code class="docutils literal notranslate"><span class="pre">Plot</span> <span class="pre">Over</span></code> button rather than
+the <code class="docutils literal notranslate"><span class="pre">Plot</span></code> button. This will send data to the <strong>Current</strong> plot window, so you may need to <code class="docutils literal notranslate"><span class="pre">Make</span> <span class="pre">Current</span></code> on it again.
+This is available only for 1D cuts. For 2D slices, you cannot overplot current data.</p>
+</section>
+<section id="manipulating-workspaces">
+<h2><span class="section-number">1.8. </span>Manipulating Workspaces<a class="headerlink" href="#manipulating-workspaces" title="Permalink to this headline">¶</a></h2>
+<p>MSlice supports some basic workspace operations at present and more are planned for future releases. For loaded
+workspaces, summing and background subtraction are supported, whilst for processed workspaces (<code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Event</span></code> workspaces
+in <strong>PSD</strong> mode), only merging workspaces are supported. This is intended primarily for merging HYSPEC data at different
+detector scattering angles.</p>
+<p>In order to sum several workspaces, select multiple workspaces in the workspace panel and click <code class="docutils literal notranslate"><span class="pre">Add</span></code>. A new workspace
+named after the first selected workspace with <code class="docutils literal notranslate"><span class="pre">_sum</span></code> appended will be created.</p>
+<a class="reference internal image-reference" href="_images/subtract_dialog.png"><img alt="_images/subtract_dialog.png" src="_images/subtract_dialog.png" style="width: 645.6px; height: 583.2px;" /></a>
+<p>To subtract the a background dataset from sample dataset(s), first select one or more sample workspace(s). Then click
+<code class="docutils literal notranslate"><span class="pre">Subtract</span></code>. A dialog will appear asking you to select the background dataset to subtract and optionally allow you to
+specify a self-shielding factor. This self-shielding factor is applied to the background dataset first before it
+is subtracted from the sample dataset(s). The subtraction is done on each sample workspace individually.</p>
+<p>For example, in the image above, two sample workspaces, <code class="docutils literal notranslate"><span class="pre">MAR22012_Ei10.00meV</span></code> and <code class="docutils literal notranslate"><span class="pre">MAR22013_Ei10.00meV</span></code> representing
+data at 4 and 20 K, are selected. Then the background dataset <code class="docutils literal notranslate"><span class="pre">MAR22017_Ei10.00meV</span></code> showing data at 50 K is selected with
+a self-shielding factor of <code class="docutils literal notranslate"><span class="pre">1.00</span></code>. Clicking <code class="docutils literal notranslate"><span class="pre">Ok</span></code> will produce two subtracted workspaces,
+<code class="docutils literal notranslate"><span class="pre">MAR22012_Ei10.00meV_subtracted</span></code> and <code class="docutils literal notranslate"><span class="pre">MAR22013_Ei10.00meV_subtracted</span></code>. The subtracted dataset can be sliced or cut
+as usual.</p>
+<a class="reference internal image-reference" href="_images/subtract_slice.png"><img alt="_images/subtract_slice.png" src="_images/subtract_slice.png" style="width: 645.6px; height: 794.4000000000001px;" /></a>
+</section>
+<section id="energy-transfer-units">
+<h2><span class="section-number">1.9. </span>Energy transfer units<a class="headerlink" href="#energy-transfer-units" title="Permalink to this headline">¶</a></h2>
+<p>By default MSlice uses <code class="docutils literal notranslate"><span class="pre">meV</span></code> as the unit for energy transfer, with the convention that positive energy transfer
+corresponds neutron energy loss. In addition to this, MSlice also supports cm<sup>-1</sup> (wavenumbers), denoted <code class="docutils literal notranslate"><span class="pre">cm-1</span></code>.</p>
+<p>You can choose the desired unit using the <code class="docutils literal notranslate"><span class="pre">en</span></code> drop-down comboboxes in the <strong>Cut</strong> and <strong>Slice</strong> tabs.</p>
+<img alt="_images/en_units_combo.png" src="_images/en_units_combo.png" />
+<p>Alternatively you can also set a default energy unit using the <code class="docutils literal notranslate"><span class="pre">Options</span></code> menu item</p>
+<img alt="_images/en_units_defaults.png" src="_images/en_units_defaults.png" />
+<p>This default energy unit will be applied to Cut and Slice tabs for new workspaces. The cut tab for old workspaces will have
+the previous energy unit if you’ve made a cut of that workspace before (together with the other parameters of the cut).</p>
+<p>Finally, if you first plot a cut using one energy unit (say <code class="docutils literal notranslate"><span class="pre">meV</span></code>) but then <em>over-plot</em> another energy cut using a different
+unit (say <code class="docutils literal notranslate"><span class="pre">cm-1</span></code>), MSlice will automatically convert the previous cuts to the new energy unit (<code class="docutils literal notranslate"><span class="pre">cm-1</span></code> in this case), and
+replot everything in the new unit. If you don’t want this behaviour, you can turn it off in the <code class="docutils literal notranslate"><span class="pre">Options</span></code> menu:</p>
+<img alt="_images/en_units_conversion.png" src="_images/en_units_conversion.png" />
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">1. Quick Start</a><ul>
 <li><a class="reference internal" href="#starting-mslice">1.1. Starting MSlice</a></li>
@@ -65,7 +210,7 @@
                         title="previous chapter">MSlice for Mantid</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="cutting.html"
-                        title="next chapter">2. Taking Cuts</a></p>
+                        title="next chapter"><span class="section-number">2. </span>Taking Cuts</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -74,167 +219,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="quick-start">
-<h1>1. Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="starting-mslice">
-<h2>1.1. Starting MSlice<a class="headerlink" href="#starting-mslice" title="Permalink to this headline">¶</a></h2>
-<p>MSlice is included in the Mantid distribution so the easiest way to start it is from the <strong>Interfaces</strong> menu in <em>MantidPlot</em>.</p>
-<img alt="_images/mantid_interfaces_menu.png" src="_images/mantid_interfaces_menu.png" />
-<p>The version of <em>MSlice</em> distributed with Mantid is the last stable version. However, there is currently quite rapid ongoing
-devlopment to the program, which is available only in the development version on <cite>GitHub</cite>. To get this version, please
-download this <a class="reference external" href="https://github.com/mantidproject/mslice/archive/master.zip">zip</a> and extract it to a folder on your computer.
-You can then either copy the <code class="docutils literal"><span class="pre">mslice</span></code> subfolder (the folder containing a file called <code class="docutils literal"><span class="pre">__init__.py</span></code>) to the
-<code class="docutils literal"><span class="pre">scripts/ExternalInterfaces/</span></code> folder of <em>Mantid</em>, which will make the new version accessible from <em>MantidPlot</em>, or run the
-the <code class="docutils literal"><span class="pre">mslicedevel.bat</span></code> (or <code class="docutils literal"><span class="pre">mslicedevel.sh</span></code> for Linux) script to start <em>MSlice</em>. You may have to edit the file first if
-you did not install <em>Mantid</em> in the default location.</p>
-</div>
-<div class="section" id="loading-data">
-<h2>1.2. Loading Data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
-<a class="reference internal image-reference" href="_images/load_tab.png"><img alt="_images/load_tab.png" src="_images/load_tab.png" style="width: 645.6px; height: 291.2px;" /></a>
-<p>The GUI is divided into two main tabs, a <code class="docutils literal"><span class="pre">Data</span> <span class="pre">Loading</span></code> tab which shows the filesystem and allows the user to load reduced
-data files, and a <code class="docutils literal"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> which handles the loaded data. To reach a particular data folder you can either
-type the full path to the folder in the edit box, or navigate using the filesystem tree below using either the mouse or
-keyboard arrow keys and the <code class="docutils literal"><span class="pre">Enter</span></code> key, with <code class="docutils literal"><span class="pre">Backspace</span></code> used for going up a folder level. Typing the first few letters
-of a file or folder name will also jump to its location in the tree.</p>
-<p>The filesystem tree only shows files which <em>MSlice</em> can load (currently <code class="docutils literal"><span class="pre">nxs</span></code>, <code class="docutils literal"><span class="pre">nxspe</span></code> and <code class="docutils literal"><span class="pre">txt</span></code> or <code class="docutils literal"><span class="pre">xye</span></code> files).</p>
-<p>Double clicking on a file or pressing <code class="docutils literal"><span class="pre">Enter</span></code> when it is selected will load it. You can select multiple files by holding
-down the <code class="docutils literal"><span class="pre">Shift</span></code> key to select a range or the <code class="docutils literal"><span class="pre">Ctrl</span></code> key to select individual files. These files may then be loaded
-separately using the <code class="docutils literal"><span class="pre">Load</span> <span class="pre">Data</span></code> button or summed together into a single workspace using the <code class="docutils literal"><span class="pre">Load</span> <span class="pre">and</span> <span class="pre">Merge</span> <span class="pre">Data</span></code>
-button. In the later case, the logs of the datafiles are also combined. (Note that you can also sum loaded workspaces
-together in the <code class="docutils literal"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> tab after loading, but in this case the logs are not combined).</p>
-</div>
-<div class="section" id="psd-and-non-psd-modes">
-<span id="id1"></span><h2>1.3. PSD and non-PSD modes<a class="headerlink" href="#psd-and-non-psd-modes" title="Permalink to this headline">¶</a></h2>
-<p>Once the data has been loaded, the GUI will switch to the <code class="docutils literal"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> tab and select the loaded workspace(s).
-MSlice has two operating modes which it selects automatically depending on the type of data which is loaded. For data from
-spectrometers with position-sensitive detectors which have been reduced preserving the pixel data (for example, autoreduced
-data from SNS or <em>one2one mapped</em> data from ISIS), then the <strong>PSD mode</strong> is used. For these types of data, an extra step
-to <code class="docutils literal"><span class="pre">Calculate</span> <span class="pre">Projection</span></code> is required before the data can be plotted. This step converts the data into an <strong>MD</strong> (multi-
-dimensional) workspace and then uses the fast binning algorithms for these workspace types which <em>Mantid</em> provides. This
-step will also be needed for single-crystal data which will be supported in future.</p>
-<img alt="_images/calc_proj.png" src="_images/calc_proj.png" />
-<p>If you have loaded a <strong>PSD</strong> type dataset, the <code class="docutils literal"><span class="pre">Slice</span></code> and <code class="docutils literal"><span class="pre">Cut</span></code> tabs will be disabled, and instead a <code class="docutils literal"><span class="pre">Powder</span></code> tab
-will be enabled. Please chose the axes you want to plot (either <em>Momentum Transfer</em> - <em>Energy Transfer</em>, or <em>Scattering
-Angle</em> - <em>Energy Transfer</em>) and click <code class="docutils literal"><span class="pre">Calculate</span> <span class="pre">Projection</span></code>. This will create another workspace in the <code class="docutils literal"><span class="pre">MD</span> <span class="pre">Event</span></code>
-tab. Selecting it will enable the <code class="docutils literal"><span class="pre">Slice</span></code> and <code class="docutils literal"><span class="pre">Cut</span></code> tabs to allow you to plot a 2D slice or 1D cut.</p>
-<p>On the other hand, if you have loaded a <strong>non-PSD</strong> type dataset (either from an instrument without position-sensitive
-detectors or reduced using a <strong>rings map</strong>), then the <code class="docutils literal"><span class="pre">Powder</span></code> tab will be disabled and you can plot a slice or cut
-directly from the loaded data using the <code class="docutils literal"><span class="pre">Slice</span></code> and <code class="docutils literal"><span class="pre">Cut</span></code> tabs. In this case, <em>MSlice</em> uses a fractional rebinning
-algorithm <a class="reference external" href="http://docs.mantidproject.org/nightly/algorithms/SofQWNormalisedPolygon-v1.html">SofQWNormalisedPolygon</a> to
-directly rebin the powder data.</p>
-</div>
-<div class="section" id="plotting-a-slice">
-<h2>1.4. Plotting a Slice<a class="headerlink" href="#plotting-a-slice" title="Permalink to this headline">¶</a></h2>
-<a class="reference internal image-reference" href="_images/data_tab.png"><img alt="_images/data_tab.png" src="_images/data_tab.png" style="width: 645.6px; height: 291.2px;" /></a>
-<p>Once the <code class="docutils literal"><span class="pre">Slice</span></code> tab is enabled (either directly for loaded <strong>non-PSD</strong> data, or after calculating projections for
-<strong>PSD</strong> data) you can click <code class="docutils literal"><span class="pre">Display</span></code> to show a 2D slice of the data. The default values of the limits of the data and
-step sizes are taken from the input data file. You can change these values and replot. Note that there is a minimum step
-size which is 1/100 of the default step size which is to ensure that the program does not run out of memory for very
-small step sizes (which have large number of points). For step sizes smaller than the data step size, some pixels will
-contain no data and will appear empty (white) in the 2D slice. For more details see <a class="reference internal" href="slicing.html#slicing-from-the-gui"><span class="std std-ref">Slicing from the GUI</span></a>.</p>
-<a class="reference internal image-reference" href="_images/slice_intensity.png"><img alt="_images/slice_intensity.png" src="_images/slice_intensity.png" style="width: 652.8000000000001px; height: 503.20000000000005px;" /></a>
-<p>Once the slice is displayed (in a separate window), clicking on the plot or colorbar axes will allow you to change the
-plot limits, and whether to use a linear or logarithmic axis. Clicking on the plot or axes titles will allow you to edit
-them. Both changing the limits and titles can be done using the options menu accessible from the toolbar.</p>
-</div>
-<div class="section" id="interactive-cuts">
-<span id="id2"></span><h2>1.5. Interactive Cuts<a class="headerlink" href="#interactive-cuts" title="Permalink to this headline">¶</a></h2>
-<a class="reference internal image-reference" href="_images/interactive_cuts.png"><img alt="_images/interactive_cuts.png" src="_images/interactive_cuts.png" style="width: 1304.0px; height: 503.20000000000005px;" /></a>
-<p>From the slice window, you can also select an <code class="docutils literal"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> which will allow you to select a region of data to
-integrate into a 1D and dynamically change this region and the corresponding cut. Clicking <code class="docutils literal"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> will
-change the cursor to a cross-hair. You should then select a rectangular region in the 2D slice, after which a separate
-cut window will open showing the 1D cut. The long axis of the selected rectangle is the cut axis, and the short axis
-the integration axis. For example, if the 2D plot has <em>Momentum Transfer</em> along <em>x</em> and <em>Energy Transfer</em> along <em>y</em>,
-selecting a “tall” (vertical) rectangle will result in a cut along <em>Energy Transfer</em> integrating over some region
-of <em>Momentum Transfer</em>. You can click the rectangular arrows on the toolbar to swap cut and integration axes.</p>
-<p>Dragging the rectangle or changing its size in the slice window will update the cut window. You can also redraw the
-rectangle by clicking outside the current rectangle and dragging. Once you have finished, please click on the
-<code class="docutils literal"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> again to leave interactive mode. If you leave a slice in interactive cut mode and plot another
-slice, another window will open. Making a cut (see below) whilst the interactive mode is active will overplot on the
-same window as the interactive cut and this cut will be removed when the interactive mode rectangle is moved again.</p>
-</div>
-<div class="section" id="plotting-a-cut">
-<h2>1.6. Plotting a Cut<a class="headerlink" href="#plotting-a-cut" title="Permalink to this headline">¶</a></h2>
-<a class="reference internal image-reference" href="_images/cut_q.png"><img alt="_images/cut_q.png" src="_images/cut_q.png" style="width: 645.6px; height: 795.2px;" /></a>
-<p>Instead of an interactive cut, you can use the main GUI to specify more specific limits and step sizes for cuts.
-This will also allow you to overplot multiple cuts from the same dataset with different integration ranges, or
-from different datasets. To overplot multiple ranges, you can also use the <code class="docutils literal"><span class="pre">width</span></code> parameter. This splits in
-specified integration ranges into chunks of the widths specified. For example, if <code class="docutils literal"><span class="pre">from</span></code> is <code class="docutils literal"><span class="pre">0</span></code> and <code class="docutils literal"><span class="pre">to</span></code>
-is <code class="docutils literal"><span class="pre">10</span></code> and <code class="docutils literal"><span class="pre">width</span></code> is <code class="docutils literal"><span class="pre">3</span></code>, <em>Mslice</em> will plot 4 cuts which integrate over [0,3], [3,6], [6,9] and [9,10]
-respectively.</p>
-<a class="reference internal image-reference" href="_images/multi_cut.png"><img alt="_images/multi_cut.png" src="_images/multi_cut.png" style="width: 645.6px; height: 793.6px;" /></a>
-<p>To overplot multiple datasets, you can select multiple workspaces in the left pane (using <code class="docutils literal"><span class="pre">Shift</span></code> or <code class="docutils literal"><span class="pre">Ctrl</span></code>)
-and then give common limits, step sizes and integration range, and click <code class="docutils literal"><span class="pre">Plot</span></code>. For more details see
-<a class="reference internal" href="cutting.html#cutting-from-the-gui"><span class="std std-ref">Cutting from the GUI</span></a></p>
-</div>
-<div class="section" id="keep-make-current">
-<span id="id3"></span><h2>1.7. Keep / Make Current<a class="headerlink" href="#keep-make-current" title="Permalink to this headline">¶</a></h2>
-<img alt="_images/keep.png" src="_images/keep.png" />
-<p>This version of MSlice supports the window management behaviour introduced by the original Matlab MSlice, which is
-controlled by two buttons, <code class="docutils literal"><span class="pre">Keep</span></code> and <code class="docutils literal"><span class="pre">Make</span> <span class="pre">Current</span></code>, in the toolbar of every plot window. When you click on <code class="docutils literal"><span class="pre">Display</span></code>
-or <code class="docutils literal"><span class="pre">Plot</span></code> on the main GUI, the resulting plot will appear in the <strong>Current</strong> window, over-writing any previous plots in
-that window. If you want to keep the data in a particular window, click <code class="docutils literal"><span class="pre">Keep</span></code>. Subsequent plots will then open a new
-window. If you subsequently want to overwrite the data on the same particular window, you can make it <strong>Current</strong> again by
-clicking <code class="docutils literal"><span class="pre">Make</span> <span class="pre">Current</span></code>. In order to overplot new data preserving previous data, use the <code class="docutils literal"><span class="pre">Plot</span> <span class="pre">Over</span></code> button rather than
-the <code class="docutils literal"><span class="pre">Plot</span></code> button. This will send data to the <strong>Current</strong> plot window, so you may need to <code class="docutils literal"><span class="pre">Make</span> <span class="pre">Current</span></code> on it again.
-This is available only for 1D cuts. For 2D slices, you cannot overplot current data.</p>
-</div>
-<div class="section" id="manipulating-workspaces">
-<h2>1.8. Manipulating Workspaces<a class="headerlink" href="#manipulating-workspaces" title="Permalink to this headline">¶</a></h2>
-<p>MSlice supports some basic workspace operations at present and more are planned for future releases. For loaded
-workspaces, summing and background subtraction are supported, whilst for processed workspaces (<code class="docutils literal"><span class="pre">MD</span> <span class="pre">Event</span></code> workspaces
-in <strong>PSD</strong> mode), only merging workspaces are supported. This is intended primarily for merging HYSPEC data at different
-detector scattering angles.</p>
-<p>In order to sum several workspaces, select multiple workspaces in the workspace panel and click <code class="docutils literal"><span class="pre">Add</span></code>. A new workspace
-named after the first selected workspace with <code class="docutils literal"><span class="pre">_sum</span></code> appended will be created.</p>
-<a class="reference internal image-reference" href="_images/subtract_dialog.png"><img alt="_images/subtract_dialog.png" src="_images/subtract_dialog.png" style="width: 645.6px; height: 583.2px;" /></a>
-<p>To subtract the a background dataset from sample dataset(s), first select one or more sample workspace(s). Then click
-<code class="docutils literal"><span class="pre">Subtract</span></code>. A dialog will appear asking you to select the background dataset to subtract and optionally allow you to
-specify a self-shielding factor. This self-shielding factor is applied to the background dataset first before it
-is subtracted from the sample dataset(s). The subtraction is done on each sample workspace individually.</p>
-<p>For example, in the image above, two sample workspaces, <code class="docutils literal"><span class="pre">MAR22012_Ei10.00meV</span></code> and <code class="docutils literal"><span class="pre">MAR22013_Ei10.00meV</span></code> representing
-data at 4 and 20 K, are selected. Then the background dataset <code class="docutils literal"><span class="pre">MAR22017_Ei10.00meV</span></code> showing data at 50 K is selected with
-a self-shielding factor of <code class="docutils literal"><span class="pre">1.00</span></code>. Clicking <code class="docutils literal"><span class="pre">Ok</span></code> will produce two subtracted workspaces,
-<code class="docutils literal"><span class="pre">MAR22012_Ei10.00meV_subtracted</span></code> and <code class="docutils literal"><span class="pre">MAR22013_Ei10.00meV_subtracted</span></code>. The subtracted dataset can be sliced or cut
-as usual.</p>
-<a class="reference internal image-reference" href="_images/subtract_slice.png"><img alt="_images/subtract_slice.png" src="_images/subtract_slice.png" style="width: 645.6px; height: 794.4000000000001px;" /></a>
-</div>
-<div class="section" id="energy-transfer-units">
-<h2>1.9. Energy transfer units<a class="headerlink" href="#energy-transfer-units" title="Permalink to this headline">¶</a></h2>
-<p>By default MSlice uses <code class="docutils literal"><span class="pre">meV</span></code> as the unit for energy transfer, with the convention that positive energy transfer
-corresponds neutron energy loss. In addition to this, MSlice also supports cm<sup>-1</sup> (wavenumbers), denoted <code class="docutils literal"><span class="pre">cm-1</span></code>.</p>
-<p>You can choose the desired unit using the <code class="docutils literal"><span class="pre">en</span></code> drop-down comboboxes in the <strong>Cut</strong> and <strong>Slice</strong> tabs.</p>
-<img alt="_images/en_units_combo.png" src="_images/en_units_combo.png" />
-<p>Alternatively you can also set a default energy unit using the <code class="docutils literal"><span class="pre">Options</span></code> menu item</p>
-<img alt="_images/en_units_defaults.png" src="_images/en_units_defaults.png" />
-<p>This default energy unit will be applied to Cut and Slice tabs for new workspaces. The cut tab for old workspaces will have
-the previous energy unit if you’ve made a cut of that workspace before (together with the other parameters of the cut).</p>
-<p>Finally, if you first plot a cut using one energy unit (say <code class="docutils literal"><span class="pre">meV</span></code>) but then <em>over-plot</em> another energy cut using a different
-unit (say <code class="docutils literal"><span class="pre">cm-1</span></code>), MSlice will automatically convert the previous cuts to the new energy unit (<code class="docutils literal"><span class="pre">cm-1</span></code> in this case), and
-replot everything in the new unit. If you don’t want this behaviour, you can turn it off in the <code class="docutils literal"><span class="pre">Options</span></code> menu:</p>
-<img alt="_images/en_units_conversion.png" src="_images/en_units_conversion.png" />
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -251,12 +244,13 @@ replot everything in the new unit. If you don’t want this behaviour, you can t
         <li class="right" >
           <a href="index.html" title="MSlice for Mantid"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">MSlice 1.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">MSlice 2.3.0.dev documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">1. </span>Quick Start</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2016, Mantid Project.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+        &#169; Copyright 2021, Mantid Project.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>
 </html>
