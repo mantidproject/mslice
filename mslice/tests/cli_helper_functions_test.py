@@ -163,6 +163,15 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         return_value = is_cut(cut_ws)
         self.assertEqual(return_value, True)
 
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
+    def test_that_in_psd_workspace_is_cut_works_as_expected(self, is_gui):
+        is_gui.return_value = True
+        psd_workspace = self.create_pixel_workspace('psd_workspace')
+        cut_psd_ws = Cut(psd_workspace)
+
+        return_value = is_cut(cut_psd_ws)
+        self.assertEqual(return_value, True)
+
     def test_show_or_hide_a_line(self):
         fig, ax = plt.subplots()
         ax.errorbar([1], [2], [0.3])
