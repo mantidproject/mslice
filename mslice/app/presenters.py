@@ -3,6 +3,8 @@ from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.cli.views.cli_data_loader import CLIDataLoaderWidget
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
+from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.cli.views.cli_powder import CLIPowderWidget
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
 from . import is_gui
@@ -13,6 +15,7 @@ cli_cut_plotter_presenter = CutPlotterPresenter()
 cli_slice_plotter_presenter = SlicePlotterPresenter()
 cli_dataloader_presenter = DataLoaderPresenter(CLIDataLoaderWidget())
 cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), MantidProjectionCalculator())
+# cli_plot_selector_presenter = PlotSelectorPresenter(GlobalFigureManager)
 
 
 def get_dataloader_presenter():
@@ -41,3 +44,11 @@ def get_powder_presenter():
         return app.MAIN_WINDOW.powder_presenter
     else:
         return cli_powder_presenter
+
+
+# def get_plot_selector_presenter():
+#     if is_gui():
+#         return app.MAIN_WINDOW.plot_selector_presenter
+#     else:
+#         return cli_plot_selector_presenter
+
