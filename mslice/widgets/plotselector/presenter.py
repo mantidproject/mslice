@@ -58,9 +58,6 @@ class PlotSelectorPresenter(PresenterUtility, PlotSelectorPresenterInterface):
         else:
             self.model = model
 
-        # Make sure the plot list is up to date
-        # self.update_plot_list()
-
     def get_plot_name_from_number(self, plot_number):
         return self.model.get_plot_name_from_number(plot_number)
 

@@ -48,10 +48,11 @@ class PlotSelectorModel(object):
         :return: A dictionary with figure numbers as keys, and plot
                  names as values
         """
+        plot_dict = {}
         figures = self.GlobalFigureManager.get_all_fig_managers()
         for figure in figures:
-            self.plot_dict[figure.number] = figure.get_window_title()
-        return self.plot_dict
+            plot_dict[figure.number] = figure.get_window_title()
+        return plot_dict
 
     def notify(self, action, plot_number):
         """
@@ -67,7 +68,6 @@ class PlotSelectorModel(object):
         :param action: A FigureAction corresponding to the event
         :param plot_number: The unique number in GlobalFigureManager
         """
-        print(f"Action {action} notified")
         if action == FigureAction.New:
             self.presenter.append_to_plot_list(plot_number)
         if action == FigureAction.Closed:
