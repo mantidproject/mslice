@@ -41,9 +41,6 @@ class PlotSelectorPresenter(PresenterUtility, PlotSelectorPresenterInterface):
                       the class create one (intended for testing)
         """
         # Create model and view, or accept mocked versions
-        # if view is None:
-        #     self.view = PlotSelectorView(self)
-        # else:
         self.view = view
         if model is None:
             self.model = PlotSelectorModel(self, global_figure_manager)
