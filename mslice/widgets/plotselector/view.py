@@ -12,7 +12,7 @@ from qtpy.QtCore import Qt, Signal, QMutex, QMutexLocker
 from qtpy.QtWidgets import (QAbstractItemView, QAction, QActionGroup, QFileDialog, QHBoxLayout, QHeaderView, QLineEdit,
                             QMenu, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
-from enum import IntEnum
+from .column_info import Column
 
 from mantidqt.icons import get_icon
 from mantidqt.utils.flowlayout import FlowLayout
@@ -28,12 +28,6 @@ EXPORT_TYPES = [
     ('Export to PNG', '.png'),
     ('Export to SVG', '.svg')
 ]
-
-
-class Column(IntEnum):
-    Number = 0
-    Name = 1
-    LastActive = 2
 
 
 class PlotSelectorView(QWidget):

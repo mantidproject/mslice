@@ -10,18 +10,10 @@
 import os
 import re
 
-from enum import IntEnum
-
 from .model import PlotSelectorModel
-# from .view import PlotSelectorView, Column
+from .column_info import Column
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.presenters.interfaces.plot_selector import PlotSelectorPresenterInterface
-
-
-class Column(IntEnum):
-    Number = 0
-    Name = 1
-    LastActive = 2
 
 
 class PlotSelectorPresenter(PresenterUtility, PlotSelectorPresenterInterface):
