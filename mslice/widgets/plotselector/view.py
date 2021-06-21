@@ -65,6 +65,7 @@ class PlotSelectorView(QWidget):
         # Note this button is labeled delete, but for consistency
         # with matplotlib 'close' is used in the code
         self.close_button = QPushButton('Delete')
+        self.close_all_button = QPushButton('Delete All')
         self.select_all_button = QPushButton('Select All')
         self.sort_button = self._make_sort_button()
         self.export_button = self._make_export_button()
@@ -84,6 +85,7 @@ class PlotSelectorView(QWidget):
         buttons_layout.addWidget(self.select_all_button)
         buttons_layout.addWidget(self.sort_button)
         buttons_layout.addWidget(self.export_button)
+        buttons_layout.addWidget(self.close_all_button)
 
         filter_layout = QHBoxLayout()
         filter_layout.addWidget(self.filter_box)
@@ -125,6 +127,7 @@ class PlotSelectorView(QWidget):
         self.table_widget.doubleClicked.connect(self.presenter.show_single_selected)
         self.filter_box.textChanged.connect(self.presenter.filter_text_changed)
         self.deleteKeyPressed.connect(self.presenter.close_action_called)
+        self.close_all_button.clicked.connect(self.presenter.close_all_action_called)
 
         if DEBUG_MODE:
             self.table_widget.clicked.connect(self.show_debug_info)

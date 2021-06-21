@@ -255,6 +255,9 @@ class PlotSelectorPresenter(PresenterUtility, PlotSelectorPresenterInterface):
             except ValueError as e:
                 print(e)
 
+    def close_all_action_called(self):
+        self.model.close_all()
+
     # ----------------------- Plot Sorting --------------------------
 
     def set_sort_order(self, is_ascending):

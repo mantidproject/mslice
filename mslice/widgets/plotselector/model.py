@@ -26,7 +26,6 @@ class PlotSelectorModel(object):
         """
         self.GlobalFigureManager = global_figure_manager
         self.presenter = presenter
-        self.plot_dict = {}
 
         # Register with CurrentFigure that we want to know of any
         # changes to the list of plots
@@ -151,6 +150,13 @@ class PlotSelectorModel(object):
             raise ValueError('Error closing, could not find a plot with the number {}.'.format(plot_number))
 
         self.GlobalFigureManager.destroy(plot_number)
+
+    def close_all(self):
+        """
+        Close all plots and remove all corresponding references in the GlobalFigureManager
+        """
+
+        self.GlobalFigureManager.destroy_all()
 
     # ----------------------- Plot Sorting --------------------------
 
