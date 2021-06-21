@@ -138,13 +138,17 @@ class GlobalFigureManager(object):
         if num in cls._unclassified_figures:
             cls._unclassified_figures.remove(num)
             return
-        category = cls.get_category(num)
         if cls._active_figure == num:
             cls._active_figure = None
-        if cls._category_current_figures[category] == num:
-            cls._category_current_figures[category] = None
-        cls._figures_by_category[category].remove(num)
+        try:
+            category = cls.get_category(num)
+            if cls._category_current_figures[category] == num:
+                cls._category_current_figures[category] = None
+            cls._figures_by_category[category].remove(num)
+        except KeyError:
+            pass
         current_fig_manager = cls._figures[num]
+        cls._remove_manager_if_present(current_fig_manager)
         del cls._figures[num]
         current_fig_manager.destroy()
         cls.notify_observers(FigureAction.Closed, num)
@@ -290,7 +294,6 @@ class GlobalFigureManager(object):
                     for existing_fig_num in cls._figures.keys()
             ]):
                 num += 1
-        print("Number for a new figure ", num)
         new_fig = new_plot_figure_manager(num, GlobalFigureManager)
         cls._figures[num] = new_fig
         cls._active_figure = num
