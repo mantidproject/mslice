@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qtpy.QtWidgets import QApplication, QMainWindow, QLabel, QMenu, QStackedLayout
 
 from mslice.models.units import EnergyUnits
