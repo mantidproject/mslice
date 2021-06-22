@@ -69,12 +69,12 @@ class MainWindow(MainView, QMainWindow):
         self.cut_plotter_presenter = CutPlotterPresenter()
         self.cut_widget_presenter = self.wgtCut.get_presenter()
         self.cut_widget_presenter.set_cut_plotter_presenter(self.cut_plotter_presenter)
-        # self.plot_selector_presenter = self.plot_selector_view.get_presenter()
-        # self.plot_selector_presenter.update_plot_list()
+        self.plot_selector_presenter = self.plot_selector_view.get_presenter()
+        self.plot_selector_presenter.update_plot_list()
         self._presenter = MainPresenter(self, self.workspace_presenter, self.dataloader_presenter,
                                         slice_widget_presenter, self.powder_presenter, self.cut_widget_presenter,
-                                        self.slice_plotter_presenter, self.cut_plotter_presenter)
-        #                                self.plot_selector_presenter)
+                                        self.slice_plotter_presenter, self.cut_plotter_presenter,
+                                        self.plot_selector_presenter)
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.setup_save()

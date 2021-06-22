@@ -32,20 +32,20 @@ from functools import wraps
 
 # import atexit
 #
-# from enum import Enum
+from enum import Enum
 # from .observabledictionary import DictionaryAction, ObservableDictionary
 
 # Labels for each category
 CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
 
 
-# class FigureAction(Enum):
-#     Update = 0
-#     New = 1
-#     Closed = 2
-#     Renamed = 3
-#     OrderChanged = 4
-#     VisibilityChanged = 5
+class FigureAction(Enum):
+    Update = 0
+    New = 1
+    Closed = 2
+    Renamed = 3
+    OrderChanged = 4
+    VisibilityChanged = 5
 
 
 # class GlobalFigureManagerObserver(object):
