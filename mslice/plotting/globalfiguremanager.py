@@ -33,7 +33,7 @@ from functools import wraps
 import atexit
 
 from enum import Enum
-from .observabledictionary import DictionaryAction, ObservableDictionary
+from .observabledictionary import DictionaryAction  # , ObservableDictionary
 
 # Labels for each category
 CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
