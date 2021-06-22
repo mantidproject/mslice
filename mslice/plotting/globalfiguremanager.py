@@ -189,7 +189,7 @@ class GlobalFigureManager(object):
             CATEGORY_CUT: None,
             CATEGORY_SLICE: None
         }
-        # cls._activeQue = []
+        cls._activeQue = []
         cls._figures.clear()
 
     @classmethod
