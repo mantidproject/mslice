@@ -30,10 +30,10 @@ from __future__ import (absolute_import, division, print_function)
 # system imports
 from functools import wraps
 
-# import atexit
-#
+import atexit
+
 from enum import Enum
-# from .observabledictionary import DictionaryAction, ObservableDictionary
+from .observabledictionary import DictionaryAction, ObservableDictionary
 
 # Labels for each category
 CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
@@ -48,41 +48,41 @@ class FigureAction(Enum):
     VisibilityChanged = 5
 
 
-# class GlobalFigureManagerObserver(object):
-#     def __init__(self, figure_manager=None):
-#         """
-#         :param figure_manager: Figure manager that will be used to notify observers.
-#                                Injected on initialisation for easy mocking
-#         """
-#         self.figure_manager = figure_manager
-#
-#     def notify(self, action, key):
-#         """
-#         This method is called when a dictionary entry is added,
-#         removed or changed
-#         :param action: An enum with the type of dictionary action
-#         :param key: The key in the dictionary that was changed
-#         :param old_value: Old value(s) removed
-#         """
-#
-#         if action == DictionaryAction.Create:
-#             self.figure_manager.notify_observers(FigureAction.New, key)
-#         elif action == DictionaryAction.Set:
-#             self.figure_manager.notify_observers(FigureAction.Renamed, key)
-#         elif action == DictionaryAction.Removed:
-#             self.figure_manager.notify_observers(FigureAction.Closed, key)
-#         elif action == DictionaryAction.Update:
-#             self.figure_manager.notify_observers(FigureAction.Update, key)
-#         elif action == DictionaryAction.Clear:
-#             # On Clear notify the observers to close all of the figures
-#             # `figs.keys()` is safe to iterate and delete items at the same time
-#             # because `keys` returns a new list, not referencing the original dict
-#             for key in self.figure_manager.figs.keys():
-#                 self.figure_manager.notify_observers(FigureAction.Closed, key)
-#         else:
-#             raise ValueError("Notifying for action {} is not supported".format(action))
-#
-#
+class GlobalFigureManagerObserver(object):
+    def __init__(self, figure_manager=None):
+        """
+        :param figure_manager: Figure manager that will be used to notify observers.
+                               Injected on initialisation for easy mocking
+        """
+        self.figure_manager = figure_manager
+
+    def notify(self, action, key):
+        """
+        This method is called when a dictionary entry is added,
+        removed or changed
+        :param action: An enum with the type of dictionary action
+        :param key: The key in the dictionary that was changed
+        :param old_value: Old value(s) removed
+        """
+
+        if action == DictionaryAction.Create:
+            self.figure_manager.notify_observers(FigureAction.New, key)
+        elif action == DictionaryAction.Set:
+            self.figure_manager.notify_observers(FigureAction.Renamed, key)
+        elif action == DictionaryAction.Removed:
+            self.figure_manager.notify_observers(FigureAction.Closed, key)
+        elif action == DictionaryAction.Update:
+            self.figure_manager.notify_observers(FigureAction.Update, key)
+        elif action == DictionaryAction.Clear:
+            # On Clear notify the observers to close all of the figures
+            # `figs.keys()` is safe to iterate and delete items at the same time
+            # because `keys` returns a new list, not referencing the original dict
+            for key in self.figure_manager.figs.keys():
+                self.figure_manager.notify_observers(FigureAction.Closed, key)
+        else:
+            raise ValueError("Notifying for action {} is not supported".format(action))
+
+
 class GlobalFigureManager(object):
     """Static class to manage a set of numbered figures.
 
@@ -581,7 +581,7 @@ def set_category(category):
         return wrapper
 
     return activate_impl
-#
-#
-# GlobalFigureManager.initialiseFiguresObserver()
-# atexit.register(GlobalFigureManager.destroy_all)
+
+
+GlobalFigureManager.initialiseFiguresObserver()
+atexit.register(GlobalFigureManager.destroy_all)
