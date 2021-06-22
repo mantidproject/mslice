@@ -33,7 +33,7 @@ from functools import wraps
 import atexit
 
 from enum import Enum
-from .observabledictionary import DictionaryAction  # , ObservableDictionary
+from .observabledictionary import DictionaryAction, ObservableDictionary
 
 # Labels for each category
 CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
@@ -112,19 +112,19 @@ class GlobalFigureManager(object):
     # the interactive cut window to stop other windows being made current whilst the interactive cut is active.
     _disable_make_current = False
 
-    # _activeQue = []
-    # figs = ObservableDictionary({})
-    # observers = []
-    #
-    # @classmethod
-    # def initialiseFiguresObserver(cls):
-    #     """
-    #     This is used to inject the GlobalFigureManager into the GlobalFigureManagerObserver
-    #     as there is no way to reference the class' own name inside the class' own definition
-    #     :return:
-    #     """
-    #     cls.figs.add_observer(GlobalFigureManagerObserver(cls))
-    #
+    _activeQue = []
+    figs = ObservableDictionary({})
+    observers = []
+
+    @classmethod
+    def initialiseFiguresObserver(cls):
+        """
+        This is used to inject the GlobalFigureManager into the GlobalFigureManagerObserver
+        as there is no way to reference the class' own name inside the class' own definition
+        :return:
+        """
+        cls.figs.add_observer(GlobalFigureManagerObserver(cls))
+
     @classmethod
     def destroy(cls, num):
         """
@@ -517,20 +517,20 @@ class GlobalFigureManager(object):
                 return key
         raise ValueError('Figure %s was not recognised' % fig)
 
-    # # ---------------------- Observer methods ---------------------
-    # # This is currently very simple as the only observer is
-    # # permanently registered to this class.
-    #
-    # @classmethod
-    # def add_observer(cls, observer):
-    #     """
-    #     Add an observer to this class - this can be any class with a
-    #     notify() method
-    #     :param observer: A class with a notify method
-    #     """
-    #     assert "notify" in dir(observer), "An observer must have a notify method"
-    #     cls.observers.append(observer)
-    #
+    # ---------------------- Observer methods ---------------------
+    # This is currently very simple as the only observer is
+    # permanently registered to this class.
+
+    @classmethod
+    def add_observer(cls, observer):
+        """
+        Add an observer to this class - this can be any class with a
+        notify() method
+        :param observer: A class with a notify method
+        """
+        assert "notify" in dir(observer), "An observer must have a notify method"
+        cls.observers.append(observer)
+
     # @classmethod
     # def notify_observers(cls, action, figure_number):
     #     """
