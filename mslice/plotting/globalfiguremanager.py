@@ -39,13 +39,13 @@ from functools import wraps
 CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
 
 
-class FigureAction(Enum):
-    Update = 0
-    New = 1
-    Closed = 2
-    Renamed = 3
-    OrderChanged = 4
-    VisibilityChanged = 5
+# class FigureAction(Enum):
+#     Update = 0
+#     New = 1
+#     Closed = 2
+#     Renamed = 3
+#     OrderChanged = 4
+#     VisibilityChanged = 5
 
 
 # class GlobalFigureManagerObserver(object):
