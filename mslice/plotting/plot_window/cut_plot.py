@@ -81,9 +81,8 @@ class CutPlot(IPlot):
         if icut is not None and self._is_icut:
             icut.window_closing()
             self.manager.button_pressed_connected(False)
-            self.manager.picking_connected(False)#
-        self._canvas.figure.clf()
-        # self.plot_window.close()
+            self.manager.picking_connected(False)
+        self.plot_window.close()
 
     def plot_options(self):
         CutPlotOptionsPresenter(CutPlotOptions(redraw_signal=self.plot_window.redraw), self)
