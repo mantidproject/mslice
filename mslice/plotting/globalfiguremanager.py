@@ -298,8 +298,8 @@ class GlobalFigureManager(object):
         cls._figures[num] = new_fig
         cls._active_figure = num
         cls._unclassified_figures.append(num)
-        # cls.notify_observers(FigureAction.New, num)
-        # cls.notify_observers(FigureAction.Renamed, num)
+        cls.notify_observers(FigureAction.New, num)
+        cls.notify_observers(FigureAction.Renamed, num)
         return cls._figures[num], num
 
     @classmethod
