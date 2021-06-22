@@ -277,18 +277,15 @@ class PlotSelectorPresenterTest(unittest.TestCase):
                              mock.call(100 + i, os.path.join('/home/Documents', 'Plot1 ({}).xyz'.format(i))))
 
     def test_exporting_multiple_plots_with_special_characters_in_file_name(self):
-        for character in '<>:"/|\\?*':
-            self.run_special_character_test(character)
-
-    def run_special_character_test(self, special_character):
-        self.view.get_all_selected_plot_numbers = mock.Mock(return_value=[0, 1])
-        self.model.get_plot_name_from_number = mock.Mock(return_value='Plot' + special_character + '1')
-        self.view.get_directory_name_for_saving = mock.Mock(return_value='/home/Documents')
-        self.presenter.export_plots_called('.xyz')
-        self.assertEqual(self.model.export_plot.mock_calls[0],
-                         mock.call(0, os.path.join('/home/Documents', 'Plot-1.xyz')))
-        self.assertEqual(self.model.export_plot.mock_calls[1],
-                         mock.call(1, os.path.join('/home/Documents', 'Plot-1 (1).xyz')))
+        for special_character in '<>:"/|\\?*':
+            self.view.get_all_selected_plot_numbers = mock.Mock(return_value=[0, 1])
+            self.model.get_plot_name_from_number = mock.Mock(return_value='Plot' + special_character + '1')
+            self.view.get_directory_name_for_saving = mock.Mock(return_value='/home/Documents')
+            self.presenter.export_plots_called('.xyz')
+            self.assertEqual(self.model.export_plot.mock_calls[0],
+                             mock.call(0, os.path.join('/home/Documents', 'Plot-1.xyz')))
+            self.assertEqual(self.model.export_plot.mock_calls[1],
+                             mock.call(1, os.path.join('/home/Documents', 'Plot-1 (1).xyz')))
 
 
 if __name__ == '__main__':
