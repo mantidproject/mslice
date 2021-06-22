@@ -531,32 +531,32 @@ class GlobalFigureManager(object):
         assert "notify" in dir(observer), "An observer must have a notify method"
         cls.observers.append(observer)
 
-    # @classmethod
-    # def notify_observers(cls, action, figure_number):
-    #     """
-    #     Calls notify method on all observers
-    #     :param action: A FigureAction enum for the action called
-    #     :param figure_number: The unique fig number (key in the dict)
-    #     """
-    #     for observer in cls.observers:
-    #         observer.notify(action, figure_number)
-    #
-    # @classmethod
-    # def figure_title_changed(cls, figure_number):
-    #     """
-    #     Notify the observers that a figure title was changed
-    #     :param figure_number: The unique number in GlobalFigureManager
-    #     """
-    #     cls.notify_observers(FigureAction.Renamed, figure_number)
-    #
-    # @classmethod
-    # def figure_visibility_changed(cls, figure_number):
-    #     """
-    #     Notify the observers that a figure was shown or hidden
-    #     :param figure_number: The unique number in GlobalFigureManager
-    #     """
-    #     cls.notify_observers(FigureAction.VisibilityChanged, figure_number)
-    #
+    @classmethod
+    def notify_observers(cls, action, figure_number):
+        """
+        Calls notify method on all observers
+        :param action: A FigureAction enum for the action called
+        :param figure_number: The unique fig number (key in the dict)
+        """
+        for observer in cls.observers:
+            observer.notify(action, figure_number)
+
+    @classmethod
+    def figure_title_changed(cls, figure_number):
+        """
+        Notify the observers that a figure title was changed
+        :param figure_number: The unique number in GlobalFigureManager
+        """
+        cls.notify_observers(FigureAction.Renamed, figure_number)
+
+    @classmethod
+    def figure_visibility_changed(cls, figure_number):
+        """
+        Notify the observers that a figure was shown or hidden
+        :param figure_number: The unique number in GlobalFigureManager
+        """
+        cls.notify_observers(FigureAction.VisibilityChanged, figure_number)
+
 
 # WARNING: If you change the name or parameter list here then the corresponding changes
 # to tools/boilerplate.py must be made and that script reran to regenerate pyplot.py
