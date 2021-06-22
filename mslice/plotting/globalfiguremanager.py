@@ -336,9 +336,7 @@ class GlobalFigureManager(object):
             if cls._active_figure is None:
                 fig, num = cls._new_figure()
                 cls._active_figure = num
-        tmp_fig = cls._figures[cls._active_figure]
-        for observer in cls.observers:
-            observer.presenter.rename_in_plot_list(cls._active_figure, tmp_fig.get_window_title())
+        cls.notify_observers(FigureAction.Renamed, cls._active_figure)
         return cls._figures[cls._active_figure]
 
     @classmethod

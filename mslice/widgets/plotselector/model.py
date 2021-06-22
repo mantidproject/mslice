@@ -32,7 +32,7 @@ class PlotSelectorModel(object):
         self.GlobalFigureManager.add_observer(self)
 
     def get_plot_name_from_number(self, plot_number):
-        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)  # figs.get(plot_number)
+        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             return ''
         else:
@@ -73,7 +73,7 @@ class PlotSelectorModel(object):
         if action == FigureAction.Closed:
             self.presenter.remove_from_plot_list(plot_number)
         if action == FigureAction.Renamed:
-            figure_manager = self.GlobalFigureManager.figs.get(plot_number)
+            figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
             # This can be triggered before the plot is added to the
             # GlobalFigureManager, so we silently ignore this case
             if figure_manager is not None:
@@ -95,7 +95,7 @@ class PlotSelectorModel(object):
         front and make it the destination for overplotting
         :param plot_number: The unique number in GlobalFigureManager
         """
-        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)  # figs.get(plot_number)
+        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError('Error showing, could not find a plot with the number {}.'.format(plot_number))
         figure_manager.show()
@@ -107,7 +107,7 @@ class PlotSelectorModel(object):
         Determines if plot window is visible or hidden
         :return: True if plot visible (window open), false if hidden
         """
-        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)  # figs.get(plot_number)
+        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError('Error in is_visible, could not find a plot with the number {}.'.format(plot_number))
 
@@ -118,7 +118,7 @@ class PlotSelectorModel(object):
         Hide a plot by calling .window.hide() on the figure manager
         :param plot_number: The unique number in GlobalFigureManager
         """
-        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)  # figs.get(plot_number)
+        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError('Error hiding, could not find a plot with the number {}.'.format(plot_number))
         figure_manager.window.hide()
@@ -131,7 +131,7 @@ class PlotSelectorModel(object):
         :param plot_number: The unique number in GlobalFigureManager
         :param new_name: The new figure (plot) name
         """
-        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)  # figs.get(plot_number)
+        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError('Error renaming, could not find a plot with the number {}.'.format(plot_number))
 
@@ -145,7 +145,7 @@ class PlotSelectorModel(object):
         GlobalFigureManager
         :param plot_number: The unique number in GlobalFigureManager
         """
-        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)  # figs.get(plot_number)
+        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError('Error closing, could not find a plot with the number {}.'.format(plot_number))
 
@@ -182,7 +182,7 @@ class PlotSelectorModel(object):
                                    extension giving the type
         :return:
         """
-        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)  # figs.get(plot_number)
+        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError('Error exporting, could not find a plot with the number {}.'.format(plot_number))
 
