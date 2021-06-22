@@ -206,69 +206,69 @@ class GlobalFigureManager(object):
         """
         return list(cls._figures.values())
 
-    # @classmethod
-    # def get_active(cls):
-    #     """
-    #     Return the manager of the active figure, or *None*.
-    #     """
-    #     if len(cls._activeQue) == 0:
-    #         return None
-    #     else:
-    #         return cls._activeQue[-1]
-    #
-    # @classmethod
-    # def set_active(cls, manager):
-    #     """
-    #     Make the figure corresponding to *manager* the active one.
-    #     """
-    #     cls._remove_manager_if_present(manager)
-    #     cls._activeQue.append(manager)
-    #     cls.figs[manager.num] = manager
-    #     cls.notify_observers(FigureAction.OrderChanged, manager.num)
-    #
-    # @classmethod
-    # def _remove_manager_if_present(cls, manager):
-    #     """
-    #     Removes the manager from the active queue, if it is present in it.
-    #     :param manager: Manager to be removed from the active queue
-    #     :return:
-    #     """
-    #     try:
-    #         del cls._activeQue[cls._activeQue.index(manager)]
-    #     except ValueError:
-    #         # the figure manager was not in the active queue - no need to delete anything
-    #         pass
-    #
-    # @classmethod
-    # def draw_all(cls, force=False):
-    #     """
-    #     Redraw all figures registered with the pyplot
-    #     state machine.
-    #     """
-    #     for f_mgr in cls.get_all_fig_managers():
-    #         if force or f_mgr.canvas.figure.stale:
-    #             f_mgr.canvas.draw_idle()
-    #
-    # # ------------------ Our additional interface -----------------
-    #
-    # @classmethod
-    # def last_active_values(cls):
-    #     """
-    #     Returns a dictionary where the keys are the plot numbers and
-    #     the values are the last shown (active) order, the most recent
-    #     being 1, the oldest being N, where N is the number of figure
-    #     managers
-    #     :return: A dictionary with the values as plot number and keys
-    #              as the opening order
-    #     """
-    #     last_shown_order_dict = {}
-    #     num_figure_managers = len(cls._activeQue)
-    #
-    #     for index in range(num_figure_managers):
-    #         last_shown_order_dict[cls._activeQue[index].num] = num_figure_managers - index
-    #
-    #     return last_shown_order_dict
-    #
+    @classmethod
+    def get_active(cls):
+        """
+        Return the manager of the active figure, or *None*.
+        """
+        if len(cls._activeQue) == 0:
+            return None
+        else:
+            return cls._activeQue[-1]
+
+    @classmethod
+    def set_active(cls, manager):
+        """
+        Make the figure corresponding to *manager* the active one.
+        """
+        cls._remove_manager_if_present(manager)
+        cls._activeQue.append(manager)
+        cls.figs[manager.num] = manager
+        cls.notify_observers(FigureAction.OrderChanged, manager.num)
+
+    @classmethod
+    def _remove_manager_if_present(cls, manager):
+        """
+        Removes the manager from the active queue, if it is present in it.
+        :param manager: Manager to be removed from the active queue
+        :return:
+        """
+        try:
+            del cls._activeQue[cls._activeQue.index(manager)]
+        except ValueError:
+            # the figure manager was not in the active queue - no need to delete anything
+            pass
+
+    @classmethod
+    def draw_all(cls, force=False):
+        """
+        Redraw all figures registered with the pyplot
+        state machine.
+        """
+        for f_mgr in cls.get_all_fig_managers():
+            if force or f_mgr.canvas.figure.stale:
+                f_mgr.canvas.draw_idle()
+
+    # ------------------ Our additional interface -----------------
+
+    @classmethod
+    def last_active_values(cls):
+        """
+        Returns a dictionary where the keys are the plot numbers and
+        the values are the last shown (active) order, the most recent
+        being 1, the oldest being N, where N is the number of figure
+        managers
+        :return: A dictionary with the values as plot number and keys
+                 as the opening order
+        """
+        last_shown_order_dict = {}
+        num_figure_managers = len(cls._activeQue)
+
+        for index in range(num_figure_managers):
+            last_shown_order_dict[cls._activeQue[index].num] = num_figure_managers - index
+
+        return last_shown_order_dict
+
     @classmethod
     def reset(cls):
         """Reset all class variables to initial state. This function exists for testing purposes """
