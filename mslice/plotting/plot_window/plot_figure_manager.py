@@ -61,7 +61,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             self._toggle_legend)
         self.button_pressed_connected(True)
         self.picking_connected(True)
-        self.window.show()
+        # self.window.show()
         self.window.raise_()
 
     def show(self):

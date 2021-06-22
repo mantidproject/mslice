@@ -30,10 +30,10 @@ from __future__ import (absolute_import, division, print_function)
 # system imports
 from functools import wraps
 
-import atexit
-
-from enum import Enum
-from .observabledictionary import DictionaryAction, ObservableDictionary
+# import atexit
+#
+# from enum import Enum
+# from .observabledictionary import DictionaryAction, ObservableDictionary
 
 # Labels for each category
 CATEGORY_CUT, CATEGORY_SLICE = "1d", "2d"
@@ -48,41 +48,41 @@ class FigureAction(Enum):
     VisibilityChanged = 5
 
 
-class GlobalFigureManagerObserver(object):
-    def __init__(self, figure_manager=None):
-        """
-        :param figure_manager: Figure manager that will be used to notify observers.
-                               Injected on initialisation for easy mocking
-        """
-        self.figure_manager = figure_manager
-
-    def notify(self, action, key):
-        """
-        This method is called when a dictionary entry is added,
-        removed or changed
-        :param action: An enum with the type of dictionary action
-        :param key: The key in the dictionary that was changed
-        :param old_value: Old value(s) removed
-        """
-
-        if action == DictionaryAction.Create:
-            self.figure_manager.notify_observers(FigureAction.New, key)
-        elif action == DictionaryAction.Set:
-            self.figure_manager.notify_observers(FigureAction.Renamed, key)
-        elif action == DictionaryAction.Removed:
-            self.figure_manager.notify_observers(FigureAction.Closed, key)
-        elif action == DictionaryAction.Update:
-            self.figure_manager.notify_observers(FigureAction.Update, key)
-        elif action == DictionaryAction.Clear:
-            # On Clear notify the observers to close all of the figures
-            # `figs.keys()` is safe to iterate and delete items at the same time
-            # because `keys` returns a new list, not referencing the original dict
-            for key in self.figure_manager.figs.keys():
-                self.figure_manager.notify_observers(FigureAction.Closed, key)
-        else:
-            raise ValueError("Notifying for action {} is not supported".format(action))
-
-
+# class GlobalFigureManagerObserver(object):
+#     def __init__(self, figure_manager=None):
+#         """
+#         :param figure_manager: Figure manager that will be used to notify observers.
+#                                Injected on initialisation for easy mocking
+#         """
+#         self.figure_manager = figure_manager
+#
+#     def notify(self, action, key):
+#         """
+#         This method is called when a dictionary entry is added,
+#         removed or changed
+#         :param action: An enum with the type of dictionary action
+#         :param key: The key in the dictionary that was changed
+#         :param old_value: Old value(s) removed
+#         """
+#
+#         if action == DictionaryAction.Create:
+#             self.figure_manager.notify_observers(FigureAction.New, key)
+#         elif action == DictionaryAction.Set:
+#             self.figure_manager.notify_observers(FigureAction.Renamed, key)
+#         elif action == DictionaryAction.Removed:
+#             self.figure_manager.notify_observers(FigureAction.Closed, key)
+#         elif action == DictionaryAction.Update:
+#             self.figure_manager.notify_observers(FigureAction.Update, key)
+#         elif action == DictionaryAction.Clear:
+#             # On Clear notify the observers to close all of the figures
+#             # `figs.keys()` is safe to iterate and delete items at the same time
+#             # because `keys` returns a new list, not referencing the original dict
+#             for key in self.figure_manager.figs.keys():
+#                 self.figure_manager.notify_observers(FigureAction.Closed, key)
+#         else:
+#             raise ValueError("Notifying for action {} is not supported".format(action))
+#
+#
 class GlobalFigureManager(object):
     """Static class to manage a set of numbered figures.
 
@@ -92,10 +92,10 @@ class GlobalFigureManager(object):
     to be placed into a category such that a current figure for
     a given category can be returned to be operated on separately
     to the current figure for another category.
-
-            *_activeQue*:
-          list of *managers*, with active one at the end
-
+    #
+    #         *_activeQue*:
+    #       list of *managers*, with active one at the end
+    #
     """
     # if there is a current figure it should be both current and active
     _active_category = None
@@ -112,19 +112,19 @@ class GlobalFigureManager(object):
     # the interactive cut window to stop other windows being made current whilst the interactive cut is active.
     _disable_make_current = False
 
-    _activeQue = []
-    figs = ObservableDictionary({})
-    observers = []
-
-    @classmethod
-    def initialiseFiguresObserver(cls):
-        """
-        This is used to inject the GlobalFigureManager into the GlobalFigureManagerObserver
-        as there is no way to reference the class' own name inside the class' own definition
-        :return:
-        """
-        cls.figs.add_observer(GlobalFigureManagerObserver(cls))
-
+    # _activeQue = []
+    # figs = ObservableDictionary({})
+    # observers = []
+    #
+    # @classmethod
+    # def initialiseFiguresObserver(cls):
+    #     """
+    #     This is used to inject the GlobalFigureManager into the GlobalFigureManagerObserver
+    #     as there is no way to reference the class' own name inside the class' own definition
+    #     :return:
+    #     """
+    #     cls.figs.add_observer(GlobalFigureManagerObserver(cls))
+    #
     @classmethod
     def destroy(cls, num):
         """
@@ -138,20 +138,24 @@ class GlobalFigureManager(object):
         if num in cls._unclassified_figures:
             cls._unclassified_figures.remove(num)
             return
+        category = cls.get_category(num)
         if cls._active_figure == num:
             cls._active_figure = None
-        try:
-            category = cls.get_category(num)
-            if cls._category_current_figures[category] == num:
-                cls._category_current_figures[category] = None
-            cls._figures_by_category[category].remove(num)
-        except KeyError:
-            pass
-        current_fig_manager = cls._figures[num]
-        cls._remove_manager_if_present(current_fig_manager)
+        if cls._category_current_figures[category] == num:
+            cls._category_current_figures[category] = None
+        cls._figures_by_category[category].remove(num)
+        # try:
+        #     category = cls.get_category(num)
+        #     if cls._category_current_figures[category] == num:
+        #         cls._category_current_figures[category] = None
+        #     cls._figures_by_category[category].remove(num)
+        # except KeyError:
+        #     pass
+        # current_fig_manager = cls._figures[num]
+        # cls._remove_manager_if_present(current_fig_manager)
         del cls._figures[num]
-        current_fig_manager.destroy()
-        cls.notify_observers(FigureAction.Closed, num)
+        # current_fig_manager.destroy()
+        # cls.notify_observers(FigureAction.Closed, num)
 
     @classmethod
     def get_figure_by_number(cls, num):
@@ -168,12 +172,8 @@ class GlobalFigureManager(object):
     @classmethod
     def destroy_fig(cls, fig):
         """*fig* is a Figure instance"""
-        # num = next((manager.num for manager in cls._figures.values()
-        #             if manager.canvas.figure == fig), None)
-        num = None
-        for manager in cls._figures.values():
-            num = manager.num
-            break
+        num = next((manager.num for manager in cls._figures.values()
+                    if manager.canvas.figure == fig), None)
         if num is not None:
             cls.destroy(num)
 
@@ -189,7 +189,7 @@ class GlobalFigureManager(object):
             CATEGORY_CUT: None,
             CATEGORY_SLICE: None
         }
-        cls._activeQue = []
+        # cls._activeQue = []
         cls._figures.clear()
 
     @classmethod
@@ -206,69 +206,69 @@ class GlobalFigureManager(object):
         """
         return list(cls._figures.values())
 
-    @classmethod
-    def get_active(cls):
-        """
-        Return the manager of the active figure, or *None*.
-        """
-        if len(cls._activeQue) == 0:
-            return None
-        else:
-            return cls._activeQue[-1]
-
-    @classmethod
-    def set_active(cls, manager):
-        """
-        Make the figure corresponding to *manager* the active one.
-        """
-        cls._remove_manager_if_present(manager)
-        cls._activeQue.append(manager)
-        cls.figs[manager.num] = manager
-        cls.notify_observers(FigureAction.OrderChanged, manager.num)
-
-    @classmethod
-    def _remove_manager_if_present(cls, manager):
-        """
-        Removes the manager from the active queue, if it is present in it.
-        :param manager: Manager to be removed from the active queue
-        :return:
-        """
-        try:
-            del cls._activeQue[cls._activeQue.index(manager)]
-        except ValueError:
-            # the figure manager was not in the active queue - no need to delete anything
-            pass
-
-    @classmethod
-    def draw_all(cls, force=False):
-        """
-        Redraw all figures registered with the pyplot
-        state machine.
-        """
-        for f_mgr in cls.get_all_fig_managers():
-            if force or f_mgr.canvas.figure.stale:
-                f_mgr.canvas.draw_idle()
-
-    # ------------------ Our additional interface -----------------
-
-    @classmethod
-    def last_active_values(cls):
-        """
-        Returns a dictionary where the keys are the plot numbers and
-        the values are the last shown (active) order, the most recent
-        being 1, the oldest being N, where N is the number of figure
-        managers
-        :return: A dictionary with the values as plot number and keys
-                 as the opening order
-        """
-        last_shown_order_dict = {}
-        num_figure_managers = len(cls._activeQue)
-
-        for index in range(num_figure_managers):
-            last_shown_order_dict[cls._activeQue[index].num] = num_figure_managers - index
-
-        return last_shown_order_dict
-
+    # @classmethod
+    # def get_active(cls):
+    #     """
+    #     Return the manager of the active figure, or *None*.
+    #     """
+    #     if len(cls._activeQue) == 0:
+    #         return None
+    #     else:
+    #         return cls._activeQue[-1]
+    #
+    # @classmethod
+    # def set_active(cls, manager):
+    #     """
+    #     Make the figure corresponding to *manager* the active one.
+    #     """
+    #     cls._remove_manager_if_present(manager)
+    #     cls._activeQue.append(manager)
+    #     cls.figs[manager.num] = manager
+    #     cls.notify_observers(FigureAction.OrderChanged, manager.num)
+    #
+    # @classmethod
+    # def _remove_manager_if_present(cls, manager):
+    #     """
+    #     Removes the manager from the active queue, if it is present in it.
+    #     :param manager: Manager to be removed from the active queue
+    #     :return:
+    #     """
+    #     try:
+    #         del cls._activeQue[cls._activeQue.index(manager)]
+    #     except ValueError:
+    #         # the figure manager was not in the active queue - no need to delete anything
+    #         pass
+    #
+    # @classmethod
+    # def draw_all(cls, force=False):
+    #     """
+    #     Redraw all figures registered with the pyplot
+    #     state machine.
+    #     """
+    #     for f_mgr in cls.get_all_fig_managers():
+    #         if force or f_mgr.canvas.figure.stale:
+    #             f_mgr.canvas.draw_idle()
+    #
+    # # ------------------ Our additional interface -----------------
+    #
+    # @classmethod
+    # def last_active_values(cls):
+    #     """
+    #     Returns a dictionary where the keys are the plot numbers and
+    #     the values are the last shown (active) order, the most recent
+    #     being 1, the oldest being N, where N is the number of figure
+    #     managers
+    #     :return: A dictionary with the values as plot number and keys
+    #              as the opening order
+    #     """
+    #     last_shown_order_dict = {}
+    #     num_figure_managers = len(cls._activeQue)
+    #
+    #     for index in range(num_figure_managers):
+    #         last_shown_order_dict[cls._activeQue[index].num] = num_figure_managers - index
+    #
+    #     return last_shown_order_dict
+    #
     @classmethod
     def reset(cls):
         """Reset all class variables to initial state. This function exists for testing purposes """
@@ -298,8 +298,8 @@ class GlobalFigureManager(object):
         cls._figures[num] = new_fig
         cls._active_figure = num
         cls._unclassified_figures.append(num)
-        cls.notify_observers(FigureAction.New, num)
-        cls.notify_observers(FigureAction.Renamed, num)
+        # cls.notify_observers(FigureAction.New, num)
+        # cls.notify_observers(FigureAction.Renamed, num)
         return cls._figures[num], num
 
     @classmethod
@@ -340,9 +340,9 @@ class GlobalFigureManager(object):
             if cls._active_figure is None:
                 fig, num = cls._new_figure()
                 cls._active_figure = num
-        tmp_fig = cls._figures[cls._active_figure]
-        for observer in cls.observers:
-            observer.presenter.rename_in_plot_list(cls._active_figure, tmp_fig.get_window_title())
+        # tmp_fig = cls._figures[cls._active_figure]
+        # for observer in cls.observers:
+        #     observer.presenter.rename_in_plot_list(cls._active_figure, tmp_fig.get_window_title())
         return cls._figures[cls._active_figure]
 
     @classmethod
@@ -517,46 +517,46 @@ class GlobalFigureManager(object):
                 return key
         raise ValueError('Figure %s was not recognised' % fig)
 
-    # ---------------------- Observer methods ---------------------
-    # This is currently very simple as the only observer is
-    # permanently registered to this class.
-
-    @classmethod
-    def add_observer(cls, observer):
-        """
-        Add an observer to this class - this can be any class with a
-        notify() method
-        :param observer: A class with a notify method
-        """
-        assert "notify" in dir(observer), "An observer must have a notify method"
-        cls.observers.append(observer)
-
-    @classmethod
-    def notify_observers(cls, action, figure_number):
-        """
-        Calls notify method on all observers
-        :param action: A FigureAction enum for the action called
-        :param figure_number: The unique fig number (key in the dict)
-        """
-        for observer in cls.observers:
-            observer.notify(action, figure_number)
-
-    @classmethod
-    def figure_title_changed(cls, figure_number):
-        """
-        Notify the observers that a figure title was changed
-        :param figure_number: The unique number in GlobalFigureManager
-        """
-        cls.notify_observers(FigureAction.Renamed, figure_number)
-
-    @classmethod
-    def figure_visibility_changed(cls, figure_number):
-        """
-        Notify the observers that a figure was shown or hidden
-        :param figure_number: The unique number in GlobalFigureManager
-        """
-        cls.notify_observers(FigureAction.VisibilityChanged, figure_number)
-
+    # # ---------------------- Observer methods ---------------------
+    # # This is currently very simple as the only observer is
+    # # permanently registered to this class.
+    #
+    # @classmethod
+    # def add_observer(cls, observer):
+    #     """
+    #     Add an observer to this class - this can be any class with a
+    #     notify() method
+    #     :param observer: A class with a notify method
+    #     """
+    #     assert "notify" in dir(observer), "An observer must have a notify method"
+    #     cls.observers.append(observer)
+    #
+    # @classmethod
+    # def notify_observers(cls, action, figure_number):
+    #     """
+    #     Calls notify method on all observers
+    #     :param action: A FigureAction enum for the action called
+    #     :param figure_number: The unique fig number (key in the dict)
+    #     """
+    #     for observer in cls.observers:
+    #         observer.notify(action, figure_number)
+    #
+    # @classmethod
+    # def figure_title_changed(cls, figure_number):
+    #     """
+    #     Notify the observers that a figure title was changed
+    #     :param figure_number: The unique number in GlobalFigureManager
+    #     """
+    #     cls.notify_observers(FigureAction.Renamed, figure_number)
+    #
+    # @classmethod
+    # def figure_visibility_changed(cls, figure_number):
+    #     """
+    #     Notify the observers that a figure was shown or hidden
+    #     :param figure_number: The unique number in GlobalFigureManager
+    #     """
+    #     cls.notify_observers(FigureAction.VisibilityChanged, figure_number)
+    #
 
 # WARNING: If you change the name or parameter list here then the corresponding changes
 # to tools/boilerplate.py must be made and that script reran to regenerate pyplot.py
@@ -581,7 +581,7 @@ def set_category(category):
         return wrapper
 
     return activate_impl
-
-
-GlobalFigureManager.initialiseFiguresObserver()
-atexit.register(GlobalFigureManager.destroy_all)
+#
+#
+# GlobalFigureManager.initialiseFiguresObserver()
+# atexit.register(GlobalFigureManager.destroy_all)
