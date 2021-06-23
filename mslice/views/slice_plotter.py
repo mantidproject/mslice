@@ -59,11 +59,14 @@ def remove_line(line):
 
 def plot_overplot_line(x, y, key, recoil, cache):
     color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
-    if recoil:  # key is relative mass
-        label = get_recoil_label(key)
-    else:  # key is element name
-        label = key
-    if cache.rotated:
+    if recoil:
+        return overplot_line(x, y, color, get_recoil_label(key), cache.rotated)
+    else:
+        return overplot_line(x, y, color, key, cache.rotated)
+
+
+def overplot_line(x, y, color, label, rotated):
+    if rotated:
         return plt.gca().plot(y, x, color=color, label=label, alpha=.7,
                               picker=PICKER_TOL_PTS)[0]
     else:
