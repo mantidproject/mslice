@@ -36,6 +36,8 @@ def _show_plot(slice_cache, workspace):
     if cur_fig.canvas.manager.plot_handler.icut is not None:
         cur_fig.canvas.manager.plot_handler.icut.rect.ax = ax
 
+    cur_fig.canvas.manager.plot_handler._update_lines()
+
     cur_fig.canvas.draw_idle()
     cur_fig.show()
 
