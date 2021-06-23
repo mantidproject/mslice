@@ -31,12 +31,14 @@ def _show_plot(slice_cache, workspace):
     cb = plt.colorbar(image, ax=ax)
     cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
 
+    plt_handler = cur_fig.canvas.manager.plot_handler
+
     # Because the axis is cleared, RectangleSelector needs to use the new axis
     # otherwise it can't be used after doing an intensity plot (as it clears the axes)
-    if cur_fig.canvas.manager.plot_handler.icut is not None:
-        cur_fig.canvas.manager.plot_handler.icut.rect.ax = ax
+    if plt_handler.icut is not None:
+        plt_handler.icut.rect.ax = ax
 
-    cur_fig.canvas.manager.plot_handler._update_lines()
+    plt_handler._update_lines()
 
     cur_fig.canvas.draw_idle()
     cur_fig.show()
@@ -44,8 +46,8 @@ def _show_plot(slice_cache, workspace):
     # This ensures that another slice plotted in the same window saves the plot options
     # as the plot window's showEvent is called only once. The equivalent command is left
     # in the showEvent for use by the CLI.
-    if cur_fig.canvas.manager.plot_handler.default_options is None:
-        cur_fig.canvas.manager.plot_handler.save_default_options()
+    if plt_handler.default_options is None:
+        plt_handler.save_default_options()
 
 
 def set_colorbar_label(label):
