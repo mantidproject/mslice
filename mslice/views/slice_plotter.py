@@ -1,8 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.models.labels import recoil_labels
+from mslice.models.labels import get_recoil_label
 import mslice.plotting.pyplot as plt
-
 
 OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
 PICKER_TOL_PTS = 5
@@ -61,7 +60,7 @@ def remove_line(line):
 def plot_overplot_line(x, y, key, recoil, cache):
     color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
     if recoil:  # key is relative mass
-        label = recoil_labels[key] if key in recoil_labels else 'Relative mass ' + str(key)
+        label = get_recoil_label(key)
     else:  # key is element name
         label = key
     if cache.rotated:
