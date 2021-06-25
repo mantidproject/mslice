@@ -376,20 +376,32 @@ class SlicePlot(IPlot):
         else:
             return str(temp_field), temp_field in keys
 
-    def _update_lines(self):
-        """ Updates the powder/recoil overplots lines when intensity type changes """
+    def _update_overplot_lines(self, lines):
+        for line in lines:
+            if line.isChecked():
+                self._slice_plotter_presenter.add_overplot_line(self.ws_name, *lines[line])
+
+    def _update_recoil_lines(self):
+        """ Updates the recoil overplots lines when intensity type changes """
         lines = {self.plot_window.action_hydrogen: [1, True, ''],
                  self.plot_window.action_deuterium: [2, True, ''],
                  self.plot_window.action_helium: [4, True, ''],
-                 self.plot_window.action_arbitrary_nuclei: [self._arb_nuclei_rmm, True, ''],
-                 self.plot_window.action_aluminium: ['Aluminium', False, ''],
+                 self.plot_window.action_arbitrary_nuclei: [self._arb_nuclei_rmm, True, '']}
+        self._update_overplot_lines(lines)
+
+    def _update_powder_lines(self):
+        """ Updates the powder overplots lines when intensity type changes """
+        lines = {self.plot_window.action_aluminium: ['Aluminium', False, ''],
                  self.plot_window.action_copper: ['Copper', False, ''],
                  self.plot_window.action_niobium: ['Niobium', False, ''],
                  self.plot_window.action_tantalum: ['Tantalum', False, ''],
                  self.plot_window.action_cif_file: [self._cif_file, False, self._cif_path]}
-        for line in lines:
-            if line.isChecked():
-                self._slice_plotter_presenter.add_overplot_line(self.ws_name, *lines[line])
+        self._update_overplot_lines(lines)
+
+    def _update_lines(self):
+        """ Updates the powder/recoil overplots lines when intensity type changes """
+        self._update_recoil_lines()
+        self._update_powder_lines()
         self.update_legend()
         self._canvas.draw()
 
