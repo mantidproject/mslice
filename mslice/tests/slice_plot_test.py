@@ -3,7 +3,7 @@ import unittest
 
 from matplotlib import colors
 from matplotlib.legend import Legend
-from mslice.plotting.plot_window.slice_plot import SlicePlot
+from mslice.plotting.plot_window.slice_plot import SlicePlot, toggle_overplot_line
 
 
 class SlicePlotTest(unittest.TestCase):
@@ -57,7 +57,8 @@ class SlicePlotTest(unittest.TestCase):
 
     def test_lines_redrawn_on_intensity_change(self):
         self.slice_plot.save_default_options()
-        self.slice_plot.toggle_overplot_line(self.slice_plot.plot_window.action_helium, 4, True, True)
+        toggle_overplot_line(self.slice_plot, self.slice_plot._slice_plotter_presenter,
+                             self.slice_plot.plot_window.action_helium, 4, True, True)
         colorbar_range = PropertyMock(return_value=(0, 10))
         type(self.slice_plot).colorbar_range = colorbar_range
         self.slice_plotter.show_dynamical_susceptibility.__name__ = 'foo'
