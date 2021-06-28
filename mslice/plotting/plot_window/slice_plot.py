@@ -18,6 +18,41 @@ from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 
 
+def _update_overplot_lines(plotter_presenter, ws_name, lines):
+    for line in lines:
+        if line.isChecked():
+            plotter_presenter.add_overplot_line(ws_name, *lines[line])
+
+
+def _update_powder_lines(plot_handler, plotter_presenter):
+    """ Updates the powder overplots lines when intensity type changes """
+    lines = {plot_handler.plot_window.action_aluminium: ['Aluminium', False, ''],
+             plot_handler.plot_window.action_copper: ['Copper', False, ''],
+             plot_handler.plot_window.action_niobium: ['Niobium', False, ''],
+             plot_handler.plot_window.action_tantalum: ['Tantalum', False, ''],
+             plot_handler.plot_window.action_cif_file: [plot_handler._cif_file, False, plot_handler._cif_path]}
+    _update_overplot_lines(plotter_presenter, plot_handler.ws_name, lines)
+
+
+def toggle_overplot_line(plot_handler, plotter_presenter, key, recoil, checked, cif_file=None):
+    last_active_figure_number = None
+    if plot_handler.manager._current_figs._active_figure is not None:
+        last_active_figure_number = plot_handler.manager._current_figs.get_active_figure().number
+    plot_handler.manager.report_as_current()
+
+    if checked:
+        plotter_presenter.add_overplot_line(plot_handler.ws_name, key, recoil, cif_file)
+    else:
+        plotter_presenter.hide_overplot_line(plot_handler.ws_name, key)
+
+    plot_handler.update_legend()
+    plot_handler._canvas.draw()
+
+    # Reset current active figure
+    if last_active_figure_number is not None:
+        plot_handler.manager._current_figs.set_figure_as_current(last_active_figure_number)
+
+
 class SlicePlot(IPlot):
 
     def __init__(self, figure_manager, slice_plotter_presenter, workspace_name):
@@ -96,20 +131,20 @@ class SlicePlot(IPlot):
             partial(self.show_intensity_plot, plot_window.action_gdos, self._slice_plotter_presenter.show_gdos, True))
 
         plot_window.action_hydrogen.triggered.connect(
-            partial(self.toggle_overplot_line, 1, True))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 1, True))
         plot_window.action_deuterium.triggered.connect(
-            partial(self.toggle_overplot_line, 2, True))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 2, True))
         plot_window.action_helium.triggered.connect(
-            partial(self.toggle_overplot_line, 4, True))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 4, True))
         plot_window.action_arbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
         plot_window.action_aluminium.triggered.connect(
-            partial(self.toggle_overplot_line, 'Aluminium', False))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Aluminium', False))
         plot_window.action_copper.triggered.connect(
-            partial(self.toggle_overplot_line, 'Copper', False))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Copper', False))
         plot_window.action_niobium.triggered.connect(
-            partial(self.toggle_overplot_line, 'Niobium', False))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Niobium', False))
         plot_window.action_tantalum.triggered.connect(
-            partial(self.toggle_overplot_line, 'Tantalum', False))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
         plot_window.action_gen_script.triggered.connect(self.generate_script)
         plot_window.action_gen_script_clipboard.triggered.connect(lambda: self.generate_script(clipboard=True))
@@ -226,24 +261,6 @@ class SlicePlot(IPlot):
         bounds['x_label'] = fig_y * 0.05
         return bounds
 
-    def toggle_overplot_line(self, key, recoil, checked, cif_file=None):
-        last_active_figure_number = None
-        if self.manager._current_figs._active_figure is not None:
-            last_active_figure_number = self.manager._current_figs.get_active_figure().number
-        self.manager.report_as_current()
-
-        if checked:
-            self._slice_plotter_presenter.add_overplot_line(self.ws_name, key, recoil, cif_file)
-        else:
-            self._slice_plotter_presenter.hide_overplot_line(self.ws_name, key)
-
-        self.update_legend()
-        self._canvas.draw()
-
-        # Reset current active figure
-        if last_active_figure_number is not None:
-            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
-
     def arbitrary_recoil_line(self):
         recoil = True
         checked = self.plot_window.action_arbitrary_nuclei.isChecked()
@@ -251,11 +268,11 @@ class SlicePlot(IPlot):
             self._arb_nuclei_rmm, confirm = QtWidgets.QInputDialog.getInt(
                 self.plot_window, 'Arbitrary Nuclei', 'Enter relative mass:', min=1)
             if confirm:
-                self.toggle_overplot_line(self._arb_nuclei_rmm, recoil, checked)
+                toggle_overplot_line(self, self._slice_plotter_presenter, self._arb_nuclei_rmm, recoil, checked)
             else:
                 self.plot_window.action_arbitrary_nuclei.setChecked(not checked)
         else:
-            self.toggle_overplot_line(self._arb_nuclei_rmm, recoil, checked)
+            toggle_overplot_line(self, self._slice_plotter_presenter, self._arb_nuclei_rmm, recoil, checked)
 
     def cif_file_powder_line(self, checked):
         if checked:
@@ -270,7 +287,7 @@ class SlicePlot(IPlot):
             cif_path = None
         if key:
             recoil = False
-            self.toggle_overplot_line(key, recoil, checked, cif_file=cif_path)
+            toggle_overplot_line(self, self._slice_plotter_presenter, key, recoil, checked, cif_file=cif_path)
 
     def _reset_intensity(self):
         options = self.plot_window.menu_intensity.actions()
@@ -376,32 +393,18 @@ class SlicePlot(IPlot):
         else:
             return str(temp_field), temp_field in keys
 
-    def _update_overplot_lines(self, lines):
-        for line in lines:
-            if line.isChecked():
-                self._slice_plotter_presenter.add_overplot_line(self.ws_name, *lines[line])
-
     def _update_recoil_lines(self):
         """ Updates the recoil overplots lines when intensity type changes """
         lines = {self.plot_window.action_hydrogen: [1, True, ''],
                  self.plot_window.action_deuterium: [2, True, ''],
                  self.plot_window.action_helium: [4, True, ''],
                  self.plot_window.action_arbitrary_nuclei: [self._arb_nuclei_rmm, True, '']}
-        self._update_overplot_lines(lines)
-
-    def _update_powder_lines(self):
-        """ Updates the powder overplots lines when intensity type changes """
-        lines = {self.plot_window.action_aluminium: ['Aluminium', False, ''],
-                 self.plot_window.action_copper: ['Copper', False, ''],
-                 self.plot_window.action_niobium: ['Niobium', False, ''],
-                 self.plot_window.action_tantalum: ['Tantalum', False, ''],
-                 self.plot_window.action_cif_file: [self._cif_file, False, self._cif_path]}
-        self._update_overplot_lines(lines)
+        _update_overplot_lines(self._slice_plotter_presenter, self.ws_name, lines)
 
     def _update_lines(self):
         """ Updates the powder/recoil overplots lines when intensity type changes """
         self._update_recoil_lines()
-        self._update_powder_lines()
+        _update_powder_lines(self, self._slice_plotter_presenter)
         self.update_legend()
         self._canvas.draw()
 
