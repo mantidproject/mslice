@@ -31,4 +31,3 @@ def toggle_overplot_line(plot_handler, plotter_presenter, key, recoil, checked, 
     # Reset current active figure
     if last_active_figure_number is not None:
         plot_handler.manager._current_figs.set_figure_as_current(last_active_figure_number)
-
