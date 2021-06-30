@@ -3,7 +3,8 @@ import unittest
 
 from matplotlib import colors
 from matplotlib.legend import Legend
-from mslice.plotting.plot_window.slice_plot import SlicePlot, toggle_overplot_line
+from mslice.plotting.plot_window.slice_plot import SlicePlot
+from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line
 
 
 class SlicePlotTest(unittest.TestCase):
