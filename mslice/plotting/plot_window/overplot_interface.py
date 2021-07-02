@@ -1,3 +1,8 @@
+from qtpy.QtWidgets import QFileDialog
+
+import os.path as path
+
+
 def _update_overplot_lines(plotter_presenter, ws_name, lines):
     for line in lines:
         if line.isChecked():
@@ -10,7 +15,8 @@ def _update_powder_lines(plot_handler, plotter_presenter):
              plot_handler.plot_window.action_copper: ['Copper', False, ''],
              plot_handler.plot_window.action_niobium: ['Niobium', False, ''],
              plot_handler.plot_window.action_tantalum: ['Tantalum', False, ''],
-             plot_handler.plot_window.action_cif_file: [plot_handler._cif_file, False, plot_handler._cif_path]}
+             plot_handler.plot_window.action_cif_file: [plot_handler._cif_file,
+                                                        False, plot_handler._cif_path]}
     _update_overplot_lines(plotter_presenter, plot_handler.ws_name, lines)
 
 
@@ -31,3 +37,21 @@ def toggle_overplot_line(plot_handler, plotter_presenter, key, recoil, checked, 
     # Reset current active figure
     if last_active_figure_number is not None:
         plot_handler.manager._current_figs.set_figure_as_current(last_active_figure_number)
+
+
+def cif_file_powder_line(plot_handler, plotter_presenter, checked):
+    if checked:
+        cif_path = QFileDialog().getOpenFileName(plot_handler.plot_window,
+                                                 'Open CIF file', '/home',
+                                                 'Files (*.cif)')
+        cif_path = str(cif_path[0]) if isinstance(cif_path, tuple) else str(cif_path)
+        key = path.basename(cif_path).rsplit('.')[0]
+        plot_handler._cif_file = key
+        plot_handler._cif_path = cif_path
+    else:
+        key = plot_handler._cif_file
+        cif_path = None
+    if key:
+        recoil = False
+        toggle_overplot_line(plot_handler, plotter_presenter, key, recoil,
+                             checked, cif_file=cif_path)

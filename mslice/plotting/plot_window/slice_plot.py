@@ -15,7 +15,7 @@ from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 from mslice.plotting.plot_window.overplot_interface import _update_overplot_lines, _update_powder_lines,\
-    toggle_overplot_line
+    toggle_overplot_line, cif_file_powder_line
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 
@@ -112,7 +112,8 @@ class SlicePlot(IPlot):
             partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Niobium', False))
         plot_window.action_tantalum.triggered.connect(
             partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Tantalum', False))
-        plot_window.action_cif_file.triggered.connect(partial(self.cif_file_powder_line))
+        plot_window.action_cif_file.triggered.connect(partial(cif_file_powder_line, self,
+                                                              self._slice_plotter_presenter))
         plot_window.action_gen_script.triggered.connect(self.generate_script)
         plot_window.action_gen_script_clipboard.triggered.connect(lambda: self.generate_script(clipboard=True))
 
@@ -240,21 +241,6 @@ class SlicePlot(IPlot):
                 self.plot_window.action_arbitrary_nuclei.setChecked(not checked)
         else:
             toggle_overplot_line(self, self._slice_plotter_presenter, self._arb_nuclei_rmm, recoil, checked)
-
-    def cif_file_powder_line(self, checked):
-        if checked:
-            cif_path = QtWidgets.QFileDialog().getOpenFileName(self.plot_window, 'Open CIF file', '/home',
-                                                               'Files (*.cif)')
-            cif_path = str(cif_path[0]) if isinstance(cif_path, tuple) else str(cif_path)
-            key = path.basename(cif_path).rsplit('.')[0]
-            self._cif_file = key
-            self._cif_path = cif_path
-        else:
-            key = self._cif_file
-            cif_path = None
-        if key:
-            recoil = False
-            toggle_overplot_line(self, self._slice_plotter_presenter, key, recoil, checked, cif_file=cif_path)
 
     def _reset_intensity(self):
         options = self.plot_window.menu_intensity.actions()
