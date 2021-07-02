@@ -49,4 +49,3 @@ def _show_plot(slice_cache, workspace):
 
 def set_colorbar_label(label):
     plt.gcf().get_axes()[1].set_ylabel(label, rotation=270, labelpad=20)
-
