@@ -5,9 +5,9 @@ from mslice.models.slice.slice_functions import (compute_slice, sample_temperatu
 from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice import Slice
 from mslice.models.labels import is_momentum, is_twotheta
-from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, remove_line,
-                                        plot_overplot_line, create_slice_figure)
+from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, create_slice_figure)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.plotting.plot_window.overplot_interface import plot_overplot_line, remove_line
 from mslice.presenters.presenter_utility import PresenterUtility
 
 

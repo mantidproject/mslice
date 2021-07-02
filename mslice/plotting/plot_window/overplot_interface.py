@@ -2,6 +2,13 @@ from qtpy.QtWidgets import QFileDialog
 
 import os.path as path
 
+from mslice.models.labels import get_recoil_label
+import mslice.plotting.pyplot as plt
+
+OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g',
+                   'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
+PICKER_TOL_PTS = 5
+
 
 def _update_overplot_lines(plotter_presenter, ws_name, lines):
     for line in lines:
@@ -55,3 +62,24 @@ def cif_file_powder_line(plot_handler, plotter_presenter, checked):
         recoil = False
         toggle_overplot_line(plot_handler, plotter_presenter, key, recoil,
                              checked, cif_file=cif_path)
+
+
+def remove_line(line):
+    plt.gca().lines.remove(line)
+
+
+def plot_overplot_line(x, y, key, recoil, cache):
+    color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
+    if recoil:
+        return overplot_line(x, y, color, get_recoil_label(key), cache.rotated)
+    else:
+        return overplot_line(x, y, color, key, cache.rotated)
+
+
+def overplot_line(x, y, color, label, rotated):
+    if rotated:
+        return plt.gca().plot(y, x, color=color, label=label, alpha=.7,
+                              picker=PICKER_TOL_PTS)[0]
+    else:
+        return plt.gca().plot(x, y, color=color, label=label, alpha=.7,
+                              picker=PICKER_TOL_PTS)[0]
