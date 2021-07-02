@@ -16,6 +16,7 @@ class Cut(object):
         self.width = width
         self.algorithm = algorithm
         self.workspace_name = 'None'
+        self.rotated = False
 
     def reset_integration_axis(self, start, end):
         self.integration_axis.start = start
