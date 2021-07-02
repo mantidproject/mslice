@@ -4,7 +4,6 @@ import numpy as np
 from functools import partial
 
 from mantid.api import WorkspaceUnitValidator
-from mantid.geometry import CrystalStructure, ReflectionGenerator, ReflectionConditionFilter
 from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
@@ -12,7 +11,7 @@ from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.util.mantid.mantid_algorithms import LoadCIF, CloneWorkspace
+from mslice.util.mantid.mantid_algorithms import CloneWorkspace
 from mslice.util.mantid import mantid_algorithms
 
 from mslice.util.numpy_helper import apply_with_swapped_axes
@@ -21,11 +20,6 @@ from mslice.workspace.workspace import Workspace
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 E_TO_K = np.sqrt(2 * constants.neutron_mass * constants.elementary_charge / 1000) / constants.hbar
-E2L = 1.e23 * constants.h**2 / (2 * constants.m_n * constants.e)  # energy to wavelength conversion E = h^2/(2*m_n*l^2)
-crystal_structure = {'Copper': ['3.6149 3.6149 3.6149', 'F m -3 m', 'Cu 0 0 0 1.0 0.05'],
-                     'Aluminium': ['4.0495 4.0495 4.0495', 'F m -3 m', 'Al 0 0 0 1.0 0.05'],
-                     'Niobium': ['3.3004 3.3004 3.3004', 'I m -3 m', 'Nb 0 0 0 1.0 0.05'],
-                     'Tantalum': ['3.3013 3.3013 3.3013', 'I m -3 m', 'Ta 0 0 0 1.0 0.05']}
 
 
 def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
@@ -159,55 +153,6 @@ def compute_recoil_line(ws_name, axis, relative_mass=1):
     else:
         raise RuntimeError("units of axis not recognised")
     return x_axis, line
-
-
-def compute_powder_line(ws_name, axis, element, cif_file=False):
-    efixed = get_workspace_handle(ws_name).e_fixed
-    if is_momentum(axis.units):
-        x0 = _compute_powder_line_momentum(ws_name, axis, element, cif_file)
-    elif is_twotheta(axis.units):
-        x0 = _compute_powder_line_degrees(ws_name, axis, element, efixed, cif_file)
-    else:
-        raise RuntimeError("units of axis not recognised")
-    x = sum([[xv, xv, np.nan] for xv in x0], [])
-    y = sum([[efixed / 20,  -efixed / 20, np.nan] for xv in x0], [])
-    return x, y
-
-
-def _compute_powder_line_momentum(ws_name, q_axis, element, cif_file):
-    d_min = (2 * np.pi) / q_axis.end
-    d_max = (2 * np.pi) / q_axis.start
-    structure = _crystal_structure(ws_name, element, cif_file)
-    dvalues = compute_dvalues(d_min, d_max, structure)
-    x = (2 * np.pi) / dvalues
-    return x
-
-
-def _crystal_structure(ws_name, element, cif_file):
-    if cif_file:
-        ws = get_workspace_handle(ws_name).raw_ws
-        LoadCIF(Workspace=ws, InputFile=cif_file)
-        return ws.sample().getCrystalStructure()
-    else:
-        return CrystalStructure(crystal_structure[element][0], crystal_structure[element][1],
-                                crystal_structure[element][2])
-
-
-def _compute_powder_line_degrees(ws_name, theta_axis, element, efixed, cif_file):
-    wavelength = np.sqrt(E2L / efixed)
-    d_min = wavelength / (2 * np.sin(np.deg2rad(theta_axis.end / 2)))
-    d_max = wavelength / (2 * np.sin(np.deg2rad(theta_axis.start / 2)))
-    structure = _crystal_structure(ws_name, element, cif_file)
-    dvalues = compute_dvalues(d_min, d_max, structure)
-    x = 2 * np.arcsin(wavelength / 2 / dvalues) * 180 / np.pi
-    return x
-
-
-def compute_dvalues(d_min, d_max, structure):
-    generator = ReflectionGenerator(structure)
-    hkls = generator.getUniqueHKLsUsingFilter(d_min, d_max, ReflectionConditionFilter.StructureFactor)
-    dvalues = np.sort(np.array(generator.getDValues(hkls)))[::-1]
-    return dvalues
 
 
 def _norm_to_one(workspace):

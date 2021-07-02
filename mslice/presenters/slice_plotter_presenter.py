@@ -1,7 +1,7 @@
 from matplotlib.colors import Normalize
 
-from mslice.models.slice.slice_functions import (compute_slice, sample_temperature, compute_recoil_line,
-                                                 compute_powder_line)
+from mslice.models.slice.slice_functions import compute_slice, sample_temperature, compute_recoil_line
+from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice import Slice
 from mslice.models.labels import is_momentum, is_twotheta
