@@ -141,6 +141,15 @@ clicking ``Make Current``. In order to overplot new data preserving previous dat
 the ``Plot`` button. This will send data to the **Current** plot window, so you may need to ``Make Current`` on it again.
 This is available only for 1D cuts. For 2D slices, you cannot overplot current data.
 
+Plots Management in GUI
+-----------------------
+
+.. image:: images/quickstart/plots_tab.png
+   :scale: 80 %
+
+``Plots`` tab is made available in the MSlice graphical user interface. This widget helps users to manage plots.
+For example, ``Delete All`` can be used to close all MSlice plots.
+
 
 Manipulating Workspaces
 -----------------------
