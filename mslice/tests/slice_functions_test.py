@@ -120,7 +120,7 @@ class SliceFunctionsTest(unittest.TestCase):
         self.assertAlmostEqual(line[10], 0.999578, 6)
         self.assertAlmostEqual(line[29], 5.276328, 6)
 
-    @patch('mslice.models.slice.slice_functions.get_workspace_handle')
+    @patch('mslice.models.powder.powder_functions.get_workspace_handle')
     def test_powder_line(self, ws_handle_mock):
         from mslice.models.axis import Axis
         ws_handle_mock.return_value.e_fixed = 20
@@ -132,7 +132,7 @@ class SliceFunctionsTest(unittest.TestCase):
         self.assertEqual(y[0], 1)
         self.assertEqual(y[1], -1)
 
-    @patch('mslice.models.slice.slice_functions.get_workspace_handle')
+    @patch('mslice.models.powder.powder_functions.get_workspace_handle')
     def test_powder_line_degrees(self, ws_handle_mock):
         from mslice.models.axis import Axis
         ws_handle_mock.return_value.e_fixed = 20
