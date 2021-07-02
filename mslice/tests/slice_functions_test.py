@@ -11,7 +11,8 @@ from mslice.models.axis import Axis
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.models.slice.slice_functions import (compute_slice, compute_boltzmann_dist, compute_chi,
                                                  compute_chi_magnetic, compute_d2sigma, compute_symmetrised,
-                                                 compute_gdos, compute_powder_line, compute_recoil_line)
+                                                 compute_gdos, compute_recoil_line)
+from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 
