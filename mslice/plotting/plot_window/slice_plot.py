@@ -3,7 +3,6 @@ from functools import partial
 from qtpy import QtWidgets
 from qtpy.QtCore import Qt
 
-import os.path as path
 import matplotlib.colors as colors
 
 from mslice.models.colors import to_hex
@@ -178,24 +177,20 @@ class SlicePlot(IPlot):
         current_axis = self._canvas.figure.gca()
         colormesh = current_axis.collections[0]
         vmin, vmax = colorbar_range
+
         if logarithmic:
-            label = self.colorbar_label
-            colormesh.colorbar.remove()
             if vmin <= float(0):
                 vmin = 0.001
-            colormesh.set_clim((vmin, vmax))
             norm = colors.LogNorm(vmin, vmax)
-            colormesh.set_norm(norm)
-            self._canvas.figure.colorbar(colormesh)
-            self.colorbar_label = label
         else:
-            label = self.colorbar_label
-            colormesh.colorbar.remove()
-            colormesh.set_clim((vmin, vmax))
             norm = colors.Normalize(vmin, vmax)
-            colormesh.set_norm(norm)
-            self._canvas.figure.colorbar(colormesh)
-            self.colorbar_label = label
+
+        label = self.colorbar_label
+        colormesh.colorbar.remove()
+        colormesh.set_clim((vmin, vmax))
+        colormesh.set_norm(norm)
+        self._canvas.figure.colorbar(colormesh)
+        self.colorbar_label = label
 
     def get_line_options(self, target):
         line_options = {
