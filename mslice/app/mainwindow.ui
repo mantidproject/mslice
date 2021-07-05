@@ -31,7 +31,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="iconSize">
         <size>
@@ -371,6 +371,11 @@
          </item>
         </layout>
        </widget>
+       <widget class="PlotSelectorView" name="plot_selector_view">
+        <attribute name="title">
+         <string>Plots</string>
+        </attribute>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -394,7 +399,7 @@
      <x>0</x>
      <y>0</y>
      <width>533</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -506,6 +511,12 @@
    <class>DataLoaderWidget</class>
    <extends>QWidget</extends>
    <header>mslice/widgets/dataloader/dataloader.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PlotSelectorView</class>
+   <extends>QWidget</extends>
+   <header>mslice/widgets/plotselector/view.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

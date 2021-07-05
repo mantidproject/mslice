@@ -17,6 +17,7 @@ class CurrentFigureTest(unittest.TestCase):
 
     def setUp(self):
         GlobalFigureManager.reset()
+        GlobalFigureManager.notify_observers = mock.Mock()
         # The getattr_static call in the real implementation does not play well
         # with mocks
         self.mock_force_qapp = mock.patch(
