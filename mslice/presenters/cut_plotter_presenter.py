@@ -1,6 +1,7 @@
 from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend, is_momentum, is_twotheta
+from mslice.models.units import convert_energy_to_meV
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -104,11 +105,7 @@ class CutPlotterPresenter(PresenterUtility):
             q_axis = cache.cut_axis
             e_axis = cache.integration_axis
         x, y = compute_powder_line(workspace_name, q_axis, key, cif_file=cif)
-        if 'meV' not in e_axis.e_unit:
-            from mslice.models.units import EnergyUnits
-            import numpy as np
-            y = np.array(y) * EnergyUnits(e_axis.e_unit).factor_from_meV()
-
+        convert_energy_to_meV(y, e_axis.e_unit)
         self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
 
     def store_icut(self, icut):

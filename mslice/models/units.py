@@ -7,11 +7,15 @@ are defined, but they are separated into a module for possible future expansion.
 from __future__ import (absolute_import, division, print_function)
 from mslice.util import MPL_COMPAT
 
+import numpy as np
+
+
 def _scale_string_or_float(value, scale):
     try:
         return '{:.5f}'.format(float(value) * scale)
     except (ValueError, TypeError):
         return value
+
 
 def get_sample_temperature_from_string(string):
     if string is not None and string.strip():
@@ -23,6 +27,7 @@ def get_sample_temperature_from_string(string):
         except ValueError:
             return None
     return None
+
 
 class EnergyUnits(object):
 
@@ -89,3 +94,8 @@ class EnergyUnits(object):
     @classmethod
     def get_all_units(cls):
         return cls._available_units
+
+
+def convert_energy_to_meV(y, energy_axis_units):
+    if 'meV' not in energy_axis_units:
+        y = np.array(y) * EnergyUnits(energy_axis_units).factor_from_meV()
