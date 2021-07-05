@@ -98,7 +98,7 @@ class SlicePlotterPresenter(PresenterUtility):
             x, y = compute_recoil_line(workspace_name, cache.momentum_axis, key)
         else:
             x, y = compute_powder_line(workspace_name, cache.momentum_axis, key, cif_file=cif)
-        convert_energy_to_meV(y, cache.energy_axis.e_unit)
+        y = convert_energy_to_meV(y, cache.energy_axis.e_unit)
         cache.overplot_lines[key] = plot_overplot_line(x, y, key, recoil, cache)
 
     def validate_intensity(self, intensity_start, intensity_end):

@@ -105,7 +105,7 @@ class CutPlotterPresenter(PresenterUtility):
             q_axis = cache.cut_axis
             e_axis = cache.integration_axis
         x, y = compute_powder_line(workspace_name, q_axis, key, cif_file=cif)
-        convert_energy_to_meV(y, e_axis.e_unit)
+        y = convert_energy_to_meV(y, e_axis.e_unit)
         self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
 
     def store_icut(self, icut):
