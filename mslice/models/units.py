@@ -99,3 +99,5 @@ class EnergyUnits(object):
 def convert_energy_to_meV(y, energy_axis_units):
     if 'meV' not in energy_axis_units:
         return np.array(y) * EnergyUnits(energy_axis_units).factor_from_meV()
+    else:
+        return y
