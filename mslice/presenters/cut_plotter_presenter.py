@@ -97,7 +97,7 @@ class CutPlotterPresenter(PresenterUtility):
         recoil = False
         cache = list(self._cut_cache_dict.values())[0][0]
         cache.rotated = not is_twotheta(cache.cut_axis.units) and not is_momentum(cache.cut_axis.units)
-        workspace_name = cache.workspace_name
+        workspace_name = workspace_name.split('(')[0][:-4]
         if cache.rotated:
             q_axis = cache.integration_axis
             e_axis = cache.cut_axis
