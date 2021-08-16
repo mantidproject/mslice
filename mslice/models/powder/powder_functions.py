@@ -28,7 +28,7 @@ def compute_dvalues(d_min, d_max, structure):
 def _compute_powder_line_momentum(ws_name, q_axis, element, cif_file):
     two_pi = 2.0 * np.pi
     d_min = two_pi / q_axis.end
-    d_max = two_pi / q_axis.start
+    d_max = two_pi / np.max([q_axis.start, 0.01])
     structure = _crystal_structure(ws_name, element, cif_file)
     dvalues = compute_dvalues(d_min, d_max, structure)
     x = two_pi / dvalues
