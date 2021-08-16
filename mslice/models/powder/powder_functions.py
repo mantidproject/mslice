@@ -64,6 +64,4 @@ def _crystal_structure(ws_name, element, cif_file):
         LoadCIF(Workspace=ws, InputFile=cif_file)
         return ws.sample().getCrystalStructure()
     else:
-        return CrystalStructure(crystal_structure[element][0],
-                                crystal_structure[element][1],
-                                crystal_structure[element][2])
+        return CrystalStructure(*crystal_structure[element])

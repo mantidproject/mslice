@@ -1,7 +1,6 @@
 from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend, is_momentum, is_twotheta
-from mslice.models.units import convert_energy_to_meV
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -95,17 +94,24 @@ class CutPlotterPresenter(PresenterUtility):
 
     def add_overplot_line(self, workspace_name, key, recoil, cif=None):
         recoil = False
-        cache = list(self._cut_cache_dict.values())[0][0]
+        from mslice.plotting.pyplot import gca
+        cache = self._cut_cache_dict[gca()][0]
         cache.rotated = not is_twotheta(cache.cut_axis.units) and not is_momentum(cache.cut_axis.units)
-        workspace_name = workspace_name.split('(')[0][:-4]
+        import numpy as np
+        try:
+            ws_handle = get_workspace_handle(workspace_name)
+            workspace_name = ws_handle.parent
+            scale_fac = np.nanmax(ws_handle.get_signal()) / 10
+        except KeyError:
+            # Workspace is interactively generated and is not in the workspace list
+            scale_fac = 1
+            workspace_name = workspace_name.split('(')[0][:-4]
         if cache.rotated:
             q_axis = cache.integration_axis
-            e_axis = cache.cut_axis
         else:
             q_axis = cache.cut_axis
-            e_axis = cache.integration_axis
         x, y = compute_powder_line(workspace_name, q_axis, key, cif_file=cif)
-        y = convert_energy_to_meV(y, e_axis.e_unit)
+        y = np.array(y) * (scale_fac / np.nanmax(y))
         self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
 
     def store_icut(self, icut):
