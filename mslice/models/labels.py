@@ -14,11 +14,14 @@ DELTA_E_LABEL = 'DeltaE'
 TWOTHETA_UNITS = ('Degrees', '2Theta')
 MOMENTUM_UNITS = ('MomentumTransfer', '|Q|')
 
+
 def is_twotheta(unit):
     return any([unit in val for val in TWOTHETA_UNITS])
 
+
 def is_momentum(unit):
     return any([unit in val for val in MOMENTUM_UNITS])
+
 
 def get_recoil_key(label):
     for key, value in recoil_labels.items():
@@ -47,3 +50,11 @@ def generate_legend(workspace_name, integrated_dim, integration_start, integrati
     integrated_dim = mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
     return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
         "%.2f" % integration_end
+
+
+def get_recoil_label(key) -> str:
+    if key in recoil_labels:
+        label = recoil_labels[key]
+    else:
+        label = 'Relative mass ' + str(key)
+    return label

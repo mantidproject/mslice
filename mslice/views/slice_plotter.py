@@ -1,10 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mslice.models.labels import recoil_labels
 import mslice.plotting.pyplot as plt
 
-
-OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g', 'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}
 PICKER_TOL_PTS = 5
 
 
@@ -31,10 +28,14 @@ def _show_plot(slice_cache, workspace):
     cb = plt.colorbar(image, ax=ax)
     cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
 
+    plt_handler = cur_fig.canvas.manager.plot_handler
+
     # Because the axis is cleared, RectangleSelector needs to use the new axis
     # otherwise it can't be used after doing an intensity plot (as it clears the axes)
-    if cur_fig.canvas.manager.plot_handler.icut is not None:
-        cur_fig.canvas.manager.plot_handler.icut.rect.ax = ax
+    if plt_handler.icut is not None:
+        plt_handler.icut.rect.ax = ax
+
+    plt_handler._update_lines()
 
     cur_fig.canvas.manager.plot_handler._update_lines()
 
@@ -44,27 +45,9 @@ def _show_plot(slice_cache, workspace):
     # This ensures that another slice plotted in the same window saves the plot options
     # as the plot window's showEvent is called only once. The equivalent command is left
     # in the showEvent for use by the CLI.
-    if cur_fig.canvas.manager.plot_handler.default_options is None:
-        cur_fig.canvas.manager.plot_handler.save_default_options()
+    if plt_handler.default_options is None:
+        plt_handler.save_default_options()
 
 
 def set_colorbar_label(label):
     plt.gcf().get_axes()[1].set_ylabel(label, rotation=270, labelpad=20)
-
-
-def remove_line(line):
-    plt.gca().lines.remove(line)
-
-
-def plot_overplot_line(x, y, key, recoil, cache):
-    color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
-    if recoil:  # key is relative mass
-        label = recoil_labels[key] if key in recoil_labels else 'Relative mass ' + str(key)
-    else:  # key is element name
-        label = key
-    if cache.rotated:
-        return plt.gca().plot(y, x, color=color, label=label, alpha=.7,
-                              picker=PICKER_TOL_PTS)[0]
-    else:
-        return plt.gca().plot(x, y, color=color, label=label, alpha=.7,
-                              picker=PICKER_TOL_PTS)[0]

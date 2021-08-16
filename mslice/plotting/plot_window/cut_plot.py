@@ -1,3 +1,5 @@
+from functools import partial
+
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 import warnings
@@ -8,6 +10,8 @@ from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
+from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line,\
+    cif_file_powder_line
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 
@@ -57,7 +61,7 @@ class CutPlot(IPlot):
     def setup_connections(self, plot_window):
         plot_window.redraw.connect(self._canvas.draw)
         plot_window.menu_intensity.setDisabled(True)
-        plot_window.menu_information.setDisabled(True)
+        plot_window.menu_recoil_lines.setDisabled(True)
         plot_window.action_interactive_cuts.setVisible(False)
         plot_window.action_save_cut.setVisible(False)
         plot_window.action_save_cut.triggered.connect(self.save_icut)
@@ -69,12 +73,27 @@ class CutPlot(IPlot):
         plot_window.waterfall_x_edt.editingFinished.connect(self.toggle_waterfall)
         plot_window.waterfall_y_edt.editingFinished.connect(self.toggle_waterfall)
         self.mpl_axes_changed = self._canvas.figure.gca().add_callback(self.on_newplot)
+        plot_window.action_aluminium.triggered.connect(
+            partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Aluminium', False))
+        plot_window.action_copper.triggered.connect(
+            partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Copper', False))
+        plot_window.action_niobium.triggered.connect(
+            partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Niobium', False))
+        plot_window.action_tantalum.triggered.connect(
+            partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Tantalum', False))
+        plot_window.action_cif_file.triggered.connect(partial(cif_file_powder_line, self,
+                                                              self._cut_plotter_presenter))
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
         plot_window.action_flip_axis.triggered.disconnect()
         plot_window.action_gen_script.triggered.disconnect()
         self._canvas.figure.gca().remove_callack(self.mpl_axes_changed)
+        plot_window.action_aluminium.triggered.disconnect()
+        plot_window.action_copper.triggered.disconnect()
+        plot_window.action_niobium.triggered.disconnect()
+        plot_window.action_tantalum.triggered.disconnect()
+        plot_window.action_cif_file.triggered.disconnect()
 
     def window_closing(self):
         icut = self._cut_plotter_presenter.get_icut()
@@ -353,6 +372,11 @@ class CutPlot(IPlot):
         num_lines = len(line_containers)
         self.plot_window.action_waterfall.setEnabled(num_lines > 1)
         self.plot_window.toggle_waterfall_edit()
+        self.plot_window.action_aluminium.setChecked(False)
+        self.plot_window.action_copper.setChecked(False)
+        self.plot_window.action_niobium.setChecked(False)
+        self.plot_window.action_tantalum.setChecked(False)
+        self.plot_window.action_cif_file.setChecked(False)
         all_lines = [line for container in line_containers for line in container.get_children()]
         for cached_lines in list(self._waterfall_cache.keys()):
             if cached_lines not in all_lines:
