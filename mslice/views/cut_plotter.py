@@ -47,6 +47,9 @@ def plot_cut_impl(workspace, intensity_range=None, plot_over=False, legend=None,
     else:
         cur_fig.canvas.manager.plot_handler.ws_list = [workspace.name]
 
+    if cur_fig.canvas.manager.plot_handler.default_options is None:
+        cur_fig.canvas.manager.plot_handler.save_default_options()
+
     return ax.lines
 
 
