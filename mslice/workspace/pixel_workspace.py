@@ -53,9 +53,21 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
         attribute_from_log(None, self.raw_ws)
 
     def __del__(self):
-        if hasattr(self, '_raw_ws') and self._raw_ws is not None and self._raw_ws.name().endswith('_HIDDEN'):
-            DeleteWorkspace(self._raw_ws)
-            self._raw_ws = None
-        if hasattr(self, '_histo_ws') and self._histo_ws is not None and self._histo_ws.name().endswith('_HIDDEN'):
-            DeleteWorkspace(self._histo_ws)
-            self._histo_ws = None
+        try:
+            if hasattr(self, '_raw_ws') and self._raw_ws is not None and self._raw_ws.name().endswith('_HIDDEN'):
+                DeleteWorkspace(self._raw_ws)
+                self._raw_ws = None
+        except RuntimeError:
+            # On exit the workspace can get deleted before __del__ is called
+            # where you receive a RuntimeError: Variable invalidated, data has been deleted.
+            # error
+            pass
+        try:
+            if hasattr(self, '_histo_ws') and self._histo_ws is not None and self._histo_ws.name().endswith('_HIDDEN'):
+                DeleteWorkspace(self._histo_ws)
+                self._histo_ws = None
+        except RuntimeError:
+            # On exit the workspace can get deleted before __del__ is called
+            # where you receive a RuntimeError: Variable invalidated, data has been deleted.
+            # error
+            pass

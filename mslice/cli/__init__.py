@@ -28,6 +28,12 @@ class MSliceAxes(Axes):
         if is_cut(*args):
             return errorbar(self, *args, **kwargs)
         else:
+            if 'intensity_range' in kwargs:
+                kwargs.pop('intensity_range', None)
+            if 'plot_over' in kwargs:
+                kwargs.pop('plot_over', None)
+            if 'en_conversion' in kwargs:
+                kwargs.pop('en_conversion', None)
             return Axes.errorbar(self, *args, **kwargs)
 
     def pcolormesh(self, *args, **kwargs):
