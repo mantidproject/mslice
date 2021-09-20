@@ -3,11 +3,9 @@ from .base import WorkspaceBase
 from .histogram_workspace import HistogramWorkspace
 from .pixel_mixin import PixelMixin
 from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
-from .helperfunctions import attribute_from_log, attribute_to_log
+from .helperfunctions import attribute_from_log, attribute_to_log, delete_workspace
 
 from mantid.api import IMDEventWorkspace
-from mantid.simpleapi import DeleteWorkspace
-
 
 
 class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase):
@@ -53,21 +51,5 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
         attribute_from_log(None, self.raw_ws)
 
     def __del__(self):
-        try:
-            if hasattr(self, '_raw_ws') and self._raw_ws is not None and self._raw_ws.name().endswith('_HIDDEN'):
-                DeleteWorkspace(self._raw_ws)
-                self._raw_ws = None
-        except RuntimeError:
-            # On exit the workspace can get deleted before __del__ is called
-            # where you receive a RuntimeError: Variable invalidated, data has been deleted.
-            # error
-            pass
-        try:
-            if hasattr(self, '_histo_ws') and self._histo_ws is not None and self._histo_ws.name().endswith('_HIDDEN'):
-                DeleteWorkspace(self._histo_ws)
-                self._histo_ws = None
-        except RuntimeError:
-            # On exit the workspace can get deleted before __del__ is called
-            # where you receive a RuntimeError: Variable invalidated, data has been deleted.
-            # error
-            pass
+        delete_workspace(self, self._raw_ws)
+        delete_workspace(self, self._histo_ws)

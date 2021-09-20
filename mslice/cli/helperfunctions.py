@@ -161,10 +161,7 @@ def is_hs_workspace(*args):
     """
     Checks if args[0] is a HistogramWorkspace
     """
-    if isinstance(args[0], HistogramWorkspace):
-        return True
-    else:
-        return False
+    return isinstance(args[0], HistogramWorkspace)
 
 def append_visible_handle(visible_handles, handles, idx: int):
     handle = handles[idx]
