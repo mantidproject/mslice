@@ -6,6 +6,7 @@ import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.plotting.plot_window.overplot_interface import remove_line, plot_overplot_line
 from mslice.models.powder.powder_functions import compute_powder_line
+import warnings
 
 
 class CutPlotterPresenter(PresenterUtility):
@@ -111,8 +112,11 @@ class CutPlotterPresenter(PresenterUtility):
         else:
             q_axis = cache.cut_axis
         x, y = compute_powder_line(workspace_name, q_axis, key, cif_file=cif)
-        y = np.array(y) * (scale_fac / np.nanmax(y))
-        self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
+        try:
+            y = np.array(y) * (scale_fac / np.nanmax(y))
+            self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
+        except ValueError:
+            warnings.warn("No Bragg peak found.")
 
     def store_icut(self, icut):
         self._interactive_cut_cache = icut
