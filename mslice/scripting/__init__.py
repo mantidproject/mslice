@@ -1,4 +1,4 @@
-from qtpy import QtWidgets
+from qtpy import QtGui, QtWidgets
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.scripting.helperfunctions import add_plot_statements
 from mslice.app.presenters import get_cut_plotter_presenter
@@ -20,7 +20,8 @@ def generate_script(ws_name, filename=None, plot_handler=None, window=None, clip
     script_lines = preprocess_lines(ws_name, plot_handler, ax)
     script_lines = add_plot_statements(script_lines, plot_handler, ax)
     if clipboard:
-        QtWidgets.QApplication.clipboard().setText(''.join(script_lines))
+        cb = QtGui.QGuiApplication.clipboard()
+        cb.setText(''.join(script_lines), mode=cb.Clipboard)
     else:
         with open(filename, 'w') as generated_script:
             generated_script.writelines(script_lines)
