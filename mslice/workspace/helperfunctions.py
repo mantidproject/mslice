@@ -1,6 +1,9 @@
 import pickle
 import codecs
 
+from mantid.simpleapi import DeleteWorkspace
+
+
 def _attribute_from_string(ws, comstr):
     if comstr:
         try:
@@ -75,6 +78,16 @@ def attribute_to_log(attrdict, raw_ws, append=False):
                     attrdict[k] = v
         runinfo.addProperty('MSlice', str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()), True)
 
+def delete_workspace(workspace, ws):
+    try:
+        if hasattr(workspace, str(ws)) and ws is not None and ws.name().endswith('_HIDDEN'):
+            DeleteWorkspace(ws)
+            ws = None
+    except RuntimeError:
+        # On exit the workspace can get deleted before __del__ is called
+        # where you receive a RuntimeError: Variable invalidated, data has been deleted.
+        # error
+        pass
 
 class WrapWorkspaceAttribute(object):
 

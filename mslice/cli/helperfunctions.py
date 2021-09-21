@@ -149,7 +149,7 @@ def is_slice(*args):
 
 def is_cut(*args):
     """
-    Checks if args[0] is a HistogramWorkspace
+    Checks if args[0] is a HistogramWorkspace and if the bin number matches
     """
     if isinstance(args[0], HistogramWorkspace) and \
             sum([args[0].raw_ws.getDimension(i).getNBins() != 1 for i in range(args[0]._raw_ws.getNumDims())]) == 1:
@@ -157,6 +157,11 @@ def is_cut(*args):
     else:
         return False
 
+def is_hs_workspace(*args):
+    """
+    Checks if args[0] is a HistogramWorkspace
+    """
+    return isinstance(args[0], HistogramWorkspace)
 
 def append_visible_handle(visible_handles, handles, idx: int):
     handle = handles[idx]

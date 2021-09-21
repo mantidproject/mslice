@@ -4,7 +4,7 @@ import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.plotting.pyplot import *  # noqa: F401
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
-from mslice.cli.helperfunctions import is_slice, is_cut
+from mslice.cli.helperfunctions import is_slice, is_cut, is_hs_workspace
 from ._mslice_commands import *  # noqa: F401
 from mslice.app import is_gui
 from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_type, _get_overplot_key,
@@ -27,7 +27,7 @@ class MSliceAxes(Axes):
         from mslice.cli.plotfunctions import errorbar
         if is_cut(*args):
             return errorbar(self, *args, **kwargs)
-        else:
+        if not is_hs_workspace(*args):
             return Axes.errorbar(self, *args, **kwargs)
 
     def pcolormesh(self, *args, **kwargs):
