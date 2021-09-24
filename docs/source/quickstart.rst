@@ -11,7 +11,7 @@ MSlice is included in the Mantid distribution so the easiest way to start it is 
 The version of *MSlice* distributed with Mantid is the last stable version. However, there is currently quite rapid ongoing
 devlopment to the program, which is available only in the development version on `GitHub`. To get this version, please
 download this `zip <https://github.com/mantidproject/mslice/archive/master.zip>`_ and extract it to a folder on your computer.
-You can then either copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the 
+You can then either copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the
 ``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*, or run the
 the ``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
 you did not install *Mantid* in the default location.
@@ -22,8 +22,9 @@ Loading Data
 .. image:: images/quickstart/load_tab.png
    :scale: 80 %
 
-The GUI is divided into two main tabs, a ``Data Loading`` tab which shows the filesystem and allows the user to load reduced
-data files, and a ``Workspace Manager`` which handles the loaded data. To reach a particular data folder you can either
+The GUI is divided into three main tabs, a ``Data Loading`` tab which shows the filesystem and allows the user to load reduced
+data files, a ``Workspace Manager`` which handles the loaded data, and a ``Plots`` tab which provides an easy way to interact with
+all currently open plots. To reach a particular data folder you can either
 type the full path to the folder in the edit box, or navigate using the filesystem tree below using either the mouse or
 keyboard arrow keys and the ``Enter`` key, with ``Backspace`` used for going up a folder level. Typing the first few letters
 of a file or folder name will also jump to its location in the tree.
@@ -140,15 +141,6 @@ window. If you subsequently want to overwrite the data on the same particular wi
 clicking ``Make Current``. In order to overplot new data preserving previous data, use the ``Plot Over`` button rather than
 the ``Plot`` button. This will send data to the **Current** plot window, so you may need to ``Make Current`` on it again.
 This is available only for 1D cuts. For 2D slices, you cannot overplot current data.
-
-Plots Management in GUI
------------------------
-
-.. image:: images/quickstart/plots_tab.png
-   :scale: 80 %
-
-``Plots`` tab is made available in the MSlice graphical user interface. This widget helps users to manage plots.
-For example, ``Delete All`` can be used to close all MSlice plots.
 
 
 Manipulating Workspaces
