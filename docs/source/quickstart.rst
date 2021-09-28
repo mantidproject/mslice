@@ -10,7 +10,7 @@ MSlice is included in the Mantid distribution so the easiest way to start it is 
 
 The version of *MSlice* distributed with Mantid is the last stable version. However, there is currently quite rapid ongoing
 devlopment to the program, which is available only in the development version on `GitHub`. To get this version, please
-download this `zip <https://github.com/mantidproject/mslice/archive/master.zip>`_ and extract it to a folder on your computer.
+download this `zip <https://github.com/mantidproject/mslice/archive/main.zip>`_ and extract it to a folder on your computer.
 You can then either copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the
 ``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*, or run the
 the ``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
@@ -162,10 +162,10 @@ To subtract the a background dataset from sample dataset(s), first select one or
 specify a self-shielding factor. This self-shielding factor is applied to the background dataset first before it
 is subtracted from the sample dataset(s). The subtraction is done on each sample workspace individually.
 
-For example, in the image above, two sample workspaces, ``MAR22012_Ei10.00meV`` and ``MAR22013_Ei10.00meV`` representing
-data at 4 and 20 K, are selected. Then the background dataset ``MAR22017_Ei10.00meV`` showing data at 50 K is selected with
+For example, in the image above, two sample workspaces, ``MAR28237_Ei11.16meV`` and ``MAR28236_Ei11.16meV`` are selected.
+Then the dataset ``MAR28230_Ei11.16meV`` is selected with
 a self-shielding factor of ``1.00``. Clicking ``Ok`` will produce two subtracted workspaces,
-``MAR22012_Ei10.00meV_subtracted`` and ``MAR22013_Ei10.00meV_subtracted``. The subtracted dataset can be sliced or cut
+``MAR28237_Ei10.00meV_subtracted`` and ``MAR28236_Ei10.00meV_subtracted``. The subtracted dataset can be sliced or cut
 as usual.
 
 .. image:: images/quickstart/subtract_slice.png
