@@ -7,20 +7,21 @@ Generating scripts
 
 Each MSlice plot window has an option in the ``File`` menu to generate a script that would reproduce the plot. This will include the
 full history of the workspace which provides the data for the plot, and additionally any graphical changes to the plot above the
-default (e.g. if the axes titles or limits have been changed or additional information such as recoil or Bragg lines added).
+default (e.g. if the axes titles or limits have been changed or additional information such as recoil or Bragg lines added). The
+script can either be written to a file or copied to the clipboard.
 
 .. image:: images/cli/generate_script_menu.png
 
 Generated scripts may be run from the MantidWorkbench script window.
 
-Alternatively, the script can also be run from the IPython console in the MSlice GUI using the ``import`` directive and the ``reload``
-(``importlib.reload`` in Python 3) function. For example, the first time the script is run, do:
+Alternatively, when written to a file the script can also be run from the IPython console in the MSlice GUI using the ``import``
+directive and the ``reload`` (``importlib.reload`` in Python 3) function. For example, the first time the script is run, do:
 
 .. code:: python
 
     import script_name
 
-For a script named ``script_name.py`` which is on the Python path. Subsequently, if you change the script and want to re-run it,
+for a script file named ``script_name.py`` which is on the Python path. Subsequently, if you change the script file and want to re-run it,
 you can do:
 
 .. code:: python

@@ -9,11 +9,11 @@ MSlice is included in the Mantid distribution so the easiest way to start it is 
 .. image:: images/quickstart/mantid_interfaces_menu.png
 
 The version of *MSlice* distributed with Mantid is the last stable version. However, there is currently quite rapid ongoing
-devlopment to the program, which is available only in the development version on `GitHub`. To get this version, please
-download this `zip <https://github.com/mantidproject/mslice/archive/master.zip>`_ and extract it to a folder on your computer.
-You can then either copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the 
+development to the program, which is available only in the development version on `GitHub`. To get this version, please
+download this `zip <https://github.com/mantidproject/mslice/archive/main.zip>`_ and extract it to a folder on your computer.
+You can then either copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the
 ``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*, or run the
-the ``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
+``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
 you did not install *Mantid* in the default location.
 
 Loading Data
@@ -22,8 +22,9 @@ Loading Data
 .. image:: images/quickstart/load_tab.png
    :scale: 80 %
 
-The GUI is divided into two main tabs, a ``Data Loading`` tab which shows the filesystem and allows the user to load reduced
-data files, and a ``Workspace Manager`` which handles the loaded data. To reach a particular data folder you can either
+The GUI is divided into three main tabs, a ``Data Loading`` tab which shows the filesystem and allows the user to load reduced
+data files, a ``Workspace Manager`` which handles the loaded data, and a ``Plots`` tab which provides an easy way to interact with
+all currently open plots. To reach a particular data folder you can either
 type the full path to the folder in the edit box, or navigate using the filesystem tree below using either the mouse or
 keyboard arrow keys and the ``Enter`` key, with ``Backspace`` used for going up a folder level. Typing the first few letters
 of a file or folder name will also jump to its location in the tree.
@@ -141,15 +142,6 @@ clicking ``Make Current``. In order to overplot new data preserving previous dat
 the ``Plot`` button. This will send data to the **Current** plot window, so you may need to ``Make Current`` on it again.
 This is available only for 1D cuts. For 2D slices, you cannot overplot current data.
 
-Plots Management in GUI
------------------------
-
-.. image:: images/quickstart/plots_tab.png
-   :scale: 80 %
-
-``Plots`` tab is made available in the MSlice graphical user interface. This widget helps users to manage plots.
-For example, ``Delete All`` can be used to close all MSlice plots.
-
 
 Manipulating Workspaces
 -----------------------
@@ -165,15 +157,15 @@ named after the first selected workspace with ``_sum`` appended will be created.
 .. image:: images/quickstart/subtract_dialog.png
    :scale: 80 %
 
-To subtract the a background dataset from sample dataset(s), first select one or more sample workspace(s). Then click
+To subtract a background dataset from sample dataset(s), first select one or more sample workspace(s). Then click
 ``Subtract``. A dialog will appear asking you to select the background dataset to subtract and optionally allow you to
 specify a self-shielding factor. This self-shielding factor is applied to the background dataset first before it
 is subtracted from the sample dataset(s). The subtraction is done on each sample workspace individually.
 
-For example, in the image above, two sample workspaces, ``MAR22012_Ei10.00meV`` and ``MAR22013_Ei10.00meV`` representing
-data at 4 and 20 K, are selected. Then the background dataset ``MAR22017_Ei10.00meV`` showing data at 50 K is selected with
+For example, in the image above, two sample workspaces, ``MAR28237_Ei11.16meV`` and ``MAR28236_Ei11.16meV`` are selected.
+Then the dataset ``MAR28230_Ei11.16meV`` is selected with
 a self-shielding factor of ``1.00``. Clicking ``Ok`` will produce two subtracted workspaces,
-``MAR22012_Ei10.00meV_subtracted`` and ``MAR22013_Ei10.00meV_subtracted``. The subtracted dataset can be sliced or cut
+``MAR28237_Ei10.00meV_subtracted`` and ``MAR28236_Ei10.00meV_subtracted``. The subtracted dataset can be sliced or cut
 as usual.
 
 .. image:: images/quickstart/subtract_slice.png
