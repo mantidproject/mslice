@@ -9,11 +9,11 @@ MSlice is included in the Mantid distribution so the easiest way to start it is 
 .. image:: images/quickstart/mantid_interfaces_menu.png
 
 The version of *MSlice* distributed with Mantid is the last stable version. However, there is currently quite rapid ongoing
-devlopment to the program, which is available only in the development version on `GitHub`. To get this version, please
+development to the program, which is available only in the development version on `GitHub`. To get this version, please
 download this `zip <https://github.com/mantidproject/mslice/archive/main.zip>`_ and extract it to a folder on your computer.
 You can then either copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the
 ``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*, or run the
-the ``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
+``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
 you did not install *Mantid* in the default location.
 
 Loading Data
@@ -157,7 +157,7 @@ named after the first selected workspace with ``_sum`` appended will be created.
 .. image:: images/quickstart/subtract_dialog.png
    :scale: 80 %
 
-To subtract the a background dataset from sample dataset(s), first select one or more sample workspace(s). Then click
+To subtract a background dataset from sample dataset(s), first select one or more sample workspace(s). Then click
 ``Subtract``. A dialog will appear asking you to select the background dataset to subtract and optionally allow you to
 specify a self-shielding factor. This self-shielding factor is applied to the background dataset first before it
 is subtracted from the sample dataset(s). The subtraction is done on each sample workspace individually.
