@@ -2,23 +2,23 @@ name: MSlice online documentation update
 
 on:
   push:
-    paths:
-      - 'mslice\__init__.py'
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-18.04
     steps:
     - name: Checkout
-      uses: actions/checkout@master
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0
     - name: Build and Commit
-      uses: sphinx-notes/pages@master
+      uses: sphinx-notes/pages@v1
       with:
         documentation_path: docs/source
     - name: Push changes
-      uses: ad-m/github-push-action@master
+      uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: gh-pages
