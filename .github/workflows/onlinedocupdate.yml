@@ -1,6 +1,7 @@
 name: MSlice online documentation update
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
