@@ -27,8 +27,8 @@ jobs:
         run: |
           sudo apt-add-repository ppa:mantid/mantid -y && sudo apt-get update -qq
           sudo apt-get install gdebi -y
-          export mantiddeb=$(curl -sL https://github.com/mantidproject/download.mantidproject.org/raw/master/releases/nightly.txt | grep ubuntu)
-          wget http://downloads.sourceforge.net/project/mantid/Nightly/$mantiddeb -O /tmp/mtn.deb
+          export mantiddeb=$(curl -sL https://github.com/mantidproject/download.mantidproject.org/raw/main/releases/nightly.txt | grep ubuntu)
+          wget https://sourceforge.net/projects/mantid/files/Nightly/$mantiddeb -O /tmp/mtn.deb
           sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
           echo "PYTHONPATH=/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $GITHUB_ENV
           echo "HDF5_DISABLE_VERSION_CHECK=1" >> $GITHUB_ENV
