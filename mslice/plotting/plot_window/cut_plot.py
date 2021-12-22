@@ -72,7 +72,6 @@ class CutPlot(IPlot):
         plot_window.action_waterfall.triggered.connect(self.toggle_waterfall)
         plot_window.waterfall_x_edt.editingFinished.connect(self.toggle_waterfall)
         plot_window.waterfall_y_edt.editingFinished.connect(self.toggle_waterfall)
-        self.mpl_axes_changed = self._canvas.figure.gca().add_callback(self.on_newplot)
         plot_window.action_aluminium.triggered.connect(
             partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Aluminium', False))
         plot_window.action_copper.triggered.connect(
@@ -88,7 +87,6 @@ class CutPlot(IPlot):
         plot_window.action_save_cut.triggered.disconnect()
         plot_window.action_flip_axis.triggered.disconnect()
         plot_window.action_gen_script.triggered.disconnect()
-        self._canvas.figure.gca().remove_callack(self.mpl_axes_changed)
         plot_window.action_aluminium.triggered.disconnect()
         plot_window.action_copper.triggered.disconnect()
         plot_window.action_niobium.triggered.disconnect()
