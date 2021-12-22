@@ -72,7 +72,6 @@ class CLIProjectionTest(unittest.TestCase):
 
         return_value = errorbar(ax, cut)
         self.assertEqual(ax.lines, return_value)
-        ax.pchanged.assert_called()
 
     def test_that_plot_slice_mslice_projection_works_correctly(self):
         slice = mc.Slice(self.workspace)
