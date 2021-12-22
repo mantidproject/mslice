@@ -71,7 +71,7 @@ def errorbar(axes, workspace, *args, **kwargs):
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.manager.add_cut_plot(presenter, workspace.name)
     cur_fig.canvas.draw()
-    axes.pchanged()  # This call is to let the waterfall callback know to update
+    cur_canvas.manager.update_axes(axes)
 
     cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='',
               algorithm=workspace.algorithm)

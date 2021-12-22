@@ -68,6 +68,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window.show()
         self.window.activateWindow()
         self.window.raise_()
+        self.canvas.draw()
 
     def window_closing(self):
         if self.plot_handler is not None:
@@ -267,6 +268,10 @@ class PlotFigureManagerQT(QtCore.QObject):
             self.canvas.figure.gca().grid(True, axis='x')
         if self._ygrid:
             self.canvas.figure.gca().grid(True, axis='y')
+
+    def update_axes(self, ax):
+        if self.plot_handler is not None:
+            self.plot_handler.on_newplot(ax)
 
     def move_window(self, x, y):
         center = QtWidgets.QDesktopWidget().screenGeometry().center()
