@@ -265,6 +265,7 @@ class CutPlot(IPlot):
         self.plot_window.action_make_current.setVisible(not is_icut)
         self.plot_window.action_flip_axis.setVisible(is_icut)
         self.plot_window.action_gen_script.setVisible(not is_icut)
+        self.plot_window.action_gen_script_clipboard.setVisible(not is_icut)
         self.plot_window.action_waterfall.setVisible(not is_icut)
 
         self.plot_window.showNormal()
