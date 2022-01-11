@@ -62,7 +62,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
     @mock.patch('mslice.scripting.helperfunctions.add_header')
     @mock.patch('mslice.scripting.helperfunctions.add_cut_plot_statements')
-    def test_that_add_plot_statements_works_as_expected_for_cuts(self, add_cut, add_header):
+    @mock.patch('mslice.scripting.helperfunctions.add_overplot_statements')
+    def test_that_add_plot_statements_works_as_expected_for_cuts(self, add_overplot, add_cut, add_header):
         plot_handler = mock.MagicMock(spec=CutPlot)
         script_lines = []
 
@@ -73,6 +74,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         add_header.assert_called_once_with(script_lines, plot_handler)
         add_cut.assert_called_once_with(script_lines, plot_handler, ax)
+        add_overplot.assert_called_once_with(script_lines, plot_handler)
 
         self.assertIn("mc.Show()\n", script_lines)
         self.assertIn('fig = plt.gcf()\n', script_lines)
