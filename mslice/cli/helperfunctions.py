@@ -125,6 +125,12 @@ def _check_workspace_type(workspace, correct_type):
         if not isinstance(workspace, MatrixWorkspace):
             raise RuntimeError("Incorrect workspace type.")
 
+def _get_workspace_type(workspace):
+    """Determine workspace type"""
+    if isinstance(workspace, MatrixWorkspace):
+        return "MatrixWorkspace"
+    if isinstance(workspace, HistogramWorkspace):
+        return "HistogramWorkspace"
 
 def _rescale_energy_cut_plot(presenter, cuts, new_e_unit):
     """Given a CutPlotterPresenter and a set of cached cuts,

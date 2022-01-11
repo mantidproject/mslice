@@ -46,6 +46,7 @@ def add_plot_statements(script_lines, plot_handler, ax):
             add_overplot_statements(script_lines, plot_handler)
         elif isinstance(plot_handler, CutPlot):
             add_cut_plot_statements(script_lines, plot_handler, ax)
+            add_overplot_statements(script_lines, plot_handler)
 
         script_lines.append("mc.Show()\n")
 
