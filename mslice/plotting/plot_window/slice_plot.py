@@ -498,4 +498,6 @@ class SlicePlot(IPlot):
         self.manager.y_grid = value
 
     def is_changed(self, item):
+        if self.default_options is None:
+            return False
         return self.default_options[item] != getattr(self, item)

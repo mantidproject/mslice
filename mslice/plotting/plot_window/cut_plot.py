@@ -514,4 +514,6 @@ class CutPlot(IPlot):
         self.plot_window.waterfall_y = value
 
     def is_changed(self, item):
+        if self.default_options is None:
+            return False
         return self.default_options[item] != getattr(self, item)
