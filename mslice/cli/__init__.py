@@ -7,7 +7,6 @@ from matplotlib.projections import register_projection
 from mslice.cli.helperfunctions import is_slice, is_cut, is_hs_workspace
 from ._mslice_commands import *  # noqa: F401
 from mslice.app import is_gui
-from mslice.app.presenters import get_cut_plotter_presenter, get_slice_plotter_presenter
 from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_type, _get_workspace_type, _get_overplot_key,
                                         _update_overplot_checklist, _update_legend)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -39,6 +38,7 @@ class MSliceAxes(Axes):
             return Axes.pcolormesh(self, *args, **kwargs)
 
     def recoil(self, workspace, element=None, rmm=None):
+        from mslice.app.presenters import get_slice_plotter_presenter
         _check_workspace_name(workspace)
         workspace = get_workspace_handle(workspace)
         _check_workspace_type(workspace, HistogramWorkspace)
@@ -55,6 +55,7 @@ class MSliceAxes(Axes):
         _update_legend()
 
     def bragg(self, workspace, element=None, cif=None):
+        from mslice.app.presenters import get_cut_plotter_presenter, get_slice_plotter_presenter
         _check_workspace_name(workspace)
         workspace = get_workspace_handle(workspace)
 
