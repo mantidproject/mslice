@@ -76,6 +76,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         self.assertIn("mc.Show()\n", script_lines)
         self.assertIn('fig = plt.gcf()\n', script_lines)
+        self.assertIn('fig.clf()\n', script_lines)
         self.assertIn('ax = fig.add_subplot(111, projection="mslice")\n', script_lines)
 
     @mock.patch('mslice.scripting.helperfunctions.add_header')
@@ -96,6 +97,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         self.assertIn("mc.Show()\n", script_lines)
         self.assertIn('fig = plt.gcf()\n', script_lines)
+        self.assertIn('fig.clf()\n', script_lines)
         self.assertIn('ax = fig.add_subplot(111, projection="mslice")\n', script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
