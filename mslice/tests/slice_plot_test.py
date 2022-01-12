@@ -1,8 +1,10 @@
-from mock import MagicMock, patch, PropertyMock
+from mock import MagicMock, patch, PropertyMock, ANY
 import unittest
 
 from matplotlib import colors
 from matplotlib.legend import Legend
+from matplotlib.lines import Line2D
+
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line
 
@@ -18,6 +20,8 @@ class SlicePlotTest(unittest.TestCase):
         self.axes = MagicMock()
         canvas.figure.gca = MagicMock(return_value=self.axes)
         self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
+        self.line = [Line2D([], [])]
+        self.axes.get_legend_handles_labels = MagicMock(return_value=(self.line, ['some_label']))
 
     def test_that_is_changed_works_correctly(self):
         self.slice_plot.default_options = {}
@@ -101,6 +105,14 @@ class SlicePlotTest(unittest.TestCase):
 
         self.assertEqual(self.slice_plot._canvas.manager.plot_handler.icut.rect.ax, self.axes)
 
+    def test_update_legend_in_slice_plot(self):
+        with patch.object(self.axes, 'legend') as mock_add_legend,\
+                patch.object(self.axes, 'get_legend') as mock_get_legend:
+
+            mock_get_legend.return_value = MagicMock()
+
+            self.slice_plot.update_legend()
+            mock_add_legend.assert_called_with(self.line, ['some_label'], fontsize=ANY)
 
 if __name__ == '__main__':
     unittest.main()

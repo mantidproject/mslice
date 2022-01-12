@@ -158,7 +158,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             self.plot_handler.show_legends = True
             self.plot_handler.update_legend()
 
-        else: 
+        else:
             self.plot_handler.show_legends = False
             axes.legend_ = None
 
