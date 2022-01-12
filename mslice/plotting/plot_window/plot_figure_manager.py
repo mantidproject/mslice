@@ -153,10 +153,15 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def _toggle_legend(self):
         axes = self.canvas.figure.gca()
-        if axes.legend_ is None:
+
+        if not self.plot_handler.show_legends:
+            self.plot_handler.show_legends = True
             self.plot_handler.update_legend()
-        else:
+
+        else: 
+            self.plot_handler.show_legends = False
             axes.legend_ = None
+
         self.canvas.draw()
 
     def plot_clicked(self, event):

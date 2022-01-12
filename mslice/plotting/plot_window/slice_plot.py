@@ -4,6 +4,7 @@ from qtpy import QtWidgets
 from qtpy.QtCore import Qt
 
 import matplotlib.colors as colors
+from matplotlib.legend import Legend
 
 from mslice.models.colors import to_hex
 from mslice.models.units import get_sample_temperature_from_string
@@ -30,6 +31,7 @@ class SlicePlot(IPlot):
         self._arb_nuclei_rmm = None
         self._cif_file = None
         self._cif_path = None
+        self._legends_shown = True
         self._legend_dict = {}
 
         # Interactive cuts
@@ -61,6 +63,7 @@ class SlicePlot(IPlot):
             'y_label': 'Energy Transfer (meV)',
             'y_grid': False,
             'y_range': self.y_range,
+            'legend': True,
         }
 
     def setup_connections(self, plot_window):
@@ -157,21 +160,28 @@ class SlicePlot(IPlot):
             self._canvas.draw()
 
     def object_clicked(self, target):
-        if target in self._legend_dict:
-            quick_options(self._legend_dict[target], self)
+        if isinstance(target, Legend):
+            return
         else:
             quick_options(target, self)
-        self.update_legend()
-        self._canvas.draw()
+            self.update_legend()
+            self._canvas.draw()
 
     def update_legend(self):
         axes = self._canvas.figure.gca()
-        lgn = axes.get_legend()
-        if lgn:
-            legend_set_draggable(lgn, True)
+
+        if self._legends_shown:
+            self.add_or_renew_legend(axes)
 
         if self._canvas.manager.plot_handler.icut is not None:
             self._canvas.manager.plot_handler.icut.rect.ax = axes
+
+    def _add_or_renew_legend(self, axes):
+        handles, labels = axes.get_legend_handles_labels()
+
+        if handles:
+            axes.legend(handles, labels, fontsize='medium')
+            legend_set_draggable(axes.get_legend(), True)
 
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
@@ -496,6 +506,14 @@ class SlicePlot(IPlot):
     @y_grid.setter
     def y_grid(self, value):
         self.manager.y_grid = value
+
+    @property
+    def show_legends(self):
+        return self._legends_shown
+
+    @show_legends.setter
+    def show_legends(self, value):
+        self._legends_shown = value
 
     def is_changed(self, item):
         if self.default_options is None:
