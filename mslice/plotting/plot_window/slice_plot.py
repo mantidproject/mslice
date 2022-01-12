@@ -171,7 +171,7 @@ class SlicePlot(IPlot):
         axes = self._canvas.figure.gca()
 
         if self._legends_shown:
-            self.add_or_renew_legend(axes)
+            self._add_or_renew_legend(axes)
 
         if self._canvas.manager.plot_handler.icut is not None:
             self._canvas.manager.plot_handler.icut.rect.ax = axes
