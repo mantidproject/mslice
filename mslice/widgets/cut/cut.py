@@ -224,22 +224,40 @@ class CutWidget(CutView, QWidget):
         return True
 
     def populate_input_fields(self, saved_input):
+        new_unit = self.get_energy_units()
         self.populate_cut_params(*saved_input['cut_parameters'])
         self.populate_integration_params(*saved_input['integration_range'])
         self.lneCutIntegrationWidth.setText(saved_input['integration_width'])
         self.lneCutSmoothing.setText(saved_input['smoothing'])
         self.rdoCutNormToOne.setChecked(saved_input['normtounity'])
-        self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(saved_input['energy_unit']))
+
+        # convert energy unit if global default was changed since saving cut parameters
+        if new_unit != saved_input['energy_unit']:
+            energy_unit = EnergyUnits(saved_input['energy_unit'])
+            if 'DeltaE' in self.get_cut_axis():
+                cut_start, cut_end, cut_step = energy_unit.convert_to(new_unit,
+                                                                      self.get_cut_axis_start(),
+                                                                      self.get_cut_axis_end(),
+                                                                      self.get_cut_axis_step())
+                self.populate_cut_params(cut_start, cut_end, cut_step)
+                saved_input['cut_parameters'] = list((cut_start, cut_end, cut_step))
+            elif 'DeltaE' in self.get_integration_axis():
+                int_start, int_end, int_width = energy_unit.convert_to(new_unit,
+                                                                       self.get_integration_start(),
+                                                                       self.get_integration_end(),
+                                                                       self.get_integration_width())
+                self.populate_integration_params(int_start, int_end)
+                self.lneCutIntegrationWidth.setText(int_width)
+                saved_input['integration_range'] = list((int_start, int_end))
+                saved_input['integration_width'] = int_width
+        else:
+            self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(saved_input['energy_unit']))
 
     def get_input_fields(self):
         saved_input = dict()
         saved_input['axes'] = [str(self.cmbCutAxis.itemText(ind)) for ind in range(self.cmbCutAxis.count())]
         cut_params = (self.get_cut_axis_start(), self.get_cut_axis_end(), self.get_cut_axis_step())
         int_params = (self.get_integration_start(), self.get_integration_end(), self.get_integration_width())
-        if 'DeltaE' in self.get_cut_axis():
-            cut_params = list(self._en.to_meV(*cut_params))
-        if 'DeltaE' in self.get_integration_axis():
-            int_params = list(self._en.to_meV(*int_params))
         saved_input['cut_parameters'] = list(cut_params)
         saved_input['integration_range'] = list(int_params)[:2]
         saved_input['integration_width'] = list(int_params)[2]
