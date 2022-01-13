@@ -12,10 +12,9 @@ from mslice.workspace.workspace import Workspace as MsliceWorkspace2D
 
 
 def _parse_ws_names(args, kwargs):
-    input_workspace = None
-    if 'InputWorkspace' in kwargs:
-        input_workspace = kwargs['InputWorkspace']
-        kwargs['InputWorkspace'] = _name_or_wrapper_to_workspace(kwargs['InputWorkspace'])
+    input_workspace = kwargs.get('InputWorkspace', None)
+    if input_workspace:
+        kwargs['InputWorkspace'] = _name_or_wrapper_to_workspace(input_workspace)
     elif len(args) > 0:
         if isinstance(args[0], MsliceWorkspace) or isinstance(args[0], string_types):
             input_workspace = get_workspace_handle(args[0])
