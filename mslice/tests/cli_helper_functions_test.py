@@ -5,7 +5,7 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHisto
 from unittest import mock
 from mslice.workspace import wrap_workspace
 from mslice.cli.helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
-    _check_workspace_name, _check_workspace_type, is_slice, is_cut, _get_overplot_key, _update_overplot_checklist, \
+    _check_workspace_name, _check_workspace_type, _get_workspace_type, is_slice, is_cut, _get_overplot_key, _update_overplot_checklist, \
     _update_legend
 from mslice.cli._mslice_commands import Cut, Slice
 from mslice.models.axis import Axis
@@ -142,6 +142,16 @@ class CLIHelperFunctionsTest(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             _check_workspace_type(psd_workspace, MatrixWorkspace)
+
+    def test_that_get_workspace_type_works_as_expected(self):
+        workspace = self.create_workspace("test_workspace")
+        workspace_histo = self.create_histo_workspace('histogram_workspace')
+
+        return_value = _get_workspace_type(workspace)
+        self.assertEqual(return_value, "MatrixWorkspace")
+
+        return_value = _get_workspace_type(workspace_histo)
+        self.assertEqual(return_value, "HistogramWorkspace")
 
     def test_that_is_slice_works_as_expected(self):
         workspace = self.create_workspace('workspace')
