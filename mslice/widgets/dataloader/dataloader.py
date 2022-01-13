@@ -5,7 +5,7 @@ import os
 from functools import partial
 
 from qtpy.QtWidgets import QWidget, QFileSystemModel, QAbstractItemView, QMessageBox
-from qtpy.QtCore import Signal, QDir, Qt
+from qtpy.QtCore import Signal, QDir, Qt, QFileInfo
 
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.util.qt import load_ui
@@ -60,6 +60,10 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self._update_from_path()
 
     def refresh(self):
+        file_info = QFileInfo(self.txtpath.text())
+        if file_info.isFile():
+            self._display_error("Loading by file path is not supported")
+            return
         path_entered = QDir(self.txtpath.text())
         if path_entered.exists():
             self.directory = path_entered
