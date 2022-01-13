@@ -170,11 +170,31 @@ class CutPlot(IPlot):
 
     def get_line_options(self, line):
         index = self._get_line_index(line)
-        return self.get_line_options_by_index(index)
+        if index >= 0:
+            return self.get_line_options_by_index(index)
+        else:
+            line_options = {
+                'label': line.get_label(),
+                'legend': None,
+                'shown': None,
+                'color': to_hex(line.get_color()),
+                'style': line.get_linestyle(),
+                'width': str(int(line.get_linewidth())),
+                'marker': line.get_marker(),
+                'error_bar': None
+            }
+            return line_options
 
     def set_line_options(self, line, line_options):
         index = self._get_line_index(line)
-        self.set_line_options_by_index(index, line_options)
+        if index >= 0:
+            self.set_line_options_by_index(index, line_options)
+        else:
+            line.set_label(line_options['label'])
+            line.set_linestyle(line_options['style'])
+            line.set_marker(line_options['marker'])
+            line.set_color(line_options['color'])
+            line.set_linewidth(line_options['width'])
 
     def get_all_line_options(self):
         all_line_options = []
@@ -291,7 +311,10 @@ class CutPlot(IPlot):
             container = self._lines[line]
         except KeyError:
             self._lines = self.line_containers()
-            container = self._lines[line]
+            try:
+                container = self._lines[line]
+            except KeyError:
+                return -1
         i = 0
         for c in self._canvas.figure.gca().containers:
             if container == c:
