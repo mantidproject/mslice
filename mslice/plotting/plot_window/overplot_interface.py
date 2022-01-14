@@ -52,6 +52,11 @@ def cif_file_powder_line(plot_handler, plotter_presenter, checked):
                                                  'Open CIF file', '/home',
                                                  'Files (*.cif)')
         cif_path = str(cif_path[0]) if isinstance(cif_path, tuple) else str(cif_path)
+
+        if not cif_path:
+            plot_handler.plot_window.uncheck_action_by_text(plot_handler.plot_window.menu_bragg_peaks, "CIF file")
+            return
+
         key = path.basename(cif_path).rsplit('.')[0]
         plot_handler._cif_file = key
         plot_handler._cif_path = cif_path

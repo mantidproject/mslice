@@ -211,6 +211,11 @@ class PlotWindow(QtWidgets.QMainWindow):
         except AttributeError:
             pass
 
+    def uncheck_action_by_text(self, holder, item_text):
+        for action in holder.actions():
+            if action.iconText() == item_text and action.isCheckable() and action.isChecked():
+                action.setChecked(False)
+
     @property
     def waterfall(self):
         return (self.action_waterfall.isChecked()
