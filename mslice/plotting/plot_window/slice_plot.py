@@ -16,6 +16,7 @@ from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 from mslice.plotting.plot_window.overplot_interface import _update_overplot_lines, _update_powder_lines,\
     toggle_overplot_line, cif_file_powder_line
+from mslice.plotting.pyplot import GlobalFigureManager
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 
@@ -395,7 +396,6 @@ class SlicePlot(IPlot):
         if self.icut is not None:
             self.icut.clear()
             self.icut = None
-            from mslice.plotting.pyplot import GlobalFigureManager
             GlobalFigureManager.enable_make_current()
         else:
             self.icut = InteractiveCut(self, self._canvas, self.ws_name)

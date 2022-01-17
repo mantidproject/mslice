@@ -4,6 +4,7 @@ import unittest
 import numpy as np
 from mantid.simpleapi import CreateWorkspace
 
+from mslice.workspace.helperfunctions import attribute_to_log
 from mslice.workspace.workspace import Workspace
 
 
@@ -52,7 +53,6 @@ class BaseWorkspaceTest(unittest.TestCase):
         self.assertTrue((result == expected_values).all())
 
     def set_attribute(self):
-        from mslice.workspace.helperfunctions import attribute_to_log
         self.attr = {'axes':[1, object]}
         attribute_to_log(self.attr, self.workspace.raw_ws)
 

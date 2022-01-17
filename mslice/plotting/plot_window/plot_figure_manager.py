@@ -1,6 +1,6 @@
 import os.path
 import weakref
-
+import io
 import six
 from qtpy.QtCore import Qt
 from qtpy import QtCore, QtGui, QtWidgets, QtPrintSupport
@@ -245,7 +245,6 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.canvas.figure.savefig(path, dpi=resolution)
 
     def _get_figure_image_data(self, resolution=300):
-        import io
         buf = io.BytesIO()
         self.canvas.figure.savefig(buf, dpi=resolution)
         return buf

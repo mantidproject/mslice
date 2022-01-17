@@ -1,6 +1,9 @@
 import unittest
 import mock
 import numpy as np
+
+from matplotlib.axes import Axes
+
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 from mslice.cli._mslice_commands import (Load, MakeProjection, Slice, Cut, PlotCut, PlotSlice, KeepFigure, MakeCurrent,
@@ -224,7 +227,6 @@ class CommandLineTest(unittest.TestCase):
         is_gui.return_value = True
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
-        from matplotlib.axes import Axes
         ax = mock.Mock(spec=Axes)
         ax.get_ylim.return_value = (0., 1.)
         ax.lines = mock.Mock

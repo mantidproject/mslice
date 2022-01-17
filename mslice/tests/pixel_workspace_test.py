@@ -4,6 +4,7 @@ import unittest
 
 from mantid.simpleapi import CreateSimulationWorkspace, ConvertToMD, AddSampleLog
 
+from mslice.workspace.helperfunctions import attribute_to_log
 from mslice.workspace.pixel_workspace import PixelWorkspace
 
 
@@ -78,7 +79,6 @@ class PixelWorkspaceTest(unittest.TestCase):
         self.assertAlmostEqual(35, result[3][52], 8)
 
     def test_attribute_propagation(self):
-        from mslice.workspace.helperfunctions import attribute_to_log
         self.attr = {'axes':[1, object]}
         attribute_to_log(self.attr, self.workspace.raw_ws)
         new_workspace = PixelWorkspace(self.workspace.raw_ws, 'new')

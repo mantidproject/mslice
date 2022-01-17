@@ -7,6 +7,7 @@ from mslice.models.units import EnergyUnits
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
+from mslice.plotting.pyplot import GlobalFigureManager
 
 
 class InteractiveCut(object):
@@ -56,7 +57,6 @@ class InteractiveCut(object):
             self._cut_plotter_presenter.set_is_icut(True)
             if self._is_initial_cut_plotter_presenter:
                 # First time we've plotted a 1D cut - get the true CutPlotterPresenter
-                from mslice.plotting.pyplot import GlobalFigureManager
                 self._cut_plotter_presenter = GlobalFigureManager.get_active_figure().plot_handler._cut_plotter_presenter
                 self._is_initial_cut_plotter_presenter = False
                 GlobalFigureManager.disable_make_current()

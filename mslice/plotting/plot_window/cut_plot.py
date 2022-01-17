@@ -1,7 +1,10 @@
 from functools import partial
 
+from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
+from matplotlib.lines import Line2D
+
 import warnings
 import numpy as np
 
@@ -373,8 +376,6 @@ class CutPlot(IPlot):
         self._canvas.draw()
 
     def _apply_offset(self, x, y):
-        from matplotlib.lines import Line2D
-        from matplotlib.collections import LineCollection
         for ind, line_containers in enumerate(self._canvas.figure.gca().containers):
             for line in line_containers.get_children():
                 if isinstance(line, Line2D):
@@ -388,7 +389,6 @@ class CutPlot(IPlot):
 
     def on_newplot(self, ax):
         # This callback should be activated by a call to errorbar
-        from matplotlib.lines import Line2D
         new_line = False
         line_containers = self._canvas.figure.gca().containers
         num_lines = len(line_containers)
