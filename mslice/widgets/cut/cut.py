@@ -231,6 +231,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutSmoothing.setText(saved_input['smoothing'])
         self.rdoCutNormToOne.setChecked(saved_input['normtounity'])
         self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(saved_input['energy_unit']))
+        self._en = EnergyUnits(saved_input['energy_unit'])
         self.cmbCutEUnits.blockSignals(False)
 
     def get_input_fields(self):
