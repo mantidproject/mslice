@@ -348,12 +348,12 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
             self.show_line = None
             self.show_legend = None
 
+        # for quick options the color validator and the delete button is not used
         if self.color_validator is not None:
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
-
-        self.delete_button = QtWidgets.QPushButton("Delete Line", self)
-        row5.addWidget(self.delete_button)
-        self.delete_button.clicked.connect(self.deleteLater)
+            self.delete_button = QtWidgets.QPushButton("Delete Line", self)
+            row5.addWidget(self.delete_button)
+            self.delete_button.clicked.connect(self.deleteLater)
 
         separator = QtWidgets.QFrame()
         separator.setFrameShape(QtWidgets.QFrame.HLine)
