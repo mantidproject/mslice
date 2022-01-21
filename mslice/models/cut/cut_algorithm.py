@@ -2,7 +2,7 @@ import numpy as np
 
 from mantid.api import PythonAlgorithm, WorkspaceProperty
 from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator, StringListValidator
-from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, \
+from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, Scale, \
     ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs, Integration, Rebin, Transpose
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
@@ -149,15 +149,17 @@ def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace, algo):
     if 'Integration' in algo:
         qbins = [float(q) for q in q_binning.split(',')]
         ebins = [float(e) for e in e_binning.split(',')]
+        nstep = 100.
         if np.abs((qbins[2]-qbins[0]) - qbins[1]) < 0.0001:
-            qbinstr = ','.join(map(str, [qbins[0], (qbins[2]-qbins[0])/100., qbins[2]]))
+            qbinstr = ','.join(map(str, [qbins[0], (qbins[2]-qbins[0])/nstep, qbins[2]]))
             ws_out = _cut_indirect_or_direct(qbinstr, e_binning, emode, selected_workspace)
             ws_out = Transpose(InputWorkspace=ws_out, EnableLogging=False)
             ws_out = Integration(InputWorkspace=ws_out, RangeLower=qbins[0], RangeUpper=qbins[2], EnableLogging=False)
         else:
-            ebinstr = ','.join(map(str, [ebins[0], (ebins[2]-ebins[0])/100., ebins[2]]))
+            ebinstr = ','.join(map(str, [ebins[0], (ebins[2]-ebins[0])/nstep, ebins[2]]))
             ws_out = _cut_indirect_or_direct(q_binning, ebinstr, emode, selected_workspace)
             ws_out = Integration(InputWorkspace=ws_out, RangeLower=ebins[0], RangeUpper=ebins[2], EnableLogging=False)
+        ws_out = Scale(InputWorkspace=ws_out, Factor=nstep, EnableLogging=False)
     else:
         ws_out = _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace)
     return ws_out
