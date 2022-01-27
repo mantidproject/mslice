@@ -53,7 +53,8 @@ class CutPlotterPresenterTest(unittest.TestCase):
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.compute_cut')
     @mock.patch('mslice.presenters.cut_plotter_presenter.plot_cut_impl')
-    def test_save_to_workspace_success(self, plot_cut_impl_mock, compute_cut_mock, get_ws_handle_mock):
+    @mock.patch('mslice.presenters.cut_plotter_presenter.export_workspace_to_ads')
+    def test_save_to_workspace_success(self, export_workspace_to_ads, plot_cut_impl_mock, compute_cut_mock, get_ws_handle_mock):
         mock_ws = mock.MagicMock()
         mock_ws.name = 'workspace'
         get_ws_handle_mock.return_value = mock_ws
@@ -61,6 +62,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
 
         self.cut_plotter_presenter.run_cut('workspace', cut_cache, save_only=True)
         self.assertEqual(1, compute_cut_mock.call_count)
+        self.assertEqual(1, export_workspace_to_ads.call_count)
         self.assertEqual(0, plot_cut_impl_mock.call_count)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
