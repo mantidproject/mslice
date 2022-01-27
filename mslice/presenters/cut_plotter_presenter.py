@@ -1,6 +1,7 @@
 from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend, is_momentum, is_twotheta
+from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -20,11 +21,11 @@ class CutPlotterPresenter(PresenterUtility):
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
         cut.workspace_name = workspace.name
-
+        if save_only:
+            self.save_cut_to_workspace(workspace, cut)
+            return
         if cut.width is not None:
             self._plot_with_width(workspace, cut, plot_over)
-        elif save_only:
-            self.save_cut_to_workspace(workspace, cut)
         else:
             self._plot_cut(workspace, cut, plot_over)
 
@@ -67,8 +68,9 @@ class CutPlotterPresenter(PresenterUtility):
         return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
 
     def save_cut_to_workspace(self, workspace, cut):
-        compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one, cut.algorithm)
+        cut_ws = compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one, cut.algorithm)
         self._main_presenter.update_displayed_workspaces()
+        export_workspace_to_ads(cut_ws)
 
     def plot_cut_from_selected_workspace(self, plot_over=False):
         selected_workspaces = self._main_presenter.get_selected_workspaces()
