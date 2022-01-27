@@ -124,7 +124,9 @@ respectively.
 
 To overplot multiple datasets, you can select multiple workspaces in the left pane (using ``Shift`` or ``Ctrl``)
 and then give common limits, step sizes and integration range, and click ``Plot``. For more details see
-:ref:`Cutting_from_the_GUI`
+:ref:`Cutting_from_the_GUI`.
+
+The ``Waterfall`` button allows modifying the offsets for the x and y axes when plotting multiple cuts.
 
 .. _Keep_/_Make_Current:
 
