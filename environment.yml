@@ -6,7 +6,6 @@ dependencies:
   - ipython
   - matplotlib
   - mock
-  - nose
   - numpy
   - numpy-base
   - pip
@@ -19,5 +18,6 @@ dependencies:
   - pip:
       - coverage
       - h5py
+      - nose
       - pre-commit
       - pyyaml
