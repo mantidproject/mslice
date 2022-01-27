@@ -243,7 +243,10 @@ class CutPlot(IPlot):
         main_line.set_linestyle(line_options['style'])
         main_line.set_marker(line_options['marker'])
 
-        self._legends_visible[line_index] = bool(line_options['legend'])
+        try:
+            self._legends_visible[line_index] = bool(line_options['legend'])
+        except IndexError:
+            self._legends_visible.append(bool(line_options['legend']))
 
         self.toggle_errorbar(line_index, line_options)
 
