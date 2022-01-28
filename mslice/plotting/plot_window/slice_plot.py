@@ -68,6 +68,15 @@ class SlicePlot(IPlot):
 
     def setup_connections(self, plot_window):
         plot_window.redraw.connect(self._canvas.draw)
+        plot_window.action_gen_script.setVisible(True)
+        plot_window.action_gen_script_clipboard.setVisible(True)
+        plot_window.menu_information.setDisabled(False)
+        plot_window.menu_intensity.setDisabled(False)
+        plot_window.action_toggle_legends.setVisible(True)
+        plot_window.action_keep.setVisible(True)
+        plot_window.action_make_current.setVisible(True)
+        plot_window.action_save_image.setVisible(True)
+        plot_window.action_plot_options.setVisible(True)
         plot_window.action_interactive_cuts.setVisible(True)
         plot_window.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
         plot_window.action_save_cut.setVisible(False)
