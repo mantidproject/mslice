@@ -1,3 +1,5 @@
+import copy
+
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -135,7 +137,6 @@ def _get_workspace_type(workspace):
 def _rescale_energy_cut_plot(presenter, cuts, new_e_unit):
     """Given a CutPlotterPresenter and a set of cached cuts,
     rescales the workspaces to a different energy-unit and replot"""
-    import copy
     cuts_copy = copy.deepcopy(cuts)  # Because run_cut will overwrite the cuts cache for plot_over=True
     for id, cut in enumerate(cuts_copy):
         cut.cut_axis.e_unit = new_e_unit

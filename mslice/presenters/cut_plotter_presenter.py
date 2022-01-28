@@ -1,3 +1,5 @@
+import numpy as np
+
 from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend, is_momentum, is_twotheta
@@ -95,10 +97,8 @@ class CutPlotterPresenter(PresenterUtility):
 
     def add_overplot_line(self, workspace_name, key, recoil, cif=None):
         recoil = False
-        from mslice.plotting.pyplot import gca
-        cache = self._cut_cache_dict[gca()][0]
+        cache = self._cut_cache_dict[plt.gca()][0]
         cache.rotated = not is_twotheta(cache.cut_axis.units) and not is_momentum(cache.cut_axis.units)
-        import numpy as np
         try:
             ws_handle = get_workspace_handle(workspace_name)
             workspace_name = ws_handle.parent

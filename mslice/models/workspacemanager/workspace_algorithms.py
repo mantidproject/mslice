@@ -7,6 +7,7 @@ Uses mantid algorithms to perform workspace operations
 from __future__ import (absolute_import, division, print_function)
 
 import os.path
+from os.path import splitext
 
 import numpy as np
 from scipy import constants
@@ -19,10 +20,12 @@ from mslice.models.axis import Axis
 
 from mslice.util.mantid.algorithm_wrapper import add_to_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name, delete_workspace
-from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits
+from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits, Rebose
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace
+
+from .file_io import save_ascii, save_matlab, save_nexus
 
 # -----------------------------------------------------------------------------
 # Classes and functions
@@ -212,7 +215,6 @@ def subtract(workspaces, background_ws, ssf):
 
 
 def rebose_single(ws, from_temp, to_temp):
-    from mslice.util.mantid.mantid_algorithms import Rebose
     ws = get_workspace_handle(ws)
     results = Rebose(InputWorkspace=ws, CurrentTemperature=from_temp, TargetTemperature=to_temp,
                      OutputWorkspace=ws.name+'_bosed')
@@ -240,7 +242,6 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
     :param extension: file extension (such as .txt)
     :param slice_nonpsd: whether the selection is in non_psd mode
     """
-    from .file_io import save_ascii, save_matlab, save_nexus
     if extension == '.nxs':
         save_method = save_nexus
     elif extension == '.txt':
@@ -253,7 +254,6 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
         if len(workspaces) == 1:
             save_names = [save_name]
         else:
-            from os.path import splitext
             name, _ = splitext(save_name)
             save_names = ['{}_{:03d}{}'.format(name, idx+1, extension) for idx in range(len(workspaces))]
     else:

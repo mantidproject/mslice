@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
+from command import Command as c
 from quickview.QuickView import QuickView
 from WorkspaceManagerPresenter import WorkspaceManagerPresenter
 from workspacemanager.WorkspaceView import WorkspaceView
@@ -17,6 +18,5 @@ class WorkspaceManagerQuickView(QuickView,WorkspaceView):
 
 
 if __name__ == '__main__':
-    from command import Command as c
     m = WorkspaceManagerQuickView(c)
     m.app.exec_()

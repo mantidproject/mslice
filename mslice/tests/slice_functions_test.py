@@ -122,7 +122,6 @@ class SliceFunctionsTest(unittest.TestCase):
 
     @patch('mslice.models.powder.powder_functions.get_workspace_handle')
     def test_powder_line(self, ws_handle_mock):
-        from mslice.models.axis import Axis
         ws_handle_mock.return_value.e_fixed = 20
         x, y = compute_powder_line('ws_name', Axis('|Q|', 0.1, 9.1, 0.1), 'Copper')
         self.assertEqual(len(x), len(y))
@@ -134,7 +133,6 @@ class SliceFunctionsTest(unittest.TestCase):
 
     @patch('mslice.models.powder.powder_functions.get_workspace_handle')
     def test_powder_line_degrees(self, ws_handle_mock):
-        from mslice.models.axis import Axis
         ws_handle_mock.return_value.e_fixed = 20
         x, y = compute_powder_line('ws_name', Axis('Degrees', 3, 93, 1), 'Copper')
         self.assertEqual(len(x), len(y))

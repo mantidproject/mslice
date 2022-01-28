@@ -6,6 +6,7 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 import mslice.cli._mslice_commands as mc
 from mslice.workspace import wrap_workspace
 import mslice.plotting.pyplot as plt
+from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.cli.plotfunctions import pcolormesh, errorbar
 from mslice.cli.helperfunctions import _get_overplot_key
 
@@ -139,7 +140,6 @@ class CLIProjectionTest(unittest.TestCase):
         self.assertEqual(plot_handler.manager._xgrid, b)
 
     def test_that_waterfall_command_works(self):
-        from mslice.plotting.plot_window.cut_plot import CutPlot
         active_figure = mock.MagicMock()
         active_figure.plot_handler = mock.MagicMock(spec=CutPlot)
 

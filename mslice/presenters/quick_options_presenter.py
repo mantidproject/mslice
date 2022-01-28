@@ -1,5 +1,6 @@
 from six import string_types
 from matplotlib import text
+from matplotlib.mathtext import MathTextParser
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions, QuickError
 
 
@@ -51,7 +52,6 @@ def _set_axis_options(view, target, model, has_logarithmic, grid):
 
 def check_latex(value):
     if '$' in value:
-        from matplotlib.mathtext import MathTextParser
         parser = MathTextParser('ps')
         try:
             parser.parse(value)

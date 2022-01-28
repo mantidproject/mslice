@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import mock
 import unittest
+import numpy as np
 
 from mslice.models.axis import Axis
 from mslice.models.cmap import DEFAULT_CMAP
@@ -75,7 +76,6 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_presenter.add_overplot_line('workspace', recoil_key, True)
         compute_recoil_mock.assert_called_once()
         cache_mock.overplot_lines.__setitem__.assert_called_with(recoil_key, 'plot')
-        import numpy as np
         plot_line_mock.assert_called_with([1], np.array([2]) * 8.065544, recoil_key, True, cache_mock)
         slice_presenter.add_overplot_line('workspace', powder_key, False)
         compute_powder_mock.assert_called_once()
