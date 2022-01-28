@@ -9,6 +9,7 @@ from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget
 from mslice.util.qt import load_ui
 from mslice.util.qt.validator_helper import double_validator_without_separator
+from mslice.util.mantid import in_mantid
 
 from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
 
@@ -32,7 +33,7 @@ class CutWidget(CutView, QWidget):
         self._command_lookup = {
             self.btnCutPlot: Command.Plot,
             self.btnCutPlotOver: Command.PlotOver,
-            self.btnCutSaveToWorkspace: Command.SaveToWorkspace
+            self.btnCutSaveToWorkbench: Command.SaveToWorkspace
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
@@ -262,11 +263,14 @@ class CutWidget(CutView, QWidget):
         self.lneCutIntensityEnd.setEnabled(True)
         self.rdoCutNormToOne.setEnabled(True)
 
-        self.btnCutSaveToWorkspace.setEnabled(False)
+        self.btnCutSaveToWorkbench.setEnabled(False)
         self.btnCutPlot.setEnabled(False)
         self.btnCutPlotOver.setEnabled(False)
 
-        self.btnCutSaveToWorkspace.setEnabled(True)
+        if in_mantid():
+            self.btnCutSaveToWorkbench.setEnabled(True)
+        else:
+            self.btnCutSaveToWorkbench.hide()
         self.btnCutPlot.setEnabled(True)
         self.btnCutPlotOver.setEnabled(True)
 
@@ -285,7 +289,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutIntensityEnd.setEnabled(False)
         self.rdoCutNormToOne.setEnabled(False)
 
-        self.btnCutSaveToWorkspace.setEnabled(False)
+        self.btnCutSaveToWorkbench.setEnabled(False)
         self.btnCutPlot.setEnabled(False)
         self.btnCutPlotOver.setEnabled(False)
 

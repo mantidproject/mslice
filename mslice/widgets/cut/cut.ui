@@ -173,12 +173,12 @@
       </widget>
      </item>
      <item row="4" column="3" colspan="3">
-      <widget class="QPushButton" name="btnCutSaveToWorkspace">
+      <widget class="QPushButton" name="btnCutSaveToWorkbench">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>Save to Workspace</string>
+        <string>Save to Workbench</string>
        </property>
       </widget>
      </item>
