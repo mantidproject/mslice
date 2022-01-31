@@ -60,8 +60,14 @@ class CutPlot(IPlot):
 
     def setup_connections(self, plot_window):
         plot_window.redraw.connect(self._canvas.draw)
-        plot_window.menu_intensity.setDisabled(True)
+        plot_window.menu_information.setDisabled(False)
         plot_window.menu_recoil_lines.setDisabled(True)
+        plot_window.menu_intensity.setDisabled(True)
+        plot_window.action_toggle_legends.setVisible(True)
+        plot_window.action_keep.setVisible(True)
+        plot_window.action_make_current.setVisible(True)
+        plot_window.action_save_image.setVisible(True)
+        plot_window.action_plot_options.setVisible(True)
         plot_window.action_interactive_cuts.setVisible(False)
         plot_window.action_save_cut.setVisible(False)
         plot_window.action_save_cut.triggered.connect(self.save_icut)

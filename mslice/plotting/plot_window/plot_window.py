@@ -86,6 +86,8 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.add_intensity_actions(self.menu_intensity)
 
         self.setMenuBar(self.menubar)
+        self.menu_information.setDisabled(True)
+        self.menu_intensity.setDisabled(True)
 
     def add_file_actions(self, menu):
         self.action_gen_script = add_action(menu, self, "Generate Script File")
@@ -93,28 +95,28 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.action_gen_script_clipboard = add_action(menu, self, "Generate Script to Clipboard")
         menu.addAction(self.action_gen_script_clipboard)
 
-        self.action_quit = add_action(menu, self, "Close")
+        self.action_quit = add_action(menu, self, "Close", visible=True)
         menu.addAction(self.action_quit)
         self.action_quit.triggered.connect(self.close)
 
     def add_information_actions(self, menu, items):
         for text in items:
-            action = add_action(menu, self, text, checkable=True)
+            action = add_action(menu, self, text, checkable=True, visible=True)
             setattr(self, create_attribute_name(text), action)
             menu.addAction(action)
 
     def add_intensity_actions(self, menu):
-        self.action_sqe = add_action(menu, self, "S(Q,E)", checkable=True, checked=True)
+        self.action_sqe = add_action(menu, self, "S(Q,E)", checkable=True, checked=True, visible=True)
         menu.addAction(self.action_sqe)
-        self.action_chi_qe = add_action(menu, self, "Chi''(Q,E)", checkable=True)
+        self.action_chi_qe = add_action(menu, self, "Chi''(Q,E)", checkable=True, visible=True)
         menu.addAction(self.action_chi_qe)
-        self.action_chi_qe_magnetic = add_action(menu, self, "Chi''(Q,E) magnetic", checkable=True)
+        self.action_chi_qe_magnetic = add_action(menu, self, "Chi''(Q,E) magnetic", checkable=True, visible=True)
         menu.addAction(self.action_chi_qe_magnetic)
-        self.action_d2sig_dw_de = add_action(menu, self, "d2sigma/dOmega.dE", checkable=True)
+        self.action_d2sig_dw_de = add_action(menu, self, "d2sigma/dOmega.dE", checkable=True, visible=True)
         menu.addAction(self.action_d2sig_dw_de)
-        self.action_symmetrised_sqe = add_action(menu, self, "Symmetrised S(Q,E)", checkable=True)
+        self.action_symmetrised_sqe = add_action(menu, self, "Symmetrised S(Q,E)", checkable=True, visible=True)
         menu.addAction(self.action_symmetrised_sqe)
-        self.action_gdos = add_action(menu, self, "GDOS", checkable=True)
+        self.action_gdos = add_action(menu, self, "GDOS", checkable=True, visible=True)
         menu.addAction(self.action_gdos)
 
     def create_toolbar(self):
@@ -124,23 +126,23 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     def add_toolbar_actions(self, toolbar):
         self.action_zoom_in = add_action(toolbar, self,  "Zoom In", on_triggered=self.stock_toolbar.zoom,
-                                         icon_name='mdi.magnify-plus-outline', checkable=True)
+                                         icon_name='mdi.magnify-plus-outline', checkable=True, visible=True)
         self.action_zoom_out = add_action(toolbar, self,  "Zoom Out", on_triggered=self.stock_toolbar.back,
-                                          icon_name='mdi.magnify-minus-outline', checkable=False)
+                                          icon_name='mdi.magnify-minus-outline', checkable=False, visible=True)
         self.action_toggle_legends = add_action(toolbar, self, "Legends", checkable=True,
                                                 checked=True)
         toolbar.addSeparator()
-        self.action_keep = add_action(toolbar, self,  "Keep", checkable=True)
+        self.action_keep = add_action(toolbar, self,  "Keep", checkable=True, visible=True)
         self.action_make_current = add_action(toolbar, self,  "Make Current",
-                                              checkable=True, checked=True)
+                                              checkable=True, checked=True, visible=True)
         self.keep_make_current_group = QtWidgets.QActionGroup(self)
         self.keep_make_current_group.addAction(self.action_keep)
         self.keep_make_current_group.addAction(self.action_make_current)
         self.keep_make_current_seperator = toolbar.addSeparator()
 
         self.action_save_image = add_action(toolbar, self, "Save Image", icon_name='mdi.content-save')
-        self.action_copy_image = add_action(toolbar, self, "Copy Image", icon_name='mdi.content-copy')
-        self.action_print_plot = add_action(toolbar, self,  "Print", icon_name='mdi.printer')
+        self.action_copy_image = add_action(toolbar, self, "Copy Image", icon_name='mdi.content-copy', visible=True)
+        self.action_print_plot = add_action(toolbar, self,  "Print", icon_name='mdi.printer', visible=True)
         self.action_plot_options = add_action(toolbar, self, "Plot Options", icon_name='mdi.settings')
 
         toolbar.addSeparator()
@@ -249,7 +251,7 @@ def create_attribute_name(text):
 
 
 def add_action(holder, parent, text, on_triggered=None, icon_name=None,
-               checkable=False, checked=False, visible=True):
+               checkable=False, checked=False, visible=False):
     """Create a new action based on the given attributes and add it to the given
     holder"""
     action = QtWidgets.QAction(text, parent)
