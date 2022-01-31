@@ -1,6 +1,6 @@
 name: mslice
 channels:
-  - conda-forge
+  - default
 dependencies:
   - flake8
   - ipython
