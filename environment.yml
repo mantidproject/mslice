@@ -2,7 +2,6 @@ name: mslice
 channels:
   - defaults
 dependencies:
-  - flake8
   - ipython
   - matplotlib
   - mock
@@ -17,6 +16,7 @@ dependencies:
   - six
   - pip:
       - coverage
+      - flake8
       - h5py
       - nose
       - pre-commit
