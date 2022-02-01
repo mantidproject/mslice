@@ -426,7 +426,7 @@
     </widget>
     <widget class="QMenu" name="menuCutAlgo">
      <property name="title">
-      <string>Cut algorithm</string>
+      <string>Cut algorithm default</string>
      </property>
      <addaction name="actionCutAlgoRebin"/>
      <addaction name="actionCutAlgoIntegration"/>
