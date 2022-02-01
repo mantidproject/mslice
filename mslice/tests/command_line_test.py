@@ -173,6 +173,12 @@ class CommandLineTest(unittest.TestCase):
         self.assertEqual(128, signal[0])
         self.assertEqual(192, signal[29])
         self.assertEqual(429, signal[15])
+        result = Cut(workspace, Algorithm='Integration')
+        signal = result.get_signal()
+        self.assertEqual(type(result), HistogramWorkspace)
+        self.assertAlmostEqual(64, signal[0], 2)
+        self.assertAlmostEqual(192, signal[29], 2)
+        self.assertAlmostEqual(1287, signal[15], 2)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_fail_workspace_type(self, get_spp):

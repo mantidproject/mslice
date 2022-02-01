@@ -8,7 +8,7 @@ class HistoMixin(object):
 
     def get_signal(self):
         """Gets data values (Y axis) from the workspace as a numpy array."""
-        return self._raw_ws.getSignalArray().copy()
+        return np.squeeze(self._raw_ws.getSignalArray().copy())
 
     def get_error(self):
         """Gets error values (E) from the workspace as a numpy array."""
@@ -17,7 +17,7 @@ class HistoMixin(object):
     def get_variance(self, copy=True):
         """Gets variance (error^2) from the workspace as a numpy array."""
         variance = self._raw_ws.getErrorSquaredArray()
-        return variance.copy() if copy else variance
+        return np.squeeze(variance.copy() if copy else variance)
 
     def set_signal(self, signal):
         self._raw_ws.setSignalArray(signal)
