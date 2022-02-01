@@ -261,8 +261,10 @@ class MainWindow(MainView, QMainWindow):
         for action in self._cut_algo_map.keys():
             if algo not in action:
                 self._cut_algo_map[action].setChecked(False)
+        self._presenter.set_cut_algorithm_default(self.get_cut_algorithm())
 
     def get_cut_algorithm(self):
         for action in self._cut_algo_map.keys():
             if self._cut_algo_map[action].isChecked():
+                print(action)
                 return action

@@ -95,7 +95,7 @@ class CutWidgetPresenter(PresenterUtility):
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
         width = self._cut_view.get_integration_width()
-        algo = self._main_presenter.get_cut_algorithm() if self._main_presenter is not None else 'Rebin'
+        algo = self._cut_view.get_cut_algorithm()
         return cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width, algo
 
     def _set_minimum_step(self, workspace, axis):
@@ -200,3 +200,9 @@ class CutWidgetPresenter(PresenterUtility):
         self._en_default = en_default
         self._cut_view.set_energy_units_default(en_default)
         self._cut_view.set_energy_units(en_default)
+
+    def set_cut_algorithm_default(self, algo_default):
+        print("cut default")
+        print(algo_default)
+        self._cut_view.set_cut_alg_default(algo_default)
+        self._cut_view.set_cut_algorithm(algo_default)

@@ -113,7 +113,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         axis, processed_axis = tuple(args[0:2])
         integration_start, integration_end, width = tuple(args[2:5])
         intensity_start, intensity_end, is_norm = tuple(args[5:8])
-        workspace, integrated_axis = tuple(args[8:10])
+        workspace, integrated_axis, cut_algorithm = tuple(args[8:11])
         if isinstance(workspace, string_types):
             workspace = [workspace]
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=workspace)
@@ -129,6 +129,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         self.view.get_intensity_is_norm_to_one = mock.Mock(return_value=is_norm)
         self.view.get_integration_width = mock.Mock(return_value=width)
         self.view.get_energy_units = mock.Mock(return_value=axis.e_unit)
+        self.view.get_cut_algorithm = mock.Mock(return_value=cut_algorithm)
 
     def test_cut_no_workspaces_selected_fail(self):
         cut_widget_presenter = CutWidgetPresenter(self.view)
@@ -164,7 +165,6 @@ class CutWidgetPresenterTest(unittest.TestCase):
         fields1['cut_parameters'] = ['0', '10', '0.05']
         fields1['integration_range'] = ['-1', '1']
         fields1['integration_width'] = '2'
-        fields1['smoothing'] = ''
         fields1['normtounity'] = False
         self.view.get_input_fields = mock.Mock(return_value=fields1)
         self.view.get_cut_axis = mock.Mock(return_value='DeltaE')
@@ -180,7 +180,6 @@ class CutWidgetPresenterTest(unittest.TestCase):
         fields2['cut_parameters'] = ['-5', '5', '0.1']
         fields2['integration_range'] = ['2', '3']
         fields2['integration_width'] = '1'
-        fields2['smoothing'] = ''
         fields2['normtounity'] = True
         self.view.get_input_fields = mock.Mock(return_value=fields2)
         self.view.get_cut_axis = mock.Mock(return_value='|Q|')
@@ -226,8 +225,10 @@ class CutWidgetPresenterTest(unittest.TestCase):
         is_norm = True
         workspace = "workspace"
         integrated_axis = 'integrated axis'
+        cut_algorithm = 'Rebin'
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
-                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis,
+                         cut_algorithm)
         self.view.get_cut_axis_step = mock.Mock(return_value="")
         self.view.get_minimum_step = mock.Mock(return_value=1)
 
@@ -252,9 +253,11 @@ class CutWidgetPresenterTest(unittest.TestCase):
         is_norm = True
         selected_workspaces = ["ws1", "ws2"]
         integrated_axis = 'integrated axis'
+        cut_algorithm = 'Rebin'
         integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
         self._create_cut(axis, integration_axis, integration_start, integration_end, width,
-                         intensity_start, intensity_end, is_norm, selected_workspaces, integrated_axis)
+                         intensity_start, intensity_end, is_norm, selected_workspaces, integrated_axis,
+                         cut_algorithm)
         cut_widget_presenter.notify(Command.Plot)
         call_list = [
             call(selected_workspaces[0], mock.ANY, save_only=False, plot_over=False),
@@ -279,9 +282,10 @@ class CutWidgetPresenterTest(unittest.TestCase):
         intensity_start, intensity_end, is_norm, workspace = (11, 30, True, 'ws1')
         axis = Axis("units", "0", "100", "1")
         integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
+        cut_algorithm = 'Integration'
         self._create_cut(axis, integration_axis, integration_start, integration_end, width,
-                         intensity_start, intensity_end, is_norm, workspace, integrated_axis)
-        self.main_presenter.get_cut_algorithm = mock.Mock(return_value='Integration')
+                         intensity_start, intensity_end, is_norm, workspace, integrated_axis,
+                         cut_algorithm)
         cut_widget_presenter.notify(Command.Plot)
         self.view.display_error.assert_not_called()
         mock_cut_obj.assert_called_once_with(axis, integration_axis, intensity_start, intensity_end,
