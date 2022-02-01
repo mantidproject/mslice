@@ -36,7 +36,7 @@ jobs:
 
       - name: Flake8
         run: |
-          python setup.py flake8
+          python -m flake8
 
       - name: Nosetests
         run: |
