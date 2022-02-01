@@ -3199,6 +3199,8 @@ def plot(*args, **kwargs):
     ax = gca()
     # Deprecated: allow callers to override the hold state
     # by passing hold=True|False
+    if not hasattr(ax, '_hold'):
+        return ax.plot(*args, **kwargs)
     washold = ax._hold
     hold = kwargs.pop('hold', None)
     if hold is not None:
