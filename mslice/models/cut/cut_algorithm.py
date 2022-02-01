@@ -3,7 +3,8 @@ import numpy as np
 from mantid.api import PythonAlgorithm, WorkspaceProperty
 from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator, StringListValidator
 from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, \
-    ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs, Integration, Rebin, Transpose
+    ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs, Integration, Rebin, Transpose, \
+    IntegrateMDHistoWorkspace
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
@@ -50,7 +51,7 @@ class Cut(PythonAlgorithm):
 
 def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_norm, algo):
     if PSD:
-        cut = _compute_cut_PSD(selected_workspace, cut_axis, integration_axis)
+        cut = _compute_cut_PSD(selected_workspace, cut_axis, integration_axis, algo)
     else:
         cut = _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, e_mode, algo)
     if is_norm:
@@ -58,17 +59,25 @@ def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_
     return cut
 
 
-def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis):
+def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis, algo):
     cut_axis.units = cut_axis.units.replace('2Theta', 'Degrees')
     integration_axis.units = integration_axis.units.replace('2Theta', 'Degrees')
     fill_in_missing_input(cut_axis, selected_workspace)
     n_steps = get_number_of_steps(cut_axis)
     cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start_meV, cut_axis.end_meV, n_steps)))
     integration_binning = integration_axis.units + "," + str(integration_axis.start_meV) + "," + \
-        str(integration_axis.end_meV) + ",1"
+        str(integration_axis.end_meV) + (",1" if 'Rebin' in algo else ",100")
 
-    return BinMD(InputWorkspace=selected_workspace, AxisAligned="1", AlignedDim1=integration_binning,
-                 AlignedDim0=cut_binning, StoreInADS=False)
+    ws = BinMD(InputWorkspace=selected_workspace, AxisAligned="1", AlignedDim0=integration_binning,
+               AlignedDim1=cut_binning, StoreInADS=False)
+    if 'Integration' in algo:
+        x0, x1 = (integration_axis.start_meV, integration_axis.end_meV)
+        # 100 step is hard coded into the `integration_binning` string above
+        norm_fac = (np.sum(ws.getNumEventsArray() != 0., axis=0) / 100) * (x1 - x0)
+        ws = IntegrateMDHistoWorkspace(ws, P1Bin=[x0, x1], P2Bin=[], StoreInADS=False)
+        ws.setSignalArray(ws.getSignalArray() * norm_fac)
+        ws.setErrorSquaredArray(ws.getErrorSquaredArray() * np.square(norm_fac))
+    return ws
 
 
 def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, algo):
