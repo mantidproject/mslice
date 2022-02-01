@@ -202,7 +202,5 @@ class CutWidgetPresenter(PresenterUtility):
         self._cut_view.set_energy_units(en_default)
 
     def set_cut_algorithm_default(self, algo_default):
-        print("cut default")
-        print(algo_default)
         self._cut_view.set_cut_alg_default(algo_default)
         self._cut_view.set_cut_algorithm(algo_default)

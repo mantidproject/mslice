@@ -72,8 +72,7 @@ class MainPresenter(MainPresenterInterface):
             listener.set_energy_default(en_default)
 
     def subscribe_to_cut_algo_default_monitor(self, client):
-        print("client")
-        if isinstance(getattr(client, "set_cut_algo_default", None), collections.Callable):
+        if isinstance(getattr(client, "set_cut_algorithm_default", None), collections.Callable):
             self._cut_algo_default_listener.append(client)
 
     def set_cut_algorithm_default(self, algo_default):

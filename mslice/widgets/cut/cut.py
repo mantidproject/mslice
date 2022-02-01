@@ -238,12 +238,12 @@ class CutWidget(CutView, QWidget):
         return True
 
     def populate_input_fields(self, saved_input):
+        self.cmbCutEUnits.blockSignals(True)
         self.populate_cut_params(*saved_input['cut_parameters'])
         self.populate_integration_params(*saved_input['integration_range'])
         self.lneCutIntegrationWidth.setText(saved_input['integration_width'])
         self.rdoCutNormToOne.setChecked(saved_input['normtounity'])
         self.cmbCutAlg.setCurrentIndex(saved_input['cut_algorithm_index'])
-        self.cmbCutEUnits.blockSignals(True)
         self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(saved_input['energy_unit']))
         self._en = EnergyUnits(saved_input['energy_unit'])
         self.cmbCutEUnits.blockSignals(False)
