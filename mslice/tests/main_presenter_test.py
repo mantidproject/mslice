@@ -83,3 +83,21 @@ class MainPresenterTests(unittest.TestCase):
         main_presenter = MainPresenter(self.mainview)
         main_presenter.is_energy_conversion_allowed()
         self.mainview.is_energy_conversion_allowed.assert_called()
+
+    def test_set_cut_algorithm_default(self):
+        main_presenter = MainPresenter(self.mainview)
+        clients = [[mock.Mock(), True], [mock.Mock(), False], [mock.Mock(), True]]
+        for client, enable in clients:
+            if not enable:
+                client.set_cut_algorithm_default = mock.NonCallableMagicMock()
+            main_presenter.subscribe_to_cut_algo_default_monitor(client)
+
+        for client, enable in clients:
+            client.set_energy_default.assert_not_called()
+
+        main_presenter.set_cut_algorithm_default('Rebin')
+        for client, enable in clients:
+            if enable:
+                client.set_cut_algorithm_default.assert_called_once()
+            else:
+                client.set_cut_algorithm_default.assert_not_called()

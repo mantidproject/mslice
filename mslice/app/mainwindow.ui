@@ -426,7 +426,7 @@
     </widget>
     <widget class="QMenu" name="menuCutAlgo">
      <property name="title">
-      <string>Cut algorithm</string>
+      <string>Cut algorithm default</string>
      </property>
      <addaction name="actionCutAlgoRebin"/>
      <addaction name="actionCutAlgoIntegration"/>
@@ -470,7 +470,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Rebin</string>
+    <string>Rebin (Averages Counts)</string>
    </property>
   </action>
   <action name="actionCutAlgoIntegration">
@@ -478,7 +478,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Integration</string>
+    <string>Integration (Sum Counts)</string>
    </property>
   </action>
  </widget>

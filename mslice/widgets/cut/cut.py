@@ -26,6 +26,7 @@ from .command import Command
 class CutWidget(CutView, QWidget):
     error_occurred = Signal('QString')
     busy = Signal(bool)
+    _name_to_index = {'Rebin':0, 'Integration':1}
 
     def __init__(self, parent=None, *args, **kwargs):
         QWidget.__init__(self, parent, *args, **kwargs)
@@ -45,7 +46,10 @@ class CutWidget(CutView, QWidget):
         self.set_validators()
         self._en = EnergyUnits('meV')
         self._en_default = 'meV'
+        self._cut_alg_default = 'Rebin'
+        self.set_cut_algorithm('Rebin')
         self.cmbCutEUnits.currentIndexChanged.connect(self._changed_unit)
+        self.cmbCutAlg.currentIndexChanged.connect(self.cut_algorithm_changed)
 
     def _btn_clicked(self):
         sender = self.sender()
@@ -89,6 +93,9 @@ class CutWidget(CutView, QWidget):
 
     def display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def cut_algorithm_changed(self, _changed_index):
+        self.get_input_fields()
 
     def axis_changed(self, _changed_index):
         self._presenter.notify(Command.AxisChanged)
@@ -143,9 +150,6 @@ class CutWidget(CutView, QWidget):
     def get_intensity_is_norm_to_one(self):
         return self.rdoCutNormToOne.isChecked()
 
-    def get_smoothing(self):
-        return str(self.lneCutSmoothing.text())
-
     def get_energy_units(self):
         return self.cmbCutEUnits.currentText()
 
@@ -154,6 +158,15 @@ class CutWidget(CutView, QWidget):
 
     def set_energy_units_default(self, unit):
         self._en_default = unit
+
+    def set_cut_alg_default(self, algo_default):
+        self._cut_alg_default = algo_default
+
+    def get_cut_algorithm(self):
+        return self.cmbCutAlg.currentIndex()
+
+    def set_cut_algorithm(self, algo):
+        self.cmbCutAlg.setCurrentIndex(self._name_to_index[algo])
 
     def set_cut_axis(self, axis_name):
         index = [ind for ind in range(self.cmbCutAxis.count()) if str(self.cmbCutAxis.itemText(ind)) == axis_name]
@@ -208,8 +221,8 @@ class CutWidget(CutView, QWidget):
         self.populate_cut_params("", "", "")
         self.populate_integration_params("", "")
         self.lneCutIntegrationWidth.setText("")
-        self.lneCutSmoothing.setText("")
         self.rdoCutNormToOne.setChecked(0)
+        self.cmbCutAlg.setCurrentIndex(self._name_to_index[self._cut_alg_default])
         self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(self._en_default))
 
     def is_fields_cleared(self):
@@ -217,8 +230,8 @@ class CutWidget(CutView, QWidget):
         cleared_fields = {'cut_parameters': ['', '', ''],
                           'integration_range': ['', ''],
                           'integration_width': '',
-                          'smoothing': '',
-                          'normtounity': False}
+                          'normtounity': False,
+                          'cut_algorithm_index': ''}
         for k in cleared_fields:
             if current_fields[k] != cleared_fields[k]:
                 return False
@@ -229,8 +242,8 @@ class CutWidget(CutView, QWidget):
         self.populate_cut_params(*saved_input['cut_parameters'])
         self.populate_integration_params(*saved_input['integration_range'])
         self.lneCutIntegrationWidth.setText(saved_input['integration_width'])
-        self.lneCutSmoothing.setText(saved_input['smoothing'])
         self.rdoCutNormToOne.setChecked(saved_input['normtounity'])
+        self.cmbCutAlg.setCurrentIndex(saved_input['cut_algorithm_index'])
         self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(saved_input['energy_unit']))
         self._en = EnergyUnits(saved_input['energy_unit'])
         self.cmbCutEUnits.blockSignals(False)
@@ -243,8 +256,8 @@ class CutWidget(CutView, QWidget):
         saved_input['cut_parameters'] = list(cut_params)
         saved_input['integration_range'] = list(int_params)[:2]
         saved_input['integration_width'] = list(int_params)[2]
-        saved_input['smoothing'] = self.get_smoothing()
         saved_input['normtounity'] = self.get_intensity_is_norm_to_one()
+        saved_input['cut_algorithm_index'] = self.get_cut_algorithm()
         saved_input['energy_unit'] = self.get_energy_units()
         return saved_input
 
@@ -254,6 +267,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutStep.setEnabled(True)
         self.cmbCutAxis.setEnabled(True)
         self.cmbCutEUnits.setEnabled(True)
+        self.cmbCutAlg.setEnabled(True)
 
         self.lneCutIntegrationStart.setEnabled(True)
         self.lneCutIntegrationEnd.setEnabled(True)
@@ -280,6 +294,7 @@ class CutWidget(CutView, QWidget):
         self.lneCutStep.setEnabled(False)
         self.cmbCutAxis.setEnabled(False)
         self.cmbCutEUnits.setEnabled(False)
+        self.cmbCutAlg.setEnabled(False)
 
         self.lneCutIntegrationStart.setEnabled(False)
         self.lneCutIntegrationEnd.setEnabled(False)

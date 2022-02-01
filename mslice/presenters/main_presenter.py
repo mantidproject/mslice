@@ -9,6 +9,7 @@ class MainPresenter(MainPresenterInterface):
         self._mainView = main_view
         self._selected_workspace_listener = []
         self._energy_default_listener = []
+        self._cut_algo_default_listener = []
         for presenter in subpresenters:
             presenter.register_master(self)
 
@@ -69,6 +70,14 @@ class MainPresenter(MainPresenterInterface):
     def set_energy_default(self, en_default):
         for listener in self._energy_default_listener:
             listener.set_energy_default(en_default)
+
+    def subscribe_to_cut_algo_default_monitor(self, client):
+        if isinstance(getattr(client, "set_cut_algorithm_default", None), collections.Callable):
+            self._cut_algo_default_listener.append(client)
+
+    def set_cut_algorithm_default(self, algo_default):
+        for listener in self._cut_algo_default_listener:
+            listener.set_cut_algorithm_default(algo_default)
 
     def is_energy_conversion_allowed(self):
         return self._mainView.is_energy_conversion_allowed()

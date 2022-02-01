@@ -113,8 +113,8 @@ class MainWindow(MainView, QMainWindow):
         self.actionEUnitConvEnabled.triggered.connect(partial(self.set_energy_conversion, True))
         self.actionEUnitConvDisabled.triggered.connect(partial(self.set_energy_conversion, False))
         self._cut_algo_map = {'Rebin': self.actionCutAlgoRebin, 'Integration': self.actionCutAlgoIntegration}
-        self.actionCutAlgoRebin.triggered.connect(partial(self.set_cut_algorithm, 'Rebin'))
-        self.actionCutAlgoIntegration.triggered.connect(partial(self.set_cut_algorithm, 'Integration'))
+        self.actionCutAlgoRebin.triggered.connect(partial(self.set_cut_algorithm_default, 'Rebin'))
+        self.actionCutAlgoIntegration.triggered.connect(partial(self.set_cut_algorithm_default, 'Integration'))
 
     def setup_save(self):
         menu = QMenu()
@@ -254,15 +254,11 @@ class MainWindow(MainView, QMainWindow):
         else:
             self.actionEUnitConvEnabled.setChecked(not self.actionEUnitConvDisabled.isChecked())
 
-    def is_energy_conversion_allowed(self):
-        return self.actionEUnitConvEnabled.isChecked()
-
-    def set_cut_algorithm(self, algo):
+    def set_cut_algorithm_default(self, algo):
         for action in self._cut_algo_map.keys():
             if algo not in action:
                 self._cut_algo_map[action].setChecked(False)
+        self._presenter.set_cut_algorithm_default(algo)
 
-    def get_cut_algorithm(self):
-        for action in self._cut_algo_map.keys():
-            if self._cut_algo_map[action].isChecked():
-                return action
+    def is_energy_conversion_allowed(self):
+        return self.actionEUnitConvEnabled.isChecked()
