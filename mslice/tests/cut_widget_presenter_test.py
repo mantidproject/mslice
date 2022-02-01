@@ -225,7 +225,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         is_norm = True
         workspace = "workspace"
         integrated_axis = 'integrated axis'
-        cut_algorithm = 'Rebin'
+        cut_algorithm = 0
         self._create_cut(axis, processed_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis,
                          cut_algorithm)
@@ -253,7 +253,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         is_norm = True
         selected_workspaces = ["ws1", "ws2"]
         integrated_axis = 'integrated axis'
-        cut_algorithm = 'Rebin'
+        cut_algorithm = 0
         integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
         self._create_cut(axis, integration_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, selected_workspaces, integrated_axis,
@@ -282,7 +282,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         intensity_start, intensity_end, is_norm, workspace = (11, 30, True, 'ws1')
         axis = Axis("units", "0", "100", "1")
         integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
-        cut_algorithm = 'Integration'
+        cut_algorithm = 1
         self._create_cut(axis, integration_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis,
                          cut_algorithm)
