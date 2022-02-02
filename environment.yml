@@ -1,6 +1,6 @@
 name: mslice
 channels:
-  - default
+  - defaults
 dependencies:
   - flake8
   - ipython
