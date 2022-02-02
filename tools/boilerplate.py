@@ -103,7 +103,7 @@ def {name}():
 '''
 
 
-def boilerplate_gen():
+def boilerplate_gen():# noqa: C901
     """Generator of lines for the automated part of pyplot."""
 
     # these methods are all simple wrappers of Axes methods by the same
@@ -208,8 +208,8 @@ def boilerplate_gen():
                 return '=mlab.' + value.__name__
             if value.__name__ == 'mean':
                 return '=np.' + value.__name__
-            raise ValueError(('default value %s unknown to boilerplate.' +
-                             'formatvalue') % value)
+            raise ValueError(('default value %s unknown to boilerplate.'
+                             + 'formatvalue') % value)
         return '=' + repr(value)
 
     text_wrapper = textwrap.TextWrapper(break_long_words=False)
@@ -243,7 +243,7 @@ def boilerplate_gen():
                 def_edited = []
                 for val in defaults:
                     if six.PY2:
-                        if isinstance(val, unicode):
+                        if isinstance(val, str):
                             val = val.encode('ascii', 'ignore')
                     def_edited.append(val)
                 defaults = tuple(def_edited)
