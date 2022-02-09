@@ -105,6 +105,7 @@ rectangle by clicking outside the current rectangle and dragging. Once you have 
 ``Interactive Cut`` again to leave interactive mode. If you leave a slice in interactive cut mode and plot another
 slice, another window will open. Making a cut (see below) whilst the interactive mode is active will overplot on the
 same window as the interactive cut and this cut will be removed when the interactive mode rectangle is moved again.
+Only when you click ``Save Cut to Workspace`` is an ``MD Histo`` type workspace created.
 
 Plotting a Cut
 --------------
