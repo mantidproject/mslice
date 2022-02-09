@@ -2,8 +2,9 @@ import numpy as np
 
 from mantid.api import PythonAlgorithm, WorkspaceProperty
 from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator, StringListValidator
-from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, Scale, \
-    ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs, Integration, Rebin, Transpose
+from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, \
+    ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs, Integration, Rebin, Transpose, \
+    IntegrateMDHistoWorkspace
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
@@ -50,7 +51,7 @@ class Cut(PythonAlgorithm):
 
 def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_norm, algo):
     if PSD:
-        cut = _compute_cut_PSD(selected_workspace, cut_axis, integration_axis)
+        cut = _compute_cut_PSD(selected_workspace, cut_axis, integration_axis, algo)
     else:
         cut = _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, e_mode, algo)
     if is_norm:
@@ -58,17 +59,25 @@ def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_
     return cut
 
 
-def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis):
+def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis, algo):
     cut_axis.units = cut_axis.units.replace('2Theta', 'Degrees')
     integration_axis.units = integration_axis.units.replace('2Theta', 'Degrees')
     fill_in_missing_input(cut_axis, selected_workspace)
     n_steps = get_number_of_steps(cut_axis)
     cut_binning = " ,".join(map(str, (cut_axis.units, cut_axis.start_meV, cut_axis.end_meV, n_steps)))
     integration_binning = integration_axis.units + "," + str(integration_axis.start_meV) + "," + \
-        str(integration_axis.end_meV) + ",1"
+        str(integration_axis.end_meV) + (",1" if 'Rebin' in algo else ",100")
 
-    return BinMD(InputWorkspace=selected_workspace, AxisAligned="1", AlignedDim1=integration_binning,
-                 AlignedDim0=cut_binning, StoreInADS=False)
+    ws = BinMD(InputWorkspace=selected_workspace, AxisAligned="1", AlignedDim0=integration_binning,
+               AlignedDim1=cut_binning, StoreInADS=False)
+    if 'Integration' in algo:
+        x0, x1 = (integration_axis.start_meV, integration_axis.end_meV)
+        # 100 step is hard coded into the `integration_binning` string above
+        norm_fac = (np.sum(ws.getNumEventsArray() != 0., axis=0) / 100) * (x1 - x0)
+        ws = IntegrateMDHistoWorkspace(ws, P1Bin=[x0, x1], P2Bin=[], StoreInADS=False)
+        ws.setSignalArray(ws.getSignalArray() * norm_fac)
+        ws.setErrorSquaredArray(ws.getErrorSquaredArray() * np.square(norm_fac))
+    return ws
 
 
 def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, algo):
@@ -149,17 +158,15 @@ def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace, algo):
     if 'Integration' in algo:
         qbins = [float(q) for q in q_binning.split(',')]
         ebins = [float(e) for e in e_binning.split(',')]
-        nstep = 100.
         if np.abs((qbins[2]-qbins[0]) - qbins[1]) < 0.0001:
-            qbinstr = ','.join(map(str, [qbins[0], (qbins[2]-qbins[0])/nstep, qbins[2]]))
+            qbinstr = ','.join(map(str, [qbins[0], (qbins[2]-qbins[0])/100., qbins[2]]))
             ws_out = _cut_indirect_or_direct(qbinstr, e_binning, emode, selected_workspace)
             ws_out = Transpose(InputWorkspace=ws_out, EnableLogging=False)
             ws_out = Integration(InputWorkspace=ws_out, RangeLower=qbins[0], RangeUpper=qbins[2], EnableLogging=False)
         else:
-            ebinstr = ','.join(map(str, [ebins[0], (ebins[2]-ebins[0])/nstep, ebins[2]]))
+            ebinstr = ','.join(map(str, [ebins[0], (ebins[2]-ebins[0])/100., ebins[2]]))
             ws_out = _cut_indirect_or_direct(q_binning, ebinstr, emode, selected_workspace)
             ws_out = Integration(InputWorkspace=ws_out, RangeLower=ebins[0], RangeUpper=ebins[2], EnableLogging=False)
-        ws_out = Scale(InputWorkspace=ws_out, Factor=nstep, EnableLogging=False)
     else:
         ws_out = _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace)
     return ws_out

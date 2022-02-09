@@ -50,6 +50,10 @@ class MainPresenterInterface(object):
         pass
 
     @abc.abstractmethod
+    def subscribe_to_cut_algo_default_monitor(self, client):
+        pass
+
+    @abc.abstractmethod
     def is_energy_conversion_allowed(self):
         pass
 

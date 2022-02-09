@@ -38,9 +38,6 @@ class CutView:
     def get_intensity_is_norm_to_one(self):
         pass
 
-    def get_smoothing(self):
-        pass
-
     def get_presenter(self):
         pass
 
@@ -60,6 +57,12 @@ class CutView:
         pass
 
     def set_energy_units(self, unit):
+        pass
+
+    def get_cut_algorithm(self):
+        pass
+
+    def set_cut_algorithm(self, algo):
         pass
 
     def set_energy_units_default(self, unit):
