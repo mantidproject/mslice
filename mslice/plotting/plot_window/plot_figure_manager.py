@@ -325,12 +325,28 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.canvas.figure.gca().set_xlim(value)
 
     @property
+    def x_range_font_size(self):
+        return self.canvas.figure.gca().xaxis.get_ticklabels()[0].get_size()
+
+    @x_range_font_size.setter
+    def x_range_font_size(self, font_size):
+        self.canvas.figure.gca().tick_params(axis='x', labelsize=font_size)
+
+    @property
     def y_range(self):
         return self.figure.gca().get_ylim()
 
     @y_range.setter
     def y_range(self, value):
         self.figure.gca().set_ylim(value)
+
+    @property
+    def y_range_font_size(self):
+        return self.canvas.figure.gca().yaxis.get_ticklabels()[0].get_size()
+
+    @y_range_font_size.setter
+    def y_range_font_size(self, font_size):
+        self.canvas.figure.gca().tick_params(axis='y', labelsize=font_size)
 
     @property
     def x_grid(self):

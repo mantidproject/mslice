@@ -5,6 +5,7 @@ from qtpy.QtCore import Qt
 
 import matplotlib.colors as colors
 from matplotlib.legend import Legend
+from matplotlib.text import Text
 
 from mslice.models.colors import to_hex
 from mslice.models.units import get_sample_temperature_from_string
@@ -172,6 +173,9 @@ class SlicePlot(IPlot):
     def object_clicked(self, target):
         if isinstance(target, Legend):
             return
+        elif isinstance(target, Text):
+            quick_options(target, self, redraw_signal=self.plot_window.redraw)
+
         else:
             quick_options(target, self)
             self.update_legend()
@@ -444,6 +448,14 @@ class SlicePlot(IPlot):
         self.change_axis_scale(value, self.colorbar_log)
 
     @property
+    def colorbar_range_font_size(self):
+        return self._canvas.figure.get_axes()[1].get_yticklabels()[0].get_size()
+
+    @colorbar_range_font_size.setter
+    def colorbar_range_font_size(self, value):
+        self._canvas.figure.get_axes()[1].tick_params(axis='y', which='both', labelsize=value)
+
+    @property
     def colorbar_log(self):
         return isinstance(self._canvas.figure.gca().collections[0].norm, colors.LogNorm)
 
@@ -493,12 +505,28 @@ class SlicePlot(IPlot):
         self.manager.x_range = value
 
     @property
+    def x_range_font_size(self):
+        return self.manager.x_range_font_size
+
+    @x_range_font_size.setter
+    def x_range_font_size(self, font_size):
+        self.manager.x_range_font_size = font_size
+
+    @property
     def y_range(self):
         return self.manager.y_range
 
     @y_range.setter
     def y_range(self, value):
         self.manager.y_range = value
+
+    @property
+    def y_range_font_size(self):
+        return self.manager.y_range_font_size
+
+    @y_range_font_size.setter
+    def y_range_font_size(self, font_size):
+        self.manager.y_range_font_size = font_size
 
     @property
     def x_grid(self):

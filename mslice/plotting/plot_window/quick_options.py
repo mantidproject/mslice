@@ -24,7 +24,7 @@ class QuickOptions(QtWidgets.QDialog):
 
 class QuickAxisOptions(QuickOptions):
 
-    def __init__(self, target, existing_values, grid, log, redraw_signal):
+    def __init__(self, target, existing_values, fontsize, grid, log, redraw_signal):
         super(QuickAxisOptions, self).__init__()
         self.setWindowTitle("Edit " + target)
         self.log = log
@@ -34,26 +34,35 @@ class QuickAxisOptions(QuickOptions):
         self.max_label = QtWidgets.QLabel("Max:")
         self.max = QtWidgets.QLineEdit()
         self.max.setText(str(existing_values[1]))
+        self.font_size_label = QtWidgets.QLabel("Font Size:")
+        self.font_size = QtWidgets.QDoubleSpinBox()
+        self.decimals = 1
+        self.font_size.setValue(fontsize)
+
         row1 = QtWidgets.QHBoxLayout()
         row2 = QtWidgets.QHBoxLayout()
+        row3 = QtWidgets.QHBoxLayout()
         row1.addWidget(self.min_label)
         row1.addWidget(self.min)
         row2.addWidget(self.max_label)
         row2.addWidget(self.max)
+        row3.addWidget(self.font_size_label)
+        row3.addWidget(self.font_size)
         self.layout.addLayout(row1)
         self.layout.addLayout(row2)
+        self.layout.addLayout(row3)
         if grid is not None:
             self.grid = QtWidgets.QCheckBox("Grid", self)
             self.grid.setChecked(grid)
-            row3 = QtWidgets.QHBoxLayout()
-            row3.addWidget(self.grid)
-            self.layout.addLayout(row3)
+            row4 = QtWidgets.QHBoxLayout()
+            row4.addWidget(self.grid)
+            self.layout.addLayout(row4)
         if log is not None:
             self.log_scale = QtWidgets.QCheckBox("Logarithmic", self)
             self.log_scale.setChecked(self.log)
-            row4 = QtWidgets.QHBoxLayout()
-            row4.addWidget(self.log_scale)
-            self.layout.addLayout(row4)
+            row5 = QtWidgets.QHBoxLayout()
+            row5.addWidget(self.log_scale)
+            self.layout.addLayout(row5)
         self.layout.addLayout(self.button_row)
         self.layout.addWidget(self.keep_open)
         self.ok_button.clicked.disconnect()
@@ -87,19 +96,40 @@ class QuickLabelOptions(QuickOptions):
     ok_clicked = Signal()
     cancel_clicked = Signal()
 
-    def __init__(self, label):
+    def __init__(self, label, redraw_signal):
         super(QuickLabelOptions, self).__init__()
         self.setWindowTitle("Edit " + label.get_text())
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText(label.get_text())
+        self.font_size_label = QtWidgets.QLabel("Font Size:")
+        self.font_size = QtWidgets.QDoubleSpinBox()
+        self.font_size.setValue(label.get_size())
+
+        row1 = QtWidgets.QHBoxLayout()
+        row1.addWidget(self.font_size_label)
+        row1.addWidget(self.font_size)
+
         self.layout.addWidget(self.line_edit)
+        self.layout.addLayout(row1)
         self.layout.addLayout(self.button_row)
         self.line_edit.show()
+
+        self.redraw_signal = redraw_signal
+        self.ok_button.disconnect()
+        self.ok_button.clicked.connect(self._ok_clicked)
 
     @property
     def label(self):
         return self.line_edit.text()
 
+    @property
+    def label_font_size(self):
+        return self.font_size.value()
+
+    def _ok_clicked(self):
+        self.ok_clicked.emit()
+        self.redraw_signal.emit()
+        self.accept()
 
 class QuickLineOptions(QuickOptions):
 
