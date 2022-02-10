@@ -16,6 +16,10 @@ You can then either copy the ``mslice`` subfolder (the folder containing a file 
 ``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
 you did not install *Mantid* in the default location.
 
+When you are using MSlice as an interface in *MantidWorkbench*, the **File** menu allows changing the font size of the GUI via the
+``General`` tab in ``Settings``. Please note that the font size change is only applied after a restart of Mantid. Use ``Ctrl++`` to
+increase and ``Ctrl+-`` to decrease the font size within the Script Editor or the IPython Console.
+
 Loading Data
 ------------
 
