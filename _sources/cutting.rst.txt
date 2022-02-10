@@ -81,5 +81,8 @@ From the plot figure window, you can also save the workspace data to the same fo
 addition you can also save the figure as an image, either in ``png`` or ``pdf`` formats.
 
 In order to save a cut from an :ref:`Interactive_Cuts`, you can click the ``Save`` icon (floppy disk) direct on the cut
-window, or first click the ``Save Cut`` button to create an ``MD Histo`` type workspace and then use the ``Save`` button on
+window, or first click the ``Save Cut to Workspace`` button to create an ``MD Histo`` type workspace and then use the ``Save`` button on
 that tab.
+
+When MSlice is used as a Mantid interface ``MD Histo`` type workspaces can also be saved to Mantid Workbench by clicking the
+ ``Save to Workbench`` button either on the ``MD Histo`` or the ``Cut`` tab.
