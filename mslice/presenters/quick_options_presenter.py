@@ -14,10 +14,12 @@ def quick_options(target, model, has_logarithmic=None, redraw_signal=None):
         quick_line_options(target, model)
 
 
-def quick_label_options(target, redraw_signal):
+def quick_label_options(target, redraw_signal=None):
     view = QuickLabelOptions(target, redraw_signal)
     view.ok_clicked.connect(lambda: _set_label_options(view, target))
     view.show()
+    return view
+
 
 def quick_axis_options(target, model, has_logarithmic=None, redraw_signal=None):
     if target[:1] == 'x' or target[:1] == 'y':

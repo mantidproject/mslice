@@ -24,7 +24,7 @@ class QuickOptions(QtWidgets.QDialog):
 
 class QuickAxisOptions(QuickOptions):
 
-    def __init__(self, target, existing_values, fontsize, grid, log, redraw_signal):
+    def __init__(self, target, existing_values, font_size, grid, log, redraw_signal):
         super(QuickAxisOptions, self).__init__()
         self.setWindowTitle("Edit " + target)
         self.log = log
@@ -37,7 +37,7 @@ class QuickAxisOptions(QuickOptions):
         self.font_size_label = QtWidgets.QLabel("Font Size:")
         self.font_size = QtWidgets.QDoubleSpinBox()
         self.decimals = 1
-        self.font_size.setValue(fontsize)
+        self.font_size.setValue(font_size)
 
         row1 = QtWidgets.QHBoxLayout()
         row2 = QtWidgets.QHBoxLayout()
