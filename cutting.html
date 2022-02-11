@@ -61,6 +61,8 @@ cuts between the specified integration minimum and maximum with the specified wi
 For example, if <code class="docutils literal notranslate"><span class="pre">from</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">to</span></code> is <code class="docutils literal notranslate"><span class="pre">10</span></code> and <code class="docutils literal notranslate"><span class="pre">width</span></code> is <code class="docutils literal notranslate"><span class="pre">3</span></code>, clicking <code class="docutils literal notranslate"><span class="pre">Plot</span></code> will overplot 4 cuts which
 integrate over [0,3], [3,6], [6,9] and [9,10] respectively.</p>
 <p>Cuts with the same range from multiple datasets can be plotted by first selecting multiple workspaces in the left panel.</p>
+<p>There are two different methods to compute cuts. <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> uses the basic rebinning algorithms directly and effectively averages
+the counts in the integration range, whilst <code class="docutils literal notranslate"><span class="pre">Integration</span></code> sums the counts in the integration range.</p>
 <p>Clicking on the <code class="docutils literal notranslate"><span class="pre">Norm</span> <span class="pre">to</span> <span class="pre">1</span></code> check box will cause the resulting cut data to be normalised such that the maximum of the data
 of each cut is unity.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">Plot</span> <span class="pre">Over</span></code> button allows you to overplot data on the same figure window without first clearing the current data. Note
@@ -100,10 +102,8 @@ addition you can also save the figure as an image, either in <code class="docuti
 <p>In order to save a cut from an <a class="reference internal" href="quickstart.html#interactive-cuts"><span class="std std-ref">Interactive Cuts</span></a>, you can click the <code class="docutils literal notranslate"><span class="pre">Save</span></code> icon (floppy disk) direct on the cut
 window, or first click the <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Cut</span> <span class="pre">to</span> <span class="pre">Workspace</span></code> button to create an <code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Histo</span></code> type workspace and then use the <code class="docutils literal notranslate"><span class="pre">Save</span></code> button on
 that tab.</p>
-<dl class="simple">
-<dt>When MSlice is used as a Mantid interface <code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Histo</span></code> type workspaces can also be saved to Mantid Workbench by clicking the</dt><dd><p><code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">to</span> <span class="pre">Workbench</span></code> button either on the <code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Histo</span></code> or the <code class="docutils literal notranslate"><span class="pre">Cut</span></code> tab.</p>
-</dd>
-</dl>
+<p>When MSlice is used as a Mantid interface <code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Histo</span></code> type workspaces can also be saved to Mantid Workbench by clicking the
+<code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">to</span> <span class="pre">Workbench</span></code> button either on the <code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Histo</span></code> or the <code class="docutils literal notranslate"><span class="pre">Cut</span></code> tab.</p>
 </section>
 </section>
 
