@@ -30,9 +30,8 @@ integrate over [0,3], [3,6], [6,9] and [9,10] respectively.
 
 Cuts with the same range from multiple datasets can be plotted by first selecting multiple workspaces in the left panel.
 
-There are two different methods to compute cuts for **non-PSD** data. ``Rebin`` uses the ``SofQW3`` algorithm directly and
-effectively averages the counts in the integration range. ``Integration`` rebins the data first with ``SofQW3`` and then
-calls ``Integration``, and effectively sums the counts in the integration range.
+There are two different methods to compute cuts. ``Rebin`` uses the basic rebinning algorithms directly and effectively averages
+the counts in the integration range, whilst ``Integration`` sums the counts in the integration range.
 
 Clicking on the ``Norm to 1`` check box will cause the resulting cut data to be normalised such that the maximum of the data
 of each cut is unity.
