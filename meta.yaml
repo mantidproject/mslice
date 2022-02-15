@@ -1,0 +1,33 @@
+{% set version = "2.3.1" %}
+
+package:
+  name: mslice
+  version: {{ version }}
+
+source:
+  url: https://github.com/mantidproject/mslice/archive/{{ version }}.tar.gz
+  sha256: 17bb1a08c6b01361774ac119d0a5869608671403c94df26108e705083bdca896
+
+build:
+  script: python setup.py install --single-version-externally-managed --record=record.txt
+
+requirements:
+  build:
+    - python {{ python }}
+    - flake8
+    - qtpy
+    - setuptools
+
+  run:
+  - python
+  - mantid
+  - mantidqt
+  - pyqt
+  - qtpy
+  - ipython
+  - qtconsole
+
+about:
+  home:
+  license:
+  license_file:

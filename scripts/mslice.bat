@@ -7,7 +7,11 @@
 if DEFINED MANTIDPATH (
   set MANTIDPYTHON=%MANTIDPATH%\mantidpython.bat
 ) else (
-  set MANTIDPYTHON=C:\MantidInstall\bin\mantidpython.bat
+  if DEFINED CONDA_PREFIX (
+    set MANTIDPYTHON=mantidpython
+  ) else (
+    set MANTIDPYTHON=C:\MantidInstall\bin\mantidpython.bat
+  )
 )
 set MANTIDPYTHON_ARGS=--classic
 set MAIN_SCRIPT=%~dp0start_mslice.py

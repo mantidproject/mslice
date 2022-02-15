@@ -9,14 +9,16 @@
 SCRIPT=$(readlink -f "$0")
 SCRIPT_PATH=$(dirname "$SCRIPT")
 
-if [ -n "$MANTIDPATH" ]; then
+MANTIDPYTHON_ARGS="--classic"
+MAIN_SCRIPT=${SCRIPT_PATH}/start_mslice.py
+
+if [ -n "$CONDA_PREFIX" ] || [ -n "$CONDA_DEFAULT_ENV" ]; then
+  MANTIDPYTHON=mantidpython
+elif [ -n "$MANTIDPATH" ]; then
   MANTIDPYTHON=$MANTIDPATH/mantidpython
 else
   MANTIDPYTHON=/opt/mantidnightly/bin/mantidpython
 fi
-
-MANTIDPYTHON_ARGS="--classic"
-MAIN_SCRIPT=${SCRIPT_PATH}/start_mslice.py
 
 # Run
 ${MANTIDPYTHON} ${MANTIDPYTHON_ARGS} ${MAIN_SCRIPT}
