@@ -72,7 +72,7 @@ setup_args = dict(name=NAME,
                   classifiers=['Operating System :: MacOS',
                                'Operating System :: Microsoft :: Windows',
                                'Operating System :: POSIX :: Linux',
-                               'Programming Language :: Python :: 2.7',
+                               'Programming Language :: Python :: 3.8',
                                'Development Status :: 4 - Beta',
                                'Topic :: Scientific/Engineering'])
 
