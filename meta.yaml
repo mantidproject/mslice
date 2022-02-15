@@ -28,6 +28,6 @@ requirements:
   - qtconsole
 
 about:
-  home:
-  license:
-  license_file:
+  home: https://github.com/mantidproject/mslice
+  license: GPL-3.0-or-later
+  summary: MSlice is a tool for visualizing cuts and slices of inelastic neutron scattering data.
