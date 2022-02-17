@@ -6,7 +6,7 @@
 
 ## Overview
 
-Mantid is a tool for performing slices and cuts of multi-dimensional data produced by
+MSlice is a tool for performing slices and cuts of multi-dimensional data produced by
 [Mantid](http://www.mantidproject.org).
 
 ## Documentation
