@@ -7,7 +7,7 @@ from matplotlib.lines import Line2D
 from matplotlib.container import ErrorbarContainer
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
-from mslice.presenters.quick_options_presenter import quick_options, quick_axis_options
+from mslice.presenters.quick_options_presenter import quick_options, quick_axis_options, quick_label_options, _set_label_options
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions
 
 
@@ -35,7 +35,7 @@ class QuickOptionsTest(unittest.TestCase):
     def test_label(self, label_options_mock):
         target = Mock(spec=text.Text)
         quick_options(target, self.model)
-        label_options_mock.assert_called_once_with(target)
+        label_options_mock.assert_called_once_with(target, None)
 
     @patch.object(QuickLineOptions, '__init__', lambda x, y: None)
     @patch.object(QuickLineOptions, 'exec_', lambda x: None)
@@ -101,7 +101,7 @@ class QuickOptionsTest(unittest.TestCase):
                              {'shown': True, 'color': '#0000ff', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': True, 'error_bar': False})
 
-    @patch.object(QuickAxisOptions, '__init__', lambda u, v, w, x, y, z: None)
+    @patch.object(QuickAxisOptions, '__init__', lambda t, u, v, w, x, y, z: None)
     @patch.object(QuickAxisOptions, 'range_min', PropertyMock(return_value='0'))
     @patch.object(QuickAxisOptions, 'range_max', PropertyMock(return_value='10'))
     @patch.object(QuickAxisOptions, 'grid_state', PropertyMock(return_value=True))
@@ -110,6 +110,8 @@ class QuickOptionsTest(unittest.TestCase):
     def test_axis_with_grid(self):
         self.target = 'y_range'
         qopt = quick_options(self.target, self.model)
+        qopt.font_size = PropertyMock()
+        qopt.font_size.return_value.value.return_value = 10
         qopt.redraw_signal = PropertyMock()
         qopt.ok_clicked.connect.call_args[0][0]()  # Call the connected signal directly
         self.assertEquals(self.model.y_grid, True)
@@ -173,26 +175,32 @@ class QuickLabelTest(unittest.TestCase):
         type(self.view).label = label
         self.target.set_text = MagicMock()
 
-    def test_accept(self, quick_label_options_view):
+    @patch('mslice.presenters.quick_options_presenter._set_label')
+    @patch('mslice.presenters.quick_options_presenter._set_font_size')
+    def test_accept(self, set_font_size, set_label, quick_label_options_view):
         quick_label_options_view.return_value = self.view
-        self.view.exec_ = MagicMock(return_value=True)
-        quick_options(self.target, self.model)
-        self.target.set_text.assert_called_once_with("label")
+        qopt = quick_label_options('label')
+        qopt.redraw_signal = PropertyMock()
+        qopt.ok_clicked.connect.call_args[0][0]()  # Call the connected signal directly
+        assert set_label.called
+        assert set_font_size.called
 
     def test_reject(self, quick_label_options_view):
         quick_label_options_view.return_value = self.view
-        self.view.exec_ = MagicMock(return_value=False)
-        quick_options(self.target, self.model)
+        self.view.set_range = Mock()
+        qopt = quick_label_options('label')
+        qopt.redraw_signal = PropertyMock()
+        qopt.reject()
         self.target.set_text.assert_not_called()
 
     @patch('mslice.presenters.quick_options_presenter.QuickError')
     def test_latex(self, quickerror, quick_label_options_view):
-        type(self.view).label = PropertyMock(return_value="$\a$")
         quick_label_options_view.return_value = self.view
-        self.view.exec_ = MagicMock(return_value=True)
-        quick_options(self.target, self.model)
-        quickerror.assert_called()
-        self.target.set_text.assert_not_called()
+        type(self.view).label = PropertyMock(return_value="$\a$")
+        _set_label_options(self.view, self.target)
+        assert quickerror.called
+        assert not self.target.set_text.called
+
 
 @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
 class QuickLineTest(unittest.TestCase):
