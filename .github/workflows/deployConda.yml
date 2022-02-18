@@ -20,11 +20,12 @@ jobs:
         with:
           activate-environment: mslice
           environment-file: environment.yml
-          python-version: 3.8
+          #python-version: 3.8
           auto-activate-base: false
 
       - name: Install Mantid
         run: |
+          conda install libglu>=9.0.0
           conda install mantid -c mantid
           conda install mantidqt -c mantid/label/nightly
 
