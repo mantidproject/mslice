@@ -1,9 +1,13 @@
 name: mslice
 channels:
   - defaults
+  - mantid
+  - mantid/label/nightly
 dependencies:
   - flake8
   - ipython
+  - mantid
+  - mantidqt
   - matplotlib
   - mock
   - numpy

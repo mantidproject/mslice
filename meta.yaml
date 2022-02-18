@@ -10,6 +10,10 @@ source:
 
 build:
   script: python setup.py install --single-version-externally-managed --record=record.txt
+  number: 0  # [osx]
+  entry_points:
+    - workbench = workbench.app.main:main  # [osx]
+  osx_is_app: true  # [osx]
 
 requirements:
   build:
@@ -26,6 +30,10 @@ requirements:
   - qtpy
   - ipython
   - qtconsole
+
+test:
+  imports:
+    - mslice
 
 about:
   home: https://github.com/mantidproject/mslice
