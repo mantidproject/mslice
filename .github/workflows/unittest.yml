@@ -16,23 +16,19 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2.0.1
+        uses: conda-incubator/setup-miniconda@v2.1.1
         with:
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
           activate-environment: mslice
           environment-file: environment.yml
-          python-version: 3.6
+          python-version: 3.8
           auto-activate-base: false
 
       - name: Install Mantid
         run: |
-          sudo apt-add-repository ppa:mantid/mantid -y && sudo apt-get update -qq
-          sudo apt-get install gdebi -y
-          export mantiddeb=$(curl -sL https://github.com/mantidproject/download.mantidproject.org/raw/main/releases/nightly.txt | grep ubuntu)
-          wget https://sourceforge.net/projects/mantid/files/Nightly/$mantiddeb -O /tmp/mtn.deb
-          sudo gdebi --option=APT::Get::force-yes=1,APT::Get::Assume-Yes=1 -n /tmp/mtn.deb
-          echo "PYTHONPATH=/opt/mantidnightly/bin:/opt/mantidnightly/lib" >> $GITHUB_ENV
-          echo "HDF5_DISABLE_VERSION_CHECK=1" >> $GITHUB_ENV
-          sudo apt-get install libglu1-mesa
+          conda config --add channels conda-forge
+          conda install mantidworkbench -c mantid/label/nightly
 
       - name: Flake8
         run: |

@@ -4,20 +4,8 @@ channels:
 dependencies:
   - flake8
   - ipython
-  - matplotlib
-  - mock
-  - numpy
-  - numpy-base
-  - pip
+  - nose
   - pyqt
-  - qtawesome
   - qtconsole
   - qtpy
-  - scipy
-  - six
-  - pip:
-      - coverage
-      - h5py
-      - nose
-      - pre-commit
-      - pyyaml
+
