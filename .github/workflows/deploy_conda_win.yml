@@ -30,11 +30,11 @@ jobs:
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
-          mamba build $GITHUB_WORKSPACE/conda
+          mamba build conda/mslice
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: mslice-2.3.1-py38_0.tar.bz2
-          path: /usr/local/miniconda/conda-bld/osx-64/mslice-*.tar.bz2
+          path: C:\Miniconda3\envs\test\conda-bld\win-64\mslice-*.tar.bz2
           if-no-files-found: ignore

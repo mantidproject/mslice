@@ -27,8 +27,7 @@ jobs:
 
       - name: Install Mantid
         run: |
-          conda config --add channels conda-forge
-          conda install mantidworkbench -c mantid/label/nightly
+          conda install mantidworkbench
 
       - name: Flake8
         run: |
