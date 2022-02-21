@@ -13,7 +13,7 @@ MANTIDPYTHON_ARGS="--classic"
 MAIN_SCRIPT=${SCRIPT_PATH}/start_mslice.py
 
 if [ -n "$CONDA_PREFIX" ] || [ -n "$CONDA_DEFAULT_ENV" ]; then
-  MANTIDPYTHON=mantidpython
+  python ${MAIN_SCRIPT}
 elif [ -n "$MANTIDPATH" ]; then
   MANTIDPYTHON=$MANTIDPATH/mantidpython
 else
