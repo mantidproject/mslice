@@ -22,6 +22,7 @@ jobs:
           miniforge-version: latest
           miniforge-variant: Mambaforge
           python-version: 3.8
+          activate-environment: build-env
           auto-activate-base: false
 
       - name: Build MSlice conda package for OSX
@@ -30,4 +31,4 @@ jobs:
           conda install conda-build conda-verify
           conda config --add channels mantid
           conda config --add channels mantid/label/nightly
-          conda build $GITHUB_WORKSPACE/conda
+          mamba build $GITHUB_WORKSPACE/conda
