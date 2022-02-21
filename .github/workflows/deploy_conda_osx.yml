@@ -1,0 +1,33 @@
+name: Build MSlice for OSX
+
+on: push
+
+jobs:
+  test:
+    runs-on: macos-10.15
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout MSlice
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: 592_conda_recipe
+
+      - name: Create build environment
+        run: |
+          conda config --set always_yes yes --set changeps1 no
+          conda create  -n build-env python=3.8
+          conda activate build-env
+          conda config --set anaconda_upload no
+          conda install conda-build conda-verify
+
+      - name: Build MSlice conda package for OSX
+        run: |
+          conda activate build-env
+          conda config --add channels conda-forge
+          conda config --add channels mantid
+          conda config --add channels mantid/label/nightly
+          conda build $GITHUB_WORKSPACE/conda
