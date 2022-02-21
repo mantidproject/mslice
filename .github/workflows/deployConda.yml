@@ -28,5 +28,7 @@ jobs:
 
       - name: Build MSlice conda package for Linux
         run: |
+          mamba create  -n build-env python=3.8
+          conda activate build-env
           mamba install conda-build
-          mamba build mslice
+          mamba build ./mslice
