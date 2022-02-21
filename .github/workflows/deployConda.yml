@@ -16,8 +16,10 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2.0.1
+        uses: conda-incubator/setup-miniconda@v2.1.1
         with:
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
           activate-environment: mslice
           environment-file: environment.yml
           python-version: 3.8
@@ -25,7 +27,7 @@ jobs:
 
       - name: Install Mantid
         run: |
-          # conda config --add channels conda-forge
+          conda config --add channels conda-forge
           conda install mantidworkbench -c mantid/label/nightly
 
       - name: Flake8
