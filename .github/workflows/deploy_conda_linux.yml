@@ -21,14 +21,20 @@ jobs:
         with:
           miniforge-version: latest
           miniforge-variant: Mambaforge
+          activate-environment: mslice
+          environment-file: environment.yml
           python-version: 3.8
-          activate-environment: build-env
           auto-activate-base: false
 
       - name: Build MSlice conda package for Linux
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
-          conda config --add channels mantid
-          conda config --add channels mantid/label/nightly
           mamba build $GITHUB_WORKSPACE/conda
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: mslice-2.3.1-py38_0.tar.bz2
+          path: /usr/share/miniconda/conda-bld/linux-64/mslice-*.tar.bz2
+          if-no-files-found: ignore

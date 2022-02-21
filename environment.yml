@@ -1,6 +1,8 @@
 name: mslice
 channels:
-  - defaults
+  - conda-forge
+  - mantid
+  - mantid/label/nightly
 dependencies:
   - flake8
   - pip
