@@ -30,5 +30,7 @@ jobs:
         run: |
           mamba create  -n build-env python=3.8
           conda activate build-env
-          mamba install conda-build
-          mamba build ./mslice
+          conda config --set anaconda_upload no
+          mamba install conda-build conda-verify
+          echo $GITHUB_WORKSPACE
+          mamba build mslice
