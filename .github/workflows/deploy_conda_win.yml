@@ -16,18 +16,26 @@ jobs:
           fetch-depth: 0
           ref: 592_conda_recipe
 
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
+          python-version: 3.8
+          auto-activate-base: false
+
       - name: Create build environment
         run: |
-          C:\Miniconda\condabin\conda.bat config --set always_yes yes --set changeps1 no
-          C:\Miniconda\condabin\conda.bat create  -n build-env python=3.8
-          C:\Miniconda\condabin\conda.bat activate build-env
-          C:\Miniconda\condabin\conda.bat config --set anaconda_upload no
-          C:\Miniconda\condabin\conda.bat install conda-build conda-verify
+          #conda config --set always_yes yes --set changeps1 no
+          #conda create  -n build-env python=3.8
+          #conda activate build-env
+          conda config --set anaconda_upload no
+          conda install conda-build conda-verify
 
       - name: Build MSlice conda package for Windows
         run: |
-          C:\Miniconda\condabin\conda.bat activate build-env
-          C:\Miniconda\condabin\conda.bat config --add channels conda-forge
-          C:\Miniconda\condabin\conda.bat config --add channels mantid
-          C:\Miniconda\condabin\conda.bat config --add channels mantid/label/nightly
-          C:\Miniconda\condabin\conda.bat build $GITHUB_WORKSPACE/conda
+          #conda activate build-env
+          conda config --add channels conda-forge
+          conda config --add channels mantid
+          conda config --add channels mantid/label/nightly
+          conda build $GITHUB_WORKSPACE/conda
