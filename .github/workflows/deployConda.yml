@@ -29,9 +29,9 @@ jobs:
       - name: Build MSlice conda package for Linux
         run: |
           conda config --set always_yes yes --set changeps1 no
-          mamba create  -n build-env python=3.8
+          conda create  -n build-env python=3.8
           conda activate build-env
           conda config --set anaconda_upload no
-          mamba install conda-build conda-verify
+          conda install conda-build conda-verify
           echo $GITHUB_WORKSPACE
-          mamba build ./mslice
+          conda build ./mslice
