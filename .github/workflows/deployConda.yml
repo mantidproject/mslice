@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
           ref: 592_conda_recipe
 
-      - #name: Setup Miniconda
+      #- name: Setup Miniconda
         #uses: conda-incubator/setup-miniconda@v2.1.1
         #with:
           #miniforge-version: latest
@@ -33,4 +33,4 @@ jobs:
           conda config --set anaconda_upload no
           mamba install conda-build conda-verify
           echo $GITHUB_WORKSPACE
-          mamba build mslice
+          mamba build ./mslice
