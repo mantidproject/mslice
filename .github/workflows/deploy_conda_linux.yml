@@ -16,18 +16,18 @@ jobs:
           fetch-depth: 0
           ref: 592_conda_recipe
 
-      - name: Create build environment
-        run: |
-          conda config --set always_yes yes --set changeps1 no
-          conda create  -n build-env python=3.8
-          conda activate build-env
-          conda config --set anaconda_upload no
-          conda install conda-build conda-verify
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
+          python-version: 3.8
+          auto-activate-base: false
 
       - name: Build MSlice conda package for Linux
         run: |
-          conda activate build-env
-          conda config --add channels conda-forge
+          conda config --set anaconda_upload no
+          conda install conda-build conda-verify
           conda config --add channels mantid
           conda config --add channels mantid/label/nightly
           conda build $GITHUB_WORKSPACE/conda
