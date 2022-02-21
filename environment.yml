@@ -4,8 +4,10 @@ channels:
 dependencies:
   - flake8
   - ipython
-  - nose
+  - pip
   - pyqt
   - qtconsole
   - qtpy
+  - pip:
+      - nose
 
