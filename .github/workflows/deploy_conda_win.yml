@@ -30,7 +30,7 @@ jobs:
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
-          mamba build conda/mslice
+          mamba build $GITHUB_WORKSPACE\conda
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
