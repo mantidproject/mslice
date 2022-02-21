@@ -16,15 +16,15 @@ jobs:
           fetch-depth: 0
           ref: 592_conda_recipe
 
-      - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2.1.1
-        with:
-          miniforge-version: latest
-          miniforge-variant: Mambaforge
-          activate-environment: mslice
-          environment-file: environment.yml
-          python-version: 3.8
-          auto-activate-base: false
+      - #name: Setup Miniconda
+        #uses: conda-incubator/setup-miniconda@v2.1.1
+        #with:
+          #miniforge-version: latest
+          #miniforge-variant: Mambaforge
+          #activate-environment: mslice
+          #environment-file: environment.yml
+          #python-version: 3.8
+          #auto-activate-base: false
 
       - name: Build MSlice conda package for Linux
         run: |
