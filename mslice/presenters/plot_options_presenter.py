@@ -12,7 +12,6 @@ class PlotOptionsPresenter(object):
 
         self.set_properties()  # propagate dialog with existing data
 
-
         self._view.titleEdited.connect(partial(self._value_modified, 'title'))
         self._view.xLabelEdited.connect(partial(self._value_modified, 'x_label'))
         self._view.yLabelEdited.connect(partial(self._value_modified, 'y_label'))
@@ -20,7 +19,6 @@ class PlotOptionsPresenter(object):
         self._view.yRangeEdited.connect(partial(self._xy_config_modified, 'y_range'))
         self._view.xGridEdited.connect(partial(self._value_modified, 'x_grid'))
         self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
-
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
