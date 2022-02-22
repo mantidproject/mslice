@@ -1,5 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
-from mock import MagicMock, PropertyMock, Mock
+from mock import MagicMock, PropertyMock, Mock, ANY
 import unittest
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
 
@@ -207,7 +207,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter.get_new_config()
 
         self.view.get_line_options.assert_called_once_with()
-        self.model.set_all_line_options.assert_called_once_with(line_data2, Mock.ANY)
+        self.model.set_all_line_options.assert_called_once_with(line_data2, ANY)
 
     def test_remove_line(self):
         self.remove_line_by_index = Mock()

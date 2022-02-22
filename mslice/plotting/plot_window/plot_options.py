@@ -220,7 +220,7 @@ class CutPlotOptions(PlotOptionsDialog):
 
     def disable_show_legend(self):
         for line_widget in self._line_widgets:
-            line_widget.show_legend.setEnabled(self.chkShowLegends.isChecked())
+            line_widget.show_legend_line_specific.setEnabled(self.chkShowLegends.isChecked())
 
     @property
     def x_log(self):
@@ -340,21 +340,21 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
             self.show_line = QtWidgets.QCheckBox("Show Line")
             self.show_line.setChecked(line_options['shown'])
 
-            self.show_legend = QtWidgets.QCheckBox("Show Legend")
-            self.show_legend.setChecked(line_options['legend'])
+            self.show_legend_line_specific = QtWidgets.QCheckBox("Show Legend")
+            self.show_legend_line_specific.setChecked(line_options['legend'])
 
             if show_legends:
-                self.show_legend.setEnabled(line_options['shown'])
+                self.show_legend_line_specific.setEnabled(line_options['shown'])
             else:
-                self.show_legend.setEnabled(show_legends)
+                self.show_legend_line_specific.setEnabled(show_legends)
 
             row5.addWidget(self.show_line)
-            row4.addWidget(self.show_legend)
+            row4.addWidget(self.show_legend_line_specific)
 
             self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))
         else:
             self.show_line = None
-            self.show_legend = None
+            self.show_legend_line_specific = None
 
         # for quick options the color validator and the delete button is not used
         if self.color_validator is not None:
@@ -378,8 +378,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     def show_line_changed(self, state):
         #  automatically shows/hides legend if line is shown/hidden
-        self.show_legend.setEnabled(state)
-        self.show_legend.setChecked(state)
+        self.show_legend_line_specific.setEnabled(state)
+        self.show_legend_line_specific.setChecked(state)
 
         self.error_bar_checkbox.setEnabled(state)
         self.error_bar_checkbox.setChecked(state)
@@ -396,9 +396,9 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def legend(self):
-        if self.show_legend is None:
+        if self.show_legend_line_specific is None:
             return None
-        return self.show_legend.checkState()
+        return self.show_legend_line_specific.checkState()
 
     @property
     def label(self):

@@ -96,7 +96,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         if self._xy_config['modified']:
             self._model.change_axis_scale(self._xy_config)
         for key, value in list(self._modified_values.items()):
-            if key is 'show_legends':
+            if key == 'show_legends':
                 new_show_legends = value
             else:
                 setattr(self._model, key, value)

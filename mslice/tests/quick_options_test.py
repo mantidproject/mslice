@@ -37,7 +37,7 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, self.model)
         label_options_mock.assert_called_once_with(target, None)
 
-    @patch.object(QuickLineOptions, '__init__', lambda x, y: None)
+    @patch.object(QuickLineOptions, '__init__', lambda x, y, z: None)
     @patch.object(QuickLineOptions, 'exec_', lambda x: None)
     @patch('mslice.presenters.quick_options_presenter.quick_line_options')
     def test_line(self, line_options_mock):
@@ -45,7 +45,7 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, self.model)
         line_options_mock.assert_called_once_with(target, self.model)
 
-    @patch.object(QuickLineOptions, '__init__', lambda x, y: None)
+    @patch.object(QuickLineOptions, '__init__', lambda x, y, z: None)
     @patch.object(QuickLineOptions, 'exec_', lambda x: None)
     @patch('mslice.presenters.quick_options_presenter.quick_axis_options')
     def test_axis(self, axis_options_mock):
@@ -53,8 +53,9 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, self.model)
         axis_options_mock.assert_called_once_with(target, self.model, None, None)
 
+    @patch('mslice.plotting.plot_window.cut_plot.CutPlot.show_legends', new_callable=PropertyMock(return_value=True))
     @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
-    def test_line_slice(self, qlo_mock):
+    def test_line_slice(self, qlo_mock, show_legends):
         plot_figure = MagicMock()
         window = MagicMock()
         plot_figure.window = window
@@ -63,19 +64,21 @@ class QuickOptionsTest(unittest.TestCase):
         slice_plotter = MagicMock()
         model = SlicePlot(plot_figure, slice_plotter, 'workspace')
         qlo_mock, target = setup_line_values(qlo_mock)
+
         quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
             {'shown': None, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3',
-             'marker': 'o', 'legend': None, 'error_bar': None})
+             'marker': 'o', 'legend': None, 'error_bar': None}, True)
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
                              {'shown': None, 'color': '#0000ff', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': None,
                               'error_bar': None})
 
+    @patch('mslice.plotting.plot_window.cut_plot.CutPlot.show_legends', new_callable=PropertyMock(return_value=True))
     @patch('mslice.presenters.quick_options_presenter.QuickLineOptions')
-    def test_line_cut(self, qlo_mock):
+    def test_line_cut(self, qlo_mock, show_legends):
         plot_figure = MagicMock()
         window = MagicMock()
         plot_figure.window = window
@@ -95,7 +98,7 @@ class QuickOptionsTest(unittest.TestCase):
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
             {'shown': True, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3',
-             'marker': 'o', 'legend': True, 'error_bar': False})
+             'marker': 'o', 'legend': True, 'error_bar': False}, True)
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
                              {'shown': True, 'color': '#0000ff', 'label': u'label2',
