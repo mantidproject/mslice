@@ -182,10 +182,11 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkXLog.stateChanged.connect(self.xLogEdited)
         self.chkYLog.stateChanged.connect(self.yLogEdited)
         self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
+        self.showLegendsEdited.connect(self.disable_show_legend)
 
     def set_line_options(self, line_options):
         for i in range(len(line_options)):
-            line_widget = LegendAndLineOptionsSetter(line_options[i], self.color_validator)
+            line_widget = LegendAndLineOptionsSetter(line_options[i], self.color_validator, self.show_legends)
             line_widget.destroyed.connect(functools.partial(self.remove_line_widget, line_widget, i))
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
@@ -216,6 +217,10 @@ class CutPlotOptions(PlotOptionsDialog):
     def remove_line_widget(self, selected, index):
         self._line_widgets.remove(selected)
         self.removed_line.emit(index)
+
+    def disable_show_legend(self):
+        for line_widget in self._line_widgets:
+            line_widget.show_legend.setEnabled(self.chkShowLegends.isChecked())
 
     @property
     def x_log(self):
@@ -257,7 +262,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     inverse_styles = {v: k for k, v in iteritems(styles)}
     inverse_markers = {v: k for k, v in iteritems(markers)}
 
-    def __init__(self, line_options, color_validator):
+    def __init__(self, line_options, color_validator, show_legends=None):
         super(LegendAndLineOptionsSetter, self).__init__()
 
         self.legend_text_label = QtWidgets.QLabel("Plot")
@@ -338,7 +343,10 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
             self.show_legend = QtWidgets.QCheckBox("Show Legend")
             self.show_legend.setChecked(line_options['legend'])
 
-            self.show_legend.setEnabled(line_options['shown'])
+            if show_legends:
+                self.show_legend.setEnabled(line_options['shown'])
+            else:
+                self.show_legend.setEnabled(show_legends)
 
             row5.addWidget(self.show_line)
             row4.addWidget(self.show_legend)

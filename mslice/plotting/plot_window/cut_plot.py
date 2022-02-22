@@ -212,11 +212,12 @@ class CutPlot(IPlot):
             all_line_options.append(line_options)
         return all_line_options
 
-    def set_all_line_options(self, line_data):
+    def set_all_line_options(self, line_data, update_legend):
         containers = self._canvas.figure.gca().containers
         for i in range(len(containers)):
             self.set_line_options_by_index(i, line_data[i])
-        self.update_legend(line_data)
+        if update_legend:
+            self.update_legend(line_data)
 
     def _single_line_has_error_bars(self, line_index):
         current_axis = self._canvas.figure.gca()
