@@ -262,7 +262,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     inverse_styles = {v: k for k, v in iteritems(styles)}
     inverse_markers = {v: k for k, v in iteritems(markers)}
 
-    def __init__(self, line_options, color_validator, show_legends=None):
+    def __init__(self, line_options, color_validator, show_legends):
         super(LegendAndLineOptionsSetter, self).__init__()
 
         self.legend_text_label = QtWidgets.QLabel("Plot")

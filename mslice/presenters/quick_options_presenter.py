@@ -33,7 +33,7 @@ def quick_axis_options(target, model, has_logarithmic=None, redraw_signal=None):
 
 
 def quick_line_options(target, model):
-    view = QuickLineOptions(model.get_line_options(target))
+    view = QuickLineOptions(model.get_line_options(target), model.show_legends)
     _run_quick_options(view, _set_line_options, model, target)
 
 
