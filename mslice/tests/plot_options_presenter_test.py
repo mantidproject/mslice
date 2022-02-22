@@ -207,7 +207,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter.get_new_config()
 
         self.view.get_line_options.assert_called_once_with()
-        self.model.set_all_line_options.assert_called_once_with(line_data2)
+        self.model.set_all_line_options.assert_called_once_with(line_data2, Mock.ANY)
 
     def test_remove_line(self):
         self.remove_line_by_index = Mock()
