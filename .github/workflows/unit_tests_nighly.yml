@@ -20,7 +20,7 @@ jobs:
         with:
           miniforge-version: latest
           miniforge-variant: Mambaforge
-          activate-environment: mslice
+          activate-environment: mslice-env
           environment-file: environment.yml
           python-version: 3.8
           auto-activate-base: false

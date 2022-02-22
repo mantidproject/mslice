@@ -1,4 +1,4 @@
-name: mslice
+name: mslice-env
 channels:
   - conda-forge
   - mantid
