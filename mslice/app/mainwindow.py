@@ -105,7 +105,7 @@ class MainWindow(MainView, QMainWindow):
 
         self._en_default_actions = []
         for e_unit in EnergyUnits.get_all_units():
-            action = add_action(self.menuDefault_Energy_Units, self, e_unit, checkable=True)
+            action = add_action(self.menuDefault_Energy_Units, self, e_unit, checkable=True, visible=True)
             action.triggered.connect(partial(self.set_energy_default, action))
             self._en_default_actions.append(action)
         self._en_default_actions[0].setChecked(True)
