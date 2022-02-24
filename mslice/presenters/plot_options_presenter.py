@@ -90,9 +90,20 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._model.remove_line_by_index(index)
 
     def get_new_config(self):
+        current_show_legends = getattr(self._model, 'show_legends')
+        new_show_legends = current_show_legends
+
         if self._xy_config['modified']:
             self._model.change_axis_scale(self._xy_config)
         for key, value in list(self._modified_values.items()):
-            setattr(self._model, key, value)
+            if key == 'show_legends':
+                new_show_legends = value
+            else:
+                setattr(self._model, key, value)
+
         line_options = self._view.get_line_options()
-        self._model.set_all_line_options(line_options)
+
+        if new_show_legends is not current_show_legends:
+            self._model.manager.window.action_toggle_legends.trigger()
+
+        self._model.set_all_line_options(line_options, new_show_legends)

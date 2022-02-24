@@ -182,10 +182,11 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkXLog.stateChanged.connect(self.xLogEdited)
         self.chkYLog.stateChanged.connect(self.yLogEdited)
         self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
+        self.showLegendsEdited.connect(self.disable_show_legend)
 
     def set_line_options(self, line_options):
         for i in range(len(line_options)):
-            line_widget = LegendAndLineOptionsSetter(line_options[i], self.color_validator)
+            line_widget = LegendAndLineOptionsSetter(line_options[i], self.color_validator, self.show_legends)
             line_widget.destroyed.connect(functools.partial(self.remove_line_widget, line_widget, i))
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
@@ -216,6 +217,10 @@ class CutPlotOptions(PlotOptionsDialog):
     def remove_line_widget(self, selected, index):
         self._line_widgets.remove(selected)
         self.removed_line.emit(index)
+
+    def disable_show_legend(self):
+        for line_widget in self._line_widgets:
+            line_widget.show_legend_line_specific.setEnabled(self.chkShowLegends.isChecked())
 
     @property
     def x_log(self):
@@ -257,7 +262,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     inverse_styles = {v: k for k, v in iteritems(styles)}
     inverse_markers = {v: k for k, v in iteritems(markers)}
 
-    def __init__(self, line_options, color_validator):
+    def __init__(self, line_options, color_validator, show_legends):
         super(LegendAndLineOptionsSetter, self).__init__()
 
         self.legend_text_label = QtWidgets.QLabel("Plot")
@@ -335,18 +340,21 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
             self.show_line = QtWidgets.QCheckBox("Show Line")
             self.show_line.setChecked(line_options['shown'])
 
-            self.show_legend = QtWidgets.QCheckBox("Show Legend")
-            self.show_legend.setChecked(line_options['legend'])
+            self.show_legend_line_specific = QtWidgets.QCheckBox("Show Legend")
+            self.show_legend_line_specific.setChecked(line_options['legend'])
 
-            self.show_legend.setEnabled(line_options['shown'])
+            if show_legends:
+                self.show_legend_line_specific.setEnabled(line_options['shown'])
+            else:
+                self.show_legend_line_specific.setEnabled(show_legends)
 
             row5.addWidget(self.show_line)
-            row4.addWidget(self.show_legend)
+            row4.addWidget(self.show_legend_line_specific)
 
             self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))
         else:
             self.show_line = None
-            self.show_legend = None
+            self.show_legend_line_specific = None
 
         # for quick options the color validator and the delete button is not used
         if self.color_validator is not None:
@@ -370,8 +378,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     def show_line_changed(self, state):
         #  automatically shows/hides legend if line is shown/hidden
-        self.show_legend.setEnabled(state)
-        self.show_legend.setChecked(state)
+        self.show_legend_line_specific.setEnabled(state)
+        self.show_legend_line_specific.setChecked(state)
 
         self.error_bar_checkbox.setEnabled(state)
         self.error_bar_checkbox.setChecked(state)
@@ -388,9 +396,9 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def legend(self):
-        if self.show_legend is None:
+        if self.show_legend_line_specific is None:
             return None
-        return self.show_legend.checkState()
+        return self.show_legend_line_specific.checkState()
 
     @property
     def label(self):

@@ -136,10 +136,10 @@ class QuickLineOptions(QuickOptions):
     ok_clicked = Signal()
     cancel_clicked = Signal()
 
-    def __init__(self, line_options):
+    def __init__(self, line_options, show_legends):
         super(QuickLineOptions, self).__init__()
         self.setWindowTitle("Edit line")
-        self.line_widget = LegendAndLineOptionsSetter(line_options, None)
+        self.line_widget = LegendAndLineOptionsSetter(line_options, None, show_legends)
         self.layout.addWidget(self.line_widget)
         self.layout.addLayout(self.button_row)
 
