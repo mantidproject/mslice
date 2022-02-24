@@ -25,10 +25,15 @@ requirements:
   - python
   - mantid
   - mantidqt
-  - pyqt
-  - qtpy
   - ipython
+  - matplotlib
+  - numpy
+  - pre-commit
+  - pyqt
+  - qtawesome
   - qtconsole
+  - qtpy
+  - six
 
 test:
   imports:

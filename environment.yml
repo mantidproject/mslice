@@ -4,7 +4,9 @@ channels:
   - mantid
   - mantid/label/nightly
 dependencies:
+  - coverage
   - flake8
+  - mock
   - pip
   - pyqt
   - qtpy
