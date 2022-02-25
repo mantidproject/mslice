@@ -1,4 +1,4 @@
-name: Build MSlice for Linux
+name: Build MSlice
 
 on: push
 

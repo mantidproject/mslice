@@ -67,7 +67,7 @@ setup_args = dict(name=NAME,
                   packages=find_packages(exclude=["misc"]),
                   package_data=get_package_data(),
                   data_files=get_data_files(),
-                  entry_points={"console_scripts" : ["mslice = mslice.app:main"]},
+                  entry_points={"console_scripts" : ["mslice = mslice.app.__init__:main"]},
                   # Install this as a directory
                   zip_safe=False,
                   classifiers=['Operating System :: MacOS',
