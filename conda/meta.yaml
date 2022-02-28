@@ -22,11 +22,11 @@ requirements:
     - setuptools
 
   host:
-    - python {{ python }}
+    - python
     - setuptools
 
   run:
-  - python {{ python }}
+  - python
   - mantid
   - mantidqt
   - ipython
