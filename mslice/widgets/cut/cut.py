@@ -46,8 +46,8 @@ class CutWidget(CutView, QWidget):
         self.set_validators()
         self._en = EnergyUnits('meV')
         self._en_default = 'meV'
-        self._cut_alg_default = 'Rebin'
-        self.set_cut_algorithm('Rebin')
+        self._cut_alg_default = 'Integration'
+        self.set_cut_algorithm('Integration')
         self.cmbCutEUnits.currentIndexChanged.connect(self._changed_unit)
         self.cmbCutAlg.currentIndexChanged.connect(self.cut_algorithm_changed)
 
