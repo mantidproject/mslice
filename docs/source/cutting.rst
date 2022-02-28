@@ -31,10 +31,9 @@ integrate over [0,3], [3,6], [6,9] and [9,10] respectively.
 Cuts with the same range from multiple datasets can be plotted by first selecting multiple workspaces in the left panel.
 
 There are two different methods to compute cuts: ``Rebin`` and ``Integration``.
-
-.. warning:: for mantid major releases from ``v6.40``, the default cutting algorithm has been changed from ``Rebin`` to
- ``Integration``. For more detail on this change, and cutting algorithms in general, see the *Cutting Algorithms* seciton
- below.
+**NOTE: for mantid major releases from** ``v6.40``\ **, the default cutting algorithm has been changed from** ``Rebin``
+**to** ``Integration``\ **. For more detail on this change, and cutting algorithms in general, see the** *Cutting Algorithms*
+**section below**.
 
 Clicking on the ``Norm to 1`` check box will cause the resulting cut data to be normalised such that the maximum of the data
 of each cut is unity.
@@ -97,7 +96,7 @@ Cutting Algorithms
 ------------------
 There are two different methods used to compute cuts. ``Rebin`` uses the basic rebinning algorithms directly and effectively averages
 the counts in the integration range, whilst ``Integration`` sums the counts in the integration range.
-For mantid major releases from v6.40, the default cutting algorithm has been changed from ``Rebin`` to ``Integration``. This change
+For mantid major releases from ``v6.40``, the default cutting algorithm has been changed from ``Rebin`` to ``Integration``. This change
 has been made because the ``Integration`` method can be used for both absolute and non-absolute units measurements. Conversely, for
 absolute units measurements the ``Rebin`` method will give incorrect and misleading values.
 As a result of this change, it is expected that values calculanced henceforth will differ from those calculated historically, if the
