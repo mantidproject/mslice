@@ -147,11 +147,18 @@ class CommandLineTest(unittest.TestCase):
         is_gui.return_value = True
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_workspace('test_workspace_cut_cli')
-        result = Cut(workspace)
-        signal = result.get_signal()
-        self.assertEqual(type(result), HistogramWorkspace)
-        self.assertAlmostEqual(1.129, signal[5], 2)
-        self.assertAlmostEqual(1.375, signal[8], 2)
+        #test rebin
+        rebin_result = Cut(workspace, Algorithm='Rebin')
+        rebin_signal = rebin_result.get_signal()
+        self.assertEqual(type(rebin_result), HistogramWorkspace)
+        self.assertAlmostEqual(1.129, rebin_signal[5], 2)
+        self.assertAlmostEqual(1.375, rebin_signal[8], 2)
+        #test integration
+        int_result = Cut(workspace)
+        int_signal = int_result.get_signal()
+        self.assertAlmostEqual(2.258, int_signal[5], 2)
+        self.assertAlmostEqual(1.375, int_signal[8], 2)
+
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_psd(self, get_spp):
@@ -170,18 +177,20 @@ class CommandLineTest(unittest.TestCase):
         is_gui.return_value = True
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_pixel_workspace('test_workspace_cut_psd_cli')
-        result = Cut(workspace)
-        signal = result.get_signal()
-        self.assertEqual(type(result), HistogramWorkspace)
-        self.assertEqual(128, signal[0])
-        self.assertEqual(192, signal[29])
-        self.assertEqual(429, signal[15])
-        result = Cut(workspace, Algorithm='Integration')
-        signal = result.get_signal()
-        self.assertEqual(type(result), HistogramWorkspace)
-        self.assertAlmostEqual(64, signal[0], 2)
-        self.assertAlmostEqual(192, signal[29], 2)
-        self.assertAlmostEqual(1287, signal[15], 2)
+        #test rebin
+        rebin_result = Cut(workspace, Algorithm='Rebin')
+        rebin_signal = rebin_result.get_signal()
+        self.assertEqual(type(rebin_result), HistogramWorkspace)
+        self.assertEqual(128, rebin_signal[0])
+        self.assertEqual(192, rebin_signal[29])
+        self.assertEqual(429, rebin_signal[15])
+        #test Integration
+        int_result = Cut(workspace)
+        int_signal = int_result.get_signal()
+        self.assertEqual(type(int_result), HistogramWorkspace)
+        self.assertAlmostEqual(64, int_signal[0], 2)
+        self.assertAlmostEqual(192, int_signal[29], 2)
+        self.assertAlmostEqual(1287, int_signal[15], 2)
 
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_fail_workspace_type(self, get_spp):
