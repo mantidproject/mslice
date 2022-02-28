@@ -21,8 +21,12 @@ requirements:
     - qtpy
     - setuptools
 
+  host:
+    - python {{ python }}
+    - setuptools
+
   run:
-  - python
+  - python {{ python }}
   - mantid
   - mantidqt
   - ipython
