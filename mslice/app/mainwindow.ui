@@ -428,8 +428,8 @@
      <property name="title">
       <string>Cut algorithm default</string>
      </property>
-     <addaction name="actionCutAlgoRebin"/>
      <addaction name="actionCutAlgoIntegration"/>
+     <addaction name="actionCutAlgoRebin"/>
     </widget>
     <addaction name="menuDefault_Energy_Units"/>
     <addaction name="menuEUnitConv"/>
@@ -462,7 +462,7 @@
     <string>Disabled</string>
    </property>
   </action>
-  <action name="actionCutAlgoRebin">
+  <action name="actionCutAlgoIntegration">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -470,15 +470,15 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Rebin (Averages Counts)</string>
+    <string>Integration (Sum Counts)</string>
    </property>
   </action>
-  <action name="actionCutAlgoIntegration">
+  <action name="actionCutAlgoRebin">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Integration (Sum Counts)</string>
+    <string>Rebin (Averages Counts)</string>
    </property>
   </action>
  </widget>
