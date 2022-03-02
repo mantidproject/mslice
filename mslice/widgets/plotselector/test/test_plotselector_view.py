@@ -28,7 +28,7 @@ class PlotSelectorWidgetTest(unittest.TestCase):
         self.presenter.get_initial_last_active_value = mock.Mock(side_effect=self.se_get_initial_last_active_value)
         self.presenter.is_shown_by_filter = mock.Mock(side_effect=self.se_is_shown_by_filter)
 
-        patcher = mock.patch('workbench.widgets.plotselector.view.get_icon')
+        patcher = mock.patch('mslice.widgets.plotselector.view.get_icon')
         self.mock_get_icon = patcher.start()
         self.mock_get_icon.return_value = QIcon()
         self.addCleanup(patcher.stop)
