@@ -11,12 +11,12 @@ source:
   git_tag: 592_conda_recipe
 
 build:
-  noarch: python {{ python }}
+  noarch: python
   script: python setup.py install --single-version-externally-managed --record=record.txt
 
 requirements:
   build:
-    - python
+    - python {{ python }}
     - flake8
     - qtpy
     - setuptools
