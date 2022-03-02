@@ -4,6 +4,7 @@ from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
+from matplotlib.text import Text
 
 import warnings
 import numpy as np
@@ -126,9 +127,12 @@ class CutPlot(IPlot):
     def object_clicked(self, target):
         if isinstance(target, Legend):
             return
-        quick_options(target, self)
-        self.update_legend()
-        self._canvas.draw()
+        elif isinstance(target, Text):
+            quick_options(target, self, redraw_signal=self.plot_window.redraw)
+        else:
+            quick_options(target, self)
+            self.update_legend()
+            self._canvas.draw()
 
     def update_legend(self, line_data=None):
         axes = self._canvas.figure.gca()
@@ -500,12 +504,28 @@ class CutPlot(IPlot):
         self.manager.x_range = value
 
     @property
+    def x_range_font_size(self):
+        return self.manager.x_range_font_size
+
+    @x_range_font_size.setter
+    def x_range_font_size(self, font_size):
+        self.manager.x_range_font_size = font_size
+
+    @property
     def y_range(self):
         return self.manager.y_range
 
     @y_range.setter
     def y_range(self, value):
         self.manager.y_range = value
+
+    @property
+    def y_range_font_size(self):
+        return self.manager.y_range_font_size
+
+    @y_range_font_size.setter
+    def y_range_font_size(self, font_size):
+        self.manager.y_range_font_size = font_size
 
     @property
     def x_grid(self):
