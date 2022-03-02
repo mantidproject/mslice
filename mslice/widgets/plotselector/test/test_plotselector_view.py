@@ -33,7 +33,7 @@ class PlotSelectorWidgetTest(unittest.TestCase):
         self.mock_get_icon.return_value = QIcon()
         self.addCleanup(patcher.stop)
 
-        self.view = PlotSelectorView(self.presenter)
+        self.view = PlotSelectorView()
         self.view.table_widget.setSortingEnabled(False)
 
     def se_plot_name(self, plot_number):
