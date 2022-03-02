@@ -11,9 +11,10 @@ import os
 import unittest
 
 from unittest import mock
-from workbench.widgets.plotselector.model import PlotSelectorModel
-from workbench.widgets.plotselector.presenter import PlotSelectorPresenter
-from workbench.widgets.plotselector.view import PlotSelectorView, Column
+from mslice.widgets.plotselector.column_info import Column
+from mslice.widgets.plotselector.model import PlotSelectorModel
+from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
+from mslice.widgets.plotselector.view import PlotSelectorView
 
 
 class PlotSelectorPresenterTest(unittest.TestCase):

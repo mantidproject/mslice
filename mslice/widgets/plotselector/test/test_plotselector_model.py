@@ -10,9 +10,9 @@
 import unittest
 
 from unittest import mock
-from workbench.plotting.globalfiguremanager import FigureAction
-from workbench.widgets.plotselector.model import PlotSelectorModel
-from workbench.widgets.plotselector.presenter import PlotSelectorPresenter
+from mslice.plotting.globalfiguremanager import FigureAction
+from mslice.widgets.plotselector.model import PlotSelectorModel
+from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
 
 
 class PlotSelectorModelTest(unittest.TestCase):
