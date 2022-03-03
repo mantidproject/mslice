@@ -6,6 +6,7 @@ channels:
 dependencies:
   - coverage
   - flake8
+  - ipython
   - mock
   - pip
   - pyqt
