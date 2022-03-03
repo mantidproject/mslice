@@ -13,6 +13,8 @@ from qtpy.QtWidgets import (QAbstractItemView, QAction, QActionGroup, QFileDialo
                             QMenu, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 from .column_info import Column
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
 
 from mantidqt.icons import get_icon
 from mantidqt.utils.flowlayout import FlowLayout
@@ -37,7 +39,7 @@ class PlotSelectorView(QWidget):
     deleteKeyPressed = Signal(int)
     enterKeyPressed = Signal(int)
 
-    def __init__(self, presenter, parent=None):
+    def __init__(self, presenter=None, parent=None):
         """
         Initialise a new instance of PlotSelectorWidget
         :param presenter: The presenter controlling this view
@@ -45,7 +47,10 @@ class PlotSelectorView(QWidget):
         running as a unit test, in which case skip file dialogs
         """
         super(PlotSelectorView, self).__init__(parent)
-        self.presenter = presenter
+        if presenter is not None:
+            self.presenter = presenter
+        else:
+            self.presenter = PlotSelectorPresenter(GlobalFigureManager, self)
 
         # This mutex prevents multiple operations on the table at the
         # same time. Wrap code in - with QMutexLocker(self.mutex):
