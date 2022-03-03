@@ -32,7 +32,7 @@ class PlotSelectorModelTest(unittest.TestCase):
 
         self.global_figure_manager = mock.Mock()
         self.global_figure_manager.add_observer = mock.Mock()
-        self.global_figure_manager.figs.get = mock.Mock(side_effect=self.side_effect_manager)
+        self.global_figure_manager.get_figure_by_number = mock.Mock(side_effect=self.side_effect_manager)
         self.global_figure_manager.destroy = mock.Mock()
 
         self.model = PlotSelectorModel(self.presenter, self.global_figure_manager)
@@ -100,7 +100,7 @@ class PlotSelectorModelTest(unittest.TestCase):
         self.figure_manager.window.hide.assert_called_once_with()
 
     def test_hide_plot_for_invalid_name_raises_value_error(self):
-        self.assertRaises(ValueError, self.model.hide_plot, 3)
+        self.assertRaises(ValueError, self.model.hide_plot, 0)
         self.figure_manager.window.hide.asser_not_called()
 
     # ------------------------ Plot Renaming ------------------------
