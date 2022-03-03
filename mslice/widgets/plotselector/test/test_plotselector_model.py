@@ -100,7 +100,7 @@ class PlotSelectorModelTest(unittest.TestCase):
         self.figure_manager.window.hide.assert_called_once_with()
 
     def test_hide_plot_for_invalid_name_raises_value_error(self):
-        self.assertRaises(ValueError, self.model.hide_plot, 0)
+        self.assertRaises(ValueError, self.model.hide_plot, 3)
         self.figure_manager.window.hide.asser_not_called()
 
     # ------------------------ Plot Renaming ------------------------
