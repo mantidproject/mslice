@@ -145,7 +145,8 @@ class PlotSelectorModel(object):
         GlobalFigureManager
         :param plot_number: The unique number in GlobalFigureManager
         """
-        figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
+        #figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
+        figure_manager = self.GlobalFigureManager.figs.get(plot_number)
         if figure_manager is None:
             raise ValueError('Error closing, could not find a plot with the number {}.'.format(plot_number))
 
