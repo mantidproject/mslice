@@ -1,10 +1,7 @@
-# Mantid Repository : https://github.com/mantidproject/mantid
-#
 # Copyright &copy; 2018 ISIS Rutherford Appleton Laboratory UKRI,
 #   NScD Oak Ridge National Laboratory, European Spallation Source,
 #   Institut Laue - Langevin & CSNS, Institute of High Energy Physics, CAS
 # SPDX - License - Identifier: GPL - 3.0 +
-#  This file is part of the mantid workbench.
 #
 #
 from qtpy.QtCore import Qt
@@ -15,8 +12,8 @@ import unittest
 from unittest import mock
 from mantidqt.utils.qt.testing import start_qapplication
 from mslice.widgets.plotselector.column_info import Column
-from workbench.widgets.plotselector.presenter import PlotSelectorPresenter
-from workbench.widgets.plotselector.view import EXPORT_TYPES, PlotSelectorView
+from mslice.widgets.plotselector.view import EXPORT_TYPES, PlotSelectorView
+from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
 
 
 @start_qapplication
@@ -28,7 +25,7 @@ class PlotSelectorWidgetTest(unittest.TestCase):
         self.presenter.get_initial_last_active_value = mock.Mock(side_effect=self.se_get_initial_last_active_value)
         self.presenter.is_shown_by_filter = mock.Mock(side_effect=self.se_is_shown_by_filter)
 
-        patcher = mock.patch('workbench.widgets.plotselector.view.get_icon')
+        patcher = mock.patch('mslice.widgets.plotselector.view.get_icon')
         self.mock_get_icon = patcher.start()
         self.mock_get_icon.return_value = QIcon()
         self.addCleanup(patcher.stop)
