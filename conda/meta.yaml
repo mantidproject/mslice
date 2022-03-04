@@ -28,7 +28,7 @@ requirements:
   - mantid
   - mantidqt
   - ipython
-  - matplotlib {{ matplotlib }}
+  - matplotlib
   - numpy
   - pre-commit
   - pyqt
