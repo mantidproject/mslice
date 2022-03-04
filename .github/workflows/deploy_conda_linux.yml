@@ -26,7 +26,7 @@ jobs:
           python-version: 3.8
           auto-activate-base: false
 
-      - name: Build MSlice conda package for Linux
+      - name: Build MSlice conda package
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify

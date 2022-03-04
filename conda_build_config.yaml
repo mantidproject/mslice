@@ -1,2 +1,5 @@
 python:
   - 3.8
+
+matplotlib:
+  - 3.2.1
