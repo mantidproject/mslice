@@ -30,14 +30,13 @@ jobs:
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
-          mamba build $GITHUB_WORKSPACE/conda
-          conda list mslice
-          echo $PKG_VERSION
-          echo $PKG_NAME
+          mamba build --output $GITHUB_WORKSPACE/conda
+          echo $CONDA_PREFIX
+          export $packagefile="$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: mslice-${{ PKG_VERSION }}-py38_0.tar.bz2
+          name: mslice-${{ $packagefile }}-py38_0.tar.bz2
           path: /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2
           if-no-files-found: ignore
