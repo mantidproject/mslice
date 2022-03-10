@@ -17,9 +17,10 @@ jobs:
     steps:
       - name: Checkout MSlice
         uses: actions/checkout@v2
-        with: # this is only for testing and has to be removed
-          fetch-depth: 0 # this is only for testing and has to be removed
-          ref: 592_conda_recipe # this is only for testing and has to be removed
+
+      - name: Check for changes since last build
+        run: |
+          echo "recentCommits=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo false || echo true)" >> $GITHUB_ENV
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.1.1
@@ -32,6 +33,7 @@ jobs:
           auto-activate-base: false
 
       - name: Build MSlice nightly conda package
+        if: ${{ env.recentCommits == 'true'}}
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
@@ -39,6 +41,7 @@ jobs:
           echo "artifactName=$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)" >> $GITHUB_ENV
 
       - name: Upload artifact # replace with upload to anaconda
+        if: ${{ env.recentCommits == 'true'}}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifactName }}
