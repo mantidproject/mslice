@@ -33,7 +33,7 @@ jobs:
           auto-activate-base: false
 
       - name: Build MSlice conda package
-        if: ${{ env.recentCommits == 'true'}}
+        if: ${{ env.recentCommits != 'true'}}
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
