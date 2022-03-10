@@ -1,4 +1,4 @@
-name: Build MSlice
+name: Deploy MSlice
 
 on: push # this is only for testing and has to be removed later
   #release:
@@ -34,8 +34,10 @@ jobs:
           conda install conda-build conda-verify
           mamba build --label main $GITHUB_WORKSPACE/conda
           echo "artifactName=$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)" >> $GITHUB_ENV
+          git log --since=1.day
+          git log --since=1.day main
 
-      - name: Upload artifact # replace with upload to anaconda with main label
+      - name: Upload artifact # replace with upload to anaconda
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifactName }}

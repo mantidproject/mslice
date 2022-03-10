@@ -1,8 +1,8 @@
-name: Build MSlice
+name: Deploy MSlice nightly
 
 on:
   workflow_run:
-    workflows: ["MSlice unit tests"]
+    workflows: ["MSlice nightly build"]
     branches: [main]
     types:
       - completed
@@ -31,14 +31,14 @@ jobs:
           python-version: 3.8
           auto-activate-base: false
 
-      - name: Build MSlice conda package
+      - name: Build MSlice nightly conda package
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
-          mamba build --label unstable $GITHUB_WORKSPACE/conda
+          mamba build --label nightly $GITHUB_WORKSPACE/conda
           echo "artifactName=$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)" >> $GITHUB_ENV
 
-      - name: Upload artifact # replace with upload to anaconda with unstable label
+      - name: Upload artifact # replace with upload to anaconda
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifactName }}
