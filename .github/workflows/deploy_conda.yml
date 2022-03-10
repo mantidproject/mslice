@@ -18,10 +18,6 @@ jobs:
           fetch-depth: 0
           ref: 592_conda_recipe # this is only for testing and has to be removed later
 
-      - name: Check for changes since last build
-        run: |
-          echo "recentCommits=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo false || echo true)" >> $GITHUB_ENV
-
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.1.1
         with:
@@ -33,7 +29,6 @@ jobs:
           auto-activate-base: false
 
       - name: Build MSlice conda package
-        if: ${{ env.recentCommits != 'true'}}
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
