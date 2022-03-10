@@ -21,8 +21,9 @@ jobs:
       - name: Check for changes since last build
         run: |
           test -z $(git log --since="yesterday" -1 --format=%h)
-          echo "commitsExist=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo true || echo false)" >> $GITHUB_ENV
-          echo ${{ env.commitsExist }}
+          echo "recentCommits=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo false || echo true)" >> $GITHUB_ENV
+          echo $recentCommits
+          echo ${{ env.recentCommits }}
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.1.1
@@ -40,6 +41,7 @@ jobs:
           conda install conda-build conda-verify
           mamba build --label main $GITHUB_WORKSPACE/conda
           echo "artifactName=$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)" >> $GITHUB_ENV
+          echo ${{ env.recentCommits }}
 
       - name: Upload artifact # replace with upload to anaconda
         uses: actions/upload-artifact@v2
