@@ -35,7 +35,7 @@ jobs:
         run: |
           conda config --set anaconda_upload no
           conda install conda-build conda-verify
-          mamba build $GITHUB_WORKSPACE/conda
+          mamba build --label unstable $GITHUB_WORKSPACE/conda
           echo "artifactName=$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)" >> $GITHUB_ENV
 
       - name: Upload artifact # replace with upload to anaconda with unstable label
