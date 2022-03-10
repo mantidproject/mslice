@@ -20,9 +20,7 @@ jobs:
 
       - name: Check for changes since last build
         run: |
-          git log --since="yesterday"
-          echo "attempt test"
-          test -z $(git log --since="yesterday)
+          test -z $(git log --since="yesterday")
           #echo "commitsExist=$(test -z $(git log --since="yesterday) && echo true || echo false)" >> $GITHUB_ENV
           #echo ${{ env.commitsExist }}
 
