@@ -20,8 +20,8 @@ jobs:
 
       - name: Check for changes since last build
         run: |
-          echo "commitsSinceYesterday=$(git log --since="yesterday")" >> $GITHUB_ENV
-          echo ${{ env.commitsSinceYesterday}}
+          echo "commitsExist=$(test -z $(git log --since="yesterday) && echo true || echo false)" >> $GITHUB_ENV
+          echo ${{ env.commitsExist }}
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.1.1
