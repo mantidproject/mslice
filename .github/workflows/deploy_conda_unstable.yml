@@ -1,8 +1,11 @@
 name: Build MSlice
 
-on: push # this is only for testing and has to be removed later
-  #release:
-    #types: [published]
+on:
+  workflow_run:
+    workflows: ["MSlice unit tests"]
+    branches: [main]
+    types:
+      - completed
 
 jobs:
   build_conda_and_upload:
@@ -14,9 +17,9 @@ jobs:
     steps:
       - name: Checkout MSlice
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          ref: 592_conda_recipe # this is only for testing and has to be removed later
+        with: # this is only for testing and has to be removed
+          fetch-depth: 0 # this is only for testing and has to be removed
+          ref: 592_conda_recipe # this is only for testing and has to be removed
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.1.1
@@ -35,7 +38,7 @@ jobs:
           mamba build $GITHUB_WORKSPACE/conda
           echo "artifactName=$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)" >> $GITHUB_ENV
 
-      - name: Upload artifact # replace with upload to anaconda with main label
+      - name: Upload artifact # replace with upload to anaconda with unstable label
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.artifactName }}
