@@ -1,6 +1,6 @@
 name: Deploy MSlice
 
-on: push
+on:
   release:
     types: [published]
 
