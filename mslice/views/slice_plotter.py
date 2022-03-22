@@ -12,7 +12,7 @@ def plot_cached_slice(slice_workspace, slice_cache):
 @plt.set_category(plt.CATEGORY_SLICE)
 def create_slice_figure(workspace_name, presenter):
     fig_canvas = plt.gcf().canvas
-    fig_canvas.set_window_title(workspace_name)
+    fig_canvas.manager.set_window_title(workspace_name)
     fig_canvas.manager.add_slice_plot(presenter, workspace_name)
     fig_canvas.manager.update_grid()
     plt.draw_all()

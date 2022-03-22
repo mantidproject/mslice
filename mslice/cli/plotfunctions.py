@@ -66,7 +66,7 @@ def errorbar(axes, workspace, *args, **kwargs):
     axes.set_xlabel(get_display_name(cut_axis), picker=CUT_PICKER_TOL_PTS)
     axes.set_ylabel(CUT_INTENSITY_LABEL, picker=CUT_PICKER_TOL_PTS)
     if not plot_over:
-        cur_canvas.set_window_title(workspace.name)
+        cur_canvas.manager.set_window_title(workspace.name)
         cur_canvas.manager.update_grid()
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.manager.add_cut_plot(presenter, workspace.name)
