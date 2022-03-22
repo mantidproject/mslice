@@ -1,8 +1,8 @@
 name: Deploy MSlice
 
-on: push # this is only for testing and has to be removed later
-  #release:
-    #types: [published]
+on: push
+  release:
+    types: [published]
 
 jobs:
   build_conda_and_upload:
@@ -16,7 +16,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          ref: 592_conda_recipe # this is only for testing and has to be removed later
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v2.1.1
