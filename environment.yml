@@ -1,23 +1,16 @@
-name: mslice
+name: mslice-env
 channels:
-  - defaults
+  - conda-forge
+  - mantid
+  - mantid/label/nightly
 dependencies:
+  - coverage
   - flake8
   - ipython
-  - matplotlib
   - mock
-  - numpy
-  - numpy-base
   - pip
   - pyqt
-  - qtawesome
   - qtconsole
   - qtpy
-  - scipy
-  - six
   - pip:
-      - coverage
-      - h5py
       - nose
-      - pre-commit
-      - pyyaml

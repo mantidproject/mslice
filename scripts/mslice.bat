@@ -4,13 +4,20 @@
 :: C:\MantidInstall\bin
 ::
 
-if DEFINED MANTIDPATH (
+
+set MAIN_SCRIPT=%~dp0start_mslice.py
+
+if DEFINED CONDA_PREFIX (
+  python %MAIN_SCRIPT%
+) else if DEFINED CONDA_DEFAULT_ENV (
+  python %MAIN_SCRIPT%
+) else if DEFINED MANTIDPATH (
   set MANTIDPYTHON=%MANTIDPATH%\mantidpython.bat
 ) else (
   set MANTIDPYTHON=C:\MantidInstall\bin\mantidpython.bat
 )
+
 set MANTIDPYTHON_ARGS=--classic
-set MAIN_SCRIPT=%~dp0start_mslice.py
 
 :: Run
 %MANTIDPYTHON% %MANTIDPYTHON_ARGS% %MAIN_SCRIPT%
