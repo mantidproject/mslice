@@ -1,10 +1,7 @@
-# Mantid Repository : https://github.com/mantidproject/mantid
-#
 # Copyright &copy; 2018 ISIS Rutherford Appleton Laboratory UKRI,
 #   NScD Oak Ridge National Laboratory, European Spallation Source,
 #   Institut Laue - Langevin & CSNS, Institute of High Energy Physics, CAS
 # SPDX - License - Identifier: GPL - 3.0 +
-#  This file is part of the mantid workbench.
 #
 #
 import re
@@ -13,12 +10,12 @@ from qtpy.QtWidgets import (QAbstractItemView, QAction, QActionGroup, QFileDialo
                             QMenu, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 from .column_info import Column
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
 
 from mantidqt.icons import get_icon
 from mantidqt.utils.flowlayout import FlowLayout
 from mantidqt.utils.qt.qappthreadcall import QAppThreadCall
-from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
 
 DEBUG_MODE = False
 
@@ -39,7 +36,7 @@ class PlotSelectorView(QWidget):
     deleteKeyPressed = Signal(int)
     enterKeyPressed = Signal(int)
 
-    def __init__(self, parent=None):
+    def __init__(self, presenter=None, parent=None):
         """
         Initialise a new instance of PlotSelectorWidget
         :param presenter: The presenter controlling this view
@@ -47,7 +44,10 @@ class PlotSelectorView(QWidget):
         running as a unit test, in which case skip file dialogs
         """
         super(PlotSelectorView, self).__init__(parent)
-        self.presenter = PlotSelectorPresenter(GlobalFigureManager, self)
+        if presenter is not None:
+            self.presenter = presenter
+        else:
+            self.presenter = PlotSelectorPresenter(GlobalFigureManager, self)
 
         # This mutex prevents multiple operations on the table at the
         # same time. Wrap code in - with QMutexLocker(self.mutex):
