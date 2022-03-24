@@ -1,5 +1,7 @@
+from distutils.version import LooseVersion
 from functools import partial
 
+from matplotlib import __version__ as mpl_version
 from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
@@ -398,7 +400,8 @@ class CutPlot(IPlot):
                     line.set_xdata(self._waterfall_cache[line][0] + ind * x)
                     line.set_ydata(self._waterfall_cache[line][1] + ind * y)
                 elif isinstance(line, LineCollection):
-                    line.set_offset_position('data')
+                    if LooseVersion(mpl_version) < LooseVersion('3.3'):
+                        line.set_offset_position('data') # set_offset_position is deprecated since 3.3
                     line.set_offsets((ind * x, ind * y))
 
     def on_newplot(self, ax):
