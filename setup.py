@@ -90,15 +90,6 @@ install_requires = setup_args['install_requires'] = \
 setup_args['tests_require'] = read_requirements_from_file(os.path.join(THIS_DIR, 'test-requirements.txt')) \
     + install_requires
 
-# Startup scripts - these use the mantidpython wrappers so we cannot
-# go through the entry_points mechanism
-#scripts = ['scripts/start_mslice.py']
-#if os.name == 'nt':
-#    scripts.append('scripts/mslice.bat')
-#else:
-#    scripts.append('scripts/mslice')
-#setup_args['scripts'] = scripts
-
 # ==============================================================================
 # Main setup
 # ==============================================================================
