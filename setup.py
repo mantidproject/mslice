@@ -67,12 +67,13 @@ setup_args = dict(name=NAME,
                   packages=find_packages(exclude=["misc"]),
                   package_data=get_package_data(),
                   data_files=get_data_files(),
+                  entry_points={"console_scripts" : ["mslice = mslice.app:main"]},
                   # Install this as a directory
                   zip_safe=False,
                   classifiers=['Operating System :: MacOS',
                                'Operating System :: Microsoft :: Windows',
                                'Operating System :: POSIX :: Linux',
-                               'Programming Language :: Python :: 2.7',
+                               'Programming Language :: Python :: 3.8',
                                'Development Status :: 4 - Beta',
                                'Topic :: Scientific/Engineering'])
 
@@ -88,15 +89,6 @@ install_requires = setup_args['install_requires'] = \
 # Testing requires
 setup_args['tests_require'] = read_requirements_from_file(os.path.join(THIS_DIR, 'test-requirements.txt')) \
     + install_requires
-
-# Startup scripts - these use the mantidpython wrappers so we cannot
-# go through the entry_points mechanism
-scripts = ['scripts/start_mslice.py']
-if os.name == 'nt':
-    scripts.append('scripts/mslice.bat')
-else:
-    scripts.append('scripts/mslice')
-setup_args['scripts'] = scripts
 
 # ==============================================================================
 # Main setup

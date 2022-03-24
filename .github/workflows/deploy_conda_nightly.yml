@@ -1,0 +1,50 @@
+name: Deploy MSlice nightly
+
+on:
+  workflow_run:
+    workflows: ["MSlice nightly build"]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  build_conda_and_upload:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout MSlice
+        uses: actions/checkout@v2
+
+      - name: Check for changes since last build
+        run: |
+          echo "recentCommits=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo false || echo true)" >> $GITHUB_ENV
+
+      - name: Setup Miniconda
+        if: ${{ env.recentCommits == 'true'}}
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
+          activate-environment: mslice-env
+          environment-file: environment.yml
+          python-version: 3.8
+          auto-activate-base: false
+
+      - name: Build MSlice nightly conda package
+        if: ${{ env.recentCommits == 'true'}}
+        run: |
+          conda config --set anaconda_upload no
+          conda install conda-build conda-verify
+          mamba build --label nightly $GITHUB_WORKSPACE/conda
+          echo "artifactName=$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)" >> $GITHUB_ENV
+
+      - name: Upload artifact # replace with upload to anaconda
+        if: ${{ env.recentCommits == 'true'}}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.artifactName }}
+          path: /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2
+          if-no-files-found: ignore
