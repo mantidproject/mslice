@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Checkout MSlice
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: main
 
       - name: Check for changes since last build
         run: |
