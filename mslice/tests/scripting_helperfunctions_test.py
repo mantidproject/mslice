@@ -277,8 +277,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_cut_lines_with_width(errorbars, script_lines, cuts)
 
         self.assertIn(
-            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, Algorithm={})\n'.format(
-                0, 'ws_name', cuts[0].cut_axis, cuts[0].integration_axis, cuts[0].norm_to_one, "\"Integration\""),
+            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={})\n'.format(
+                0, 'ws_name', cuts[0].cut_axis, cuts[0].integration_axis, cuts[0].norm_to_one),
             script_lines)
 
         self.assertIn(
@@ -319,16 +319,16 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_cut_lines_with_width(errorbars, script_lines, cuts)
 
         self.assertIn(
-            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, Algorithm={})\n'.format(
-                0, 'ws_0', cuts[0].cut_axis, "DeltaE,-1.0,0.0,0.0", cuts[0].norm_to_one, "\"Integration\""), script_lines)
+            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={})\n'.format(
+                0, 'ws_0', cuts[0].cut_axis, "DeltaE,-1.0,0.0,0.0", cuts[0].norm_to_one), script_lines)
 
         self.assertIn(
-            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, Algorithm={})\n'.format(
-                1, 'ws_0', cuts[0].cut_axis, "DeltaE,0.0,1.0,0.0", cuts[0].norm_to_one, "\"Integration\""), script_lines)
+            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={})\n'.format(
+                1, 'ws_0', cuts[0].cut_axis, "DeltaE,0.0,1.0,0.0", cuts[0].norm_to_one), script_lines)
 
         self.assertIn(
-            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, Algorithm={})\n'.format(
-                2, 'ws_1', cuts[1].cut_axis, cuts[1].integration_axis, cuts[1].norm_to_one, "\"Integration\""),
+            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={})\n'.format(
+                2, 'ws_1', cuts[1].cut_axis, cuts[1].integration_axis, cuts[1].norm_to_one),
             script_lines)
 
         # Each mc.Cut statement has a corresponding errorbar statement
