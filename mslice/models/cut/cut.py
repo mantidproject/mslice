@@ -2,7 +2,7 @@ class Cut(object):
     """Groups parameters needed to cut and validates them"""
 
     def __init__(self, cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one=False, width=None,
-                 algorithm='Rebin'):
+                 algorithm='Integration'):
         self.cut_axis = cut_axis
         self.integration_axis = integration_axis
         self.intensity_start = intensity_start

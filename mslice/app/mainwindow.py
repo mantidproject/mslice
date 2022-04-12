@@ -111,6 +111,8 @@ class MainWindow(MainView, QMainWindow):
         self.actionCutAlgoRebin.triggered.connect(partial(self.set_cut_algorithm_default, 'Rebin'))
         self.actionCutAlgoIntegration.triggered.connect(partial(self.set_cut_algorithm_default, 'Integration'))
 
+        self.print_startup_notifications()
+
     def setup_save(self):
         menu = QMenu()
         menu.addAction("Nexus (*.nxs)", lambda: self.button_save('Nexus'))
@@ -201,6 +203,7 @@ class MainWindow(MainView, QMainWindow):
 
     def setup_ipython(self):
         ipython = IPythonWidget()
+        self._console = ipython
         self.splitter.addWidget(ipython)
         self.splitter.setSizes([500, 250])
 
@@ -257,3 +260,13 @@ class MainWindow(MainView, QMainWindow):
 
     def is_energy_conversion_allowed(self):
         return self.actionEUnitConvEnabled.isChecked()
+
+    def print_startup_notifications(self):
+        #if notifications are required to be printed on mslice start up, add to list.
+        print_list = ["WARNING: The default cut algorithm in mslice has been changed from 'Rebin (average counts)'\n\
+         to 'Intergration (summed counts)'. This is expected to result in different output values\n\
+         to those obtained historically. For more information, please refer to documentation at:\n\
+         https://mantidproject.github.io/mslice/cutting.html"]
+
+        for item in print_list:
+            print(item)
