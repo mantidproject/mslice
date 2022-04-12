@@ -27,7 +27,7 @@ jobs:
 
       - name: Install Mantid
         run: |
-          conda install mantid mantidqt
+          conda install -c mantid/label/nightly mantid mantidqt
 
       - name: Flake8
         run: |
