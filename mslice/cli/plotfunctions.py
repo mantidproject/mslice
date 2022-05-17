@@ -103,13 +103,16 @@ def pcolormesh(axes, workspace, *args, **kwargs):
     intensity = kwargs.pop('intensity', None)
     temperature = kwargs.pop('temperature', None)
 
+    plot_handler = GlobalFigureManager.get_active_figure().plot_handler
+    plot_handler.on_newplot()
+
     if temperature is not None:
         get_slice_plotter_presenter().set_sample_temperature(workspace.name[2:], temperature)
 
     if intensity is not None and intensity != 's(q,e)':
         workspace = getattr(slice_cache, _intensity_to_workspace[intensity])
         plot_window = GlobalFigureManager.get_active_figure().window
-        plot_handler = GlobalFigureManager.get_active_figure().plot_handler
+
         intensity_action = getattr(plot_window, _intensity_to_action[intensity])
         plot_handler.set_intensity(intensity_action)
         intensity_action.setChecked(True)
@@ -128,6 +131,7 @@ def pcolormesh(axes, workspace, *args, **kwargs):
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)
+
     axesfunctions.pcolormesh(axes, workspace.raw_ws, *args, **kwargs)
     axes.set_title(workspace.name[2:], picker=SLICE_PICKER_TOL_PTS)
     x_axis = slice_cache.energy_axis if slice_cache.rotated else slice_cache.momentum_axis
