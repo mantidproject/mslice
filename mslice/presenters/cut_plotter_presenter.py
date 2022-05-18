@@ -107,7 +107,7 @@ class CutPlotterPresenter(PresenterUtility):
             scale_fac = np.nanmax(ws_handle.get_signal()) / 10
         except KeyError:
             # Workspace is interactively generated and is not in the workspace list
-            scale_fac = 1
+            scale_fac = 90
             workspace_name = workspace_name.split('(')[0][:-4]
         if cache.rotated:
             q_axis = cache.integration_axis
