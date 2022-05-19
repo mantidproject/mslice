@@ -165,7 +165,11 @@ class CutPlot(IPlot):
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
             min = get_min(xdata, absolute_minimum=0.)
             self.x_axis_min = min
-            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(min))))
+            if LooseVersion(mpl_version) < LooseVersion('3.3'):
+                current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(min))))
+            else:
+                current_axis.set_xscale('symlog', linthresh=pow(10, np.floor(np.log10(min))))
+
             if xmin > 0:
                 xy_config['x_range'] = (xmin, xy_config['x_range'][1])
         else:
@@ -175,7 +179,11 @@ class CutPlot(IPlot):
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
             min = get_min(ydata, absolute_minimum=0.)
             self.y_axis_min = min
-            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(min))))
+            if LooseVersion(mpl_version) < LooseVersion('3.3'):
+                current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(min))))
+            else:
+                current_axis.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10(min))))
+
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
         else:
