@@ -100,8 +100,10 @@ class InteractiveCut(object):
     def clear(self):
         self._cut_plotter_presenter.set_is_icut(False)
         self.rect.set_active(False)
+        self.rect.set_visible(False)
         for event in self.connect_event:
             self._canvas.mpl_disconnect(event)
+
         self._canvas.draw()
 
     def flip_axis(self):
