@@ -205,6 +205,9 @@ class SlicePlot(IPlot):
         if logarithmic:
             if vmin <= float(0):
                 vmin = 0.001
+            if vmax <= float(0):
+                vmax = 0.001
+
             norm = colors.LogNorm(vmin, vmax)
         else:
             norm = colors.Normalize(vmin, vmax)
