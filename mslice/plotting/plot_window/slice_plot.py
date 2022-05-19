@@ -425,6 +425,18 @@ class SlicePlot(IPlot):
     def update_workspaces(self):
         self._slice_plotter_presenter.update_displayed_workspaces()
 
+    def on_newplot(self):
+        # This callback should be activated by a call to pcolormesh
+        self.plot_window.action_hydrogen.setChecked(False)
+        self.plot_window.action_deuterium.setChecked(False)
+        self.plot_window.action_helium.setChecked(False)
+        self.plot_window.action_arbitrary_nuclei.setChecked(False)
+        self.plot_window.action_aluminium.setChecked(False)
+        self.plot_window.action_copper.setChecked(False)
+        self.plot_window.action_niobium.setChecked(False)
+        self.plot_window.action_tantalum.setChecked(False)
+        self.plot_window.action_cif_file.setChecked(False)
+
     def generate_script(self, clipboard=False):
         try:
             generate_script(self.ws_name, None, self, self.plot_window, clipboard)
