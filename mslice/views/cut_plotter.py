@@ -50,6 +50,9 @@ def plot_cut_impl(workspace, intensity_range=None, plot_over=False, legend=None,
     if cur_fig.canvas.manager.plot_handler.default_options is None:
         cur_fig.canvas.manager.plot_handler.save_default_options()
 
+    if cur_fig.canvas.manager.plot_handler.is_icut():
+        cur_fig.canvas.manager.plot_handler.update_bragg_peaks()
+
     return ax.lines
 
 

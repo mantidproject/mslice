@@ -48,6 +48,7 @@ class CutPlot(IPlot):
         self.default_options = None
         self._waterfall_cache = {}
         self._is_icut = False
+        self._powder_lines = {}
 
     def save_default_options(self):
         self.default_options = {
@@ -312,6 +313,20 @@ class CutPlot(IPlot):
         self.plot_window.raise_()
         self._is_icut = is_icut
 
+    def is_icut(self):
+        return self._is_icut
+
+    def update_bragg_peaks(self):
+        if self.plot_window.action_aluminium.isChecked():
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, cif=None)
+        if self.plot_window.action_copper.isChecked():
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, cif=None)
+        if self.plot_window.action_niobium.isChecked():
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, cif=None)
+        if self.plot_window.action_tantalum.isChecked():
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, cif=None)
+        self.update_legend()
+
     def save_icut(self):
         icut = self._cut_plotter_presenter.get_icut()
         return icut.save_cut()
@@ -411,11 +426,12 @@ class CutPlot(IPlot):
         num_lines = len(line_containers)
         self.plot_window.action_waterfall.setEnabled(num_lines > 1)
         self.plot_window.toggle_waterfall_edit()
-        self.plot_window.action_aluminium.setChecked(False)
-        self.plot_window.action_copper.setChecked(False)
-        self.plot_window.action_niobium.setChecked(False)
-        self.plot_window.action_tantalum.setChecked(False)
-        self.plot_window.action_cif_file.setChecked(False)
+        if not self._is_icut:
+            self.plot_window.action_aluminium.setChecked(False)
+            self.plot_window.action_copper.setChecked(False)
+            self.plot_window.action_niobium.setChecked(False)
+            self.plot_window.action_tantalum.setChecked(False)
+            self.plot_window.action_cif_file.setChecked(False)
         all_lines = [line for container in line_containers for line in container.get_children()]
         for cached_lines in list(self._waterfall_cache.keys()):
             if cached_lines not in all_lines:
