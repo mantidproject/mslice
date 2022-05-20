@@ -16,20 +16,15 @@ def _update_overplot_lines(plotter_presenter, ws_name, lines):
             plotter_presenter.add_overplot_line(ws_name, *lines[line])
 
 
-def _get_powder_lines(plot_handler):
+def _update_powder_lines(plot_handler, plotter_presenter):
+    """ Updates the powder overplots lines when intensity type changes """
     lines = {plot_handler.plot_window.action_aluminium: ['Aluminium', False, ''],
              plot_handler.plot_window.action_copper: ['Copper', False, ''],
              plot_handler.plot_window.action_niobium: ['Niobium', False, ''],
              plot_handler.plot_window.action_tantalum: ['Tantalum', False, ''],
              plot_handler.plot_window.action_cif_file: [plot_handler._cif_file,
                                                         False, plot_handler._cif_path]}
-
-    return lines
-
-
-def _update_powder_lines(plot_handler, plotter_presenter):
-    """ Updates the powder overplot lines when intensity type changes """
-    _update_overplot_lines(plotter_presenter, plot_handler.ws_name, _get_powder_lines(plot_handler))
+    _update_overplot_lines(plotter_presenter, plot_handler.ws_name, lines)
 
 
 def toggle_overplot_line(plot_handler, plotter_presenter, key, recoil, checked, cif_file=None):
