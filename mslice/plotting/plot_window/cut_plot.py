@@ -17,7 +17,7 @@ from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line,\
-    cif_file_powder_line
+    cif_file_powder_line, _update_overplot_lines, _get_powder_lines
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 
@@ -48,6 +48,9 @@ class CutPlot(IPlot):
         self.default_options = None
         self._waterfall_cache = {}
         self._is_icut = False
+        self._powder_lines = {}
+        self._cif_file = None
+        self._cif_path = None
 
     def save_default_options(self):
         self.default_options = {
@@ -319,6 +322,15 @@ class CutPlot(IPlot):
     def flip_icut(self):
         icut = self._cut_plotter_presenter.get_icut()
         icut.flip_axis()
+
+    def is_icut(self):
+        return self._is_icut
+
+    def save_powder_lines(self):
+        self._powder_lines = _get_powder_lines(self)
+
+    def restore_powder_lines(self):
+        _update_overplot_lines(self._cut_plotter_presenter, self.ws_name, self._powder_lines)
 
     def _get_line_index(self, line):
         """
