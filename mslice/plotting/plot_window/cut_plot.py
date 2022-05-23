@@ -1,7 +1,5 @@
-from distutils.version import LooseVersion
 from functools import partial
 
-from matplotlib import __version__ as mpl_version
 from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
@@ -16,7 +14,7 @@ from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
-from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line,\
+from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line, \
     cif_file_powder_line
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
@@ -407,8 +405,8 @@ class CutPlot(IPlot):
                 elif isinstance(line, LineCollection):
                     for index, path in enumerate(line._paths):
                         if not np.isnan(path.vertices).any():
-                            path.vertices = np.add(self._waterfall_cache[line][index], \
-                                            np.array([[ind * x, ind * y], [ind * x, ind * y]]))
+                            path.vertices = np.add(self._waterfall_cache[line][index],
+                                                   np.array([[ind * x, ind * y], [ind * x, ind * y]]))
 
     def on_newplot(self, ax):
         # This callback should be activated by a call to errorbar
