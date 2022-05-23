@@ -123,14 +123,13 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
     add_cut_lines(script_lines, plot_handler, ax)
     add_plot_options(script_lines, plot_handler)
 
-    x_axis_str = "x" if LooseVersion(mpl_version) < LooseVersion('3.3') else ""
-    y_axis_str = "y" if LooseVersion(mpl_version) < LooseVersion('3.3') else ""
-
     if plot_handler.is_changed("x_log"):
+        x_axis_str = "x" if LooseVersion(mpl_version) < LooseVersion('3.3') else ""
         script_lines.append(f"ax.set_xscale('symlog', "
                             f"linthresh{x_axis_str}=pow(10, np.floor(np.log10({plot_handler.x_axis_min}))))\n")
 
     if plot_handler.is_changed("y_log"):
+        y_axis_str = "y" if LooseVersion(mpl_version) < LooseVersion('3.3') else ""
         script_lines.append(f"ax.set_yscale('symlog', "
                             f"linthresh{y_axis_str}=pow(10, np.floor(np.log10({plot_handler.y_axis_min}))))\n")
 
