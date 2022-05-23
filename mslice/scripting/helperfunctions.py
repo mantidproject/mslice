@@ -135,7 +135,7 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
                             f"linthresh{x_axis_str}=pow(10, np.floor(np.log10({plot_handler.x_axis_min}))))\n")
 
     if plot_handler.is_changed("y_log"):
-        script_lines.append(f"ax.set_xscale('symlog', "
+        script_lines.append(f"ax.set_yscale('symlog', "
                             f"linthresh{y_axis_str}=pow(10, np.floor(np.log10({plot_handler.y_axis_min}))))\n")
 
 def add_cut_lines(script_lines, plot_handler, ax):
