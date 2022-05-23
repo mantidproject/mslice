@@ -391,18 +391,24 @@ class CutPlot(IPlot):
             self._apply_offset(0., 0.)
         self._canvas.draw()
 
+    def _cache_line(self, line):
+        if isinstance(line, Line2D):
+            self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
+        elif isinstance(line, LineCollection):
+            self._waterfall_cache[line] = [np.copy(path.vertices) for path in line._paths]
+
     def _apply_offset(self, x, y):
         for ind, line_containers in enumerate(self._canvas.figure.gca().containers):
             for line in line_containers.get_children():
+                line not in self._waterfall_cache and self._cache_line(line)
                 if isinstance(line, Line2D):
-                    if line not in self._waterfall_cache:
-                        self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
                     line.set_xdata(self._waterfall_cache[line][0] + ind * x)
                     line.set_ydata(self._waterfall_cache[line][1] + ind * y)
                 elif isinstance(line, LineCollection):
-                    if LooseVersion(mpl_version) < LooseVersion('3.3'):
-                        line.set_offset_position('data') # set_offset_position is deprecated since 3.3
-                    line.set_offsets((ind * x, ind * y))
+                    for index, path in enumerate(line._paths):
+                        if not np.isnan(path.vertices).any():
+                            path.vertices = np.add(self._waterfall_cache[line][index], \
+                                            np.array([[ind * x, ind * y], [ind * x, ind * y]]))
 
     def on_newplot(self, ax):
         # This callback should be activated by a call to errorbar
