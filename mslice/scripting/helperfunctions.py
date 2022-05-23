@@ -126,6 +126,9 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
     if LooseVersion(mpl_version) < LooseVersion('3.3'):
         x_axis_str = "x"
         y_axis_str = "y"
+    else:
+        x_axis_str = ""
+        y_axis_str = ""
 
     if plot_handler.is_changed("x_log"):
         script_lines.append(f"ax.set_xscale('symlog', "
