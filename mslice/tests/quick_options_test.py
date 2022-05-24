@@ -41,7 +41,7 @@ class QuickOptionsTest(unittest.TestCase):
     @patch.object(QuickLineOptions, 'exec_', lambda x: None)
     @patch('mslice.presenters.quick_options_presenter.quick_line_options')
     def test_line(self, line_options_mock):
-        target = Line2D([], [], 3, '-', 'red', 'o', label='label1')
+        target = Line2D([], [], 3.0, '-', 'red', 'o', label='label1')
         quick_options(target, self.model)
         line_options_mock.assert_called_once_with(target, self.model)
 
