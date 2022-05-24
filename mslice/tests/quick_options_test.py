@@ -17,10 +17,10 @@ def setup_line_values(qlo_mock):
     type(quick_line_options).marker = PropertyMock(return_value='.')
     type(quick_line_options).color = PropertyMock(return_value='blue')
     type(quick_line_options).style = PropertyMock(return_value='--')
-    type(quick_line_options).width = PropertyMock(return_value='5')
+    type(quick_line_options).width = PropertyMock(return_value='5.0')
     type(quick_line_options).label = PropertyMock(return_value='label2')
     type(quick_line_options).shown = PropertyMock(return_value=True)
-    target = Line2D([], [], 3, '-', 'red', 'o', label='label1')
+    target = Line2D([], [], 3.0, '-', 'red', 'o', label='label1')
     return qlo_mock, target
 
 
@@ -68,12 +68,12 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
-            {'shown': None, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3',
+            {'shown': None, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3.0',
              'marker': 'o', 'legend': None, 'error_bar': None}, True)
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
                              {'shown': None, 'color': '#0000ff', 'label': u'label2',
-                              'style': '--', 'width': '5', 'marker': '.', 'legend': None,
+                              'style': '--', 'width': '5.0', 'marker': '.', 'legend': None,
                               'error_bar': None})
 
     @patch('mslice.plotting.plot_window.cut_plot.CutPlot.show_legends', new_callable=PropertyMock(return_value=True))
@@ -97,12 +97,12 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
-            {'shown': True, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3',
+            {'shown': True, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3.0',
              'marker': 'o', 'legend': True, 'error_bar': False}, True)
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
                              {'shown': True, 'color': '#0000ff', 'label': u'label2',
-                              'style': '--', 'width': '5', 'marker': '.', 'legend': True, 'error_bar': False})
+                              'style': '--', 'width': '5.0', 'marker': '.', 'legend': True, 'error_bar': False})
 
     @patch.object(QuickAxisOptions, '__init__', lambda t, u, v, w, x, y, z: None)
     @patch.object(QuickAxisOptions, 'range_min', PropertyMock(return_value='0'))
@@ -222,7 +222,7 @@ class QuickLineTest(unittest.TestCase):
         type(self.view).color = color
         style = PropertyMock(return_value=2)
         type(self.view).style = style
-        width = PropertyMock(return_value=3)
+        width = PropertyMock(return_value=3.0)
         type(self.view).width = width
         marker = PropertyMock(return_value=4)
         type(self.view).marker = marker
@@ -250,7 +250,7 @@ class QuickLineTest(unittest.TestCase):
         type(self.view).legend = legend
         self.view.exec_ = MagicMock(return_value=True)
         quick_options(self.target, self.model)
-        values = {'color': 1, 'style': 2, 'width': 3, 'marker': 4, 'label': 5, 'shown': False, 'legend': False,
+        values = {'color': 1, 'style': 2, 'width': 3.0, 'marker': 4, 'label': 5, 'shown': False, 'legend': False,
                   'error_bar': True}
         self.model.set_line_options.assert_called_once_with(self.target, values)
 
