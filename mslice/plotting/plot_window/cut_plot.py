@@ -247,7 +247,7 @@ class CutPlot(IPlot):
             'shown': self.get_line_visible(line_index),
             'color': to_hex(line.get_color()),
             'style': line.get_linestyle(),
-            'width': str(int(line.get_linewidth())),
+            'width': str(line.get_linewidth()),
             'marker': line.get_marker(),
             'error_bar': self._single_line_has_error_bars(line_index)
         }
