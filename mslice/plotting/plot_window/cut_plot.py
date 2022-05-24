@@ -11,7 +11,7 @@ from matplotlib.text import Text
 import warnings
 import numpy as np
 
-from mslice.models.colors import to_hex
+from mslice.models.colors import to_hex, name_to_color
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
@@ -208,7 +208,7 @@ class CutPlot(IPlot):
             line.set_label(line_options['label'])
             line.set_linestyle(line_options['style'])
             line.set_marker(line_options['marker'])
-            line.set_color(line_options['color'])
+            line.set_color(name_to_color(line_options['color']))
             line.set_linewidth(line_options['width'])
 
     def get_all_line_options(self):
@@ -267,7 +267,7 @@ class CutPlot(IPlot):
         self.toggle_errorbar(line_index, line_options)
 
         for child in container.get_children():
-            child.set_color(line_options['color'])
+            child.set_color(name_to_color(line_options['color']))
             child.set_linewidth(line_options['width'])
             child.set_visible(line_options['shown'])
 

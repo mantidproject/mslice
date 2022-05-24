@@ -14,10 +14,10 @@ class ColorsTest(unittest.TestCase):
             self.assertTrue(':' not in name)
 
     def test_known_color_name_gives_expected_hex(self):
-        self.assertEqual("#008000", name_to_color("green"))
+        self.assertEqual("#2ca02c", name_to_color("green"))
 
     def test_known_hex_gives_expected_color_name(self):
-        self.assertEqual("green", color_to_name("#008000"))
+        self.assertEqual("green", color_to_name("#2ca02c"))
 
     def test_unknown_color_name_raises_valueerror(self):
         self.assertRaises(ValueError, name_to_color, "NotAColorName")
@@ -26,7 +26,7 @@ class ColorsTest(unittest.TestCase):
         self.assertRaises(ValueError, color_to_name, "#12345")
 
     def test_basic_color_is_known(self):
-        self.assertEqual('c', color_to_name('#00bfbf'))
+        self.assertEqual('cyan', color_to_name('#17becf'))
 
 
 if __name__ == '__main__':
