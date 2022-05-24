@@ -1,7 +1,7 @@
 import pickle
 import codecs
 
-from mantid.simpleapi import DeleteWorkspace
+from mantid.simpleapi import DeleteWorkspace, RenameWorkspace
 
 
 def _attribute_from_string(ws, comstr):
@@ -88,6 +88,12 @@ def delete_workspace(workspace, ws):
         # where you receive a RuntimeError: Variable invalidated, data has been deleted.
         # error
         pass
+
+
+def rename_workspace(old_name: str, new_name: str) -> None:
+    """Rename a workspace stored in the ADS."""
+    RenameWorkspace(InputWorkspace=old_name, OutputWorkspace=new_name)
+
 
 class WrapWorkspaceAttribute(object):
 
