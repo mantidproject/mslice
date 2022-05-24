@@ -168,7 +168,6 @@ class SlicePlot(IPlot):
                     quick_options('y_range', self, redraw_signal=self.plot_window.redraw)
                 elif x > bounds['colorbar_range']:
                     quick_options('colorbar_range', self, self.colorbar_log, redraw_signal=self.plot_window.redraw)
-            self._canvas.draw()
 
     def object_clicked(self, target):
         if isinstance(target, Legend):
