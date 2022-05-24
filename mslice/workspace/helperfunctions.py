@@ -92,7 +92,8 @@ def delete_workspace(workspace, ws):
 
 def rename_workspace(old_name: str, new_name: str) -> None:
     """Rename a workspace stored in the ADS."""
-    RenameWorkspace(InputWorkspace=old_name, OutputWorkspace=new_name)
+    if new_name != old_name:
+        RenameWorkspace(InputWorkspace=old_name, OutputWorkspace=new_name)
 
 
 class WrapWorkspaceAttribute(object):
