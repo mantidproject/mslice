@@ -20,7 +20,7 @@ def setup_line_values(qlo_mock):
     type(quick_line_options).width = PropertyMock(return_value='5')
     type(quick_line_options).label = PropertyMock(return_value='label2')
     type(quick_line_options).shown = PropertyMock(return_value=True)
-    target = Line2D([], [], 3, '-', 'red', 'o', label='label1')
+    target = Line2D([], [], 3, '-', '#d62728', 'o', label='label1')
     return qlo_mock, target
 
 
@@ -68,11 +68,11 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
-            {'shown': None, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3',
+            {'shown': None, 'color': '#d62728', 'label': u'label1', 'style': '-', 'width': '3',
              'marker': 'o', 'legend': None, 'error_bar': None}, True)
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
-                             {'shown': None, 'color': '#0000ff', 'label': u'label2',
+                             {'shown': None, 'color': '#1f77b4', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': None,
                               'error_bar': None})
 
@@ -97,11 +97,11 @@ class QuickOptionsTest(unittest.TestCase):
         quick_options(target, model)
         # check view is called with existing line parameters
         qlo_mock.assert_called_with(
-            {'shown': True, 'color': '#ff0000', 'label': u'label1', 'style': '-', 'width': '3',
+            {'shown': True, 'color': '#d62728', 'label': u'label1', 'style': '-', 'width': '3',
              'marker': 'o', 'legend': True, 'error_bar': False}, True)
         # check model is updated with parameters from view
         self.assertDictEqual(model.get_line_options(target),
-                             {'shown': True, 'color': '#0000ff', 'label': u'label2',
+                             {'shown': True, 'color': '#1f77b4', 'label': u'label2',
                               'style': '--', 'width': '5', 'marker': '.', 'legend': True, 'error_bar': False})
 
     @patch.object(QuickAxisOptions, '__init__', lambda t, u, v, w, x, y, z: None)
