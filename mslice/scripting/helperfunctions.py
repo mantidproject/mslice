@@ -1,6 +1,8 @@
 from datetime import datetime
+from distutils.version import LooseVersion
 from mslice.cli.helperfunctions import _function_to_intensity
 from mslice.models.labels import get_recoil_key
+from matplotlib import __version__ as mpl_version
 
 COMMON_PACKAGES = ["import mslice.cli as mc", "import mslice.plotting.pyplot as plt\n\n"]
 MPL_COLORS_IMPORT = ["\nimport matplotlib.colors as colors\n"]
@@ -122,13 +124,14 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
     add_plot_options(script_lines, plot_handler)
 
     if plot_handler.is_changed("x_log"):
-        script_lines.append("ax.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
-            plot_handler.x_axis_min))
+        x_axis_str = "x" if LooseVersion(mpl_version) < LooseVersion('3.3') else ""
+        script_lines.append(f"ax.set_xscale('symlog', "
+                            f"linthresh{x_axis_str}=pow(10, np.floor(np.log10({plot_handler.x_axis_min}))))\n")
 
     if plot_handler.is_changed("y_log"):
-        script_lines.append("ax.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10({}))))\n".format(
-            plot_handler.y_axis_min))
-
+        y_axis_str = "y" if LooseVersion(mpl_version) < LooseVersion('3.3') else ""
+        script_lines.append(f"ax.set_yscale('symlog', "
+                            f"linthresh{y_axis_str}=pow(10, np.floor(np.log10({plot_handler.y_axis_min}))))\n")
 
 def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]

@@ -164,9 +164,13 @@ class CutPlot(IPlot):
         if xy_config['x_log']:
             xmin = xy_config['x_range'][0]
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-            min = get_min(xdata, absolute_minimum=0.)
-            self.x_axis_min = min
-            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(min))))
+            self.x_axis_min = get_min(xdata, absolute_minimum=0.)
+            linthresh_val = pow(10, np.floor(np.log10(self.x_axis_min)))
+
+            kwargs = {'linthreshx': linthresh_val} if LooseVersion(mpl_version) < LooseVersion('3.3') \
+                else {'linthresh': linthresh_val}
+            current_axis.set_xscale('symlog', **kwargs)
+
             if xmin > 0:
                 xy_config['x_range'] = (xmin, xy_config['x_range'][1])
         else:
@@ -174,9 +178,13 @@ class CutPlot(IPlot):
         if xy_config['y_log']:
             ymin = xy_config['y_range'][0]
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-            min = get_min(ydata, absolute_minimum=0.)
-            self.y_axis_min = min
-            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(min))))
+            self.y_axis_min = get_min(ydata, absolute_minimum=0.)
+            linthresh_val = pow(10, np.floor(np.log10(self.y_axis_min)))
+
+            kwargs = {'linthreshy': linthresh_val} if LooseVersion(mpl_version) < LooseVersion('3.3') \
+                else {'linthresh': linthresh_val}
+            current_axis.set_yscale('symlog', **kwargs)
+
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
         else:

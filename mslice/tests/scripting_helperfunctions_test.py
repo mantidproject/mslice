@@ -1,5 +1,6 @@
 import unittest
 from unittest import mock
+from distutils.version import LooseVersion
 from mslice.scripting.helperfunctions import header, add_header, add_plot_statements, add_slice_plot_statements, \
     COMMON_PACKAGES, MPL_COLORS_IMPORT, NUMPY_IMPORT, add_overplot_statements, add_cut_plot_statements, add_cut_lines, \
     add_cut_lines_with_width, add_plot_options, hide_lines
@@ -8,6 +9,7 @@ from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.cli.helperfunctions import _function_to_intensity
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
+from matplotlib import __version__ as mpl_version
 import numpy as np
 from mslice.models.cut.cut import Cut
 from mslice.models.axis import Axis
@@ -211,11 +213,16 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_cut_lines.assert_called_once_with(script_lines, plot_handler, ax)
         add_plot_options.assert_called_once_with(script_lines, plot_handler)
 
-        self.assertIn("ax.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
-            plot_handler.x_axis_min), script_lines)
-
-        self.assertIn("ax.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10({}))))\n".format(
-            plot_handler.y_axis_min), script_lines)
+        if LooseVersion(mpl_version) < LooseVersion('3.3'):
+            self.assertIn("ax.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10({}))))\n".format(
+                plot_handler.x_axis_min), script_lines)
+            self.assertIn("ax.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10({}))))\n".format(
+                plot_handler.y_axis_min), script_lines)
+        else:
+            self.assertIn("ax.set_xscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
+                plot_handler.x_axis_min), script_lines)
+            self.assertIn("ax.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
+                plot_handler.y_axis_min), script_lines)
 
     @mock.patch('mslice.scripting.helperfunctions.add_cut_lines_with_width')
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
