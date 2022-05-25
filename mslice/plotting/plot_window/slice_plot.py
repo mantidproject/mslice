@@ -226,7 +226,7 @@ class SlicePlot(IPlot):
             'shown': None,
             'color': to_hex(target.get_color()),
             'style': target.get_linestyle(),
-            'width': str(int(target.get_linewidth())),
+            'width': str(target.get_linewidth()),
             'marker': target.get_marker(),
             'error_bar': None
         }
