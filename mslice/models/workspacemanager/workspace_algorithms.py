@@ -135,8 +135,8 @@ def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
 
 
 def _get_theta_for_limits(ws):
-    num_hist = ws.raw_ws.getNumberHistograms()
-    theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_hist)]
+    num_detectors = ws.raw_ws.getInstrument().getNumberDetectors()
+    theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_detectors)]
     round_fac = 100
     ws.is_PSD = not all(x < y for x, y in zip(theta, theta[1:]))
     # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
