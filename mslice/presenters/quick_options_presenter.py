@@ -45,8 +45,10 @@ def _run_quick_options(view, update_model_function, *args):
 
 def _set_axis_options(view, target, model, has_logarithmic, grid):
     range = (float(view.range_min), float(view.range_max))
-    model.change_axis_scale(range, view.log_scale.isChecked() if has_logarithmic is not None else model.colorbar_log)
+    setattr(model, target, range)
 
+    if has_logarithmic is not None:
+        setattr(model, target[:-5] + 'log', view.log_scale.isChecked())
     if grid is not None:
         setattr(model, target[:-5] + 'grid', view.grid_state)
 
