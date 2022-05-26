@@ -112,7 +112,7 @@ class SlicePlotTest(unittest.TestCase):
             mock_get_legend.return_value = MagicMock()
 
             self.slice_plot.update_legend()
-            mock_add_legend.assert_called_with(self.line, ['some_label'], fontsize=ANY)
+            mock_add_legend.assert_called_with(self.line, ['some_label'], fontsize=ANY, loc='upper right')
 
 if __name__ == '__main__':
     unittest.main()
