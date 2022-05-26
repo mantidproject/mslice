@@ -193,8 +193,13 @@ class SlicePlot(IPlot):
         handles, labels = axes.get_legend_handles_labels()
 
         if handles:
-            axes.legend(handles, labels, fontsize='medium')
+            # Uses the 'upper right' location because 'best' causes very slow plotting for large datasets.
+            axes.legend(handles, labels, fontsize='medium', loc='upper right')
             legend_set_draggable(axes.get_legend(), True)
+        else:
+            legend = axes.get_legend()
+            if legend:
+                legend.remove()
 
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
