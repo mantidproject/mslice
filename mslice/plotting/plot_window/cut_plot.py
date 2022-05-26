@@ -8,7 +8,6 @@ from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 from matplotlib.text import Text
 
-import warnings
 import numpy as np
 
 from mslice.models.colors import to_hex, name_to_color
