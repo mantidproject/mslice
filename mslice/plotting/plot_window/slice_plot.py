@@ -7,7 +7,7 @@ import matplotlib.colors as colors
 from matplotlib.legend import Legend
 from matplotlib.text import Text
 
-from mslice.models.colors import to_hex
+from mslice.models.colors import to_hex, name_to_color
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
@@ -168,7 +168,6 @@ class SlicePlot(IPlot):
                     quick_options('y_range', self, redraw_signal=self.plot_window.redraw)
                 elif x > bounds['colorbar_range']:
                     quick_options('colorbar_range', self, self.colorbar_log, redraw_signal=self.plot_window.redraw)
-            self._canvas.draw()
 
     def object_clicked(self, target):
         if isinstance(target, Legend):
@@ -194,8 +193,13 @@ class SlicePlot(IPlot):
         handles, labels = axes.get_legend_handles_labels()
 
         if handles:
-            axes.legend(handles, labels, fontsize='medium')
+            # Uses the 'upper right' location because 'best' causes very slow plotting for large datasets.
+            axes.legend(handles, labels, fontsize='medium', loc='upper right')
             legend_set_draggable(axes.get_legend(), True)
+        else:
+            legend = axes.get_legend()
+            if legend:
+                legend.remove()
 
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
@@ -236,7 +240,7 @@ class SlicePlot(IPlot):
         line.set_label(line_options['label'])
         line.set_linestyle(line_options['style'])
         line.set_marker(line_options['marker'])
-        line.set_color(line_options['color'])
+        line.set_color(name_to_color(line_options['color']))
         line.set_linewidth(line_options['width'])
 
     def calc_figure_boundaries(self):

@@ -11,7 +11,7 @@ from matplotlib.text import Text
 import warnings
 import numpy as np
 
-from mslice.models.colors import to_hex
+from mslice.models.colors import to_hex, name_to_color
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
@@ -164,9 +164,13 @@ class CutPlot(IPlot):
         if xy_config['x_log']:
             xmin = xy_config['x_range'][0]
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-            min = get_min(xdata, absolute_minimum=0.)
-            self.x_axis_min = min
-            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(min))))
+            self.x_axis_min = get_min(xdata, absolute_minimum=0.)
+            linthresh_val = pow(10, np.floor(np.log10(self.x_axis_min)))
+
+            kwargs = {'linthreshx': linthresh_val} if LooseVersion(mpl_version) < LooseVersion('3.3') \
+                else {'linthresh': linthresh_val}
+            current_axis.set_xscale('symlog', **kwargs)
+
             if xmin > 0:
                 xy_config['x_range'] = (xmin, xy_config['x_range'][1])
         else:
@@ -174,9 +178,13 @@ class CutPlot(IPlot):
         if xy_config['y_log']:
             ymin = xy_config['y_range'][0]
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-            min = get_min(ydata, absolute_minimum=0.)
-            self.y_axis_min = min
-            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(min))))
+            self.y_axis_min = get_min(ydata, absolute_minimum=0.)
+            linthresh_val = pow(10, np.floor(np.log10(self.y_axis_min)))
+
+            kwargs = {'linthreshy': linthresh_val} if LooseVersion(mpl_version) < LooseVersion('3.3') \
+                else {'linthresh': linthresh_val}
+            current_axis.set_yscale('symlog', **kwargs)
+
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
         else:
@@ -209,7 +217,7 @@ class CutPlot(IPlot):
             line.set_label(line_options['label'])
             line.set_linestyle(line_options['style'])
             line.set_marker(line_options['marker'])
-            line.set_color(line_options['color'])
+            line.set_color(name_to_color(line_options['color']))
             line.set_linewidth(line_options['width'])
 
     def get_all_line_options(self):
@@ -268,7 +276,7 @@ class CutPlot(IPlot):
         self.toggle_errorbar(line_index, line_options)
 
         for child in container.get_children():
-            child.set_color(line_options['color'])
+            child.set_color(name_to_color(line_options['color']))
             child.set_linewidth(line_options['width'])
             child.set_visible(line_options['shown'])
 
@@ -295,8 +303,9 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def set_is_icut(self, is_icut):
-        self.manager.button_pressed_connected(not is_icut)
-        self.manager.picking_connected(not is_icut)
+        if is_icut: #disconnect quick options if icut
+            self.manager.button_pressed_connected(False)
+            self.manager.picking_connected(False)
 
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)

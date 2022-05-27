@@ -4,6 +4,7 @@ import numpy as np
 from mantid.simpleapi import CloneWorkspace, PowerMD
 from mslice.util.numpy_helper import apply_with_corrected_shape
 
+
 # Other operators are defined when MSlice is imported in _workspace_ops.attach_binary_operators()
 class WorkspaceOperatorMixin(object):
     def __neg__(self):
@@ -12,6 +13,7 @@ class WorkspaceOperatorMixin(object):
     def __pow__(self, exponent):
         return self.rewrap(PowerMD(InputWorkspace=self._raw_ws, OutputWorkspace="_",
                                    Exponent=exponent, StoreInADS=False))
+
 
 class WorkspaceMixin(object):
 
@@ -70,6 +72,10 @@ class WorkspaceMixin(object):
 
     def is_axis_saved(self, axis):
         return True if axis in self._cut_params else False
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def raw_ws(self):
