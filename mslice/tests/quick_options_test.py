@@ -157,14 +157,13 @@ class QuickAxisTest(unittest.TestCase):
     def test_colorbar(self, quick_axis_options_view):
         quick_axis_options_view.return_value = self.view
         self.view.exec_ = MagicMock(return_value=True)
-        colorbar_log = PropertyMock()
-        type(self.model).colorbar_log = colorbar_log
-        self.view.log_scale.isChecked = Mock()
+        self.model.change_axis_scale = MagicMock()
+        self.view.log_scale.isChecked = Mock(return_value=True)
         qopt = quick_axis_options('colorbar_range', self.model, True)
         qopt.redraw_signal = PropertyMock()
         qopt.ok_clicked.connect.call_args[0][0]()  # Call the connected signal directly
         self.view.log_scale.isChecked.assert_called_once()
-        colorbar_log.assert_called_once()
+        self.model.change_axis_scale.assert_called_once_with((5, 10), True)
 
 
 @patch('mslice.presenters.quick_options_presenter.QuickLabelOptions')
