@@ -8,7 +8,6 @@ from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 from matplotlib.text import Text
 
-import warnings
 import numpy as np
 
 from mslice.models.colors import to_hex, name_to_color
@@ -24,10 +23,8 @@ from mslice.util.compat import legend_set_draggable
 
 def get_min(data, absolute_minimum=-np.inf):
     """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        mask = np.greater(data, absolute_minimum)
-    return np.min(np.extract(mask, data))
+    masked_data = [np.extract(np.greater(row, absolute_minimum), row) for row in data]
+    return np.min([np.min(row) for row in masked_data])
 
 
 class CutPlot(IPlot):
