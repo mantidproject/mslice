@@ -174,7 +174,6 @@ class SlicePlot(IPlot):
             return
         elif isinstance(target, Text):
             quick_options(target, self, redraw_signal=self.plot_window.redraw)
-
         else:
             quick_options(target, self)
             self.update_legend()

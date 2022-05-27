@@ -7,33 +7,34 @@ from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLab
 def quick_options(target, model, has_logarithmic=None, redraw_signal=None):
     """Find which quick_options to use based on type of target"""
     if isinstance(target, text.Text):
-        quick_label_options(target, redraw_signal)
+        quick_label_options(model.plot_window, target, redraw_signal)
     elif isinstance(target, string_types):
-        return quick_axis_options(target, model, has_logarithmic, redraw_signal)
+        return quick_axis_options(model.plot_window, target, model, has_logarithmic, redraw_signal)
     else:
-        quick_line_options(target, model)
+        quick_line_options(model.plot_window, target, model)
 
 
-def quick_label_options(target, redraw_signal=None):
-    view = QuickLabelOptions(target, redraw_signal)
+def quick_label_options(parent, target, redraw_signal=None):
+    view = QuickLabelOptions(parent, target, redraw_signal)
     view.ok_clicked.connect(lambda: _set_label_options(view, target))
     view.show()
     return view
 
 
-def quick_axis_options(target, model, has_logarithmic=None, redraw_signal=None):
+def quick_axis_options(parent, target, model, has_logarithmic=None, redraw_signal=None):
     if target[:1] == 'x' or target[:1] == 'y':
         grid = getattr(model, target[:-5] + 'grid')
     else:
         grid = None
-    view = QuickAxisOptions(target, getattr(model, target), getattr(model, target + '_font_size'), grid, has_logarithmic, redraw_signal)
+    view = QuickAxisOptions(parent, target, getattr(model, target), getattr(model, target + '_font_size'), grid,
+                            has_logarithmic, redraw_signal)
     view.ok_clicked.connect(lambda: _set_axis_options(view, target, model, has_logarithmic, grid))
     view.show()
     return view
 
 
-def quick_line_options(target, model):
-    view = QuickLineOptions(model.get_line_options(target), model.show_legends)
+def quick_line_options(parent, target, model):
+    view = QuickLineOptions(parent, model.get_line_options(target), model.show_legends)
     _run_quick_options(view, _set_line_options, model, target)
 
 
