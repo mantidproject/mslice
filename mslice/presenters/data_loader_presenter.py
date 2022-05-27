@@ -65,7 +65,10 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                     not_opened.append(ws_name)
                 else:
                     if not allChecked:
-                        allChecked = self.check_efixed(ws_name, multi)
+                        try:
+                            allChecked = self.check_efixed(ws_name, multi)
+                        except ValueError:
+                            not_opened.append(ws_name)
                     else:
                         apply_fixed_final_energy_to_a_valid_workspace(ws_name, self._EfCache)
                     if self._main_presenter is not None:
