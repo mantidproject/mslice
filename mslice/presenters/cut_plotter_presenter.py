@@ -97,8 +97,7 @@ class CutPlotterPresenter(PresenterUtility):
             line = cache.pop(key)
             remove_line(line)
 
-    def add_overplot_line(self, workspace_name, key, recoil, cif=None):
-        recoil = False
+    def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None):
         cache = self._cut_cache_dict[plt.gca()][0]
         cache.rotated = not is_twotheta(cache.cut_axis.units) and not is_momentum(cache.cut_axis.units)
         try:
@@ -115,7 +114,8 @@ class CutPlotterPresenter(PresenterUtility):
             q_axis = cache.cut_axis
         x, y = compute_powder_line(workspace_name, q_axis, key, cif_file=cif)
         try:
-            y = np.array(y) * (scale_fac / np.nanmax(y))
+            adj_scale_fac = (scale_fac / np.nanmax(y)) if not  y_has_logarithmic else (scale_fac / np.nanmax(y))
+            y = np.array(y) * adj_scale_fac
             self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
         except ValueError:
             warnings.warn("No Bragg peak found.")

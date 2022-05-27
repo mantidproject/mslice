@@ -570,3 +570,7 @@ class SlicePlot(IPlot):
         if self.default_options is None:
             return False
         return self.default_options[item] != getattr(self, item)
+
+    @property
+    def y_log(self):  # needed for interface consistency with cut plot
+        return False

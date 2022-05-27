@@ -323,13 +323,13 @@ class CutPlot(IPlot):
 
     def update_bragg_peaks(self):
         if self.plot_window.action_aluminium.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, cif=None)
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, None, self.y_log)
         if self.plot_window.action_copper.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, cif=None)
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, None, self.y_log)
         if self.plot_window.action_niobium.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, cif=None)
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, None, self.y_log)
         if self.plot_window.action_tantalum.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, cif=None)
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, None, self.y_log)
         self.update_legend()
 
     def save_icut(self):
