@@ -1,5 +1,7 @@
+from distutils.version import LooseVersion
 from functools import partial
 
+from matplotlib import __version__ as mpl_version
 from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
