@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
+from numpy import arange as np_arange
 from six import iteritems
 import functools
 
@@ -292,7 +293,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         self.width_label = QtWidgets.QLabel(self)
         self.width_label.setText("Width:")
         self.line_width = QtWidgets.QComboBox(self)
-        self.line_width.addItems([str(x + 1) for x in range(10)])
+        self.line_width.addItems([str(x) for x in np_arange(1,10.5,0.5)])
         self.line_width.setCurrentIndex(self.line_width.findText(line_options['width']))
 
         self.marker_label = QtWidgets.QLabel(self)
@@ -420,7 +421,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
 
     @property
     def width(self):
-        return int(self.line_width.currentText())
+        return float(self.line_width.currentText())
 
     @property
     def marker(self):
