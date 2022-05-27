@@ -303,8 +303,9 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def set_is_icut(self, is_icut):
-        self.manager.button_pressed_connected(not is_icut)
-        self.manager.picking_connected(not is_icut)
+        if is_icut: #disconnect quick options if icut
+            self.manager.button_pressed_connected(False)
+            self.manager.picking_connected(False)
 
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
