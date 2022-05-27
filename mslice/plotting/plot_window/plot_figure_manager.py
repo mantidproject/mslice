@@ -40,6 +40,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self._current_figs = current_figs
 
         self.window = PlotWindow(manager=weakref.proxy(self))
+        self.window.setAttribute(Qt.WA_DeleteOnClose, True)
         self.window.resize(800, 600)
 
         self.plot_handler = None
