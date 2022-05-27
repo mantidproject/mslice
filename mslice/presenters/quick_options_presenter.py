@@ -44,13 +44,13 @@ def _run_quick_options(view, update_model_function, *args):
 
 
 def _set_axis_options(view, target, model, has_logarithmic, grid):
-    range = (float(view.range_min), float(view.range_max))
-    setattr(model, target, range)
-
     if has_logarithmic is not None:
         setattr(model, target[:-5] + 'log', view.log_scale.isChecked())
     if grid is not None:
         setattr(model, target[:-5] + 'grid', view.grid_state)
+
+    range = (float(view.range_min), float(view.range_max))
+    setattr(model, target, range)
 
     setattr(model, target + "_font_size", view.font_size.value())
 
