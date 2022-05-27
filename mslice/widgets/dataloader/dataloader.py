@@ -100,6 +100,9 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.txtpath.setText(new_path)
         self._clear_displayed_error()
 
+        # Reseting the QFileSystemModel prevents warning messages about QAccessibleTable
+        self.reload_model()
+
     def back(self):
         self.directory.cdUp()
         self._update_from_path()
