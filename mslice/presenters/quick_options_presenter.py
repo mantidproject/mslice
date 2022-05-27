@@ -48,7 +48,7 @@ def _set_axis_options(view, target, model, has_logarithmic, grid):
     setattr(model, target, range)
 
     if has_logarithmic is not None:
-        setattr(model, target[:-5] + 'log', view.log_scale.isChecked())
+        model.change_axis_scale(range, view.log_scale.isChecked())
     if grid is not None:
         setattr(model, target[:-5] + 'grid', view.grid_state)
 
