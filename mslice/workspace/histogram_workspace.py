@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from .base import WorkspaceBase
 from .histo_mixin import HistoMixin
 from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
-from .helperfunctions import attribute_from_log, attribute_to_log, delete_workspace
+from .helperfunctions import attribute_from_log, attribute_to_log, delete_workspace, rename_workspace
 
 from mantid.api import IMDHistoWorkspace
 
@@ -15,7 +15,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
             self._raw_ws = mantid_ws
         else:
             raise TypeError('HistogramWorkspace expected IMDHistoWorkspace, got %s' % mantid_ws.__class__.__name__)
-        self.name = name
+        self._name = name
         self._cut_params = {}
         self.is_PSD = None
         self.axes = []
@@ -23,6 +23,13 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
         self.parent = None
         self.algorithm = []
         attribute_from_log(self, mantid_ws)
+
+    @WorkspaceMixin.name.setter
+    def name(self, new_name: str):
+        raw_name = str(self.raw_ws)
+        rename_workspace(raw_name, raw_name.replace(self.name, new_name))
+
+        self._name = new_name
 
     def rewrap(self, ws):
         new_ws = HistogramWorkspace(ws, self.name)

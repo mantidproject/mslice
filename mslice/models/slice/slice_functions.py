@@ -137,9 +137,11 @@ def sample_temperature(ws_name, sample_temp_fields):
     return sample_temp
 
 
-def compute_recoil_line(ws_name, axis, relative_mass=1):
+def compute_recoil_line(ws_name, axis, relative_mass=None):
     efixed = get_workspace_handle(ws_name).e_fixed
     x_axis = np.arange(axis.start, axis.end, axis.step)
+    if not relative_mass:
+        relative_mass = 1
     if is_momentum(axis.units):
         momentum_transfer = x_axis
         line = np.square(momentum_transfer * 1.e10 * constants.hbar) / (2 * relative_mass * constants.neutron_mass) /\

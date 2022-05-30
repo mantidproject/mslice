@@ -8,15 +8,14 @@ from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 from matplotlib.text import Text
 
-import warnings
 import numpy as np
 
-from mslice.models.colors import to_hex
+from mslice.models.colors import to_hex, name_to_color
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
-from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line,\
+from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line, \
     cif_file_powder_line
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
@@ -24,10 +23,8 @@ from mslice.util.compat import legend_set_draggable
 
 def get_min(data, absolute_minimum=-np.inf):
     """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        mask = np.greater(data, absolute_minimum)
-    return np.min(np.extract(mask, data))
+    masked_data = [np.extract(np.greater(row, absolute_minimum), row) for row in data]
+    return np.min([np.min(row) for row in masked_data])
 
 
 class CutPlot(IPlot):
@@ -48,6 +45,7 @@ class CutPlot(IPlot):
         self.default_options = None
         self._waterfall_cache = {}
         self._is_icut = False
+        self._powder_lines = {}
 
     def save_default_options(self):
         self.default_options = {
@@ -163,9 +161,13 @@ class CutPlot(IPlot):
         if xy_config['x_log']:
             xmin = xy_config['x_range'][0]
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-            min = get_min(xdata, absolute_minimum=0.)
-            self.x_axis_min = min
-            current_axis.set_xscale('symlog', linthreshx=pow(10, np.floor(np.log10(min))))
+            self.x_axis_min = get_min(xdata, absolute_minimum=0.)
+            linthresh_val = pow(10, np.floor(np.log10(self.x_axis_min)))
+
+            kwargs = {'linthreshx': linthresh_val} if LooseVersion(mpl_version) < LooseVersion('3.3') \
+                else {'linthresh': linthresh_val}
+            current_axis.set_xscale('symlog', **kwargs)
+
             if xmin > 0:
                 xy_config['x_range'] = (xmin, xy_config['x_range'][1])
         else:
@@ -173,9 +175,13 @@ class CutPlot(IPlot):
         if xy_config['y_log']:
             ymin = xy_config['y_range'][0]
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-            min = get_min(ydata, absolute_minimum=0.)
-            self.y_axis_min = min
-            current_axis.set_yscale('symlog', linthreshy=pow(10, np.floor(np.log10(min))))
+            self.y_axis_min = get_min(ydata, absolute_minimum=0.)
+            linthresh_val = pow(10, np.floor(np.log10(self.y_axis_min)))
+
+            kwargs = {'linthreshy': linthresh_val} if LooseVersion(mpl_version) < LooseVersion('3.3') \
+                else {'linthresh': linthresh_val}
+            current_axis.set_yscale('symlog', **kwargs)
+
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
         else:
@@ -208,7 +214,7 @@ class CutPlot(IPlot):
             line.set_label(line_options['label'])
             line.set_linestyle(line_options['style'])
             line.set_marker(line_options['marker'])
-            line.set_color(line_options['color'])
+            line.set_color(name_to_color(line_options['color']))
             line.set_linewidth(line_options['width'])
 
     def get_all_line_options(self):
@@ -246,7 +252,7 @@ class CutPlot(IPlot):
             'shown': self.get_line_visible(line_index),
             'color': to_hex(line.get_color()),
             'style': line.get_linestyle(),
-            'width': str(int(line.get_linewidth())),
+            'width': str(line.get_linewidth()),
             'marker': line.get_marker(),
             'error_bar': self._single_line_has_error_bars(line_index)
         }
@@ -267,7 +273,7 @@ class CutPlot(IPlot):
         self.toggle_errorbar(line_index, line_options)
 
         for child in container.get_children():
-            child.set_color(line_options['color'])
+            child.set_color(name_to_color(line_options['color']))
             child.set_linewidth(line_options['width'])
             child.set_visible(line_options['shown'])
 
@@ -294,8 +300,9 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def set_is_icut(self, is_icut):
-        self.manager.button_pressed_connected(not is_icut)
-        self.manager.picking_connected(not is_icut)
+        if is_icut: #disconnect quick options if icut
+            self.manager.button_pressed_connected(False)
+            self.manager.picking_connected(False)
 
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
@@ -311,6 +318,20 @@ class CutPlot(IPlot):
         self.plot_window.activateWindow()
         self.plot_window.raise_()
         self._is_icut = is_icut
+
+    def is_icut(self):
+        return self._is_icut
+
+    def update_bragg_peaks(self):
+        if self.plot_window.action_aluminium.isChecked():
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, cif=None)
+        if self.plot_window.action_copper.isChecked():
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, cif=None)
+        if self.plot_window.action_niobium.isChecked():
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, cif=None)
+        if self.plot_window.action_tantalum.isChecked():
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, cif=None)
+        self.update_legend()
 
     def save_icut(self):
         icut = self._cut_plotter_presenter.get_icut()
@@ -391,18 +412,24 @@ class CutPlot(IPlot):
             self._apply_offset(0., 0.)
         self._canvas.draw()
 
+    def _cache_line(self, line):
+        if isinstance(line, Line2D):
+            self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
+        elif isinstance(line, LineCollection):
+            self._waterfall_cache[line] = [np.copy(path.vertices) for path in line._paths]
+
     def _apply_offset(self, x, y):
         for ind, line_containers in enumerate(self._canvas.figure.gca().containers):
             for line in line_containers.get_children():
+                line not in self._waterfall_cache and self._cache_line(line)
                 if isinstance(line, Line2D):
-                    if line not in self._waterfall_cache:
-                        self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
                     line.set_xdata(self._waterfall_cache[line][0] + ind * x)
                     line.set_ydata(self._waterfall_cache[line][1] + ind * y)
                 elif isinstance(line, LineCollection):
-                    if LooseVersion(mpl_version) < LooseVersion('3.3'):
-                        line.set_offset_position('data') # set_offset_position is deprecated since 3.3
-                    line.set_offsets((ind * x, ind * y))
+                    for index, path in enumerate(line._paths):
+                        if not np.isnan(path.vertices).any():
+                            path.vertices = np.add(self._waterfall_cache[line][index],
+                                                   np.array([[ind * x, ind * y], [ind * x, ind * y]]))
 
     def on_newplot(self, ax):
         # This callback should be activated by a call to errorbar
@@ -411,11 +438,12 @@ class CutPlot(IPlot):
         num_lines = len(line_containers)
         self.plot_window.action_waterfall.setEnabled(num_lines > 1)
         self.plot_window.toggle_waterfall_edit()
-        self.plot_window.action_aluminium.setChecked(False)
-        self.plot_window.action_copper.setChecked(False)
-        self.plot_window.action_niobium.setChecked(False)
-        self.plot_window.action_tantalum.setChecked(False)
-        self.plot_window.action_cif_file.setChecked(False)
+        if not self._is_icut:
+            self.plot_window.action_aluminium.setChecked(False)
+            self.plot_window.action_copper.setChecked(False)
+            self.plot_window.action_niobium.setChecked(False)
+            self.plot_window.action_tantalum.setChecked(False)
+            self.plot_window.action_cif_file.setChecked(False)
         all_lines = [line for container in line_containers for line in container.get_children()]
         for cached_lines in list(self._waterfall_cache.keys()):
             if cached_lines not in all_lines:

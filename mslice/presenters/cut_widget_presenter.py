@@ -53,7 +53,10 @@ class CutWidgetPresenter(PresenterUtility):
             self._parse_step()
             params = self._parse_input()
         except ValueError as e:
-            self._cut_view.display_error(str(e))
+            if "''" in str(e):
+                self._cut_view.display_error("Cut axes cannot be empty!")
+            else:
+                self._cut_view.display_error(str(e))
             return
         for workspace in selected_workspaces:
             try:

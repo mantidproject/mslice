@@ -7,7 +7,7 @@ import matplotlib.colors as colors
 from matplotlib.legend import Legend
 from matplotlib.text import Text
 
-from mslice.models.colors import to_hex
+from mslice.models.colors import to_hex, name_to_color
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
@@ -168,7 +168,6 @@ class SlicePlot(IPlot):
                     quick_options('y_range', self, redraw_signal=self.plot_window.redraw)
                 elif x > bounds['colorbar_range']:
                     quick_options('colorbar_range', self, self.colorbar_log, redraw_signal=self.plot_window.redraw)
-            self._canvas.draw()
 
     def object_clicked(self, target):
         if isinstance(target, Legend):
@@ -194,8 +193,13 @@ class SlicePlot(IPlot):
         handles, labels = axes.get_legend_handles_labels()
 
         if handles:
-            axes.legend(handles, labels, fontsize='medium')
+            # Uses the 'upper right' location because 'best' causes very slow plotting for large datasets.
+            axes.legend(handles, labels, fontsize='medium', loc='upper right')
             legend_set_draggable(axes.get_legend(), True)
+        else:
+            legend = axes.get_legend()
+            if legend:
+                legend.remove()
 
     def change_axis_scale(self, colorbar_range, logarithmic):
         current_axis = self._canvas.figure.gca()
@@ -205,6 +209,9 @@ class SlicePlot(IPlot):
         if logarithmic:
             if vmin <= float(0):
                 vmin = 0.001
+            if vmax <= float(0):
+                vmax = 0.001
+
             norm = colors.LogNorm(vmin, vmax)
         else:
             norm = colors.Normalize(vmin, vmax)
@@ -223,7 +230,7 @@ class SlicePlot(IPlot):
             'shown': None,
             'color': to_hex(target.get_color()),
             'style': target.get_linestyle(),
-            'width': str(int(target.get_linewidth())),
+            'width': str(target.get_linewidth()),
             'marker': target.get_marker(),
             'error_bar': None
         }
@@ -233,7 +240,7 @@ class SlicePlot(IPlot):
         line.set_label(line_options['label'])
         line.set_linestyle(line_options['style'])
         line.set_marker(line_options['marker'])
-        line.set_color(line_options['color'])
+        line.set_color(name_to_color(line_options['color']))
         line.set_linewidth(line_options['width'])
 
     def calc_figure_boundaries(self):
@@ -424,6 +431,18 @@ class SlicePlot(IPlot):
 
     def update_workspaces(self):
         self._slice_plotter_presenter.update_displayed_workspaces()
+
+    def on_newplot(self):
+        # This callback should be activated by a call to pcolormesh
+        self.plot_window.action_hydrogen.setChecked(False)
+        self.plot_window.action_deuterium.setChecked(False)
+        self.plot_window.action_helium.setChecked(False)
+        self.plot_window.action_arbitrary_nuclei.setChecked(False)
+        self.plot_window.action_aluminium.setChecked(False)
+        self.plot_window.action_copper.setChecked(False)
+        self.plot_window.action_niobium.setChecked(False)
+        self.plot_window.action_tantalum.setChecked(False)
+        self.plot_window.action_cif_file.setChecked(False)
 
     def generate_script(self, clipboard=False):
         try:
