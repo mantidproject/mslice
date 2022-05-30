@@ -270,3 +270,6 @@ class MainWindow(MainView, QMainWindow):
 
         for item in print_list:
             print(item)
+
+    def closeEvent(self, event):
+        self.workspace_presenter.notify(ws_command.RemoveAllWorkspaces)

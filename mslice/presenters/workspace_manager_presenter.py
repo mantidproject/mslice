@@ -9,7 +9,8 @@ from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces
                                                                  is_pixel_workspace, combine_workspace,
                                                                  add_workspace_runs, scale_workspaces)
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
-                                                               get_workspace_name, delete_workspace, rename_workspace)
+                                                               get_all_workspace_names, get_workspace_name,
+                                                               delete_workspace, rename_workspace)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -26,6 +27,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             Command.SaveSelectedWorkspaceAscii: lambda: self._save_selected_workspace('.txt'),
             Command.SaveSelectedWorkspaceMatlab: lambda: self._save_selected_workspace('.mat'),
             Command.RemoveSelectedWorkspaces: self._remove_selected_workspaces,
+            Command.RemoveAllWorkspaces: self._remove_all_workspaces,
             Command.RenameWorkspace: self._rename_workspace,
             Command.CombineWorkspace: self._combine_workspace,
             Command.SelectionChanged: self._broadcast_selected_workspaces,
@@ -115,6 +117,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
         for workspace in selected_workspaces:
+            delete_workspace(workspace)
+            self.update_displayed_workspaces()
+
+    def _remove_all_workspaces(self):
+        all_workspaces = get_all_workspace_names()
+        for workspace in all_workspaces:
             delete_workspace(workspace)
             self.update_displayed_workspaces()
 
