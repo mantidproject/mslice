@@ -21,7 +21,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     yGridEdited = Signal()
     ok_clicked = Signal()
 
-    def __init__(self, parent=None, redraw_signal=None):
+    def __init__(self, parent, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
 
@@ -130,8 +130,8 @@ class SlicePlotOptions(PlotOptionsDialog):
     cRangeEdited = Signal()
     cLogEdited = Signal()
 
-    def __init__(self, redraw_signal=None):
-        super(SlicePlotOptions, self).__init__(redraw_signal=redraw_signal)
+    def __init__(self, parent, redraw_signal=None):
+        super(SlicePlotOptions, self).__init__(parent, redraw_signal=redraw_signal)
         self.chkXLog.hide()
         self.chkYLog.hide()
         self.cut_options.hide()
@@ -175,8 +175,8 @@ class CutPlotOptions(PlotOptionsDialog):
     showLegendsEdited = Signal()
     removed_line = Signal(int)
 
-    def __init__(self, redraw_signal=None):
-        super(CutPlotOptions, self).__init__(redraw_signal=redraw_signal)
+    def __init__(self, parent, redraw_signal=None):
+        super(CutPlotOptions, self).__init__(parent, redraw_signal=redraw_signal)
         self._line_widgets = []
         self.groupBox_4.hide()
 
@@ -184,6 +184,10 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkYLog.stateChanged.connect(self.yLogEdited)
         self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
         self.showLegendsEdited.connect(self.disable_show_legend)
+
+    def disconnect(self):
+        for line_widget in self._line_widgets:
+            line_widget.destroyed.disconnect()
 
     def set_line_options(self, line_options):
         for i in range(len(line_options)):

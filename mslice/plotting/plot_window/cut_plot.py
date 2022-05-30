@@ -34,6 +34,7 @@ class CutPlot(IPlot):
         self.plot_window = figure_manager.window
         self._canvas = self.plot_window.canvas
         self._cut_plotter_presenter = cut_plotter_presenter
+        self._plot_options_view = None
         self._lines_visible = {}
         self._legends_shown = True
         self._legends_visible = []
@@ -109,10 +110,13 @@ class CutPlot(IPlot):
             icut.window_closing()
             self.manager.button_pressed_connected(False)
             self.manager.picking_connected(False)
+        if self._plot_options_view is not None:
+            self._plot_options_view.disconnect()
         self.plot_window.close()
 
     def plot_options(self):
-        CutPlotOptionsPresenter(CutPlotOptions(redraw_signal=self.plot_window.redraw), self)
+        self._plot_options_view = CutPlotOptions(self.plot_window, redraw_signal=self.plot_window.redraw)
+        return CutPlotOptionsPresenter(self._plot_options_view, self)
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()

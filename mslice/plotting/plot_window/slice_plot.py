@@ -156,7 +156,7 @@ class SlicePlot(IPlot):
         pass
 
     def plot_options(self):
-        SlicePlotOptionsPresenter(SlicePlotOptions(redraw_signal=self.plot_window.redraw), self)
+        SlicePlotOptionsPresenter(SlicePlotOptions(self.plot_window, redraw_signal=self.plot_window.redraw), self)
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
