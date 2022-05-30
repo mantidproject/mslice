@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>1. Quick Start &#8212; MSlice 2.3.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,6 +12,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -41,9 +42,9 @@
           <div class="body" role="main">
             
   <section id="quick-start">
-<h1><span class="section-number">1. </span>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">1. </span>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading">¶</a></h1>
 <section id="starting-mslice">
-<h2><span class="section-number">1.1. </span>Starting MSlice<a class="headerlink" href="#starting-mslice" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.1. </span>Starting MSlice<a class="headerlink" href="#starting-mslice" title="Permalink to this heading">¶</a></h2>
 <p>MSlice is included in the Mantid distribution so the easiest way to start it is from the <strong>Interfaces</strong> menu in <em>MantidWorkbench</em>.</p>
 <img alt="_images/mantid_interfaces_menu.png" src="_images/mantid_interfaces_menu.png" />
 <p>The version of <em>MSlice</em> distributed with Mantid is the last stable version. However, there is currently quite rapid ongoing
@@ -58,7 +59,7 @@ you did not install <em>Mantid</em> in the default location.</p>
 increase and <code class="docutils literal notranslate"><span class="pre">Ctrl+-</span></code> to decrease the font size within the Script Editor or the IPython Console.</p>
 </section>
 <section id="loading-data">
-<h2><span class="section-number">1.2. </span>Loading Data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.2. </span>Loading Data<a class="headerlink" href="#loading-data" title="Permalink to this heading">¶</a></h2>
 <a class="reference internal image-reference" href="_images/load_tab.png"><img alt="_images/load_tab.png" src="_images/load_tab.png" style="width: 789.6px; height: 531.2px;" /></a>
 <p>The GUI is divided into three main tabs, a <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Loading</span></code> tab which shows the filesystem and allows the user to load reduced
 data files, a <code class="docutils literal notranslate"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> which handles the loaded data, and a <code class="docutils literal notranslate"><span class="pre">Plots</span></code> tab which provides an easy way to interact with
@@ -74,7 +75,7 @@ button. In the later case, the logs of the datafiles are also combined. (Note th
 together in the <code class="docutils literal notranslate"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> tab after loading, but in this case the logs are not combined).</p>
 </section>
 <section id="psd-and-non-psd-modes">
-<span id="id1"></span><h2><span class="section-number">1.3. </span>PSD and non-PSD modes<a class="headerlink" href="#psd-and-non-psd-modes" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2><span class="section-number">1.3. </span>PSD and non-PSD modes<a class="headerlink" href="#psd-and-non-psd-modes" title="Permalink to this heading">¶</a></h2>
 <p>Once the data has been loaded, the GUI will switch to the <code class="docutils literal notranslate"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> tab and select the loaded workspace(s).
 MSlice has two operating modes which it selects automatically depending on the type of data which is loaded. For data from
 spectrometers with position-sensitive detectors which have been reduced preserving the pixel data (for example, autoreduced
@@ -94,7 +95,7 @@ algorithm <a class="reference external" href="http://docs.mantidproject.org/nigh
 directly rebin the powder data.</p>
 </section>
 <section id="plotting-a-slice">
-<h2><span class="section-number">1.4. </span>Plotting a Slice<a class="headerlink" href="#plotting-a-slice" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.4. </span>Plotting a Slice<a class="headerlink" href="#plotting-a-slice" title="Permalink to this heading">¶</a></h2>
 <a class="reference internal image-reference" href="_images/data_tab.png"><img alt="_images/data_tab.png" src="_images/data_tab.png" style="width: 785.6px; height: 513.6px;" /></a>
 <p>Once the <code class="docutils literal notranslate"><span class="pre">Slice</span></code> tab is enabled (either directly for loaded <strong>non-PSD</strong> data, or after calculating projections for
 <strong>PSD</strong> data) you can click <code class="docutils literal notranslate"><span class="pre">Display</span></code> to show a 2D slice of the data. The default values of the limits of the data and
@@ -108,7 +109,7 @@ plot limits, and whether to use a linear or logarithmic axis. Double clicking on
 them. Both changing the limits and titles can be done using the options menu accessible from the toolbar.</p>
 </section>
 <section id="interactive-cuts">
-<span id="id2"></span><h2><span class="section-number">1.5. </span>Interactive Cuts<a class="headerlink" href="#interactive-cuts" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2><span class="section-number">1.5. </span>Interactive Cuts<a class="headerlink" href="#interactive-cuts" title="Permalink to this heading">¶</a></h2>
 <a class="reference internal image-reference" href="_images/interactive_cuts.png"><img alt="_images/interactive_cuts.png" src="_images/interactive_cuts.png" style="width: 640.8000000000001px; height: 908.0px;" /></a>
 <p>From the slice window, you can also select an <code class="docutils literal notranslate"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> which will allow you to select a region of data to
 integrate into a 1D and dynamically change this region and the corresponding cut. Clicking <code class="docutils literal notranslate"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> will
@@ -125,7 +126,7 @@ same window as the interactive cut and this cut will be removed when the interac
 Only when you click <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Cut</span> <span class="pre">to</span> <span class="pre">Workspace</span></code> is an <code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Histo</span></code> type workspace created.</p>
 </section>
 <section id="plotting-a-cut">
-<h2><span class="section-number">1.6. </span>Plotting a Cut<a class="headerlink" href="#plotting-a-cut" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.6. </span>Plotting a Cut<a class="headerlink" href="#plotting-a-cut" title="Permalink to this heading">¶</a></h2>
 <a class="reference internal image-reference" href="_images/cut_q.png"><img alt="_images/cut_q.png" src="_images/cut_q.png" style="width: 639.2px; height: 693.6px;" /></a>
 <p>Instead of an interactive cut, you can use the main GUI to specify more specific limits and step sizes for cuts.
 This will also allow you to overplot multiple cuts from the same dataset with different integration ranges, or
@@ -140,7 +141,7 @@ and then give common limits, step sizes and integration range, and click <code c
 <p>The <code class="docutils literal notranslate"><span class="pre">Waterfall</span></code> button allows modifying the offsets for the x and y axes when plotting multiple cuts.</p>
 </section>
 <section id="keep-make-current">
-<span id="id3"></span><h2><span class="section-number">1.7. </span>Keep / Make Current<a class="headerlink" href="#keep-make-current" title="Permalink to this headline">¶</a></h2>
+<span id="id3"></span><h2><span class="section-number">1.7. </span>Keep / Make Current<a class="headerlink" href="#keep-make-current" title="Permalink to this heading">¶</a></h2>
 <img alt="_images/keep.png" src="_images/keep.png" />
 <p>This version of MSlice supports the window management behaviour introduced by the original Matlab MSlice, which is
 controlled by two buttons, <code class="docutils literal notranslate"><span class="pre">Keep</span></code> and <code class="docutils literal notranslate"><span class="pre">Make</span> <span class="pre">Current</span></code>, in the toolbar of every plot window. When you click on <code class="docutils literal notranslate"><span class="pre">Display</span></code>
@@ -152,7 +153,7 @@ the <code class="docutils literal notranslate"><span class="pre">Plot</span></co
 This is available only for 1D cuts. For 2D slices, you cannot overplot current data.</p>
 </section>
 <section id="manipulating-workspaces">
-<h2><span class="section-number">1.8. </span>Manipulating Workspaces<a class="headerlink" href="#manipulating-workspaces" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.8. </span>Manipulating Workspaces<a class="headerlink" href="#manipulating-workspaces" title="Permalink to this heading">¶</a></h2>
 <p>MSlice supports some basic workspace operations at present and more are planned for future releases. For loaded
 workspaces, summing and background subtraction are supported, whilst for processed workspaces (<code class="docutils literal notranslate"><span class="pre">MD</span> <span class="pre">Event</span></code> workspaces
 in <strong>PSD</strong> mode), only merging workspaces are supported. This is intended primarily for merging HYSPEC data at different
@@ -172,7 +173,7 @@ as usual.</p>
 <a class="reference internal image-reference" href="_images/subtract_slice.png"><img alt="_images/subtract_slice.png" src="_images/subtract_slice.png" style="width: 786.4000000000001px; height: 730.4000000000001px;" /></a>
 </section>
 <section id="energy-transfer-units">
-<h2><span class="section-number">1.9. </span>Energy transfer units<a class="headerlink" href="#energy-transfer-units" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.9. </span>Energy transfer units<a class="headerlink" href="#energy-transfer-units" title="Permalink to this heading">¶</a></h2>
 <p>By default MSlice uses <code class="docutils literal notranslate"><span class="pre">meV</span></code> as the unit for energy transfer, with the convention that positive energy transfer
 corresponds neutron energy loss. In addition to this, MSlice also supports cm<sup>-1</sup> (wavenumbers), denoted <code class="docutils literal notranslate"><span class="pre">cm-1</span></code>.</p>
 <p>You can choose the desired unit using the <code class="docutils literal notranslate"><span class="pre">en</span></code> drop-down comboboxes in the <strong>Cut</strong> and <strong>Slice</strong> tabs.</p>
@@ -239,7 +240,7 @@ replot everything in the new unit. If you don’t want this behaviour, you can t
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -262,7 +263,7 @@ replot everything in the new unit. If you don’t want this behaviour, you can t
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Mantid Project.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>
