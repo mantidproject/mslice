@@ -273,3 +273,4 @@ class MainWindow(MainView, QMainWindow):
 
     def closeEvent(self, event):
         self.workspace_presenter.notify(ws_command.RemoveAllWorkspaces)
+        self._console.cleanup()
