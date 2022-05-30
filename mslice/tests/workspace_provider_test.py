@@ -6,7 +6,8 @@ import unittest
 from mslice.models.workspacemanager.workspace_algorithms import (subtract, add_workspace_runs, combine_workspace,
                                                                  propagate_properties, get_limits)
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
-                                                               delete_workspace, rename_workspace)
+                                                               get_all_workspace_names, delete_workspace,
+                                                               rename_workspace)
 from mslice.models.workspacemanager.workspace_algorithms import processEfixed
 from mslice.util.mantid.mantid_algorithms import ConvertToMD, CloneWorkspace, CreateSimulationWorkspace
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
@@ -144,3 +145,8 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_equal(self.test_ws_2d.limits['|Q|'], self.test_ws_2d.limits['MomentumTransfer'])
         np.testing.assert_almost_equal(self.test_ws_2d.limits['|Q|'], [0.25116,  9.52454,  0.04287], 5)
         np.testing.assert_almost_equal(self.test_ws_2d.limits['2Theta'], [3.43, 134.14, 0.57296], 5)
+
+    def test_get_all_workspace_names(self):
+        self.assertTrue('test_ws_md' in get_all_workspace_names())
+        delete_workspace('test_ws_md')
+        self.assertFalse('test_ws_md' in get_all_workspace_names())

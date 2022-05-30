@@ -190,6 +190,20 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         assert(self.view.display_loaded_workspaces.called)
 
     @patch('mslice.presenters.workspace_manager_presenter.delete_workspace')
+    def test_remove_all_workspaces(self, delete_ws_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        # Create a view that reports 3 selected workspaces on calls to get_workspace_selected
+        workspace1 = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1')
+        workspace2 = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file2')
+        self.view.get_workspace_selected = mock.Mock(return_value=[workspace1, workspace2])
+
+        self.presenter.notify(Command.RemoveAllWorkspaces)
+        self.view.get_workspace_selected.assert_called_once_with()
+        delete_calls = [call(workspace1), call(workspace2)]
+        delete_ws_mock.assert_has_calls(delete_calls, any_order=True)
+        assert(self.view.display_loaded_workspaces.called)
+
+    @patch('mslice.presenters.workspace_manager_presenter.delete_workspace')
     def test_remove_workspace_non_selected_prompt_user(self, delete_ws_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a view that reports no workspace selected on calls to get_workspace_selected
