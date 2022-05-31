@@ -29,14 +29,6 @@ jobs:
 
       - name: Build MSlice conda package
         run: |
-          conda config --set anaconda_upload no
+          conda config --set anaconda_upload yes
           conda install conda-build conda-verify
-          mamba build --label main $GITHUB_WORKSPACE/conda
-          echo "artifactName=$(basename /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2)" >> $GITHUB_ENV
-
-      - name: Upload artifact # replace with upload to anaconda
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.artifactName }}
-          path: /usr/share/miniconda3/envs/mslice-env/conda-bld/noarch/mslice-*.tar.bz2
-          if-no-files-found: ignore
+          mamba build --label main --user mantid --token ${{ secrets.ANACONDA_API_TOKEN }} $GITHUB_WORKSPACE/conda
