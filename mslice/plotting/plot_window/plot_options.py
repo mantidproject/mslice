@@ -9,6 +9,8 @@ from qtpy.QtCore import Signal
 from mslice.models.colors import named_cycle_colors, color_to_name
 from mslice.util.qt import load_ui
 
+from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
+
 
 class PlotOptionsDialog(QtWidgets.QDialog):
 
@@ -24,6 +26,15 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
+
+        self.x_min_validator = LineEditDoubleValidator(self.lneXMin, 0.0)
+        self.lneXMin.setValidator(self.x_min_validator)
+        self.x_max_validator = LineEditDoubleValidator(self.lneXMax, 0.0)
+        self.lneXMax.setValidator(self.x_max_validator)
+        self.y_min_validator = LineEditDoubleValidator(self.lneYMin, 0.0)
+        self.lneYMin.setValidator(self.y_min_validator)
+        self.y_max_validator = LineEditDoubleValidator(self.lneYMax, 0.0)
+        self.lneYMax.setValidator(self.y_max_validator)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
@@ -136,6 +147,11 @@ class SlicePlotOptions(PlotOptionsDialog):
         self.chkYLog.hide()
         self.cut_options.hide()
         self.setMaximumWidth(350)
+
+        self.c_min_validator = LineEditDoubleValidator(self.lneCMin, 0.0)
+        self.lneCMin.setValidator(self.c_min_validator)
+        self.c_max_validator = LineEditDoubleValidator(self.lneCMax, 0.0)
+        self.lneCMax.setValidator(self.c_max_validator)
 
         self.lneCMin.editingFinished.connect(self.cRangeEdited)
         self.lneCMax.editingFinished.connect(self.cRangeEdited)
