@@ -1,5 +1,7 @@
 from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
 
+from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
+
 from qtpy import QtWidgets
 from qtpy.QtCore import Signal
 
@@ -31,9 +33,15 @@ class QuickAxisOptions(QuickOptions):
         self.min_label = QtWidgets.QLabel("Min:")
         self.min = QtWidgets.QLineEdit()
         self.min.setText(str(existing_values[0]))
+        self.min_validator = LineEditDoubleValidator(self.min, str(existing_values[0]))
+        self.min.setValidator(self.min_validator)
+
         self.max_label = QtWidgets.QLabel("Max:")
         self.max = QtWidgets.QLineEdit()
         self.max.setText(str(existing_values[1]))
+        self.max_validator = LineEditDoubleValidator(self.max, str(existing_values[1]))
+        self.max.setValidator(self.max_validator)
+
         self.font_size_label = QtWidgets.QLabel("Font Size:")
         self.font_size = QtWidgets.QDoubleSpinBox()
         self.decimals = 1
