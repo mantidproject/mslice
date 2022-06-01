@@ -97,7 +97,26 @@ class CutPlotterPresenter(PresenterUtility):
             line = cache.pop(key)
             remove_line(line)
 
-    def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None):
+    @staticmethod
+    def _get_log_bragg_y_coords(size, portion_of_axes, datum):
+        datum = 0.001 if datum == 0 else datum
+        y1, y2 = plt.gca().get_ylim()
+        if (y2 > 0 and y1 > 0) or (y2 < 0 and y1 < 0):
+            total_steps = np.log10(y2/y1)
+        elif y1 < 0:
+            y1_int = -1
+            y2_int = 1
+            total_steps = np.log10(y2 / y2_int) + np.log10(y1 / y1_int) + 2
+        else:
+            y1 = 1 if y1 == 0 else y1
+            y2 = 1 if y2 == 0 else y2
+            total_steps = np.log10(y2/y1) + 1
+
+        adj_factor = total_steps * portion_of_axes / 2
+        return np.resize(np.array([10**adj_factor, 10**(-adj_factor), np.nan]), size) * datum
+
+    def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=None):
+        datum = 0 if datum is None else datum
         cache = self._cut_cache_dict[plt.gca()][0]
         cache.rotated = not is_twotheta(cache.cut_axis.units) and not is_momentum(cache.cut_axis.units)
         try:
@@ -114,10 +133,13 @@ class CutPlotterPresenter(PresenterUtility):
             q_axis = cache.cut_axis
         x, y = compute_powder_line(workspace_name, q_axis, key, cif_file=cif)
         try:
-            adj_scale_fac = (scale_fac / np.nanmax(y)) if not  y_has_logarithmic else (scale_fac / np.nanmax(y))
-            y = np.array(y) * adj_scale_fac
+            if not y_has_logarithmic:
+                y = np.array(y) * scale_fac / np.nanmax(y) + datum
+            else:
+                y = self._get_log_bragg_y_coords(len(y), 0.25, datum)
+
             self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
-        except ValueError:
+        except (ValueError, IndexError) as e:
             warnings.warn("No Bragg peak found.")
 
     def store_icut(self, icut):
@@ -137,3 +159,6 @@ class CutPlotterPresenter(PresenterUtility):
 
     def workspace_selection_changed(self):
         pass
+
+    def is_overplot(self, line):
+        return line in self._overplot_cache.values()

@@ -574,3 +574,7 @@ class SlicePlot(IPlot):
     @property
     def y_log(self):  # needed for interface consistency with cut plot
         return False
+
+    @staticmethod
+    def _get_overplot_datum():  # needed for interface consistency with cut plot
+        return 0

@@ -321,15 +321,23 @@ class CutPlot(IPlot):
     def is_icut(self):
         return self._is_icut
 
+    def _get_overplot_datum(self):
+        return np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
+                             if not self._cut_plotter_presenter.is_overplot(line)])
+
     def update_bragg_peaks(self):
         if self.plot_window.action_aluminium.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, None, self.y_log)
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, None, self.y_log,
+                                                          self._get_overplot_datum())
         if self.plot_window.action_copper.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, None, self.y_log)
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, None, self.y_log,
+                                                          self._get_overplot_datum())
         if self.plot_window.action_niobium.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, None, self.y_log)
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, None, self.y_log,
+                                                          self._get_overplot_datum())
         if self.plot_window.action_tantalum.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, None, self.y_log)
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, None, self.y_log,
+                                                          self._get_overplot_datum())
         self.update_legend()
 
     def save_icut(self):
