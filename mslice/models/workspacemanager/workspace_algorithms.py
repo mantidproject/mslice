@@ -135,7 +135,7 @@ def set_limits(ws, qmin, qmax, qstep, theta, emin, emax, estep):
 
 
 def _get_theta_for_limits(ws):
-    num_detectors = ws.raw_ws.getInstrument().getNumberDetectors()
+    num_detectors = ws.raw_ws.getInstrument().getNumberDetectors(skipMonitors=True)
     theta = [ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_detectors)]
     round_fac = 100
     ws.is_PSD = not all(x < y for x, y in zip(theta, theta[1:]))
