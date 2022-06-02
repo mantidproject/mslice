@@ -158,6 +158,7 @@ class CutPlot(IPlot):
 
     def change_axis_scale(self, xy_config):
         current_axis = self._canvas.figure.gca()
+        orig_y_scale_log = self.y_log
         if xy_config['x_log']:
             xmin = xy_config['x_range'][0]
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
@@ -184,10 +185,14 @@ class CutPlot(IPlot):
 
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
+
         else:
             current_axis.set_yscale('linear')
         self.x_range = xy_config['x_range']
         self.y_range = xy_config['y_range']
+
+        if xy_config['y_log'] or (xy_config['y_log'] != orig_y_scale_log):
+            self.update_bragg_peaks(refresh=True)
 
     def get_line_options(self, line):
         index = self._get_line_index(line)
@@ -325,17 +330,22 @@ class CutPlot(IPlot):
         return np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
                              if not self._cut_plotter_presenter.is_overplot(line)])
 
-    def update_bragg_peaks(self):
+    def update_bragg_peaks(self, refresh=None):
+        refresh = False if refresh is None else True
         if self.plot_window.action_aluminium.isChecked():
+            refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Aluminium')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, None, self.y_log,
                                                           self._get_overplot_datum())
         if self.plot_window.action_copper.isChecked():
+            refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Copper')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, None, self.y_log,
                                                           self._get_overplot_datum())
         if self.plot_window.action_niobium.isChecked():
+            refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Niobium')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, None, self.y_log,
                                                           self._get_overplot_datum())
         if self.plot_window.action_tantalum.isChecked():
+            refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Tantalum')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, None, self.y_log,
                                                           self._get_overplot_datum())
         self.update_legend()

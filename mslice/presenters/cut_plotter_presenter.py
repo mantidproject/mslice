@@ -136,7 +136,7 @@ class CutPlotterPresenter(PresenterUtility):
             if not y_has_logarithmic:
                 y = np.array(y) * scale_fac / np.nanmax(y) + datum
             else:
-                y = self._get_log_bragg_y_coords(len(y), 0.25, datum)
+                y = self._get_log_bragg_y_coords(len(y), 0.15, datum)
 
             self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
         except (ValueError, IndexError) as e:
