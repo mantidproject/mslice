@@ -208,7 +208,7 @@ class CutPlotOptions(PlotOptionsDialog):
     def set_line_options(self, line_options):
         for i in range(len(line_options)):
             line_widget = LegendAndLineOptionsSetter(line_options[i], self.color_validator, self.show_legends)
-            line_widget.destroyed.connect(functools.partial(self.remove_line_widget, line_widget, i))
+            line_widget.destroyed.connect(functools.partial(self.remove_line_widget, line_widget))
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
 
@@ -235,7 +235,8 @@ class CutPlotOptions(PlotOptionsDialog):
         msg_box.exec_()
         return False
 
-    def remove_line_widget(self, selected, index):
+    def remove_line_widget(self, selected):
+        index = self._line_widgets.index(selected)
         self._line_widgets.remove(selected)
         self.removed_line.emit(index)
 
