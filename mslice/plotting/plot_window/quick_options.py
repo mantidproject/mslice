@@ -10,8 +10,8 @@ class QuickOptions(QtWidgets.QDialog):
 
     ok_clicked = Signal()
 
-    def __init__(self):
-        super(QuickOptions, self).__init__()
+    def __init__(self, parent=None):
+        super(QuickOptions, self).__init__(parent)
         self.layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.layout)
         self.ok_button = QtWidgets.QPushButton("OK", self)
@@ -26,8 +26,8 @@ class QuickOptions(QtWidgets.QDialog):
 
 class QuickAxisOptions(QuickOptions):
 
-    def __init__(self, target, existing_values, font_size, grid, log, redraw_signal):
-        super(QuickAxisOptions, self).__init__()
+    def __init__(self, parent, target, existing_values, font_size, grid, log, redraw_signal):
+        super(QuickAxisOptions, self).__init__(parent)
         self.setWindowTitle("Edit " + target)
         self.log = log
         self.min_label = QtWidgets.QLabel("Min:")
@@ -99,13 +99,14 @@ class QuickAxisOptions(QuickOptions):
     def is_kept_open(self):
         return self.keep_open.isChecked()
 
+
 class QuickLabelOptions(QuickOptions):
 
     ok_clicked = Signal()
     cancel_clicked = Signal()
 
-    def __init__(self, label, redraw_signal):
-        super(QuickLabelOptions, self).__init__()
+    def __init__(self, parent, label, redraw_signal):
+        super(QuickLabelOptions, self).__init__(parent)
         self.setWindowTitle("Edit " + label.get_text())
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText(label.get_text())
@@ -139,13 +140,14 @@ class QuickLabelOptions(QuickOptions):
         self.redraw_signal.emit()
         self.accept()
 
+
 class QuickLineOptions(QuickOptions):
 
     ok_clicked = Signal()
     cancel_clicked = Signal()
 
-    def __init__(self, line_options, show_legends):
-        super(QuickLineOptions, self).__init__()
+    def __init__(self, parent, line_options, show_legends):
+        super(QuickLineOptions, self).__init__(parent)
         self.setWindowTitle("Edit line")
         self.line_widget = LegendAndLineOptionsSetter(line_options, None, show_legends)
         self.layout.addWidget(self.line_widget)
