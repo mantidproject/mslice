@@ -15,7 +15,7 @@ from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
-from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line,\
+from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line, \
     cif_file_powder_line
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
@@ -46,6 +46,8 @@ class CutPlot(IPlot):
         self._waterfall_cache = {}
         self._is_icut = False
         self._powder_lines = {}
+        self._datum_dirty = True
+        self._datum_cache = 0
 
     def save_default_options(self):
         self.default_options = {
@@ -292,6 +294,9 @@ class CutPlot(IPlot):
                 line.remove()
         containers.remove(container)
 
+        self._datum_dirty = True
+        self.update_bragg_peaks(refresh=True)
+
     def toggle_errorbar(self, line_index, line_options):
         container = self._canvas.figure.gca().containers[line_index]
         error_bar_elements = container.get_children()[1:]
@@ -326,11 +331,14 @@ class CutPlot(IPlot):
         return self._is_icut
 
     def _get_overplot_datum(self):
-        return np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
-                             if not self._cut_plotter_presenter.is_overplot(line)])
+        if self._datum_dirty:
+            self._datum_cache = np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
+                                              if not self._cut_plotter_presenter.is_overplot(line)])
+            self._datum_dirty = False
 
-    def update_bragg_peaks(self, refresh=None):
-        refresh = False if refresh is None else True
+        return self._datum_cache
+
+    def update_bragg_peaks(self, refresh=False):
         if self.plot_window.action_aluminium.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Aluminium')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, None, self.y_log,
@@ -438,7 +446,7 @@ class CutPlot(IPlot):
                     line.set_ydata(self._waterfall_cache[line][1] + ind * y)
                 elif isinstance(line, LineCollection):
                     if LooseVersion(mpl_version) < LooseVersion('3.3'):
-                        line.set_offset_position('data') # set_offset_position is deprecated since 3.3
+                        line.set_offset_position('data')  # set_offset_position is deprecated since 3.3
                     line.set_offsets((ind * x, ind * y))
 
     def on_newplot(self, ax):
@@ -465,6 +473,9 @@ class CutPlot(IPlot):
                     new_line = True
         if new_line and num_lines > 1:
             self.toggle_waterfall()
+
+        self._datum_dirty = True
+        self.update_bragg_peaks(refresh=True)
 
     def generate_script(self, clipboard=False):
         try:

@@ -11,6 +11,8 @@ from mslice.plotting.plot_window.overplot_interface import remove_line, plot_ove
 from mslice.models.powder.powder_functions import compute_powder_line
 import warnings
 
+BRAGG_SIZE_ON_AXES = 0.15
+
 
 class CutPlotterPresenter(PresenterUtility):
 
@@ -104,10 +106,8 @@ class CutPlotterPresenter(PresenterUtility):
         if (y2 > 0 and y1 > 0) or (y2 < 0 and y1 < 0):
             total_steps = np.log10(y2 / y1)
         elif y1 < 0:
-            y1_int = -1
-            y2_int = 1
-            total_steps_up = np.log10(y2 / y2_int) + 1 if abs(y2) >= 1 else abs(y2)
-            total_steps_down = np.log10(y1 / y1_int) + 1 if abs(y1) >= 1 else abs(y1)
+            total_steps_up = np.log10(y2) + 1 if abs(y2) >= 1 else abs(y2)
+            total_steps_down = np.log10(-y1) + 1 if abs(y1) >= 1 else abs(y1)
             total_steps = total_steps_up + total_steps_down
         else:
             y1 = 1 if y1 == 0 else y1
@@ -117,8 +117,7 @@ class CutPlotterPresenter(PresenterUtility):
         adj_factor = total_steps * portion_of_axes / 2
         return np.resize(np.array([10 ** adj_factor, 10 ** (-adj_factor), np.nan]), size) * datum
 
-    def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=None):
-        datum = 0 if datum is None else datum
+    def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=0):
         cache = self._cut_cache_dict[plt.gca()][0]
         cache.rotated = not is_twotheta(cache.cut_axis.units) and not is_momentum(cache.cut_axis.units)
         try:
@@ -138,7 +137,7 @@ class CutPlotterPresenter(PresenterUtility):
             if not y_has_logarithmic:
                 y = np.array(y) * scale_fac / np.nanmax(y) + datum
             else:
-                y = self._get_log_bragg_y_coords(len(y), 0.15, datum)
+                y = self._get_log_bragg_y_coords(len(y), BRAGG_SIZE_ON_AXES, datum)
 
             self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
         except (ValueError, IndexError):
