@@ -40,5 +40,6 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
     def test_process_limits_does_not_fail_for_indirect_data(self):
         process_limits(self.indirect_workspace)
 
-    def test_process_limits_does_not_fail_for_workspace_where_not_every_histogram_corresponds_to_a_detector(self):
-        process_limits(self.extended_workspace)
+    def test_process_limits_will_raise_a_runtime_error_for_a_workspace_where_not_every_histogram_has_a_detector(self):
+        with self.assertRaises(RuntimeError):
+            process_limits(self.extended_workspace)
