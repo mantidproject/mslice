@@ -59,15 +59,16 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                         allChecked = True
                     else:
                         load(filename=file_paths[i], output_workspace=ws_name)
+
+                    if not allChecked:
+                        allChecked = self.check_efixed(ws_name, multi)
+                    else:
+                        apply_fixed_final_energy_to_a_valid_workspace(ws_name, self._EfCache)
                 except (ValueError, TypeError) as e:
                     self._view.error_loading_workspace(e)
                 except RuntimeError:
                     not_opened.append(ws_name)
                 else:
-                    if not allChecked:
-                        allChecked = self.check_efixed(ws_name, multi)
-                    else:
-                        apply_fixed_final_energy_to_a_valid_workspace(ws_name, self._EfCache)
                     if self._main_presenter is not None:
                         self._main_presenter.show_workspace_manager_tab()
                         self._main_presenter.show_tab_for_workspace(get_workspace_handle(ws_name))
