@@ -139,7 +139,7 @@ class CutPlotterPresenter(PresenterUtility):
                 y = self._get_log_bragg_y_coords(len(y), 0.15, datum)
 
             self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
-        except (ValueError, IndexError) as e:
+        except (ValueError, IndexError):
             warnings.warn("No Bragg peak found.")
 
     def store_icut(self, icut):

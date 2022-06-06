@@ -185,7 +185,6 @@ class CutPlot(IPlot):
 
             if ymin > 0:
                 xy_config['y_range'] = (ymin, xy_config['y_range'][1])
-
         else:
             current_axis.set_yscale('linear')
         self.x_range = xy_config['x_range']
