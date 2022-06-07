@@ -12,9 +12,9 @@ def generate_script(ws_name, filename=None, plot_handler=None, window=None, clip
             path = path[0]
         if not path:
             return
-        filename = path + '{}'.format('' if path.endswith('.py') else '.py')
+        filename = f"{path}{'' if path.endswith('.py') else '.py'}"
     elif not clipboard:
-        filename = filename + '{}'.format('' if filename.endswith('.py') else '.py')
+        filename = f"{filename}{'' if filename.endswith('.py') else '.py'}"
 
     ax = window.canvas.figure.axes[0]
     script_lines = preprocess_lines(ws_name, plot_handler, ax)
@@ -64,10 +64,10 @@ def generate_script_lines(raw_ws, workspace_name):
         alg_name = algorithm.name()
         kwargs, output_ws = get_algorithm_kwargs(algorithm, existing_ws_refs)
         if (output_ws is not None and output_ws != ws_name):
-            lines += ["{} = mc.{}({})\n".format(output_ws, alg_name, kwargs)]
+            lines += [f"{output_ws} = mc.{alg_name}({kwargs})\n"]
             existing_ws_refs.append(output_ws)
         else:
-            lines += ["ws_{} = mc.{}({})\n".format(ws_name, alg_name, kwargs)]
+            lines += [f"ws_{ws_name} = mc.{alg_name}({kwargs})\n"]
     return lines
 
 def _parse_prop(prop):
@@ -96,7 +96,7 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
                 continue
             if algorithm.name() == "Load":
                 if prop.name() == "Filename":
-                    arguments += ["{}='{}'".format(prop.name(), pval)]
+                    arguments += [f"{prop.name()}='{pval}'"]
                     continue
                 elif prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
                     continue
@@ -104,9 +104,9 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
                 if prop.name() == "Limits" or prop.name() == "OutputWorkspace" or prop.name() == "ProjectionType":
                     continue
             if isinstance(pval, str) and pval.replace(".", "_") in existing_ws_refs:
-                arguments += ["{}={}".format(prop.name(), pval.replace(".", "_"))]
+                arguments += [f"{prop.name()}={pval.replace('.', '_')}"]
             elif isinstance(prop.value(), str):
-                arguments += ["{}='{}'".format(prop.name(), pval)]
+                arguments += [f"{prop.name()}='{pval}'"]
             else:
-                arguments += ["{}={}".format(prop.name(), pval)]
+                arguments += [f"{prop.name()}={pval}"]
     return ", ".join(arguments), output_ws
