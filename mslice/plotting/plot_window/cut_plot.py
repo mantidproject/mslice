@@ -285,12 +285,12 @@ class CutPlot(IPlot):
 
     def remove_line_by_index(self, line_index):
         containers = self._canvas.figure.gca().containers
-        container = containers[line_index]
-        container[0].remove()
-        for i in range(2):
-            for line in container[i + 1]:
+        if line_index < len(containers):
+            container = containers[line_index]
+            container[0].remove()
+            for line in container[1] + container[2]:
                 line.remove()
-        containers.remove(container)
+            containers.remove(container)
 
     def toggle_errorbar(self, line_index, line_options):
         container = self._canvas.figure.gca().containers[line_index]

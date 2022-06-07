@@ -2,7 +2,6 @@ from __future__ import (absolute_import, division, print_function)
 
 from numpy import arange as np_arange
 from six import iteritems
-import functools
 
 import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
@@ -206,9 +205,9 @@ class CutPlotOptions(PlotOptionsDialog):
             line_widget.destroyed.disconnect()
 
     def set_line_options(self, line_options):
-        for i in range(len(line_options)):
-            line_widget = LegendAndLineOptionsSetter(line_options[i], self.color_validator, self.show_legends)
-            line_widget.destroyed.connect(functools.partial(self.remove_line_widget, line_widget, i))
+        for line_option in line_options:
+            line_widget = LegendAndLineOptionsSetter(line_option, self.color_validator, self.show_legends,
+                                                     self.remove_line_widget)
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
 
@@ -235,7 +234,8 @@ class CutPlotOptions(PlotOptionsDialog):
         msg_box.exec_()
         return False
 
-    def remove_line_widget(self, selected, index):
+    def remove_line_widget(self, selected):
+        index = self._line_widgets.index(selected)
         self._line_widgets.remove(selected)
         self.removed_line.emit(index)
 
@@ -283,8 +283,10 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     inverse_styles = {v: k for k, v in iteritems(styles)}
     inverse_markers = {v: k for k, v in iteritems(markers)}
 
-    def __init__(self, line_options, color_validator, show_legends):
+    def __init__(self, line_options, color_validator, show_legends, remove_line_callback=None):
         super(LegendAndLineOptionsSetter, self).__init__()
+
+        self._deletion_callback = remove_line_callback
 
         self.legend_text_label = QtWidgets.QLabel("Plot")
         self.legendText = QtWidgets.QLineEdit(self)
@@ -382,12 +384,18 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
             self.delete_button = QtWidgets.QPushButton("Delete Line", self)
             row5.addWidget(self.delete_button)
+            self.delete_button.clicked.connect(self.deletion_callback)
             self.delete_button.clicked.connect(self.deleteLater)
 
         separator = QtWidgets.QFrame()
         separator.setFrameShape(QtWidgets.QFrame.HLine)
         separator.setFrameShadow(QtWidgets.QFrame.Sunken)
         layout.addWidget(separator)
+
+    def deletion_callback(self):
+        if self._deletion_callback is not None:
+            self._deletion_callback(self)
+            self._deletion_callback = None
 
     def color_valid(self, index):
         if self.color_validator is None:
