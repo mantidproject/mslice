@@ -6,7 +6,9 @@ from mantid.simpleapi import AddSampleLog, CreateSampleWorkspace
 from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.models.cut.cut import Cut
 from mslice.models.axis import Axis
+from mslice.models.workspacemanager.workspace_provider import add_workspace
 from mslice.scripting import preprocess_lines, generate_script_lines, get_algorithm_kwargs, generate_script
+from mslice.tests.testhelpers.fake_objects import FakeClipboard, FakeFile
 
 
 class ScriptingTest(unittest.TestCase):
@@ -26,9 +28,10 @@ class ScriptingTest(unittest.TestCase):
         workspace.e_fixed = 10
         return workspace
 
+    @mock.patch('builtins.open')
     @mock.patch('mslice.scripting.preprocess_lines')
     @mock.patch('mslice.scripting.add_plot_statements')
-    def test_that_generate_script_works_as_expected(self, add_plot_statements, preprocess_lines):
+    def test_that_generate_script_works_as_expected(self, add_plot_statements, preprocess_lines, mock_open):
         workspace = self.create_workspace('test')
         filename = 'filename'
         plot_handler = mock.MagicMock()
@@ -38,6 +41,7 @@ class ScriptingTest(unittest.TestCase):
 
         add_plot_statements.assert_called_once()
         preprocess_lines.assert_called_once()
+        mock_open.assert_called_once()
 
     @mock.patch('mslice.scripting.get_workspace_handle')
     @mock.patch('mslice.scripting.generate_script_lines')
@@ -226,3 +230,26 @@ class ScriptingTest(unittest.TestCase):
         args, output_ws = get_algorithm_kwargs(some_alg, 'workspace_name')
 
         self.assertIn("{}='{}'".format("SomeProp", "string"), args)
+
+    @mock.patch('qtpy.QtGui.QGuiApplication.clipboard')
+    @mock.patch('builtins.open')
+    def test_generate_script_produces_the_same_script_for_file_and_clipboard(self, mock_open, mock_clipboard):
+        workspace = self.create_workspace('test')
+        add_workspace(workspace, workspace.name)
+
+        plot_handler = mock.MagicMock()
+        plot_window = plot_handler.plot_window
+
+        fake_file = FakeFile()
+        mock_open.return_value = fake_file
+
+        generate_script(workspace.name, filename='filename', plot_handler=plot_handler, window=plot_window)
+        mock_open.assert_called_once()
+
+        fake_clipboard = FakeClipboard()
+        mock_clipboard.return_value = fake_clipboard
+
+        generate_script(workspace.name, plot_handler=plot_handler, window=plot_window, clipboard=True)
+        mock_clipboard.assert_called_once()
+
+        self.assertEqual(fake_clipboard.text, fake_file.text)
