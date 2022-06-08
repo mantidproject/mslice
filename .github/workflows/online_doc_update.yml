@@ -15,6 +15,7 @@ jobs:
         fetch-depth: 0
     - name: Update dependencies
       run: |
+        sudo apt-get update -qq
         sudo apt-get install texlive-latex-base texlive-latex-recommended \
             texlive-fonts-recommended texlive-latex-extra dvipng
     - name: Build and Commit
