@@ -18,6 +18,7 @@ to report any bugs or suggest any improvements to the program.
    cutting
    slicing
    cli
+   math_ref
 
 
 * :ref:`search`
