@@ -34,7 +34,8 @@ def toggle_overplot_line(plot_handler, plotter_presenter, key, recoil, checked, 
     plot_handler.manager.report_as_current()
 
     if checked:
-        plotter_presenter.add_overplot_line(plot_handler.ws_name, key, recoil, cif_file)
+        plotter_presenter.add_overplot_line(plot_handler.ws_name, key, recoil, cif_file, plot_handler.y_log,
+                                            plot_handler._get_overplot_datum())
     else:
         plotter_presenter.hide_overplot_line(plot_handler.ws_name, key)
 

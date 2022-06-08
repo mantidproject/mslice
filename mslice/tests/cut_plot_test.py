@@ -57,7 +57,7 @@ class CutPlotTest(unittest.TestCase):
         self.axes.get_lines = MagicMock(return_value=[line])
         self.canvas.figure.gca = MagicMock(return_value=self.axes)
         xy_config = {'x_log': True, 'y_log': True, 'x_range': (0, 20), 'y_range': (1, 7)}
-
+        self.cut_plot.update_bragg_peaks = MagicMock()
         self.cut_plot.change_axis_scale(xy_config)
 
         if LooseVersion(mpl_version) < LooseVersion('3.3'):
@@ -67,6 +67,7 @@ class CutPlotTest(unittest.TestCase):
             self.axes.set_xscale.assert_called_once_with('symlog', linthresh=10.0)
             self.axes.set_yscale.assert_called_once_with('symlog', linthresh=1.0)
 
+        self.cut_plot.update_bragg_peaks.assert_called_once_with(refresh=True)
         self.assertEqual(self.cut_plot.x_range, (0, 20))
         self.assertEqual(self.cut_plot.y_range, (1, 7))
 
@@ -99,6 +100,7 @@ class CutPlotTest(unittest.TestCase):
 
     def test_waterfall(self):
         self.cut_plot._apply_offset = MagicMock()
+        self.cut_plot.update_bragg_peaks = MagicMock()
         self.cut_plot.waterfall = True
         self.cut_plot.waterfall_x = 1
         self.cut_plot.waterfall_y = 2
@@ -107,3 +109,4 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.waterfall = False
         self.cut_plot.toggle_waterfall()
         self.cut_plot._apply_offset.assert_called_with(0, 0)
+        self.cut_plot.update_bragg_peaks.assert_called_with(refresh=True)
