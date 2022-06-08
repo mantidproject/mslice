@@ -455,9 +455,10 @@ class CutPlot(IPlot):
                     line.set_xdata(self._waterfall_cache[line][0] + ind * x)
                     line.set_ydata(self._waterfall_cache[line][1] + ind * y)
                 elif isinstance(line, LineCollection):
-                    if LooseVersion(mpl_version) < LooseVersion('3.3'):
-                        line.set_offset_position('data')  # set_offset_position is deprecated since 3.3
-                    line.set_offsets((ind * x, ind * y))
+                    for index, path in enumerate(line._paths):
+                        if not np.isnan(path.vertices).any():
+                            path.vertices = np.add(self._waterfall_cache[line][index],
+                                                   np.array([[ind * x, ind * y], [ind * x, ind * y]]))
 
     def on_newplot(self, ax):
         # This callback should be activated by a call to errorbar
