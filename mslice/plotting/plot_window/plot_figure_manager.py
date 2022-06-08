@@ -274,9 +274,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         if self._ygrid:
             self.canvas.figure.gca().grid(True, axis='y')
 
-    def update_axes(self, ax):
+    def update_axes(self, ax, plot_over):
         if self.plot_handler is not None:
-            self.plot_handler.on_newplot(ax)
+            self.plot_handler.on_newplot(ax, plot_over)
 
     def move_window(self, x, y):
         center = QtWidgets.QDesktopWidget().screenGeometry().center()
