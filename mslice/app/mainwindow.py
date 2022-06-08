@@ -263,9 +263,15 @@ class MainWindow(MainView, QMainWindow):
 
     def print_startup_notifications(self):
         #if notifications are required to be printed on mslice start up, add to list.
-        print_list = ["WARNING: The default cut algorithm in mslice has been changed from 'Rebin (average counts)' \
-to 'Intergration (summed counts)'. This is expected to result in different output values to those obtained historically. \n\
-For more information, please refer to documentation at: https://mantidproject.github.io/mslice/cutting.html"]
+
+        # Disable this notification pending decision on changing the default
+        #print_list = ["\nWARNING: The default cut algorithm in mslice has been changed " \
+        #              "from 'Rebin (average counts)' to 'Intergration (summed counts)'.\n" \
+        #              "This is expected to result in different output values to those obtained historically.\n" \
+        #              "For more information, please refer to documentation at: " \
+        #              "https://mantidproject.github.io/mslice/cutting.html"]
+        print_list = []
 
         for item in print_list:
-            print(item)
+            for strn in item.split('\n'):
+                self._console.execute(f'print("{strn}")', hidden=True)

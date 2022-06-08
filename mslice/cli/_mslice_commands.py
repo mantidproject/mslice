@@ -167,7 +167,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     return get_slice_plotter_presenter().create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
 
 
-def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Integration'):
+def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin'):
     """
     Cuts workspace.
     :param InputWorkspace: Workspace to cut. The parameter can be either a python
@@ -183,6 +183,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
             '<name>, <start>, <end>, <step>, cm-1', or '<name>, <start>, <end>, meV'
             Recognised energy units are 'meV' (default) and 'cm-1'
     :param NormToOne: if True the cut will be normalized to one.
+    :param Algorithm: the cut algorithm to use. Either 'Rebin' (default) or 'Integration'
     :return:
     """
     from mslice.app.presenters import get_cut_plotter_presenter
