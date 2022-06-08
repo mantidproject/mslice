@@ -100,6 +100,7 @@ class CutPlotTest(unittest.TestCase):
 
     def test_waterfall(self):
         self.cut_plot._apply_offset = MagicMock()
+        self.cut_plot.update_bragg_peaks = MagicMock()
         self.cut_plot.waterfall = True
         self.cut_plot.waterfall_x = 1
         self.cut_plot.waterfall_y = 2
@@ -108,3 +109,4 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.waterfall = False
         self.cut_plot.toggle_waterfall()
         self.cut_plot._apply_offset.assert_called_with(0, 0)
+        self.cut_plot.update_bragg_peaks.assert_called_with(refresh=True)
