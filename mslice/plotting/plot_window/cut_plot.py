@@ -332,8 +332,15 @@ class CutPlot(IPlot):
 
     def _get_overplot_datum(self):
         if self._datum_dirty:
-            self._datum_cache = np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
-                                              if not self._cut_plotter_presenter.is_overplot(line)])
+            if not self.waterfall:
+                self._datum_cache = np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
+                                                  if not self._cut_plotter_presenter.is_overplot(line)])
+            else:
+                for line in self._canvas.figure.gca().get_lines():
+                    if not self._cut_plotter_presenter.is_overplot(line):
+                        self._datum_cache = np.nanmedian([line.get_ydata()])
+                        break
+
             self._datum_dirty = False
 
         return self._datum_cache
@@ -434,6 +441,9 @@ class CutPlot(IPlot):
             self._apply_offset(self.plot_window.waterfall_x, self.plot_window.waterfall_y)
         else:
             self._apply_offset(0., 0.)
+
+        self._datum_dirty = True
+        self.update_bragg_peaks(refresh=True)
         self._canvas.draw()
 
     def _apply_offset(self, x, y):
