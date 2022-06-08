@@ -435,14 +435,14 @@ class CutPlot(IPlot):
                             path.vertices = np.add(self._waterfall_cache[line][index],
                                                    np.array([[ind * x, ind * y], [ind * x, ind * y]]))
 
-    def on_newplot(self, ax):
+    def on_newplot(self, ax, plot_over):
         # This callback should be activated by a call to errorbar
         new_line = False
         line_containers = self._canvas.figure.gca().containers
         num_lines = len(line_containers)
         self.plot_window.action_waterfall.setEnabled(num_lines > 1)
         self.plot_window.toggle_waterfall_edit()
-        if not self._is_icut:
+        if not self._is_icut and not plot_over:
             self.plot_window.action_aluminium.setChecked(False)
             self.plot_window.action_copper.setChecked(False)
             self.plot_window.action_niobium.setChecked(False)
