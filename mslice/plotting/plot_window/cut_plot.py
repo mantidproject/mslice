@@ -110,8 +110,6 @@ class CutPlot(IPlot):
             icut.window_closing()
             self.manager.button_pressed_connected(False)
             self.manager.picking_connected(False)
-        if self._plot_options_view is not None:
-            self._plot_options_view.disconnect()
         self.plot_window.close()
 
     def plot_options(self):
