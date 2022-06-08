@@ -200,10 +200,6 @@ class CutPlotOptions(PlotOptionsDialog):
         self.chkShowLegends.stateChanged.connect(self.showLegendsEdited)
         self.showLegendsEdited.connect(self.disable_show_legend)
 
-    def disconnect(self):
-        for line_widget in self._line_widgets:
-            line_widget.destroyed.disconnect()
-
     def set_line_options(self, line_options):
         for line_option in line_options:
             line_widget = LegendAndLineOptionsSetter(line_option, self.color_validator, self.show_legends,
