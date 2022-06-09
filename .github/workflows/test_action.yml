@@ -1,0 +1,32 @@
+name: MSlice aaction tests
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout MSlice
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
+          activate-environment: mslice-env
+          environment-file: environment.yml
+          python-version: 3.8
+          auto-activate-base: false
+
+      - name: Install Mantid
+        run: |
+        uses: ./.github/actions/publish-package
+        with:
+          token: ${{ secrets.ANACONDA_API_TOKEN }}
