@@ -26,7 +26,6 @@ jobs:
           auto-activate-base: false
 
       - name: Install Mantid
-        run: |
         uses: ./.github/actions/publish-package
         with:
           token: ${{ secrets.ANACONDA_API_TOKEN }}
