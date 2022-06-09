@@ -15,16 +15,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2.1.1
-        with:
-          miniforge-version: latest
-          miniforge-variant: Mambaforge
-          activate-environment: mslice-env
-          environment-file: environment.yml
-          python-version: 3.8
-          auto-activate-base: false
-
       - name: Install Mantid
         uses: ./.github/actions/publish-package
         with:
