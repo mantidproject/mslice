@@ -26,7 +26,7 @@ runs:
       conda activate build-env
       conda install -c conda-forge mamba anaconda-client conda-verify
       # conda config --add channels conda-forge
-      conda config --add channels mantid mantid/label/nightly
+      conda config --add channels mantid
       conda config --add channels mantid/label/nightly
 
   - name: Build package
