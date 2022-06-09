@@ -30,10 +30,9 @@ integrate over [0,3], [3,6], [6,9] and [9,10] respectively.
 
 Cuts with the same range from multiple datasets can be plotted by first selecting multiple workspaces in the left panel.
 
-There are two different methods to compute cuts: ``Rebin`` and ``Integration``.
-**NOTE: for mantid major releases from** ``v6.40``\ **, the default cutting algorithm has been changed from** ``Rebin``
-**to** ``Integration``\ **. For more detail on this change, and cutting algorithms in general, see the** *Cutting Algorithms*
-**section below**.
+There are two different methods to compute cuts: ``Rebin`` and ``Integration``, which can be selected from the
+``Cut Algorithm`` drop down menu. The difference between these methods are described in the :ref:`Cutting_Algorithms`
+section below and in more detail in the :ref:`Mathematical_Reference`. 
 
 Clicking on the ``Norm to 1`` check box will cause the resulting cut data to be normalised such that the maximum of the data
 of each cut is unity.
@@ -122,10 +121,3 @@ similar cuts on the same workspace.
 You can also change the default using the ``Options`` menu, ``Cut algorithm default``
 entry. This will change the default cut algorithm *for this session of MSlice*
 (the default algorithm will revert to ``Rebin`` if you restart MSlice).
-
-..
-  For mantid major releases from ``v6.40``, the default cutting algorithm has been changed from ``Rebin`` to ``Integration``. This change
-  has been made because the ``Integration`` method can be used for both absolute and non-absolute units measurements. Conversely, for
-  absolute units measurements the ``Rebin`` method will give incorrect and misleading values.
-  As a result of this change, it is expected that values calculanced henceforth will differ from those calculated historically, if the
-  default integration method has been used.

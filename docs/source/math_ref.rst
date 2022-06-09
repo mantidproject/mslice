@@ -15,6 +15,8 @@ in reciprocal space, a coordinate transformation is needed.
 This means that the input and output binning grids of the data will not be axis aligned, and will
 instead look something like this:
 
+.. _grid_figure:
+
 .. image:: images/math_ref/rebin_grids.svg
    :width: 600
 
@@ -23,7 +25,7 @@ Where the square red grid represents the target (output) bins, and the slanted g
 As discussed in the :ref:`PSD_and_non-PSD_modes` section, MSlice makes a distinction between
 **PSD** (fine green grid) and **non-PSD** (coarser green grid) data.
 
-``Slice`` refers to a rebin into a two dimensional output, whilst ``Cut`` refers to a rebin _or_
+A ``Slice`` refers to a rebin into a two dimensional output, whilst a ``Cut`` is a rebin _or_
 integration into a one dimensional output.
 For each type of data (**PSD** and **non-PSD**) we will describe each operation in turn.
 
@@ -33,14 +35,14 @@ PSD Slice
 
 For **PSD** data, MSlice uses *centre-point rebinning*, treating each input bin ("pixel") as a
 point and summing the full signal of each pixel whose centres lie within an output bin
-(illustrated in the image by the darker green shading in top left).
+(illustrated in the image by the darker green shading in top left, with dots marking centres).
 Thus the output signal in the :math:`(i,j)`\ th bin, :math:`Y_{ij}`, is:
 
 .. math::
     Y_{ij} = \frac{1}{N_{kl}} \sum_{kl} y_{kl}
 
 where :math:`y_{kl}` is the input signal in the input :math:`(k,l)`\ th bin
-and the sum runs over the :math:`N_{kl}` number of bins whoses centres lie within the
+and the sum runs over the :math:`N_{kl}` number of bins whose centres lie within the
 boundaries of the :math:`(i,j)`\ th output bin.
 
 The above expression uses the ``NumEventsNormalization`` convention of Mantid which is the
@@ -59,7 +61,7 @@ in the :ref:`Cutting_Algorithms` section:
 
 - The default ``Rebin`` method just uses the rebinning described above with one axis having
   only a single bin.
-- The ``Integration`` method first rebins the data as described above with integration axis
+- The ``Integration`` method first rebins the data as described above with the integration axis
   divided into :math:`N_{\mathrm{int}} =` 100 bins.
   It then calls the relevant Mantid algorithm
   (`IntegrateMDHistoWorkspace <https://docs.mantidproject.org/nightly/algorithms/IntegrateMDHistoWorkspace-v1.html>`_\ )
@@ -88,15 +90,15 @@ then all the :math:`w_i` will be equal to the full integration width and the dif
 
 However, if the integration range covers region with no data (e.g. beyond the kinematic limits)
 then the two cuts *may* look very different because :math:`C_i^{\mathrm{integration}}` will weight
-regions with more data more heavily than regions without data.
+regions with data more heavily than regions without data.
 
 
 Non-PSD Slice
 -------------
 
 For **non-PSD** data, MSlice uses *fractional rebinning*, where it first calculates the
-overlap area between the input and output bins, and then sums only the fractions of the
-signal of the input bins within the output bin (darker green shading in bottom right).
+overlap area between the input and output bins, and then sums only the fraction of the
+signal of the input bins which overlaps the output bin.
 
 The output signal is computed as:
 
@@ -111,10 +113,10 @@ and the output uncertainty as:
 where :math:`f_{kl}` is the fractional overlap of the input :math:`(k,l)`\ th bin with
 the output :math:`(i,j)`\ th bin.
 
-This is illustrated in the image at the start of the page by the square on the right
+This is illustrated in the :ref:`figure <grid_figure>` at the start of the page by the square on the right
 hand side with blue triangular and orange quadrilateral shaded regions.
 The blue and orange shading illustrates the fractional overlap areas which weights
-the signal in the top left and top right input bins (large parallelograms).
+the signal in the top left and top right input bins (large parallelograms) respectively.
 
 Non-PSD Cuts
 ------------
@@ -137,14 +139,14 @@ and 100 bins in the integration axis and then sums them as:
     C_i^{\mathrm{integration}} = \left. N_i \sum_{j \in \mathcal{F}} Y_{ij} w_{ij} \right/ \sum_{j \in \mathcal{F}} F_{ij}
 
 where :math:`N_i = \sum_{j \in \mathcal{D}} 1` is the number of :math:`j` bins at a given
-:math:`i` with non-zero fraction (e.g. if the integration contains only regions with data
+:math:`i` *with non-zero fraction* (e.g. if the integration contains only regions with data
 then :math:`N_i` = 100, otherwise :math:`N_i` will be less),
 and :math:`w_{ij}` is the width along the :math:`j`\ th axis of the :math:`(i,j)`\ th bin.
 The :math:`N_i` normalisation is needed because in the limiting case where all the fractions
-:math:`F_i` are unity, the denominator would be :math:`N_i`, so we recover the usual
+:math:`F_{ij}` are unity, the denominator would be :math:`N_i`, so we recover the usual
 expression for integrating over a distribution.
 Note that as previously, :math:`\mathcal{D}` indicates the region within the integration
-range with non-zero fractions.
+range with data (in this case equivalent to regions with non-zero fractions).
 
 Like with the **PSD** case there is thus an :math:`i` dependent scaling factor :math:`N_i w`
 (assuming all the bins have the same width) between ``Cuts`` computed using the ``Rebin`` or
@@ -185,7 +187,7 @@ However, an ``Integration`` over :math:`|Q|` instead of energy will yield units 
 average ``Rebin`` which will leave the units unchanged.
 
 Unfortunately, the input files read by MSlice do not indicate if the signal values saved
-are in absolute units or not, so MSlice cannot automatically write the correct units to axes
+are in absolute units or not, so MSlice cannot automatically display the correct units on plots
 - this is left to the user.
 
 A note on the regions of validity of the two algorithms
@@ -193,8 +195,8 @@ A note on the regions of validity of the two algorithms
 
 As can be seen in the example above, the ``Integration`` cut algorithm will produce low signals
 where there is less data, whereas the ``Rebin`` cut algorithm will amplify the signals in such
-regions - effectively assuming that the signal is constant across the integration range and
-thus extrapolating over regions without data (so the only manifestation of the lack of data
+regions. In effect, it assumes that the signal is constant across the integration range and
+can be extrapolated over regions without data (so the only manifestation of the lack of data
 are larger errorbars associated with these bins).
 
 This assumption *may* be valid for density-of-states (DOS) type cuts where one would expect
