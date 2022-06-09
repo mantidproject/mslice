@@ -51,7 +51,7 @@ First install Mantid using `conda create -n mantidnightly -c conda-forge -c mant
 then add this interpreter by going to the `File->Settings` in PyCharm, then `Project: mslice -> Python Interpreter`,
 click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.8 (mantidnightly)`.
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
-Specify `start_mslice.py` as the startup script as above, but you do not need to set any environment variable.
+Specify `start_mslice.py` as the startup script set the same `QT_QPA_PLATFORM_PLUGIN_PATH` environment variable as above.
 To run tests, create a `Nosetests` configuration and specify the `Target` as `Custom` with `mslice.tests`
 with the working directory being the mslice package folder (e.g. `<mslice_root>/mslice`).
 
