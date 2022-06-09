@@ -38,7 +38,7 @@ jobs:
 
       - name: Build MSlice nightly conda package
         if: ${{ env.recentCommits == 'true'}}
-        run: |
-          conda config --set anaconda_upload yes
-          conda install conda-build conda-verify
-          mamba build --label nightly --user mantid --token ${{ secrets.ANACONDA_API_TOKEN }} $GITHUB_WORKSPACE/conda
+        uses: ./.github/actions/publish-package
+        with:
+          label: nightly
+          token: ${{ secrets.ANACONDA_API_TOKEN }}

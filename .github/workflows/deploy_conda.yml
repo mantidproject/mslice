@@ -27,8 +27,8 @@ jobs:
           python-version: 3.8
           auto-activate-base: false
 
-      - name: Build MSlice conda package
-        run: |
-          conda config --set anaconda_upload yes
-          conda install conda-build conda-verify
-          mamba build --label main --user mantid --token ${{ secrets.ANACONDA_API_TOKEN }} $GITHUB_WORKSPACE/conda
+      - name: Publish conda package
+        uses: ./.github/actions/publish-package
+        with:
+          label: main
+          token: ${{ secrets.ANACONDA_API_TOKEN }}

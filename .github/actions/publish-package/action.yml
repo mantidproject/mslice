@@ -1,0 +1,38 @@
+name: Build and upload conda package
+
+inputs:
+  repository:
+    description: 'Anaconda repository'
+    required: true
+    default: 'mantid'
+  label:
+    description: 'Label'
+    required: false
+    default: 'nightly'
+  token:
+    description: 'Anaconda API Token'
+    required: true
+
+description: Build and upload conda package
+runs:
+  using: "composite"
+  defaults:
+    run:
+      shell: bash -l {0}
+
+  steps:
+  - name: Make build-env
+    run: |
+      conda config --set always_yes yes --set changeps1 no
+      conda create -n build-env python=3.8
+      conda activate build-env
+      conda install -c conda-forge mamba conda-build anaconda-client conda-verify
+      conda config --add channels mantid
+      conda config --add channels mantid/label/nightly
+
+  - name: Build package
+    run: |
+      conda activate build-env
+      conda config --set anaconda_upload yes
+      mamba build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
+      grep "Upload complete" upload.log
