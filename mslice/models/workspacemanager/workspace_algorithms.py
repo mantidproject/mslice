@@ -13,6 +13,8 @@ import numpy as np
 from scipy import constants
 from six import string_types
 
+import mslice.util.mantid.init_mantid # noqa: F401
+
 from mantid.api import WorkspaceUnitValidator
 from mantid.api import MatrixWorkspace
 
