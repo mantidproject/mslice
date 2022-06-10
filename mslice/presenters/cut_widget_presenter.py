@@ -53,7 +53,7 @@ class CutWidgetPresenter(PresenterUtility):
             self._parse_step()
             params = self._parse_input()
         except ValueError as e:
-            if "''" in str(e):
+            if len(str(e).split(":",1)[1]) <= 3:
                 self._cut_view.display_error("Cut axes cannot be empty!")
             else:
                 self._cut_view.display_error(str(e))
