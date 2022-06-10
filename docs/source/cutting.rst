@@ -30,10 +30,9 @@ integrate over [0,3], [3,6], [6,9] and [9,10] respectively.
 
 Cuts with the same range from multiple datasets can be plotted by first selecting multiple workspaces in the left panel.
 
-There are two different methods to compute cuts: ``Rebin`` and ``Integration``.
-**NOTE: for mantid major releases from** ``v6.40``\ **, the default cutting algorithm has been changed from** ``Rebin``
-**to** ``Integration``\ **. For more detail on this change, and cutting algorithms in general, see the** *Cutting Algorithms*
-**section below**.
+There are two different methods to compute cuts: ``Rebin`` and ``Integration``, which can be selected from the
+``Cut Algorithm`` drop down menu. The difference between these methods are described in the :ref:`Cutting_Algorithms`
+section below and in more detail in the :ref:`Mathematical_Reference`. 
 
 Clicking on the ``Norm to 1`` check box will cause the resulting cut data to be normalised such that the maximum of the data
 of each cut is unity.
@@ -92,12 +91,33 @@ that tab.
 When MSlice is used as a Mantid interface ``MD Histo`` type workspaces can also be saved to Mantid Workbench by clicking the
 ``Save to Workbench`` button either on the ``MD Histo`` or the ``Cut`` tab.
 
+.. _Cutting_Algorithms:
+
 Cutting Algorithms
 ------------------
-There are two different methods used to compute cuts. ``Rebin`` uses the basic rebinning algorithms directly and effectively averages
-the counts in the integration range, whilst ``Integration`` sums the counts in the integration range.
-For mantid major releases from ``v6.40``, the default cutting algorithm has been changed from ``Rebin`` to ``Integration``. This change
-has been made because the ``Integration`` method can be used for both absolute and non-absolute units measurements. Conversely, for
-absolute units measurements the ``Rebin`` method will give incorrect and misleading values.
-As a result of this change, it is expected that values calculanced henceforth will differ from those calculated historically, if the
-default integration method has been used.
+
+There are two different methods used to compute cuts:
+
+- ``Integration`` sums the (signal :math:`\times` bin width) in the integration range.
+- ``Rebin`` averages the signal in the integration range.
+
+The two methods are described in more detail in the :ref:`Mathematical_Reference`,
+but in short, there is a bin-dependent conversion factor between the two types of
+cuts which depends on the data coverage in the integration range of that bin.
+That is, if the integration range does not include regions without data
+(e.g. due to kinematic constraints), then the two cuts will be equivalent except
+for a constant scaling factor (proportional to the integration range).
+However, if the integration range overlaps regions without data,
+then the two cuts will give markedly different results.
+
+The default method is ``Rebin`` and is more suitable for DOS-types cuts which
+integrate over :math:`|Q|` whilst if you are interested in cross-sections and
+are integrating over energy transfer, it is recommended to use ``Integration``.
+
+There is an option in the ``Cut`` tab to change the cut algorithm from ``Rebin``
+to ``Integration`` or vice versa and this setting will be saved for subsequent
+similar cuts on the same workspace.
+
+You can also change the default using the ``Options`` menu, ``Cut algorithm default``
+entry. This will change the default cut algorithm *for this session of MSlice*
+(the default algorithm will revert to ``Rebin`` if you restart MSlice).
