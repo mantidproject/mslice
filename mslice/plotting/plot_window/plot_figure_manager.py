@@ -40,6 +40,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self._current_figs = current_figs
 
         self.window = PlotWindow(manager=weakref.proxy(self))
+        self.window.setAttribute(Qt.WA_DeleteOnClose, True)
         self.window.resize(800, 600)
 
         self.plot_handler = None
@@ -273,9 +274,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         if self._ygrid:
             self.canvas.figure.gca().grid(True, axis='y')
 
-    def update_axes(self, ax):
+    def update_axes(self, ax, plot_over):
         if self.plot_handler is not None:
-            self.plot_handler.on_newplot(ax)
+            self.plot_handler.on_newplot(ax, plot_over)
 
     def move_window(self, x, y):
         center = QtWidgets.QDesktopWidget().screenGeometry().center()

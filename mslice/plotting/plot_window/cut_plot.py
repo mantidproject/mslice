@@ -34,6 +34,7 @@ class CutPlot(IPlot):
         self.plot_window = figure_manager.window
         self._canvas = self.plot_window.canvas
         self._cut_plotter_presenter = cut_plotter_presenter
+        self._plot_options_view = None
         self._lines_visible = {}
         self._legends_shown = True
         self._legends_visible = []
@@ -46,6 +47,8 @@ class CutPlot(IPlot):
         self._waterfall_cache = {}
         self._is_icut = False
         self._powder_lines = {}
+        self._datum_dirty = True
+        self._datum_cache = 0
 
     def save_default_options(self):
         self.default_options = {
@@ -112,7 +115,8 @@ class CutPlot(IPlot):
         self.plot_window.close()
 
     def plot_options(self):
-        CutPlotOptionsPresenter(CutPlotOptions(redraw_signal=self.plot_window.redraw), self)
+        self._plot_options_view = CutPlotOptions(self.plot_window, redraw_signal=self.plot_window.redraw)
+        return CutPlotOptionsPresenter(self._plot_options_view, self)
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
@@ -158,6 +162,7 @@ class CutPlot(IPlot):
 
     def change_axis_scale(self, xy_config):
         current_axis = self._canvas.figure.gca()
+        orig_y_scale_log = self.y_log
         if xy_config['x_log']:
             xmin = xy_config['x_range'][0]
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
@@ -188,6 +193,9 @@ class CutPlot(IPlot):
             current_axis.set_yscale('linear')
         self.x_range = xy_config['x_range']
         self.y_range = xy_config['y_range']
+
+        if xy_config['y_log'] or (xy_config['y_log'] != orig_y_scale_log):
+            self.update_bragg_peaks(refresh=True)
 
     def get_line_options(self, line):
         index = self._get_line_index(line)
@@ -281,12 +289,15 @@ class CutPlot(IPlot):
 
     def remove_line_by_index(self, line_index):
         containers = self._canvas.figure.gca().containers
-        container = containers[line_index]
-        container[0].remove()
-        for i in range(2):
-            for line in container[i + 1]:
+        if line_index < len(containers):
+            container = containers[line_index]
+            container[0].remove()
+            for line in container[1] + container[2]:
                 line.remove()
-        containers.remove(container)
+            containers.remove(container)
+
+        self._datum_dirty = True
+        self.update_bragg_peaks(refresh=True)
 
     def toggle_errorbar(self, line_index, line_options):
         container = self._canvas.figure.gca().containers[line_index]
@@ -322,15 +333,38 @@ class CutPlot(IPlot):
     def is_icut(self):
         return self._is_icut
 
-    def update_bragg_peaks(self):
+    def _get_overplot_datum(self):
+        if self._datum_dirty:
+            if not self.waterfall:
+                self._datum_cache = np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
+                                                  if not self._cut_plotter_presenter.is_overplot(line)])
+            else:
+                for line in self._canvas.figure.gca().get_lines():
+                    if not self._cut_plotter_presenter.is_overplot(line):
+                        self._datum_cache = np.nanmedian([line.get_ydata()])
+                        break
+
+            self._datum_dirty = False
+
+        return self._datum_cache
+
+    def update_bragg_peaks(self, refresh=False):
         if self.plot_window.action_aluminium.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, cif=None)
+            refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Aluminium')
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, None, self.y_log,
+                                                          self._get_overplot_datum())
         if self.plot_window.action_copper.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, cif=None)
+            refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Copper')
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, None, self.y_log,
+                                                          self._get_overplot_datum())
         if self.plot_window.action_niobium.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, cif=None)
+            refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Niobium')
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, None, self.y_log,
+                                                          self._get_overplot_datum())
         if self.plot_window.action_tantalum.isChecked():
-            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, cif=None)
+            refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Tantalum')
+            self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, None, self.y_log,
+                                                          self._get_overplot_datum())
         self.update_legend()
 
     def save_icut(self):
@@ -410,6 +444,9 @@ class CutPlot(IPlot):
             self._apply_offset(self.plot_window.waterfall_x, self.plot_window.waterfall_y)
         else:
             self._apply_offset(0., 0.)
+
+        self._datum_dirty = True
+        self.update_bragg_peaks(refresh=True)
         self._canvas.draw()
 
     def _cache_line(self, line):
@@ -431,14 +468,14 @@ class CutPlot(IPlot):
                             path.vertices = np.add(self._waterfall_cache[line][index],
                                                    np.array([[ind * x, ind * y], [ind * x, ind * y]]))
 
-    def on_newplot(self, ax):
+    def on_newplot(self, ax, plot_over):
         # This callback should be activated by a call to errorbar
         new_line = False
         line_containers = self._canvas.figure.gca().containers
         num_lines = len(line_containers)
         self.plot_window.action_waterfall.setEnabled(num_lines > 1)
         self.plot_window.toggle_waterfall_edit()
-        if not self._is_icut:
+        if not self._is_icut and not plot_over:
             self.plot_window.action_aluminium.setChecked(False)
             self.plot_window.action_copper.setChecked(False)
             self.plot_window.action_niobium.setChecked(False)
@@ -455,6 +492,9 @@ class CutPlot(IPlot):
                     new_line = True
         if new_line and num_lines > 1:
             self.toggle_waterfall()
+
+        self._datum_dirty = True
+        self.update_bragg_peaks(refresh=True)
 
     def generate_script(self, clipboard=False):
         try:

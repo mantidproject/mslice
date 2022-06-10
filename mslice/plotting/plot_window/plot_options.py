@@ -2,12 +2,13 @@ from __future__ import (absolute_import, division, print_function)
 
 from numpy import arange as np_arange
 from six import iteritems
-import functools
 
 import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from mslice.models.colors import named_cycle_colors, color_to_name
 from mslice.util.qt import load_ui
+
+from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
 
 
 class PlotOptionsDialog(QtWidgets.QDialog):
@@ -21,9 +22,18 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     yGridEdited = Signal()
     ok_clicked = Signal()
 
-    def __init__(self, parent=None, redraw_signal=None):
+    def __init__(self, parent, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
+
+        self.x_min_validator = LineEditDoubleValidator(self.lneXMin, 0.0)
+        self.lneXMin.setValidator(self.x_min_validator)
+        self.x_max_validator = LineEditDoubleValidator(self.lneXMax, 0.0)
+        self.lneXMax.setValidator(self.x_max_validator)
+        self.y_min_validator = LineEditDoubleValidator(self.lneYMin, 0.0)
+        self.lneYMin.setValidator(self.y_min_validator)
+        self.y_max_validator = LineEditDoubleValidator(self.lneYMax, 0.0)
+        self.lneYMax.setValidator(self.y_max_validator)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
@@ -130,12 +140,17 @@ class SlicePlotOptions(PlotOptionsDialog):
     cRangeEdited = Signal()
     cLogEdited = Signal()
 
-    def __init__(self, redraw_signal=None):
-        super(SlicePlotOptions, self).__init__(redraw_signal=redraw_signal)
+    def __init__(self, parent, redraw_signal=None):
+        super(SlicePlotOptions, self).__init__(parent, redraw_signal=redraw_signal)
         self.chkXLog.hide()
         self.chkYLog.hide()
         self.cut_options.hide()
         self.setMaximumWidth(350)
+
+        self.c_min_validator = LineEditDoubleValidator(self.lneCMin, 0.0)
+        self.lneCMin.setValidator(self.c_min_validator)
+        self.c_max_validator = LineEditDoubleValidator(self.lneCMax, 0.0)
+        self.lneCMax.setValidator(self.c_max_validator)
 
         self.lneCMin.editingFinished.connect(self.cRangeEdited)
         self.lneCMax.editingFinished.connect(self.cRangeEdited)
@@ -175,8 +190,8 @@ class CutPlotOptions(PlotOptionsDialog):
     showLegendsEdited = Signal()
     removed_line = Signal(int)
 
-    def __init__(self, redraw_signal=None):
-        super(CutPlotOptions, self).__init__(redraw_signal=redraw_signal)
+    def __init__(self, parent, redraw_signal=None):
+        super(CutPlotOptions, self).__init__(parent, redraw_signal=redraw_signal)
         self._line_widgets = []
         self.groupBox_4.hide()
 
@@ -186,9 +201,9 @@ class CutPlotOptions(PlotOptionsDialog):
         self.showLegendsEdited.connect(self.disable_show_legend)
 
     def set_line_options(self, line_options):
-        for i in range(len(line_options)):
-            line_widget = LegendAndLineOptionsSetter(line_options[i], self.color_validator, self.show_legends)
-            line_widget.destroyed.connect(functools.partial(self.remove_line_widget, line_widget, i))
+        for line_option in line_options:
+            line_widget = LegendAndLineOptionsSetter(line_option, self.color_validator, self.show_legends,
+                                                     self.remove_line_widget)
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
 
@@ -215,7 +230,8 @@ class CutPlotOptions(PlotOptionsDialog):
         msg_box.exec_()
         return False
 
-    def remove_line_widget(self, selected, index):
+    def remove_line_widget(self, selected):
+        index = self._line_widgets.index(selected)
         self._line_widgets.remove(selected)
         self.removed_line.emit(index)
 
@@ -263,8 +279,10 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     inverse_styles = {v: k for k, v in iteritems(styles)}
     inverse_markers = {v: k for k, v in iteritems(markers)}
 
-    def __init__(self, line_options, color_validator, show_legends):
+    def __init__(self, line_options, color_validator, show_legends, remove_line_callback=None):
         super(LegendAndLineOptionsSetter, self).__init__()
+
+        self._deletion_callback = remove_line_callback
 
         self.legend_text_label = QtWidgets.QLabel("Plot")
         self.legendText = QtWidgets.QLineEdit(self)
@@ -362,12 +380,18 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
             self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
             self.delete_button = QtWidgets.QPushButton("Delete Line", self)
             row5.addWidget(self.delete_button)
+            self.delete_button.clicked.connect(self.deletion_callback)
             self.delete_button.clicked.connect(self.deleteLater)
 
         separator = QtWidgets.QFrame()
         separator.setFrameShape(QtWidgets.QFrame.HLine)
         separator.setFrameShadow(QtWidgets.QFrame.Sunken)
         layout.addWidget(separator)
+
+    def deletion_callback(self):
+        if self._deletion_callback is not None:
+            self._deletion_callback(self)
+            self._deletion_callback = None
 
     def color_valid(self, index):
         if self.color_validator is None:

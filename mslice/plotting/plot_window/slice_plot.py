@@ -156,7 +156,7 @@ class SlicePlot(IPlot):
         pass
 
     def plot_options(self):
-        SlicePlotOptionsPresenter(SlicePlotOptions(redraw_signal=self.plot_window.redraw), self)
+        SlicePlotOptionsPresenter(SlicePlotOptions(self.plot_window, redraw_signal=self.plot_window.redraw), self)
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
@@ -174,7 +174,6 @@ class SlicePlot(IPlot):
             return
         elif isinstance(target, Text):
             quick_options(target, self, redraw_signal=self.plot_window.redraw)
-
         else:
             quick_options(target, self)
             self.update_legend()
@@ -575,3 +574,11 @@ class SlicePlot(IPlot):
         if self.default_options is None:
             return False
         return self.default_options[item] != getattr(self, item)
+
+    @property
+    def y_log(self):  # needed for interface consistency with cut plot
+        return False
+
+    @staticmethod
+    def _get_overplot_datum():  # needed for interface consistency with cut plot
+        return 0
