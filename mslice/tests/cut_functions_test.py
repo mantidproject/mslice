@@ -4,17 +4,17 @@ from mock import patch
 from unittest import TestCase
 
 from mantid.api import AlgorithmFactory, AnalysisDataService
-from mantid.simpleapi import AddSampleLog, CreateMDWorkspace, _create_algorithm_function
+from mantid.simpleapi import AddSampleLog, _create_algorithm_function
 
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_algorithm import Cut
 from mslice.models.cut.cut_functions import compute_cut, is_cuttable, output_workspace_name
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
+from mslice.tests.testhelpers.workspace_creator import create_pixel_workspace
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
-from mslice.workspace.pixel_workspace import PixelWorkspace
 
 
-class SliceFunctionsTest(TestCase):
+class CutFunctionsTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -22,28 +22,22 @@ class SliceFunctionsTest(TestCase):
         cls.integration_start = 0
         cls.integration_end = 1.5
 
-        cls.sim_scattering_data = np.arange(cls.integration_start, cls.integration_end, 0.002).reshape(30, 25).transpose()
-        cls.e_axis = Axis('DeltaE', -10, 15, 1)
-        cls.q_axis = Axis('|Q|', 0.1, 3.1, 0.1)
-        cls.q_axis_degrees = Axis('Degrees', 3, 33, 1)
+        cls.e_axis = Axis("DeltaE", -10, 15, 1)
+        cls.q_axis = Axis("|Q|", 0.1, 3.1, 0.1)
 
         cls.test_ws = CreateSampleWorkspace(OutputWorkspace=cls.workspace_name, NumBanks=1, BankPixelWidth=5, XMin=0.1,
-                                            XMax=3.1, BinWidth=0.1, XUnit='DeltaE')
+                                            XMax=3.1, BinWidth=0.1, XUnit="DeltaE")
+        AddSampleLog(workspace=cls.test_ws.raw_ws, LogName="Ei", LogText="3.", LogType="Number", StoreInADS=False)
 
+        sim_scattering_data = np.arange(cls.integration_start, cls.integration_end, 0.002).reshape(30, 25).transpose()
         for i in range(cls.test_ws.raw_ws.getNumberHistograms()):
-            cls.test_ws.raw_ws.setY(i, cls.sim_scattering_data[i])
-        AddSampleLog(workspace=cls.test_ws.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
-        cls.test_ws.e_mode = 'Direct'
+            cls.test_ws.raw_ws.setY(i, sim_scattering_data[i])
+        cls.test_ws.e_mode = "Direct"
         cls.test_ws.e_fixed = 3
         cls.test_ws.is_PSD = False
 
-        md_2d_workspace = CreateMDWorkspace(Dimensions=2, Extents='-10,10,-10,10', Names='A,B', Units='U,U',
-                                            OutputWorkspace="2d_workspace")
-        cls.pixel_workspace = PixelWorkspace(md_2d_workspace, '2d_workspace')
-
-        md_3d_workspace = CreateMDWorkspace(Dimensions=3, Extents='-10,10,-10,10,-10,10', Names='A,B,C', Units='U,U,U',
-                                            OutputWorkspace="3d_workspace")
-        cls.workspace_3d = PixelWorkspace(md_3d_workspace, "3d_workspace")
+        cls.pixel_workspace_2d = create_pixel_workspace(2, "2d_workspace")
+        cls.pixel_workspace_3d = create_pixel_workspace(3, "3d_workspace")
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -67,11 +61,11 @@ class SliceFunctionsTest(TestCase):
         self.assertEqual(cut.parent, self.workspace_name)
         self.assertEqual(cut.get_signal().shape, (30,))
 
-    def test_that_is_cuttable_returns_true_for_a_2D_pixel_workspace(self):
-        self.assertTrue(is_cuttable(self.pixel_workspace))
+    def test_that_is_cuttable_returns_true_for_a_2d_pixel_workspace(self):
+        self.assertTrue(is_cuttable(self.pixel_workspace_2d))
 
-    def test_that_is_cuttable_returns_false_for_a_non_2d_workspace(self):
-        self.assertFalse(is_cuttable(self.workspace_3d))
+    def test_that_is_cuttable_returns_false_for_a_3d_pixel_workspace(self):
+        self.assertFalse(is_cuttable(self.pixel_workspace_3d))
 
     def test_that_is_cuttable_returns_true_for_a_valid_workspace2D(self):
         self.assertTrue(is_cuttable(self.test_ws))

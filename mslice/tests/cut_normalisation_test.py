@@ -2,23 +2,16 @@ import numpy as np
 from unittest import TestCase
 
 from mantid.api import AnalysisDataService
-from mantid.simpleapi import CreateMDHistoWorkspace
 
 from mslice.models.cut.cut_normalisation import normalize_workspace
-from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
+from mslice.tests.testhelpers.workspace_creator import create_md_histo_workspace, create_workspace
 
 
 class CutNormalisationTest(TestCase):
 
     def setUp(self):
-        self.non_md_histo_ws = CreateSampleWorkspace(OutputWorkspace="non_md_histo_ws", NumBanks=1, BankPixelWidth=5,
-                                                     XMin=0.1, XMax=3.1, BinWidth=0.1, XUnit='DeltaE')
-
-        self.md_histo_ws = CreateMDHistoWorkspace(Dimensionality=2, Extents="-3,3,-10,10",
-                                                  SignalInput=list(range(0, 100)), ErrorInput=list(range(0, 100)),
-                                                  NumberOfBins="10,10", Names="Dim1,Dim2",
-                                                  Units="MomentumTransfer,EnergyTransfer",
-                                                  OutputWorkspace="md_histo_ws")
+        self.non_md_histo_ws = create_workspace("non_md_histo_ws")
+        self.md_histo_ws = create_md_histo_workspace(2, "md_histo_ws")
 
     def tearDown(self) -> None:
         AnalysisDataService.clear()
