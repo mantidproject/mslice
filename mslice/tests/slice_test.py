@@ -1,4 +1,4 @@
-from mock import MagicMock, patch, PropertyMock, ANY, create_autospec
+from mock import MagicMock, patch
 import unittest
 
 from mslice.models.slice.slice import Slice
