@@ -2,7 +2,6 @@ from mock import MagicMock, patch, PropertyMock, ANY, create_autospec
 import unittest
 
 from mslice.models.slice.slice import Slice
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 
 
 class SliceTest(unittest.TestCase):
@@ -47,11 +46,6 @@ class SliceTest(unittest.TestCase):
         test_slice = self.create_slice()
         test_slice._chi_magnetic = test_chi_magnetic
         self.assertEqual(test_slice.chi_magnetic, test_chi_magnetic)
-
-    @staticmethod
-    def create_slice(workspace=MagicMock(), colourmap=MagicMock(), norm=MagicMock(), sample_temp=MagicMock(),
-                     q_axis=MagicMock(), e_axis=MagicMock(), rotated=MagicMock()):
-        return Slice(workspace, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     @patch('mslice.models.slice.slice.compute_d2sigma')
     def test_d2sigma_computes_if_none(self, compute_d2sigma_fn):
@@ -102,6 +96,11 @@ class SliceTest(unittest.TestCase):
         test_slice = self.create_slice()
         test_slice._gdos = test_gdos
         self.assertEqual(test_slice.gdos, test_gdos)
+
+    @staticmethod
+    def create_slice(workspace=None, colourmap=None, norm=None, sample_temp=None,
+                     q_axis=None, e_axis=None, rotated=None):
+        return Slice(workspace, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
 if __name__ == '__main__':
     unittest.main()
