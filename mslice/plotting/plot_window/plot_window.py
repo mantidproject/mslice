@@ -37,6 +37,8 @@ class PlotWindow(QtWidgets.QMainWindow):
         self._first_time_show = False
 
     def closeEvent(self, _):
+        self.lose_waterfall_x_edt_focus()  # lose focus so toggle_waterfall does not trigger upon close
+        self.lose_waterfall_y_edt_focus()
         self.canvas.manager.window_closing()
 
     def showEvent(self, evt):
@@ -183,6 +185,18 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.waterfall_y_lbl_act.setVisible(is_waterfall)
         self.waterfall_x_edt_act.setVisible(is_waterfall)
         self.waterfall_y_edt_act.setVisible(is_waterfall)
+
+    def lose_waterfall_x_edt_focus(self):
+        self._lose_focus_without_signal(self.waterfall_x_edt)
+
+    def lose_waterfall_y_edt_focus(self):
+        self._lose_focus_without_signal(self.waterfall_y_edt)
+
+    @staticmethod
+    def _lose_focus_without_signal(qt_obj):
+        qt_obj.blockSignals(True)  # prevents a subsequent call to this function
+        qt_obj.clearFocus()
+        qt_obj.blockSignals(False)
 
     def create_status_bar(self):
         self.statusbar = QtWidgets.QStatusBar(self)

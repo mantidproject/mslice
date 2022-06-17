@@ -85,6 +85,8 @@ class CutPlot(IPlot):
         plot_window.action_waterfall.triggered.connect(self.toggle_waterfall)
         plot_window.waterfall_x_edt.editingFinished.connect(self.toggle_waterfall)
         plot_window.waterfall_y_edt.editingFinished.connect(self.toggle_waterfall)
+        plot_window.waterfall_x_edt.editingFinished.connect(plot_window.lose_waterfall_x_edt_focus)
+        plot_window.waterfall_y_edt.editingFinished.connect(plot_window.lose_waterfall_y_edt_focus)
         plot_window.action_aluminium.triggered.connect(
             partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Aluminium', False))
         plot_window.action_copper.triggered.connect(
