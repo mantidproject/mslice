@@ -42,6 +42,7 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [0.05] * 20)
         np.testing.assert_array_almost_equal(self.test_ws_2d.raw_ws.dataY(0), [1] * 20)
         self.assertFalse('test_ws_2d_scaled' in get_visible_workspace_names())
+        self.assertRaises(ValueError, subtract, ['test_ws_2d'], 'test_ws_md', 1.0)
 
     def test_add_workspace(self):
         original_data = self.test_ws_2d.raw_ws.dataY(0)
