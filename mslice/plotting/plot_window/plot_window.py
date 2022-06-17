@@ -160,6 +160,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     def add_waterfall_edit(self, parent):
         self.waterfall_x_lbl = QtWidgets.QLabel("x:", parent)
+        self.waterfall_x_lbl.setFocusPolicy(QtCore.Qt.TabFocus)
         self.waterfall_y_lbl = QtWidgets.QLabel("y:", parent)
         self.waterfall_x_edt = QtWidgets.QLineEdit("0", parent)
         self.waterfall_y_edt = QtWidgets.QLineEdit("0", parent)
