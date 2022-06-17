@@ -83,8 +83,10 @@ class CutPlot(IPlot):
         plot_window.action_gen_script.triggered.connect(self.generate_script)
         plot_window.action_gen_script_clipboard.triggered.connect(lambda: self.generate_script(clipboard=True))
         plot_window.action_waterfall.triggered.connect(self.toggle_waterfall)
-        plot_window.waterfall_x_edt.editingFinished.connect(self.toggle_waterfall)
-        plot_window.waterfall_y_edt.editingFinished.connect(self.toggle_waterfall)
+        plot_window.waterfall_x_edt.editingFinished.connect(self.update_waterfall)
+        plot_window.waterfall_y_edt.editingFinished.connect(self.update_waterfall)
+        plot_window.waterfall_x_edt.editingFinished.connect(plot_window.lose_waterfall_x_edt_focus)
+        plot_window.waterfall_y_edt.editingFinished.connect(plot_window.lose_waterfall_y_edt_focus)
         plot_window.action_aluminium.triggered.connect(
             partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Aluminium', False))
         plot_window.action_copper.triggered.connect(
@@ -440,13 +442,16 @@ class CutPlot(IPlot):
             return line_visible
 
     def toggle_waterfall(self):
+        self._datum_dirty = True
+        self.update_bragg_peaks(refresh=True)
+        self.update_waterfall()
+
+    def update_waterfall(self):
         if self.waterfall:
             self._apply_offset(self.plot_window.waterfall_x, self.plot_window.waterfall_y)
         else:
             self._apply_offset(0., 0.)
 
-        self._datum_dirty = True
-        self.update_bragg_peaks(refresh=True)
         self._canvas.draw()
 
     def _cache_line(self, line):
@@ -490,8 +495,8 @@ class CutPlot(IPlot):
                 if line not in self._waterfall_cache:
                     self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
                     new_line = True
-        if new_line and num_lines > 1:
-            self.toggle_waterfall()
+        if new_line and num_lines > 1 and self.plot_window.waterfall:
+            self.update_waterfall()
 
         self._datum_dirty = True
         self.update_bragg_peaks(refresh=True)
