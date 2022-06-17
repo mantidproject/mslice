@@ -6,7 +6,7 @@ import unittest
 from mslice.models.workspacemanager.workspace_algorithms import (subtract, add_workspace_runs, combine_workspace,
                                                                  propagate_properties, get_limits)
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
-                                                               delete_workspace, rename_workspace)
+                                                               delete_workspace, rename_workspace, get_workspace_name)
 from mslice.models.workspacemanager.workspace_algorithms import processEfixed
 from mslice.util.mantid.mantid_algorithms import ConvertToMD, CloneWorkspace, CreateSimulationWorkspace
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
@@ -31,6 +31,12 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
         self.test_ws_md.is_PSD = True
         self.test_ws_md.e_mode = "Direct"
         self.test_ws_md.limits = {'DeltaE': [0, 2, 1]}
+
+    def test_get_workspace_handle(self):
+        self.assertRaises(KeyError, get_workspace_handle, 'no_test_ws')
+
+    def test_get_workspace_name(self):
+        self.assertEqual(get_workspace_name('test_ws_md'), 'test_ws_md')
 
     def test_delete_workspace(self):
         delete_workspace('test_ws_md')
