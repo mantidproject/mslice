@@ -51,7 +51,7 @@ class SliceAlgorithmTest(unittest.TestCase):
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25).transpose()
 
     @staticmethod
-    def create_test_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False):
+    def create_tst_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False):
         scattering_rotated = np.rot90(sim_scattering_data, k=3)
         scattering_rotated = np.flipud(scattering_rotated)
         e_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value,
@@ -96,7 +96,7 @@ class SliceAlgorithmTest(unittest.TestCase):
                            mock_set_property):
         x_dict = self.create_axis_dict()
         y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_test_objects(self.sim_scattering_data, x_dict, y_dict)
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
         mock_get_property.side_effect = self.property_side_effect
         mock_energy_units.return_value.factor_from_meV.return_value = 1.0
         mock_compute_nonPSD.return_value = MagicMock()
@@ -112,21 +112,27 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.setProperty')
     @patch('mslice.models.slice.slice_algorithm.attribute_to_log')
+    @patch('mslice.models.slice.slice_algorithm.ScaleX')
     @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_nonPSD')
-    @patch('mslice.models.slice.slice_algorithm.EnergyUnits')
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
-    def test_PyExec_nonPSD_non_meV(self, mock_get_property, mock_energy_units, mock_compute_nonPSD, mock_attribute_to_log,
+    def test_PyExec_nonPSD_non_meV(self, mock_get_property, mock_compute_nonPSD, mock_ScaleX, mock_attribute_to_log,
                     mock_set_property):
+        x_dict = self.create_axis_dict(e_unit='cm-1')
+        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
         mock_get_property.side_effect = self.property_side_effect
-        mock_energy_units.return_value.factor_from_meV.return_value = 1.0
         mock_compute_nonPSD.return_value = MagicMock()
+        mock_ScaleX.return_value = MagicMock()
 
         test_slice = Slice()
         test_slice.PyExec()
-        mock_energy_units.assert_called_once()
         mock_compute_nonPSD.assert_called_once()
+        mock_ScaleX.assert_called_with(InputWorkspace=mock_compute_nonPSD.return_value, Factor=8.065544,
+                                       Operation='Multiply', StoreInADS=False)
         mock_attribute_to_log.assert_called_once()
-        mock_set_property.assert_called_with('OutputWorkspace', mock_compute_nonPSD.return_value)
+        mock_set_property.assert_called_with('OutputWorkspace', mock_ScaleX.return_value)
+
+        self.test_objects = None  # reset test objects
 
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.setProperty')
     @patch('mslice.models.slice.slice_algorithm.attribute_to_log')
@@ -137,7 +143,7 @@ class SliceAlgorithmTest(unittest.TestCase):
                     mock_set_property):
         x_dict = self.create_axis_dict()
         y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_test_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
         mock_get_property.side_effect = self.property_side_effect
         mock_energy_units.return_value.factor_from_meV.return_value = 1.0
         mock_compute_PSD.return_value = MagicMock()
@@ -154,18 +160,40 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.setProperty')
     @patch('mslice.models.slice.slice_algorithm.attribute_to_log')
     @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_PSD')
-    @patch('mslice.models.slice.slice_algorithm.EnergyUnits')
+    @patch('mslice.models.slice.slice_algorithm.TransformMD')
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
-    def test_PyExec_PSD_non_mEV(self, mock_get_property, mock_energy_units, mock_compute_PSD, mock_attribute_to_log,
-                    mock_set_property):
-        self.PSD = True #reactor to encapsulate from other tests
+    def test_PyExec_PSD_non_meV(self, mock_get_property, mock_transform_MD, mock_compute_PSD, mock_attribute_to_log,
+                                mock_set_property):
+        x_dict = self.create_axis_dict(e_unit='cm-1')
+        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
         mock_get_property.side_effect = self.property_side_effect
-        mock_energy_units.return_value.factor_from_meV.return_value = 1.0
         mock_compute_PSD.return_value = MagicMock()
+        mock_transform_MD.return_value = MagicMock()
 
         test_slice = Slice()
         test_slice.PyExec()
-        mock_energy_units.assert_called_once()
         mock_compute_PSD.assert_called_once()
+        mock_transform_MD.assert_called_with(InputWorkspace=mock_compute_PSD.return_value, Scaling=[8.065544, 1.])
         mock_attribute_to_log.assert_called_once()
-        mock_set_property.assert_called_with('OutputWorkspace', mock_compute_PSD.return_value)
+        mock_set_property.assert_called_with('OutputWorkspace', mock_transform_MD.return_value)
+
+        self.test_objects = None  # reset test objects
+
+    @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.setProperty')
+    @patch('mslice.models.slice.slice_algorithm.attribute_to_log')
+    @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_PSD')
+    @patch('mslice.models.slice.slice_algorithm.TransformMD')
+    @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
+    def test_PyExec_PSD_non_meV_with_DeltaE_y_axis(self, mock_get_property, mock_transform_MD, mock_compute_PSD, mock_attribute_to_log,
+                                mock_set_property):
+        x_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
+        y_dict = self.create_axis_dict(e_unit='cm-1')
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
+        mock_get_property.side_effect = self.property_side_effect
+
+        test_slice = Slice()
+        test_slice.PyExec()
+        mock_transform_MD.assert_called_with(InputWorkspace=mock_compute_PSD.return_value, Scaling=[1., 8.065544])
+
+        self.test_objects = None  # reset test objects
