@@ -7,7 +7,6 @@ import unittest
 from mantid.simpleapi import AddSampleLog
 from mantid.kernel import PropertyManager, PropertyManagerProperty
 
-from mslice.models.axis import Axis
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 
@@ -26,7 +25,7 @@ class SliceAlgorithmTest(unittest.TestCase):
         def value(self):
             return self.return_value
 
-    def property_side_effect(self, *args, **kwargs):
+    def property_side_effect(self, *args):
         if args[0] == 'InputWorkspace':
             return self.MockProperty(self.test_objects['workspace'])
         elif args[0] == 'XAxis':
@@ -57,13 +56,6 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @staticmethod
     def create_tst_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False):
-        scattering_rotated = np.rot90(sim_scattering_data, k=3)
-        scattering_rotated = np.flipud(scattering_rotated)
-        e_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value,
-                      x_dict['step'].value, x_dict['e_unit'].value)
-        q_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value,
-                      y_dict['step'].value, y_dict['e_unit'].value)
-        q_axis_degrees = Axis('Degrees', 3, 33, 1)
         test_ws = CreateSampleWorkspace(OutputWorkspace='test_ws', NumBanks=1, BankPixelWidth=5, XMin=0.1,
                                         XMax=3.1, BinWidth=0.1, XUnit=x_dict['units'].value)
         for i in range(test_ws.raw_ws.getNumberHistograms()):
@@ -190,7 +182,8 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_PSD')
     @patch('mslice.models.slice.slice_algorithm.TransformMD')
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
-    def test_PyExec_PSD_non_meV_with_DeltaE_y_axis(self, mock_get_property, mock_transform_MD, mock_compute_PSD):
+    def test_PyExec_PSD_non_meV_with_DeltaE_y_axis(self, mock_get_property, mock_transform_MD, mock_compute_PSD,
+                                                   mock_attribute_to_log, mock_set_property):
         x_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
         y_dict = self.create_axis_dict(e_unit='cm-1')
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
