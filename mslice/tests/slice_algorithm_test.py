@@ -5,14 +5,10 @@ import numpy as np
 import unittest
 
 from mantid.simpleapi import AddSampleLog
-from mantid.kernel import PropertyManager, PropertyManagerProperty
+from mantid.kernel import PropertyManager
 
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
-
-
-def invert_axes(matrix):
-    return np.rot90(np.flipud(matrix))
 
 
 class SliceAlgorithmTest(unittest.TestCase):
