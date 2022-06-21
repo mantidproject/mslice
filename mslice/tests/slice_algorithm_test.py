@@ -234,4 +234,3 @@ class SliceAlgorithmTest(unittest.TestCase):
         self.assertRaises(RuntimeError, lambda: test_slice.dimension_index(workspace, axis))
         calls = [call(axis.units)]
         workspace.getDimensionIndexByName.assert_has_calls(calls)
-
