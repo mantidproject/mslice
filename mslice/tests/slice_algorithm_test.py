@@ -1,20 +1,14 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mock import patch, MagicMock
+from mock import patch, MagicMock, call
 import numpy as np
 import unittest
 
-from mantid.api import AlgorithmFactory
-from mantid.simpleapi import AddSampleLog, _create_algorithm_function
+from mantid.simpleapi import AddSampleLog
 from mantid.kernel import PropertyManager, PropertyManagerProperty
 
 from mslice.models.axis import Axis
 from mslice.models.slice.slice_algorithm import Slice
-from mslice.models.slice.slice_functions import (compute_slice, compute_boltzmann_dist, compute_chi,
-                                                 compute_chi_magnetic, compute_d2sigma, compute_symmetrised,
-                                                 compute_gdos, compute_recoil_line)
-from mslice.models.powder.powder_functions import compute_powder_line
-from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 
 
@@ -45,6 +39,17 @@ class SliceAlgorithmTest(unittest.TestCase):
             return self.MockProperty(self.test_objects['PSD'])
         elif args[0] == 'EMode':
             return self.MockProperty(self.test_objects['workspace'].e_mode)
+
+    @staticmethod
+    def getDimensionIndexByName_side_effect(*args, **kwargs):
+        if args[0] == 'test':
+            return 1.0
+        elif args[0] == 'Degrees':
+            return 2.0
+        elif args[0] == '2Theta':
+            raise RuntimeError
+        elif args[0] == 'error':
+            raise RuntimeError
 
     @classmethod
     def setUpClass(cls):
@@ -197,3 +202,36 @@ class SliceAlgorithmTest(unittest.TestCase):
         mock_transform_MD.assert_called_with(InputWorkspace=mock_compute_PSD.return_value, Scaling=[1., 8.065544])
 
         self.test_objects = None  # reset test objects
+
+    def test_dimension_index_initial_success(self):
+        workspace = MagicMock()
+        workspace.getDimensionIndexByName.side_effect = self.getDimensionIndexByName_side_effect
+        axis = MagicMock()
+        axis.units = 'test'
+
+        test_slice = Slice()
+        test_slice.dimension_index(workspace, axis)
+        workspace.getDimensionIndexByName.assert_called_with(axis.units)
+
+    def test_dimension_index_secondary_success(self):
+        workspace = MagicMock()
+        workspace.getDimensionIndexByName.side_effect = self.getDimensionIndexByName_side_effect
+        axis = MagicMock()
+        axis.units = '2Theta'
+
+        test_slice = Slice()
+        test_slice.dimension_index(workspace, axis)
+        calls = [call(axis.units), call('Degrees')]
+        workspace.getDimensionIndexByName.assert_has_calls(calls)
+
+    def test_dimension_index_error(self):
+        workspace = MagicMock()
+        workspace.getDimensionIndexByName.side_effect = self.getDimensionIndexByName_side_effect
+        axis = MagicMock()
+        axis.units = 'error'
+
+        test_slice = Slice()
+        self.assertRaises(RuntimeError, lambda: test_slice.dimension_index(workspace, axis))
+        calls = [call(axis.units)]
+        workspace.getDimensionIndexByName.assert_has_calls(calls)
+
