@@ -121,7 +121,7 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_nonPSD')
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
     def test_PyExec_nonPSD_non_meV(self, mock_get_property, mock_compute_nonPSD, mock_ScaleX, mock_attribute_to_log,
-                    mock_set_property):
+                                   mock_set_property):
         x_dict = self.create_axis_dict(e_unit='cm-1')
         y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
@@ -145,7 +145,7 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.EnergyUnits')
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
     def test_PyExec_PSD(self, mock_get_property, mock_energy_units, mock_compute_PSD, mock_attribute_to_log,
-                    mock_set_property):
+                        mock_set_property):
         x_dict = self.create_axis_dict()
         y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
@@ -190,8 +190,7 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_PSD')
     @patch('mslice.models.slice.slice_algorithm.TransformMD')
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
-    def test_PyExec_PSD_non_meV_with_DeltaE_y_axis(self, mock_get_property, mock_transform_MD, mock_compute_PSD, mock_attribute_to_log,
-                                mock_set_property):
+    def test_PyExec_PSD_non_meV_with_DeltaE_y_axis(self, mock_get_property, mock_transform_MD, mock_compute_PSD):
         x_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
         y_dict = self.create_axis_dict(e_unit='cm-1')
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
