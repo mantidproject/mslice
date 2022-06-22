@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
-import traceback
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
 from mslice.models.units import EnergyUnits
@@ -67,7 +66,6 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         try:
             self._slice_plotter_presenter.plot_slice(*args)
         except RuntimeError as e:
-            traceback.print_exc(e)
             self._slice_view.error(e.args[0])
         except ValueError as e:
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa

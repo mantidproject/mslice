@@ -152,8 +152,10 @@ class SlicePlot(IPlot):
         plot_window.action_gen_script.triggered.disconnect()
 
     def window_closing(self):
-        # nothing to do
-        pass
+        if self.icut is not None:
+            self.icut.clear()
+            self.icut.window_closing()
+            self.icut = None
 
     def plot_options(self):
         SlicePlotOptionsPresenter(SlicePlotOptions(self.plot_window, redraw_signal=self.plot_window.redraw), self)
