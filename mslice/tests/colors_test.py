@@ -27,7 +27,7 @@ class ColorsTest(unittest.TestCase):
 
     def test_basic_color_is_known(self):
         self.assertEqual('cyan', color_to_name('#17becf'))
-        self.assertEqual('yellow', color_to_name('#ffff00'))
+        self.assertEqual('navy', color_to_name('#000080'))
 
     def test_pretty_name(self):
         self.assertEqual('blue', pretty_name('tab:blue'))
