@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import unittest
 
-from mslice.models.workspacemanager.workspace_algorithms import (process_limits, scale_workspaces,
+from mslice.models.workspacemanager.workspace_algorithms import (process_limits, process_limits_event, scale_workspaces,
                                                                  export_workspace_to_ads, is_pixel_workspace, get_comment)
 from mslice.models.workspacemanager.workspace_provider import add_workspace
 from mslice.util.mantid.mantid_algorithms import (AppendSpectra, CreateSampleWorkspace, CreateSimulationWorkspace,
@@ -57,6 +57,10 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
     def test_process_limits_will_raise_a_runtime_error_for_a_workspace_where_not_every_histogram_has_a_detector(self):
         with self.assertRaises(RuntimeError):
             process_limits(self.extended_workspace)
+
+    def test_process_limits_events_will_raise_an_attribute_error_for_pixel_workspace(self):
+        with self.assertRaises(AttributeError):
+            process_limits_event(self.pixel_workspace)
 
     def test_scale_workspaces_without_parameters(self):
         self.assertRaises(ValueError, scale_workspaces, self.direct_workspace)
