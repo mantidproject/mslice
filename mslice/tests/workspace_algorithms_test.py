@@ -43,6 +43,7 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
         cls.test_workspace = CreateSampleWorkspace(OutputWorkspace='test_workspace', NumBanks=1, BankPixelWidth=5,
                                                    XMin=0.1, XMax=3.1, BinWidth=0.1, XUnit='DeltaE')
 
+
     @classmethod
     def tearDownClass(cls) -> None:
         AnalysisDataService.clear()
