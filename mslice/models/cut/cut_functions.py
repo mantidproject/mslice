@@ -8,9 +8,8 @@ from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as Workspace2D
 
 
-def output_workspace_name(selected_workspace, integration_start, integration_end):
-    return selected_workspace + "_cut(" + "{:.3f}".format(integration_start) + "," + "{:.3f}".format(
-        integration_end) + ")"
+def output_workspace_name(selected_workspace: str, integration_start: float, integration_end: float) -> str:
+    return f"{selected_workspace}_cut({integration_start:.3f},{integration_end:.3f})"
 
 
 def compute_cut(workspace, cut_axis, integration_axis, is_norm, algo='Rebin', store=True):

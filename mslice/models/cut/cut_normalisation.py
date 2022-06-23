@@ -1,6 +1,7 @@
 import numpy as np
 from mantid.api import IMDHistoWorkspace, MDNormalization
 
+
 def normalize_workspace(workspace):
     assert isinstance(workspace, IMDHistoWorkspace)
     num_events = workspace.getNumEventsArray()
@@ -19,6 +20,7 @@ def normalize_workspace(workspace):
     errors = workspace.getErrorSquaredArray() / (average_event_max**2)
     workspace.setErrorSquaredArray(errors)
     workspace.setComment("Normalized By MSlice")
+
 
 def _num_events_normalized_array(workspace):
     assert isinstance(workspace, IMDHistoWorkspace)
