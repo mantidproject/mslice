@@ -7,9 +7,11 @@ from mslice.models.workspacemanager.workspace_algorithms import (process_limits,
                                                                  export_workspace_to_ads, is_pixel_workspace,
                                                                  get_axis_from_dimension, get_comment)
 from mslice.models.workspacemanager.workspace_provider import add_workspace
-from mslice.util.mantid.mantid_algorithms import (AppendSpectra, CreateSampleWorkspace, CreateSimulationWorkspace,
+from mslice.tests.testhelpers.workspace_creator import (create_md_histo_workspace, create_workspace,
+                                                        create_simulation_workspace)
+from mslice.util.mantid.mantid_algorithms import (AppendSpectra, CreateSimulationWorkspace,
                                                   CreateWorkspace, ConvertToMD, AddSampleLog)
-
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mantid.api import AnalysisDataService
 
 
@@ -17,15 +19,8 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.direct_workspace = CreateSimulationWorkspace(OutputWorkspace='MAR_workspace', Instrument='MAR',
-                                                         BinParams=[-10, 1, 10], UnitX='DeltaE')
-        cls.direct_workspace.e_mode = "Direct"
-        cls.direct_workspace.e_fixed = 1.1
-
-        cls.indirect_workspace = CreateSimulationWorkspace(OutputWorkspace='OSIRIS_workspace', Instrument='OSIRIS',
-                                                           BinParams=[-10, 1, 10], UnitX='DeltaE')
-        cls.indirect_workspace.e_mode = "Indirect"
-        cls.indirect_workspace.e_fixed = 1.1
+        cls.direct_workspace = create_simulation_workspace("Direct", "MAR_workspace")
+        cls.indirect_workspace = create_simulation_workspace("Indirect", "OSIRIS_workspace")
 
         CreateWorkspace(DataX=cls.indirect_workspace.raw_ws.readX(0), DataY=cls.indirect_workspace.raw_ws.readY(0),
                         ParentWorkspace='OSIRIS_workspace', UnitX='DeltaE', OutputWorkspace="extra_spectra_ws")
@@ -41,10 +36,11 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
         cls.pixel_workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="convert_ws", QDimensions='|Q|',
                                           dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
                                           SplitInto='50,50')
+        cls.pixel_workspace.limits['|Q|'] = [0.1, 3.1, 0.1]
+        cls.pixel_workspace.limits['DeltaE'] = [-10, 15, 1]
 
-        cls.test_workspace = CreateSampleWorkspace(OutputWorkspace='test_workspace', NumBanks=1, BankPixelWidth=5,
-                                                   XMin=0.1, XMax=3.1, BinWidth=0.1, XUnit='DeltaE')
-
+        cls.test_workspace = create_workspace('test_workspace')
+        cls.histo_workspace = HistogramWorkspace(create_md_histo_workspace(2, 'histo_workspace'), 'histo_workspace')
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -65,8 +61,6 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
             process_limits_event(self.pixel_workspace)
 
     def test_get_axis_from_dimension(self):
-        self.pixel_workspace.limits['|Q|'] = [0.1, 3.1, 0.1]
-        self.pixel_workspace.limits['DeltaE'] = [-10, 15, 1]
         return_value = get_axis_from_dimension(self.pixel_workspace, self.pixel_workspace.name, 0)
         self.assertEqual(return_value, Axis('|Q|','0.1','3.1','0.1'))
         return_value = get_axis_from_dimension(self.pixel_workspace, self.pixel_workspace.name, 1)
@@ -77,13 +71,16 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
 
     def test_scale_workspace_with_rebose(self):
         current_len = len(AnalysisDataService)
-        add_workspace(self.test_workspace, self.test_workspace.name)
         export_workspace_to_ads(self.test_workspace)
         self.assertEqual(len(AnalysisDataService), current_len + 1)
         scale_workspaces([self.test_workspace], from_temp=300.0, to_temp=5.0)
 
     def test_if_pixel_workspace(self):
         self.assertTrue(is_pixel_workspace, self.pixel_workspace)
+
+    def test_export_workspace_to_ads_does_not_fail_for_histo_workspace(self):
+        add_workspace(self.histo_workspace, self.histo_workspace.name)
+        export_workspace_to_ads(self.histo_workspace)
 
     def test_get_comment(self):
         self.assertEqual(get_comment(self.test_workspace), "")

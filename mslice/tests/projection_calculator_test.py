@@ -39,3 +39,4 @@ class ProjectionCalculatorTest(TestCase):
         result = self.projection_calculator.calculate_projection(self.psd_workspace, '|Q|', 'DeltaE')
         self.assertEqual(type(result), PixelWorkspace)
         result = self.projection_calculator.calculate_projection(self.psd_workspace, 'DeltaE', '2Theta')
+        self.assertEqual(type(result), PixelWorkspace)

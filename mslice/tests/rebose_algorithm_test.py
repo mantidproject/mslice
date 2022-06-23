@@ -3,16 +3,15 @@ import unittest
 import mslice.util.mantid.init_mantid # noqa: F401
 
 from mantid.api import AnalysisDataService
-
-from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace, Rebose
+from mslice.tests.testhelpers.workspace_creator import create_workspace
+from mslice.util.mantid.mantid_algorithms import Rebose
 
 
 class RebinAlgorithmTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.test_workspace = CreateSampleWorkspace(OutputWorkspace='test_workspace', NumBanks=1, BankPixelWidth=5,
-                                                   XMin=0.1, XMax=3.1, BinWidth=0.1, XUnit='DeltaE')
+        cls.test_workspace = create_workspace('test_workspace')
 
     @classmethod
     def tearDownClass(cls) -> None:
