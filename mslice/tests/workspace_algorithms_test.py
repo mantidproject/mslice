@@ -2,8 +2,10 @@ from __future__ import (absolute_import, division, print_function)
 
 import unittest
 
+from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_algorithms import (process_limits, process_limits_event, scale_workspaces,
-                                                                 export_workspace_to_ads, is_pixel_workspace, get_comment)
+                                                                 export_workspace_to_ads, is_pixel_workspace,
+                                                                 get_axis_from_dimension, get_comment)
 from mslice.models.workspacemanager.workspace_provider import add_workspace
 from mslice.util.mantid.mantid_algorithms import (AppendSpectra, CreateSampleWorkspace, CreateSimulationWorkspace,
                                                   CreateWorkspace, ConvertToMD, AddSampleLog)
@@ -61,6 +63,14 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
     def test_process_limits_events_will_raise_an_attribute_error_for_pixel_workspace(self):
         with self.assertRaises(AttributeError):
             process_limits_event(self.pixel_workspace)
+
+    def test_get_axis_from_dimension(self):
+        self.pixel_workspace.limits['|Q|'] = [0.1, 3.1, 0.1]
+        self.pixel_workspace.limits['DeltaE'] = [-10, 15, 1]
+        return_value = get_axis_from_dimension(self.pixel_workspace, self.pixel_workspace.name, 0)
+        self.assertEqual(return_value, Axis('|Q|','0.1','3.1','0.1'))
+        return_value = get_axis_from_dimension(self.pixel_workspace, self.pixel_workspace.name, 1)
+        self.assertEqual(return_value, Axis('DeltaE','-10.0','15.0','1.0'))
 
     def test_scale_workspaces_without_parameters(self):
         self.assertRaises(ValueError, scale_workspaces, self.direct_workspace)
