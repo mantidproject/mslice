@@ -58,5 +58,5 @@ with the working directory being the mslice package folder (e.g. `<mslice_root>/
 ### Automated testing and nightly conda build
 
 Every night the MSlice unit tests are run [automatically](https://github.com/mantidproject/mslice/actions/workflows/unit_tests_nighly.yml) using the latest nightly conda
-packages for mantid and mantidqt as well as the main branch of MSlice. If the unit tests were running successfully and if there were changes pushed to MSlice main within
-the last 24 hours, a new MSlice conda package with the label ``nightly`` is created and uploaded to the [mantid conda channel](https://anaconda.org/mantid/mslice).
+packages for mantid and mantidqt, as well as the ``main`` branch of MSlice. If the unit tests run successfully, and if changes have been made to the ``main`` MSlice branch within
+the last 24 hours, a new MSlice conda package labelled ``nightly`` is created and uploaded to the [mantid conda channel](https://anaconda.org/mantid/mslice).
