@@ -43,11 +43,12 @@ class Cut(PythonAlgorithm):
         cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one, algo)
         if 'DeltaE' in cut_axis.units and cut_axis.scale != 1.:
             cut = TransformMD(InputWorkspace=cut, Scaling=[EnergyUnits(cut_axis.e_unit).factor_from_meV()])
-        attribute_to_log({'axes':[cut_axis, int_axis], 'norm_to_one':norm_to_one, 'algorithm': algo}, cut)
+        attribute_to_log({'axes': [cut_axis, int_axis], 'norm_to_one': norm_to_one, 'algorithm': algo}, cut)
         self.setProperty('OutputWorkspace', cut)
 
     def category(self):
         return 'MSlice'
+
 
 def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_norm, algo):
     if PSD:
