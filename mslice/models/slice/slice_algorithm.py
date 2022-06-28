@@ -57,8 +57,9 @@ class Slice(PythonAlgorithm):
         y_dim = workspace.getDimension(y_dim_id)
         xbinning = x_dim.getName() + "," + str(x_axis.start_meV) + "," + str(x_axis.end_meV) + "," + str(n_x_bins)
         ybinning = y_dim.getName() + "," + str(y_axis.start_meV) + "," + str(y_axis.end_meV) + "," + str(n_y_bins)
-        return BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
-                     StoreInADS=False)
+        binned_ws = BinMD(InputWorkspace=workspace, AxisAligned="1", AlignedDim0=xbinning, AlignedDim1=ybinning,
+                          StoreInADS=False)
+        return binned_ws
 
     def dimension_index(self, workspace, axis):
         try:

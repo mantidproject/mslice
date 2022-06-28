@@ -6,10 +6,13 @@ import unittest
 
 from mantid.simpleapi import AddSampleLog
 from mantid.kernel import PropertyManager
+from mantid.dataobjects import MDHistoWorkspace
 
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
+from mslice.tests.testhelpers.workspace_creator import create_md_workspace
 
+from mantid.simpleapi import BinMD
 
 class SliceAlgorithmTest(unittest.TestCase):
 
@@ -222,3 +225,38 @@ class SliceAlgorithmTest(unittest.TestCase):
         self.assertRaises(RuntimeError, lambda: test_slice.dimension_index(workspace, axis))
         calls = [call(axis.units)]
         workspace.getDimensionIndexByName.assert_has_calls(calls)
+
+
+    @patch('mslice.models.slice.slice_algorithm.get_number_of_steps')
+    def test_compute_slice_PSD(self, mock_get_no_steps):
+        workspace = create_md_workspace(2, "md_ws")
+
+        mock_x_axis = MagicMock()
+        mock_x_axis.start_meV = -10
+        mock_x_axis.end_meV = 10
+        mock_x_axis.units = "|Q|"
+
+        mock_y_axis = MagicMock()
+        mock_y_axis.start_meV = -10
+        mock_y_axis.end_meV = 10
+        mock_y_axis.units = "DeltaE"
+
+        mock_get_no_steps.return_value = 20
+
+        test_slice = Slice()
+        binned_ws = test_slice._compute_slice_PSD(workspace, mock_x_axis, mock_y_axis, None)
+
+        self.assertTrue(isinstance(binned_ws, MDHistoWorkspace))
+        self.assertEquals(binned_ws.getSignalArray().shape, (mock_get_no_steps.return_value,
+                                                             mock_get_no_steps.return_value))
+        self.assertEquals(np.sum(binned_ws.getNumEventsArray()), workspace.getNPoints())
+
+        x_dim = binned_ws.getXDimension()
+        self.assertEquals(x_dim.name, "|Q|")
+        self.assertEquals(x_dim.getMinimum(), mock_x_axis.start_meV)
+        self.assertEquals(x_dim.getMaximum(), mock_x_axis.end_meV)
+
+        y_dim = binned_ws.getYDimension()
+        self.assertEquals(y_dim.name, "DeltaE")
+        self.assertEquals(y_dim.getMinimum(), mock_y_axis.start_meV)
+        self.assertEquals(y_dim.getMaximum(), mock_y_axis.end_meV)
