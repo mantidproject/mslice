@@ -1,18 +1,18 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mock import patch, MagicMock, call
+from mock import patch, MagicMock, call, ANY
 import numpy as np
 import unittest
 
 from mantid.simpleapi import AddSampleLog
 from mantid.kernel import PropertyManager
-from mantid.dataobjects import MDHistoWorkspace
+from mantid.dataobjects import MDHistoWorkspace, RebinnedOutput, Workspace2D
 
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from mslice.tests.testhelpers.workspace_creator import create_md_workspace
+from mslice.models.axis import Axis
 
-from mantid.simpleapi import BinMD
 
 class SliceAlgorithmTest(unittest.TestCase):
 
@@ -54,13 +54,13 @@ class SliceAlgorithmTest(unittest.TestCase):
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25).transpose()
 
     @staticmethod
-    def create_tst_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False):
+    def create_tst_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False, e_mode='Direct'):
         test_ws = CreateSampleWorkspace(OutputWorkspace='test_ws', NumBanks=1, BankPixelWidth=5, XMin=0.1,
                                         XMax=3.1, BinWidth=0.1, XUnit=x_dict['units'].value)
         for i in range(test_ws.raw_ws.getNumberHistograms()):
             test_ws.raw_ws.setY(i, sim_scattering_data[i])
         AddSampleLog(workspace=test_ws.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
-        test_ws.e_mode = 'Direct'
+        test_ws.e_mode = e_mode
         test_ws.e_fixed = 3
         return {'workspace': test_ws, 'x_dict': x_dict, 'y_dict': y_dict, 'norm_to_one': norm_to_one, 'PSD': PSD}
 
@@ -226,7 +226,6 @@ class SliceAlgorithmTest(unittest.TestCase):
         calls = [call(axis.units)]
         workspace.getDimensionIndexByName.assert_has_calls(calls)
 
-
     @patch('mslice.models.slice.slice_algorithm.get_number_of_steps')
     def test_compute_slice_PSD(self, mock_get_no_steps):
         workspace = create_md_workspace(2, "md_ws")
@@ -244,19 +243,126 @@ class SliceAlgorithmTest(unittest.TestCase):
         mock_get_no_steps.return_value = 20
 
         test_slice = Slice()
-        binned_ws = test_slice._compute_slice_PSD(workspace, mock_x_axis, mock_y_axis, None)
+        computed_slice = test_slice._compute_slice_PSD(workspace, mock_x_axis, mock_y_axis, None)
 
-        self.assertTrue(isinstance(binned_ws, MDHistoWorkspace))
-        self.assertEquals(binned_ws.getSignalArray().shape, (mock_get_no_steps.return_value,
-                                                             mock_get_no_steps.return_value))
-        self.assertEquals(np.sum(binned_ws.getNumEventsArray()), workspace.getNPoints())
+        self.assertTrue(isinstance(computed_slice, MDHistoWorkspace))
+        self.assertEquals(computed_slice.getSignalArray().shape, (mock_get_no_steps.return_value,
+                          mock_get_no_steps.return_value))
+        self.assertEquals(np.sum(computed_slice.getNumEventsArray()), workspace.getNPoints())
 
-        x_dim = binned_ws.getXDimension()
+        x_dim = computed_slice.getXDimension()
         self.assertEquals(x_dim.name, "|Q|")
         self.assertEquals(x_dim.getMinimum(), mock_x_axis.start_meV)
         self.assertEquals(x_dim.getMaximum(), mock_x_axis.end_meV)
 
-        y_dim = binned_ws.getYDimension()
+        y_dim = computed_slice.getYDimension()
         self.assertEquals(y_dim.name, "DeltaE")
         self.assertEquals(y_dim.getMinimum(), mock_y_axis.start_meV)
         self.assertEquals(y_dim.getMaximum(), mock_y_axis.end_meV)
+
+    def test_compute_slice_nonPSD_direct(self):
+        x_dict = self.create_axis_dict()
+        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+
+        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
+                      x_dict['e_unit'].value)
+        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
+                      y_dict['e_unit'].value)
+
+        test_slice = Slice()
+        computed_slice = test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws, x_axis, y_axis,
+                                                          self.test_objects['workspace'].e_mode,
+                                                          self.test_objects['norm_to_one'])
+
+        self.assertTrue(isinstance(computed_slice, RebinnedOutput))
+        self.assertEquals(computed_slice.getNumberBins(), (x_dict['end'].value - x_dict['start'].value) /
+                          x_dict['step'].value)
+        self.assertEquals(computed_slice.getNumberHistograms(), (y_dict['end'].value - y_dict['start'].value) /
+                          y_dict['step'].value)
+        self.assertEquals(computed_slice.getNPoints(), self.test_objects['workspace'].raw_ws.getNPoints())
+
+        self.test_objects = None  # reset test objects
+
+    @patch('mslice.models.slice.slice_algorithm.SofQW3')
+    def test_compute_slice_nonPSD_indirect(self, mock_SofQW3):
+        x_dict = self.create_axis_dict()
+        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, e_mode='Indirect')
+
+        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
+                      x_dict['e_unit'].value)
+        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
+                      y_dict['e_unit'].value)
+        raw_ws = self.test_objects['workspace'].raw_ws
+        raw_ws.run = MagicMock()
+        raw_ws.run.return_value.hasProperty.return_value = True
+        raw_ws.run.return_value.getProperty.return_value.value = "test"
+
+        test_slice = Slice()
+        test_slice._compute_slice_nonPSD(raw_ws, x_axis, y_axis, self.test_objects['workspace'].e_mode,
+                                         self.test_objects['norm_to_one'])
+        mock_SofQW3.assert_called_once_with(InputWorkspace=ANY, QAxisBinning=ANY, EAxisBinning=ANY, EMode=ANY,
+                                            StoreInADS=ANY, EFixed="test")
+
+        self.test_objects = None  # reset test objects
+
+    def test_compute_slice_nonPSD_error_if_no_DeltaE_axis(self):
+        x_dict = self.create_axis_dict(units='|Q|')
+        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+
+        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
+                      x_dict['e_unit'].value)
+        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
+                      y_dict['e_unit'].value)
+
+        test_slice = Slice()
+        self.assertRaises(RuntimeError, lambda: test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws,
+                          x_axis, y_axis, self.test_objects['workspace'].e_mode, self.test_objects['norm_to_one']))
+
+        self.test_objects = None  # reset test objects
+
+    def test_compute_slice_nonPSD_2Theta_axes(self):
+        x_dict = self.create_axis_dict()
+        y_dict = self.create_axis_dict(units='2Theta', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+
+        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
+                      x_dict['e_unit'].value)
+        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
+                      y_dict['e_unit'].value)
+
+        test_slice = Slice()
+        computed_slice = test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws, x_axis, y_axis,
+                                                          self.test_objects['workspace'].e_mode,
+                                                          self.test_objects['norm_to_one'])
+
+        self.assertTrue(isinstance(computed_slice, Workspace2D))
+        self.assertEquals(computed_slice.getNPoints(), self.test_objects['workspace'].raw_ws.getNPoints())
+
+        x_dim = computed_slice.getXDimension()
+        self.assertEquals(x_dim.name, "Energy transfer")
+        self.assertEquals(x_dim.getMinimum(), x_dict['start'].value)
+        self.assertEquals(x_dim.getMaximum(), x_dict['end'].value)
+
+        y_dim = computed_slice.getYDimension()
+        self.assertEquals(y_dim.name, 'Scattering angle')
+
+        self.test_objects = None  # reset test objects
+
+    def test_compute_slice_nonPSD_error_if_unsupported_axes(self):
+        x_dict = self.create_axis_dict()
+        y_dict = self.create_axis_dict(units='invalid', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+
+        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
+                      x_dict['e_unit'].value)
+        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
+                      y_dict['e_unit'].value)
+
+        test_slice = Slice()
+        self.assertRaises(RuntimeError, lambda: test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws,
+                          x_axis, y_axis, self.test_objects['workspace'].e_mode, self.test_objects['norm_to_one']))
+
+        self.test_objects = None  # reset test objects
