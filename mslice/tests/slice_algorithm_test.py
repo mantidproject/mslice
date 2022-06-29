@@ -228,17 +228,17 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @patch('mslice.models.slice.slice_algorithm.get_number_of_steps')
     def test_compute_slice_PSD(self, mock_get_no_steps):
-        workspace = create_md_workspace(2, "md_ws")
+        workspace = create_md_workspace(2, 'md_ws')
 
         mock_x_axis = MagicMock()
         mock_x_axis.start_meV = -10
         mock_x_axis.end_meV = 10
-        mock_x_axis.units = "|Q|"
+        mock_x_axis.units = '|Q|'
 
         mock_y_axis = MagicMock()
         mock_y_axis.start_meV = -10
         mock_y_axis.end_meV = 10
-        mock_y_axis.units = "DeltaE"
+        mock_y_axis.units = 'DeltaE'
 
         mock_get_no_steps.return_value = 20
 
@@ -251,12 +251,12 @@ class SliceAlgorithmTest(unittest.TestCase):
         self.assertEquals(np.sum(computed_slice.getNumEventsArray()), workspace.getNPoints())
 
         x_dim = computed_slice.getXDimension()
-        self.assertEquals(x_dim.name, "|Q|")
+        self.assertEquals(x_dim.name, '|Q|')
         self.assertEquals(x_dim.getMinimum(), mock_x_axis.start_meV)
         self.assertEquals(x_dim.getMaximum(), mock_x_axis.end_meV)
 
         y_dim = computed_slice.getYDimension()
-        self.assertEquals(y_dim.name, "DeltaE")
+        self.assertEquals(y_dim.name, 'DeltaE')
         self.assertEquals(y_dim.getMinimum(), mock_y_axis.start_meV)
         self.assertEquals(y_dim.getMaximum(), mock_y_axis.end_meV)
 
@@ -290,13 +290,13 @@ class SliceAlgorithmTest(unittest.TestCase):
         raw_ws = self.test_objects['workspace'].raw_ws
         raw_ws.run = MagicMock()
         raw_ws.run.return_value.hasProperty.return_value = True
-        raw_ws.run.return_value.getProperty.return_value.value = "test"
+        raw_ws.run.return_value.getProperty.return_value.value = 'test'
 
         test_slice = Slice()
         test_slice._compute_slice_nonPSD(raw_ws, x_axis, y_axis, self.test_objects['workspace'].e_mode,
                                          self.test_objects['norm_to_one'])
         mock_SofQW3.assert_called_once_with(InputWorkspace=ANY, QAxisBinning=ANY, EAxisBinning=ANY, EMode=ANY,
-                                            StoreInADS=ANY, EFixed="test")
+                                            StoreInADS=ANY, EFixed='test')
 
         self.test_objects = None  # reset test objects
 
@@ -327,7 +327,7 @@ class SliceAlgorithmTest(unittest.TestCase):
         self.assertEquals(computed_slice.getNPoints(), self.test_objects['workspace'].raw_ws.getNPoints())
 
         x_dim = computed_slice.getXDimension()
-        self.assertEquals(x_dim.name, "Energy transfer")
+        self.assertEquals(x_dim.name, 'Energy transfer')
         self.assertEquals(x_dim.getMinimum(), x_dict['start'].value)
         self.assertEquals(x_dim.getMaximum(), x_dict['end'].value)
 
