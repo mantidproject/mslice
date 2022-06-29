@@ -264,11 +264,7 @@ class SliceAlgorithmTest(unittest.TestCase):
         x_dict = self.create_axis_dict()
         y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
-
-        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
-                      x_dict['e_unit'].value)
-        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
-                      y_dict['e_unit'].value)
+        x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         test_slice = Slice()
         computed_slice = test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws, x_axis, y_axis,
@@ -289,11 +285,8 @@ class SliceAlgorithmTest(unittest.TestCase):
         x_dict = self.create_axis_dict()
         y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, e_mode='Indirect')
+        x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
-        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
-                      x_dict['e_unit'].value)
-        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
-                      y_dict['e_unit'].value)
         raw_ws = self.test_objects['workspace'].raw_ws
         raw_ws.run = MagicMock()
         raw_ws.run.return_value.hasProperty.return_value = True
@@ -311,11 +304,7 @@ class SliceAlgorithmTest(unittest.TestCase):
         x_dict = self.create_axis_dict(units='|Q|')
         y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
-
-        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
-                      x_dict['e_unit'].value)
-        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
-                      y_dict['e_unit'].value)
+        x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         test_slice = Slice()
         self.assertRaises(RuntimeError, lambda: test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws,
@@ -327,11 +316,7 @@ class SliceAlgorithmTest(unittest.TestCase):
         x_dict = self.create_axis_dict()
         y_dict = self.create_axis_dict(units='2Theta', start=0.1, end=3.1, step=0.1)
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
-
-        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
-                      x_dict['e_unit'].value)
-        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
-                      y_dict['e_unit'].value)
+        x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         test_slice = Slice()
         computed_slice = test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws, x_axis, y_axis,
@@ -355,14 +340,18 @@ class SliceAlgorithmTest(unittest.TestCase):
         x_dict = self.create_axis_dict()
         y_dict = self.create_axis_dict(units='invalid', start=0.1, end=3.1, step=0.1)
         self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
-
-        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
-                      x_dict['e_unit'].value)
-        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
-                      y_dict['e_unit'].value)
+        x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         test_slice = Slice()
         self.assertRaises(RuntimeError, lambda: test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws,
                           x_axis, y_axis, self.test_objects['workspace'].e_mode, self.test_objects['norm_to_one']))
 
         self.test_objects = None  # reset test objects
+
+    @staticmethod
+    def _generate_axis(x_dict, y_dict):
+        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
+                      x_dict['e_unit'].value)
+        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
+                      y_dict['e_unit'].value)
+        return x_axis, y_axis
