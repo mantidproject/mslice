@@ -8,5 +8,4 @@ omit =
     */mslice/models/workspacemanager/rebose_algorithm.py
     */mslice/models/projection/powder/make_projection.py
     */mslice/models/projection/powder/projection_calculator.py
-    */mslice/models/slice*
 show_missing = True
