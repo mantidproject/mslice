@@ -5,8 +5,6 @@ from mantid.simpleapi import (AddSampleLog, CreateMDHistoWorkspace, CreateMDWork
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.mantid import mantid_algorithms
 
-# Test
-
 
 def _create_extents(n_dims: int) -> str:
     """Create test data for the extents of a workspace."""
