@@ -33,7 +33,7 @@ class SliceFunctionsTest(unittest.TestCase):
         cls.q_axis_degrees = Axis('Degrees', 3, 33, 1)
 
         cls.test_ws = CreateSampleWorkspace(OutputWorkspace='test_ws', NumBanks=1, BankPixelWidth=5, XMin=0.1,
-                                            XMax=3.1, BinWidth=0.1, XUnit='DeltaE')
+                                            XMax=3.1, BinWidth=0.1, XUnit='DeltaE', StoreInADS=False)
         for i in range(cls.test_ws.raw_ws.getNumberHistograms()):
             cls.test_ws.raw_ws.setY(i, cls.sim_scattering_data[i])
         AddSampleLog(workspace=cls.test_ws.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
