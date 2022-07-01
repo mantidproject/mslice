@@ -53,14 +53,13 @@ class SliceAlgorithmTest(unittest.TestCase):
     def setUpClass(cls):
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25).transpose()
 
-    @classmethod
-    def tearDown(cls) -> None:
-        cls.test_objects = None  # reset test objects
+    def tearDown(self) -> None:
+        self.test_objects = None  # reset test objects
         AnalysisDataService.clear()
 
     @staticmethod
     def _create_tst_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False, e_mode='Direct'):
-        test_ws = CreateSampleWorkspace(OutputWorkspace='test_ws', NumBanks=1, BankPixelWidth=5, XMin=0.1,
+        test_ws = CreateSampleWorkspace(OutputWorkspace='slice_algo_test_ws', NumBanks=1, BankPixelWidth=5, XMin=0.1,
                                         XMax=3.1, BinWidth=0.1, XUnit=x_dict['units'].value)
         for i in range(test_ws.raw_ws.getNumberHistograms()):
             test_ws.raw_ws.setY(i, sim_scattering_data[i])
@@ -231,7 +230,7 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     @patch('mslice.models.slice.slice_algorithm.get_number_of_steps')
     def test_compute_slice_PSD(self, mock_get_no_steps):
-        workspace = create_md_workspace(2, 'md_ws')
+        workspace = create_md_workspace(2, 'slice_algo_md_ws')
 
         mock_x_axis = MagicMock()
         mock_x_axis.start_meV = -10
