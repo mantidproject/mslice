@@ -2,14 +2,8 @@ from mock import MagicMock, patch
 import unittest
 
 from mslice.models.slice.slice import Slice
-from mantid.simpleapi import AnalysisDataService
 
 class SliceTest(unittest.TestCase):
-
-    @classmethod
-    def tearDown(cls) -> None:
-        AnalysisDataService.clear()
-
     def test_sample_temp_error_if_none(self):
         test_slice = self._create_slice(sample_temp=None)
         self.assertRaises(ValueError, lambda: test_slice.sample_temp)
