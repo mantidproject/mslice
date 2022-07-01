@@ -5,7 +5,7 @@ import numpy as np
 import unittest
 
 from mantid.api import AlgorithmFactory
-from mantid.simpleapi import AddSampleLog, _create_algorithm_function
+from mantid.simpleapi import AddSampleLog, _create_algorithm_function, AnalysisDataService
 
 from mslice.models.axis import Axis
 from mslice.models.slice.slice_algorithm import Slice
@@ -39,6 +39,10 @@ class SliceFunctionsTest(unittest.TestCase):
         AddSampleLog(workspace=cls.test_ws.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
         cls.test_ws.e_mode = 'Direct'
         cls.test_ws.e_fixed = 3
+
+    @classmethod
+    def tearDownClass(cls):
+        AnalysisDataService.clear()
 
     @patch('mslice.models.slice.slice_functions.mantid_algorithms')
     def test_slice(self, alg_mock):
