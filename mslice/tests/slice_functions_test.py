@@ -40,10 +40,6 @@ class SliceFunctionsTest(unittest.TestCase):
         cls.test_ws.e_mode = 'Direct'
         cls.test_ws.e_fixed = 3
 
-    @classmethod
-    def tearDownClass(cls):
-        AnalysisDataService.clear()
-
     @patch('mslice.models.slice.slice_functions.mantid_algorithms')
     def test_slice(self, alg_mock):
         # set up slice algorithm
