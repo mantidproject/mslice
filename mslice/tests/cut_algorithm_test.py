@@ -22,6 +22,7 @@ class MockProperty:
 class CutAlgorithmTest(TestCase):
 
     def setUp(self):
+        AnalysisDataService.clear()
         self.e_axis = Axis("DeltaE", -10, 15, 1)
         self.q_axis = Axis("|Q|", 0.1, 3.1, 0.1)
         self.theta_axis = Axis("2Theta", -10, 15, 1)
