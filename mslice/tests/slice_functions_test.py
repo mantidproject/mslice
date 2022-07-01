@@ -17,6 +17,7 @@ from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from mslice.tests.testhelpers.workspace_creator import create_pixel_workspace
 
+
 class SliceFunctionsTest(unittest.TestCase):
 
     @classmethod

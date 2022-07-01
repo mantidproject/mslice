@@ -3,6 +3,7 @@ import unittest
 
 from mslice.models.slice.slice import Slice
 
+
 class SliceTest(unittest.TestCase):
     def test_sample_temp_error_if_none(self):
         test_slice = self._create_slice(sample_temp=None)
@@ -100,5 +101,3 @@ class SliceTest(unittest.TestCase):
                       q_axis=None, e_axis=None, rotated=None):
         return Slice(workspace, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
-if __name__ == '__main__':
-    unittest.main()
