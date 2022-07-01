@@ -5,7 +5,7 @@ import numpy as np
 import unittest
 
 from mantid.api import AlgorithmFactory
-from mantid.simpleapi import AddSampleLog, _create_algorithm_function
+from mantid.simpleapi import AddSampleLog, _create_algorithm_function, AnalysisDataService
 
 from mslice.models.axis import Axis
 from mslice.models.slice.slice_algorithm import Slice
@@ -16,11 +16,6 @@ from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from mslice.tests.testhelpers.workspace_creator import create_pixel_workspace
-
-
-def invert_axes(matrix):
-    return np.rot90(np.flipud(matrix))
-
 
 class SliceFunctionsTest(unittest.TestCase):
 
@@ -41,6 +36,10 @@ class SliceFunctionsTest(unittest.TestCase):
         AddSampleLog(workspace=cls.test_ws.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
         cls.test_ws.e_mode = 'Direct'
         cls.test_ws.e_fixed = 3
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        AnalysisDataService.clear()
 
     @patch('mslice.models.slice.slice_functions.mantid_algorithms')
     def test_slice(self, alg_mock):

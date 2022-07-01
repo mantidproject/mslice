@@ -2,17 +2,21 @@ from mock import MagicMock, patch
 import unittest
 
 from mslice.models.slice.slice import Slice
-
+from mantid.simpleapi import AnalysisDataService
 
 class SliceTest(unittest.TestCase):
 
+    @classmethod
+    def tearDown(cls) -> None:
+        AnalysisDataService.clear()
+
     def test_sample_temp_error_if_none(self):
-        test_slice = self.create_slice(sample_temp=None)
+        test_slice = self._create_slice(sample_temp=None)
         self.assertRaises(ValueError, lambda: test_slice.sample_temp)
 
     def test_sample_temp_sets_and_returns(self):
         test_temp = 5.0
-        test_slice = self.create_slice()
+        test_slice = self._create_slice()
         test_slice.sample_temp = test_temp
         self.assertEqual(test_slice.sample_temp, test_temp)
 
@@ -22,28 +26,28 @@ class SliceTest(unittest.TestCase):
         test_sample_temp = MagicMock()
         test_energy_axis = MagicMock()
 
-        test_slice = self.create_slice(workspace=test_output_workspace, sample_temp=test_sample_temp,
-                                       e_axis=test_energy_axis)
+        test_slice = self._create_slice(workspace=test_output_workspace, sample_temp=test_sample_temp,
+                                        e_axis=test_energy_axis)
         test_slice.chi
         compute_chi_fn.called_once_with(test_output_workspace, test_sample_temp, test_energy_axis)
 
     def test_chi_returns_if_already_computed(self):
         test_chi = 5.0
-        test_slice = self.create_slice()
+        test_slice = self._create_slice()
         test_slice._chi = test_chi
         self.assertEqual(test_slice.chi, test_chi)
 
     @patch('mslice.models.slice.slice.compute_chi_magnetic')
     def test_chi_magnetic_computes_if_none(self, compute_chi_magnetic_fn):
         test_chi = 5.0
-        test_slice = self.create_slice()
+        test_slice = self._create_slice()
         test_slice._chi = test_chi
         test_slice.chi_magnetic
         compute_chi_magnetic_fn.called_once_with(test_chi)
 
     def test_ch_magnetic_returns_if_already_computed(self):
         test_chi_magnetic = 5.0
-        test_slice = self.create_slice()
+        test_slice = self._create_slice()
         test_slice._chi_magnetic = test_chi_magnetic
         self.assertEqual(test_slice.chi_magnetic, test_chi_magnetic)
 
@@ -52,13 +56,13 @@ class SliceTest(unittest.TestCase):
         test_output_workspace = MagicMock()
         test_energy_axis = MagicMock()
 
-        test_slice = self.create_slice(workspace=test_output_workspace, e_axis=test_energy_axis)
+        test_slice = self._create_slice(workspace=test_output_workspace, e_axis=test_energy_axis)
         test_slice.d2sigma
         compute_d2sigma_fn.called_once_with(test_output_workspace, test_energy_axis)
 
     def test_d2sigma_returns_if_already_computed(self):
         test_d2sigma = 5.0
-        test_slice = self.create_slice()
+        test_slice = self._create_slice()
         test_slice._d2sigma = test_d2sigma
         self.assertEqual(test_slice.d2sigma, test_d2sigma)
 
@@ -69,14 +73,14 @@ class SliceTest(unittest.TestCase):
         test_momentum_axis = MagicMock()
         test_energy_axis = MagicMock()
 
-        test_slice = self.create_slice(workspace=test_output_workspace, sample_temp=test_sample_temp,
-                                       q_axis=test_momentum_axis, e_axis=test_energy_axis)
+        test_slice = self._create_slice(workspace=test_output_workspace, sample_temp=test_sample_temp,
+                                        q_axis=test_momentum_axis, e_axis=test_energy_axis)
         test_slice.symmetrised
         compute_symmetrised_fn.called_once_with(test_output_workspace, test_sample_temp,test_momentum_axis, test_energy_axis)
 
     def test_symmetrised_returns_if_already_computed(self):
         test_symmetrised = 5.0
-        test_slice = self.create_slice()
+        test_slice = self._create_slice()
         test_slice._symmetrised = test_symmetrised
         self.assertEqual(test_slice.symmetrised, test_symmetrised)
 
@@ -86,20 +90,20 @@ class SliceTest(unittest.TestCase):
         test_sample_temp = MagicMock()
         test_energy_axis = MagicMock()
 
-        test_slice = self.create_slice(workspace=test_output_workspace, sample_temp=test_sample_temp,
-                                       e_axis=test_energy_axis)
+        test_slice = self._create_slice(workspace=test_output_workspace, sample_temp=test_sample_temp,
+                                        e_axis=test_energy_axis)
         test_slice.gdos
         compute_gdos_fn.called_once_with(test_output_workspace, test_sample_temp, test_energy_axis)
 
     def test_gdos_returns_if_already_computed(self):
         test_gdos = 5.0
-        test_slice = self.create_slice()
+        test_slice = self._create_slice()
         test_slice._gdos = test_gdos
         self.assertEqual(test_slice.gdos, test_gdos)
 
     @staticmethod
-    def create_slice(workspace=None, colourmap=None, norm=None, sample_temp=None,
-                     q_axis=None, e_axis=None, rotated=None):
+    def _create_slice(workspace=None, colourmap=None, norm=None, sample_temp=None,
+                      q_axis=None, e_axis=None, rotated=None):
         return Slice(workspace, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
 if __name__ == '__main__':

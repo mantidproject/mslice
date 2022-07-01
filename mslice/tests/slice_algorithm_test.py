@@ -4,7 +4,7 @@ from mock import patch, MagicMock, call, ANY
 import numpy as np
 import unittest
 
-from mantid.simpleapi import AddSampleLog
+from mantid.simpleapi import AddSampleLog, AnalysisDataService
 from mantid.kernel import PropertyManager
 from mantid.dataobjects import MDHistoWorkspace, RebinnedOutput, Workspace2D
 
@@ -24,7 +24,7 @@ class SliceAlgorithmTest(unittest.TestCase):
         def value(self):
             return self.return_value
 
-    def property_side_effect(self, *args):
+    def _property_side_effect(self, *args):
         if args[0] == 'InputWorkspace':
             return self.MockProperty(self.test_objects['workspace'])
         elif args[0] == 'XAxis':
@@ -39,7 +39,7 @@ class SliceAlgorithmTest(unittest.TestCase):
             return self.MockProperty(self.test_objects['workspace'].e_mode)
 
     @staticmethod
-    def getDimensionIndexByName_side_effect(*args, **kwargs):
+    def _getDimensionIndexByName_side_effect(*args, **kwargs):
         if args[0] == 'test':
             return 1.0
         elif args[0] == 'Degrees':
@@ -53,8 +53,13 @@ class SliceAlgorithmTest(unittest.TestCase):
     def setUpClass(cls):
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25).transpose()
 
+    @classmethod
+    def tearDown(cls) -> None:
+        cls.test_objects = None  # reset test objects
+        AnalysisDataService.clear()
+
     @staticmethod
-    def create_tst_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False, e_mode='Direct'):
+    def _create_tst_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False, e_mode='Direct'):
         test_ws = CreateSampleWorkspace(OutputWorkspace='test_ws', NumBanks=1, BankPixelWidth=5, XMin=0.1,
                                         XMax=3.1, BinWidth=0.1, XUnit=x_dict['units'].value)
         for i in range(test_ws.raw_ws.getNumberHistograms()):
@@ -64,9 +69,17 @@ class SliceAlgorithmTest(unittest.TestCase):
         test_ws.e_fixed = 3
         return {'workspace': test_ws, 'x_dict': x_dict, 'y_dict': y_dict, 'norm_to_one': norm_to_one, 'PSD': PSD}
 
-    def create_axis_dict(self, units='DeltaE', start=-10, end=15, step=1, e_unit='meV'):
+    def _create_axis_dict(self, units='DeltaE', start=-10, end=15, step=1, e_unit='meV'):
         return {'units': self.MockProperty(units), 'start': self.MockProperty(start), 'end': self.MockProperty(end),
                 'step': self.MockProperty(step), 'e_unit': self.MockProperty(e_unit)}
+
+    @staticmethod
+    def _generate_axis(x_dict, y_dict):
+        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
+                      x_dict['e_unit'].value)
+        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
+                      y_dict['e_unit'].value)
+        return x_axis, y_axis
 
     def test_PyInit(self):
         test_slice = Slice()
@@ -90,10 +103,10 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
     def test_PyExec_nonPSD(self, mock_get_property, mock_energy_units, mock_compute_nonPSD, mock_attribute_to_log,
                            mock_set_property):
-        x_dict = self.create_axis_dict()
-        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
-        mock_get_property.side_effect = self.property_side_effect
+        x_dict = self._create_axis_dict()
+        y_dict = self._create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+        mock_get_property.side_effect = self._property_side_effect
         mock_energy_units.return_value.factor_from_meV.return_value = 1.0
         mock_compute_nonPSD.return_value = MagicMock()
 
@@ -104,8 +117,6 @@ class SliceAlgorithmTest(unittest.TestCase):
         mock_attribute_to_log.assert_called_once()
         mock_set_property.assert_called_with('OutputWorkspace', mock_compute_nonPSD.return_value)
 
-        self.test_objects = None  # reset test objects
-
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.setProperty')
     @patch('mslice.models.slice.slice_algorithm.attribute_to_log')
     @patch('mslice.models.slice.slice_algorithm.ScaleX')
@@ -113,10 +124,10 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
     def test_PyExec_nonPSD_non_meV(self, mock_get_property, mock_compute_nonPSD, mock_ScaleX, mock_attribute_to_log,
                                    mock_set_property):
-        x_dict = self.create_axis_dict(e_unit='cm-1')
-        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
-        mock_get_property.side_effect = self.property_side_effect
+        x_dict = self._create_axis_dict(e_unit='cm-1')
+        y_dict = self._create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+        mock_get_property.side_effect = self._property_side_effect
         mock_compute_nonPSD.return_value = MagicMock()
         mock_ScaleX.return_value = MagicMock()
 
@@ -128,8 +139,6 @@ class SliceAlgorithmTest(unittest.TestCase):
         mock_attribute_to_log.assert_called_once()
         mock_set_property.assert_called_with('OutputWorkspace', mock_ScaleX.return_value)
 
-        self.test_objects = None  # reset test objects
-
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.setProperty')
     @patch('mslice.models.slice.slice_algorithm.attribute_to_log')
     @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_PSD')
@@ -137,10 +146,10 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
     def test_PyExec_PSD(self, mock_get_property, mock_energy_units, mock_compute_PSD, mock_attribute_to_log,
                         mock_set_property):
-        x_dict = self.create_axis_dict()
-        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
-        mock_get_property.side_effect = self.property_side_effect
+        x_dict = self._create_axis_dict()
+        y_dict = self._create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
+        mock_get_property.side_effect = self._property_side_effect
         mock_energy_units.return_value.factor_from_meV.return_value = 1.0
         mock_compute_PSD.return_value = MagicMock()
 
@@ -151,8 +160,6 @@ class SliceAlgorithmTest(unittest.TestCase):
         mock_attribute_to_log.assert_called_once()
         mock_set_property.assert_called_with('OutputWorkspace', mock_compute_PSD.return_value)
 
-        self.test_objects = None  # reset test objects
-
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.setProperty')
     @patch('mslice.models.slice.slice_algorithm.attribute_to_log')
     @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_PSD')
@@ -160,10 +167,10 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
     def test_PyExec_PSD_non_meV(self, mock_get_property, mock_transform_MD, mock_compute_PSD, mock_attribute_to_log,
                                 mock_set_property):
-        x_dict = self.create_axis_dict(e_unit='cm-1')
-        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
-        mock_get_property.side_effect = self.property_side_effect
+        x_dict = self._create_axis_dict(e_unit='cm-1')
+        y_dict = self._create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
+        mock_get_property.side_effect = self._property_side_effect
         mock_compute_PSD.return_value = MagicMock()
         mock_transform_MD.return_value = MagicMock()
 
@@ -174,8 +181,6 @@ class SliceAlgorithmTest(unittest.TestCase):
         mock_attribute_to_log.assert_called_once()
         mock_set_property.assert_called_with('OutputWorkspace', mock_transform_MD.return_value)
 
-        self.test_objects = None  # reset test objects
-
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.setProperty')
     @patch('mslice.models.slice.slice_algorithm.attribute_to_log')
     @patch('mslice.models.slice.slice_algorithm.Slice._compute_slice_PSD')
@@ -183,20 +188,18 @@ class SliceAlgorithmTest(unittest.TestCase):
     @patch('mslice.models.slice.slice_algorithm.PythonAlgorithm.getProperty')
     def test_PyExec_PSD_non_meV_with_DeltaE_y_axis(self, mock_get_property, mock_transform_MD, mock_compute_PSD,
                                                    mock_attribute_to_log, mock_set_property):
-        x_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
-        y_dict = self.create_axis_dict(e_unit='cm-1')
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
-        mock_get_property.side_effect = self.property_side_effect
+        x_dict = self._create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1, e_unit='cm-1')
+        y_dict = self._create_axis_dict(e_unit='cm-1')
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict, PSD=True)
+        mock_get_property.side_effect = self._property_side_effect
 
         test_slice = Slice()
         test_slice.PyExec()
         mock_transform_MD.assert_called_with(InputWorkspace=mock_compute_PSD.return_value, Scaling=[1., 8.065544])
 
-        self.test_objects = None  # reset test objects
-
     def test_dimension_index_initial_success(self):
         workspace = MagicMock()
-        workspace.getDimensionIndexByName.side_effect = self.getDimensionIndexByName_side_effect
+        workspace.getDimensionIndexByName.side_effect = self._getDimensionIndexByName_side_effect
         axis = MagicMock()
         axis.units = 'test'
 
@@ -206,7 +209,7 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     def test_dimension_index_secondary_success(self):
         workspace = MagicMock()
-        workspace.getDimensionIndexByName.side_effect = self.getDimensionIndexByName_side_effect
+        workspace.getDimensionIndexByName.side_effect = self._getDimensionIndexByName_side_effect
         axis = MagicMock()
         axis.units = '2Theta'
 
@@ -217,7 +220,7 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     def test_dimension_index_error(self):
         workspace = MagicMock()
-        workspace.getDimensionIndexByName.side_effect = self.getDimensionIndexByName_side_effect
+        workspace.getDimensionIndexByName.side_effect = self._getDimensionIndexByName_side_effect
         axis = MagicMock()
         axis.units = 'error'
 
@@ -261,9 +264,9 @@ class SliceAlgorithmTest(unittest.TestCase):
         self.assertEquals(y_dim.getMaximum(), mock_y_axis.end_meV)
 
     def test_compute_slice_nonPSD_direct(self):
-        x_dict = self.create_axis_dict()
-        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+        x_dict = self._create_axis_dict()
+        y_dict = self._create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
         x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         test_slice = Slice()
@@ -278,13 +281,11 @@ class SliceAlgorithmTest(unittest.TestCase):
                           / y_dict['step'].value)
         self.assertEquals(computed_slice.getNPoints(), self.test_objects['workspace'].raw_ws.getNPoints())
 
-        self.test_objects = None  # reset test objects
-
     @patch('mslice.models.slice.slice_algorithm.SofQW3')
     def test_compute_slice_nonPSD_indirect(self, mock_SofQW3):
-        x_dict = self.create_axis_dict()
-        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict, e_mode='Indirect')
+        x_dict = self._create_axis_dict()
+        y_dict = self._create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict, e_mode='Indirect')
         x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         raw_ws = self.test_objects['workspace'].raw_ws
@@ -298,24 +299,20 @@ class SliceAlgorithmTest(unittest.TestCase):
         mock_SofQW3.assert_called_once_with(InputWorkspace=ANY, QAxisBinning=ANY, EAxisBinning=ANY, EMode=ANY,
                                             StoreInADS=ANY, EFixed='test')
 
-        self.test_objects = None  # reset test objects
-
     def test_compute_slice_nonPSD_error_if_no_DeltaE_axis(self):
-        x_dict = self.create_axis_dict(units='|Q|')
-        y_dict = self.create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+        x_dict = self._create_axis_dict(units='|Q|')
+        y_dict = self._create_axis_dict(units='|Q|', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
         x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         test_slice = Slice()
         self.assertRaises(RuntimeError, lambda: test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws,
                           x_axis, y_axis, self.test_objects['workspace'].e_mode, self.test_objects['norm_to_one']))
 
-        self.test_objects = None  # reset test objects
-
     def test_compute_slice_nonPSD_2Theta_axes(self):
-        x_dict = self.create_axis_dict()
-        y_dict = self.create_axis_dict(units='2Theta', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+        x_dict = self._create_axis_dict()
+        y_dict = self._create_axis_dict(units='2Theta', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
         x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         test_slice = Slice()
@@ -334,24 +331,12 @@ class SliceAlgorithmTest(unittest.TestCase):
         y_dim = computed_slice.getYDimension()
         self.assertEquals(y_dim.name, 'Scattering angle')
 
-        self.test_objects = None  # reset test objects
-
     def test_compute_slice_nonPSD_error_if_unsupported_axes(self):
-        x_dict = self.create_axis_dict()
-        y_dict = self.create_axis_dict(units='invalid', start=0.1, end=3.1, step=0.1)
-        self.test_objects = self.create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
+        x_dict = self._create_axis_dict()
+        y_dict = self._create_axis_dict(units='invalid', start=0.1, end=3.1, step=0.1)
+        self.test_objects = self._create_tst_objects(self.sim_scattering_data, x_dict, y_dict)
         x_axis, y_axis = self._generate_axis(x_dict, y_dict)
 
         test_slice = Slice()
         self.assertRaises(RuntimeError, lambda: test_slice._compute_slice_nonPSD(self.test_objects['workspace'].raw_ws,
                           x_axis, y_axis, self.test_objects['workspace'].e_mode, self.test_objects['norm_to_one']))
-
-        self.test_objects = None  # reset test objects
-
-    @staticmethod
-    def _generate_axis(x_dict, y_dict):
-        x_axis = Axis(x_dict['units'].value, x_dict['start'].value, x_dict['end'].value, x_dict['step'].value,
-                      x_dict['e_unit'].value)
-        y_axis = Axis(y_dict['units'].value, y_dict['start'].value, y_dict['end'].value, y_dict['step'].value,
-                      y_dict['e_unit'].value)
-        return x_axis, y_axis
