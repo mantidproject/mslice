@@ -118,7 +118,7 @@ class CutAlgorithmTest(TestCase):
         mock_set_property.assert_called_with('OutputWorkspace', mock_compute_cut.return_value)
 
     def _test_psd_cut(self, normalized: bool, algorithm: str):
-        psd_workspace = create_md_workspace(2, "md_ws")
+        psd_workspace = create_md_workspace(2, "cut_algo_md_ws")
 
         cut = compute_cut(psd_workspace, self.q_axis, self.e_axis, "Direct", True, normalized, algorithm)
 
@@ -128,7 +128,7 @@ class CutAlgorithmTest(TestCase):
         return cut
 
     def _test_non_psd_cut(self, normalized: bool, algorithm: str):
-        non_psd_workspace = create_simulation_workspace("Direct", "non_psd_ws", psd=False)
+        non_psd_workspace = create_simulation_workspace("Direct", "cut_algo_non_psd_ws", psd=False)
 
         cut = compute_cut(non_psd_workspace.raw_ws, self.q_axis, self.e_axis, "Direct", False, normalized, algorithm)
 
