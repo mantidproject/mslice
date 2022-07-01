@@ -20,7 +20,7 @@ from mslice.tests.testhelpers.workspace_creator import create_pixel_workspace
 class SliceFunctionsTest(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUp(cls):
         cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30,25).transpose()
         cls.scattering_rotated = np.rot90(cls.sim_scattering_data, k=3)
         cls.scattering_rotated = np.flipud(cls.scattering_rotated)
@@ -38,7 +38,7 @@ class SliceFunctionsTest(unittest.TestCase):
         cls.test_ws.e_fixed = 3
 
     @classmethod
-    def tearDownClass(cls) -> None:
+    def tearDown(cls) -> None:
         AnalysisDataService.clear()
 
     @patch('mslice.models.slice.slice_functions.mantid_algorithms')
