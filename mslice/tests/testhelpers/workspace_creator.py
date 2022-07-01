@@ -5,6 +5,8 @@ from mantid.simpleapi import (AddSampleLog, CreateMDHistoWorkspace, CreateMDWork
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.mantid import mantid_algorithms
 
+# Test
+
 
 def _create_extents(n_dims: int) -> str:
     """Create test data for the extents of a workspace."""
@@ -34,7 +36,7 @@ def create_simulation_workspace(e_mode: str, output_name: str, psd: bool = False
     else:
         workspace = mantid_algorithms.CreateSimulationWorkspace(Instrument="OSIRIS", BinParams=[-15, 1, 15],
                                                                 UnitX="DeltaE", OutputWorkspace=output_name)
-    AddSampleLog(workspace=workspace.raw_ws, LogName='Ei', LogText='3.', LogType='Number')
+    AddSampleLog(workspace=workspace.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
 
     sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25).transpose()
     for i in range(25):
@@ -65,8 +67,7 @@ def create_md_workspace(n_dims: int, output_name: str):
     """Creates a basic MDWorkspace for testing purposes."""
     md_ws = CreateMDWorkspace(Dimensions=n_dims, Extents=_create_extents(n_dims), Names=_create_dim_names(n_dims),
                               Units=_create_units(n_dims), OutputWorkspace=output_name)
-    FakeMDEventData(InputWorkspace=md_ws, PeakParams=f"500000,{','.join(['0'] * n_dims)},3", RandomizeSignal=True,
-                    StoreInADS=store_in_ads)
+    FakeMDEventData(InputWorkspace=md_ws, PeakParams=f"500000,{','.join(['0'] * n_dims)},3", RandomizeSignal=True)
     return md_ws
 
 
