@@ -5,7 +5,7 @@ import numpy as np
 import unittest
 
 from mantid.api import AlgorithmFactory
-from mantid.simpleapi import AddSampleLog, _create_algorithm_function, AnalysisDataService
+from mantid.simpleapi import AddSampleLog, _create_algorithm_function
 
 from mslice.models.axis import Axis
 from mslice.models.slice.slice_algorithm import Slice
