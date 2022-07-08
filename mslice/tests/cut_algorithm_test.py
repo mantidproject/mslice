@@ -35,7 +35,7 @@ class CutAlgorithmTest(TestCase):
         psd_workspace = CreateMDWorkspace(Dimensions=2, Extents=",".join(["-10,10"] * 2),
                                           Names=",".join(["|Q|", "DeltaE"]),
                                           Units=",".join(["U"] * 2), OutputWorkspace="cut_algo_test_md_ws")
-        FakeMDEventData(InputWorkspace=psd_workspace, PeakParams=f"500000,0,0,3",
+        FakeMDEventData(InputWorkspace=psd_workspace, PeakParams="500000,0,0,3",
                         RandomizeSignal=False)
         e_dim = psd_workspace.getYDimension()
         q_dim = psd_workspace.getXDimension()

@@ -6,7 +6,7 @@ import unittest
 from mslice.models.workspacemanager.workspace_algorithms import (subtract, add_workspace_runs, combine_workspace,
                                                                  propagate_properties, get_limits)
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
-                                                               delete_workspace, rename_workspace, get_workspace_name)
+                                                               delete_workspace, rename_workspace)
 from mslice.models.workspacemanager.workspace_algorithms import processEfixed
 from mslice.util.mantid.mantid_algorithms import ConvertToMD, CloneWorkspace, CreateSimulationWorkspace
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
