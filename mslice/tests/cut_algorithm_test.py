@@ -3,7 +3,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from mantid.api import AnalysisDataService
-from mantid.simpleapi import CreateMDWorkspace, FakeMDEventData
+from mantid.simpleapi import CreateMDWorkspace, FakeMDEventData, BinMD
 from mantid.dataobjects import MDHistoWorkspace
 
 from mslice.models.axis import Axis
@@ -34,6 +34,7 @@ class CutAlgorithmTest(TestCase):
         normalized = True
         algorithm = "Rebin"
 
+        AnalysisDataService.clear()
         psd_workspace = CreateMDWorkspace(Dimensions=2, Extents=",".join(["-10,10"] * 2),
                                           Names=",".join(["|Q|", "DeltaE", "C"][:2]),
                                           Units=",".join(["U"] * 2), OutputWorkspace="cut_algo_test_md_ws")
@@ -41,10 +42,11 @@ class CutAlgorithmTest(TestCase):
                         RandomizeSignal=False, RandomSeed=0)
         e_dim = psd_workspace.getYDimension()
         q_dim = psd_workspace.getXDimension()
-        e_axis = Axis(e_dim.getDimensionId(), e_dim.getMinimum(), e_dim.getMaximum(), "1")
-        q_axis = Axis(q_dim.getDimensionId(), q_dim.getMinimum(), q_dim.getMaximum(), "1")
 
-        cut = compute_cut(psd_workspace, e_axis, q_axis, "Direct", True, normalized, algorithm)
+        y_dim = e_dim.getDimensionId() + "," + str(e_dim.getMinimum()) + "," + str(e_dim.getMaximum()) + "," + "20"
+        x_dim = q_dim.getDimensionId() + "," + str(q_dim.getMinimum()) + "," + str(q_dim.getMaximum()) + "," + "1"
+
+        cut = BinMD(InputWorkspace=psd_workspace, AxisAligned="1", AlignedDim0=x_dim, AlignedDim1=y_dim)
         self.assertAlmostEqual(np.nanmax(cut.getSignalArray()), 101381, 3)
 
     def test_that_compute_cut_returns_a_result_with_the_expected_size_for_normalized_non_psd_rebin_data(self):
