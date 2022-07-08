@@ -34,7 +34,7 @@ class CutAlgorithmTest(TestCase):
         algorithm = "Rebin"
 
         cut = self._test_psd_cut(normalized, algorithm)
-        self.assertAlmostEqual(np.nanmax(cut.getSignalArray()), 10738.0, 3)
+        self.assertAlmostEqual(np.nanmax(cut.getSignalArray()), 101381, 3)
 
     def test_that_compute_cut_returns_a_result_with_the_expected_size_for_normalized_non_psd_rebin_data(self):
         normalized = True
@@ -120,11 +120,16 @@ class CutAlgorithmTest(TestCase):
     def _test_psd_cut(self, normalized: bool, algorithm: str):
         psd_workspace = create_md_workspace(2, "md_ws")
 
-        cut = compute_cut(psd_workspace, self.q_axis, self.e_axis, "Direct", True, normalized, algorithm)
+        e_dim = psd_workspace.getYDimension()
+        q_dim = psd_workspace.getXDimension()
+        e_axis = Axis(e_dim.getDimensionId(), e_dim.getMinimum(), e_dim.getMaximum(), "1")
+        q_axis = Axis(q_dim.getDimensionId(), q_dim.getMinimum(), q_dim.getMaximum(), "1")
+
+        cut = compute_cut(psd_workspace, e_axis, q_axis, "Direct", True, normalized, algorithm)
 
         self.assertTrue(isinstance(cut, MDHistoWorkspace))
-        self.assertEqual(cut.getSignalArray().shape, (1, 30))
-        self.assertEqual(cut.getErrorSquaredArray().shape, (1, 30))
+        self.assertEqual(cut.getSignalArray().shape, (1, 20))
+        self.assertEqual(cut.getErrorSquaredArray().shape, (1, 20))
         return cut
 
     def _test_non_psd_cut(self, normalized: bool, algorithm: str):

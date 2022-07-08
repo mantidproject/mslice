@@ -65,7 +65,8 @@ def create_md_workspace(n_dims: int, output_name: str):
     """Creates a basic MDWorkspace for testing purposes."""
     md_ws = CreateMDWorkspace(Dimensions=n_dims, Extents=_create_extents(n_dims), Names=_create_dim_names(n_dims),
                               Units=_create_units(n_dims), OutputWorkspace=output_name)
-    FakeMDEventData(InputWorkspace=md_ws, PeakParams=f"500000,{','.join(['0'] * n_dims)},3", RandomizeSignal=False, RandomSeed=0)
+    FakeMDEventData(InputWorkspace=md_ws, PeakParams=f"500000,{','.join(['0'] * n_dims)},3", RandomizeSignal=False,
+                    RandomSeed=0)
     return md_ws
 
 
