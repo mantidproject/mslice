@@ -34,7 +34,7 @@ class CutAlgorithmTest(TestCase):
         algorithm = "Rebin"
 
         cut = self._test_psd_cut(normalized, algorithm)
-        self.assertAlmostEqual(np.nanmax(cut.getSignalArray()), 10623.719, 3)
+        self.assertAlmostEqual(np.nanmax(cut.getSignalArray()), 10738.0, 3)
 
     def test_that_compute_cut_returns_a_result_with_the_expected_size_for_normalized_non_psd_rebin_data(self):
         normalized = True
