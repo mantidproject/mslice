@@ -42,7 +42,7 @@ class CutAlgorithmTest(TestCase):
 
         self._test_non_psd_cut(normalized, algorithm)
 
-    def test_that_compute_cut_returns_the_expected_size_for_psd_rebin_data(self):
+    def xtest_that_compute_cut_returns_the_expected_size_for_psd_rebin_data(self):
         normalized = False
         algorithm = "Rebin"
 
@@ -55,7 +55,7 @@ class CutAlgorithmTest(TestCase):
 
         self._test_non_psd_cut(normalized, algorithm)
 
-    def test_that_compute_cut_returns_a_result_with_the_expected_size_for_normalized_psd_integration_data(self):
+    def xtest_that_compute_cut_returns_a_result_with_the_expected_size_for_normalized_psd_integration_data(self):
         normalized = True
         algorithm = "Integration"
 
@@ -68,7 +68,7 @@ class CutAlgorithmTest(TestCase):
 
         self._test_non_psd_cut(normalized, algorithm)
 
-    def test_that_compute_cut_returns_the_expected_size_for_psd_integration_data(self):
+    def xtest_that_compute_cut_returns_the_expected_size_for_psd_integration_data(self):
         normalized = False
         algorithm = "Integration"
 
