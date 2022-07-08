@@ -9,4 +9,5 @@ omit =
     */mslice/models/projection/powder/make_projection.py
     */mslice/models/projection/powder/projection_calculator.py
     */mslice/models/slice*
+    */mslice/models/cut/cut_algorithm.py
 show_missing = True
