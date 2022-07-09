@@ -119,6 +119,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.action_symmetrised_sqe = add_action(menu, self, "Symmetrised S(Q,E)", checkable=True, visible=True)
         menu.addAction(self.action_symmetrised_sqe)
         self.action_gdos = add_action(menu, self, "GDOS", checkable=True, visible=True)
+        self.action_gdos.setEnabled(False)
         menu.addAction(self.action_gdos)
 
     def create_toolbar(self):
