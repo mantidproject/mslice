@@ -118,8 +118,12 @@ class PlotWindow(QtWidgets.QMainWindow):
         menu.addAction(self.action_d2sig_dw_de)
         self.action_symmetrised_sqe = add_action(menu, self, "Symmetrised S(Q,E)", checkable=True, visible=True)
         menu.addAction(self.action_symmetrised_sqe)
+
+        menu.setToolTipsVisible(True)
         self.action_gdos = add_action(menu, self, "GDOS", checkable=True, visible=True)
         self.action_gdos.setEnabled(False)
+        self.action_gdos.setToolTip("GDOS intensity correction has temporarily been disabled as it is causing an error "
+                                    "on some datasets ")
         menu.addAction(self.action_gdos)
 
     def create_toolbar(self):
