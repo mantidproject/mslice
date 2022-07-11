@@ -24,7 +24,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
-        cut.workspace_name = workspace.name
+        cut.cut_ws = workspace
         if save_only:
             self.save_cut_to_workspace(workspace, cut)
             return
@@ -33,10 +33,14 @@ class CutPlotterPresenter(PresenterUtility):
         else:
             self._plot_cut(workspace, cut, plot_over)
 
-    def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True):
+    def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True,
+                  intensity_correction="scattering_function"):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
         cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store)
+        cut.cut_ws = cut_ws
+        if intensity_correction != "scattering_function":
+            cut_ws = cut.get_intensity_corrected_ws(intensity_correction)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start, integration_axis.end)
         en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
         plot_cut_impl(cut_ws, (cut.intensity_start, cut.intensity_end), plot_over, legend, en_conversion)
@@ -88,9 +92,8 @@ class CutPlotterPresenter(PresenterUtility):
         self.set_is_icut(False)
         return lines
 
-    def plot_interactive_cut(self, workspace, cut, store):
-        workspace = get_workspace_handle(workspace)
-        self._plot_cut(workspace, cut, False, store, update_main=False)
+    def plot_interactive_cut(self, workspace, cut, store, intensity_correction):
+        self._plot_cut(workspace, cut, False, store, update_main=False, intensity_correction=intensity_correction)
         draw_interactive_cut(workspace)
 
     def hide_overplot_line(self, workspace, key):

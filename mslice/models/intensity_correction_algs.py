@@ -46,18 +46,18 @@ def compute_chi_magnetic(chi):
     return chi_magnetic
 
 
-def compute_d2sigma(scattering_data, e_axis):
+def compute_d2sigma(scattering_data, e_axis, e_fixed):
     """
     :param scattering_data: Scattering data workspace
     :param e_axis: Axis object defining energy axis details
     :return: d2sigma
     """
-    Ei = scattering_data.e_fixed
-    if Ei is None:
+
+    if e_fixed is None:
         return None
-    ki = np.sqrt(Ei) * E_TO_K
+    ki = np.sqrt(e_fixed) * E_TO_K
     energy_transfer = axis_values(e_axis)
-    kf = (np.sqrt(Ei - energy_transfer)*E_TO_K)
+    kf = (np.sqrt(e_fixed - energy_transfer)*E_TO_K)
     return scattering_data * kf / ki
 
 

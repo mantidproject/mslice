@@ -75,7 +75,7 @@ def errorbar(axes, workspace, *args, **kwargs):
 
     cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='',
               algorithm=workspace.algorithm)
-    cut.workspace_name = workspace.parent
+    cut.override_ws_name(workspace.parent)
     presenter.save_cache(axes, cut, plot_over)
 
     return axes.lines

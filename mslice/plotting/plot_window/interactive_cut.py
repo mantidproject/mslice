@@ -53,8 +53,10 @@ class InteractiveCut(object):
             units = self._canvas.figure.gca().get_yaxis().units if self.horizontal else \
                 self._canvas.figure.gca().get_xaxis().units
             integration_axis = Axis(units, integration_start, integration_end, 0, self._en_unit)
-            cut = Cut(ax, integration_axis, None, None)
-            self._cut_plotter_presenter.plot_interactive_cut(str(self._ws_title), cut, store)
+            workspace = get_workspace_handle(self._ws_title)
+            cut = Cut(ax, integration_axis, None, None, sample_temp=self.slice_plot.temp, e_fixed=workspace.e_fixed)
+            intensity_method = "scattering_function" if not self.slice_plot.intensity_method else self.slice_plot.intensity_method[5:]
+            self._cut_plotter_presenter.plot_interactive_cut(workspace, cut, store, intensity_method)
             self._cut_plotter_presenter.set_is_icut(True)
             if self._is_initial_cut_plotter_presenter:
                 # First time we've plotted a 1D cut - get the true CutPlotterPresenter
