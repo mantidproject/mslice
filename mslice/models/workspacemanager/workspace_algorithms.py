@@ -377,11 +377,17 @@ def _get_exp_info_using(raw_ws, get_exp_info):
 
 def propagate_properties(old_workspace, new_workspace):
     """Propagates MSlice only properties of workspaces, e.g. limits"""
-    new_workspace.ef_defined = old_workspace.ef_defined
-    new_workspace.e_mode = old_workspace.e_mode
-    new_workspace.limits = old_workspace.limits
+    if type(new_workspace) == HistogramWorkspace:  #cut
+        new_workspace.algorithm = old_workspace.algorithm
+        new_workspace.norm_to_one = old_workspace.norm_to_one
+        new_workspace.parent = old_workspace.parent
+    else:  #slice
+        new_workspace.ef_defined = old_workspace.ef_defined
+        new_workspace.e_mode = old_workspace.e_mode
+        new_workspace.limits = old_workspace.limits
+        new_workspace.e_fixed = old_workspace.e_fixed
+
     new_workspace.is_PSD = old_workspace.is_PSD
-    new_workspace.e_fixed = old_workspace.e_fixed
 
 
 def get_comment(workspace):

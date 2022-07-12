@@ -78,9 +78,15 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
 
 
 def modify_part_of_signal(multiplier, up_to_index, signal):
-    lhs = signal[:, :up_to_index] * multiplier
-    rhs = signal[:, up_to_index:]
-    return np.concatenate((lhs, rhs), 1)
+    if len(signal.shape) < 2:  #cut
+        lhs = signal[:up_to_index] * multiplier
+        rhs = signal[up_to_index:]
+        axis_index = 0
+    else:  #slice
+        lhs = signal[:, :up_to_index] * multiplier
+        rhs = signal[:, up_to_index:]
+        axis_index = 1
+    return np.concatenate((lhs, rhs), axis_index)
 
 def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis):
     energy_transfer = axis_values(e_axis)
