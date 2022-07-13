@@ -11,6 +11,7 @@ from mslice.util.compat import legend_set_draggable
 from mslice.util.mantid.mantid_algorithms import Transpose
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mslice.models.cut.cut import Cut
+from mslice.models.workspacemanager.workspace_algorithms import get_EFixed
 import mantid.plots.axesfunctions as axesfunctions
 from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
@@ -74,7 +75,8 @@ def errorbar(axes, workspace, *args, **kwargs):
     cur_canvas.manager.update_axes(axes, plot_over)
 
     cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='',
-              algorithm=workspace.algorithm)
+              algorithm=workspace.algorithm, sample_temp=None, e_fixed=get_EFixed(workspace.raw_ws))
+    cut.cut_ws = workspace
     cut.override_ws_name(workspace.parent)
     presenter.save_cache(axes, cut, plot_over)
 

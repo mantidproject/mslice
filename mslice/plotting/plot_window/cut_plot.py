@@ -1,6 +1,8 @@
 from distutils.version import LooseVersion
 from functools import partial
 
+from qtpy import QtWidgets
+
 from matplotlib import __version__ as mpl_version
 from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
@@ -16,9 +18,11 @@ from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line, \
-    cif_file_powder_line
+    cif_file_powder_line, _update_powder_lines
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.units import get_sample_temperature_from_string
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -49,6 +53,13 @@ class CutPlot(IPlot):
         self._powder_lines = {}
         self._datum_dirty = True
         self._datum_cache = 0
+        self._cif_file = None
+        self._cif_path = None
+
+        self._intensity = False
+        self._intensity_method = False
+        self._temp_dependent = False
+        self._temp = None
 
     def save_default_options(self):
         self.default_options = {
@@ -63,6 +74,10 @@ class CutPlot(IPlot):
             'y_grid': False,
             'y_range': (None, None),
             'waterfall': False,
+            'intensity': self._intensity,
+            'intensity_method': self._intensity_method,
+            'temp': self._temp,
+            'temp_dependent': self._temp_dependent,
         }
 
     def setup_connections(self, plot_window):
@@ -97,6 +112,27 @@ class CutPlot(IPlot):
             partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(cif_file_powder_line, self,
                                                               self._cut_plotter_presenter))
+
+        plot_window.action_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_sqe,
+                    self._cut_plotter_presenter.show_scattering_function, False))
+
+        plot_window.action_chi_qe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_chi_qe,
+                    self._cut_plotter_presenter.show_dynamical_susceptibility, True))
+
+        plot_window.action_chi_qe_magnetic.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_chi_qe_magnetic,
+                    self._cut_plotter_presenter.show_dynamical_susceptibility_magnetic, True))
+
+        plot_window.action_d2sig_dw_de.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
+                    self._cut_plotter_presenter.show_d2sigma, False))
+
+        plot_window.action_symmetrised_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_symmetrised_sqe,
+                    self._cut_plotter_presenter.show_symmetrised, True))
+
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
@@ -326,6 +362,7 @@ class CutPlot(IPlot):
         self.plot_window.action_gen_script.setVisible(not is_icut)
         self.plot_window.action_gen_script_clipboard.setVisible(not is_icut)
         self.plot_window.action_waterfall.setVisible(not is_icut)
+        self.plot_window.menu_intensity.setDisabled(is_icut)
 
         self.plot_window.showNormal()
         self.plot_window.activateWindow()
@@ -507,6 +544,103 @@ class CutPlot(IPlot):
         except Exception as e:
             # We don't want any exceptions raised in the GUI as could crash the GUI
             self.plot_window.display_error(e.message)
+
+    def _reset_intensity(self):
+        options = self.plot_window.menu_intensity.actions()
+        for op in options:
+            op.setChecked(False)
+
+    def set_intensity(self, intensity):
+        self._reset_intensity()
+        intensity.setChecked(True)
+
+    def selected_intensity(self):
+        options = self.plot_window.menu_intensity.actions()
+        for option in options:
+            if option.isChecked():
+                return option
+
+    def show_intensity_plot(self, action, cut_plotter_method, temp_dependent):
+        last_active_figure_number = None
+        if self.manager._current_figs._active_figure is not None:
+            last_active_figure_number = self.manager._current_figs.get_active_figure().number
+
+        self.manager.report_as_current()
+
+        self.default_options['temp_dependent'] = temp_dependent
+        self.temp_dependent = temp_dependent
+        self.default_options['intensity'] = True
+        self.intensity = True
+        self.default_options['intensity_method'] = cut_plotter_method.__name__
+        self.intensity_method = cut_plotter_method.__name__
+
+        if action.isChecked():
+            previous = self.selected_intensity()
+            self.set_intensity(action)
+
+            if temp_dependent:
+                if not self._run_temp_dependent(cut_plotter_method, previous):
+                    return
+            else:
+                cut_plotter_method(self._canvas.figure.axes[0])
+            self._update_lines()
+        else:
+            action.setChecked(True)
+        # Reset current active figure
+        if last_active_figure_number is not None:
+            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+
+    def _run_temp_dependent(self, cut_plotter_method, previous):
+        temp_value_raw = None
+        temp_value = None
+        try:
+            cut_plotter_method(self._canvas.figure.axes[0])
+        except ValueError:  # sample temperature not yet set
+            try:
+                temp_value_raw, field = self.ask_sample_temperature_field(str(self.ws_name))
+            except RuntimeError:  # if cancel is clicked, go back to previous selection
+                self.set_intensity(previous)
+                return False
+            if field:
+                self._cut_plotter_presenter.add_sample_temperature_field(temp_value_raw)
+                self._cut_plotter_presenter.update_sample_temperature(self.ws_name)
+            else:
+                temp_value = get_sample_temperature_from_string(temp_value_raw)
+                if temp_value is not None:
+                    try:
+                        temp_value = float(temp_value)
+                    except ValueError:
+                        temp_value = None
+                if temp_value is None or temp_value < 0:
+                    self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
+                                               or a sample log field.")
+                    self.set_intensity(previous)
+                    return False
+                else:
+                    self.default_options['temp'] = temp_value
+                    self.temp = temp_value
+                    self._cut_plotter_presenter.set_sample_temperature(self._canvas.figure.axes[0], temp_value)
+            cut_plotter_method(self._canvas.figure.axes[0])
+        return True
+
+    def ask_sample_temperature_field(self, ws_name):
+        text = 'Sample Temperature not found. Select the sample temperature field or enter a value in Kelvin:'
+        ws = get_workspace_handle(ws_name)
+        try:
+            keys = ws.raw_ws.run().keys()
+        except AttributeError:
+            keys = ws.raw_ws.getExperimentInfo(0).run().keys()
+        temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_window, 'Sample Temperature', text, keys)
+        if not confirm:
+            raise RuntimeError("sample_temperature_dialog cancelled")
+        else:
+            return str(temp_field), temp_field in keys
+
+    def _update_lines(self):
+        """ Updates the powder overplot lines when intensity type changes """
+        _update_powder_lines(self, self._cut_plotter_presenter)
+        self.update_legend()
+        self._canvas.draw()
 
     @property
     def x_log(self):

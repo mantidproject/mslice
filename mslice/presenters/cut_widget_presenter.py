@@ -60,6 +60,8 @@ class CutWidgetPresenter(PresenterUtility):
             return
         for workspace in selected_workspaces:
             try:
+                workspace = get_workspace_handle(workspace)
+                params += (None, workspace.e_fixed)  # add non-parsed cut params
                 self._cut_plotter_presenter.run_cut(workspace, Cut(*params), plot_over=plot_over, save_only=save_only)
             except RuntimeError as e:
                 self._cut_view.display_error(str(e))

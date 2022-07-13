@@ -8,7 +8,6 @@ from scipy import constants
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.util.mantid.mantid_algorithms import CloneWorkspace
-
 from mslice.util.numpy_helper import apply_with_swapped_axes
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000

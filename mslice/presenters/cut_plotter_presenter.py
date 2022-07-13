@@ -24,7 +24,6 @@ class CutPlotterPresenter(PresenterUtility):
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
-        cut.cut_ws = workspace
         if save_only:
             self.save_cut_to_workspace(workspace, cut)
             return
@@ -37,13 +36,17 @@ class CutPlotterPresenter(PresenterUtility):
                   intensity_correction="scattering_function"):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
-        cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store)
-        cut.cut_ws = cut_ws
-        if intensity_correction != "scattering_function":
+        if not cut.cut_ws:
+            cut.cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store)
+        if intensity_correction == "scattering_function":
+            cut_ws = cut.cut_ws
+            intensity_range = (cut.intensity_start, cut.intensity_end)
+        else:
             cut_ws = cut.get_intensity_corrected_ws(intensity_correction)
+            intensity_range = cut.get_corrected_intensity_range(intensity_correction)
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start, integration_axis.end)
         en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
-        plot_cut_impl(cut_ws, (cut.intensity_start, cut.intensity_end), plot_over, legend, en_conversion)
+        plot_cut_impl(cut_ws, intensity_range, plot_over, legend, en_conversion)
         if update_main:
             self.set_is_icut(False)
             self.update_main_window()
@@ -68,9 +71,24 @@ class CutPlotterPresenter(PresenterUtility):
             self._cut_cache_dict[ax] = []
         if len(self._cut_cache_dict[ax]) == 0 or plot_over:
             self._cut_cache_dict[ax].append(cut)
-        if not plot_over:
-            self._cut_cache_dict[ax][:] = []
-            self._cut_cache_dict[ax].append(cut)
+        elif not cut.intensity_corrected and not plot_over:
+            for cached_cut in self._cut_cache_dict[ax]:
+                if not self._cut_is_equal(cached_cut, cut):
+                    self._cut_cache_dict[ax].remove(cached_cut)
+                if len(self._cut_cache_dict[ax]) == 0:
+                    self._cut_cache_dict[ax].append(cut)
+
+    @staticmethod
+    def _cut_is_equal(cached_cut, cut):
+        cached_cut_params = [cached_cut.cut_axis, cached_cut.integration_axis, cached_cut.intensity_start,
+                             cached_cut.intensity_end, cached_cut.norm_to_one, cached_cut.width, cached_cut.algorithm,
+                             cached_cut.cut_ws]
+        cut_params = [cut.cut_axis, cut.integration_axis, cut.intensity_start, cut.intensity_end,
+                      cut.norm_to_one, cut.width, cut.algorithm, cut.cut_ws]
+        if cached_cut_params == cut_params:
+            return True
+        else:
+            return False
 
     def get_cache(self, ax):
         return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
@@ -166,3 +184,32 @@ class CutPlotterPresenter(PresenterUtility):
 
     def is_overplot(self, line):
         return line in self._overplot_cache.values()
+
+    def show_scattering_function(self, axes):
+        cached_cut = self._cut_cache_dict[axes][0]
+        workspace = get_workspace_handle(cached_cut.workspace_name)
+        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="scattering_function")
+        return
+
+    def show_dynamical_susceptibility(self, axes):
+        cached_cut = self._cut_cache_dict[axes][0]
+        workspace = get_workspace_handle(cached_cut.workspace_name)
+        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="dynamical_susceptibility")
+
+    def show_dynamical_susceptibility_magnetic(self, axes):
+        cached_cut = self._cut_cache_dict[axes][0]
+        workspace = get_workspace_handle(cached_cut.workspace_name)
+        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="dynamical_susceptibility_magnetic")
+
+    def show_d2sigma(self, axes):
+        cached_cut = self._cut_cache_dict[axes][0]
+        workspace = get_workspace_handle(cached_cut.workspace_name)
+        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="d2sigma")
+
+    def show_symmetrised(self, axes):
+        cached_cut = self._cut_cache_dict[axes][0]
+        workspace = get_workspace_handle(cached_cut.workspace_name)
+        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="symmetrised")
+
+    def set_sample_temperature(self, axes, temp):
+        self._cut_cache_dict[axes][0].sample_temp = temp

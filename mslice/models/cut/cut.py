@@ -1,5 +1,7 @@
 from mslice.models.intensity_correction_algs import (compute_chi, compute_chi_magnetic, compute_d2sigma,
                                                      compute_symmetrised)
+import numpy as np
+
 
 class Cut(object):
     """Groups parameters needed to cut and validates them, caches intensities"""
@@ -23,8 +25,9 @@ class Cut(object):
         self._sample_temp = sample_temp
         self._e_fixed = e_fixed
         self._ws_name_override = None
+        self._corrected_intensity_range_cache = {}
 
-        #intensities
+        # intensities
         self._chi = None
         self._chi_magnetic = None
         self._d2sigma = None
@@ -49,7 +52,7 @@ class Cut(object):
     @property
     def workspace_name(self):
         if not self._ws_name_override:
-            return self._cut_ws.name().replace(".", "_")
+            return self._cut_ws.name
         else:
             return self._ws_name_override
 
@@ -150,24 +153,33 @@ class Cut(object):
     def chi(self):
         if self._chi is None:
             self._chi = compute_chi(self._cut_ws, self.sample_temp, self._e_axis())
+            self._chi.intensity_corrected = True
+            self._corrected_intensity_range_cache["dynamical_susceptibility"] = self._get_intensity_range_from_ws(self._chi)
         return self._chi
 
     @property
     def chi_magnetic(self):
         if self._chi_magnetic is None:
             self._chi_magnetic = compute_chi_magnetic(self.chi)
+            self._chi_magnetic.intensity_corrected = True
+            self._corrected_intensity_range_cache["dynamical_susceptibility_magnetic"] = \
+                self._get_intensity_range_from_ws(self._chi_magnetic)
         return self._chi_magnetic
 
     @property
     def d2sigma(self):
         if self._d2sigma is None:
             self._d2sigma = compute_d2sigma(self._cut_ws, self._e_axis(), self._e_fixed)
+            self._d2sigma.intensity_corrected = True
+            self._corrected_intensity_range_cache["d2sigma"] = self._get_intensity_range_from_ws(self._d2sigma)
         return self._d2sigma
 
     @property
     def symmetrised(self):
         if self._symmetrised is None:
             self._symmetrised = compute_symmetrised(self._cut_ws, self.sample_temp, self._e_axis(), self.rotated)
+            self._symmetrised.intensity_corrected = True
+            self._corrected_intensity_range_cache["symmetrised"] = self._get_intensity_range_from_ws(self._symmetrised)
         return self._symmetrised
 
     def get_intensity_corrected_ws(self, intensity_correction_type):
@@ -188,3 +200,18 @@ class Cut(object):
         self.cut_axis.step = self._cut_ws.raw_ws.getXDimension().getBinWidth()
         self.cut_axis.start = self._cut_ws.raw_ws.getXDimension().getMinimum()
         self.cut_axis.end = self._cut_ws.raw_ws.getXDimension().getMaximum()
+
+    @property
+    def intensity_corrected(self):
+        return self.cut_ws.intensity_corrected
+
+    def get_corrected_intensity_range(self, intensity_correction):
+        return self._corrected_intensity_range_cache[intensity_correction]
+
+    @staticmethod
+    def _get_intensity_range_from_ws(workspace):
+        min_intensity = np.nanmin(workspace.get_signal())
+        max_intensity = np.nanmax(workspace.get_signal())
+        # adjust intensities to allow space above and below on intensity axis
+        allowance = (max_intensity - min_intensity) * 0.05
+        return min_intensity - allowance, max_intensity + allowance

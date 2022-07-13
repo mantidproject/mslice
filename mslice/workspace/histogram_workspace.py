@@ -22,6 +22,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
         self.norm_to_one = False
         self.parent = None
         self.algorithm = []
+        self.intensity_corrected = False
         attribute_from_log(self, mantid_ws)
 
     @WorkspaceMixin.name.setter
