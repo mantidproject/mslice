@@ -100,4 +100,3 @@ class SliceTest(unittest.TestCase):
     def _create_slice(workspace=None, colourmap=None, norm=None, sample_temp=None,
                       q_axis=None, e_axis=None, rotated=None):
         return Slice(workspace, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
-
