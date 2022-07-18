@@ -1,12 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
-from six import string_types
 import numpy as np
 
 from mantid.api import WorkspaceUnitValidator
 from scipy import constants
 
 from mslice.models.labels import is_momentum, is_twotheta
-from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid import mantid_algorithms
@@ -24,28 +22,6 @@ def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one):
     if norm_to_one:
         slice = _norm_to_one(slice)
     return slice
-
-def sample_temperature(ws_name, sample_temp_fields):
-    ws = get_workspace_handle(ws_name).raw_ws
-    sample_temp = None
-    for field_name in sample_temp_fields:
-        try:
-            sample_temp = ws.run().getLogData(field_name).value
-        except RuntimeError:
-            pass
-        except AttributeError:
-            sample_temp = ws.getExperimentInfo(0).run().getLogData(field_name).value
-    try:
-        float(sample_temp)
-    except (ValueError, TypeError):
-        pass
-    else:
-        return sample_temp
-    if isinstance(sample_temp, string_types):
-        sample_temp = get_sample_temperature_from_string(sample_temp)
-    if isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
-        sample_temp = np.mean(sample_temp)
-    return sample_temp
 
 
 def compute_recoil_line(ws_name, axis, relative_mass=None):

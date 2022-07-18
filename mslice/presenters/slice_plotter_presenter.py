@@ -1,11 +1,12 @@
 from matplotlib.colors import Normalize
 
-from mslice.models.slice.slice_functions import compute_slice, sample_temperature, compute_recoil_line
+from mslice.models.slice.slice_functions import compute_slice, compute_recoil_line
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice import Slice
 from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.units import convert_energy_to_meV
+from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, create_slice_figure)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.plot_window.overplot_interface import plot_overplot_line, remove_line

@@ -7,8 +7,11 @@ from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.units import get_sample_temperature_from_string
 from mslice.util.mantid.mantid_algorithms import CloneWorkspace
 from mslice.util.numpy_helper import apply_with_swapped_axes
+
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 E_TO_K = np.sqrt(2 * constants.neutron_mass * constants.elementary_charge / 1000) / constants.hbar
@@ -87,6 +90,7 @@ def modify_part_of_signal(multiplier, up_to_index, signal):
         axis_index = 1
     return np.concatenate((lhs, rhs), axis_index)
 
+
 def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis):
     energy_transfer = axis_values(e_axis)
     momentum_transfer = axis_values(q_axis)
@@ -96,3 +100,26 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis):
     gdos *= energy_transfer
     gdos *= (1 - boltzmann_dist)
     return gdos
+
+
+def sample_temperature(ws_name, sample_temp_fields):
+    ws = get_workspace_handle(ws_name).raw_ws
+    sample_temp = None
+    for field_name in sample_temp_fields:
+        try:
+            sample_temp = ws.run().getLogData(field_name).value
+        except RuntimeError:
+            pass
+        except AttributeError:
+            sample_temp = ws.getExperimentInfo(0).run().getLogData(field_name).value
+    try:
+        float(sample_temp)
+    except (ValueError, TypeError):
+        pass
+    else:
+        return sample_temp
+    if isinstance(sample_temp, string_types):
+        sample_temp = get_sample_temperature_from_string(sample_temp)
+    if isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
+        sample_temp = np.mean(sample_temp)
+    return sample_temp

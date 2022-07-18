@@ -9,6 +9,7 @@ import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.plotting.plot_window.overplot_interface import remove_line, plot_overplot_line
 from mslice.models.powder.powder_functions import compute_powder_line
+from mslice.models.intensity_correction_algs import sample_temperature
 import warnings
 
 BRAGG_SIZE_ON_AXES = 0.15
@@ -266,3 +267,7 @@ class CutPlotterPresenter(PresenterUtility):
             return True
         else:
             return False
+
+    def set_sample_temperature_by_field(self, axes, field, workspace_name):
+        temp = sample_temperature(workspace_name, [field])
+        self.set_sample_temperature(axes, workspace_name, temp)

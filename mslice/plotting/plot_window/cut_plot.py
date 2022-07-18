@@ -605,8 +605,8 @@ class CutPlot(IPlot):
                 self.set_intensity(previous)
                 return False
             if not temperature_cached and field:
-                self._cut_plotter_presenter.add_sample_temperature_field(temp_value_raw)
-                self._cut_plotter_presenter.update_sample_temperature(err.ws_name)
+                self._cut_plotter_presenter.set_sample_temperature_by_field(self._canvas.figure.axes[0], temp_value_raw,
+                                                                            err.ws_name)
             elif not temperature_cached:
                 temp_value = get_sample_temperature_from_string(temp_value_raw)
                 if temp_value is not None:
