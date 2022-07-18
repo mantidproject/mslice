@@ -3,11 +3,12 @@ from .base import WorkspaceBase
 from .histo_mixin import HistoMixin
 from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
 from .helperfunctions import attribute_from_log, attribute_to_log, delete_workspace, rename_workspace
+from .common_workspace_properties import CommonWorkspaceProperties
 
 from mantid.api import IMDHistoWorkspace
 
 
-class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase):
+class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWorkspaceProperties):
     """workspace wrapper for MDHistoWorkspace"""
 
     def __init__(self, mantid_ws, name):
@@ -15,6 +16,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
             self._raw_ws = mantid_ws
         else:
             raise TypeError('HistogramWorkspace expected IMDHistoWorkspace, got %s' % mantid_ws.__class__.__name__)
+        CommonWorkspaceProperties.__init__(self)
         self._name = name
         self._cut_params = {}
         self.is_PSD = None

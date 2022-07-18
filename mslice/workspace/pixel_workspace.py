@@ -4,11 +4,12 @@ from .histogram_workspace import HistogramWorkspace
 from .pixel_mixin import PixelMixin
 from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
 from .helperfunctions import attribute_from_log, attribute_to_log, delete_workspace, rename_workspace
+from .common_workspace_properties import CommonWorkspaceProperties
 
 from mantid.api import IMDEventWorkspace
 
 
-class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase):
+class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWorkspaceProperties):
     """workspace wrapper for MDEventWorkspace. Converts to HistogramWorkspace internally."""
 
     def __init__(self, mantid_ws, name):
@@ -22,6 +23,7 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
         else:
             raise TypeError("PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got %s"
                             % mantid_ws.__class__.__name__)
+        CommonWorkspaceProperties.__init__(self)
         self._name = name
         self._cut_params = {}
         self.limits = {}
