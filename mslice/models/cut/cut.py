@@ -40,7 +40,8 @@ class Cut(object):
     @cut_ws.setter
     def cut_ws(self, cut_ws):
         self._cut_ws = cut_ws
-        self._update_cut_axis()
+        if self._cut_ws:
+            self._update_cut_axis()
 
     def reset_integration_axis(self, start, end):
         self.integration_axis.start = start
@@ -140,7 +141,7 @@ class Cut(object):
     @property
     def sample_temp(self):
         if self._sample_temp is None:
-            raise ValueError('sample temperature not found')
+            raise SampleTempValueError('sample temperature not found', self.workspace_name)
         return self._sample_temp
 
     @sample_temp.setter
@@ -211,3 +212,9 @@ class Cut(object):
         min_intensity = np.nanmin(workspace.get_signal())
         max_intensity = np.nanmax(workspace.get_signal())
         return min_intensity, max_intensity
+
+
+class SampleTempValueError(ValueError):
+    def __init__(self, message, ws_name):
+        self.message = message
+        self.ws_name = ws_name

@@ -62,6 +62,7 @@ class CutPlotterPresenter(PresenterUtility):
             cut.integration_axis.end = cut_end
             self._plot_cut(workspace, cut, plot_over)
             cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
+            cut.cut_ws = None
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
         cut.reset_integration_axis(cut.start, cut.end)

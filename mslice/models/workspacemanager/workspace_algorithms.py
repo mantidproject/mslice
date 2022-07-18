@@ -385,6 +385,9 @@ def propagate_properties(old_workspace, new_workspace):
         new_workspace.is_PSD = old_workspace.is_PSD
     else:
         new_workspace.is_PSD = old_workspace.is_PSD
+        new_workspace.parent = old_workspace.parent
+        new_workspace.intensity_corrected = old_workspace.intensity_corrected
+        new_workspace.axes = old_workspace.axes
 
 
 def get_comment(workspace):

@@ -23,6 +23,7 @@ from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.units import get_sample_temperature_from_string
+from mslice.models.cut.cut import SampleTempValueError
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -509,8 +510,10 @@ class CutPlot(IPlot):
                             path.vertices = np.add(self._waterfall_cache[line][index],
                                                    np.array([[ind * x, ind * y], [ind * x, ind * y]]))
 
-    def on_newplot(self, ax, plot_over):
+    def on_newplot(self, plot_over, ws_name):
         # This callback should be activated by a call to errorbar
+        #if ws_name not in self.ws_list:
+            #self.ws_list.append(ws_name)
         new_line = False
         line_containers = self._canvas.figure.gca().containers
         num_lines = len(line_containers)
@@ -592,18 +595,18 @@ class CutPlot(IPlot):
         temp_value = None
         try:
             cut_plotter_method(self._canvas.figure.axes[0])
-        except ValueError:  # sample temperature not yet set
+        except SampleTempValueError as err:  # sample temperature not yet set
             try:
                 temperature_cached = \
                     self._cut_plotter_presenter.propagate_sample_temperatures_throughout_cache(self._canvas.figure.axes[0])
                 if not temperature_cached:
-                    temp_value_raw, field = self.ask_sample_temperature_field(str(self.ws_name))
+                    temp_value_raw, field = self.ask_sample_temperature_field(str(err.ws_name))
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.set_intensity(previous)
                 return False
             if not temperature_cached and field:
                 self._cut_plotter_presenter.add_sample_temperature_field(temp_value_raw)
-                self._cut_plotter_presenter.update_sample_temperature(self.ws_name)
+                self._cut_plotter_presenter.update_sample_temperature(err.ws_name)
             elif not temperature_cached:
                 temp_value = get_sample_temperature_from_string(temp_value_raw)
                 if temp_value is not None:
@@ -617,13 +620,14 @@ class CutPlot(IPlot):
                     self.set_intensity(previous)
                     return False
                 else:
-                    self._cut_plotter_presenter.set_sample_temperature(self._canvas.figure.axes[0], self.ws_name, temp_value)
-            cut_plotter_method(self._canvas.figure.axes[0])
+                    self._cut_plotter_presenter.set_sample_temperature(self._canvas.figure.axes[0], err.ws_name, temp_value)
+            self._run_temp_dependent(cut_plotter_method, previous)
         return True
 
     def ask_sample_temperature_field(self, ws_name):
-        text = 'Sample Temperature not found. Select the sample temperature field or enter a value in Kelvin:'
         ws = get_workspace_handle(ws_name)
+        text = f'Workspace {ws.parent}: Sample Temperature not found. \nSelect the sample temperature field or ' \
+               f'enter a value in Kelvin:'
         try:
             keys = ws.raw_ws.run().keys()
         except AttributeError:
