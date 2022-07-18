@@ -20,6 +20,7 @@ class CutPlotterPresenter(PresenterUtility):
         self._main_presenter = None
         self._interactive_cut_cache = None
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
+        self._temp_cut_cache = []
         self._overplot_cache = {}
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
@@ -67,16 +68,29 @@ class CutPlotterPresenter(PresenterUtility):
 
     def save_cache(self, ax, cut, plot_over=False):
         # If plot over is True you want to save all plotted cuts for use by the cli
+        if cut.intensity_corrected:
+            return
         if ax not in self._cut_cache_dict.keys():
             self._cut_cache_dict[ax] = []
-        if len(self._cut_cache_dict[ax]) == 0 or plot_over:
+        if len(self._cut_cache_dict[ax]) == 0:
             self._cut_cache_dict[ax].append(cut)
-        elif not cut.intensity_corrected and not plot_over:
-            for cached_cut in self._cut_cache_dict[ax]:
-                if not self._cut_is_equal(cached_cut, cut):
-                    self._cut_cache_dict[ax].remove(cached_cut)
-                if len(self._cut_cache_dict[ax]) == 0:
-                    self._cut_cache_dict[ax].append(cut)
+        else:
+            cut_already_cached, cached_cut = self._cut_already_cached(cut)
+            if not cut_already_cached:
+                if not plot_over:
+                    self._cut_cache_dict[ax] = []
+                self._cut_cache_dict[ax].append(cut)
+            else:
+                if not plot_over:
+                    self._cut_cache_dict[ax] = [cached_cut]
+                elif cut not in self._cut_cache_dict[ax]:
+                    self._cut_cache_dict[ax].append(cached_cut)
+
+    def _cut_already_cached(self, cut):
+        for cached_cut in self._temp_cut_cache:
+            if self._cut_is_equal(cached_cut, cut):
+                return True, cached_cut
+        return False, None
 
     @staticmethod
     def _cut_is_equal(cached_cut, cut):
@@ -89,6 +103,9 @@ class CutPlotterPresenter(PresenterUtility):
             return True
         else:
             return False
+
+    def remove_cut_from_cache_by_index(self, ax, index):
+        del self._cut_cache_dict[ax][index]
 
     def get_cache(self, ax):
         return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
@@ -185,31 +202,66 @@ class CutPlotterPresenter(PresenterUtility):
     def is_overplot(self, line):
         return line in self._overplot_cache.values()
 
+    def _show_intensity(self, cut_cache, intensity_correction):
+        plot_over = False
+        self._temp_cut_cache = list(cut_cache)
+        for cached_cut in self._temp_cut_cache:
+            workspace = get_workspace_handle(cached_cut.workspace_name)
+            self._plot_cut(workspace, cached_cut, plot_over=plot_over, intensity_correction=intensity_correction)
+            plot_over = True
+        self._temp_cut_cache = []
+
     def show_scattering_function(self, axes):
-        cached_cut = self._cut_cache_dict[axes][0]
-        workspace = get_workspace_handle(cached_cut.workspace_name)
-        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="scattering_function")
-        return
+        self._show_intensity(self._cut_cache_dict[axes], "scattering_function")
 
     def show_dynamical_susceptibility(self, axes):
-        cached_cut = self._cut_cache_dict[axes][0]
-        workspace = get_workspace_handle(cached_cut.workspace_name)
-        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="dynamical_susceptibility")
+        self._show_intensity(self._cut_cache_dict[axes], "dynamical_susceptibility")
 
     def show_dynamical_susceptibility_magnetic(self, axes):
-        cached_cut = self._cut_cache_dict[axes][0]
-        workspace = get_workspace_handle(cached_cut.workspace_name)
-        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="dynamical_susceptibility_magnetic")
+        self._show_intensity(self._cut_cache_dict[axes], "dynamical_susceptibility_magnetic")
 
     def show_d2sigma(self, axes):
-        cached_cut = self._cut_cache_dict[axes][0]
-        workspace = get_workspace_handle(cached_cut.workspace_name)
-        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="d2sigma")
+        self._show_intensity(self._cut_cache_dict[axes], "d2sigma")
 
     def show_symmetrised(self, axes):
-        cached_cut = self._cut_cache_dict[axes][0]
-        workspace = get_workspace_handle(cached_cut.workspace_name)
-        self._plot_cut(workspace, cached_cut, plot_over=False, intensity_correction="symmetrised")
+        self._show_intensity(self._cut_cache_dict[axes], "symmetrised")
 
-    def set_sample_temperature(self, axes, temp):
-        self._cut_cache_dict[axes][0].sample_temp = temp
+    def set_sample_temperature(self, axes, ws_name, temp):
+        cut_dict = {}
+        parent_ws_name = None
+        for cut in self._cut_cache_dict[axes]:
+            if ws_name == cut.workspace_name:
+                parent_ws_name = cut.parent_ws_name
+            if cut.parent_ws_name not in cut_dict.keys():
+                cut_dict[cut.parent_ws_name] = [cut]
+            else:
+                cut_dict[cut.parent_ws_name].append(cut)
+
+        if parent_ws_name:
+            for cut in cut_dict[parent_ws_name]:
+                cut.sample_temp = temp
+        else:
+            warnings.warn("Sample temperature not set, cut not found in cache")
+
+    def propagate_sample_temperatures_throughout_cache(self, axes):
+        if len(self._cut_cache_dict[axes]) <= 1:
+            return False
+
+        temperature_dict = {}
+        cuts_with_no_temp = []
+        for cut in self._cut_cache_dict[axes]:
+            if cut.raw_sample_temp and cut.parent_ws_name not in temperature_dict.keys():
+                temperature_dict[cut.parent_ws_name] = cut.sample_temp
+            elif not cut.raw_sample_temp:
+                cuts_with_no_temp.append(cut)
+
+        if len(temperature_dict) > 0:
+            for cut in list(cuts_with_no_temp):
+                if cut.parent_ws_name in temperature_dict.keys():
+                    cut.sample_temp = temperature_dict[cut.parent_ws_name]
+                    cuts_with_no_temp.remove(cut)
+
+        if len(cuts_with_no_temp) == 0:
+            return True
+        else:
+            return False

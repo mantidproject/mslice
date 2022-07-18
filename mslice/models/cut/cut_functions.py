@@ -18,6 +18,7 @@ def compute_cut(workspace, cut_axis, integration_axis, is_norm, algo='Rebin', st
                                 CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
                                 EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=is_norm,
                                 Algorithm=algo)
+    cut.parent = workspace.name
     return cut
 
 

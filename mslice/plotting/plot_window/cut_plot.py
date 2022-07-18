@@ -59,7 +59,6 @@ class CutPlot(IPlot):
         self._intensity = False
         self._intensity_method = False
         self._temp_dependent = False
-        self._temp = None
 
     def save_default_options(self):
         self.default_options = {
@@ -76,7 +75,6 @@ class CutPlot(IPlot):
             'waterfall': False,
             'intensity': self._intensity,
             'intensity_method': self._intensity_method,
-            'temp': self._temp,
             'temp_dependent': self._temp_dependent,
         }
 
@@ -334,6 +332,7 @@ class CutPlot(IPlot):
                 line.remove()
             containers.remove(container)
 
+        self._cut_plotter_presenter.remove_cut_from_cache_by_index(self._canvas.figure.axes[0], line_index)
         self._datum_dirty = True
         self.update_bragg_peaks(refresh=True)
 
@@ -567,8 +566,6 @@ class CutPlot(IPlot):
 
         self.manager.report_as_current()
 
-        self.default_options['temp_dependent'] = temp_dependent
-        self.temp_dependent = temp_dependent
         self.default_options['intensity'] = True
         self.intensity = True
         self.default_options['intensity_method'] = cut_plotter_method.__name__
@@ -597,14 +594,17 @@ class CutPlot(IPlot):
             cut_plotter_method(self._canvas.figure.axes[0])
         except ValueError:  # sample temperature not yet set
             try:
-                temp_value_raw, field = self.ask_sample_temperature_field(str(self.ws_name))
+                temperature_cached = \
+                    self._cut_plotter_presenter.propagate_sample_temperatures_throughout_cache(self._canvas.figure.axes[0])
+                if not temperature_cached:
+                    temp_value_raw, field = self.ask_sample_temperature_field(str(self.ws_name))
             except RuntimeError:  # if cancel is clicked, go back to previous selection
                 self.set_intensity(previous)
                 return False
-            if field:
+            if not temperature_cached and field:
                 self._cut_plotter_presenter.add_sample_temperature_field(temp_value_raw)
                 self._cut_plotter_presenter.update_sample_temperature(self.ws_name)
-            else:
+            elif not temperature_cached:
                 temp_value = get_sample_temperature_from_string(temp_value_raw)
                 if temp_value is not None:
                     try:
@@ -617,9 +617,7 @@ class CutPlot(IPlot):
                     self.set_intensity(previous)
                     return False
                 else:
-                    self.default_options['temp'] = temp_value
-                    self.temp = temp_value
-                    self._cut_plotter_presenter.set_sample_temperature(self._canvas.figure.axes[0], temp_value)
+                    self._cut_plotter_presenter.set_sample_temperature(self._canvas.figure.axes[0], self.ws_name, temp_value)
             cut_plotter_method(self._canvas.figure.axes[0])
         return True
 

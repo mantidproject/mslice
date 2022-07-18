@@ -24,8 +24,8 @@ class Cut(object):
         self.rotated = False
         self._sample_temp = sample_temp
         self._e_fixed = e_fixed
-        self._ws_name_override = None
         self._corrected_intensity_range_cache = {}
+        self.parent_ws_name = None
 
         # intensities
         self._chi = None
@@ -42,19 +42,13 @@ class Cut(object):
         self._cut_ws = cut_ws
         self._update_cut_axis()
 
-    def override_ws_name(self, ws_name_override):
-        self._ws_name_override = ws_name_override
-
     def reset_integration_axis(self, start, end):
         self.integration_axis.start = start
         self.integration_axis.end = end
 
     @property
     def workspace_name(self):
-        if not self._ws_name_override:
-            return self._cut_ws.name
-        else:
-            return self._ws_name_override
+        return self._cut_ws.name
 
     @property
     def workspace_raw_name(self):
@@ -140,6 +134,10 @@ class Cut(object):
         self._algorithm = algo
 
     @property
+    def raw_sample_temp(self):
+        return self._sample_temp
+
+    @property
     def sample_temp(self):
         if self._sample_temp is None:
             raise ValueError('sample temperature not found')
@@ -212,6 +210,4 @@ class Cut(object):
     def _get_intensity_range_from_ws(workspace):
         min_intensity = np.nanmin(workspace.get_signal())
         max_intensity = np.nanmax(workspace.get_signal())
-        # adjust intensities to allow space above and below on intensity axis
-        allowance = (max_intensity - min_intensity) * 0.05
-        return min_intensity - allowance, max_intensity + allowance
+        return min_intensity, max_intensity
