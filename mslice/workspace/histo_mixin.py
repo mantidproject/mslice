@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
-from mslice.util.numpy_helper import apply_with_corrected_shape
+from mslice.util.numpy_helper import apply_with_corrected_shape, transform_array_to_workspace
 from mantid.simpleapi import CloneWorkspace
 
 
@@ -34,5 +34,6 @@ class HistoMixin(object):
         new_ws = CloneWorkspace(InputWorkspace=self._raw_ws, StoreInADS=False)
         error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
         new_signal = apply_with_corrected_shape(operator, signal, other, error)
+        new_signal = transform_array_to_workspace(new_signal, new_ws)
         new_ws.setSignalArray(new_signal)
         return new_ws

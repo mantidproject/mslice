@@ -196,9 +196,14 @@ class Cut(object):
         return e_axis
 
     def _update_cut_axis(self):
-        self.cut_axis.step = self._cut_ws.raw_ws.getXDimension().getBinWidth()
-        self.cut_axis.start = self._cut_ws.raw_ws.getXDimension().getMinimum()
-        self.cut_axis.end = self._cut_ws.raw_ws.getXDimension().getMaximum()
+        x_dim = self._cut_ws.raw_ws.getXDimension()
+        if self.cut_axis.units == x_dim.getUnits() or self.cut_axis.units in x_dim.getDimensionId():
+            ws_cut_axis = x_dim
+        else:
+            ws_cut_axis = self._cut_ws.raw_ws.getYDimension()
+        self.cut_axis.step = ws_cut_axis.getBinWidth()
+        self.cut_axis.start = ws_cut_axis.getMinimum()
+        self.cut_axis.end = ws_cut_axis.getMaximum()
 
     @property
     def intensity_corrected(self):

@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 
@@ -9,20 +11,29 @@ def apply_with_corrected_shape(method, shape_array, array, exception):
     :param array: array that has at least one axis of the same size as shape_array
     :param exception: exception to raise if array does not have at least one axis of the same size as shape_array
     """
-    if not (len(shape_array.shape) == 1 and array.ndim == 1):
-        if array.ndim == 1: # make 2D
+    try:
+        return_value = method(shape_array, array)
+    except ValueError:
+        if array.ndim == 1:  # make 2D
             array = array[:, np.newaxis]
         if array.shape[1] == 1:
             array = np.transpose(array)
-
-    if shape_array.shape[0] in array.shape and shape_array.shape[0] != 1:  # array matches the wrong (leftmost) axis
-        return apply_with_swapped_axes(method, shape_array, array)
-    elif (len(shape_array.shape) == 1 and array.shape[0] == 1) or shape_array.shape[1] == array.shape[1]:
-        return method(shape_array, array)
-    else:
-        raise exception
+        if shape_array.shape[0] in array.shape and shape_array.shape[0] != 1:  # array matches the wrong (leftmost) axis
+            return apply_with_swapped_axes(method, shape_array, array)
+        elif shape_array.shape[1] == array.shape[1]:
+            return method(shape_array, array)
+        else:
+            raise exception
+    return return_value
 
 
 def apply_with_swapped_axes(method, array, *args):
     out = method(np.transpose(array), *args)
     return np.transpose(out)
+
+
+def transform_array_to_workspace(array, workspace):
+    try:
+        return array.reshape(workspace.getSignalArray().shape)
+    except ValueError:
+        raise RuntimeError("Unable to transform array to workspace")

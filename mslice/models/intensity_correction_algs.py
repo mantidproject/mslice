@@ -10,7 +10,7 @@ from mslice.models.workspacemanager.workspace_algorithms import propagate_proper
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.util.mantid.mantid_algorithms import CloneWorkspace
-from mslice.util.numpy_helper import apply_with_swapped_axes
+from mslice.util.numpy_helper import apply_with_swapped_axes, transform_array_to_workspace
 
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
@@ -75,6 +75,7 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
         new_signal = modify_part_of_signal(boltzmann_dist, negative_de_len, signal)
     new_ws = CloneWorkspace(InputWorkspace=scattering_data, OutputWorkspace=scattering_data.name, store=False)
     propagate_properties(scattering_data, new_ws)
+    new_signal = transform_array_to_workspace(new_signal, new_ws.raw_ws)
     new_ws.set_signal(new_signal)
     return new_ws
 
