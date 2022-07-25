@@ -556,6 +556,28 @@ class CutPlot(IPlot):
         self._reset_intensity()
         intensity.setChecked(True)
 
+    def set_intensity_from_slice(self, intensity_method):
+        self.default_options['intensity'] = True
+        self._intensity = True
+        self.default_options['intensity_method'] = intensity_method
+        self._intensity_method = intensity_method
+
+        action = self._get_action_from_method(intensity_method)
+        self.set_intensity(action)
+
+    def _get_action_from_method(self, intensity_method):
+        intensity_type = intensity_method[5:]
+        if intensity_type == "scattering_function":
+            return self.plot_window.action_sqe
+        if intensity_type == "dynamical_susceptibility":
+            return self.plot_window.action_chi_qe
+        if intensity_type == "dynamical_susceptibility_magnetic":
+            return self.plot_window.action_chi_qe_magnetic
+        if intensity_type == "d2sigma":
+            return self.plot_window.action_d2sig_dw_de
+        if intensity_type == "symmetrised":
+            return self.plot_window.action_symmetrised_sqe
+
     def selected_intensity(self):
         options = self.plot_window.menu_intensity.actions()
         for option in options:
@@ -570,9 +592,9 @@ class CutPlot(IPlot):
         self.manager.report_as_current()
 
         self.default_options['intensity'] = True
-        self.intensity = True
+        self._intensity = True
         self.default_options['intensity_method'] = cut_plotter_method.__name__
-        self.intensity_method = cut_plotter_method.__name__
+        self._intensity_method = cut_plotter_method.__name__
 
         if action.isChecked():
             previous = self.selected_intensity()

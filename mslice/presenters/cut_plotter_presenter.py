@@ -1,6 +1,6 @@
 import numpy as np
 
-from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists
+from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists, get_active_icut_plot
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend, is_momentum, is_twotheta
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
@@ -10,18 +10,21 @@ from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.plotting.plot_window.overplot_interface import remove_line, plot_overplot_line
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
+from mslice.models.workspacemanager.workspace_provider import add_workspace
 import warnings
 
 BRAGG_SIZE_ON_AXES = 0.15
 
 
 class CutPlotterPresenter(PresenterUtility):
+    _current_icut = None  # static variable, as only one icut can be open at any time.
 
     def __init__(self):
         self._main_presenter = None
         self._interactive_cut_cache = None
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
         self._temp_cut_cache = []
+        self._prepared_cut_for_cache = None
         self._overplot_cache = {}
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
@@ -40,6 +43,7 @@ class CutPlotterPresenter(PresenterUtility):
         integration_axis = cut.integration_axis
         if not cut.cut_ws:
             cut.cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store)
+            self.prepare_cut_for_cache(cut)
         if intensity_correction == "scattering_function":
             cut_ws = cut.cut_ws
             intensity_range = (cut.intensity_start, cut.intensity_end)
@@ -52,6 +56,16 @@ class CutPlotterPresenter(PresenterUtility):
         if update_main:
             self.set_is_icut(False)
             self.update_main_window()
+
+    def prepare_cut_for_cache(self, cut):
+        self._prepared_cut_for_cache = cut.copy_for_cache()
+
+    def cache_prepared_cut(self, ax, plot_over):
+        self.save_cache(ax, self._prepared_cut_for_cache, plot_over)
+        self._prepared_cut_for_cache = None
+
+    def get_prepared_cut_for_cache(self):
+        return self._prepared_cut_for_cache
 
     def _plot_with_width(self, workspace, cut, plot_over):
         """This function handles the width parameter."""
@@ -132,6 +146,7 @@ class CutPlotterPresenter(PresenterUtility):
     def plot_interactive_cut(self, workspace, cut, store, intensity_correction):
         self._plot_cut(workspace, cut, False, store, update_main=False, intensity_correction=intensity_correction)
         draw_interactive_cut(workspace)
+        self.set_icut_cut(cut)
 
     def hide_overplot_line(self, workspace, key):
         cache = self._overplot_cache
@@ -183,15 +198,9 @@ class CutPlotterPresenter(PresenterUtility):
         except (ValueError, IndexError):
             warnings.warn("No Bragg peak found.")
 
-    def store_icut(self, icut):
-        self._interactive_cut_cache = icut
-
     def set_is_icut(self, is_icut):
         if cut_figure_exists():
             plt.gcf().canvas.manager.set_is_icut(is_icut)
-
-    def get_icut(self):
-        return self._interactive_cut_cache
 
     def update_main_window(self):
         if self._main_presenter is not None:
@@ -271,3 +280,29 @@ class CutPlotterPresenter(PresenterUtility):
     def set_sample_temperature_by_field(self, axes, field, workspace_name):
         temp = sample_temperature(workspace_name, [field])
         self.set_sample_temperature(axes, workspace_name, temp)
+
+    def get_icut(self):
+        return self._interactive_cut_cache
+
+    def store_icut(self, icut):
+        self._interactive_cut_cache = icut
+
+    @staticmethod
+    def get_icut_cut():
+        return CutPlotterPresenter._current_icut
+
+    @staticmethod
+    def store_icut_cut():
+        cut = CutPlotterPresenter.get_icut_cut()
+        if cut:
+            add_workspace(cut.cut_ws, cut.workspace_name)
+
+    @staticmethod
+    def set_icut_cut(icut_cut):
+        CutPlotterPresenter._current_icut = icut_cut
+
+    @staticmethod
+    def set_icut_intensity_category(intensity_method):
+        icut_plot = get_active_icut_plot()
+        if icut_plot:
+            icut_plot.set_intensity_from_slice(intensity_method)

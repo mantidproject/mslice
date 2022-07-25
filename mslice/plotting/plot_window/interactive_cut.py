@@ -125,3 +125,10 @@ class InteractiveCut(object):
         self.rect.to_draw.set_visible(True)
         self.rect.extents = extents
         self.slice_plot.set_cross_cursor()
+
+    def store_icut_cut_upon_toggle_and_reset(self):
+        self._cut_plotter_presenter.store_icut_cut()
+        self._cut_plotter_presenter.set_icut_cut(None)
+
+    def set_icut_intensity_category(self, intensity_method):
+        self._cut_plotter_presenter.set_icut_intensity_category(intensity_method)

@@ -73,13 +73,22 @@ def errorbar(axes, workspace, *args, **kwargs):
     cur_fig.canvas.draw()
     cur_canvas.manager.update_axes(plot_over, workspace.name)
 
-    cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='',
-              algorithm=workspace.algorithm, sample_temp=None, e_fixed=get_EFixed(workspace.raw_ws))
-    cut.parent_ws_name = workspace.parent
-    cut.cut_ws = workspace
-    presenter.save_cache(axes, cut, plot_over)
+    create_and_cache_cut(presenter, axes, plot_over, workspace, (intensity_min, intensity_max))
 
     return axes.lines
+
+
+@plt.set_category(plt.CATEGORY_CUT)
+def create_and_cache_cut(presenter, mpl_axes, plot_over, workspace, intensity_range):
+    if not presenter.get_prepared_cut_for_cache():
+        cut_axis, int_axis = tuple(workspace.axes)
+        intensity_min, intensity_max = intensity_range
+        cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='',
+                  algorithm=workspace.algorithm, sample_temp=None, e_fixed=get_EFixed(workspace.raw_ws))
+        cut.parent_ws_name = workspace.parent
+        cut.cut_ws = workspace
+        presenter.prepare_cut_for_cache(cut)
+    presenter.cache_prepared_cut(mpl_axes, plot_over)
 
 
 @plt.set_category(plt.CATEGORY_SLICE)

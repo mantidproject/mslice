@@ -420,6 +420,10 @@ class SlicePlot(IPlot):
             self.plot_window.action_save_cut.setVisible(False)
             self.plot_window.action_flip_axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
+            if self.intensity_method:
+                self.icut.set_icut_intensity_category(self.intensity_method)
+            self.icut.store_icut_cut_upon_toggle_and_reset()
+
 
     def toggle_icut(self):
         if self.icut is not None:
