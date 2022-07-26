@@ -73,10 +73,5 @@ def cut_figure_exists():
     return GlobalFigureManager.active_cut_figure_exists()
 
 
-def get_active_icut_plot():
-    figure_numbers = GlobalFigureManager.all_figures_numbers_in_category('1d')
-    for num in figure_numbers:
-        plot = GlobalFigureManager.get_figure_by_number(num).plot_handler
-        if plot.is_icut():
-            return plot
-    return None
+def get_current_plot():
+    return plt.gcf().canvas.manager.plot_handler

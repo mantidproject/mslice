@@ -1,6 +1,6 @@
 import numpy as np
 
-from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists, get_active_icut_plot
+from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists, get_current_plot
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend, is_momentum, is_twotheta
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
@@ -11,6 +11,7 @@ from mslice.plotting.plot_window.overplot_interface import remove_line, plot_ove
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.workspacemanager.workspace_provider import add_workspace
+from mslice.models.cut.cut import SampleTempValueError
 import warnings
 
 BRAGG_SIZE_ON_AXES = 0.15
@@ -44,7 +45,7 @@ class CutPlotterPresenter(PresenterUtility):
         if not cut.cut_ws:
             cut.cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store)
             self.prepare_cut_for_cache(cut)
-        if intensity_correction == "scattering_function":
+        if not intensity_correction or intensity_correction == "scattering_function":
             cut_ws = cut.cut_ws
             intensity_range = (cut.intensity_start, cut.intensity_end)
         else:
@@ -53,6 +54,9 @@ class CutPlotterPresenter(PresenterUtility):
         legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start, integration_axis.end)
         en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
         plot_cut_impl(cut_ws, intensity_range, plot_over, legend, en_conversion)
+        plot_intensity = self.get_current_plot_intensity()[5:] if self.get_current_plot_intensity() else False
+        if plot_over and plot_intensity and not intensity_correction == plot_intensity:
+            self.apply_intensity_correction_after_plot_over("show_"+plot_intensity)
         if update_main:
             self.set_is_icut(False)
             self.update_main_window()
@@ -303,6 +307,14 @@ class CutPlotterPresenter(PresenterUtility):
 
     @staticmethod
     def set_icut_intensity_category(intensity_method):
-        icut_plot = get_active_icut_plot()
+        icut_plot = get_current_plot() #icut is locked to current
         if icut_plot:
-            icut_plot.set_intensity_from_slice(intensity_method)
+            icut_plot.set_intensity_from_method(intensity_method)
+
+    @staticmethod
+    def get_current_plot_intensity():
+        return get_current_plot().intensity_method
+
+    @staticmethod
+    def apply_intensity_correction_after_plot_over(intensity_method):
+        return get_current_plot().trigger_action_from_method(intensity_method)

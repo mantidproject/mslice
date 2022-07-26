@@ -59,6 +59,7 @@ class CutPlot(IPlot):
 
         self._intensity = False
         self._intensity_method = False
+        self._intensity_correction_flag = False
         self._temp_dependent = False
 
     def save_default_options(self):
@@ -512,19 +513,16 @@ class CutPlot(IPlot):
 
     def on_newplot(self, plot_over, ws_name):
         # This callback should be activated by a call to errorbar
-        #if ws_name not in self.ws_list:
-            #self.ws_list.append(ws_name)
+        if ws_name not in self.ws_list:
+            self.ws_list.append(ws_name)
         new_line = False
         line_containers = self._canvas.figure.gca().containers
         num_lines = len(line_containers)
         self.plot_window.action_waterfall.setEnabled(num_lines > 1)
         self.plot_window.toggle_waterfall_edit()
         if not self._is_icut and not plot_over:
-            self.plot_window.action_aluminium.setChecked(False)
-            self.plot_window.action_copper.setChecked(False)
-            self.plot_window.action_niobium.setChecked(False)
-            self.plot_window.action_tantalum.setChecked(False)
-            self.plot_window.action_cif_file.setChecked(False)
+            self._reset_plot_window_options()
+
         all_lines = [line for container in line_containers for line in container.get_children()]
         for cached_lines in list(self._waterfall_cache.keys()):
             if cached_lines not in all_lines:
@@ -539,6 +537,17 @@ class CutPlot(IPlot):
 
         self._datum_dirty = True
         self.update_bragg_peaks(refresh=True)
+
+    def _reset_plot_window_options(self):
+        self.plot_window.action_aluminium.setChecked(False)
+        self.plot_window.action_copper.setChecked(False)
+        self.plot_window.action_niobium.setChecked(False)
+        self.plot_window.action_tantalum.setChecked(False)
+        self.plot_window.action_cif_file.setChecked(False)
+
+        if self.default_options and not self._intensity_correction_flag:
+            self._reset_intensity()
+            self.set_intensity_from_method(self.default_options['intensity_method'])
 
     def generate_script(self, clipboard=False):
         try:
@@ -556,27 +565,28 @@ class CutPlot(IPlot):
         self._reset_intensity()
         intensity.setChecked(True)
 
-    def set_intensity_from_slice(self, intensity_method):
-        self.default_options['intensity'] = True
+    def set_intensity_from_method(self, intensity_method):
         self._intensity = True
-        self.default_options['intensity_method'] = intensity_method
         self._intensity_method = intensity_method
 
         action = self._get_action_from_method(intensity_method)
         self.set_intensity(action)
 
     def _get_action_from_method(self, intensity_method):
-        intensity_type = intensity_method[5:]
-        if intensity_type == "scattering_function":
+        if not intensity_method or intensity_method == "show_scattering_function":
             return self.plot_window.action_sqe
-        if intensity_type == "dynamical_susceptibility":
+        if intensity_method == "show_dynamical_susceptibility":
             return self.plot_window.action_chi_qe
-        if intensity_type == "dynamical_susceptibility_magnetic":
+        if intensity_method == "show_dynamical_susceptibility_magnetic":
             return self.plot_window.action_chi_qe_magnetic
-        if intensity_type == "d2sigma":
+        if intensity_method == "show_d2sigma":
             return self.plot_window.action_d2sig_dw_de
-        if intensity_type == "symmetrised":
+        if intensity_method == "show_symmetrised":
             return self.plot_window.action_symmetrised_sqe
+
+    def trigger_action_from_method(self, intensity_method):
+        action = self._get_action_from_method(intensity_method)
+        action.trigger()
 
     def selected_intensity(self):
         options = self.plot_window.menu_intensity.actions()
@@ -585,65 +595,66 @@ class CutPlot(IPlot):
                 return option
 
     def show_intensity_plot(self, action, cut_plotter_method, temp_dependent):
+        self._intensity_correction_flag = True
         last_active_figure_number = None
         if self.manager._current_figs._active_figure is not None:
             last_active_figure_number = self.manager._current_figs.get_active_figure().number
 
         self.manager.report_as_current()
 
-        self.default_options['intensity'] = True
+        previous = self._get_action_from_method(self._intensity_method)
         self._intensity = True
-        self.default_options['intensity_method'] = cut_plotter_method.__name__
         self._intensity_method = cut_plotter_method.__name__
+        self.set_intensity(action)
 
-        if action.isChecked():
-            previous = self.selected_intensity()
-            self.set_intensity(action)
-
-            if temp_dependent:
-                if not self._run_temp_dependent(cut_plotter_method, previous):
-                    return
-            else:
-                cut_plotter_method(self._canvas.figure.axes[0])
-            self._update_lines()
+        if temp_dependent:
+            if not self._run_temp_dependent(cut_plotter_method, previous):
+                return
         else:
-            action.setChecked(True)
+            cut_plotter_method(self._canvas.figure.axes[0])
+        self._update_lines()
+
         # Reset current active figure
         if last_active_figure_number is not None:
             self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+        self._intensity_correction_flag = False
 
     def _run_temp_dependent(self, cut_plotter_method, previous):
-        temp_value_raw = None
-        temp_value = None
         try:
             cut_plotter_method(self._canvas.figure.axes[0])
         except SampleTempValueError as err:  # sample temperature not yet set
-            try:
-                temperature_cached = \
-                    self._cut_plotter_presenter.propagate_sample_temperatures_throughout_cache(self._canvas.figure.axes[0])
-                if not temperature_cached:
-                    temp_value_raw, field = self.ask_sample_temperature_field(str(err.ws_name))
-            except RuntimeError:  # if cancel is clicked, go back to previous selection
+            if not self.get_sample_temperature_on_error(err, previous=previous):
+                return False
+            self._run_temp_dependent(cut_plotter_method, previous)
+        return True
+
+    def get_sample_temperature_on_error(self, err, ax, previous):
+        temp_value_raw = None
+        temp_value = None
+        try:
+            temperature_cached = \
+                self._cut_plotter_presenter.propagate_sample_temperatures_throughout_cache(ax)
+            if not temperature_cached:
+                temp_value_raw, field = self.ask_sample_temperature_field(str(err.ws_name))
+        except RuntimeError:  # if cancel is clicked, go back to previous selection
+            self.set_intensity(previous)
+            return False
+        if not temperature_cached and field:
+            self._cut_plotter_presenter.set_sample_temperature_by_field(ax, temp_value_raw, err.ws_name)
+        elif not temperature_cached:
+            temp_value = get_sample_temperature_from_string(temp_value_raw)
+            if temp_value is not None:
+                try:
+                    temp_value = float(temp_value)
+                except ValueError:
+                    temp_value = None
+            if temp_value is None or temp_value < 0:
+                self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
+                                           or a sample log field.")
                 self.set_intensity(previous)
                 return False
-            if not temperature_cached and field:
-                self._cut_plotter_presenter.set_sample_temperature_by_field(self._canvas.figure.axes[0], temp_value_raw,
-                                                                            err.ws_name)
-            elif not temperature_cached:
-                temp_value = get_sample_temperature_from_string(temp_value_raw)
-                if temp_value is not None:
-                    try:
-                        temp_value = float(temp_value)
-                    except ValueError:
-                        temp_value = None
-                if temp_value is None or temp_value < 0:
-                    self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
-                                               or a sample log field.")
-                    self.set_intensity(previous)
-                    return False
-                else:
-                    self._cut_plotter_presenter.set_sample_temperature(self._canvas.figure.axes[0], err.ws_name, temp_value)
-            self._run_temp_dependent(cut_plotter_method, previous)
+            else:
+                self._cut_plotter_presenter.set_sample_temperature(ax, err.ws_name, temp_value)
         return True
 
     def ask_sample_temperature_field(self, ws_name):
@@ -805,3 +816,7 @@ class CutPlot(IPlot):
         if self.default_options is None:
             return False
         return self.default_options[item] != getattr(self, item)
+
+    @property
+    def intensity_method(self):
+        return self._intensity_method
