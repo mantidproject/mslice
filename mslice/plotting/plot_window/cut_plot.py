@@ -623,7 +623,7 @@ class CutPlot(IPlot):
         try:
             cut_plotter_method(self._canvas.figure.axes[0])
         except SampleTempValueError as err:  # sample temperature not yet set
-            if not self.get_sample_temperature_on_error(err, previous=previous):
+            if not self.get_sample_temperature_on_error(err, self._canvas.figure.axes[0], previous):
                 return False
             self._run_temp_dependent(cut_plotter_method, previous)
         return True

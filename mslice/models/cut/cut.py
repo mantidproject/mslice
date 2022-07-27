@@ -219,7 +219,8 @@ class Cut(object):
         return min_intensity, max_intensity
 
     def copy_for_cache(self):
-        cut = Cut(self.cut_axis, self.integration_axis, self.intensity_start, self.intensity_end, self.norm_to_one,
+        cut_axis, int_axis = tuple(self.cut_ws.axes)
+        cut = Cut(cut_axis, int_axis, self.intensity_start, self.intensity_end, self.norm_to_one,
                   '', self.algorithm, self._sample_temp, self._e_fixed)
         cut._cut_ws = self.cut_ws
         cut.parent_ws_name = self.parent_ws_name

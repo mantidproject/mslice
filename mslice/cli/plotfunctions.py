@@ -87,8 +87,9 @@ def create_and_cache_cut(presenter, mpl_axes, plot_over, workspace, intensity_ra
                   algorithm=workspace.algorithm, sample_temp=None, e_fixed=get_EFixed(workspace.raw_ws))
         cut.parent_ws_name = workspace.parent
         cut.cut_ws = workspace
-        presenter.prepare_cut_for_cache(cut)
-    presenter.cache_prepared_cut(mpl_axes, plot_over)
+        presenter.save_cache(mpl_axes, cut, plot_over)
+    else:
+        presenter.cache_prepared_cut(mpl_axes, plot_over)
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
