@@ -57,7 +57,6 @@ class CutPlot(IPlot):
         self._cif_file = None
         self._cif_path = None
 
-        self._intensity = False
         self._intensity_method = False
         self._intensity_correction_flag = False
         self._temp_dependent = False
@@ -75,7 +74,6 @@ class CutPlot(IPlot):
             'y_grid': False,
             'y_range': (None, None),
             'waterfall': False,
-            'intensity': self._intensity,
             'intensity_method': self._intensity_method,
             'temp_dependent': self._temp_dependent,
         }
@@ -566,7 +564,6 @@ class CutPlot(IPlot):
         intensity.setChecked(True)
 
     def set_intensity_from_method(self, intensity_method):
-        self._intensity = True
         self._intensity_method = intensity_method
 
         action = self._get_action_from_method(intensity_method)
@@ -602,8 +599,7 @@ class CutPlot(IPlot):
 
         self.manager.report_as_current()
 
-        previous = self._get_action_from_method(self._intensity_method)
-        self._intensity = True
+        previous = self._intensity_method
         self._intensity_method = cut_plotter_method.__name__
         self.set_intensity(action)
 
@@ -637,7 +633,7 @@ class CutPlot(IPlot):
             if not temperature_cached:
                 temp_value_raw, field = self.ask_sample_temperature_field(str(err.ws_name))
         except RuntimeError:  # if cancel is clicked, go back to previous selection
-            self.set_intensity(previous)
+            self._set_intensity_to_previous(previous)
             return False
         if not temperature_cached and field:
             self._cut_plotter_presenter.set_sample_temperature_by_field(ax, temp_value_raw, err.ws_name)
@@ -651,11 +647,16 @@ class CutPlot(IPlot):
             if temp_value is None or temp_value < 0:
                 self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
                                            or a sample log field.")
-                self.set_intensity(previous)
+                self._set_intensity_to_previous(previous)
                 return False
             else:
                 self._cut_plotter_presenter.set_sample_temperature(ax, err.ws_name, temp_value)
         return True
+
+    def _set_intensity_to_previous(self, previous):
+        self._intensity_method = previous
+        previous = self._get_action_from_method(previous)
+        self.set_intensity(previous)
 
     def ask_sample_temperature_field(self, ws_name):
         ws = get_workspace_handle(ws_name)

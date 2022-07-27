@@ -39,7 +39,7 @@ class CutPlotterPresenter(PresenterUtility):
             self._plot_cut(workspace, cut, plot_over)
 
     def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True,
-                  intensity_correction="scattering_function"):
+                  intensity_correction="scattering_function", final_plot=True):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
         if not cut.cut_ws:
@@ -51,11 +51,12 @@ class CutPlotterPresenter(PresenterUtility):
         else:
             cut_ws = cut.get_intensity_corrected_ws(intensity_correction)
             intensity_range = cut.get_corrected_intensity_range(intensity_correction)
-        legend = generate_legend(workspace.name, integration_axis.units, integration_axis.start, integration_axis.end)
+        ws_label_name = workspace.parent if workspace.parent else workspace.name
+        legend = generate_legend(ws_label_name, integration_axis.units, integration_axis.start, integration_axis.end)
         en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
         plot_cut_impl(cut_ws, intensity_range, plot_over, legend, en_conversion)
         plot_intensity = self.get_current_plot_intensity()[5:] if self.get_current_plot_intensity() else False
-        if plot_over and plot_intensity and not intensity_correction == plot_intensity:
+        if final_plot and plot_over and plot_intensity and not intensity_correction == plot_intensity:
             self.apply_intensity_correction_after_plot_over("show_"+plot_intensity)
         if update_main:
             self.set_is_icut(False)
@@ -79,7 +80,8 @@ class CutPlotterPresenter(PresenterUtility):
         while cut_start != cut_end:
             cut.integration_axis.start = cut_start
             cut.integration_axis.end = cut_end
-            self._plot_cut(workspace, cut, plot_over)
+            final_plot = True if cut_start + cut.width == integration_end else False
+            self._plot_cut(workspace, cut, plot_over, final_plot=final_plot)
             cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
             cut.cut_ws = None
             # The first plot will respect which button the user pressed. The rest will over plot
