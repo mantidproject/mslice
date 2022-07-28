@@ -229,7 +229,7 @@ class Cut(object):
 
     @property
     def rotated(self):
-        return is_twotheta(self.cut_axis.units) and not is_momentum(self.cut_axis.units)
+        return not is_twotheta(self.cut_axis.units) and not is_momentum(self.cut_axis.units)
 
 
 class SampleTempValueError(ValueError):
