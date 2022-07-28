@@ -36,7 +36,9 @@ def errorbar(axes, workspace, *args, **kwargs):
     presenter = get_cut_plotter_presenter()
 
     plot_over = kwargs.pop('plot_over', True)
-    intensity_min, intensity_max = kwargs.pop('intensity_range', (None, None))
+    intensity_range = kwargs.pop('intensity_range', (None, None))
+    intensity_range = intensity_range if intensity_range else (None, None)
+    intensity_min, intensity_max = intensity_range
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
     en_conversion_allowed = kwargs.pop('en_conversion', True)
