@@ -220,5 +220,5 @@ def _correct_intensity(scattering_data, intensity_method, e_axis, sample_temp=No
     if intensity_method == "show_d2sigma":
         return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
     if intensity_method == "show_symmetrised":
-        rotated = is_twotheta(scattering_data.cut_axis.units) and not is_momentum(scattering_data.cut_axis.units)
+        rotated = not is_twotheta(scattering_data.cut_axis.units) and not is_momentum(scattering_data.cut_axis.units)
         return compute_symmetrised(scattering_data, sample_temp, e_axis, rotated)

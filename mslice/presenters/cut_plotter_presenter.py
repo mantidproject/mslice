@@ -2,7 +2,7 @@ import numpy as np
 
 from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists, get_current_plot
 from mslice.models.cut.cut_functions import compute_cut
-from mslice.models.labels import generate_legend, is_momentum, is_twotheta
+from mslice.models.labels import generate_legend
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 import mslice.plotting.pyplot as plt
@@ -11,7 +11,6 @@ from mslice.plotting.plot_window.overplot_interface import remove_line, plot_ove
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.workspacemanager.workspace_provider import add_workspace
-from mslice.models.cut.cut import SampleTempValueError
 import warnings
 
 BRAGG_SIZE_ON_AXES = 0.15
