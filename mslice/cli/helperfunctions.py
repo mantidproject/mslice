@@ -8,6 +8,7 @@ from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.models.intensity_correction_algs import (compute_chi, compute_chi_magnetic, compute_d2sigma,
                                                      compute_symmetrised)
+from mslice.models.labels import is_momentum, is_twotheta
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
@@ -219,4 +220,5 @@ def _correct_intensity(scattering_data, intensity_method, e_axis, sample_temp=No
     if intensity_method == "show_d2sigma":
         return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
     if intensity_method == "show_symmetrised":
-        return compute_symmetrised(scattering_data, sample_temp, e_axis, False)
+        rotated = is_twotheta(scattering_data.cut_axis.units) and not is_momentum(scattering_data.cut_axis.units)
+        return compute_symmetrised(scattering_data, sample_temp, e_axis, rotated)

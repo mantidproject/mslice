@@ -1,5 +1,7 @@
 from mslice.models.intensity_correction_algs import (compute_chi, compute_chi_magnetic, compute_d2sigma,
                                                      compute_symmetrised)
+from mslice.models.labels import is_momentum, is_twotheta
+
 import numpy as np
 
 
@@ -21,7 +23,6 @@ class Cut(object):
         self.end = integration_axis.end
         self.width = width
         self.algorithm = algorithm
-        self.rotated = False
         self._sample_temp = sample_temp
         self._e_fixed = e_fixed
         self._corrected_intensity_range_cache = {}
@@ -225,6 +226,10 @@ class Cut(object):
         cut._cut_ws = self.cut_ws
         cut.parent_ws_name = self.parent_ws_name
         return cut
+
+    @property
+    def rotated(self):
+        return is_twotheta(self.cut_axis.units) and not is_momentum(self.cut_axis.units)
 
 
 class SampleTempValueError(ValueError):

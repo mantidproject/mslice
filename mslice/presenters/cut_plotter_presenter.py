@@ -180,7 +180,6 @@ class CutPlotterPresenter(PresenterUtility):
 
     def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=0):
         cache = self._cut_cache_dict[plt.gca()][0]
-        cache.rotated = not is_twotheta(cache.cut_axis.units) and not is_momentum(cache.cut_axis.units)
         try:
             ws_handle = get_workspace_handle(workspace_name)
             workspace_name = ws_handle.parent
