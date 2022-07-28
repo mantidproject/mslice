@@ -6,6 +6,8 @@ from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
+from mslice.models.intensity_correction_algs import (compute_chi, compute_chi_magnetic, compute_d2sigma,
+                                                     compute_symmetrised)
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
@@ -206,3 +208,15 @@ def hide_a_line_and_errorbars(ax, idx: int):
     show_or_hide_a_line(container, False)
     show_or_hide_errorbars_of_a_line(container, 0.0)
     return None
+
+def _correct_intensity(scattering_data, intensity_method, e_axis, sample_temp=None):
+    if not intensity_method or intensity_method == "show_scattering_function":
+        return scattering_data
+    if intensity_method == "show_dynamical_susceptibility":
+        return compute_chi(scattering_data, sample_temp, e_axis)
+    if intensity_method == "show_dynamical_susceptibility_magnetic":
+        return compute_chi_magnetic(compute_chi(scattering_data, sample_temp, e_axis))
+    if intensity_method == "show_d2sigma":
+        return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
+    if intensity_method == "show_symmetrised":
+        return compute_symmetrised(scattering_data, sample_temp, e_axis, False)

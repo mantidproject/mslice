@@ -1,9 +1,8 @@
 from qtpy import QtGui, QtWidgets
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.scripting.helperfunctions import add_plot_statements
+from mslice.scripting.helperfunctions import add_plot_statements, replace_ws_special_chars
 from mslice.app.presenters import get_cut_plotter_presenter
 from six import string_types
-import re
 
 
 def generate_script(ws_name, filename=None, plot_handler=None, window=None, clipboard=False):
@@ -34,7 +33,7 @@ def preprocess_lines(ws_name, plot_handler, ax):
     if isinstance(plot_handler, CutPlot):
         cache_list = get_cut_plotter_presenter()._cut_cache_dict[ax]
         ws_list = {}    # use a dict to ensure unique workspaces
-        for workspace_name in [cut.workspace_name for cut in cache_list]:
+        for workspace_name in [cut.parent_ws_name for cut in cache_list]:
             ws_list[get_workspace_handle(workspace_name).raw_ws] = workspace_name
         for ws, workspace_name in list(ws_list.items()):
             script_lines += generate_script_lines(ws, workspace_name)
@@ -111,12 +110,3 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
             else:
                 arguments += [f"{prop.name()}={pval}"]
     return ", ".join(arguments), output_ws
-
-
-def replace_ws_special_chars(workspace_name):
-    rep = {".": "_", "(": "_", ")": "_", ",": "_"}
-    pattern = re.compile("|".join([re.escape(key) for key in rep.keys()]))
-    new_ws_name = pattern.sub(lambda m: rep[m.group(0)], workspace_name)
-    while new_ws_name[len(new_ws_name)-1:] == '_':
-        new_ws_name = new_ws_name[:len(new_ws_name) - 1]
-    return new_ws_name

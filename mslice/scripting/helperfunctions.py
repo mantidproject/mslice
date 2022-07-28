@@ -3,6 +3,7 @@ from distutils.version import LooseVersion
 from mslice.cli.helperfunctions import _function_to_intensity
 from mslice.models.labels import get_recoil_key
 from matplotlib import __version__ as mpl_version
+import re
 
 COMMON_PACKAGES = ["import mslice.cli as mc", "import mslice.plotting.pyplot as plt\n\n"]
 MPL_COLORS_IMPORT = ["\nimport matplotlib.colors as colors\n"]
@@ -136,7 +137,8 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
 def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
-    add_cut_lines_with_width(errorbars, script_lines, cuts)
+    itensity_method = plot_handler.intensity_method
+    add_cut_lines_with_width(errorbars, script_lines, cuts, itensity_method)
     hide_lines(script_lines, plot_handler, ax)
 
 
@@ -167,7 +169,7 @@ def hide_lines(script_lines, plot_handler, ax):
                         " fontsize='medium'), True)\n\n")
 
 
-def add_cut_lines_with_width(errorbars, script_lines, cuts):
+def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_method):
     """Adds the cut statements for each interval of the cuts that were plotted"""
     index = 0  # Required as we run through the loop multiple times for each cut
     for cut in cuts:
@@ -192,8 +194,8 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts):
             label = errorbar._label
 
             script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
-                                'NormToOne={}{})\n'.format(index, cut.workspace_name, cut_axis, integration_axis,
-                                                           norm_to_one, algo_str))
+                                'NormToOne={}{}, IntensityCorrection="{}", SampleTemperature={})\n'.format(index, replace_ws_special_chars(cut.parent_ws_name), cut_axis, integration_axis,
+                                                           norm_to_one, algo_str, intensity_method, cut.sample_temp))
 
             if intensity_range != (None, None):
                 script_lines.append(
@@ -237,3 +239,12 @@ def add_plot_options(script_lines, plot_handler):
         script_lines.append("ax.set_waterfall({}, x_offset={}, y_offset={})\n".format(plot_handler.waterfall,
                                                                                       plot_handler.waterfall_x,
                                                                                       plot_handler.waterfall_y))
+
+
+def replace_ws_special_chars(workspace_name):
+    rep = {".": "_", "(": "_", ")": "_", ",": "_"}
+    pattern = re.compile("|".join([re.escape(key) for key in rep.keys()]))
+    new_ws_name = pattern.sub(lambda m: rep[m.group(0)], workspace_name)
+    while new_ws_name[len(new_ws_name)-1:] == '_':
+        new_ws_name = new_ws_name[:len(new_ws_name) - 1]
+    return new_ws_name
