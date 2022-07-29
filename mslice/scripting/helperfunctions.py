@@ -137,8 +137,9 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
 def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
-    itensity_method = plot_handler.intensity_method
-    add_cut_lines_with_width(errorbars, script_lines, cuts, itensity_method)
+    itensity_correction = plot_handler.intensity_method
+    itensity_correction = itensity_correction[5:] if itensity_correction else itensity_correction
+    add_cut_lines_with_width(errorbars, script_lines, cuts, itensity_correction)
     hide_lines(script_lines, plot_handler, ax)
 
 
@@ -169,7 +170,7 @@ def hide_lines(script_lines, plot_handler, ax):
                         " fontsize='medium'), True)\n\n")
 
 
-def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_method):
+def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction):
     """Adds the cut statements for each interval of the cuts that were plotted"""
     index = 0  # Required as we run through the loop multiple times for each cut
     for cut in cuts:
@@ -196,7 +197,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_method):
             script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
                                 'NormToOne={}{}, IntensityCorrection="{}", SampleTemperature={})'
                                 '\n'.format(index, replace_ws_special_chars(cut.parent_ws_name), cut_axis, integration_axis,
-                                            norm_to_one, algo_str, intensity_method, cut.raw_sample_temp))
+                                            norm_to_one, algo_str, intensity_correction, cut.raw_sample_temp))
 
             if intensity_range != (None, None):
                 script_lines.append(

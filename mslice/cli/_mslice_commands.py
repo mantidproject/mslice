@@ -185,6 +185,10 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
             Recognised energy units are 'meV' (default) and 'cm-1'
     :param NormToOne: if True the cut will be normalized to one.
     :param Algorithm: the cut algorithm to use. Either 'Rebin' (default) or 'Integration'
+    :param IntensityCorrection: the intensity correction algorithm to use. Either False (Default, no correction),
+           'dynamical_susceptibility', 'dynamical_susceptibility_magnetic', 'd2sigma', or 'symmetrised'.
+    :param SampleTemperature: if a temperature dependant intensity correction is input, a SampleTemperature in Kelvin
+           must be provided.
     :return:
     """
     from mslice.app.presenters import get_cut_plotter_presenter
