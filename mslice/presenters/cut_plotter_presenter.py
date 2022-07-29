@@ -11,7 +11,9 @@ from mslice.plotting.plot_window.overplot_interface import remove_line, plot_ove
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.workspacemanager.workspace_provider import add_workspace
+from mslice.models.axis import Axis
 import warnings
+from sys import float_info
 
 BRAGG_SIZE_ON_AXES = 0.15
 
@@ -177,23 +179,25 @@ class CutPlotterPresenter(PresenterUtility):
         adj_factor = total_steps * portion_of_axes / 2
         return np.resize(np.array([10 ** adj_factor, 10 ** (-adj_factor), np.nan]), size) * datum
 
-    def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=0):
+    def add_overplot_line(self, workspace_name, key, recoil, cif=None, e_is_logarithmic=None, datum=0,
+                          intensity_correction = False):
         cache = self._cut_cache_dict[plt.gca()][0]
+        if cache.rotated:
+            warnings.warn("No Bragg peak found as cut has no |Q| dimension.")
+            return
         try:
             ws_handle = get_workspace_handle(workspace_name)
             workspace_name = ws_handle.parent
-            scale_fac = np.nanmax(ws_handle.get_signal()) / 10
+            scale_fac = self._get_overall_max_signal(intensity_correction) / 10
         except KeyError:
             # Workspace is interactively generated and is not in the workspace list
             scale_fac = 90
             workspace_name = workspace_name.split('(')[0][:-4]
-        if cache.rotated:
-            q_axis = cache.integration_axis
-        else:
-            q_axis = cache.cut_axis
+
+        q_axis = self._get_overall_q_axis()
         x, y = compute_powder_line(workspace_name, q_axis, key, cif_file=cif)
         try:
-            if not y_has_logarithmic:
+            if not e_is_logarithmic:
                 y = np.array(y) * scale_fac / np.nanmax(y) + datum
             else:
                 y = self._get_log_bragg_y_coords(len(y), BRAGG_SIZE_ON_AXES, datum)
@@ -201,6 +205,25 @@ class CutPlotterPresenter(PresenterUtility):
             self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
         except (ValueError, IndexError):
             warnings.warn("No Bragg peak found.")
+
+    def _get_overall_q_axis(self):
+        min_q = float_info.max
+        max_q = -min_q
+        for cut in self._cut_cache_dict[plt.gca()]:
+            if cut.q_axis.end > max_q:
+                max_q = cut.q_axis.end
+            if cut.q_axis.start < min_q:
+                min_q = cut.q_axis.start
+        return Axis(cut.q_axis.units, min_q, max_q, cut.q_axis.step, cut.q_axis.e_unit)
+
+    def _get_overall_max_signal(self, intensity_correction):
+        overall_max_signal = 0
+        for cut in self._cut_cache_dict[plt.gca()]:
+            ws = cut.get_intensity_corrected_ws(intensity_correction) if intensity_correction else cut.cut_ws
+            max_cut_signal = np.nanmax(ws.get_signal())
+            if max_cut_signal > overall_max_signal:
+                overall_max_signal = max_cut_signal
+        return overall_max_signal
 
     def set_is_icut(self, is_icut):
         if cut_figure_exists():

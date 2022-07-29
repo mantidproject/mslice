@@ -93,7 +93,8 @@ class SlicePlotterPresenter(PresenterUtility):
             line = cache.overplot_lines.pop(key)
             remove_line(line)
 
-    def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=None):
+    def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=None,
+                          intensity_correction=None):
         cache = self._slice_cache[workspace_name]
         if recoil:
             x, y = compute_recoil_line(workspace_name, cache.momentum_axis, key)

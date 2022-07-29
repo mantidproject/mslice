@@ -152,7 +152,7 @@ class Cut(object):
     @property
     def chi(self):
         if self._chi is None:
-            self._chi = compute_chi(self._cut_ws, self.sample_temp, self._e_axis())
+            self._chi = compute_chi(self._cut_ws, self.sample_temp, self.e_axis)
             self._chi.intensity_corrected = True
             self._corrected_intensity_range_cache["dynamical_susceptibility"] = self._get_intensity_range_from_ws(self._chi)
         return self._chi
@@ -169,7 +169,7 @@ class Cut(object):
     @property
     def d2sigma(self):
         if self._d2sigma is None:
-            self._d2sigma = compute_d2sigma(self._cut_ws, self._e_axis(), self._e_fixed)
+            self._d2sigma = compute_d2sigma(self._cut_ws, self.e_axis, self._e_fixed)
             self._d2sigma.intensity_corrected = True
             self._corrected_intensity_range_cache["d2sigma"] = self._get_intensity_range_from_ws(self._d2sigma)
         return self._d2sigma
@@ -177,7 +177,7 @@ class Cut(object):
     @property
     def symmetrised(self):
         if self._symmetrised is None:
-            self._symmetrised = compute_symmetrised(self._cut_ws, self.sample_temp, self._e_axis(), self.rotated)
+            self._symmetrised = compute_symmetrised(self._cut_ws, self.sample_temp, self.e_axis, self.rotated)
             self._symmetrised.intensity_corrected = True
             self._corrected_intensity_range_cache["symmetrised"] = self._get_intensity_range_from_ws(self._symmetrised)
         return self._symmetrised
@@ -192,9 +192,19 @@ class Cut(object):
         elif intensity_correction_type == "symmetrised":
             return self.symmetrised
 
-    def _e_axis(self):
-        e_axis = self.cut_axis if 'DeltaE' in self.cut_axis.units else self.integration_axis
-        return e_axis
+    @property
+    def e_axis(self):
+        if self.rotated:
+            return self.cut_axis
+        else:
+            return self.integration_axis
+
+    @property
+    def q_axis(self):
+        if self.rotated:
+            return self.integration_axis
+        else:
+            return self.cut_axis
 
     def _update_cut_axis(self):
         x_dim = self._cut_ws.raw_ws.getXDimension()

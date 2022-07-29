@@ -387,22 +387,24 @@ class CutPlot(IPlot):
         return self._datum_cache
 
     def update_bragg_peaks(self, refresh=False):
+        intensity_correction = self.intensity_method if not self.intensity_method else self.intensity_method[5:]
+
         if self.plot_window.action_aluminium.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Aluminium')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, None, self.y_log,
-                                                          self._get_overplot_datum())
+                                                          self._get_overplot_datum(), intensity_correction)
         if self.plot_window.action_copper.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Copper')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, None, self.y_log,
-                                                          self._get_overplot_datum())
+                                                          self._get_overplot_datum(), intensity_correction)
         if self.plot_window.action_niobium.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Niobium')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, None, self.y_log,
-                                                          self._get_overplot_datum())
+                                                          self._get_overplot_datum(), intensity_correction)
         if self.plot_window.action_tantalum.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Tantalum')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, None, self.y_log,
-                                                          self._get_overplot_datum())
+                                                          self._get_overplot_datum(), intensity_correction)
         self.update_legend()
 
     def save_icut(self):
@@ -699,6 +701,13 @@ class CutPlot(IPlot):
         config['y_log'] = value
         self.change_axis_scale(config)
         self._canvas.draw()
+
+    @property
+    def e_log(self):
+        if self._e_axis_is_y():
+            return self.y_log
+        else:
+            return self.x_log
 
     @property
     def show_legends(self):
