@@ -709,6 +709,14 @@ class CutPlot(IPlot):
         else:
             return self.x_log
 
+    def _e_axis_is_y(self):
+        ws = get_workspace_handle(self.ws_name)
+        x_dim = ws.raw_ws.getXDimension()
+        if x_dim.getUnits() == "DeltaE":
+            return False
+        else:
+            return True
+
     @property
     def show_legends(self):
         return self._legends_shown
