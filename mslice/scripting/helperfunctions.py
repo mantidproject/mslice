@@ -194,10 +194,11 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
             width = errorbar.lines[0]._linewidth
             label = errorbar._label
 
+            intensity_correction_arg = intensity_correction if not intensity_correction else f'"{intensity_correction}"'
             script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
-                                'NormToOne={}{}, IntensityCorrection="{}", SampleTemperature={})'
+                                'NormToOne={}{}, IntensityCorrection={}, SampleTemperature={})'
                                 '\n'.format(index, replace_ws_special_chars(cut.parent_ws_name), cut_axis, integration_axis,
-                                            norm_to_one, algo_str, intensity_correction, cut.raw_sample_temp))
+                                            norm_to_one, algo_str, intensity_correction_arg, cut.raw_sample_temp))
 
             if intensity_range != (None, None):
                 script_lines.append(
