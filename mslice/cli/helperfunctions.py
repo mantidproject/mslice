@@ -6,7 +6,7 @@ from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
-from mslice.models.intensity_correction_algs import (compute_chi, compute_chi_magnetic, compute_d2sigma,
+from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
                                                      compute_symmetrised)
 from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.cut.cut import SampleTempValueError
@@ -211,6 +211,7 @@ def hide_a_line_and_errorbars(ax, idx: int):
     show_or_hide_errorbars_of_a_line(container, 0.0)
     return None
 
+
 def _correct_intensity(scattering_data, intensity_correction, e_axis, sample_temp=None):
     if not intensity_correction or intensity_correction == "scattering_function":
         return scattering_data
@@ -218,7 +219,8 @@ def _correct_intensity(scattering_data, intensity_correction, e_axis, sample_tem
         _check_sample_temperature(sample_temp, scattering_data.name)
         return compute_chi(scattering_data, sample_temp, e_axis)
     if intensity_correction == "dynamical_susceptibility_magnetic":
-        return compute_chi_magnetic(compute_chi(scattering_data, sample_temp, e_axis))
+        _check_sample_temperature(sample_temp, scattering_data.name)
+        return compute_chi(scattering_data, sample_temp, e_axis, True)
     if intensity_correction == "d2sigma":
         return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
     if intensity_correction == "symmetrised":

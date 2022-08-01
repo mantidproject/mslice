@@ -1,4 +1,4 @@
-from mslice.models.intensity_correction_algs import (compute_chi, compute_chi_magnetic, compute_d2sigma, slice_compute_gdos,
+from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma, slice_compute_gdos,
                                                      compute_symmetrised)
 
 
@@ -50,7 +50,7 @@ class Slice:
     @property
     def chi_magnetic(self):
         if self._chi_magnetic is None:
-            self._chi_magnetic = compute_chi_magnetic(self.chi)
+            self._chi_magnetic = compute_chi(self.scattering_function, self.sample_temp, self.energy_axis, True)
         return self._chi_magnetic
 
     @property

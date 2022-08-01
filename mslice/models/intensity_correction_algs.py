@@ -15,6 +15,7 @@ from mslice.util.numpy_helper import apply_with_swapped_axes, transform_array_to
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 E_TO_K = np.sqrt(2 * constants.neutron_mass * constants.elementary_charge / 1000) / constants.hbar
+CHI_MAGNETIC_CONST = 291  # 291 milibarns is the total neutron cross-section for a moment of one bohr magneton
 
 
 def compute_boltzmann_dist(sample_temp, delta_e):
@@ -22,30 +23,28 @@ def compute_boltzmann_dist(sample_temp, delta_e):
     kBT = sample_temp * KB_MEV
     return np.exp(-delta_e / kBT)
 
+
 def axis_values(axis):
     """Compute a numpy array of bins for the given axis values"""
     return np.linspace(axis.start_meV, axis.end_meV, get_number_of_steps(axis))
 
-def compute_chi(scattering_data, sample_temp, e_axis):
+
+def compute_chi(scattering_data, sample_temp, e_axis, magnetic=False):
     """
     :param scattering_data: Scattering data workspace
     :param sample_temp: The sample temperature in Kelvin
     :param e_axis: Axis object defining energy axis details
-    :return: The dynamic susceptibility of the data
+    :param magnetic: Flag to account for magnetic susceptibility
+    :return: The dynamic (and optionally, magnetic) susceptibility of the data
     """
     energy_transfer = axis_values(e_axis)
     signs = np.sign(energy_transfer)
     signs[signs == 0] = 1
     boltzmann_dist = compute_boltzmann_dist(sample_temp, energy_transfer)
     chi = np.pi * (signs + (boltzmann_dist * -signs))
-    out = scattering_data * chi
+    mag_scale = CHI_MAGNETIC_CONST if magnetic else 1
+    out = scattering_data * (chi / mag_scale)
     return out
-
-
-def compute_chi_magnetic(chi):
-    # 291 milibarns is the total neutron cross-section for a moment of one bohr magneton
-    chi_magnetic = chi / 291
-    return chi_magnetic
 
 
 def compute_d2sigma(scattering_data, e_axis, e_fixed):
@@ -60,7 +59,7 @@ def compute_d2sigma(scattering_data, e_axis, e_fixed):
     ki = np.sqrt(e_fixed) * E_TO_K
     energy_transfer = axis_values(e_axis)
     kf = (np.sqrt(e_fixed - energy_transfer)*E_TO_K)
-    return scattering_data * kf / ki
+    return scattering_data * (kf / ki)
 
 
 def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):

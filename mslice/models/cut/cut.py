@@ -1,4 +1,4 @@
-from mslice.models.intensity_correction_algs import (compute_chi, compute_chi_magnetic, compute_d2sigma,
+from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
                                                      compute_symmetrised)
 from mslice.models.labels import is_momentum, is_twotheta
 
@@ -160,7 +160,7 @@ class Cut(object):
     @property
     def chi_magnetic(self):
         if self._chi_magnetic is None:
-            self._chi_magnetic = compute_chi_magnetic(self.chi)
+            self._chi_magnetic = compute_chi(self._cut_ws, self.sample_temp, self.e_axis, True)
             self._chi_magnetic.intensity_corrected = True
             self._corrected_intensity_range_cache["dynamical_susceptibility_magnetic"] = \
                 self._get_intensity_range_from_ws(self._chi_magnetic)

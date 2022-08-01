@@ -31,9 +31,16 @@ class HistoMixin(object):
         :return: new HistogramWorkspace
         """
         signal = self.get_signal()
+        error = self.get_variance()
         new_ws = CloneWorkspace(InputWorkspace=self._raw_ws, StoreInADS=False)
-        error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
-        new_signal = apply_with_corrected_shape(operator, signal, other, error)
+        array_size_error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
+
+        new_signal = apply_with_corrected_shape(operator, signal, other, array_size_error)
         new_signal = transform_array_to_workspace(new_signal, new_ws)
+
+        new_error = apply_with_corrected_shape(operator, error, other, array_size_error)
+        new_error = transform_array_to_workspace(new_error, new_ws)
+
         new_ws.setSignalArray(new_signal)
+        new_ws.setErrorSquaredArray(new_error)
         return new_ws
