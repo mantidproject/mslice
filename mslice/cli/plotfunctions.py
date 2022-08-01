@@ -73,9 +73,8 @@ def errorbar(axes, workspace, *args, **kwargs):
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.manager.add_cut_plot(presenter, workspace.name)
     cur_fig.canvas.draw()
-    cur_canvas.manager.update_axes(plot_over, workspace.name)
-
     create_and_cache_cut(presenter, axes, plot_over, workspace, (intensity_min, intensity_max))
+    cur_canvas.manager.update_axes(plot_over, workspace.name)
 
     return axes.lines
 

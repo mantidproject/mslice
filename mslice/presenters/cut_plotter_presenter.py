@@ -129,6 +129,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     def remove_cut_from_cache_by_index(self, ax, index):
         del self._cut_cache_dict[ax][index]
+        return len(self._cut_cache_dict[ax])
 
     def get_cache(self, ax):
         return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None

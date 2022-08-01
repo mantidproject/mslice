@@ -332,9 +332,9 @@ class CutPlot(IPlot):
                 line.remove()
             containers.remove(container)
 
-        self._cut_plotter_presenter.remove_cut_from_cache_by_index(self._canvas.figure.axes[0], line_index)
-        self._datum_dirty = True
-        self.update_bragg_peaks(refresh=True)
+        if self._cut_plotter_presenter.remove_cut_from_cache_by_index(self._canvas.figure.axes[0], line_index):
+            self._datum_dirty = True
+            self.update_bragg_peaks(refresh=True)
 
     def toggle_errorbar(self, line_index, line_options):
         container = self._canvas.figure.gca().containers[line_index]
