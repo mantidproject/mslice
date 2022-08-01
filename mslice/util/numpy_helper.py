@@ -32,6 +32,9 @@ def apply_with_swapped_axes(method, array, *args):
 
 def transform_array_to_workspace(array, workspace):
     try:
-        return array.reshape(workspace.getSignalArray().shape)
+        if hasattr(workspace, 'get_signal'):
+            return array.reshape(workspace.get_signal().shape)
+        else:
+            return array.reshape(workspace.getSignalArray().shape)
     except ValueError:
         raise RuntimeError("Unable to transform array to workspace")

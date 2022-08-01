@@ -74,7 +74,7 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
         new_signal = modify_part_of_signal(boltzmann_dist, negative_de_len, signal)
     new_ws = CloneWorkspace(InputWorkspace=scattering_data, OutputWorkspace=scattering_data.name, store=False)
     propagate_properties(scattering_data, new_ws)
-    new_signal = transform_array_to_workspace(new_signal, new_ws.raw_ws)
+    new_signal = transform_array_to_workspace(new_signal, new_ws)
     new_ws.set_signal(new_signal)
     return new_ws
 
