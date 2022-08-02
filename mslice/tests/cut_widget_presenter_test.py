@@ -22,6 +22,32 @@ class CutWidgetPresenterTest(unittest.TestCase):
         self.cut_plotter_presenter = mock.create_autospec(CutPlotterPresenter)
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
 
+    def _create_cut(self, *args):
+        axis, processed_axis = tuple(args[0:2])
+        integration_start, integration_end, width = tuple(args[2:5])
+        intensity_start, intensity_end, is_norm = tuple(args[5:8])
+        workspace, integrated_axis, cut_algorithm = tuple(args[8:11])
+        if isinstance(workspace, string_types):
+            workspace = [workspace]
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=workspace)
+        self.view.get_cut_axis = mock.Mock(return_value=axis.units)
+        self.view.get_cut_axis_start = mock.Mock(return_value=axis.start)
+        self.view.get_cut_axis_end = mock.Mock(return_value=axis.end)
+        self.view.get_cut_axis.step = mock.Mock(return_value=axis.step)
+        self.view.get_integration_axis = mock.Mock(return_value=integrated_axis)
+        self.view.get_integration_start = mock.Mock(return_value=integration_start)
+        self.view.get_integration_end = mock.Mock(return_value=integration_end)
+        self.view.get_intensity_start = mock.Mock(return_value=intensity_start)
+        self.view.get_intensity_end = mock.Mock(return_value=intensity_end)
+        self.view.get_intensity_is_norm_to_one = mock.Mock(return_value=is_norm)
+        self.view.get_integration_width = mock.Mock(return_value=width)
+        self.view.get_energy_units = mock.Mock(return_value=axis.e_unit)
+        self.view.get_cut_algorithm = mock.Mock(return_value=cut_algorithm)
+
+    @staticmethod
+    def _get_workspace_handle_method(input_workspace):
+        return input_workspace
+
     def test_constructor_success(self):
         self.view.disable = mock.Mock()
         CutWidgetPresenter(self.view)
@@ -108,28 +134,6 @@ class CutWidgetPresenterTest(unittest.TestCase):
         cut_widget_presenter.workspace_selection_changed()
         self.view.clear_input_fields.assert_called_with()
         self.view.disable.assert_called_with()
-
-    def _create_cut(self, *args):
-        axis, processed_axis = tuple(args[0:2])
-        integration_start, integration_end, width = tuple(args[2:5])
-        intensity_start, intensity_end, is_norm = tuple(args[5:8])
-        workspace, integrated_axis, cut_algorithm = tuple(args[8:11])
-        if isinstance(workspace, string_types):
-            workspace = [workspace]
-        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=workspace)
-        self.view.get_cut_axis = mock.Mock(return_value=axis.units)
-        self.view.get_cut_axis_start = mock.Mock(return_value=axis.start)
-        self.view.get_cut_axis_end = mock.Mock(return_value=axis.end)
-        self.view.get_cut_axis.step = mock.Mock(return_value=axis.step)
-        self.view.get_integration_axis = mock.Mock(return_value=integrated_axis)
-        self.view.get_integration_start = mock.Mock(return_value=integration_start)
-        self.view.get_integration_end = mock.Mock(return_value=integration_end)
-        self.view.get_intensity_start = mock.Mock(return_value=intensity_start)
-        self.view.get_intensity_end = mock.Mock(return_value=intensity_end)
-        self.view.get_intensity_is_norm_to_one = mock.Mock(return_value=is_norm)
-        self.view.get_integration_width = mock.Mock(return_value=width)
-        self.view.get_energy_units = mock.Mock(return_value=axis.e_unit)
-        self.view.get_cut_algorithm = mock.Mock(return_value=cut_algorithm)
 
     def test_cut_no_workspaces_selected_fail(self):
         cut_widget_presenter = CutWidgetPresenter(self.view)
@@ -239,7 +243,8 @@ class CutWidgetPresenterTest(unittest.TestCase):
         self.view.display_error.assert_any_call('Invalid cut step parameter, using default.')
         self.view.populate_cut_params.assert_called_with(0.0, 100.0, '1.00000')
 
-    def test_plot_multiple_workspaces_cut(self):
+    @patch('mslice.presenters.cut_widget_presenter.get_workspace_handle')
+    def test_plot_multiple_workspaces_cut(self, mock_get_workspace_handle):
         cut_widget_presenter = CutWidgetPresenter(self.view)
         cut_widget_presenter.register_master(self.main_presenter)
         cut_plotter_presenter = mock.MagicMock()
@@ -251,10 +256,16 @@ class CutWidgetPresenterTest(unittest.TestCase):
         intensity_start = 11
         intensity_end = 30
         is_norm = True
-        selected_workspaces = ["ws1", "ws2"]
+        ws1 = mock.MagicMock()
+        ws1.return_value.return_value.e_fixed = 1
+        ws2 = mock.MagicMock()
+        ws2.return_value.return_value.e_fixed = 1
+        selected_workspaces = [ws1, ws2]
         integrated_axis = 'integrated axis'
         cut_algorithm = 0
         integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
+        mock_get_workspace_handle.side_effect = self._get_workspace_handle_method
+
         self._create_cut(axis, integration_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, selected_workspaces, integrated_axis,
                          cut_algorithm)
@@ -271,8 +282,9 @@ class CutWidgetPresenterTest(unittest.TestCase):
         self.view.set_energy_units.assert_called_once()
         self.view.set_energy_units_default.assert_called_once()
 
+    @patch('mslice.presenters.cut_widget_presenter.get_workspace_handle')
     @patch('mslice.presenters.cut_widget_presenter.Cut')
-    def test_cut_integration_algorithm(self, mock_cut_obj):
+    def test_cut_integration_algorithm(self, mock_cut_obj, mock_get_workspace_handle):
         cut_widget_presenter = CutWidgetPresenter(self.view)
         cut_widget_presenter.register_master(self.main_presenter)
         cut_plotter_presenter = mock.MagicMock()
@@ -283,10 +295,12 @@ class CutWidgetPresenterTest(unittest.TestCase):
         axis = Axis("units", "0", "100", "1")
         integration_axis = Axis('integrated axis', integration_start, integration_end, 0)
         cut_algorithm = 1
+        mock_get_workspace_handle.return_value.e_fixed = 1
+
         self._create_cut(axis, integration_axis, integration_start, integration_end, width,
                          intensity_start, intensity_end, is_norm, workspace, integrated_axis,
                          cut_algorithm)
         cut_widget_presenter.notify(Command.Plot)
         self.view.display_error.assert_not_called()
         mock_cut_obj.assert_called_once_with(axis, integration_axis, intensity_start, intensity_end,
-                                             is_norm, width, 'Integration')
+                                             is_norm, width, 'Integration', None, 1)
