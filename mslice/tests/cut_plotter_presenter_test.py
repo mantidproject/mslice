@@ -18,25 +18,54 @@ class CutPlotterPresenterTest(unittest.TestCase):
     def create_cut_cache(self):
         axis = Axis("units", "0", "100", "1")
         integration_axis = Axis("units", 0.0, 100.0, 0)
-        return Cut(axis, integration_axis, intensity_start=3.0, intensity_end= 11.0, norm_to_one=True, width=None)
+        cut = Cut(axis, integration_axis, intensity_start=3.0, intensity_end=11.0, norm_to_one=True, width=None)
+        return cut
 
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.apply_intensity_correction_after_plot_over')
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.get_current_plot_intensity')
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.compute_cut')
     @mock.patch('mslice.presenters.cut_plotter_presenter.plot_cut_impl')
-    def test_plot_single_cut_success(self, plot_cut_impl_mock, compute_cut_mock, get_ws_handle_mock):
+    def test_plot_single_cut_success(self, plot_cut_impl_mock, compute_cut_mock, get_ws_handle_mock,
+                                     get_current_plot_intensity_mock, apply_intensity_mock):
         mock_ws = mock.MagicMock()
         mock_ws.name = 'workspace'
         get_ws_handle_mock.return_value = mock_ws
         cut_cache = self.create_cut_cache()
+        cut_cache._update_cut_axis = mock.MagicMock()
+        compute_cut_mock.return_value.axes = [cut_cache.cut_axis, cut_cache.integration_axis]
+        get_current_plot_intensity_mock.return_value = False
 
         self.cut_plotter_presenter.run_cut('workspace', cut_cache)
         self.assertEqual(1, compute_cut_mock.call_count)
         self.assertEqual(1, plot_cut_impl_mock.call_count)
+        self.assertEqual(1, cut_cache._update_cut_axis.call_count)
+        self.assertEqual(0, apply_intensity_mock.call_count)
 
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.apply_intensity_correction_after_plot_over')
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.get_current_plot_intensity')
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.compute_cut')
     @mock.patch('mslice.presenters.cut_plotter_presenter.plot_cut_impl')
-    def test_multiple_cuts_with_width(self, plot_cut_impl_mock, compute_cut_mock, get_ws_handle_mock):
+    def test_plot_single_cut_success_with_intensity(self, plot_cut_impl_mock, compute_cut_mock, get_ws_handle_mock,
+                                                    get_current_plot_intensity_mock, apply_intensity_mock):
+        mock_ws = mock.MagicMock()
+        mock_ws.name = 'workspace'
+        get_ws_handle_mock.return_value = mock_ws
+        cut_cache = self.create_cut_cache()
+        cut_cache._update_cut_axis = mock.MagicMock()
+        compute_cut_mock.return_value.axes = [cut_cache.cut_axis, cut_cache.integration_axis]
+        get_current_plot_intensity_mock.return_value = "show_dynamic_susceptibility"
+
+        self.cut_plotter_presenter.run_cut('workspace', cut_cache, True)
+        self.assertEqual(1, compute_cut_mock.call_count)
+        self.assertEqual(1, plot_cut_impl_mock.call_count)
+        self.assertEqual(1, cut_cache._update_cut_axis.call_count)
+        self.assertEqual(1, apply_intensity_mock.call_count)
+
+    @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut')
+    def test_multiple_cuts_with_width(self, plot_cut_mock, get_ws_handle_mock):
         mock_ws = mock.MagicMock()
         mock_ws.name = 'workspace'
         get_ws_handle_mock.return_value = mock_ws
@@ -44,11 +73,11 @@ class CutPlotterPresenterTest(unittest.TestCase):
         cut_cache.width = '25'
 
         self.cut_plotter_presenter.run_cut('workspace', cut_cache)
-        self.assertEqual(4, compute_cut_mock.call_count)
-        self.assertEqual(4, plot_cut_impl_mock.call_count)
+        self.assertEqual(4, plot_cut_mock.call_count)
         # 0.0 now because the integration_axis is reset when a cut is made to allow
         # the script generator use the same cut intervals
         self.assertEqual(0.0, cut_cache.integration_axis.start)
+        self.assertEqual(None, cut_cache.cut_ws)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.compute_cut')
@@ -79,20 +108,18 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(1, plot_cut_impl_mock.call_count)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
-    @mock.patch('mslice.presenters.cut_plotter_presenter.compute_cut')
-    @mock.patch('mslice.presenters.cut_plotter_presenter.plot_cut_impl')
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut')
     @mock.patch('mslice.presenters.cut_plotter_presenter.draw_interactive_cut')
-    def test_plot_interactive_cut(self, draw_interact_mock, plot_cut_impl_mock, compute_cut_mock, get_ws_handle_mock):
+    def test_plot_interactive_cut(self, draw_interact_mock, plot_cut_mock, get_ws_handle_mock):
         mock_ws = mock.MagicMock()
         mock_ws.name = 'workspace'
         get_ws_handle_mock.return_value = mock_ws
         cut_axis = Axis("units", "0", "100", "1")
         integration_axis = Axis("units", 0.0, 100.0, 0)
         cut = Cut(cut_axis, integration_axis, None, None)
-        self.cut_plotter_presenter.plot_interactive_cut('workspace', cut, False)
+        self.cut_plotter_presenter.plot_interactive_cut('workspace', cut, False, False)
 
-        self.assertEqual(1, compute_cut_mock.call_count)
-        self.assertEqual(1, plot_cut_impl_mock.call_count)
+        self.assertEqual(1, plot_cut_mock.call_count)
         self.assertEqual(1, draw_interact_mock.call_count)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.cut_figure_exists')
