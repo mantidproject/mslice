@@ -75,8 +75,8 @@ class PixelWorkspaceTest(unittest.TestCase):
         result = self.workspace + list_to_add
         result = result.get_signal()
         self.assertAlmostEqual(0, result[0][0], 8)
-        self.assertAlmostEqual(13, result[1][47], 8)
-        self.assertAlmostEqual(35, result[3][52], 8)
+        self.assertAlmostEqual(59, result[1][47], 8)
+        self.assertAlmostEqual(84, result[3][52], 8)
 
     def test_attribute_propagation(self):
         self.attr = {'axes':[1, object]}

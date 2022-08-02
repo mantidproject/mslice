@@ -65,11 +65,11 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         result = self.workspace + list_to_add
         result = result.get_signal()
 
-        line = np.multiply(np.linspace(0, 9, 10), 10)
-        expected_values = np.empty((10, 10))
-        for i in range(10):
-            expected_values[i] = line
-        np.testing.assert_array_almost_equal(expected_values, result, 8)
+        ws_representative_array = np.linspace(0, 99, 100).reshape(10, 10).T
+        expected_result = ws_representative_array + list_to_add
+
+        np.testing.assert_array_almost_equal(expected_result, result, 8)
+        np.testing.assert_array_almost_equal(ws_representative_array, self.workspace.get_signal(), 8)
 
     def test_add_invalid_list(self):
         invalid_list = np.linspace(0, -6, 3)
