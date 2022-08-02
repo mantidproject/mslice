@@ -81,7 +81,7 @@ class SlicePlotTest(unittest.TestCase):
         self.plot_figure.action_arbitrary_nuclei.isChecked = MagicMock(return_value=True)
 
         self.slice_plot.arbitrary_recoil_line()
-        self.slice_plotter.add_overplot_line.assert_called_once_with('workspace', 5, True, None, False, 0)
+        self.slice_plotter.add_overplot_line.assert_called_once_with('workspace', 5, True, None, False, 0, False)
 
     @patch('mslice.plotting.plot_window.slice_plot.QtWidgets.QInputDialog.getInt')
     def test_arbitrary_recoil_line_cancelled(self, qt_get_int_mock):
