@@ -55,6 +55,7 @@ class InteractiveCut(object):
             integration_axis = Axis(units, integration_start, integration_end, 0, self._en_unit)
             workspace = get_workspace_handle(self._ws_title)
             cut = Cut(ax, integration_axis, None, None, sample_temp=self.slice_plot.temp, e_fixed=workspace.e_fixed)
+            cut.parent_ws_name = self._ws_title
             intensity_method = "scattering_function" if not self.slice_plot.intensity_method else self.slice_plot.intensity_method[5:]
             self._cut_plotter_presenter.plot_interactive_cut(workspace, cut, store, intensity_method)
             self._cut_plotter_presenter.set_is_icut(True)
