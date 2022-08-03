@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
+import operator as op
 from mslice.util.numpy_helper import apply_with_corrected_shape, transform_array_to_workspace
 from mantid.simpleapi import CloneWorkspace
 
@@ -37,10 +38,10 @@ class HistoMixin(object):
 
         new_signal = apply_with_corrected_shape(operator, signal, other, array_size_error)
         new_signal = transform_array_to_workspace(new_signal, new_ws)
-
-        new_error = apply_with_corrected_shape(operator, error, other, array_size_error)
-        new_error = transform_array_to_workspace(new_error, new_ws)
-
         new_ws.setSignalArray(new_signal)
-        new_ws.setErrorSquaredArray(new_error)
+
+        if operator == op.mul or operator == op.truediv:
+            new_error = apply_with_corrected_shape(operator, error, other, array_size_error)
+            new_error = transform_array_to_workspace(new_error, new_ws)
+            new_ws.setErrorSquaredArray(new_error)
         return new_ws
