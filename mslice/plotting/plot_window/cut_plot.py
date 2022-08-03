@@ -21,6 +21,7 @@ from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line,
     cif_file_powder_line, _update_powder_lines
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
+from mslice.util.numpy_helper import clean_array
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.cut.cut import SampleTempValueError
@@ -374,16 +375,15 @@ class CutPlot(IPlot):
     def _get_overplot_datum(self):
         if self._datum_dirty:
             if not self.waterfall:
-                self._datum_cache = np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
-                                                  if not self._cut_plotter_presenter.is_overplot(line)])
+                self._datum_cache = np.mean([np.median(clean_array(line.get_ydata())) for line in self._canvas.figure.gca().get_lines()
+                                             if not self._cut_plotter_presenter.is_overplot(line)])
             else:
                 for line in self._canvas.figure.gca().get_lines():
                     if not self._cut_plotter_presenter.is_overplot(line):
-                        self._datum_cache = np.nanmedian([line.get_ydata()])
+                        self._datum_cache = np.median(clean_array(line.get_ydata()))
                         break
 
             self._datum_dirty = False
-
         return self._datum_cache
 
     def update_bragg_peaks(self, refresh=False):

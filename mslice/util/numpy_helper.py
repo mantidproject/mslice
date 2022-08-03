@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 
 
 def apply_with_corrected_shape(method, shape_array, array, exception):
@@ -40,3 +41,17 @@ def transform_array_to_workspace(array, workspace):
             raise RuntimeError("Unable to extract array from workspace")
     except ValueError:
         raise RuntimeError("Unable to transform array to workspace")
+
+
+def clean_array(arr):
+    arr_clean = []
+    for elm in arr:
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                clean_elm = float(elm)
+            if not np.isnan(clean_elm):
+                arr_clean.append(clean_elm)
+        except ValueError as e:
+            pass
+    return arr_clean
