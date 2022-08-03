@@ -21,6 +21,11 @@ class CutPlotterPresenterTest(unittest.TestCase):
         cut = Cut(axis, integration_axis, intensity_start=3.0, intensity_end=11.0, norm_to_one=True, width=None)
         return cut
 
+    def add_intensity_to_cut(self, cut, intensity_type=False):
+        cut._cut_ws = mock.MagicMock
+        cut._cut_ws.intensity_corrected = intensity_type
+        return cut
+
     @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.apply_intensity_correction_after_plot_over')
     @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.get_current_plot_intensity')
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
@@ -138,3 +143,55 @@ class CutPlotterPresenterTest(unittest.TestCase):
 
     def test_workspace_selection_changed(self):
         self.cut_plotter_presenter.workspace_selection_changed()
+
+    def test_save_cache_plot_over(self):
+        cut_1 = self.create_cut_cache()
+        cut_2 = self.create_cut_cache()
+        ax = mock.MagicMock()
+        self.cut_plotter_presenter.save_cache(ax, cut_1, True)
+        self.cut_plotter_presenter.save_cache(ax, cut_2, True)
+        self.assertEqual(len(self.cut_plotter_presenter._cut_cache_dict[ax]), 2)
+        self.assertEqual(self.cut_plotter_presenter._cut_cache_dict[ax][0], cut_1)
+        self.assertEqual(self.cut_plotter_presenter._cut_cache_dict[ax][1], cut_2)
+
+    def test_save_cache_no_plot_over(self):
+        cut_ws = mock.MagicMock()
+        cut_ws.intensity_corrected = False
+        cut_1 = self.create_cut_cache()
+        cut_2 = self.create_cut_cache()
+        cut_1._cut_ws = cut_ws
+        cut_2._cut_ws = cut_ws
+        ax = mock.MagicMock()
+        self.cut_plotter_presenter.save_cache(ax, cut_1, False)
+        self.cut_plotter_presenter.save_cache(ax, cut_2, False)
+        self.assertEqual(len(self.cut_plotter_presenter._cut_cache_dict[ax]), 1)
+        self.assertEqual(self.cut_plotter_presenter._cut_cache_dict[ax][0], cut_2)
+
+    def test_save_cache_with_intensity(self):
+        cut_ws_1 = mock.MagicMock()
+        cut_ws_1.intensity_corrected = False
+        cut_ws_2 = mock.MagicMock()
+        cut_ws_2.intensity_corrected = True
+        cut_1 = self.create_cut_cache()
+        cut_2 = self.create_cut_cache()
+        cut_1._cut_ws = cut_ws_1
+        cut_2._cut_ws = cut_ws_2
+        ax = mock.MagicMock()
+        self.cut_plotter_presenter.save_cache(ax, cut_1, True)
+        self.cut_plotter_presenter.save_cache(ax, cut_2, True)
+        self.assertEqual(len(self.cut_plotter_presenter._cut_cache_dict[ax]), 1)
+        self.assertEqual(self.cut_plotter_presenter._cut_cache_dict[ax][0], cut_1)
+
+    def test_save_cache_duplicate_no_plot_over(self):
+        cut_ws = mock.MagicMock()
+        cut_ws.intensity_corrected = False
+        cut_1 = self.create_cut_cache()
+        cut_2 = self.create_cut_cache()
+        cut_1._cut_ws = cut_ws
+        cut_2._cut_ws = cut_ws
+        ax = mock.MagicMock()
+        self.cut_plotter_presenter.save_cache(ax, cut_1, True)
+        self.cut_plotter_presenter._temp_cut_cache = list(self.cut_plotter_presenter._cut_cache_dict[ax])
+        self.cut_plotter_presenter.save_cache(ax, cut_2, False)
+        self.assertEqual(len(self.cut_plotter_presenter._cut_cache_dict[ax]), 1)
+        self.assertEqual(self.cut_plotter_presenter._cut_cache_dict[ax][0], cut_1)
