@@ -1,6 +1,5 @@
 import unittest
 import mock
-import numpy as np
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
@@ -94,6 +93,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.main_presenter.is_energy_conversion_allowed.return_value = False
         intensity_correction_types = ["dynamical_susceptibility", "dynamical_susceptibility_magnetic", "d2sigma",
                                       "symmetrised"]
+
         for intensity in intensity_correction_types:
             get_current_plot_intensity_mock.return_value = "show_" + intensity
             self.cut_plotter_presenter._plot_cut(mock_ws, cut_cache, False, intensity_correction=intensity)
