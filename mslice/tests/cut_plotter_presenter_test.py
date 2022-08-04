@@ -42,6 +42,12 @@ class CutPlotterPresenterTest(unittest.TestCase):
 
         self.cut_plotter_presenter._cut_cache_dict[ax] = [cut_1, cut_2, cut_3]
 
+    def _workspace_handle_side_effect(self, workspace_name):
+        key = list(self.cut_plotter_presenter._cut_cache_dict.keys())[0]
+        for cut in self.cut_plotter_presenter._cut_cache_dict[key]:
+            if cut.workspace_name == workspace_name:
+                return cut.cut_ws
+
     @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.apply_intensity_correction_after_plot_over')
     @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.get_current_plot_intensity')
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
@@ -235,3 +241,43 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(cut_1.sample_temp, 120)
         self.assertEqual(cut_2.sample_temp, 120)
         self.assertEqual(cut_3._sample_temp, None)
+
+    @mock.patch('mslice.presenters.cut_plotter_presenter.plt.gca')
+    def test_get_overall_q_axis(self, mock_plot_gca):
+        ax = mock.MagicMock()
+        self.populate_presenter_cache_dict(ax)
+        cut_1, cut_2, cut_3 = self.cut_plotter_presenter._cut_cache_dict[ax]
+        cut_1._integration_axis = Axis("|Q|", -10.0, 10.0, 0)
+        cut_2._integration_axis = Axis("|Q|", 0.0, 20.0, 0)
+        cut_3._integration_axis = Axis("|Q|", 10.0, 30.0, 0)
+        mock_plot_gca.return_value = ax
+
+        overall_axis = self.cut_plotter_presenter._get_overall_q_axis()
+        self.assertEqual(overall_axis, Axis("|Q|", -10.0, 30.0, 0))
+
+    @mock.patch('mslice.presenters.cut_plotter_presenter.plt.gca')
+    def test_get_overall_max_signal(self, mock_plot_gca):
+        ax = mock.MagicMock()
+        self.populate_presenter_cache_dict(ax)
+        cut_1, cut_2, cut_3 = self.cut_plotter_presenter._cut_cache_dict[ax]
+        cut_1._cut_ws.get_signal.return_value = 25.0
+        cut_2._cut_ws.get_signal.return_value = 50.0
+        cut_3._cut_ws.get_signal.return_value = 100.0
+        mock_plot_gca.return_value = ax
+
+        max_signal = self.cut_plotter_presenter._get_overall_max_signal(False)
+        self.assertEqual(max_signal, 100)
+
+    @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut')
+    def test_show_intensity(self, mock_plot_cut, mock_get_workspace_handle):
+        ax = mock.MagicMock()
+        self.populate_presenter_cache_dict(ax)
+        cut_cache = self.cut_plotter_presenter._cut_cache_dict[ax]
+        cut_1, cut_2, cut_3 = cut_cache
+        mock_get_workspace_handle.side_effect = self._workspace_handle_side_effect
+        self.cut_plotter_presenter._show_intensity(cut_cache, "dynamical_susceptibility")
+        cut_1_call = mock.call(cut_1._cut_ws, cut_1, plot_over=False, intensity_correction='dynamical_susceptibility')
+        cut_2_call = mock.call(cut_2._cut_ws, cut_2, plot_over=True, intensity_correction='dynamical_susceptibility')
+        cut_3_call = mock.call(cut_3._cut_ws, cut_3, plot_over=True, intensity_correction='dynamical_susceptibility')
+        mock_plot_cut.assert_has_calls([cut_1_call, cut_2_call, cut_3_call])
