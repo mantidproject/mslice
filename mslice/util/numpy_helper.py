@@ -52,6 +52,6 @@ def clean_array(arr):
                 clean_elm = float(elm)
             if not np.isnan(clean_elm):
                 arr_clean.append(clean_elm)
-        except ValueError as e:
+        except ValueError:
             pass
     return arr_clean
