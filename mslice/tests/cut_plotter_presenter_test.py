@@ -1,5 +1,6 @@
 import unittest
 import mock
+import numpy as np
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
@@ -69,26 +70,42 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(1, cut_cache._update_cut_axis.call_count)
         self.assertEqual(0, apply_intensity_mock.call_count)
 
-    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.apply_intensity_correction_after_plot_over')
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.update_main_window')
     @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter.get_current_plot_intensity')
-    @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
+    @mock.patch('mslice.models.cut.cut.compute_symmetrised')
+    @mock.patch('mslice.models.cut.cut.compute_d2sigma')
+    @mock.patch('mslice.models.cut.cut.compute_chi')
     @mock.patch('mslice.presenters.cut_plotter_presenter.compute_cut')
     @mock.patch('mslice.presenters.cut_plotter_presenter.plot_cut_impl')
-    def test_plot_single_cut_success_with_intensity(self, plot_cut_impl_mock, compute_cut_mock, get_ws_handle_mock,
-                                                    get_current_plot_intensity_mock, apply_intensity_mock):
+    def test_plot_cut_with_intensity(self, plot_cut_impl_mock, compute_cut_mock, compute_chi_mock, compute_d2sigma_mock,
+                                     compute_symmetrised_mock, get_current_plot_intensity_mock, update_main_window_mock):
         mock_ws = mock.MagicMock()
         mock_ws.name = 'workspace'
-        get_ws_handle_mock.return_value = mock_ws
+        mock_ws.parent = 'workspace_parent'
         cut_cache = self.create_cut_cache()
         cut_cache._update_cut_axis = mock.MagicMock()
+        cut_cache._sample_temp = 100
+        mock_intensity_ws = mock.MagicMock()
+        mock_intensity_ws.get_signal.return_value = [0, 100]
         compute_cut_mock.return_value.axes = [cut_cache.cut_axis, cut_cache.integration_axis]
-        get_current_plot_intensity_mock.return_value = "show_dynamic_susceptibility"
+        compute_chi_mock.return_value = mock_intensity_ws
+        compute_d2sigma_mock.return_value = mock_intensity_ws
+        compute_symmetrised_mock.return_value = mock_intensity_ws
+        self.main_presenter.is_energy_conversion_allowed.return_value = False
+        intensity_correction_types = ["dynamical_susceptibility", "dynamical_susceptibility_magnetic", "d2sigma",
+                                      "symmetrised"]
+        for intensity in intensity_correction_types:
+            get_current_plot_intensity_mock.return_value = "show_" + intensity
+            self.cut_plotter_presenter._plot_cut(mock_ws, cut_cache, False, intensity_correction=intensity)
+            compute_cut_mock.assert_called_with(mock_ws, cut_cache.cut_axis, cut_cache.integration_axis,
+                                                cut_cache.norm_to_one, cut_cache.algorithm, True)
+            cut_cache._cut_ws = None
 
-        self.cut_plotter_presenter.run_cut('workspace', cut_cache, True)
-        self.assertEqual(1, compute_cut_mock.call_count)
-        self.assertEqual(1, plot_cut_impl_mock.call_count)
-        self.assertEqual(1, cut_cache._update_cut_axis.call_count)
-        self.assertEqual(1, apply_intensity_mock.call_count)
+        self.assertEqual(1 * len(intensity_correction_types), plot_cut_impl_mock.call_count)
+        self.assertEqual(1 * len(intensity_correction_types), cut_cache._update_cut_axis.call_count)
+        self.assertEqual(2 * len(intensity_correction_types), get_current_plot_intensity_mock.call_count)
+        self.assertEqual(1 * len(intensity_correction_types), update_main_window_mock.call_count)
+        self.assertEqual(2, compute_chi_mock.call_count)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut')
