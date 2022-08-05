@@ -289,6 +289,10 @@ class SlicePlot(IPlot):
         if self.manager._current_figs._active_figure is not None:
             last_active_figure_number = self.manager._current_figs.get_active_figure().number
 
+        disable_make_current_after_plot = False
+        if self.manager.make_current_disabled():
+            self.manager.enable_make_current()
+            disable_make_current_after_plot = True
         self.manager.report_as_current()
 
         self.default_options['temp_dependent'] = temp_dependent
@@ -317,6 +321,8 @@ class SlicePlot(IPlot):
         # Reset current active figure
         if last_active_figure_number is not None:
             self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+        if disable_make_current_after_plot:
+            self.manager.disable_make_current()
 
     def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
         self.change_axis_scale(cbar_range, cbar_log)

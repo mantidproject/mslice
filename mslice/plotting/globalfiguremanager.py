@@ -485,6 +485,10 @@ class GlobalFigureManager(object):
         cls._disable_make_current = False
 
     @classmethod
+    def make_current_disabled(cls):
+        return cls._disable_make_current
+
+    @classmethod
     def all_figure_numbers(cls):
         """An iterator over all figure numbers"""
         return list(cls._figures.keys())

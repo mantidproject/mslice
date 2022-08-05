@@ -5,8 +5,8 @@ import mslice.plotting.pyplot as plt
 PICKER_TOL_PTS = 5
 
 
-def plot_cached_slice(slice_workspace, slice_cache):
-    _show_plot(slice_workspace, slice_cache)
+def plot_cached_slice(slice_cache, slice_workspace):
+    _show_plot(slice_cache, slice_workspace)
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
