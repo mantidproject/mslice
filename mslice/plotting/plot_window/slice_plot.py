@@ -312,14 +312,14 @@ class SlicePlot(IPlot):
             title = self.title
             if temp_dependent:
                 if not self._run_temp_dependent(slice_plotter_method, previous):
-                    self._reset_current_figure(last_active_figure_number, last_active_figure_number)
+                    self._reset_current_figure(last_active_figure_number, disable_make_current_after_plot)
                     return
             else:
                 slice_plotter_method(self.ws_name)
             self.update_canvas(cbar_range, cbar_log, x_range, y_range, title)
         else:
             action.setChecked(True)
-        self._reset_current_figure(last_active_figure_number, last_active_figure_number)
+        self._reset_current_figure(disable_make_current_after_plot, disable_make_current_after_plot)
 
     def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
         self.change_axis_scale(cbar_range, cbar_log)
