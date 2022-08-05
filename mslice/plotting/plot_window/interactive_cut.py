@@ -116,7 +116,11 @@ class InteractiveCut(object):
         self.slice_plot.plot_window.action_interactive_cuts.setChecked(False)
 
     def refresh_rect_selector(self, ax):
+        extents = self.rect.extents
         self.rect = RectangleSelector(ax, self.plot_from_mouse_event,
                                       drawtype='box', useblit=True,
                                       button=[1, 3], spancoords='pixels', interactive=True)
+        if self._rect_pos_cache:
+            self.rect.to_draw.set_visible(True)
+            self.rect.extents = extents
         self.slice_plot.set_cross_cursor()

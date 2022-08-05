@@ -34,13 +34,12 @@ def _show_plot(slice_cache, workspace):
 
     cur_fig.canvas.manager.plot_handler._update_lines()
 
+    if plt_handler.icut is not None:
+        # Because the axis is cleared, RectangleSelector needs to use the new axis
+        plt_handler.icut.refresh_rect_selector(ax)
+
     cur_fig.canvas.draw_idle()
     cur_fig.show()
-
-    # Because the axis is cleared, RectangleSelector needs to use the new axis
-    # otherwise it can't be used after doing an intensity plot (as it clears the axes)
-    if plt_handler.icut is not None:
-        plt_handler.icut.refresh_rect_selector(ax)
 
     # This ensures that another slice plotted in the same window saves the plot options
     # as the plot window's showEvent is called only once. The equivalent command is left
