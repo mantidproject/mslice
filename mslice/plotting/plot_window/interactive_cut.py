@@ -34,6 +34,7 @@ class InteractiveCut(object):
 
         self.connect_event[3] = self._canvas.mpl_connect('draw_event', self.redraw_rectangle)
         self._canvas.draw()
+        self.slice_plot.set_cross_cursor()
 
     def plot_from_mouse_event(self, eclick, erelease):
         # Make axis orientation sticky, until user selects entirely new rectangle.
@@ -113,3 +114,9 @@ class InteractiveCut(object):
     def window_closing(self):
         self.slice_plot.toggle_interactive_cuts()
         self.slice_plot.plot_window.action_interactive_cuts.setChecked(False)
+
+    def refresh_rect_selector(self, ax):
+        self.rect = RectangleSelector(ax, self.plot_from_mouse_event,
+                                      drawtype='box', useblit=True,
+                                      button=[1, 3], spancoords='pixels', interactive=True)
+        self.slice_plot.set_cross_cursor()

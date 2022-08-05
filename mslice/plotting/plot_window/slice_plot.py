@@ -403,7 +403,6 @@ class SlicePlot(IPlot):
             self.plot_window.action_keep.setEnabled(False)
             self.plot_window.action_make_current.setEnabled(False)
             self.plot_window.action_flip_axis.setVisible(True)
-            self._canvas.setCursor(Qt.CrossCursor)
         else:
             self.manager.picking_connected(True)
             self.plot_window.action_zoom_in.setEnabled(True)
@@ -584,3 +583,6 @@ class SlicePlot(IPlot):
     @staticmethod
     def _get_overplot_datum():  # needed for interface consistency with cut plot
         return 0
+
+    def set_cross_cursor(self):
+        self._canvas.setCursor(Qt.CrossCursor)
