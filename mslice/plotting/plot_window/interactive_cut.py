@@ -133,3 +133,7 @@ class InteractiveCut(object):
 
     def set_icut_intensity_category(self, intensity_method):
         self._cut_plotter_presenter.set_icut_intensity_category(intensity_method)
+
+    def refresh_current_cut(self):
+        x1, x2, y1, y2 = self.rect.extents
+        self.plot_cut(x1, x2, y1, y2)

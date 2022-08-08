@@ -320,6 +320,8 @@ class SlicePlot(IPlot):
         else:
             action.setChecked(True)
         self._reset_current_figure(last_active_figure_number, disable_make_current_after_plot)
+        if self.icut:
+            self.icut.refresh_current_cut()
 
     def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
         self.change_axis_scale(cbar_range, cbar_log)
