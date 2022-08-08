@@ -289,6 +289,10 @@ class SlicePlot(IPlot):
         if self.manager._current_figs._active_figure is not None:
             last_active_figure_number = self.manager._current_figs.get_active_figure().number
 
+        disable_make_current_after_plot = False
+        if self.manager.make_current_disabled():
+            self.manager.enable_make_current()
+            disable_make_current_after_plot = True
         self.manager.report_as_current()
 
         self.default_options['temp_dependent'] = temp_dependent
@@ -308,15 +312,14 @@ class SlicePlot(IPlot):
             title = self.title
             if temp_dependent:
                 if not self._run_temp_dependent(slice_plotter_method, previous):
+                    self._reset_current_figure(last_active_figure_number, disable_make_current_after_plot)
                     return
             else:
                 slice_plotter_method(self.ws_name)
             self.update_canvas(cbar_range, cbar_log, x_range, y_range, title)
         else:
             action.setChecked(True)
-        # Reset current active figure
-        if last_active_figure_number is not None:
-            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+        self._reset_current_figure(last_active_figure_number, disable_make_current_after_plot)
 
     def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
         self.change_axis_scale(cbar_range, cbar_log)
@@ -326,6 +329,12 @@ class SlicePlot(IPlot):
         self.manager.update_grid()
         self._update_lines()
         self._canvas.draw()
+
+    def _reset_current_figure(self, last_active_figure_number, disable_make_current_after_plot):
+        if last_active_figure_number is not None:
+            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+        if disable_make_current_after_plot:
+            self.manager.disable_make_current()
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         temp_value_raw = None
@@ -403,7 +412,6 @@ class SlicePlot(IPlot):
             self.plot_window.action_keep.setEnabled(False)
             self.plot_window.action_make_current.setEnabled(False)
             self.plot_window.action_flip_axis.setVisible(True)
-            self._canvas.setCursor(Qt.CrossCursor)
         else:
             self.manager.picking_connected(True)
             self.plot_window.action_zoom_in.setEnabled(True)
@@ -584,3 +592,6 @@ class SlicePlot(IPlot):
     @staticmethod
     def _get_overplot_datum():  # needed for interface consistency with cut plot
         return 0
+
+    def set_cross_cursor(self):
+        self._canvas.setCursor(Qt.CrossCursor)

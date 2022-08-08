@@ -94,6 +94,15 @@ class PlotFigureManagerQT(QtCore.QObject):
         """Report to the global figure manager that this figure should be made active"""
         self._current_figs.set_figure_as_current(self.number)
 
+    def enable_make_current(self):
+        self._current_figs.enable_make_current()
+
+    def disable_make_current(self):
+        self._current_figs.disable_make_current()
+
+    def make_current_disabled(self):
+        return self._current_figs.make_current_disabled()
+
     def flag_as_kept(self):
         self.window.flag_as_kept()
 

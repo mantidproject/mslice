@@ -5,8 +5,8 @@ import mslice.plotting.pyplot as plt
 PICKER_TOL_PTS = 5
 
 
-def plot_cached_slice(slice_workspace, slice_cache):
-    _show_plot(slice_workspace, slice_cache)
+def plot_cached_slice(slice_cache, slice_workspace):
+    _show_plot(slice_cache, slice_workspace)
 
 
 @plt.set_category(plt.CATEGORY_SLICE)
@@ -30,14 +30,13 @@ def _show_plot(slice_cache, workspace):
 
     plt_handler = cur_fig.canvas.manager.plot_handler
 
-    # Because the axis is cleared, RectangleSelector needs to use the new axis
-    # otherwise it can't be used after doing an intensity plot (as it clears the axes)
-    if plt_handler.icut is not None:
-        plt_handler.icut.rect.ax = ax
-
     plt_handler._update_lines()
 
     cur_fig.canvas.manager.plot_handler._update_lines()
+
+    if plt_handler.icut is not None:
+        # Because the axis is cleared, RectangleSelector needs to use the new axis
+        plt_handler.icut.refresh_rect_selector(ax)
 
     cur_fig.canvas.draw_idle()
     cur_fig.show()
