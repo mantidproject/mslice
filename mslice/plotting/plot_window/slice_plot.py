@@ -319,7 +319,7 @@ class SlicePlot(IPlot):
             self.update_canvas(cbar_range, cbar_log, x_range, y_range, title)
         else:
             action.setChecked(True)
-        self._reset_current_figure(disable_make_current_after_plot, disable_make_current_after_plot)
+        self._reset_current_figure(last_active_figure_number, disable_make_current_after_plot)
 
     def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
         self.change_axis_scale(cbar_range, cbar_log)
