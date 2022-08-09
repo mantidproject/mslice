@@ -520,7 +520,7 @@ class CutPlot(IPlot):
         num_lines = len(line_containers)
         self.plot_window.action_waterfall.setEnabled(num_lines > 1)
         self.plot_window.toggle_waterfall_edit()
-        if not self._is_icut and not plot_over:
+        if not plot_over:
             self._reset_plot_window_options()
 
         all_lines = [line for container in line_containers for line in container.get_children()]
@@ -701,21 +701,6 @@ class CutPlot(IPlot):
         config['y_log'] = value
         self.change_axis_scale(config)
         self._canvas.draw()
-
-    @property
-    def e_log(self):
-        if self._e_axis_is_y():
-            return self.y_log
-        else:
-            return self.x_log
-
-    def _e_axis_is_y(self):
-        ws = get_workspace_handle(self.ws_name)
-        x_dim = ws.raw_ws.getXDimension()
-        if x_dim.getUnits() == "DeltaE":
-            return False
-        else:
-            return True
 
     @property
     def show_legends(self):

@@ -592,7 +592,7 @@ class SlicePlot(IPlot):
         return self.default_options[item] != getattr(self, item)
 
     @property
-    def e_log(self):  # needed for interface consistency with cut plot
+    def y_log(self):  # needed for interface consistency with cut plot
         return False
 
     @staticmethod
