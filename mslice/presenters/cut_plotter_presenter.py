@@ -21,8 +21,7 @@ BRAGG_SIZE_ON_AXES = 0.15
 class CutPlotterPresenter(PresenterUtility):
     _current_icut = None  # static variable, as only one icut can be open at any time.
     _prepared_cut_for_cache = None  # static variable, used and reset to None upon plotting of a cut
-                                    # needs to be static as icut design means that icut does not have
-                                    # access to correct CPP on first plot
+    # needs to be static as icut design means that icut does not have access to correct CPP on first plot
 
     def __init__(self):
         self._main_presenter = None
