@@ -28,15 +28,8 @@ def _update_powder_lines(plot_handler, plotter_presenter):
 
 
 def toggle_overplot_line(plot_handler, plotter_presenter, key, recoil, checked, cif_file=None):
-    last_active_figure_number = None
-    if plot_handler.manager._current_figs._active_figure is not None:
-        last_active_figure_number = plot_handler.manager._current_figs.get_active_figure().number
-
-    disable_make_current_after_plot = False
-    if plot_handler.manager.make_current_disabled():
-        plot_handler.manager.enable_make_current()
-        disable_make_current_after_plot = True
-    plot_handler.manager.report_as_current()
+    last_active_figure_number, disable_make_current_after_plot = \
+        plot_handler.manager.report_as_current_and_return_previous_status()
 
     if checked:
         intensity_correction = plot_handler.intensity_method if not plot_handler.intensity_method else \
@@ -50,14 +43,7 @@ def toggle_overplot_line(plot_handler, plotter_presenter, key, recoil, checked, 
     plot_handler._canvas.draw()
 
     # Reset current active figure
-    _reset_current_figure(plot_handler.manager, last_active_figure_number, disable_make_current_after_plot)
-
-
-def _reset_current_figure(manager, last_active_figure_number, disable_make_current_after_plot):
-    if last_active_figure_number is not None:
-        manager._current_figs.set_figure_as_current(last_active_figure_number)
-    if disable_make_current_after_plot:
-        manager.disable_make_current()
+    plot_handler.manager.reset_current_figure_as_previous(last_active_figure_number, disable_make_current_after_plot)
 
 
 def cif_file_powder_line(plot_handler, plotter_presenter, checked):
