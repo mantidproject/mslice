@@ -20,13 +20,15 @@ BRAGG_SIZE_ON_AXES = 0.15
 
 class CutPlotterPresenter(PresenterUtility):
     _current_icut = None  # static variable, as only one icut can be open at any time.
+    _prepared_cut_for_cache = None  # static variable, used and reset to None upon plotting of a cut
+                                    # needs to be static as icut design means that icut does not have
+                                    # access to correct CPP on first plot
 
     def __init__(self):
         self._main_presenter = None
         self._interactive_cut_cache = None
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
         self._temp_cut_cache = []
-        self._prepared_cut_for_cache = None
         self._overplot_cache = {}
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
@@ -64,14 +66,14 @@ class CutPlotterPresenter(PresenterUtility):
             self.update_main_window()
 
     def prepare_cut_for_cache(self, cut):
-        self._prepared_cut_for_cache = cut.copy_for_cache()
+        CutPlotterPresenter._prepared_cut_for_cache = cut.copy_for_cache()
 
     def cache_prepared_cut(self, ax, plot_over):
-        self.save_cache(ax, self._prepared_cut_for_cache, plot_over)
-        self._prepared_cut_for_cache = None
+        self.save_cache(ax, CutPlotterPresenter._prepared_cut_for_cache, plot_over)
+        CutPlotterPresenter._prepared_cut_for_cache = None
 
     def get_prepared_cut_for_cache(self):
-        return self._prepared_cut_for_cache
+        return CutPlotterPresenter._prepared_cut_for_cache
 
     def _plot_with_width(self, workspace, cut, plot_over):
         """This function handles the width parameter."""

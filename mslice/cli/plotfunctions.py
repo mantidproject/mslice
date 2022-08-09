@@ -79,7 +79,6 @@ def errorbar(axes, workspace, *args, **kwargs):
     return axes.lines
 
 
-@plt.set_category(plt.CATEGORY_CUT)
 def create_and_cache_cut(presenter, mpl_axes, plot_over, workspace, intensity_range):
     if not presenter.get_prepared_cut_for_cache():
         cut_axis, int_axis = tuple(workspace.axes)
