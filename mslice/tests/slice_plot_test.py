@@ -20,6 +20,7 @@ class SlicePlotTest(unittest.TestCase):
         self.axes = MagicMock()
         canvas.figure.gca = MagicMock(return_value=self.axes)
         self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
+        self.slice_plot.manager.report_as_current_and_return_previous_status.return_value = (None, False)
         self.line = [Line2D([], [])]
         self.axes.get_legend_handles_labels = MagicMock(return_value=(self.line, ['some_label']))
 
