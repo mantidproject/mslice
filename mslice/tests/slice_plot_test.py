@@ -20,6 +20,7 @@ class SlicePlotTest(unittest.TestCase):
         self.axes = MagicMock()
         canvas.figure.gca = MagicMock(return_value=self.axes)
         self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
+        self.slice_plot.manager.report_as_current_and_return_previous_status.return_value = (None, False)
         self.line = [Line2D([], [])]
         self.axes.get_legend_handles_labels = MagicMock(return_value=(self.line, ['some_label']))
 
@@ -81,7 +82,7 @@ class SlicePlotTest(unittest.TestCase):
         self.plot_figure.action_arbitrary_nuclei.isChecked = MagicMock(return_value=True)
 
         self.slice_plot.arbitrary_recoil_line()
-        self.slice_plotter.add_overplot_line.assert_called_once_with('workspace', 5, True, None, False, 0)
+        self.slice_plotter.add_overplot_line.assert_called_once_with('workspace', 5, True, None, False, 0, False)
 
     @patch('mslice.plotting.plot_window.slice_plot.QtWidgets.QInputDialog.getInt')
     def test_arbitrary_recoil_line_cancelled(self, qt_get_int_mock):

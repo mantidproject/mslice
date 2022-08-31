@@ -1,9 +1,18 @@
 import numpy as np
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 
-def get_number_of_steps(axis):
-    return int(np.ceil(max(1, (axis.end - axis.start)/axis.step)))
 
+def get_number_of_steps(axis):
+    if axis.step == 0:
+        return 1
+    else:
+        step_num = max(1, (axis.end - axis.start) / axis.step)
+        step_num_round = np.around(step_num)
+        step_num_ceil = np.ceil(step_num)
+        if np.isclose(step_num_round, step_num, atol=0):
+            return int(step_num_round)
+        else:
+            return int(step_num_ceil)
 
 def get_axis_range(workspace, dimension_name):
     workspace = get_workspace_handle(workspace)

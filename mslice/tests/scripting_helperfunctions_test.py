@@ -232,6 +232,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(CutPlot)
+        plot_handler.intensity_method = False
 
         script_lines = []
 
@@ -240,7 +241,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
         errorbars = plot_handler._canvas.figure.gca().containers
 
-        add_cut_lines_with_width.assert_called_once_with(errorbars, script_lines, cuts)
+        add_cut_lines_with_width.assert_called_once_with(errorbars, script_lines, cuts, False)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_plot_options_works_as_expected(self, gfm):
@@ -276,16 +277,17 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         plt.errorbar(x_data, y_data, linestyle='-', linewidth=1.5, color='blue', label='errorbar_label')
         errorbars = plt.gca().containers
         cut = Cut(Axis('|Q|', '1', '3', '1'), Axis('DelataE', '-1', '1', '0'), None, None, True, '2')
-        cut.workspace_name = 'ws_name'
+        cut.parent_ws_name = 'ws_name'
 
         cuts = [cut]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts)
+        add_cut_lines_with_width(errorbars, script_lines, cuts, False)
 
         self.assertIn(
-            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={})\n'.format(
-                0, 'ws_name', cuts[0].cut_axis, cuts[0].integration_axis, cuts[0].norm_to_one), script_lines)
+            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
+            'SampleTemperature={})\n'.format(0, 'ws_name', cuts[0].cut_axis, cuts[0].integration_axis, cuts[0].norm_to_one,
+                                             False, None), script_lines)
 
         self.assertIn(
             'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={})\n\n'.format(
@@ -296,12 +298,12 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         plt.errorbar(x_data, y_data, linestyle='-', linewidth=1.5, color='blue', label='errorbar_label')
         errorbars = plt.gca().containers
         cut = Cut(Axis('|Q|', '1', '3', '1'), Axis('DelataE', '-1', '1', '0'), 1.0, 2.0, True, '2')
-        cut.workspace_name = 'ws_name'
+        cut.parent_ws_name = 'ws_name'
 
         cuts = [cut]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts)
+        add_cut_lines_with_width(errorbars, script_lines, cuts, False)
 
         self.assertIn(
             'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
@@ -314,27 +316,30 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             plt.errorbar(x_data, y_data, linestyle='-', linewidth=1.5, color='blue', label='error_label_{}'.format(i))
         errorbars = plt.gca().containers
         cut_0 = Cut(Axis('|Q|', '1', '3', '1'), Axis('DeltaE', '-1', '1', '0'), 1.0, 2.0, True, '1')
-        cut_0.workspace_name = 'ws_0'
+        cut_0.parent_ws_name = 'ws_0'
 
         cut_2 = Cut(Axis('|Q|', '1', '3', '1'), Axis('DeltaE', '-1', '1', '0'), 1.0, 2.0, True, '2')
-        cut_2.workspace_name = 'ws_1'
+        cut_2.parent_ws_name = 'ws_1'
 
         cuts = [cut_0, cut_2]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts)
+        add_cut_lines_with_width(errorbars, script_lines, cuts, False)
 
         self.assertIn(
-            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={})\n'.format(
-                0, 'ws_0', cuts[0].cut_axis, "DeltaE,-1.0,0.0,0.0", cuts[0].norm_to_one), script_lines)
+            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
+            'SampleTemperature={})\n'.format(0, 'ws_0', cuts[0].cut_axis, "DeltaE,-1.0,0.0,0.0", cuts[0].norm_to_one,
+                                             False, None), script_lines)
 
         self.assertIn(
-            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={})\n'.format(
-                1, 'ws_0', cuts[0].cut_axis, "DeltaE,0.0,1.0,0.0", cuts[0].norm_to_one), script_lines)
+            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
+            'SampleTemperature={})\n'.format(1, 'ws_0', cuts[0].cut_axis, "DeltaE,0.0,1.0,0.0", cuts[0].norm_to_one,
+                                             False, None), script_lines)
 
         self.assertIn(
-            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={})\n'.format(
-                2, 'ws_1', cuts[1].cut_axis, cuts[1].integration_axis, cuts[1].norm_to_one), script_lines)
+            'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
+            'SampleTemperature={})\n'.format(2, 'ws_1', cuts[1].cut_axis, cuts[1].integration_axis, cuts[1].norm_to_one,
+                                             False, None), script_lines)
 
         # Each mc.Cut statement has a corresponding errorbar statement
         self.assertEqual(len(script_lines), 6)

@@ -14,12 +14,26 @@ def output_workspace_name(selected_workspace: str, integration_start: float, int
 
 def compute_cut(workspace, cut_axis, integration_axis, is_norm, algo='Rebin', store=True):
     out_ws_name = output_workspace_name(workspace.name, integration_axis.start, integration_axis.end)
-    cut = mantid_algorithms.Cut(OutputWorkspace=out_ws_name, store=store, InputWorkspace=workspace,
+    cut = mantid_algorithms.Cut(OutputWorkspace=_make_name_unique(out_ws_name), store=store, InputWorkspace=workspace,
                                 CutAxis=cut_axis.to_dict(), IntegrationAxis=integration_axis.to_dict(),
                                 EMode=workspace.e_mode, PSD=workspace.is_PSD, NormToOne=is_norm,
                                 Algorithm=algo)
     cut.parent = workspace.name
     return cut
+
+
+def _make_name_unique(ws_name, i=1):
+    try:
+        get_workspace_handle(ws_name)
+        if i == 1:
+            ws_name = ws_name + f"_({i})"
+        else:
+            ws_name = ws_name.replace(f"_({i-1})",  f"_({i})")
+        i += 1
+        ws_name = _make_name_unique(ws_name, i)
+    except KeyError:
+        pass
+    return ws_name
 
 
 def is_cuttable(workspace):

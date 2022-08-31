@@ -6,6 +6,10 @@ from mslice.workspace.workspace import Workspace as MatrixWorkspace
 from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
+from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
+                                                     compute_symmetrised)
+from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.cut.cut import SampleTempValueError
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
@@ -206,3 +210,33 @@ def hide_a_line_and_errorbars(ax, idx: int):
     show_or_hide_a_line(container, False)
     show_or_hide_errorbars_of_a_line(container, 0.0)
     return None
+
+
+def _correct_intensity(scattering_data, intensity_correction, e_axis, sample_temp=None):
+    if not intensity_correction or intensity_correction == "scattering_function":
+        return scattering_data
+    if intensity_correction == "dynamical_susceptibility":
+        _check_sample_temperature(sample_temp, scattering_data.name)
+        return compute_chi(scattering_data, sample_temp, e_axis)
+    if intensity_correction == "dynamical_susceptibility_magnetic":
+        _check_sample_temperature(sample_temp, scattering_data.name)
+        return compute_chi(scattering_data, sample_temp, e_axis, True)
+    if intensity_correction == "d2sigma":
+        return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
+    if intensity_correction == "symmetrised":
+        _check_sample_temperature(sample_temp, scattering_data.name)
+        rotated = not is_twotheta(scattering_data.cut_axis.units) and not is_momentum(scattering_data.cut_axis.units)
+        return compute_symmetrised(scattering_data, sample_temp, e_axis, rotated)
+
+
+def _check_sample_temperature(sample_temperature, workspace_name):
+    throw_error = False
+    if sample_temperature is not None:
+        try:
+            sample_temperature = float(sample_temperature)
+        except ValueError:
+            throw_error = True
+        if sample_temperature < 0:
+            throw_error = True
+    if throw_error:
+        raise SampleTempValueError('No, or invalid, sample temperature provided', workspace_name)

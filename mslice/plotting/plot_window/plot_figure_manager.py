@@ -283,9 +283,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         if self._ygrid:
             self.canvas.figure.gca().grid(True, axis='y')
 
-    def update_axes(self, ax, plot_over):
+    def update_axes(self, plot_over, ws_name):
         if self.plot_handler is not None:
-            self.plot_handler.on_newplot(ax, plot_over)
+            self.plot_handler.on_newplot(plot_over, ws_name)
 
     def move_window(self, x, y):
         center = QtWidgets.QDesktopWidget().screenGeometry().center()
@@ -375,6 +375,25 @@ class PlotFigureManagerQT(QtCore.QObject):
     def y_grid(self, value):
         self._ygrid = value
         self.figure.gca().grid(value, axis='y')
+
+    def report_as_current_and_return_previous_status(self):
+        last_active_figure_number = None
+        disable_make_current_after_plot = False
+
+        if self._current_figs._active_figure is not None:
+            last_active_figure_number = self._current_figs.get_active_figure().number
+        if self.make_current_disabled():
+            self.enable_make_current()
+            disable_make_current_after_plot = True
+        self.report_as_current()
+
+        return last_active_figure_number, disable_make_current_after_plot
+
+    def reset_current_figure_as_previous(self, last_active_figure_number, disable_make_current):
+        if last_active_figure_number is not None:
+            self._current_figs.set_figure_as_current(last_active_figure_number)
+        if disable_make_current:
+            self.disable_make_current()
 
 
 def new_plot_figure_manager(num, global_manager):

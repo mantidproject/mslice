@@ -71,3 +71,7 @@ def _create_cut():
 
 def cut_figure_exists():
     return GlobalFigureManager.active_cut_figure_exists()
+
+
+def get_current_plot():
+    return plt.gcf().canvas.manager.plot_handler

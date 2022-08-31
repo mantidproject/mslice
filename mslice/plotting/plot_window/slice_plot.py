@@ -285,15 +285,8 @@ class SlicePlot(IPlot):
         intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
-        last_active_figure_number = None
-        if self.manager._current_figs._active_figure is not None:
-            last_active_figure_number = self.manager._current_figs.get_active_figure().number
-
-        disable_make_current_after_plot = False
-        if self.manager.make_current_disabled():
-            self.manager.enable_make_current()
-            disable_make_current_after_plot = True
-        self.manager.report_as_current()
+        last_active_figure_number, disable_make_current_after_plot = \
+            self.manager.report_as_current_and_return_previous_status()
 
         self.default_options['temp_dependent'] = temp_dependent
         self.temp_dependent = temp_dependent
@@ -312,14 +305,16 @@ class SlicePlot(IPlot):
             title = self.title
             if temp_dependent:
                 if not self._run_temp_dependent(slice_plotter_method, previous):
-                    self._reset_current_figure(last_active_figure_number, disable_make_current_after_plot)
+                    self.manager.reset_current_figure_as_previous(last_active_figure_number, disable_make_current_after_plot)
                     return
             else:
                 slice_plotter_method(self.ws_name)
             self.update_canvas(cbar_range, cbar_log, x_range, y_range, title)
         else:
             action.setChecked(True)
-        self._reset_current_figure(last_active_figure_number, disable_make_current_after_plot)
+        self.manager.reset_current_figure_as_previous(last_active_figure_number, disable_make_current_after_plot)
+        if self.icut:
+            self.icut.refresh_current_cut()
 
     def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
         self.change_axis_scale(cbar_range, cbar_log)
@@ -329,12 +324,6 @@ class SlicePlot(IPlot):
         self.manager.update_grid()
         self._update_lines()
         self._canvas.draw()
-
-    def _reset_current_figure(self, last_active_figure_number, disable_make_current_after_plot):
-        if last_active_figure_number is not None:
-            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
-        if disable_make_current_after_plot:
-            self.manager.disable_make_current()
 
     def _run_temp_dependent(self, slice_plotter_method, previous):
         temp_value_raw = None
@@ -420,6 +409,10 @@ class SlicePlot(IPlot):
             self.plot_window.action_save_cut.setVisible(False)
             self.plot_window.action_flip_axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
+            if self.intensity_method:
+                self.icut.set_icut_intensity_category(self.intensity_method)
+            self.icut.store_icut_cut_upon_toggle_and_reset()
+
 
     def toggle_icut(self):
         if self.icut is not None:

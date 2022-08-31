@@ -11,6 +11,7 @@ from mslice.util.compat import legend_set_draggable
 from mslice.util.mantid.mantid_algorithms import Transpose
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mslice.models.cut.cut import Cut
+from mslice.models.workspacemanager.workspace_algorithms import get_EFixed
 import mantid.plots.axesfunctions as axesfunctions
 from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
@@ -36,6 +37,8 @@ def errorbar(axes, workspace, *args, **kwargs):
 
     plot_over = kwargs.pop('plot_over', True)
     intensity_range = kwargs.pop('intensity_range', (None, None))
+    intensity_range = intensity_range if intensity_range else (None, None)
+    intensity_min, intensity_max = intensity_range
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
     en_conversion_allowed = kwargs.pop('en_conversion', True)
@@ -58,8 +61,7 @@ def errorbar(axes, workspace, *args, **kwargs):
 
     axesfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
 
-    axes.set_ylim(*intensity_range) if intensity_range is not None else axes.autoscale()
-    intensity_min, intensity_max = axes.get_ylim()
+    axes.autoscale()
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
         leg = axes.legend(fontsize='medium')
         legend_set_draggable(leg, True)
@@ -71,14 +73,23 @@ def errorbar(axes, workspace, *args, **kwargs):
     if not cur_canvas.manager.has_plot_handler():
         cur_canvas.manager.add_cut_plot(presenter, workspace.name)
     cur_fig.canvas.draw()
-    cur_canvas.manager.update_axes(axes, plot_over)
-
-    cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='',
-              algorithm=workspace.algorithm)
-    cut.workspace_name = workspace.parent
-    presenter.save_cache(axes, cut, plot_over)
+    create_and_cache_cut(presenter, axes, plot_over, workspace, (intensity_min, intensity_max))
+    cur_canvas.manager.update_axes(plot_over, workspace.name)
 
     return axes.lines
+
+
+def create_and_cache_cut(presenter, mpl_axes, plot_over, workspace, intensity_range):
+    if not presenter.get_prepared_cut_for_cache():
+        cut_axis, int_axis = tuple(workspace.axes)
+        intensity_min, intensity_max = intensity_range
+        cut = Cut(cut_axis, int_axis, intensity_min, intensity_max, workspace.norm_to_one, width='',
+                  algorithm=workspace.algorithm, sample_temp=None, e_fixed=get_EFixed(workspace.raw_ws))
+        cut.parent_ws_name = workspace.parent
+        cut.cut_ws = workspace
+        presenter.save_cache(mpl_axes, cut, plot_over)
+    else:
+        presenter.cache_prepared_cut(mpl_axes, plot_over)
 
 
 @plt.set_category(plt.CATEGORY_SLICE)

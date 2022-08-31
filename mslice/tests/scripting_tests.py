@@ -54,9 +54,9 @@ class ScriptingTest(unittest.TestCase):
         ws_name1 = "ws1"
         ws_name2 = "ws2"
         cut1 = Cut(Axis('|Q|', '1', '3', '1'), Axis('DelataE', '-1', '1', '0'), None, None, True, '2')
-        cut1.workspace_name = ws_name1
+        cut1.parent_ws_name = ws_name1
         cut2 = Cut(Axis('|Q|', '1', '4', '1'), Axis('DelataE', '-1', '1', '0'), None, None, True, '2')
-        cut2.workspace_name = ws_name2
+        cut2.parent_ws_name = ws_name2
         get_cpp()._cut_cache_dict = {ax: [cut1, cut2]}
 
         ws1 = mock.Mock()
@@ -162,6 +162,7 @@ class ScriptingTest(unittest.TestCase):
 
         make_proj_alg_prop_output_ws = mock.MagicMock()
         make_proj_alg_prop_output_ws.name.return_value = "OutputWorkspace"
+        make_proj_alg_prop_output_ws.value.return_value = "output_workspace_name"
         make_proj_alg_prop_output_ws.isDefault.return_value = False
 
         make_proj_alg.getProperties.return_value = [make_proj_alg_prop_output_ws, make_proj_alg_prop_input_ws]

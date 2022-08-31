@@ -1,6 +1,8 @@
 from distutils.version import LooseVersion
 from functools import partial
 
+from qtpy import QtWidgets
+
 from matplotlib import __version__ as mpl_version
 from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
@@ -16,9 +18,13 @@ from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line, \
-    cif_file_powder_line
+    cif_file_powder_line, _update_powder_lines
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
+from mslice.util.numpy_helper import clean_array
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.units import get_sample_temperature_from_string
+from mslice.models.cut.cut import SampleTempValueError
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -49,6 +55,12 @@ class CutPlot(IPlot):
         self._powder_lines = {}
         self._datum_dirty = True
         self._datum_cache = 0
+        self._cif_file = None
+        self._cif_path = None
+
+        self._intensity_method = False
+        self._intensity_correction_flag = False
+        self._temp_dependent = False
 
     def save_default_options(self):
         self.default_options = {
@@ -63,6 +75,8 @@ class CutPlot(IPlot):
             'y_grid': False,
             'y_range': (None, None),
             'waterfall': False,
+            'intensity_method': self._intensity_method,
+            'temp_dependent': self._temp_dependent,
         }
 
     def setup_connections(self, plot_window):
@@ -97,6 +111,27 @@ class CutPlot(IPlot):
             partial(toggle_overplot_line, self, self._cut_plotter_presenter, 'Tantalum', False))
         plot_window.action_cif_file.triggered.connect(partial(cif_file_powder_line, self,
                                                               self._cut_plotter_presenter))
+
+        plot_window.action_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_sqe,
+                    self._cut_plotter_presenter.show_scattering_function, False))
+
+        plot_window.action_chi_qe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_chi_qe,
+                    self._cut_plotter_presenter.show_dynamical_susceptibility, True))
+
+        plot_window.action_chi_qe_magnetic.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_chi_qe_magnetic,
+                    self._cut_plotter_presenter.show_dynamical_susceptibility_magnetic, True))
+
+        plot_window.action_d2sig_dw_de.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
+                    self._cut_plotter_presenter.show_d2sigma, False))
+
+        plot_window.action_symmetrised_sqe.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_symmetrised_sqe,
+                    self._cut_plotter_presenter.show_symmetrised, True))
+
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
@@ -298,8 +333,9 @@ class CutPlot(IPlot):
                 line.remove()
             containers.remove(container)
 
-        self._datum_dirty = True
-        self.update_bragg_peaks(refresh=True)
+        if self._cut_plotter_presenter.remove_cut_from_cache_by_index(self._canvas.figure.axes[0], line_index):
+            self._datum_dirty = True
+            self.update_bragg_peaks(refresh=True)
 
     def toggle_errorbar(self, line_index, line_options):
         container = self._canvas.figure.gca().containers[line_index]
@@ -326,6 +362,7 @@ class CutPlot(IPlot):
         self.plot_window.action_gen_script.setVisible(not is_icut)
         self.plot_window.action_gen_script_clipboard.setVisible(not is_icut)
         self.plot_window.action_waterfall.setVisible(not is_icut)
+        self.plot_window.menu_intensity.setDisabled(is_icut)
 
         self.plot_window.showNormal()
         self.plot_window.activateWindow()
@@ -338,35 +375,36 @@ class CutPlot(IPlot):
     def _get_overplot_datum(self):
         if self._datum_dirty:
             if not self.waterfall:
-                self._datum_cache = np.nanmedian([line.get_ydata() for line in self._canvas.figure.gca().get_lines()
-                                                  if not self._cut_plotter_presenter.is_overplot(line)])
+                self._datum_cache = np.mean([np.median(clean_array(line.get_ydata())) for line in self._canvas.figure.gca().get_lines()
+                                             if not self._cut_plotter_presenter.is_overplot(line)])
             else:
                 for line in self._canvas.figure.gca().get_lines():
                     if not self._cut_plotter_presenter.is_overplot(line):
-                        self._datum_cache = np.nanmedian([line.get_ydata()])
+                        self._datum_cache = np.median(clean_array(line.get_ydata()))
                         break
 
             self._datum_dirty = False
-
         return self._datum_cache
 
     def update_bragg_peaks(self, refresh=False):
+        intensity_correction = self.intensity_method if not self.intensity_method else self.intensity_method[5:]
+
         if self.plot_window.action_aluminium.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Aluminium')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Aluminium', False, None, self.y_log,
-                                                          self._get_overplot_datum())
+                                                          self._get_overplot_datum(), intensity_correction)
         if self.plot_window.action_copper.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Copper')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Copper', False, None, self.y_log,
-                                                          self._get_overplot_datum())
+                                                          self._get_overplot_datum(), intensity_correction)
         if self.plot_window.action_niobium.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Niobium')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Niobium', False, None, self.y_log,
-                                                          self._get_overplot_datum())
+                                                          self._get_overplot_datum(), intensity_correction)
         if self.plot_window.action_tantalum.isChecked():
             refresh and self._cut_plotter_presenter.hide_overplot_line(None, 'Tantalum')
             self._cut_plotter_presenter.add_overplot_line(self.ws_name, 'Tantalum', False, None, self.y_log,
-                                                          self._get_overplot_datum())
+                                                          self._get_overplot_datum(), intensity_correction)
         self.update_legend()
 
     def save_icut(self):
@@ -473,19 +511,18 @@ class CutPlot(IPlot):
                             path.vertices = np.add(self._waterfall_cache[line][index],
                                                    np.array([[ind * x, ind * y], [ind * x, ind * y]]))
 
-    def on_newplot(self, ax, plot_over):
+    def on_newplot(self, plot_over, ws_name):
         # This callback should be activated by a call to errorbar
+        if ws_name not in self.ws_list:
+            self.ws_list.append(ws_name)
         new_line = False
         line_containers = self._canvas.figure.gca().containers
         num_lines = len(line_containers)
         self.plot_window.action_waterfall.setEnabled(num_lines > 1)
         self.plot_window.toggle_waterfall_edit()
-        if not self._is_icut and not plot_over:
-            self.plot_window.action_aluminium.setChecked(False)
-            self.plot_window.action_copper.setChecked(False)
-            self.plot_window.action_niobium.setChecked(False)
-            self.plot_window.action_tantalum.setChecked(False)
-            self.plot_window.action_cif_file.setChecked(False)
+        if not plot_over:
+            self._reset_plot_window_options()
+
         all_lines = [line for container in line_containers for line in container.get_children()]
         for cached_lines in list(self._waterfall_cache.keys()):
             if cached_lines not in all_lines:
@@ -501,12 +538,147 @@ class CutPlot(IPlot):
         self._datum_dirty = True
         self.update_bragg_peaks(refresh=True)
 
+    def _reset_plot_window_options(self):
+        self.plot_window.action_aluminium.setChecked(False)
+        self.plot_window.action_copper.setChecked(False)
+        self.plot_window.action_niobium.setChecked(False)
+        self.plot_window.action_tantalum.setChecked(False)
+        self.plot_window.action_cif_file.setChecked(False)
+
+        if self.default_options and not self._intensity_correction_flag:
+            self._reset_intensity()
+            self.set_intensity_from_method(self.default_options['intensity_method'])
+
     def generate_script(self, clipboard=False):
         try:
             generate_script(self.ws_name, None, self, self.plot_window, clipboard)
         except Exception as e:
             # We don't want any exceptions raised in the GUI as could crash the GUI
             self.plot_window.display_error(e.message)
+
+    def _reset_intensity(self):
+        options = self.plot_window.menu_intensity.actions()
+        for op in options:
+            op.setChecked(False)
+
+    def set_intensity(self, intensity):
+        self._reset_intensity()
+        intensity.setChecked(True)
+
+    def set_intensity_from_method(self, intensity_method):
+        self._intensity_method = intensity_method
+
+        action = self._get_action_from_method(intensity_method)
+        self.set_intensity(action)
+
+    def _get_action_from_method(self, intensity_method):
+        if not intensity_method or intensity_method == "show_scattering_function":
+            return self.plot_window.action_sqe
+        if intensity_method == "show_dynamical_susceptibility":
+            return self.plot_window.action_chi_qe
+        if intensity_method == "show_dynamical_susceptibility_magnetic":
+            return self.plot_window.action_chi_qe_magnetic
+        if intensity_method == "show_d2sigma":
+            return self.plot_window.action_d2sig_dw_de
+        if intensity_method == "show_symmetrised":
+            return self.plot_window.action_symmetrised_sqe
+
+    def trigger_action_from_method(self, intensity_method):
+        action = self._get_action_from_method(intensity_method)
+        action.trigger()
+
+    def selected_intensity(self):
+        options = self.plot_window.menu_intensity.actions()
+        for option in options:
+            if option.isChecked():
+                return option
+
+    def show_intensity_plot(self, action, cut_plotter_method, temp_dependent):
+        self._intensity_correction_flag = True
+        last_active_figure_number = None
+        if self.manager._current_figs._active_figure is not None:
+            last_active_figure_number = self.manager._current_figs.get_active_figure().number
+
+        self.manager.report_as_current()
+
+        previous = self._intensity_method
+        self._intensity_method = cut_plotter_method.__name__
+        self.set_intensity(action)
+
+        if temp_dependent:
+            if not self._run_temp_dependent(cut_plotter_method, previous):
+                return
+        else:
+            cut_plotter_method(self._canvas.figure.axes[0])
+        self._update_lines()
+
+        # Reset current active figure
+        if last_active_figure_number is not None:
+            self.manager._current_figs.set_figure_as_current(last_active_figure_number)
+        self._intensity_correction_flag = False
+
+    def _run_temp_dependent(self, cut_plotter_method, previous):
+        try:
+            cut_plotter_method(self._canvas.figure.axes[0])
+        except SampleTempValueError as err:  # sample temperature not yet set
+            if not self.get_sample_temperature_on_error(err, self._canvas.figure.axes[0], previous):
+                return False
+            self._run_temp_dependent(cut_plotter_method, previous)
+        return True
+
+    def get_sample_temperature_on_error(self, err, ax, previous):
+        temp_value_raw = None
+        temp_value = None
+        try:
+            temperature_cached = \
+                self._cut_plotter_presenter.propagate_sample_temperatures_throughout_cache(ax)
+            if not temperature_cached:
+                temp_value_raw, field = self.ask_sample_temperature_field(str(err.ws_name))
+        except RuntimeError:  # if cancel is clicked, go back to previous selection
+            self._set_intensity_to_previous(previous)
+            return False
+        if not temperature_cached and field:
+            self._cut_plotter_presenter.set_sample_temperature_by_field(ax, temp_value_raw, err.ws_name)
+        elif not temperature_cached:
+            temp_value = get_sample_temperature_from_string(temp_value_raw)
+            if temp_value is not None:
+                try:
+                    temp_value = float(temp_value)
+                except ValueError:
+                    temp_value = None
+            if temp_value is None or temp_value < 0:
+                self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
+                                           or a sample log field.")
+                self._set_intensity_to_previous(previous)
+                return False
+            else:
+                self._cut_plotter_presenter.set_sample_temperature(ax, err.ws_name, temp_value)
+        return True
+
+    def _set_intensity_to_previous(self, previous):
+        self._intensity_method = previous
+        previous = self._get_action_from_method(previous)
+        self.set_intensity(previous)
+
+    def ask_sample_temperature_field(self, ws_name):
+        ws = get_workspace_handle(ws_name)
+        text = f'Workspace {ws.parent}: Sample Temperature not found. \nSelect the sample temperature field or ' \
+               f'enter a value in Kelvin:'
+        try:
+            keys = ws.raw_ws.run().keys()
+        except AttributeError:
+            keys = ws.raw_ws.getExperimentInfo(0).run().keys()
+        temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_window, 'Sample Temperature', text, keys)
+        if not confirm:
+            raise RuntimeError("sample_temperature_dialog cancelled")
+        else:
+            return str(temp_field), temp_field in keys
+
+    def _update_lines(self):
+        """ Updates the powder overplot lines when intensity type changes """
+        _update_powder_lines(self, self._cut_plotter_presenter)
+        self.update_legend()
+        self._canvas.draw()
 
     @property
     def x_log(self):
@@ -647,3 +819,7 @@ class CutPlot(IPlot):
         if self.default_options is None:
             return False
         return self.default_options[item] != getattr(self, item)
+
+    @property
+    def intensity_method(self):
+        return self._intensity_method
