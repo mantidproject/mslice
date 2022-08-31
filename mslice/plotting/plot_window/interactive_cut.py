@@ -8,7 +8,7 @@ from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.plotting.pyplot import GlobalFigureManager
-
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 class InteractiveCut(object):
 
@@ -56,7 +56,8 @@ class InteractiveCut(object):
             workspace = get_workspace_handle(self._ws_title)
             cut = Cut(ax, integration_axis, None, None, sample_temp=self.slice_plot.temp, e_fixed=workspace.e_fixed)
             cut.parent_ws_name = self._ws_title
-            intensity_method = "scattering_function" if not self.slice_plot.intensity_method else self.slice_plot.intensity_method[5:]
+            intensity_method = IntensityType.SCATTERING_FUNCTION if not self.slice_plot.intensity_method else \
+                IntensityCache.get_intensity_type_from_desc(self.slice_plot.intensity_method[5:])
             self._cut_plotter_presenter.plot_interactive_cut(workspace, cut, store, intensity_method)
             self._cut_plotter_presenter.set_is_icut(True)
             if self._is_initial_cut_plotter_presenter:
@@ -132,7 +133,9 @@ class InteractiveCut(object):
         self._cut_plotter_presenter.set_icut_cut(None)
 
     def set_icut_intensity_category(self, intensity_method):
-        self._cut_plotter_presenter.set_icut_intensity_category(intensity_method)
+        intensity_method = "scattering_function" if not intensity_method else intensity_method[5:]
+        intensity_type = IntensityCache.get_intensity_type_from_desc(intensity_method)
+        self._cut_plotter_presenter.set_icut_intensity_category(intensity_type)
 
     def refresh_current_cut(self):
         self.plot_cut(*self.rect.extents)

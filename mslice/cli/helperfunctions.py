@@ -11,6 +11,7 @@ from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigm
 from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.cut.cut import SampleTempValueError
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
                   'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
@@ -213,17 +214,22 @@ def hide_a_line_and_errorbars(ax, idx: int):
 
 
 def _correct_intensity(scattering_data, intensity_correction, e_axis, sample_temp=None):
-    if not intensity_correction or intensity_correction == "scattering_function":
+    try:
+        intensity_correction = IntensityCache.get_intensity_type_from_desc(intensity_correction)
+    except ValueError:
+        pass
+
+    if intensity_correction == IntensityType.SCATTERING_FUNCTION:
         return scattering_data
-    if intensity_correction == "dynamical_susceptibility":
+    if intensity_correction == IntensityType.CHI:
         _check_sample_temperature(sample_temp, scattering_data.name)
         return compute_chi(scattering_data, sample_temp, e_axis)
-    if intensity_correction == "dynamical_susceptibility_magnetic":
+    if intensity_correction == IntensityType.CHI_MAGNETIC:
         _check_sample_temperature(sample_temp, scattering_data.name)
         return compute_chi(scattering_data, sample_temp, e_axis, True)
-    if intensity_correction == "d2sigma":
+    if intensity_correction == IntensityType.D2_SIGMA:
         return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
-    if intensity_correction == "symmetrised":
+    if intensity_correction == IntensityType.SYMMETRISED:
         _check_sample_temperature(sample_temp, scattering_data.name)
         rotated = not is_twotheta(scattering_data.cut_axis.units) and not is_momentum(scattering_data.cut_axis.units)
         return compute_symmetrised(scattering_data, sample_temp, e_axis, rotated)

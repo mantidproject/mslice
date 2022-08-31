@@ -1,6 +1,7 @@
 from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
                                                      compute_symmetrised)
 from mslice.models.labels import is_momentum, is_twotheta
+from mslice.util.intensity_correction import IntensityType
 
 import numpy as np
 
@@ -154,7 +155,7 @@ class Cut(object):
         if self._chi is None:
             self._chi = compute_chi(self._cut_ws, self.sample_temp, self.e_axis)
             self._chi.intensity_corrected = True
-            self._corrected_intensity_range_cache["dynamical_susceptibility"] = self._get_intensity_range_from_ws(self._chi)
+            self._corrected_intensity_range_cache[IntensityType.CHI] = self._get_intensity_range_from_ws(self._chi)
         return self._chi
 
     @property
@@ -162,7 +163,7 @@ class Cut(object):
         if self._chi_magnetic is None:
             self._chi_magnetic = compute_chi(self._cut_ws, self.sample_temp, self.e_axis, True)
             self._chi_magnetic.intensity_corrected = True
-            self._corrected_intensity_range_cache["dynamical_susceptibility_magnetic"] = \
+            self._corrected_intensity_range_cache[IntensityType.CHI_MAGNETIC] = \
                 self._get_intensity_range_from_ws(self._chi_magnetic)
         return self._chi_magnetic
 
@@ -171,7 +172,7 @@ class Cut(object):
         if self._d2sigma is None:
             self._d2sigma = compute_d2sigma(self._cut_ws, self.e_axis, self._e_fixed)
             self._d2sigma.intensity_corrected = True
-            self._corrected_intensity_range_cache["d2sigma"] = self._get_intensity_range_from_ws(self._d2sigma)
+            self._corrected_intensity_range_cache[IntensityType.D2_SIGMA] = self._get_intensity_range_from_ws(self._d2sigma)
         return self._d2sigma
 
     @property
@@ -179,17 +180,20 @@ class Cut(object):
         if self._symmetrised is None:
             self._symmetrised = compute_symmetrised(self._cut_ws, self.sample_temp, self.e_axis, self.rotated)
             self._symmetrised.intensity_corrected = True
-            self._corrected_intensity_range_cache["symmetrised"] = self._get_intensity_range_from_ws(self._symmetrised)
+            self._corrected_intensity_range_cache[IntensityType.SYMMETRISED] = \
+                self._get_intensity_range_from_ws(self._symmetrised)
         return self._symmetrised
 
     def get_intensity_corrected_ws(self, intensity_correction_type):
-        if intensity_correction_type == "dynamical_susceptibility":
+        if intensity_correction_type == IntensityType.SCATTERING_FUNCTION:
+            return self._cut_ws
+        elif intensity_correction_type == IntensityType.CHI:
             return self.chi
-        elif intensity_correction_type == "dynamical_susceptibility_magnetic":
+        elif intensity_correction_type == IntensityType.CHI_MAGNETIC:
             return self.chi_magnetic
-        elif intensity_correction_type == "d2sigma":
+        elif intensity_correction_type == IntensityType.D2_SIGMA:
             return self.d2sigma
-        elif intensity_correction_type == "symmetrised":
+        elif intensity_correction_type == IntensityType.SYMMETRISED:
             return self.symmetrised
 
     @property

@@ -125,7 +125,7 @@ def pcolormesh(axes, workspace, *args, **kwargs):
         plot_window = GlobalFigureManager.get_active_figure().window
 
         intensity_action = getattr(plot_window, _intensity_to_action[intensity])
-        plot_handler.set_intensity(intensity_action)
+        plot_handler.set_intensity_from_action(intensity_action)
         intensity_action.setChecked(True)
 
         # Set intensity properties for generated script to use
