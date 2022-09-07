@@ -1,8 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
+import operator as op
 
 from mantid.simpleapi import CloneWorkspace, PowerMD
-from mslice.util.numpy_helper import apply_with_corrected_shape
+from mslice.util.numpy_helper import apply_with_corrected_shape, transform_array_to_workspace
 
 
 # Other operators are defined when MSlice is imported in _workspace_ops.attach_binary_operators()
@@ -48,14 +49,22 @@ class WorkspaceMixin(object):
         for i in range(raw_ws.getNumberHistograms()):
             raw_ws.setY(i, signal[i])
 
+    def _set_error_raw(self, raw_ws, variance):
+        for i in range(raw_ws.getNumberHistograms()):
+            raw_ws.setE(i, variance[i])
+
     def _binary_op_array(self, operator, other):
         """Perform binary operation using a numpy array with the same number of elements as an axis of _raw_ws signal"""
         signal = self.get_signal()
+        error = self.get_error()
         new_ws = CloneWorkspace(InputWorkspace= self._raw_ws, StoreInADS=False)
-        error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
-        new_signal = apply_with_corrected_shape(operator, signal, other, error)
+        array_size_error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
+        new_signal = apply_with_corrected_shape(operator, signal, other, array_size_error)
         self._set_signal_raw(new_ws, new_signal)
-        # scale errors?
+
+        if operator == op.mul or operator == op.truediv:
+            new_error = apply_with_corrected_shape(operator, error, other, array_size_error)
+            self._set_error_raw(new_ws, new_error)
         return new_ws
 
     def get_saved_cut_parameters(self, axis=None):

@@ -132,6 +132,9 @@ class CutPlot(IPlot):
             partial(self.show_intensity_plot, plot_window.action_symmetrised_sqe,
                     self._cut_plotter_presenter.show_symmetrised, True))
 
+        plot_window.action_gdos.triggered.connect(
+            partial(self.show_intensity_plot, plot_window.action_gdos,
+                    self._cut_plotter_presenter.show_gdos, True))
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
@@ -582,6 +585,8 @@ class CutPlot(IPlot):
             return self.plot_window.action_d2sig_dw_de
         if intensity_method == "show_symmetrised":
             return self.plot_window.action_symmetrised_sqe
+        if intensity_method == "show_gdos":
+            return self.plot_window.action_gdos
 
     def trigger_action_from_method(self, intensity_method):
         action = self._get_action_from_method(intensity_method)
