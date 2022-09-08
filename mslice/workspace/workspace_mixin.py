@@ -3,7 +3,7 @@ import numpy as np
 import operator as op
 
 from mantid.simpleapi import CloneWorkspace, PowerMD
-from mslice.util.numpy_helper import apply_with_corrected_shape, transform_array_to_workspace
+from mslice.util.numpy_helper import apply_with_corrected_shape
 
 
 # Other operators are defined when MSlice is imported in _workspace_ops.attach_binary_operators()
