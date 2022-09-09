@@ -92,7 +92,7 @@ The different options available are:
 More informaton regarding these conversions and their relation to the default :math:`S(Q, \omega)` can be found with
 reference to :ref:`Converting_Intensity`.
 
-To convert the intensity information in data displayed as part of an interactive cut the intensity of the parent slice
+To convert the intensity information of data displayed through an interactive cut, the intensity of the parent slice
 must be changed. To change the intensity of an individual interactive cut, the ``interactive cut`` option of the parent
 slice figure window must be toggled off.
 
