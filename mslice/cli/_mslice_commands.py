@@ -9,6 +9,7 @@ from mslice.models.workspacemanager.file_io import save_ascii, save_matlab, save
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.workspacemanager.workspace_algorithms import rebose_single
 from mslice.models.cmap import DEFAULT_CMAP
+from mslice.models.labels import is_momentum, is_twotheta
 import mslice.app as app
 from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
@@ -200,13 +201,14 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True)
-    e_axis = cut_axis if 'DeltaE' in cut_axis.units else integration_axis
-    cut = _correct_intensity(cut, IntensityCorrection, e_axis, SampleTemperature)
+    rotated = not is_twotheta(cut_axis.units) and not is_momentum(cut_axis.units)
+    e_axis = cut_axis if rotated else integration_axis
+    q_axis = integration_axis if rotated else cut_axis
+    cut = _correct_intensity(cut, IntensityCorrection, e_axis, q_axis, NormToOne, Algorithm, rotated, SampleTemperature)
 
     get_cut_plotter_presenter().update_main_window()
 
     return cut
-
 
 def Rebose(InputWorkspace, CurrentTemperature=300, TargetTemperature=5, OutputWorkspace=None):
     """

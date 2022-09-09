@@ -9,8 +9,10 @@ from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.units import get_sample_temperature_from_string
+from mslice.models.axis import Axis
 from mslice.util.mantid.mantid_algorithms import CloneWorkspace
 from mslice.util.numpy_helper import apply_with_swapped_axes, transform_array_to_workspace
+from mslice.models.cut.cut_functions import compute_cut
 
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
@@ -24,9 +26,10 @@ def compute_boltzmann_dist(sample_temp, delta_e):
     return np.exp(-delta_e / kBT)
 
 
-def axis_values(axis):
+def axis_values(axis, step_num=False):
     """Compute a numpy array of bins for the given axis values"""
-    return np.linspace(axis.start_meV, axis.end_meV, get_number_of_steps(axis))
+    step_num = step_num if step_num else get_number_of_steps(axis)
+    return np.linspace(axis.start_meV, axis.end_meV, step_num)
 
 
 def compute_chi(scattering_data, sample_temp, e_axis, magnetic=False):
@@ -91,9 +94,11 @@ def modify_part_of_signal(multiplier, up_to_index, signal):
     return np.concatenate((lhs, rhs), axis_index)
 
 
-def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis):
-    energy_transfer = axis_values(e_axis)
-    momentum_transfer = axis_values(q_axis)
+def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
+    n_bins_energy = scattering_data.get_signal().shape[0] if rotated else scattering_data.get_signal().shape[1]
+    n_bins_momentum = scattering_data.get_signal().shape[1] if rotated else scattering_data.get_signal().shape[0]
+    energy_transfer = axis_values(e_axis, n_bins_energy)
+    momentum_transfer = axis_values(q_axis, n_bins_momentum)
     momentum_transfer = np.square(momentum_transfer, out=momentum_transfer)
     boltzmann_dist = compute_boltzmann_dist(sample_temp, energy_transfer)
     gdos = scattering_data / momentum_transfer
@@ -101,6 +106,16 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis):
     gdos *= (1 - boltzmann_dist)
     return gdos
 
+def cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm):
+    slice = get_workspace_handle(scattering_data.parent)
+    q_limits = slice.limits[q_axis.units]
+    e_limits = slice.limits[e_axis.units]
+    slice_q_axis = Axis(q_axis.units, q_limits[0], q_limits[1], q_limits[2], q_axis.e_unit)
+    slice_e_axis = Axis(e_axis.units, e_limits[0], e_limits[1], e_limits[2], e_axis.e_unit)
+    slice_gdos = slice_compute_gdos(slice, sample_temp, slice_q_axis, slice_e_axis, rotated)
+    cut_axis = e_axis if rotated else q_axis
+    int_axis = q_axis if rotated else e_axis
+    return compute_cut(slice_gdos, cut_axis, int_axis, norm_to_one, algorithm)
 
 def sample_temperature(ws_name, sample_temp_fields):
     ws = get_workspace_handle(ws_name).raw_ws
