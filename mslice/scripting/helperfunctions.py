@@ -135,11 +135,12 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
         script_lines.append(f"ax.set_yscale('symlog', "
                             f"linthresh{y_axis_str}=pow(10, np.floor(np.log10({plot_handler.y_axis_min}))))\n")
 
+
 def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
-    itensity_correction = plot_handler.intensity_type
-    add_cut_lines_with_width(errorbars, script_lines, cuts, itensity_correction)
+    intensity_correction = plot_handler.intensity_type
+    add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction)
     hide_lines(script_lines, plot_handler, ax)
 
 

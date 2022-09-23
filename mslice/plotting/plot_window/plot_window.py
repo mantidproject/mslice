@@ -126,8 +126,6 @@ class PlotWindow(QtWidgets.QMainWindow):
                                     "on some datasets ")
         menu.addAction(self.action_gdos)
 
-
-
     def create_toolbar(self):
         self.toolbar = QtWidgets.QToolBar()
         self.add_toolbar_actions(self.toolbar)

@@ -138,4 +138,5 @@ class InteractiveCut(object):
         self._cut_plotter_presenter.set_icut_intensity_category(intensity_type)
 
     def refresh_current_cut(self):
-        self.plot_cut(*self.rect.extents)
+        if not all(pos == 0 for pos in self._rect_pos_cache):  # if rect has been drawn.
+            self.plot_cut(*self.rect.extents)
