@@ -19,6 +19,7 @@ from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line, \
     cif_file_powder_line, _update_powder_lines
+from mslice.plotting.pyplot import CATEGORY_CUT
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 from mslice.util.numpy_helper import clean_array
@@ -26,6 +27,7 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.cut.cut import SampleTempValueError
 from mslice.util.intensity_correction import IntensityType, IntensityCache
+
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -115,21 +117,25 @@ class CutPlot(IPlot):
 
         plot_window.action_sqe.triggered.connect(
             partial(self.show_intensity_plot, IntensityType.SCATTERING_FUNCTION, False))
-        IntensityCache.cache_action(self._canvas.figure.axes[0], IntensityType.SCATTERING_FUNCTION, plot_window.action_sqe)
+        IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.SCATTERING_FUNCTION,
+                                    plot_window.action_sqe)
 
         plot_window.action_chi_qe.triggered.connect(partial(self.show_intensity_plot, IntensityType.CHI, True))
-        IntensityCache.cache_action(self._canvas.figure.axes[0], IntensityType.CHI, plot_window.action_chi_qe)
+        IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.CHI, plot_window.action_chi_qe)
 
         plot_window.action_chi_qe_magnetic.triggered.connect(
             partial(self.show_intensity_plot, IntensityType.CHI_MAGNETIC, True))
-        IntensityCache.cache_action(self._canvas.figure.axes[0], IntensityType.CHI_MAGNETIC, plot_window.action_chi_qe_magnetic)
+        IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.CHI_MAGNETIC,
+                                    plot_window.action_chi_qe_magnetic)
 
         plot_window.action_d2sig_dw_de.triggered.connect(partial(self.show_intensity_plot, IntensityType.D2_SIGMA, False))
-        IntensityCache.cache_action(self._canvas.figure.axes[0], IntensityType.D2_SIGMA, plot_window.action_d2sig_dw_de)
+        IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.D2_SIGMA,
+                                    plot_window.action_d2sig_dw_de)
 
         plot_window.action_symmetrised_sqe.triggered.connect(
             partial(self.show_intensity_plot, IntensityType.SYMMETRISED, True))
-        IntensityCache.cache_action(self._canvas.figure.axes[0], IntensityType.SYMMETRISED, plot_window.action_symmetrised_sqe)
+        IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.SYMMETRISED,
+                                    plot_window.action_symmetrised_sqe)
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
@@ -564,7 +570,7 @@ class CutPlot(IPlot):
     def set_intensity_from_type(self, intensity_type):
         self._intensity_type = intensity_type
 
-        action = IntensityCache.get_action(self._canvas.figure.axes[0], intensity_type)
+        action = IntensityCache.get_action(CATEGORY_CUT, self._canvas.figure.axes[0], intensity_type)
         self.set_intensity_from_action(action)
 
     def trigger_action_from_type(self, intensity_type):
@@ -587,9 +593,9 @@ class CutPlot(IPlot):
         previous_type = self._intensity_type
         self._intensity_type = intensity_type
         ax = self._canvas.figure.axes[0]
-        self.set_intensity_from_action(IntensityCache.get_action(ax, intensity_type))
+        self.set_intensity_from_action(IntensityCache.get_action(CATEGORY_CUT, ax, intensity_type))
 
-        method = IntensityCache.get_method(intensity_type)
+        method = IntensityCache.get_method(CATEGORY_CUT, intensity_type)
         if temp_dependent:
             if not self._run_temp_dependent(method, previous_type):
                 return
@@ -642,7 +648,7 @@ class CutPlot(IPlot):
 
     def _set_intensity_to_previous(self, previous_type):
         self._intensity_type = previous_type
-        previous_action = IntensityCache.get_action(self._intensity_type)
+        previous_action = IntensityCache.get_action(CATEGORY_CUT, self._intensity_type)
         self.set_intensity_from_action(previous_action)
 
     def ask_sample_temperature_field(self, ws_name):

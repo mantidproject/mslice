@@ -1,5 +1,7 @@
 from enum import Enum
+from mslice.plotting.pyplot import CATEGORY_SLICE, CATEGORY_CUT
 
+ACTION, METHOD = 1, 2
 
 class IntensityType(Enum):
     SCATTERING_FUNCTION = 1
@@ -11,42 +13,64 @@ class IntensityType(Enum):
 
 
 class IntensityCache:
-    __action_dict = {}
-    __method_dict = {}
+    __action_dict_cut = {}
+    __method_dict_cut = {}
+    __action_dict_slice = {}
+    __method_dict_slice = {}
     __identifier_dict = {}
 
     def __init__(self):
         pass
 
     @classmethod
-    def cache_action(cls, ax, intensity_correction_type, action):
-        if ax not in cls.__action_dict:
-            cls.__action_dict[ax] = {intensity_correction_type: action}
+    def _return_category_dict(cls, category, identifier):
+        if identifier == ACTION:
+            if category == CATEGORY_CUT:
+                ret_dict = cls.__action_dict_cut
+            elif category == CATEGORY_SLICE:
+                ret_dict = cls.__action_dict_slice
+        elif identifier == METHOD:
+            if category == CATEGORY_CUT:
+                ret_dict = cls.__method_dict_cut
+            elif category == CATEGORY_SLICE:
+                ret_dict = cls.__method_dict_slice
         else:
-            cls.__action_dict[ax][intensity_correction_type] = action
+            raise ValueError(f"Category invalid: {category}")
+        return ret_dict
 
     @classmethod
-    def get_action(cls, ax, intensity_correction_type):
-        if ax in cls.__action_dict and intensity_correction_type in cls.__action_dict[ax]:
-            return cls.__action_dict[ax][intensity_correction_type]
+    def cache_action(cls, category, ax, intensity_correction_type, action):
+        action_dict = cls._return_category_dict(category, ACTION)
+        if ax not in action_dict:
+            action_dict[ax] = {intensity_correction_type: action}
+        else:
+            action_dict[ax][intensity_correction_type] = action
+
+    @classmethod
+    def get_action(cls, category, ax, intensity_correction_type):
+        action_dict = cls._return_category_dict(category, ACTION)
+        if ax in action_dict and intensity_correction_type in action_dict[ax]:
+            return action_dict[ax][intensity_correction_type]
         else:
             raise KeyError("action related to the specified axis and intensity correction"
                            "type not found")
 
     @classmethod
-    def trigger_action(cls, ax, intensity_correction_type):
-        action = cls.get_action(ax, intensity_correction_type)
+    def trigger_action(cls, category, ax, intensity_correction_type):
+        action = cls.get_action(category, ax, intensity_correction_type)
         action.trigger()
 
     @classmethod
-    def cache_method(cls, intensity_correction_type, method):
-        if intensity_correction_type not in cls.__method_dict:
-            cls.__method_dict[intensity_correction_type] = method
+    def cache_method(cls, category, intensity_correction_type, method):
+        method_dict = cls._return_category_dict(category, METHOD)
+        if intensity_correction_type not in method_dict:
+            method_dict[intensity_correction_type] = method
 
     @classmethod
-    def get_method(cls, intensity_correction_type):
-        if intensity_correction_type in cls.__method_dict:
-            return cls.__method_dict[intensity_correction_type]
+    def get_method(cls, category, intensity_correction_type):
+        method_dict = cls._return_category_dict(category, METHOD)
+        if intensity_correction_type in method_dict:
+            return method_dict[intensity_correction_type]
         else:
             raise KeyError("method related to the specified intensity correction type not found")
 

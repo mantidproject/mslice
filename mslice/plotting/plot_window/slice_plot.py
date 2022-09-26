@@ -17,9 +17,10 @@ from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 from mslice.plotting.plot_window.overplot_interface import _update_overplot_lines, _update_powder_lines,\
     toggle_overplot_line, cif_file_powder_line
-from mslice.plotting.pyplot import GlobalFigureManager
+from mslice.plotting.pyplot import GlobalFigureManager, CATEGORY_SLICE
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 
 class SlicePlot(IPlot):
@@ -43,7 +44,7 @@ class SlicePlot(IPlot):
         self.setup_connections(self.plot_window)
 
         self.intensity = False
-        self.intensity_method = False
+        self.intensity_type = IntensityType.SCATTERING_FUNCTION
         self.temp_dependent = False
         self.temp = None
         self.default_options = None
@@ -54,7 +55,7 @@ class SlicePlot(IPlot):
             'colorbar_log': self.colorbar_log,
             'colorbar_range': self.colorbar_range,
             'intensity': self.intensity,
-            'intensity_method': self.intensity_method,
+            'intensity_type': self.intensity_type,
             'temp': self.temp,
             'temp_dependent': self.temp_dependent,
 
@@ -90,25 +91,37 @@ class SlicePlot(IPlot):
         plot_window.action_sqe.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_sqe,
                     self._slice_plotter_presenter.show_scattering_function, False))
+        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.SCATTERING_FUNCTION,
+                                    plot_window.action_sqe)
 
         plot_window.action_chi_qe.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_chi_qe,
                     self._slice_plotter_presenter.show_dynamical_susceptibility, True))
+        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.CHI,
+                                    plot_window.action_chi_qe)
 
         plot_window.action_chi_qe_magnetic.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_chi_qe_magnetic,
                     self._slice_plotter_presenter.show_dynamical_susceptibility_magnetic, True))
+        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.CHI_MAGNETIC,
+                                    plot_window.action_chi_qe_magnetic)
 
         plot_window.action_d2sig_dw_de.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
                     self._slice_plotter_presenter.show_d2sigma, False))
+        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.D2_SIGMA,
+                                    plot_window.action_d2sig_dw_de)
 
         plot_window.action_symmetrised_sqe.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_symmetrised_sqe,
                     self._slice_plotter_presenter.show_symmetrised, True))
+        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.SYMMETRISED,
+                                    plot_window.action_symmetrised_sqe)
 
         plot_window.action_gdos.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_gdos, self._slice_plotter_presenter.show_gdos, True))
+        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.GDOS,
+                                    plot_window.action_gdos)
 
         plot_window.action_hydrogen.triggered.connect(
             partial(toggle_overplot_line, self, self._slice_plotter_presenter, 1, True))
@@ -292,8 +305,9 @@ class SlicePlot(IPlot):
         self.temp_dependent = temp_dependent
         self.default_options['intensity'] = True
         self.intensity = True
-        self.default_options['intensity_method'] = slice_plotter_method.__name__
-        self.intensity_method = slice_plotter_method.__name__
+        self.default_options['intensity_type'] = \
+            IntensityCache.get_intensity_type_from_desc(slice_plotter_method.__name__[5:])
+        self.intensity_type = self.default_options['intensity_type']
 
         if action.isChecked():
             previous = self.selected_intensity()
@@ -409,8 +423,7 @@ class SlicePlot(IPlot):
             self.plot_window.action_save_cut.setVisible(False)
             self.plot_window.action_flip_axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
-            if self.intensity_method:
-                self.icut.set_icut_intensity_category(self.intensity_method)
+            self.icut.set_icut_intensity_category(self.intensity_type)
             self.icut.store_icut_cut_upon_toggle_and_reset()
 
 

@@ -1,6 +1,5 @@
 from datetime import datetime
 from distutils.version import LooseVersion
-from mslice.cli.helperfunctions import _function_to_intensity
 from mslice.models.labels import get_recoil_key
 from matplotlib import __version__ as mpl_version
 from mslice.util.intensity_correction import IntensityType, IntensityCache
@@ -70,7 +69,7 @@ def add_slice_plot_statements(script_lines, plot_handler):
         plot_handler.ws_name.replace(".", "_"), momentum_axis, energy_axis, norm))
 
     if plot_handler.intensity is True:
-        intensity = _function_to_intensity[plot_handler.intensity_method]
+        intensity = IntensityCache.get_desc_from_type(plot_handler.intensity_type)
         if plot_handler.temp_dependent:
             script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}", temperature={})\n'.format(
                 cache[plot_handler.ws_name].colourmap, intensity, plot_handler.temp))

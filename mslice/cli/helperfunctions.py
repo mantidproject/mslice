@@ -17,32 +17,6 @@ _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Alum
                   'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
                   'CIF file': 'CIF file'}
 
-_function_to_intensity = {
-    'show_scattering_function': 's(q,e)',
-    'show_dynamical_susceptibility': 'chi',
-    'show_dynamical_susceptibility_magnetic': 'chi_mag',
-    'show_d2sigma': 'xsec',
-    'show_symmetrised': 'symm',
-    'show_gdos': 'gdos',
-}
-
-_intensity_to_action = {
-    's(q,e)': 'action_sqe',
-    'chi': 'action_chi_qe',
-    'chi_mag': 'action_chi_qe_magnetic',
-    'xsec': 'action_d2sig_dw_de',
-    'symm': 'action_symmetrised_sqe',
-    'gdos': 'action_gdos',
-}
-
-_intensity_to_workspace = {
-    'chi': 'chi',
-    'chi_mag': 'chi_magnetic',
-    'xsec': 'd2sigma',
-    'symm': 'symmetrised',
-    'gdos': 'gdos',
-}
-
 
 def _update_legend():
     plot_handler = GlobalFigureManager.get_active_figure().plot_handler
