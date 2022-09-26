@@ -127,14 +127,11 @@ def pcolormesh(axes, workspace, *args, **kwargs):
         current_axes = GlobalFigureManager.get_active_figure().figure.axes[0]
         intensity_action = IntensityCache.get_action(plt.CATEGORY_SLICE, current_axes, intensity_type)
         plot_handler.set_intensity(intensity_action)
-
-        # Set intensity properties for generated script to use
-        if not is_gui():
-            plot_handler.intensity = True
-            plot_handler.intensity_type = intensity_type
-            plot_handler.temp = temperature
-            plot_handler.temp_dependent = True if temperature is not None else False
-            plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name].colourmap = kwargs.get('cmap')
+        plot_handler.intensity = True
+        plot_handler.intensity_type = intensity_type
+        plot_handler.temp = temperature
+        plot_handler.temp_dependent = True if temperature is not None else False
+        plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name].colourmap = kwargs.get('cmap')
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)

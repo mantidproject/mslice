@@ -300,7 +300,8 @@ class SlicePlot(IPlot):
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
         last_active_figure_number, disable_make_current_after_plot = \
             self.manager.report_as_current_and_return_previous_status()
-
+        if not self.default_options:
+            self.save_default_options()
         self.default_options['temp_dependent'] = temp_dependent
         self.temp_dependent = temp_dependent
         self.default_options['intensity'] = True
