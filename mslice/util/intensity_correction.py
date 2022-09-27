@@ -103,3 +103,10 @@ class IntensityCache:
             return "symmetrised"
         else:
             raise ValueError(f"Input intensity type invalid: {intensity_type}")
+
+    @classmethod
+    def remove_from_cache(cls, category, key):
+        dicts = (cls._return_category_dict(category, ACTION), cls._return_category_dict(category, METHOD))
+        for d in dicts:
+            if key in d.keys():
+                d.pop(key)
