@@ -86,7 +86,8 @@ def add_slice_plot_statements(script_lines, plot_handler):
         script_lines.append("mesh.set_norm(colors.LogNorm({}, {}))\n".format(min, maximum))
 
     script_lines.append("cb = plt.colorbar(mesh, ax=ax)\n")
-    script_lines.append("cb.set_label('{}', labelpad=20, rotation=270, picker=5)\n".format(plot_handler.colorbar_label))
+    script_lines.append(f"cb.set_label('{plot_handler.colorbar_label}', labelpad=20, rotation=270, picker=5, "
+                        f"fontsize={plot_handler.colorbar_label_size})\n")
     add_plot_options(script_lines, plot_handler)
 
 

@@ -21,6 +21,9 @@ from mslice.plotting.pyplot import GlobalFigureManager
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 
+DEFAULT_LABEL_SIZE = 10
+DEFAULT_TITLE_SIZE = 12
+
 
 class SlicePlot(IPlot):
 
@@ -51,6 +54,7 @@ class SlicePlot(IPlot):
     def save_default_options(self):
         self.default_options = {
             'colorbar_label': self.colorbar_label,
+            'colorbar_label_size': DEFAULT_LABEL_SIZE,
             'colorbar_log': self.colorbar_log,
             'colorbar_range': self.colorbar_range,
             'intensity': self.intensity,
@@ -59,13 +63,13 @@ class SlicePlot(IPlot):
             'temp_dependent': self.temp_dependent,
 
             'title': self.ws_name,
-            'title_size': 12,
+            'title_size': DEFAULT_TITLE_SIZE,
             'x_label': r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
-            'x_label_size': 10,
+            'x_label_size': DEFAULT_LABEL_SIZE,
             'x_grid': False,
             'x_range': self.x_range,
             'y_label': 'Energy Transfer (meV)',
-            'y_label_size': 10,
+            'y_label_size': DEFAULT_LABEL_SIZE,
             'y_grid': False,
             'y_range': self.y_range,
             'legend': True,
@@ -462,6 +466,10 @@ class SlicePlot(IPlot):
     @colorbar_label.setter
     def colorbar_label(self, value):
         self._canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
+
+    @property
+    def colorbar_label_size(self):
+        return self._canvas.figure.get_axes()[1].yaxis.label.get_size()
 
     @property
     def colorbar_range(self):

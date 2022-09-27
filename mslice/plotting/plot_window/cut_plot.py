@@ -26,6 +26,8 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.cut.cut import SampleTempValueError
 
+DEFAULT_LABEL_SIZE = 10
+DEFAULT_TITLE_SIZE = 12
 
 def get_min(data, absolute_minimum=-np.inf):
     """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
@@ -68,13 +70,13 @@ class CutPlot(IPlot):
             'x_log': False,
             'y_log': False,
             'title': self.ws_name,
-            'title_size': 12,
+            'title_size': DEFAULT_TITLE_SIZE,
             'x_label': r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
-            'x_label_size': 10,
+            'x_label_size': DEFAULT_LABEL_SIZE,
             'x_grid': False,
             'x_range': (None, None),
             'y_label': 'Energy Transfer (meV)',
-            'y_label_size': 10,
+            'y_label_size': DEFAULT_LABEL_SIZE,
             'y_grid': False,
             'y_range': (None, None),
             'waterfall': False,
