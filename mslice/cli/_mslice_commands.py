@@ -16,7 +16,6 @@ from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_ax
                                         _check_workspace_type, is_slice, _correct_intensity)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
-from mslice.util.intensity_correction import IntensityType
 from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MSliceWorkspace
@@ -202,7 +201,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True)
     e_axis = cut_axis if 'DeltaE' in cut_axis.units else integration_axis
-    intensity_correction = 'scattering_function' if IntensityCorrection == False else IntensityCorrection
+    intensity_correction = 'scattering_function' if IntensityCorrection is False else IntensityCorrection
     cut = _correct_intensity(cut, intensity_correction, e_axis, SampleTemperature)
 
     get_cut_plotter_presenter().update_main_window()

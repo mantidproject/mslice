@@ -4,7 +4,7 @@ from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
-from mslice.util.intensity_correction import IntensityType, IntensityCache
+from mslice.util.intensity_correction import IntensityType
 import mslice.plotting.globalfiguremanager as gfm
 
 
