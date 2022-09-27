@@ -169,7 +169,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
 
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin',
-        IntensityCorrection='scattering_function', SampleTemperature=None):
+        IntensityCorrection=False, SampleTemperature=None):
     """
     Cuts workspace.
     :param InputWorkspace: Workspace to cut. The parameter can be either a python
@@ -186,9 +186,8 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
             Recognised energy units are 'meV' (default) and 'cm-1'
     :param NormToOne: if True the cut will be normalized to one.
     :param Algorithm: the cut algorithm to use. Either 'Rebin' (default) or 'Integration'
-    :param IntensityCorrection: the intensity correction algorithm to use. Either 'scattering_function'
-            (Default, no correction), 'dynamical_susceptibility', 'dynamical_susceptibility_magnetic', 'd2sigma', or
-            'symmetrised'.
+    :param IntensityCorrection: the intensity correction algorithm to use. Either False (Default, no correction),
+            'dynamical_susceptibility', 'dynamical_susceptibility_magnetic', 'd2sigma', or 'symmetrised'.
     :param SampleTemperature: if a temperature dependant intensity correction is input, a SampleTemperature in Kelvin
            must be provided.
     :return:
@@ -203,7 +202,8 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True)
     e_axis = cut_axis if 'DeltaE' in cut_axis.units else integration_axis
-    cut = _correct_intensity(cut, IntensityCorrection, e_axis, SampleTemperature)
+    intensity_correction = 'scattering_function' if IntensityCorrection == False else IntensityCorrection
+    cut = _correct_intensity(cut, intensity_correction, e_axis, SampleTemperature)
 
     get_cut_plotter_presenter().update_main_window()
 

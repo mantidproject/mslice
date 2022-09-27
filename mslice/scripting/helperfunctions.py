@@ -195,7 +195,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
             label = errorbar._label
 
             intensity_correction_arg = f"'{IntensityCache.get_desc_from_type(intensity_correction)}'" \
-                if not intensity_correction == IntensityType.SCATTERING_FUNCTION else ""
+                if not intensity_correction == IntensityType.SCATTERING_FUNCTION else False
             script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
                                 'NormToOne={}{}, IntensityCorrection={}, SampleTemperature={})'
                                 '\n'.format(index, replace_ws_special_chars(cut.parent_ws_name), cut_axis, integration_axis,
