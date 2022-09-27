@@ -5,7 +5,6 @@
 #
 from __future__ import (absolute_import, unicode_literals)
 from functools import wraps
-from typing import Any, Sequence
 
 # make these available in this module for the rest of codebase
 from mantidqt.utils.qt.qappthreadcall import QAppThreadCall, force_method_calls_to_qapp_thread  # noqa: F401
@@ -23,8 +22,8 @@ def call_in_qapp_thread(func):
     :return The wrapped function
     """
     @wraps(func)
-    def wrapper(*args: Sequence) -> Any:
-        return QAppThreadCall(func)(*args)
+    def wrapper(*args, **kwargs):
+        return QAppThreadCall(func)(*args, **kwargs)
 
     return wrapper
 
