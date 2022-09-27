@@ -68,10 +68,13 @@ class CutPlot(IPlot):
             'x_log': False,
             'y_log': False,
             'title': self.ws_name,
+            'title_size': 12,
             'x_label': r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
+            'x_label_size': 10,
             'x_grid': False,
             'x_range': (None, None),
             'y_label': 'Energy Transfer (meV)',
+            'y_label_size': 10,
             'y_grid': False,
             'y_range': (None, None),
             'waterfall': False,
@@ -727,6 +730,10 @@ class CutPlot(IPlot):
             self.plot_window.display_error("invalid latex string")
 
     @property
+    def title_size(self):
+        return self.manager.title_size
+
+    @property
     def x_label(self):
         return self.manager.x_label
 
@@ -738,6 +745,10 @@ class CutPlot(IPlot):
             self.plot_window.display_error("invalid latex string")
 
     @property
+    def x_label_size(self):
+        return self.manager.x_label_size
+
+    @property
     def y_label(self):
         return self.manager.y_label
 
@@ -747,6 +758,10 @@ class CutPlot(IPlot):
             self.manager.y_label = value
         else:
             self.plot_window.display_error("invalid latex string")
+
+    @property
+    def y_label_size(self):
+        return self.manager.y_label_size
 
     @property
     def x_range(self):
