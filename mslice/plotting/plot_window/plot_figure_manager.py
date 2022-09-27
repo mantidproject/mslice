@@ -311,6 +311,10 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window.setWindowTitle(value)
 
     @property
+    def title_size(self):
+        return self.figure.gca().title.get_size()
+
+    @property
     def x_label(self):
         return self.figure.gca().get_xlabel()
 
@@ -319,12 +323,20 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.figure.gca().set_xlabel(value)
 
     @property
+    def x_label_size(self):
+        return self.figure.gca().xaxis.label.get_size()
+
+    @property
     def y_label(self):
         return self.figure.gca().get_ylabel()
 
     @y_label.setter
     def y_label(self, value):
         self.figure.gca().set_ylabel(value)
+
+    @property
+    def y_label_size(self):
+        return self.figure.gca().yaxis.label.get_size()
 
     @property
     def x_range(self):

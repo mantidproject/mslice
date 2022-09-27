@@ -217,13 +217,13 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
 
 def add_plot_options(script_lines, plot_handler):
     """Adds lines that change the plot options if they were modified"""
-    script_lines.append("ax.set_title('{}')\n".format(plot_handler.title))
+    script_lines.append(f"ax.set_title('{plot_handler.title}', fontsize={plot_handler.title_size})\n")
 
-    if plot_handler.is_changed("y_label"):
-        script_lines.append("ax.set_ylabel(r'{}')\n".format(plot_handler.y_label))
+    if plot_handler.is_changed("y_label") or plot_handler.is_changed("y_label_size"):
+        script_lines.append(f"ax.set_ylabel(r'{plot_handler.y_label}', fontsize={plot_handler.y_label_size})\n")
 
-    if plot_handler.is_changed("x_label"):
-        script_lines.append("ax.set_xlabel(r'{}')\n".format(plot_handler.x_label))
+    if plot_handler.is_changed("x_label") or plot_handler.is_changed("x_label_size"):
+        script_lines.append(f"ax.set_xlabel(r'{plot_handler.x_label}', fontsize={plot_handler.x_label_size})\n")
 
     if plot_handler.is_changed("y_grid"):
         script_lines.append("ax.grid({}, axis='y')\n".format(plot_handler.y_grid))
