@@ -16,6 +16,7 @@ from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_ax
                                         _check_workspace_type, is_slice, _correct_intensity)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
+from mslice.util.intensity_correction import IntensityType
 from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MSliceWorkspace
@@ -167,8 +168,8 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     return get_slice_plotter_presenter().create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
 
 
-def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin', IntensityCorrection=False,
-        SampleTemperature=None):
+def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin',
+        IntensityCorrection='scattering_function', SampleTemperature=None):
     """
     Cuts workspace.
     :param InputWorkspace: Workspace to cut. The parameter can be either a python
@@ -185,8 +186,9 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
             Recognised energy units are 'meV' (default) and 'cm-1'
     :param NormToOne: if True the cut will be normalized to one.
     :param Algorithm: the cut algorithm to use. Either 'Rebin' (default) or 'Integration'
-    :param IntensityCorrection: the intensity correction algorithm to use. Either False (Default, no correction),
-           'dynamical_susceptibility', 'dynamical_susceptibility_magnetic', 'd2sigma', or 'symmetrised'.
+    :param IntensityCorrection: the intensity correction algorithm to use. Either 'scattering_function'
+            (Default, no correction), 'dynamical_susceptibility', 'dynamical_susceptibility_magnetic', 'd2sigma', or
+            'symmetrised'.
     :param SampleTemperature: if a temperature dependant intensity correction is input, a SampleTemperature in Kelvin
            must be provided.
     :return:
