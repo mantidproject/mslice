@@ -357,3 +357,4 @@ class CutPlotterPresenter(PresenterUtility):
                                     self.show_dynamical_susceptibility_magnetic)
         IntensityCache.cache_method(cat, IntensityType.D2_SIGMA, self.show_d2sigma)
         IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised)
+        IntensityCache.cache_method(cat, IntensityType.GDOS, self.show_gdos)
