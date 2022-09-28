@@ -86,7 +86,10 @@ def add_slice_plot_statements(script_lines, plot_handler):
         script_lines.append("mesh.set_norm(colors.LogNorm({}, {}))\n".format(min, maximum))
 
     script_lines.append("cb = plt.colorbar(mesh, ax=ax)\n")
-    script_lines.append("cb.set_label('{}', labelpad=20, rotation=270, picker=5)\n".format(plot_handler.colorbar_label))
+    script_lines.append(f"cb.set_label('{plot_handler.colorbar_label}', labelpad=20, rotation=270, picker=5, "
+                        f"fontsize={plot_handler.colorbar_label_size})\n")
+    if plot_handler.is_changed("colorbar_range_font_size"):
+        script_lines.append(f"cb.ax.yaxis.set_tick_params(labelsize={plot_handler.colorbar_range_font_size})\n")
     add_plot_options(script_lines, plot_handler)
 
 
@@ -217,13 +220,13 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
 
 def add_plot_options(script_lines, plot_handler):
     """Adds lines that change the plot options if they were modified"""
-    script_lines.append("ax.set_title('{}')\n".format(plot_handler.title))
+    script_lines.append(f"ax.set_title('{plot_handler.title}', fontsize={plot_handler.title_size})\n")
 
-    if plot_handler.is_changed("y_label"):
-        script_lines.append("ax.set_ylabel(r'{}')\n".format(plot_handler.y_label))
+    if plot_handler.is_changed("y_label") or plot_handler.is_changed("y_label_size"):
+        script_lines.append(f"ax.set_ylabel(r'{plot_handler.y_label}', fontsize={plot_handler.y_label_size})\n")
 
-    if plot_handler.is_changed("x_label"):
-        script_lines.append("ax.set_xlabel(r'{}')\n".format(plot_handler.x_label))
+    if plot_handler.is_changed("x_label") or plot_handler.is_changed("x_label_size"):
+        script_lines.append(f"ax.set_xlabel(r'{plot_handler.x_label}', fontsize={plot_handler.x_label_size})\n")
 
     if plot_handler.is_changed("y_grid"):
         script_lines.append("ax.grid({}, axis='y')\n".format(plot_handler.y_grid))
@@ -236,6 +239,12 @@ def add_plot_options(script_lines, plot_handler):
 
     if plot_handler.is_changed("x_range"):
         script_lines.append("ax.set_xlim(left={}, right={})\n".format(*plot_handler.x_range))
+
+    if plot_handler.is_changed("y_range_font_size"):
+        script_lines.append(f"ax.yaxis.set_tick_params(labelsize={plot_handler.y_range_font_size})\n")
+
+    if plot_handler.is_changed("x_range_font_size"):
+        script_lines.append(f"ax.xaxis.set_tick_params(labelsize={plot_handler.x_range_font_size})\n")
 
     from mslice.plotting.plot_window.cut_plot import CutPlot
     if isinstance(plot_handler, CutPlot) and plot_handler.is_changed("waterfall"):

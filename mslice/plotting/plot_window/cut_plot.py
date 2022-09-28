@@ -26,6 +26,8 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.cut.cut import SampleTempValueError
 
+DEFAULT_LABEL_SIZE = 10
+DEFAULT_TITLE_SIZE = 12
 
 def get_min(data, absolute_minimum=-np.inf):
     """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
@@ -68,12 +70,17 @@ class CutPlot(IPlot):
             'x_log': False,
             'y_log': False,
             'title': self.ws_name,
+            'title_size': DEFAULT_TITLE_SIZE,
             'x_label': r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
+            'x_label_size': DEFAULT_LABEL_SIZE,
             'x_grid': False,
             'x_range': (None, None),
+            'x_range_font_size': DEFAULT_LABEL_SIZE,
             'y_label': 'Energy Transfer (meV)',
+            'y_label_size': DEFAULT_LABEL_SIZE,
             'y_grid': False,
             'y_range': (None, None),
+            'y_range_font_size': DEFAULT_LABEL_SIZE,
             'waterfall': False,
             'intensity_method': self._intensity_method,
             'temp_dependent': self._temp_dependent,
@@ -727,6 +734,10 @@ class CutPlot(IPlot):
             self.plot_window.display_error("invalid latex string")
 
     @property
+    def title_size(self):
+        return self.manager.title_size
+
+    @property
     def x_label(self):
         return self.manager.x_label
 
@@ -738,6 +749,10 @@ class CutPlot(IPlot):
             self.plot_window.display_error("invalid latex string")
 
     @property
+    def x_label_size(self):
+        return self.manager.x_label_size
+
+    @property
     def y_label(self):
         return self.manager.y_label
 
@@ -747,6 +762,10 @@ class CutPlot(IPlot):
             self.manager.y_label = value
         else:
             self.plot_window.display_error("invalid latex string")
+
+    @property
+    def y_label_size(self):
+        return self.manager.y_label_size
 
     @property
     def x_range(self):

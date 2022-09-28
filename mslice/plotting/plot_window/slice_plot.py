@@ -21,6 +21,9 @@ from mslice.plotting.pyplot import GlobalFigureManager
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 
+DEFAULT_LABEL_SIZE = 10
+DEFAULT_TITLE_SIZE = 12
+
 
 class SlicePlot(IPlot):
 
@@ -51,20 +54,27 @@ class SlicePlot(IPlot):
     def save_default_options(self):
         self.default_options = {
             'colorbar_label': self.colorbar_label,
+            'colorbar_label_size': DEFAULT_LABEL_SIZE,
             'colorbar_log': self.colorbar_log,
             'colorbar_range': self.colorbar_range,
+            'colorbar_range_font_size': DEFAULT_LABEL_SIZE,
             'intensity': self.intensity,
             'intensity_method': self.intensity_method,
             'temp': self.temp,
             'temp_dependent': self.temp_dependent,
 
             'title': self.ws_name,
+            'title_size': DEFAULT_TITLE_SIZE,
             'x_label': r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
+            'x_label_size': DEFAULT_LABEL_SIZE,
             'x_grid': False,
             'x_range': self.x_range,
+            'x_range_font_size': DEFAULT_LABEL_SIZE,
             'y_label': 'Energy Transfer (meV)',
+            'y_label_size': DEFAULT_LABEL_SIZE,
             'y_grid': False,
             'y_range': self.y_range,
+            'y_range_font_size': DEFAULT_LABEL_SIZE,
             'legend': True,
         }
 
@@ -461,6 +471,10 @@ class SlicePlot(IPlot):
         self._canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
 
     @property
+    def colorbar_label_size(self):
+        return self._canvas.figure.get_axes()[1].yaxis.label.get_size()
+
+    @property
     def colorbar_range(self):
         return self._canvas.figure.gca().collections[0].get_clim()
 
@@ -496,6 +510,10 @@ class SlicePlot(IPlot):
             self.plot_window.display_error("invalid latex string")
 
     @property
+    def title_size(self):
+        return self.manager.title_size
+
+    @property
     def x_label(self):
         return self.manager.x_label
 
@@ -507,6 +525,10 @@ class SlicePlot(IPlot):
             self.plot_window.display_error("invalid latex string")
 
     @property
+    def x_label_size(self):
+        return self.manager.x_label_size
+
+    @property
     def y_label(self):
         return self.manager.y_label
 
@@ -516,6 +538,10 @@ class SlicePlot(IPlot):
             self.manager.y_label = value
         else:
             self.plot_window.display_error("invalid latex string")
+
+    @property
+    def y_label_size(self):
+        return self.manager.y_label_size
 
     @property
     def x_range(self):

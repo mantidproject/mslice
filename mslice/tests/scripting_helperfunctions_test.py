@@ -19,23 +19,32 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
     def assign_slice_parameters(self, plot_handler, intensity=True, temp_dependent=True):
         plot_handler.colorbar_label = 'colorbar_label'
+        plot_handler.colorbar_label_size = 10
         plot_handler.colorbar_log = True
         plot_handler.colorbar_range = (0, 30)
+        plot_handler.colorbar_range_font_size = 10
         plot_handler.temp_dependent = temp_dependent
         plot_handler.temp = 30
         plot_handler.intensity = intensity
         plot_handler.intensity_method = 'show_scattering_function'
         plot_handler.y_range = (0, 10)
         plot_handler.x_range = (0, 10)
+        plot_handler.x_range_font_size = 10
+        plot_handler.y_range_font_size = 10
 
     def assign_cut_parameters(self, plot_handler):
         plot_handler.title = 'Title'
+        plot_handler.title_size = 12
         plot_handler.y_label = 'y_label'
+        plot_handler.y_label_size = 10
         plot_handler.x_label = 'x_label'
+        plot_handler.x_label_size = 10
         plot_handler.y_grid = 'y_grid'
         plot_handler.x_grid = 'x_grid'
         plot_handler.y_range = (1, 10)
         plot_handler.x_range = (1, 10)
+        plot_handler.x_range_font_size = 10
+        plot_handler.y_range_font_size = 10
 
     def test_that_header_works_as_expected_for_cuts(self):
         plot_handler = mock.MagicMock(spec=CutPlot)
@@ -126,7 +135,9 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         self.assertIn('mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}", temperature={})\n'.format(
             cache[plot_handler.ws_name].colourmap, intensity, plot_handler.temp), script_lines)
         self.assertIn("cb = plt.colorbar(mesh, ax=ax)\n", script_lines)
-        self.assertIn("cb.set_label('{}', labelpad=20, rotation=270, picker=5)\n".format(plot_handler.colorbar_label),
+        self.assertIn("cb.set_label('{}', labelpad=20, rotation=270, picker=5, fontsize={})\n".format(
+            plot_handler.colorbar_label, plot_handler.colorbar_label_size), script_lines)
+        self.assertIn("cb.ax.yaxis.set_tick_params(labelsize={})\n".format(plot_handler.colorbar_range_font_size),
                       script_lines)
         self.assertIn("mesh.set_norm(colors.LogNorm({}, {}))\n".format(0.001, 30), script_lines)
         add_plot.assert_called_once_with(script_lines, plot_handler)
@@ -252,13 +263,18 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         add_plot_options(script_lines, plot_handler)
 
-        self.assertIn("ax.set_title('{}')\n".format(plot_handler.title), script_lines)
-        self.assertIn("ax.set_ylabel(r'{}')\n".format(plot_handler.y_label), script_lines)
-        self.assertIn("ax.set_xlabel(r'{}')\n".format(plot_handler.x_label), script_lines)
+        self.assertIn("ax.set_title('{}', fontsize={})\n".format(plot_handler.title, plot_handler.title_size),
+                      script_lines)
+        self.assertIn("ax.set_ylabel(r'{}', fontsize={})\n".format(plot_handler.y_label, plot_handler.y_label_size),
+                      script_lines)
+        self.assertIn("ax.set_xlabel(r'{}', fontsize={})\n".format(plot_handler.x_label, plot_handler.x_label_size),
+                      script_lines)
         self.assertIn("ax.grid({}, axis='y')\n".format(plot_handler.y_grid), script_lines)
         self.assertIn("ax.grid({}, axis='x')\n".format(plot_handler.x_grid), script_lines)
         self.assertIn("ax.set_ylim(bottom={}, top={})\n".format(*plot_handler.y_range), script_lines)
         self.assertIn("ax.set_xlim(left={}, right={})\n".format(*plot_handler.x_range), script_lines)
+        self.assertIn("ax.yaxis.set_tick_params(labelsize={})\n".format(plot_handler.y_range_font_size), script_lines)
+        self.assertIn("ax.xaxis.set_tick_params(labelsize={})\n".format(plot_handler.x_range_font_size), script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_plot_options_works_as_expected_when_plots_options_are_not_changed(self, gfm):
@@ -270,7 +286,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         add_plot_options(script_lines, plot_handler)
 
-        self.assertIn("ax.set_title('{}')\n".format(plot_handler.title), script_lines)
+        self.assertIn("ax.set_title('{}', fontsize={})\n".format(plot_handler.title, plot_handler.title_size),
+                      script_lines)
 
     def test_that_add_cut_lines_with_width_works_as_expected_without_intensity_range(self):
         x_data, y_data = np.arange(0, 10), np.arange(0, 10)
