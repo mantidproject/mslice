@@ -304,7 +304,10 @@ class CutPlotterPresenterTest(unittest.TestCase):
     def test_methods_cached(self):
         enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
                  IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        for e in enums:
+            IntensityCache.remove_from_cache(CATEGORY_CUT, e)
+        presenter = CutPlotterPresenter()
         methods = [IntensityCache.get_method(CATEGORY_CUT, e) for e in enums]
         for method in methods:
             method_name = method.__name__
-            self.assertEqual(getattr(self.cut_plotter_presenter, method_name), method)
+            self.assertEqual(getattr(presenter, method_name), method)
