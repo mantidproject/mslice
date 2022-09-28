@@ -22,6 +22,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         plot_handler.colorbar_label_size = 10
         plot_handler.colorbar_log = True
         plot_handler.colorbar_range = (0, 30)
+        plot_handler.colorbar_range_font_size = 10
         plot_handler.temp_dependent = temp_dependent
         plot_handler.temp = 30
         plot_handler.intensity = intensity
@@ -136,6 +137,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         self.assertIn("cb = plt.colorbar(mesh, ax=ax)\n", script_lines)
         self.assertIn("cb.set_label('{}', labelpad=20, rotation=270, picker=5, fontsize={})\n".format(
             plot_handler.colorbar_label, plot_handler.colorbar_label_size), script_lines)
+        self.assertIn("cb.ax.yaxis.set_tick_params(labelsize={})\n".format(plot_handler.colorbar_range_font_size),
+                      script_lines)
         self.assertIn("mesh.set_norm(colors.LogNorm({}, {}))\n".format(0.001, 30), script_lines)
         add_plot.assert_called_once_with(script_lines, plot_handler)
 
@@ -270,8 +273,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         self.assertIn("ax.grid({}, axis='x')\n".format(plot_handler.x_grid), script_lines)
         self.assertIn("ax.set_ylim(bottom={}, top={})\n".format(*plot_handler.y_range), script_lines)
         self.assertIn("ax.set_xlim(left={}, right={})\n".format(*plot_handler.x_range), script_lines)
-        self.assertIn("ax.yaxis.set_tick_params(labelsize={})\n".format(*plot_handler.y_range_font_size), script_lines)
-        self.assertIn("ax.xaxis.set_tick_params(labelsize={})\n".format(*plot_handler.x_range_font_size), script_lines)
+        self.assertIn("ax.yaxis.set_tick_params(labelsize={})\n".format(plot_handler.y_range_font_size), script_lines)
+        self.assertIn("ax.xaxis.set_tick_params(labelsize={})\n".format(plot_handler.x_range_font_size), script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_plot_options_works_as_expected_when_plots_options_are_not_changed(self, gfm):

@@ -57,6 +57,7 @@ class SlicePlot(IPlot):
             'colorbar_label_size': DEFAULT_LABEL_SIZE,
             'colorbar_log': self.colorbar_log,
             'colorbar_range': self.colorbar_range,
+            'colorbar_range_font_size': DEFAULT_LABEL_SIZE,
             'intensity': self.intensity,
             'intensity_method': self.intensity_method,
             'temp': self.temp,

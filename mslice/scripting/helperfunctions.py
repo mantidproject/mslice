@@ -88,6 +88,8 @@ def add_slice_plot_statements(script_lines, plot_handler):
     script_lines.append("cb = plt.colorbar(mesh, ax=ax)\n")
     script_lines.append(f"cb.set_label('{plot_handler.colorbar_label}', labelpad=20, rotation=270, picker=5, "
                         f"fontsize={plot_handler.colorbar_label_size})\n")
+    if plot_handler.is_changed("colorbar_range_font_size"):
+        script_lines.append(f"cb.ax.yaxis.set_tick_params(labelsize={plot_handler.colorbar_range_font_size})\n")
     add_plot_options(script_lines, plot_handler)
 
 
