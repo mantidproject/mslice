@@ -86,6 +86,8 @@ class IntensityCache:
             return IntensityType.D2_SIGMA
         elif description == "symmetrised":
             return IntensityType.SYMMETRISED
+        elif description == "gdos":
+            return IntensityType.GDOS
         else:
             raise ValueError(f"Input intensity type invalid: {description}")
 
@@ -101,6 +103,8 @@ class IntensityCache:
             return "d2sigma"
         elif intensity_type == IntensityType.SYMMETRISED:
             return "symmetrised"
+        elif intensity_type == IntensityType.GDOS:
+            return "gdos"
         else:
             raise ValueError(f"Input intensity type invalid: {intensity_type}")
 

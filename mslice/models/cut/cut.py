@@ -191,7 +191,7 @@ class Cut(object):
             self._gdos = cut_compute_gdos(self._cut_ws, self.sample_temp, self.q_axis, self.e_axis, self.rotated,
                                           self.norm_to_one, self.algorithm)
             self._gdos.intensity_corrected = True
-            self._corrected_intensity_range_cache["gdos"] = self._get_intensity_range_from_ws(self._gdos)
+            self._corrected_intensity_range_cache[IntensityType.GDOS] = self._get_intensity_range_from_ws(self._gdos)
         return self._gdos
 
     def get_intensity_corrected_ws(self, intensity_correction_type):
@@ -205,7 +205,7 @@ class Cut(object):
             return self.d2sigma
         elif intensity_correction_type == IntensityType.SYMMETRISED:
             return self.symmetrised
-        elif intensity_correction_type == "gdos":
+        elif intensity_correction_type == IntensityType.GDOS:
             return self.gdos
 
     @property

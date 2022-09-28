@@ -269,7 +269,7 @@ class CutPlotterPresenter(PresenterUtility):
         self._show_intensity(self._cut_cache_dict[axes], IntensityType.SYMMETRISED)
 
     def show_gdos(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], "gdos")
+        self._show_intensity(self._cut_cache_dict[axes], IntensityType.GDOS)
 
     def set_sample_temperature(self, axes, ws_name, temp):
         cut_dict = {}
