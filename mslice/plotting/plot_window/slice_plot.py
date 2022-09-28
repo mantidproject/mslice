@@ -68,10 +68,12 @@ class SlicePlot(IPlot):
             'x_label_size': DEFAULT_LABEL_SIZE,
             'x_grid': False,
             'x_range': self.x_range,
+            'x_range_font_size': DEFAULT_LABEL_SIZE,
             'y_label': 'Energy Transfer (meV)',
             'y_label_size': DEFAULT_LABEL_SIZE,
             'y_grid': False,
             'y_range': self.y_range,
+            'y_range_font_size': DEFAULT_LABEL_SIZE,
             'legend': True,
         }
 

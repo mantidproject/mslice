@@ -238,6 +238,12 @@ def add_plot_options(script_lines, plot_handler):
     if plot_handler.is_changed("x_range"):
         script_lines.append("ax.set_xlim(left={}, right={})\n".format(*plot_handler.x_range))
 
+    if plot_handler.is_changed("y_range_font_size"):
+        script_lines.append(f"ax.yaxis.set_tick_params(labelsize={plot_handler.y_range_font_size})\n")
+
+    if plot_handler.is_changed("x_range_font_size"):
+        script_lines.append(f"ax.xaxis.set_tick_params(labelsize={plot_handler.x_range_font_size})\n")
+
     from mslice.plotting.plot_window.cut_plot import CutPlot
     if isinstance(plot_handler, CutPlot) and plot_handler.is_changed("waterfall"):
         script_lines.append("ax.set_waterfall({}, x_offset={}, y_offset={})\n".format(plot_handler.waterfall,
