@@ -7,8 +7,7 @@ from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
-                                                     compute_symmetrised)
-from mslice.models.labels import is_momentum, is_twotheta
+                                                     compute_symmetrised, cut_compute_gdos)
 from mslice.models.cut.cut import SampleTempValueError
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.util.intensity_correction import IntensityType, IntensityCache
@@ -187,11 +186,11 @@ def hide_a_line_and_errorbars(ax, idx: int):
     return None
 
 
-def _correct_intensity(scattering_data, intensity_correction, e_axis, sample_temp=None):
+def _correct_intensity(scattering_data, intensity_correction, e_axis, q_axis, NormToOne, Algorithm, rotated, sample_temp):
     try:
         intensity_correction = IntensityCache.get_intensity_type_from_desc(intensity_correction)
     except ValueError:
-        pass
+        raise ValueError(f"Input intensity correction invalid: {intensity_correction}")
 
     if intensity_correction == IntensityType.SCATTERING_FUNCTION:
         return scattering_data
@@ -205,11 +204,10 @@ def _correct_intensity(scattering_data, intensity_correction, e_axis, sample_tem
         return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
     elif intensity_correction == IntensityType.SYMMETRISED:
         _check_sample_temperature(sample_temp, scattering_data.name)
-        rotated = not is_twotheta(scattering_data.cut_axis.units) and not is_momentum(scattering_data.cut_axis.units)
         return compute_symmetrised(scattering_data, sample_temp, e_axis, rotated)
-    else:
-        raise ValueError(f"Input intensity correction invalid: {intensity_correction}")
-
+    elif intensity_correction == "gdos":
+        _check_sample_temperature(sample_temp, scattering_data.name)
+        return cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, NormToOne, Algorithm)
 
 
 def _check_sample_temperature(sample_temperature, workspace_name):

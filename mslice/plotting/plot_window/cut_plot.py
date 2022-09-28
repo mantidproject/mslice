@@ -132,10 +132,15 @@ class CutPlot(IPlot):
         IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.D2_SIGMA,
                                     plot_window.action_d2sig_dw_de)
 
-        plot_window.action_symmetrised_sqe.triggered.connect(
-            partial(self.show_intensity_plot, IntensityType.SYMMETRISED, True))
+        plot_window.action_symmetrised_sqe.triggered.connect(partial(self.show_intensity_plot, IntensityType.SYMMETRISED, True))
         IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.SYMMETRISED,
                                     plot_window.action_symmetrised_sqe)
+
+        plot_window.action_gdos.triggered.connect(partial(self.show_intensity_plot, plot_window.action_gdos,
+                                                          self._cut_plotter_presenter.show_gdos, True))
+        IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.GDOS,
+                                    plot_window.action_gdos)
+
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()

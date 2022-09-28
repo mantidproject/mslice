@@ -1,5 +1,5 @@
 from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
-                                                     compute_symmetrised)
+                                                     compute_symmetrised, cut_compute_gdos)
 from mslice.models.labels import is_momentum, is_twotheta
 from mslice.util.intensity_correction import IntensityType
 
@@ -34,6 +34,7 @@ class Cut(object):
         self._chi_magnetic = None
         self._d2sigma = None
         self._symmetrised = None
+        self._gdos = None
 
     @property
     def cut_ws(self):
@@ -184,6 +185,15 @@ class Cut(object):
                 self._get_intensity_range_from_ws(self._symmetrised)
         return self._symmetrised
 
+    @property
+    def gdos(self):
+        if self._gdos is None:
+            self._gdos = cut_compute_gdos(self._cut_ws, self.sample_temp, self.q_axis, self.e_axis, self.rotated,
+                                          self.norm_to_one, self.algorithm)
+            self._gdos.intensity_corrected = True
+            self._corrected_intensity_range_cache["gdos"] = self._get_intensity_range_from_ws(self._gdos)
+        return self._gdos
+
     def get_intensity_corrected_ws(self, intensity_correction_type):
         if intensity_correction_type == IntensityType.SCATTERING_FUNCTION:
             return self._cut_ws
@@ -195,6 +205,8 @@ class Cut(object):
             return self.d2sigma
         elif intensity_correction_type == IntensityType.SYMMETRISED:
             return self.symmetrised
+        elif intensity_correction_type == "gdos":
+            return self.gdos
 
     @property
     def e_axis(self):

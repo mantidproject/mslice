@@ -68,5 +68,5 @@ class Slice:
     @property
     def gdos(self):
         if self._gdos is None:
-            self._gdos = slice_compute_gdos(self.scattering_function, self.sample_temp, self.momentum_axis, self.energy_axis)
+            self._gdos = slice_compute_gdos(self.scattering_function, self.sample_temp, self.momentum_axis, self.energy_axis, self.rotated)
         return self._gdos

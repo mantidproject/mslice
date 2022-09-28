@@ -147,7 +147,7 @@ class CLIProjectionTest(unittest.TestCase):
         ax = fig.add_subplot(111, projection='mslice')
         with mock.patch('mslice.cli._mslice_commands.GlobalFigureManager.get_active_figure') as gaf:
             gaf.return_value = active_figure
-            ax.set_waterfall(True, x_offset=1, y_offset=2)
+            ax.set_waterfall(True, 1, 2)
 
         self.assertEqual(active_figure.plot_handler.waterfall, True)
         self.assertEqual(active_figure.plot_handler.waterfall_x, 1)
