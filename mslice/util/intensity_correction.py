@@ -61,18 +61,20 @@ class IntensityCache:
         action.trigger()
 
     @classmethod
-    def cache_method(cls, category, intensity_correction_type, method):
+    def cache_method(cls, category, presenter, intensity_correction_type, method):
         method_dict = cls._return_category_dict(category, METHOD)
-        if intensity_correction_type not in method_dict:
-            method_dict[intensity_correction_type] = method
+        if presenter not in method_dict:
+            method_dict[presenter] = {intensity_correction_type: method}
+        else:
+            method_dict[presenter][intensity_correction_type] = method
 
     @classmethod
-    def get_method(cls, category, intensity_correction_type):
+    def get_method(cls, category, presenter, intensity_correction_type):
         method_dict = cls._return_category_dict(category, METHOD)
-        if intensity_correction_type in method_dict:
-            return method_dict[intensity_correction_type]
+        if presenter in method_dict and intensity_correction_type in method_dict[presenter]:
+            return method_dict[presenter][intensity_correction_type]
         else:
-            raise KeyError("method related to the specified intensity correction type not found")
+            raise KeyError("method related to the specified presenter and intensity correction type not found")
 
     @classmethod
     def get_intensity_type_from_desc(cls, description):

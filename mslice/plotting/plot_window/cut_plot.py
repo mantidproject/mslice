@@ -599,7 +599,7 @@ class CutPlot(IPlot):
         ax = self._canvas.figure.axes[0]
         self.set_intensity_from_action(IntensityCache.get_action(CATEGORY_CUT, ax, intensity_type))
 
-        method = IntensityCache.get_method(CATEGORY_CUT, intensity_type)
+        method = IntensityCache.get_method(CATEGORY_CUT, self._cut_plotter_presenter, intensity_type)
         if temp_dependent:
             if not self._run_temp_dependent(method, previous_type):
                 return

@@ -48,9 +48,10 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
     def test_cache_method(self):
         category = CATEGORY_SLICE
         intensity_correction_type = IntensityType.CHI_MAGNETIC
+        presenter = MagicMock
         method = MagicMock
-        IntensityCache.cache_method(category, intensity_correction_type, method)
-        returned_method = IntensityCache.get_method(category, intensity_correction_type)
+        IntensityCache.cache_method(category, presenter, intensity_correction_type, method)
+        returned_method = IntensityCache.get_method(category, presenter, intensity_correction_type)
         self.assertEqual(method, returned_method)
 
     @staticmethod
