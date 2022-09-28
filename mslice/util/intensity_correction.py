@@ -7,7 +7,7 @@ class IntensityType(Enum):
     SCATTERING_FUNCTION = 1
     CHI = 2
     CHI_MAGNETIC = 3
-    D2_SIGMA = 4
+    D2SIGMA = 4
     SYMMETRISED = 5
     GDOS = 6
 
@@ -83,7 +83,7 @@ class IntensityCache:
         elif description == "dynamical_susceptibility_magnetic":
             return IntensityType.CHI_MAGNETIC
         elif description == "d2sigma":
-            return IntensityType.D2_SIGMA
+            return IntensityType.D2SIGMA
         elif description == "symmetrised":
             return IntensityType.SYMMETRISED
         elif description == "gdos":
@@ -99,7 +99,7 @@ class IntensityCache:
             return "dynamical_susceptibility"
         elif intensity_type == IntensityType.CHI_MAGNETIC:
             return "dynamical_susceptibility_magnetic"
-        elif intensity_type == IntensityType.D2_SIGMA:
+        elif intensity_type == IntensityType.D2SIGMA:
             return "d2sigma"
         elif intensity_type == IntensityType.SYMMETRISED:
             return "symmetrised"

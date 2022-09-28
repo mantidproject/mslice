@@ -173,7 +173,7 @@ class Cut(object):
         if self._d2sigma is None:
             self._d2sigma = compute_d2sigma(self._cut_ws, self.e_axis, self._e_fixed)
             self._d2sigma.intensity_corrected = True
-            self._corrected_intensity_range_cache[IntensityType.D2_SIGMA] = self._get_intensity_range_from_ws(self._d2sigma)
+            self._corrected_intensity_range_cache[IntensityType.D2SIGMA] = self._get_intensity_range_from_ws(self._d2sigma)
         return self._d2sigma
 
     @property
@@ -201,7 +201,7 @@ class Cut(object):
             return self.chi
         elif intensity_correction_type == IntensityType.CHI_MAGNETIC:
             return self.chi_magnetic
-        elif intensity_correction_type == IntensityType.D2_SIGMA:
+        elif intensity_correction_type == IntensityType.D2SIGMA:
             return self.d2sigma
         elif intensity_correction_type == IntensityType.SYMMETRISED:
             return self.symmetrised

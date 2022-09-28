@@ -109,7 +109,7 @@ class SlicePlot(IPlot):
         plot_window.action_d2sig_dw_de.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
                     self._slice_plotter_presenter.show_d2sigma, False))
-        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.D2_SIGMA,
+        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.D2SIGMA,
                                     plot_window.action_d2sig_dw_de)
 
         plot_window.action_symmetrised_sqe.triggered.connect(

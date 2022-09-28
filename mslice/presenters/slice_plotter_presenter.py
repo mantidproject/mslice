@@ -131,5 +131,5 @@ class SlicePlotterPresenter(PresenterUtility):
         IntensityCache.cache_method(cat, IntensityType.CHI, self.show_dynamical_susceptibility)
         IntensityCache.cache_method(cat, IntensityType.CHI_MAGNETIC,
                                     self.show_dynamical_susceptibility_magnetic)
-        IntensityCache.cache_method(cat, IntensityType.D2_SIGMA, self.show_d2sigma)
+        IntensityCache.cache_method(cat, IntensityType.D2SIGMA, self.show_d2sigma)
         IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised)

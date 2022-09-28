@@ -128,8 +128,8 @@ class CutPlot(IPlot):
         IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.CHI_MAGNETIC,
                                     plot_window.action_chi_qe_magnetic)
 
-        plot_window.action_d2sig_dw_de.triggered.connect(partial(self.show_intensity_plot, IntensityType.D2_SIGMA, False))
-        IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.D2_SIGMA,
+        plot_window.action_d2sig_dw_de.triggered.connect(partial(self.show_intensity_plot, IntensityType.D2SIGMA, False))
+        IntensityCache.cache_action(CATEGORY_CUT, self._canvas.figure.axes[0], IntensityType.D2SIGMA,
                                     plot_window.action_d2sig_dw_de)
 
         plot_window.action_symmetrised_sqe.triggered.connect(partial(self.show_intensity_plot, IntensityType.SYMMETRISED, True))

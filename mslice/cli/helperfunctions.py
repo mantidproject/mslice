@@ -200,7 +200,7 @@ def _correct_intensity(scattering_data, intensity_correction, e_axis, q_axis, No
     elif intensity_correction == IntensityType.CHI_MAGNETIC:
         _check_sample_temperature(sample_temp, scattering_data.name)
         return compute_chi(scattering_data, sample_temp, e_axis, True)
-    elif intensity_correction == IntensityType.D2_SIGMA:
+    elif intensity_correction == IntensityType.D2SIGMA:
         return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
     elif intensity_correction == IntensityType.SYMMETRISED:
         _check_sample_temperature(sample_temp, scattering_data.name)

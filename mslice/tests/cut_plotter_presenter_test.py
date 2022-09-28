@@ -92,7 +92,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
         compute_d2sigma_mock.return_value = mock_intensity_ws
         compute_symmetrised_mock.return_value = mock_intensity_ws
         self.main_presenter.is_energy_conversion_allowed.return_value = False
-        intensity_correction_types = [IntensityType.CHI, IntensityType.CHI_MAGNETIC, IntensityType.D2_SIGMA,
+        intensity_correction_types = [IntensityType.CHI, IntensityType.CHI_MAGNETIC, IntensityType.D2SIGMA,
                                       IntensityType.SYMMETRISED]
 
         for intensity in intensity_correction_types:

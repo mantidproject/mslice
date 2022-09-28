@@ -263,7 +263,7 @@ class CutPlotterPresenter(PresenterUtility):
         self._show_intensity(self._cut_cache_dict[axes], IntensityType.CHI_MAGNETIC)
 
     def show_d2sigma(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], IntensityType.D2_SIGMA)
+        self._show_intensity(self._cut_cache_dict[axes], IntensityType.D2SIGMA)
 
     def show_symmetrised(self, axes):
         self._show_intensity(self._cut_cache_dict[axes], IntensityType.SYMMETRISED)
@@ -355,6 +355,6 @@ class CutPlotterPresenter(PresenterUtility):
         IntensityCache.cache_method(cat, IntensityType.CHI, self.show_dynamical_susceptibility)
         IntensityCache.cache_method(cat, IntensityType.CHI_MAGNETIC,
                                     self.show_dynamical_susceptibility_magnetic)
-        IntensityCache.cache_method(cat, IntensityType.D2_SIGMA, self.show_d2sigma)
+        IntensityCache.cache_method(cat, IntensityType.D2SIGMA, self.show_d2sigma)
         IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised)
         IntensityCache.cache_method(cat, IntensityType.GDOS, self.show_gdos)
