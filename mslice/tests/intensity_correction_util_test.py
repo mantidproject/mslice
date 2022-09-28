@@ -1,12 +1,13 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mock import patch, MagicMock
+from mock import MagicMock
 import unittest
 
 from mslice.util.intensity_correction import IntensityCache, IntensityType
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.models.slice.slice import Slice
+from mslice.plotting.pyplot import CATEGORY_SLICE, CATEGORY_CUT
 
 
 class IntensityCorrectionUtilTest(unittest.TestCase):
@@ -30,6 +31,27 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
             if e is not IntensityType.SCATTERING_FUNCTION:
                 self.assertTrue(slice_attrs.count(e.name.lower()))
                 self.assertTrue(cut_attrs.count(e.name.lower()))
+
+    def test_cache_action(self):
+        category = CATEGORY_CUT
+        ax = MagicMock
+        intensity_correction_type = IntensityType.SCATTERING_FUNCTION
+        action = MagicMock
+        IntensityCache.cache_action(category, ax, intensity_correction_type, action)
+        returned_action = IntensityCache.get_action(category, ax, intensity_correction_type)
+        self.assertEqual(action, returned_action)
+        action2 = MagicMock
+        IntensityCache.cache_action(category, ax, intensity_correction_type, action2)
+        returned_action2 = IntensityCache.get_action(category, ax, intensity_correction_type)
+        self.assertEqual(action2, returned_action2)
+
+    def test_cache_method(self):
+        category = CATEGORY_SLICE
+        intensity_correction_type = IntensityType.CHI_MAGNETIC
+        method = MagicMock
+        IntensityCache.cache_method(category, intensity_correction_type, method)
+        returned_method = IntensityCache.get_method(category, intensity_correction_type)
+        self.assertEqual(method, returned_method)
 
     @staticmethod
     def _create_slice(workspace=None, colourmap=None, norm=None, sample_temp=None,

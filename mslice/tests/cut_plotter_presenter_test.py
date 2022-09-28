@@ -4,7 +4,8 @@ from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
-from mslice.util.intensity_correction import IntensityType
+from mslice.util.intensity_correction import IntensityType, IntensityCache
+from mslice.plotting.pyplot import CATEGORY_CUT
 import mslice.plotting.globalfiguremanager as gfm
 
 
@@ -299,3 +300,11 @@ class CutPlotterPresenterTest(unittest.TestCase):
         cut_2_call = mock.call(cut_2._cut_ws, cut_2, plot_over=True, intensity_correction='dynamical_susceptibility')
         cut_3_call = mock.call(cut_3._cut_ws, cut_3, plot_over=True, intensity_correction='dynamical_susceptibility')
         mock_plot_cut.assert_has_calls([cut_1_call, cut_2_call, cut_3_call])
+
+    def test_methods_cached(self):
+        enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
+                 IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        methods = [IntensityCache.get_method(CATEGORY_CUT, e) for e in enums]
+        for method in methods:
+            method_name = method.__name__
+            self.assertEqual(getattr(self.cut_plotter_presenter, method_name), method)

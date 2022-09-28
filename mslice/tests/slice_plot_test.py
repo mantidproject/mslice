@@ -7,7 +7,8 @@ from matplotlib.lines import Line2D
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line
-from mslice.util.intensity_correction import IntensityType
+from mslice.plotting.pyplot import CATEGORY_SLICE
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 
 class SlicePlotTest(unittest.TestCase):
@@ -15,11 +16,12 @@ class SlicePlotTest(unittest.TestCase):
     def setUp(self):
         self.plot_figure = MagicMock()
         self.plot_figure.window = MagicMock()
+        self.axes = MagicMock()
         canvas = MagicMock()
+        canvas.figure.gca = MagicMock(return_value=self.axes)
         self.plot_figure.window.canvas = canvas
         self.slice_plotter = MagicMock()
-        self.axes = MagicMock()
-        canvas.figure.gca = MagicMock(return_value=self.axes)
+
         self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
         self.slice_plot.manager.report_as_current_and_return_previous_status.return_value = (None, False)
         self.line = [Line2D([], [])]
@@ -116,6 +118,17 @@ class SlicePlotTest(unittest.TestCase):
 
             self.slice_plot.update_legend()
             mock_add_legend.assert_called_with(self.line, ['some_label'], fontsize=ANY, loc='upper right')
+
+    def test_actions_cached(self):
+        ax = self.axes
+        enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
+                 IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        actions = [IntensityCache.get_action(CATEGORY_SLICE, ax, e) for e in enums]
+        for action in actions:
+            mock_name = action._extract_mock_name()
+            action_name = mock_name.replace("mock.window.", "")
+            self.assertEqual(action, getattr(self.slice_plot.plot_window, action_name))
+
 
 if __name__ == '__main__':
     unittest.main()

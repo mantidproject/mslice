@@ -6,6 +6,8 @@ import unittest
 from matplotlib.lines import Line2D
 from matplotlib import __version__ as mpl_version
 from mslice.plotting.plot_window.cut_plot import CutPlot, get_min
+from mslice.plotting.pyplot import CATEGORY_CUT
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 
 class CutPlotTest(unittest.TestCase):
@@ -110,3 +112,13 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.toggle_waterfall()
         self.cut_plot._apply_offset.assert_called_with(0, 0)
         self.cut_plot.update_bragg_peaks.assert_called_with(refresh=True)
+
+    def test_actions_cached(self):
+        ax = self.cut_plot._canvas.figure.axes[0]
+        enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
+                 IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        actions = [IntensityCache.get_action(CATEGORY_CUT, ax, e) for e in enums]
+        for action in actions:
+            mock_name = action._extract_mock_name()
+            action_name = mock_name.replace("mock.window.", "")
+            self.assertEqual(action, getattr(self.cut_plot.plot_window, action_name))
