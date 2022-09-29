@@ -17,7 +17,7 @@ from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 from mslice.plotting.plot_window.overplot_interface import _update_overplot_lines, _update_powder_lines,\
     toggle_overplot_line, cif_file_powder_line
-from mslice.plotting.pyplot import GlobalFigureManager, CATEGORY_SLICE
+from mslice.plotting.pyplot import GlobalFigureManager
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
 from mslice.util.intensity_correction import IntensityType, IntensityCache
@@ -88,40 +88,20 @@ class SlicePlot(IPlot):
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
         plot_window.action_waterfall.setVisible(False)
 
-        plot_window.action_sqe.triggered.connect(
-            partial(self.show_intensity_plot, plot_window.action_sqe,
-                    self._slice_plotter_presenter.show_scattering_function, False))
-        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.SCATTERING_FUNCTION,
-                                    plot_window.action_sqe)
-
-        plot_window.action_chi_qe.triggered.connect(
-            partial(self.show_intensity_plot, plot_window.action_chi_qe,
-                    self._slice_plotter_presenter.show_dynamical_susceptibility, True))
-        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.CHI,
-                                    plot_window.action_chi_qe)
-
+        plot_window.action_sqe.triggered.connect(partial(self.show_intensity_plot, plot_window.action_sqe,
+                                                 self._slice_plotter_presenter.show_scattering_function, False))
+        plot_window.action_chi_qe.triggered.connect(partial(self.show_intensity_plot, plot_window.action_chi_qe,
+                                                    self._slice_plotter_presenter.show_dynamical_susceptibility, True))
         plot_window.action_chi_qe_magnetic.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_chi_qe_magnetic,
                     self._slice_plotter_presenter.show_dynamical_susceptibility_magnetic, True))
-        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.CHI_MAGNETIC,
-                                    plot_window.action_chi_qe_magnetic)
-
-        plot_window.action_d2sig_dw_de.triggered.connect(
-            partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
-                    self._slice_plotter_presenter.show_d2sigma, False))
-        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.D2SIGMA,
-                                    plot_window.action_d2sig_dw_de)
-
+        plot_window.action_d2sig_dw_de.triggered.connect(partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
+                                                         self._slice_plotter_presenter.show_d2sigma, False))
         plot_window.action_symmetrised_sqe.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_symmetrised_sqe,
                     self._slice_plotter_presenter.show_symmetrised, True))
-        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.SYMMETRISED,
-                                    plot_window.action_symmetrised_sqe)
-
         plot_window.action_gdos.triggered.connect(
             partial(self.show_intensity_plot, plot_window.action_gdos, self._slice_plotter_presenter.show_gdos, True))
-        IntensityCache.cache_action(CATEGORY_SLICE, self._canvas.figure.gca(), IntensityType.GDOS,
-                                    plot_window.action_gdos)
 
         plot_window.action_hydrogen.triggered.connect(
             partial(toggle_overplot_line, self, self._slice_plotter_presenter, 1, True))

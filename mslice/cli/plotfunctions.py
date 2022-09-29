@@ -124,8 +124,8 @@ def pcolormesh(axes, workspace, *args, **kwargs):
         else IntensityType.SCATTERING_FUNCTION
     if intensity_type is not IntensityType.SCATTERING_FUNCTION:
         workspace = getattr(slice_cache, intensity_type.name.lower())
-        current_axes = GlobalFigureManager.get_active_figure().figure.axes[0]
-        intensity_action = IntensityCache.get_action(plt.CATEGORY_SLICE, current_axes, intensity_type)
+        plot_window = plot_handler.plot_window
+        intensity_action = getattr(plot_window, IntensityCache.get_action(intensity_type))
         plot_handler.set_intensity(intensity_action)
         plot_handler.intensity = True
         plot_handler.intensity_type = intensity_type

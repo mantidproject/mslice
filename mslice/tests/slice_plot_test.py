@@ -7,8 +7,7 @@ from matplotlib.lines import Line2D
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line
-from mslice.plotting.pyplot import CATEGORY_SLICE
-from mslice.util.intensity_correction import IntensityType, IntensityCache
+from mslice.util.intensity_correction import IntensityType
 
 
 class SlicePlotTest(unittest.TestCase):
@@ -118,16 +117,6 @@ class SlicePlotTest(unittest.TestCase):
 
             self.slice_plot.update_legend()
             mock_add_legend.assert_called_with(self.line, ['some_label'], fontsize=ANY, loc='upper right')
-
-    def test_actions_cached(self):
-        ax = self.axes
-        enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
-                 IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
-        actions = [IntensityCache.get_action(CATEGORY_SLICE, ax, e) for e in enums]
-        for action in actions:
-            mock_name = action._extract_mock_name()
-            action_name = mock_name.replace("mock.window.", "")
-            self.assertEqual(action, getattr(self.slice_plot.plot_window, action_name))
 
 
 if __name__ == '__main__':

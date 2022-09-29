@@ -1,13 +1,15 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mock import MagicMock
+from mock import patch, MagicMock
 import unittest
 
 from mslice.util.intensity_correction import IntensityCache, IntensityType
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.models.slice.slice import Slice
+from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.pyplot import CATEGORY_SLICE, CATEGORY_CUT
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 
 
 class IntensityCorrectionUtilTest(unittest.TestCase):
@@ -33,26 +35,44 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
                 self.assertTrue(cut_attrs.count(e.name.lower()))
 
     def test_cache_action(self):
-        category = CATEGORY_CUT
-        ax = MagicMock
+        IntensityCache._IntensityCache__action_dict = {}
         intensity_correction_type = IntensityType.SCATTERING_FUNCTION
         action = MagicMock
-        IntensityCache.cache_action(category, ax, intensity_correction_type, action)
-        returned_action = IntensityCache.get_action(category, ax, intensity_correction_type)
+        IntensityCache.cache_action(intensity_correction_type, action)
+        returned_action = IntensityCache.get_action(intensity_correction_type)
         self.assertEqual(action, returned_action)
-        action2 = MagicMock
-        IntensityCache.cache_action(category, ax, intensity_correction_type, action2)
-        returned_action2 = IntensityCache.get_action(category, ax, intensity_correction_type)
-        self.assertEqual(action2, returned_action2)
 
     def test_cache_method(self):
+        IntensityCache._IntensityCache__method_dict_slice = {}
         category = CATEGORY_SLICE
         intensity_correction_type = IntensityType.CHI_MAGNETIC
-        presenter = MagicMock
         method = MagicMock
-        IntensityCache.cache_method(category, presenter, intensity_correction_type, method)
-        returned_method = IntensityCache.get_method(category, presenter, intensity_correction_type)
+        IntensityCache.cache_method(category, intensity_correction_type, method)
+        returned_method = IntensityCache.get_method(category, intensity_correction_type)
         self.assertEqual(method, returned_method)
+
+    def test_methods_cached_by_cut_plotter_presenter(self):
+        IntensityCache._IntensityCache__method_dict_slice = {}
+        presenter = CutPlotterPresenter()
+        enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
+                 IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        methods = [IntensityCache.get_method(CATEGORY_CUT, e) for e in enums]
+        for method in methods:
+            self.assertTrue(hasattr(presenter, method))
+
+    @patch('mslice.plotting.plot_window.plot_window.add_action')
+    @patch('mslice.plotting.plot_window.plot_window.PlotWindow.setup_ui')
+    @patch('mslice.plotting.plot_window.plot_window.PlotWindow._PlotWindow__inherit')
+    def test_actions_cached_by_cut_plotter_presenter(self, mock_inherit, mock_setup_ui, mock_add_action):
+        IntensityCache._IntensityCache__action_dict = {}
+        plot_window = PlotWindow(MagicMock())
+        plot_window.add_intensity_actions(MagicMock())
+        enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
+                 IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        actions = [IntensityCache.get_action(e) for e in enums]
+        for action in actions:
+            self.assertTrue(hasattr(plot_window, action))
+        mock_setup_ui.assert_called_once()
 
     @staticmethod
     def _create_slice(workspace=None, colourmap=None, norm=None, sample_temp=None,

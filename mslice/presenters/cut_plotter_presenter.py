@@ -351,10 +351,9 @@ class CutPlotterPresenter(PresenterUtility):
 
     def _cache_intensity_correction_methods(self):
         cat = plt.CATEGORY_CUT
-        IntensityCache.cache_method(cat, self, IntensityType.SCATTERING_FUNCTION, self.show_scattering_function)
-        IntensityCache.cache_method(cat, self, IntensityType.CHI, self.show_dynamical_susceptibility)
-        IntensityCache.cache_method(cat, self, IntensityType.CHI_MAGNETIC,
-                                    self.show_dynamical_susceptibility_magnetic)
-        IntensityCache.cache_method(cat, self, IntensityType.D2SIGMA, self.show_d2sigma)
-        IntensityCache.cache_method(cat, self, IntensityType.SYMMETRISED, self.show_symmetrised)
-        IntensityCache.cache_method(cat, self, IntensityType.GDOS, self.show_gdos)
+        IntensityCache.cache_method(cat, IntensityType.SCATTERING_FUNCTION, self.show_scattering_function.__name__)
+        IntensityCache.cache_method(cat, IntensityType.CHI, self.show_dynamical_susceptibility.__name__)
+        IntensityCache.cache_method(cat, IntensityType.CHI_MAGNETIC, self.show_dynamical_susceptibility_magnetic.__name__)
+        IntensityCache.cache_method(cat, IntensityType.D2SIGMA, self.show_d2sigma.__name__)
+        IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised.__name__)
+        IntensityCache.cache_method(cat, IntensityType.GDOS, self.show_gdos.__name__)
