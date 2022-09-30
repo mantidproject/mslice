@@ -53,6 +53,7 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
         new_ws.e_mode = self.e_mode
         new_ws.e_fixed = self.e_fixed
         new_ws.axes = self.axes
+        new_ws._raw_ws = self.raw_ws
         return new_ws
 
     def save_attributes(self):
