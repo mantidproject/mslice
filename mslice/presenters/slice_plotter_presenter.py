@@ -113,9 +113,10 @@ class SlicePlotterPresenter(PresenterUtility):
     def add_sample_temperature_field(self, field_name):
         self._sample_temp_fields.append(field_name)
 
-    def update_sample_temperature(self, workspace_name):
+    def update_sample_temperature_from_field(self, workspace_name):
         temp = sample_temperature(workspace_name, self._sample_temp_fields)
         self.set_sample_temperature(workspace_name, temp)
+        return temp
 
     def set_sample_temperature(self, workspace_name, temp):
         self._slice_cache[workspace_name].sample_temp = temp
