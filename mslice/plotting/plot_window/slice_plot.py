@@ -343,7 +343,7 @@ class SlicePlot(IPlot):
                 return False
             if field:
                 self._slice_plotter_presenter.add_sample_temperature_field(temp_value_raw)
-                self._slice_plotter_presenter.update_sample_temperature(self.ws_name)
+                self.temp = self._slice_plotter_presenter.update_sample_temperature_from_field(self.ws_name)
             else:
                 temp_value = get_sample_temperature_from_string(temp_value_raw)
                 if temp_value is not None:
