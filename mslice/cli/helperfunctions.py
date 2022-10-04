@@ -10,36 +10,11 @@ from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigm
                                                      compute_symmetrised, cut_compute_gdos)
 from mslice.models.cut.cut import SampleTempValueError
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 _overplot_keys = {'Hydrogen': 1, 'Deuterium': 2, 'Helium': 4, 'Aluminium': 'Aluminium', 'Copper': 'Copper',
                   'Niobium': 'Niobium', 'Tantalum': 'Tantalum', 'Arbitrary Nuclei': 'Arbitrary Nuclei',
                   'CIF file': 'CIF file'}
-
-_function_to_intensity = {
-    'show_scattering_function': 's(q,e)',
-    'show_dynamical_susceptibility': 'chi',
-    'show_dynamical_susceptibility_magnetic': 'chi_mag',
-    'show_d2sigma': 'xsec',
-    'show_symmetrised': 'symm',
-    'show_gdos': 'gdos',
-}
-
-_intensity_to_action = {
-    's(q,e)': 'action_sqe',
-    'chi': 'action_chi_qe',
-    'chi_mag': 'action_chi_qe_magnetic',
-    'xsec': 'action_d2sig_dw_de',
-    'symm': 'action_symmetrised_sqe',
-    'gdos': 'action_gdos',
-}
-
-_intensity_to_workspace = {
-    'chi': 'chi',
-    'chi_mag': 'chi_magnetic',
-    'xsec': 'd2sigma',
-    'symm': 'symmetrised',
-    'gdos': 'gdos',
-}
 
 
 def _update_legend():
@@ -212,20 +187,25 @@ def hide_a_line_and_errorbars(ax, idx: int):
 
 
 def _correct_intensity(scattering_data, intensity_correction, e_axis, q_axis, NormToOne, Algorithm, rotated, sample_temp):
-    if not intensity_correction or intensity_correction == "scattering_function":
+    try:
+        intensity_correction = IntensityCache.get_intensity_type_from_desc(intensity_correction)
+    except ValueError:
+        raise ValueError(f"Input intensity correction invalid: {intensity_correction}")
+
+    if intensity_correction == IntensityType.SCATTERING_FUNCTION:
         return scattering_data
-    if intensity_correction == "dynamical_susceptibility":
+    elif intensity_correction == IntensityType.CHI:
         _check_sample_temperature(sample_temp, scattering_data.name)
         return compute_chi(scattering_data, sample_temp, e_axis)
-    if intensity_correction == "dynamical_susceptibility_magnetic":
+    elif intensity_correction == IntensityType.CHI_MAGNETIC:
         _check_sample_temperature(sample_temp, scattering_data.name)
         return compute_chi(scattering_data, sample_temp, e_axis, True)
-    if intensity_correction == "d2sigma":
+    elif intensity_correction == IntensityType.D2SIGMA:
         return compute_d2sigma(scattering_data, e_axis, scattering_data.e_fixed)
-    if intensity_correction == "symmetrised":
+    elif intensity_correction == IntensityType.SYMMETRISED:
         _check_sample_temperature(sample_temp, scattering_data.name)
         return compute_symmetrised(scattering_data, sample_temp, e_axis, rotated)
-    if intensity_correction == "gdos":
+    elif intensity_correction == IntensityType.GDOS:
         _check_sample_temperature(sample_temp, scattering_data.name)
         return cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, NormToOne, Algorithm)
 

@@ -168,8 +168,8 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     return get_slice_plotter_presenter().create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
 
 
-def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin', IntensityCorrection=False,
-        SampleTemperature=None):
+def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin',
+        IntensityCorrection=False, SampleTemperature=None):
     """
     Cuts workspace.
     :param InputWorkspace: Workspace to cut. The parameter can be either a python
@@ -187,7 +187,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
     :param NormToOne: if True the cut will be normalized to one.
     :param Algorithm: the cut algorithm to use. Either 'Rebin' (default) or 'Integration'
     :param IntensityCorrection: the intensity correction algorithm to use. Either False (Default, no correction),
-           'dynamical_susceptibility', 'dynamical_susceptibility_magnetic', 'd2sigma', or 'symmetrised'.
+            'dynamical_susceptibility', 'dynamical_susceptibility_magnetic', 'd2sigma', or 'symmetrised'.
     :param SampleTemperature: if a temperature dependant intensity correction is input, a SampleTemperature in Kelvin
            must be provided.
     :return:
@@ -201,10 +201,12 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
     cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True)
+
     rotated = not is_twotheta(cut_axis.units) and not is_momentum(cut_axis.units)
     e_axis = cut_axis if rotated else integration_axis
     q_axis = integration_axis if rotated else cut_axis
-    cut = _correct_intensity(cut, IntensityCorrection, e_axis, q_axis, NormToOne, Algorithm, rotated, SampleTemperature)
+    intensity_correction = 'scattering_function' if IntensityCorrection is False else IntensityCorrection
+    cut = _correct_intensity(cut, intensity_correction, e_axis, q_axis, NormToOne, Algorithm, rotated, SampleTemperature)
 
     get_cut_plotter_presenter().update_main_window()
 

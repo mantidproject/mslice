@@ -32,10 +32,8 @@ def toggle_overplot_line(plot_handler, plotter_presenter, key, recoil, checked, 
         plot_handler.manager.report_as_current_and_return_previous_status()
 
     if checked:
-        intensity_correction = plot_handler.intensity_method if not plot_handler.intensity_method else \
-            plot_handler.intensity_method[5:]
         plotter_presenter.add_overplot_line(plot_handler.ws_name, key, recoil, cif_file, plot_handler.y_log,
-                                            plot_handler._get_overplot_datum(), intensity_correction)
+                                            plot_handler._get_overplot_datum(), plot_handler.intensity_type)
     else:
         plotter_presenter.hide_overplot_line(plot_handler.ws_name, key)
 

@@ -3,12 +3,12 @@ from __future__ import (absolute_import, division, print_function)
 import mslice.plotting.pyplot as plt
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _intensity_to_action, \
-    _intensity_to_workspace, _function_to_intensity, _rescale_energy_cut_plot
+from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _rescale_energy_cut_plot
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
 from mslice.util.compat import legend_set_draggable
 from mslice.util.mantid.mantid_algorithms import Transpose
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mslice.models.cut.cut import Cut
 from mslice.models.workspacemanager.workspace_algorithms import get_EFixed
@@ -120,25 +120,18 @@ def pcolormesh(axes, workspace, *args, **kwargs):
     if temperature is not None:
         get_slice_plotter_presenter().set_sample_temperature(workspace.name[2:], temperature)
 
-    if intensity is not None and intensity != 's(q,e)':
-        workspace = getattr(slice_cache, _intensity_to_workspace[intensity])
-        plot_window = GlobalFigureManager.get_active_figure().window
-
-        intensity_action = getattr(plot_window, _intensity_to_action[intensity])
+    intensity_type = IntensityCache.get_intensity_type_from_desc(intensity) if intensity is not None \
+        else IntensityType.SCATTERING_FUNCTION
+    if intensity_type is not IntensityType.SCATTERING_FUNCTION:
+        workspace = getattr(slice_cache, intensity_type.name.lower())
+        plot_window = plot_handler.plot_window
+        intensity_action = getattr(plot_window, IntensityCache.get_action(intensity_type))
         plot_handler.set_intensity(intensity_action)
-        intensity_action.setChecked(True)
-
-        # Set intensity properties for generated script to use
-        if not is_gui():
-            for key, value in _function_to_intensity.items():
-                if value == intensity:
-                    intensity_method = key
-                    break
-            plot_handler.intensity = True
-            plot_handler.intensity_method = intensity_method
-            plot_handler.temp = temperature
-            plot_handler.temp_dependent = True if temperature is not None else False
-            plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name].colourmap = kwargs.get('cmap')
+        plot_handler.intensity = True
+        plot_handler.intensity_type = intensity_type
+        plot_handler.temp = temperature
+        plot_handler.temp_dependent = True if temperature is not None else False
+        plot_handler._slice_plotter_presenter._slice_cache[plot_handler.ws_name].colourmap = kwargs.get('cmap')
 
     if not workspace.is_PSD and not slice_cache.rotated:
         workspace = Transpose(OutputWorkspace=workspace.name, InputWorkspace=workspace, store=False)

@@ -4,6 +4,7 @@ from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
+from mslice.util.intensity_correction import IntensityType
 import mslice.plotting.globalfiguremanager as gfm
 
 
@@ -91,11 +92,11 @@ class CutPlotterPresenterTest(unittest.TestCase):
         compute_d2sigma_mock.return_value = mock_intensity_ws
         compute_symmetrised_mock.return_value = mock_intensity_ws
         self.main_presenter.is_energy_conversion_allowed.return_value = False
-        intensity_correction_types = ["dynamical_susceptibility", "dynamical_susceptibility_magnetic", "d2sigma",
-                                      "symmetrised"]
+        intensity_correction_types = [IntensityType.CHI, IntensityType.CHI_MAGNETIC, IntensityType.D2SIGMA,
+                                      IntensityType.SYMMETRISED]
 
         for intensity in intensity_correction_types:
-            get_current_plot_intensity_mock.return_value = "show_" + intensity
+            get_current_plot_intensity_mock.return_value = intensity
             self.cut_plotter_presenter._plot_cut(mock_ws, cut_cache, False, intensity_correction=intensity)
             compute_cut_mock.assert_called_with(mock_ws, cut_cache.cut_axis, cut_cache.integration_axis,
                                                 cut_cache.norm_to_one, cut_cache.algorithm, True)
@@ -103,7 +104,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
 
         self.assertEqual(1 * len(intensity_correction_types), plot_cut_impl_mock.call_count)
         self.assertEqual(1 * len(intensity_correction_types), cut_cache._update_cut_axis.call_count)
-        self.assertEqual(2 * len(intensity_correction_types), get_current_plot_intensity_mock.call_count)
+        self.assertEqual(1 * len(intensity_correction_types), get_current_plot_intensity_mock.call_count)
         self.assertEqual(1 * len(intensity_correction_types), update_main_window_mock.call_count)
         self.assertEqual(2, compute_chi_mock.call_count)
 
@@ -282,7 +283,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
         cut_3._cut_ws.get_signal.return_value = 100.0
         mock_plot_gca.return_value = ax
 
-        max_signal = self.cut_plotter_presenter._get_overall_max_signal(False)
+        max_signal = self.cut_plotter_presenter._get_overall_max_signal(IntensityType.SCATTERING_FUNCTION)
         self.assertEqual(max_signal, 100)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')

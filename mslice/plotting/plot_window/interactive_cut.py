@@ -9,7 +9,6 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.plotting.pyplot import GlobalFigureManager
 
-
 class InteractiveCut(object):
 
     def __init__(self, slice_plot, canvas, ws_title):
@@ -56,8 +55,7 @@ class InteractiveCut(object):
             workspace = get_workspace_handle(self._ws_title)
             cut = Cut(ax, integration_axis, None, None, sample_temp=self.slice_plot.temp, e_fixed=workspace.e_fixed)
             cut.parent_ws_name = self._ws_title
-            intensity_method = "scattering_function" if not self.slice_plot.intensity_method else self.slice_plot.intensity_method[5:]
-            self._cut_plotter_presenter.plot_interactive_cut(workspace, cut, store, intensity_method)
+            self._cut_plotter_presenter.plot_interactive_cut(workspace, cut, store, self.slice_plot.intensity_type)
             self._cut_plotter_presenter.set_is_icut(True)
             if self._is_initial_cut_plotter_presenter:
                 # First time we've plotted a 1D cut - get the true CutPlotterPresenter
@@ -131,8 +129,9 @@ class InteractiveCut(object):
         self._cut_plotter_presenter.store_icut_cut()
         self._cut_plotter_presenter.set_icut_cut(None)
 
-    def set_icut_intensity_category(self, intensity_method):
-        self._cut_plotter_presenter.set_icut_intensity_category(intensity_method)
+    def set_icut_intensity_category(self, intensity_type):
+        self._cut_plotter_presenter.set_icut_intensity_category(intensity_type)
 
     def refresh_current_cut(self):
-        self.plot_cut(*self.rect.extents)
+        if not all(pos == 0 for pos in self._rect_pos_cache):  # if rect has been drawn.
+            self.plot_cut(*self.rect.extents)

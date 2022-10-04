@@ -1,8 +1,8 @@
 from datetime import datetime
 from distutils.version import LooseVersion
-from mslice.cli.helperfunctions import _function_to_intensity
 from mslice.models.labels import get_recoil_key
 from matplotlib import __version__ as mpl_version
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 import re
 
 COMMON_PACKAGES = ["import mslice.cli as mc", "import mslice.plotting.pyplot as plt\n\n"]
@@ -69,7 +69,7 @@ def add_slice_plot_statements(script_lines, plot_handler):
         plot_handler.ws_name.replace(".", "_"), momentum_axis, energy_axis, norm))
 
     if plot_handler.intensity is True:
-        intensity = _function_to_intensity[plot_handler.intensity_method]
+        intensity = IntensityCache.get_desc_from_type(plot_handler.intensity_type)
         if plot_handler.temp_dependent:
             script_lines.append('mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}", temperature={})\n'.format(
                 cache[plot_handler.ws_name].colourmap, intensity, plot_handler.temp))
@@ -137,12 +137,12 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
         script_lines.append(f"ax.set_yscale('symlog', "
                             f"linthresh{y_axis_str}=pow(10, np.floor(np.log10({plot_handler.y_axis_min}))))\n")
 
+
 def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
-    itensity_correction = plot_handler.intensity_method
-    itensity_correction = itensity_correction[5:] if itensity_correction else itensity_correction
-    add_cut_lines_with_width(errorbars, script_lines, cuts, itensity_correction)
+    intensity_correction = plot_handler.intensity_type
+    add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction)
     hide_lines(script_lines, plot_handler, ax)
 
 
@@ -197,7 +197,8 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
             width = errorbar.lines[0]._linewidth
             label = errorbar._label
 
-            intensity_correction_arg = intensity_correction if not intensity_correction else f'"{intensity_correction}"'
+            intensity_correction_arg = f"'{IntensityCache.get_desc_from_type(intensity_correction)}'" \
+                if not intensity_correction == IntensityType.SCATTERING_FUNCTION else False
             script_lines.append('cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", '
                                 'NormToOne={}{}, IntensityCorrection={}, SampleTemperature={})'
                                 '\n'.format(index, replace_ws_special_chars(cut.parent_ws_name), cut_axis, integration_axis,

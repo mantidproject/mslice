@@ -7,6 +7,7 @@ from matplotlib.lines import Line2D
 
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line
+from mslice.util.intensity_correction import IntensityType
 
 
 class SlicePlotTest(unittest.TestCase):
@@ -14,11 +15,12 @@ class SlicePlotTest(unittest.TestCase):
     def setUp(self):
         self.plot_figure = MagicMock()
         self.plot_figure.window = MagicMock()
+        self.axes = MagicMock()
         canvas = MagicMock()
+        canvas.figure.gca = MagicMock(return_value=self.axes)
         self.plot_figure.window.canvas = canvas
         self.slice_plotter = MagicMock()
-        self.axes = MagicMock()
-        canvas.figure.gca = MagicMock(return_value=self.axes)
+
         self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
         self.slice_plot.manager.report_as_current_and_return_previous_status.return_value = (None, False)
         self.line = [Line2D([], [])]
@@ -67,7 +69,7 @@ class SlicePlotTest(unittest.TestCase):
                              self.slice_plot.plot_window.action_helium, 4, True, True)
         colorbar_range = PropertyMock(return_value=(0, 10))
         type(self.slice_plot).colorbar_range = colorbar_range
-        self.slice_plotter.show_dynamical_susceptibility.__name__ = 'foo'
+        self.slice_plotter.show_dynamical_susceptibility.__name__ = 'show_dynamical_susceptibility'
         self.slice_plot.show_intensity_plot(self.plot_figure.action_chi_qe,
                                             self.slice_plotter.show_dynamical_susceptibility,
                                             True)
@@ -82,7 +84,8 @@ class SlicePlotTest(unittest.TestCase):
         self.plot_figure.action_arbitrary_nuclei.isChecked = MagicMock(return_value=True)
 
         self.slice_plot.arbitrary_recoil_line()
-        self.slice_plotter.add_overplot_line.assert_called_once_with('workspace', 5, True, None, False, 0, False)
+        self.slice_plotter.add_overplot_line.assert_called_once_with('workspace', 5, True, None, False, 0,
+                                                                     IntensityType.SCATTERING_FUNCTION)
 
     @patch('mslice.plotting.plot_window.slice_plot.QtWidgets.QInputDialog.getInt')
     def test_arbitrary_recoil_line_cancelled(self, qt_get_int_mock):
@@ -114,6 +117,7 @@ class SlicePlotTest(unittest.TestCase):
 
             self.slice_plot.update_legend()
             mock_add_legend.assert_called_with(self.line, ['some_label'], fontsize=ANY, loc='upper right')
+
 
 if __name__ == '__main__':
     unittest.main()

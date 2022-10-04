@@ -12,6 +12,7 @@ from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.workspacemanager.workspace_provider import add_workspace
 from mslice.models.axis import Axis
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 import warnings
 from sys import float_info
 
@@ -29,6 +30,7 @@ class CutPlotterPresenter(PresenterUtility):
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
         self._temp_cut_cache = []
         self._overplot_cache = {}
+        self._cache_intensity_correction_methods()
 
     def run_cut(self, workspace, cut, plot_over=False, save_only=False):
         workspace = get_workspace_handle(workspace)
@@ -41,13 +43,13 @@ class CutPlotterPresenter(PresenterUtility):
             self._plot_cut(workspace, cut, plot_over)
 
     def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True,
-                  intensity_correction="scattering_function", final_plot=True):
+                  intensity_correction=IntensityType.SCATTERING_FUNCTION, final_plot=True):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
         if not cut.cut_ws:
             cut.cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store)
             self.prepare_cut_for_cache(cut)
-        if not intensity_correction or intensity_correction == "scattering_function":
+        if intensity_correction == IntensityType.SCATTERING_FUNCTION:
             cut_ws = cut.cut_ws
             intensity_range = (cut.intensity_start, cut.intensity_end)
         else:
@@ -57,9 +59,9 @@ class CutPlotterPresenter(PresenterUtility):
         legend = generate_legend(ws_label_name, integration_axis.units, integration_axis.start, integration_axis.end)
         en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
         plot_cut_impl(cut_ws, intensity_range, plot_over, legend, en_conversion)
-        plot_intensity = self.get_current_plot_intensity()[5:] if self.get_current_plot_intensity() else False
-        if final_plot and plot_over and plot_intensity and not intensity_correction == plot_intensity:
-            self.apply_intensity_correction_after_plot_over("show_"+plot_intensity)
+        current_plot_intensity = self.get_current_plot_intensity()
+        if final_plot and plot_over and current_plot_intensity and not intensity_correction == current_plot_intensity:
+            self.apply_intensity_correction_after_plot_over(current_plot_intensity)
         if update_main:
             self.set_is_icut(False)
             self.update_main_window()
@@ -182,7 +184,7 @@ class CutPlotterPresenter(PresenterUtility):
         return np.resize(np.array([10 ** adj_factor, 10 ** (-adj_factor), np.nan]), size) * datum
 
     def add_overplot_line(self, workspace_name, key, recoil, cif=None, e_is_logarithmic=None, datum=0,
-                          intensity_correction = False):
+                          intensity_correction=IntensityType.SCATTERING_FUNCTION):
         cache = self._cut_cache_dict[plt.gca()][0]
         if cache.rotated:
             warnings.warn("No Bragg peak found as cut has no |Q| dimension.")
@@ -221,7 +223,7 @@ class CutPlotterPresenter(PresenterUtility):
     def _get_overall_max_signal(self, intensity_correction):
         overall_max_signal = 0
         for cut in self._cut_cache_dict[plt.gca()]:
-            ws = cut.get_intensity_corrected_ws(intensity_correction) if intensity_correction else cut.cut_ws
+            ws = cut.get_intensity_corrected_ws(intensity_correction)
             max_cut_signal = np.nanmax(ws.get_signal())
             if max_cut_signal > overall_max_signal:
                 overall_max_signal = max_cut_signal
@@ -252,22 +254,22 @@ class CutPlotterPresenter(PresenterUtility):
         self._temp_cut_cache = []
 
     def show_scattering_function(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], "scattering_function")
+        self._show_intensity(self._cut_cache_dict[axes], IntensityType.SCATTERING_FUNCTION)
 
     def show_dynamical_susceptibility(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], "dynamical_susceptibility")
+        self._show_intensity(self._cut_cache_dict[axes], IntensityType.CHI)
 
     def show_dynamical_susceptibility_magnetic(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], "dynamical_susceptibility_magnetic")
+        self._show_intensity(self._cut_cache_dict[axes], IntensityType.CHI_MAGNETIC)
 
     def show_d2sigma(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], "d2sigma")
+        self._show_intensity(self._cut_cache_dict[axes], IntensityType.D2SIGMA)
 
     def show_symmetrised(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], "symmetrised")
+        self._show_intensity(self._cut_cache_dict[axes], IntensityType.SYMMETRISED)
 
     def show_gdos(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], "gdos")
+        self._show_intensity(self._cut_cache_dict[axes], IntensityType.GDOS)
 
     def set_sample_temperature(self, axes, ws_name, temp):
         cut_dict = {}
@@ -334,15 +336,24 @@ class CutPlotterPresenter(PresenterUtility):
         CutPlotterPresenter._current_icut = icut_cut
 
     @staticmethod
-    def set_icut_intensity_category(intensity_method):
+    def set_icut_intensity_category(intensity_type):
         icut_plot = get_current_plot() #icut is locked to current
-        if icut_plot:
-            icut_plot.set_intensity_from_method(intensity_method)
+        if hasattr(icut_plot, "set_intensity_from_type"):
+            icut_plot.set_intensity_from_type(intensity_type)
 
     @staticmethod
     def get_current_plot_intensity():
-        return get_current_plot().intensity_method
+        return get_current_plot().intensity_type
 
     @staticmethod
-    def apply_intensity_correction_after_plot_over(intensity_method):
-        return get_current_plot().trigger_action_from_method(intensity_method)
+    def apply_intensity_correction_after_plot_over(intensity_type):
+        return get_current_plot().trigger_action_from_type(intensity_type)
+
+    def _cache_intensity_correction_methods(self):
+        cat = plt.CATEGORY_CUT
+        IntensityCache.cache_method(cat, IntensityType.SCATTERING_FUNCTION, self.show_scattering_function.__name__)
+        IntensityCache.cache_method(cat, IntensityType.CHI, self.show_dynamical_susceptibility.__name__)
+        IntensityCache.cache_method(cat, IntensityType.CHI_MAGNETIC, self.show_dynamical_susceptibility_magnetic.__name__)
+        IntensityCache.cache_method(cat, IntensityType.D2SIGMA, self.show_d2sigma.__name__)
+        IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised.__name__)
+        IntensityCache.cache_method(cat, IntensityType.GDOS, self.show_gdos.__name__)

@@ -6,13 +6,13 @@ from mslice.scripting.helperfunctions import header, add_header, add_plot_statem
     add_cut_lines_with_width, add_plot_options, hide_lines
 from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.plotting.plot_window.slice_plot import SlicePlot
-from mslice.cli.helperfunctions import _function_to_intensity
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 from matplotlib import __version__ as mpl_version
 import numpy as np
 from mslice.models.cut.cut import Cut
 from mslice.models.axis import Axis
+from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 
 class ScriptingHelperFunctionsTest(unittest.TestCase):
@@ -26,7 +26,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         plot_handler.temp_dependent = temp_dependent
         plot_handler.temp = 30
         plot_handler.intensity = intensity
-        plot_handler.intensity_method = 'show_scattering_function'
+        plot_handler.intensity_type = IntensityType.SCATTERING_FUNCTION
         plot_handler.y_range = (0, 10)
         plot_handler.x_range = (0, 10)
         plot_handler.x_range_font_size = 10
@@ -124,7 +124,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_slice_plot_statements(script_lines, plot_handler)
 
         cache = plot_handler._slice_plotter_presenter._slice_cache
-        intensity = _function_to_intensity[plot_handler.intensity_method]
+        intensity = IntensityCache.get_desc_from_type(plot_handler.intensity_type)
         slice = cache[plot_handler.ws_name]
         momentum_axis = str(slice.momentum_axis)
         energy_axis = str(slice.energy_axis)
@@ -165,7 +165,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_slice_plot_statements(script_lines, plot_handler)
 
         cache = plot_handler._slice_plotter_presenter._slice_cache
-        intensity = _function_to_intensity[plot_handler.intensity_method]
+        intensity = IntensityCache.get_desc_from_type(plot_handler.intensity_type)
 
         self.assertIn('mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}")\n'.format(
             cache[plot_handler.ws_name].colourmap, intensity), script_lines)
@@ -243,7 +243,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(CutPlot)
-        plot_handler.intensity_method = False
+        plot_handler.intensity_type = IntensityType.SCATTERING_FUNCTION
 
         script_lines = []
 
@@ -252,7 +252,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
         errorbars = plot_handler._canvas.figure.gca().containers
 
-        add_cut_lines_with_width.assert_called_once_with(errorbars, script_lines, cuts, False)
+        add_cut_lines_with_width.assert_called_once_with(errorbars, script_lines, cuts, plot_handler.intensity_type)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_plot_options_works_as_expected(self, gfm):
@@ -299,7 +299,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cuts = [cut]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts, False)
+        add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
 
         self.assertIn(
             'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
@@ -320,7 +320,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cuts = [cut]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts, False)
+        add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
 
         self.assertIn(
             'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
@@ -341,7 +341,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cuts = [cut_0, cut_2]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts, False)
+        add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
 
         self.assertIn(
             'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
