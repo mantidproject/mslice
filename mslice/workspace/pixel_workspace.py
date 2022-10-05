@@ -8,6 +8,8 @@ from .common_workspace_properties import CommonWorkspaceProperties
 
 from mantid.api import IMDEventWorkspace
 
+import re
+
 
 class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWorkspaceProperties):
     """workspace wrapper for MDEventWorkspace. Converts to HistogramWorkspace internally."""
@@ -38,10 +40,10 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
     def name(self, new_name: str):
         if self.raw_ws is not None:
             raw_name = str(self.raw_ws)
-            rename_workspace(raw_name, raw_name.replace(self.name, new_name))
+            rename_workspace(raw_name, re.sub(rf"{self.name}\w*", new_name, raw_name))
         elif self._histo_ws is not None:
             histo_name = str(self._histo_ws)
-            rename_workspace(histo_name, histo_name.replace(self.name, new_name))
+            rename_workspace(histo_name, re.sub(rf"{self.name}\w*", new_name, histo_name))
 
         self._name = new_name
 

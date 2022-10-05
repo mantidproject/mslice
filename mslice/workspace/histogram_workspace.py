@@ -7,6 +7,8 @@ from .common_workspace_properties import CommonWorkspaceProperties
 
 from mantid.api import IMDHistoWorkspace
 
+import re
+
 
 class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWorkspaceProperties):
     """workspace wrapper for MDHistoWorkspace"""
@@ -30,7 +32,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
     @WorkspaceMixin.name.setter
     def name(self, new_name: str):
         raw_name = str(self.raw_ws)
-        rename_workspace(raw_name, raw_name.replace(self.name, new_name))
+        rename_workspace(raw_name, re.sub(rf"{self.name}\w*", new_name, raw_name))
 
         self._name = new_name
 
