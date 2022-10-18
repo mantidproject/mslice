@@ -42,16 +42,16 @@ You will also need to edit the run configurations:
 
 - The startup script is `start_mslice.py`.
 - The `bin` directory of an installed version of Mantid must be on the `PATH`.
-- Set the environment variable `QT_QPA_PLATFORM_PLUGIN_PATH` to the directory with the QT plugins from the Mantid installation `MantidInstall\plugins\qt5`.
+- Set the environment variable `QT_QPA_PLATFORM_PLUGIN_PATH` to the directory with the QT plugins from the Mantid installation `MantidInstall/plugins/qt5`.
 - If you're developing on Windows, the Python interpreter used must be the one shipped with the Mantid installation `MantidInstall/bin/python.exe`.
 - If you're developing on Ubuntu, set the Python Interpreter path to `/usr/bin/python3.6`
 
 You can now also develop MSlice using a Mantid conda environment.
-First install Mantid using `conda create -n mantidnightly -c conda-forge -c mantid/label/nightly mantid mantidqt qtconsole nose coverage mock`
+First install Mantid using `conda env create -f mslice-developer.yml`,
 then add this interpreter by going to the `File->Settings` in PyCharm, then `Project: mslice -> Python Interpreter`,
 click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.8 (mantidnightly)`.
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
-Specify `start_mslice.py` as the startup script set the same `QT_QPA_PLATFORM_PLUGIN_PATH` environment variable as above.
+Specify `start_mslice.py` as the startup script.
 To run tests, create a `Nosetests` configuration and specify the `Target` as `Custom` with `mslice.tests`
 with the working directory being the mslice package folder (e.g. `<mslice_root>/mslice`).
 
