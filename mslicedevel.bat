@@ -1,11 +1,14 @@
 ::
 :: Basic wrapper script for running in development mode.
 ::
+
 @setlocal
 @set ActiveEnv=false
+@set CONDAPATH=C:\Users\eoc57742\AppData\Local\mambaforge
+@call %CONDAPATH%\Scripts\activate.bat %CONDAPATH%
 @if %CONDA_DEFAULT_ENV% == base (
     @set ActiveEnv=true
-    call conda activate mantidnightly
+    @call %CONDAPATH%\Scripts\activate.bat mantidnightly
 )
 @if %CONDA_DEFAULT_ENV% == base (
     @echo Please run `conda env create -f mslice-developer.yml` first.
