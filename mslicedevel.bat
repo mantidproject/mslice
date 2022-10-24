@@ -45,7 +45,7 @@
 @set MANTIDPATH=C:\MantidInstall\bin
 @set PYTHONPATH=%MANTIDPATH%;%THIS_DIR%;%PYTHONPATH%
 @set QT_PLUGIN_PATH=%MANTIDPATH%\..\plugins\qt5
-C:\MantidInstall\bin\python.exe %THIS_DIR%\scripts\start_mslice.py
+%MANTIDPATH%\python.exe %THIS_DIR%\scripts\start_mslice.py
 @goto End
 
 @set PYTHONPATH=%THIS_DIR%; %CONDA_PREFIX%
