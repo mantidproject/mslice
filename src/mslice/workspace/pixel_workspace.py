@@ -53,10 +53,6 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
         new_ws.e_mode = self.e_mode
         new_ws.e_fixed = self.e_fixed
         new_ws.axes = self.axes
-        if not new_ws._raw_ws:
-            # following binary op div and mul, where _raw_ws not assigned, propagate raw ws. This raw_ws has
-            # been in the case of div and mul manipulated as per the binary op.
-            new_ws._raw_ws = self.raw_ws
         return new_ws
 
     def save_attributes(self):

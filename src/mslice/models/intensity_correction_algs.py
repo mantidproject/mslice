@@ -6,9 +6,14 @@ from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.workspace import histogram_workspace
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.axis import Axis
+from mslice.util.mantid.mantid_algorithms import CloneWorkspace, CreateMDHistoWorkspace
+from mslice.util.numpy_helper import apply_with_swapped_axes, transform_array_to_workspace
 from mslice.models.cut.cut_functions import compute_cut
+from mslice.models.slice.slice_functions import compute_slice
+from mslice.models.labels import is_momentum
 
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
@@ -104,15 +109,48 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     return gdos
 
 def cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm):
-    slice = get_workspace_handle(scattering_data.parent)
-    q_limits = slice.limits[q_axis.units]
-    e_limits = slice.limits[e_axis.units]
-    slice_q_axis = Axis(q_axis.units, q_limits[0], q_limits[1], q_limits[2], q_axis.e_unit)
-    slice_e_axis = Axis(e_axis.units, e_limits[0], e_limits[1], e_limits[2], e_axis.e_unit)
-    slice_gdos = slice_compute_gdos(slice, sample_temp, slice_q_axis, slice_e_axis, rotated)
-    cut_axis = e_axis if rotated else q_axis
-    int_axis = q_axis if rotated else e_axis
-    return compute_cut(slice_gdos, cut_axis, int_axis, norm_to_one, algorithm)
+    pixel_ws = get_workspace_handle(scattering_data.parent)
+    slice_q_step = pixel_ws.limits[q_axis.units][2]
+    slice_e_step = pixel_ws.limits[e_axis.units][2]
+    slice_q_axis = Axis(q_axis.units, q_axis.start, q_axis.end, slice_q_step, q_axis.e_unit)
+    slice_e_axis = Axis(e_axis.units, e_axis.start, e_axis.end, slice_e_step, e_axis.e_unit)
+
+    x_is_momentum = is_momentum(pixel_ws.raw_ws.getXDimension().getUnits())
+    slice_x_axis = slice_q_axis if x_is_momentum else slice_e_axis
+    slice_y_axis = slice_e_axis if x_is_momentum else slice_q_axis
+    rebin_slice = compute_slice(pixel_ws, slice_x_axis, slice_y_axis, norm_to_one)
+
+    slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, slice_q_axis, slice_e_axis, rotated)
+
+    cut_axis = slice_e_axis if rotated else slice_q_axis
+    int_axis = slice_q_axis if rotated else slice_e_axis
+    return _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, rotated)
+
+
+def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, rotated):
+    axis_id = 0 if rotated else 1
+    signal = slice_gdos._raw_ws.getSignalArray().sum(axis=axis_id, keepdims=True)
+    error_squared =  slice_gdos._raw_ws.getErrorSquaredArray().sum(axis=axis_id, keepdims=True)
+    if not rotated:
+        signal = signal.transpose()
+        error_squared = error_squared.transpose()
+    if algorithm == 'Integration':
+        pass
+
+    x_dim = slice_gdos._raw_ws.getXDimension() if not rotated else slice_gdos._raw_ws.getYDimension()
+    y_dim = slice_gdos._raw_ws.getYDimension() if not rotated else slice_gdos._raw_ws.getXDimension()
+    extents = f"{x_dim.getMinimum()},{x_dim.getMaximum()}," \
+              f"{y_dim.getMinimum()},{y_dim.getMaximum()}"
+    no_of_bins = f"{signal.shape[0]},{signal.shape[1]}"
+    names = f"{x_dim.name},{y_dim.name}"
+    units = f"{x_dim.getUnits()},{y_dim.getUnits()}"
+
+    new_ws = CreateMDHistoWorkspace(Dimensionality=2, Extents=extents, SignalInput=signal, ErrorInput=error_squared,
+                    NumberOfBins=no_of_bins, Names=names, Units=units)
+
+    int_axis.step = 0
+    new_ws.axes = (cut_axis, int_axis)
+    return new_ws
 
 def sample_temperature(ws_name, sample_temp_fields):
     ws = get_workspace_handle(ws_name).raw_ws
