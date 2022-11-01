@@ -6,7 +6,7 @@ from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.workspace import histogram_workspace
+from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.axis import Axis
 from mslice.util.mantid.mantid_algorithms import CloneWorkspace, CreateMDHistoWorkspace
@@ -108,7 +108,28 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     gdos *= (1 - boltzmann_dist)
     return gdos
 
+
 def cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm):
+    parent_slice = get_workspace_handle(scattering_data.parent)
+    if isinstance(parent_slice, PixelWorkspace):
+        return _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm)
+    else:
+        return _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm)
+
+
+def _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm):
+    parent_slice = get_workspace_handle(scattering_data.parent)
+    q_limits = parent_slice.limits[q_axis.units]
+    e_limits = parent_slice.limits[e_axis.units]
+    slice_q_axis = Axis(q_axis.units, q_limits[0], q_limits[1], q_limits[2], q_axis.e_unit)
+    slice_e_axis = Axis(e_axis.units, e_limits[0], e_limits[1], e_limits[2], e_axis.e_unit)
+    slice_gdos = slice_compute_gdos(parent_slice, sample_temp, slice_q_axis, slice_e_axis, rotated)
+    cut_axis = e_axis if rotated else q_axis
+    int_axis = q_axis if rotated else e_axis
+    return compute_cut(slice_gdos, cut_axis, int_axis, norm_to_one, algorithm)
+
+
+def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm):
     pixel_ws = get_workspace_handle(scattering_data.parent)
     slice_q_step = pixel_ws.limits[q_axis.units][2]
     slice_e_step = pixel_ws.limits[e_axis.units][2]
@@ -135,7 +156,7 @@ def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, rotat
         signal = signal.transpose()
         error_squared = error_squared.transpose()
     if algorithm == 'Integration':
-        pass
+        signal = signal * int_axis.step
 
     x_dim = slice_gdos._raw_ws.getXDimension() if not rotated else slice_gdos._raw_ws.getYDimension()
     y_dim = slice_gdos._raw_ws.getYDimension() if not rotated else slice_gdos._raw_ws.getXDimension()
