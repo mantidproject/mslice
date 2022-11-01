@@ -27,7 +27,7 @@ The following setup steps are required regardless of the environment:
 To develop purely on the command line then simply use your favourite editor and run either
 
 * `mslicedevel.bat` (Windows) or
-* `./mslicedevel` (Linux)
+* `./mslicedevel.sh` (Linux)
 
 Please note that you may have to update the path to your Mantid installation in the file first if you are not using a Mantid conda environment.
 For `mslicedevel.bat` one option is to set the path to your conda installation in 'CONDAPATH' and then simply run the batch file by double-clicking on it.
