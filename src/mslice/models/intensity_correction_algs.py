@@ -137,16 +137,16 @@ def _cut_compute_gdos_pixel(parent_ws, sample_temp, q_axis, e_axis, rotated, nor
     slice_q_axis = _get_slice_axis(q_limits, q_axis)
     slice_e_axis = _get_slice_axis(e_limits, e_axis)
 
-    x_is_momentum = is_momentum(parent_ws.raw_ws.getXDimension().getUnits())
-    slice_x_axis = slice_q_axis if x_is_momentum else slice_e_axis
-    slice_y_axis = slice_e_axis if x_is_momentum else slice_q_axis
+    slice_rotated = not is_momentum(parent_ws.raw_ws.getXDimension().getUnits())  # fn arg rotated refers to cut
+    slice_x_axis = slice_e_axis if slice_rotated else slice_q_axis
+    slice_y_axis = slice_q_axis if slice_rotated else slice_e_axis
     rebin_slice = compute_slice(parent_ws, slice_x_axis, slice_y_axis, norm_to_one)
 
-    slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, slice_q_axis, slice_e_axis, rotated=False) #rotation already accounted for
+    slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, slice_q_axis, slice_e_axis, slice_rotated)
 
     cut_axis = slice_e_axis if rotated else slice_q_axis
     int_axis = slice_q_axis if rotated else slice_e_axis
-    return _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, rotated)
+    return _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, slice_rotated, rotated)
 
 
 def _get_slice_axis(slice_limits, cut_axis):
@@ -162,25 +162,24 @@ def _get_slice_axis(slice_limits, cut_axis):
     return Axis(cut_axis.units, step_aligned_cut_start, step_aligned_cut_end, step_size, cut_axis.e_unit)
 
 
-def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, rotated):
-    axis_id = 0 if rotated else 1
-    signal_array_adj = _adjust_first_and_last_bins(slice_gdos._raw_ws.getSignalArray())
-    signal = signal_array_adj.sum(axis=axis_id, keepdims=True)
-    error_array_adj = _adjust_first_and_last_bins(slice_gdos._raw_ws.getErrorSquaredArray())
-    error_squared = error_array_adj.sum(axis=axis_id, keepdims=True)
-    if not rotated:
+def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, slice_rotated, cut_rotated):
+    cut_slice_allignment = slice_rotated == cut_rotated
+    axis_id = 1 if cut_slice_allignment else 0
+    signal = slice_gdos._raw_ws.getSignalArray().sum(axis=axis_id, keepdims=True)
+    error_squared = slice_gdos._raw_ws.getErrorSquaredArray().sum(axis=axis_id, keepdims=True)
+    if not cut_slice_allignment:
         signal = signal.transpose()
         error_squared = error_squared.transpose()
     if algorithm == 'Integration':
         signal = signal * int_axis.step
 
-    x_dim = slice_gdos._raw_ws.getXDimension() if not rotated else slice_gdos._raw_ws.getYDimension()
-    y_dim = slice_gdos._raw_ws.getYDimension() if not rotated else slice_gdos._raw_ws.getXDimension()
-    extents = f"{y_dim.getMinimum()},{y_dim.getMaximum()}," \
-              f"{x_dim.getMinimum()},{x_dim.getMaximum()}"
+    x_dim = slice_gdos._raw_ws.getXDimension() if cut_slice_allignment else slice_gdos._raw_ws.getYDimension()
+    y_dim = slice_gdos._raw_ws.getYDimension() if cut_slice_allignment else slice_gdos._raw_ws.getXDimension()
+    extents = f"{x_dim.getMinimum()},{x_dim.getMaximum()}," \
+              f"{y_dim.getMinimum()},{y_dim.getMaximum()}"
     no_of_bins = f"{signal.shape[0]},{signal.shape[1]}"
-    names = f"{y_dim.name},{x_dim.name}"
-    units = f"{y_dim.getUnits()},{x_dim.getUnits()}"
+    names = f"{x_dim.name},{y_dim.name}"
+    units = f"{x_dim.getUnits()},{y_dim.getUnits()}"
 
     new_ws = CreateMDHistoWorkspace(Dimensionality=2, Extents=extents, SignalInput=signal, ErrorInput=error_squared,
                     NumberOfBins=no_of_bins, Names=names, Units=units)
