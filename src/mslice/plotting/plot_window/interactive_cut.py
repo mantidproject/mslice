@@ -55,6 +55,7 @@ class InteractiveCut(object):
             workspace = get_workspace_handle(self._ws_title)
             cut = Cut(ax, integration_axis, None, None, sample_temp=self.slice_plot.temp, e_fixed=workspace.e_fixed)
             cut.parent_ws_name = self._ws_title
+            cut.icut = self
             self._cut_plotter_presenter.plot_interactive_cut(workspace, cut, store, self.slice_plot.intensity_type)
             self._cut_plotter_presenter.set_is_icut(True)
             if self._is_initial_cut_plotter_presenter:

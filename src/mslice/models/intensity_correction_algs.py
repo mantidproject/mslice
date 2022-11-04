@@ -110,10 +110,10 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     return gdos
 
 
-def cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm):
+def cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
     original_data_ws = get_workspace_handle(scattering_data.parent)
     if isinstance(original_data_ws, PixelWorkspace):
-        return _cut_compute_gdos_pixel(original_data_ws, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm)
+        return _cut_compute_gdos_pixel(original_data_ws, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut)
     else:
         parent_slice = get_workspace_handle("__" + scattering_data.parent)
         return _cut_compute_gdos(parent_slice, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm)
@@ -130,12 +130,12 @@ def _cut_compute_gdos(parent_ws, sample_temp, q_axis, e_axis, rotated, norm_to_o
     return compute_cut(slice_gdos, cut_axis, int_axis, norm_to_one, algorithm)
 
 
-def _cut_compute_gdos_pixel(parent_ws, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm):
+def _cut_compute_gdos_pixel(parent_ws, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
     q_limits = parent_ws.limits[q_axis.units]
     e_limits = parent_ws.limits[e_axis.units]
 
-    slice_q_axis = _get_slice_axis(q_limits, q_axis)
-    slice_e_axis = _get_slice_axis(e_limits, e_axis)
+    slice_q_axis = _get_slice_axis(q_limits, q_axis, is_icut)
+    slice_e_axis = _get_slice_axis(e_limits, e_axis, is_icut)
 
     slice_rotated = not is_momentum(parent_ws.raw_ws.getXDimension().getUnits())  # fn arg rotated refers to cut
     slice_x_axis = slice_e_axis if slice_rotated else slice_q_axis
@@ -149,17 +149,22 @@ def _cut_compute_gdos_pixel(parent_ws, sample_temp, q_axis, e_axis, rotated, nor
     return _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, slice_rotated, rotated)
 
 
-def _get_slice_axis(slice_limits, cut_axis):
-    data_start = slice_limits[0]
-    step_size = slice_limits[2]
+def _get_slice_axis(slice_limits, cut_axis, is_icut):
+    slice_step_size = slice_limits[2]
+    if is_icut:  # avoid loss of resolution by aligning icut with slice bins
+        data_start = slice_limits[0]
+        steps_before_cut = trunc((cut_axis.start - data_start) / slice_step_size)
+        step_aligned_cut_start = data_start + steps_before_cut * slice_step_size
 
-    steps_before_cut = trunc((cut_axis.start - data_start) / step_size)
-    step_aligned_cut_start = data_start + steps_before_cut * step_size
-
-    steps_to_cut_end = ceil((cut_axis.end - data_start) / step_size)
-    step_aligned_cut_end = data_start + steps_to_cut_end * step_size
-
-    return Axis(cut_axis.units, step_aligned_cut_start, step_aligned_cut_end, step_size, cut_axis.e_unit)
+        steps_to_cut_end = ceil((cut_axis.end - data_start) / slice_step_size)
+        step_aligned_cut_end = data_start + steps_to_cut_end * slice_step_size
+        ret_axis = Axis(cut_axis.units, step_aligned_cut_start, step_aligned_cut_end, slice_step_size, cut_axis.e_unit)
+    else:  # if not icut (user specified), retain user input unless smaller than data steps.
+        step_size = cut_axis.step if cut_axis.step != 0 else slice_limits[2]
+        if step_size < slice_step_size:
+            step_size = slice_step_size
+        ret_axis = Axis(cut_axis.units, cut_axis.start, cut_axis.end, step_size, cut_axis.e_unit)
+    return ret_axis
 
 
 def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, slice_rotated, cut_rotated):
