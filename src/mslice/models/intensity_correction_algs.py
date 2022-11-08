@@ -6,12 +6,11 @@ from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.pixel_workspace import PixelWorkspace, HistogramWorkspace
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.axis import Axis
 from mslice.util.mantid.mantid_algorithms import CloneWorkspace, CreateMDHistoWorkspace
 from mslice.util.numpy_helper import apply_with_swapped_axes, transform_array_to_workspace
-from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.slice.slice_functions import compute_slice
 from mslice.models.labels import is_momentum
 from math import trunc, ceil
@@ -98,8 +97,13 @@ def generate_modification_array(multiplier, up_to_index, signal):
 
 
 def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
-    n_bins_energy = scattering_data.get_signal().shape[0] if rotated else scattering_data.get_signal().shape[1]
-    n_bins_momentum = scattering_data.get_signal().shape[1] if rotated else scattering_data.get_signal().shape[0]
+    x_units = e_axis.units if rotated else q_axis.units
+    x_dim, y_dim = _get_slice_dimensions(scattering_data, x_units)
+    x_dim_shape_index = 0 if x_dim.name == scattering_data._raw_ws.getXDimension().name else 1
+    y_dim_shape_index = 0 if y_dim.name == scattering_data._raw_ws.getXDimension().name else 1
+    signal = scattering_data.get_signal() if isinstance(scattering_data, HistogramWorkspace) else scattering_data.get_signal().transpose()
+    n_bins_energy = signal.shape[x_dim_shape_index] if rotated else signal.shape[y_dim_shape_index]
+    n_bins_momentum = signal.shape[y_dim_shape_index] if rotated else signal.shape[x_dim_shape_index]
     energy_transfer = axis_values(e_axis, n_bins_energy)
     momentum_transfer = axis_values(q_axis, n_bins_momentum)
     momentum_transfer = np.square(momentum_transfer, out=momentum_transfer)
@@ -115,19 +119,24 @@ def cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm
     if isinstance(original_data_ws, PixelWorkspace):
         return _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut)
     else:
-        parent_slice = get_workspace_handle("__" + scattering_data.parent)
-        return _cut_compute_gdos(parent_slice, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm)
+        return _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut)
 
 
-def _cut_compute_gdos(parent_ws, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm):
+def _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
+    parent_ws = get_workspace_handle(scattering_data.parent)
+
     q_limits = parent_ws.limits[q_axis.units]
     e_limits = parent_ws.limits[e_axis.units]
-    slice_q_axis = Axis(q_axis.units, q_limits[0], q_limits[1], q_limits[2], q_axis.e_unit)
-    slice_e_axis = Axis(e_axis.units, e_limits[0], e_limits[1], e_limits[2], e_axis.e_unit)
-    slice_gdos = slice_compute_gdos(parent_ws, sample_temp, slice_q_axis, slice_e_axis, rotated)
-    cut_axis = e_axis if rotated else q_axis
-    int_axis = q_axis if rotated else e_axis
-    return compute_cut(slice_gdos, cut_axis, int_axis, norm_to_one, algorithm)
+    slice_q_axis = _get_slice_axis(q_limits, q_axis, is_icut)
+    slice_e_axis = _get_slice_axis(e_limits, e_axis, is_icut)
+    slice_x_axis = slice_e_axis if rotated else slice_q_axis
+    slice_y_axis = slice_q_axis if rotated else slice_e_axis
+    rebin_slice = compute_slice(parent_ws, slice_x_axis, slice_y_axis, norm_to_one)
+    slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, slice_q_axis, slice_e_axis, rotated)
+    cut_axis = slice_e_axis if rotated else slice_q_axis
+    int_axis = slice_q_axis if rotated else slice_e_axis
+    cut_axis_id = 0 if rotated else 1
+    return _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, True)
 
 
 def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
@@ -152,7 +161,10 @@ def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotate
 
     cut_axis = rebin_slice_e_axis if rotated else rebin_slice_q_axis
     int_axis = rebin_slice_q_axis if rotated else rebin_slice_e_axis
-    return _reduce_bins_along_int_axis(rebin_slice_gdos, algorithm, cut_axis, int_axis, slice_rotated, rotated)
+
+    cut_slice_alignment = slice_rotated == rotated
+    cut_axis_id = 1 if cut_slice_alignment else 0
+    return _reduce_bins_along_int_axis(rebin_slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment)
 
 
 def _get_slice_axis(pixel_limits, cut_axis, is_icut):
@@ -173,22 +185,22 @@ def _get_slice_axis(pixel_limits, cut_axis, is_icut):
     return ret_axis
 
 
-def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, slice_rotated, cut_rotated):
-    cut_slice_allignment = slice_rotated == cut_rotated
-    axis_id = 1 if cut_slice_allignment else 0
-    signal = np.nansum(slice_gdos._raw_ws.getSignalArray(), axis=axis_id, keepdims=True)
-    error_squared = np.nansum(slice_gdos._raw_ws.getErrorSquaredArray(), axis_id, keepdims=True)
-    if not cut_slice_allignment:
+def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment):
+    signal = np.nansum(_get_slice_signal_array(slice_gdos), axis=cut_axis_id, keepdims=True)
+    error_squared = np.nansum(_get_slice_error_array(slice_gdos), cut_axis_id, keepdims=True)
+    if not cut_slice_alignment:
         signal = signal.transpose()
         error_squared = error_squared.transpose()
     if algorithm == 'Integration':
         signal = signal * int_axis.step
 
-    x_dim = slice_gdos._raw_ws.getXDimension() if cut_slice_allignment else slice_gdos._raw_ws.getYDimension()
-    y_dim = slice_gdos._raw_ws.getYDimension() if cut_slice_allignment else slice_gdos._raw_ws.getXDimension()
-    extents = f"{x_dim.getMinimum()},{x_dim.getMaximum()}," \
-              f"{y_dim.getMinimum()},{y_dim.getMaximum()}"
-    no_of_bins = f"{signal.shape[0]},{signal.shape[1]}"
+    int_axis_id = 0 if cut_axis_id else 1
+    slice_x, slice_y = _get_slice_dimensions(slice_gdos, cut_axis.units)
+    x_dim = slice_x if cut_slice_alignment else slice_y
+    y_dim = slice_y if cut_slice_alignment else slice_x
+    extents = f"{y_dim.getMinimum()},{y_dim.getMaximum()}," \
+              f"{x_dim.getMinimum()},{x_dim.getMaximum()}"
+    no_of_bins = f"{signal.shape[cut_axis_id]},{signal.shape[int_axis_id]}"
     names = f"{x_dim.name},{y_dim.name}"
     units = f"{x_dim.getUnits()},{y_dim.getUnits()}"
 
@@ -198,6 +210,33 @@ def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, slice
     int_axis.step = 0
     new_ws.axes = (cut_axis, int_axis)
     return new_ws
+
+
+def _get_slice_dimensions(slice, x_units):
+    x_is_momentum = is_momentum(x_units)
+    dim1 = slice._raw_ws.getXDimension()
+    dim2 = slice._raw_ws.getYDimension()
+    if (x_is_momentum and is_momentum(dim1.getUnits())) or (not x_is_momentum and not is_momentum(dim1.getUnits())):
+        ret_val = (dim1, dim2)
+    else:
+        ret_val = (dim2, dim1)
+    return ret_val
+
+
+def _get_slice_signal_array(slice):
+    if hasattr(slice, 'get_signal'):
+        signal_array = slice.get_signal()
+    else:
+        signal_array = slice._raw_ws.getSignalArray()
+    return signal_array
+
+
+def _get_slice_error_array(slice):
+    if hasattr(slice, 'get_variance'):
+        error_array = slice.get_variance()
+    else:
+        error_array = slice._raw_ws.getErrorSquaredArray()
+    return error_array
 
 
 def _adjust_first_and_last_bins(array):

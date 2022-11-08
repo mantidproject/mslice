@@ -12,7 +12,7 @@ MOD_Q_LABEL = '|Q|'
 THETA_LABEL = '2Theta'
 DELTA_E_LABEL = 'DeltaE'
 TWOTHETA_UNITS = ('Degrees', '2Theta')
-MOMENTUM_UNITS = ('MomentumTransfer', '|Q|')
+MOMENTUM_UNITS = ('MomentumTransfer', '|Q|', 'Angstrom^-1')
 
 
 def is_twotheta(unit):
