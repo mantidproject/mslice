@@ -36,6 +36,7 @@
 )
 @if %CONDA_DEFAULT_ENV% == mantidnightly (
     @set ActiveEnv=true
+    goto Conda
 ) else (
     goto NoConda
 )
@@ -48,6 +49,7 @@
 %MANTIDPATH%\python.exe %THIS_DIR%scripts\start_mslice.py
 @goto End
 
+:Conda
 @set PYTHONPATH=%THIS_DIR%; %CONDA_PREFIX%
 
 python %THIS_DIR%scripts\start_mslice.py
