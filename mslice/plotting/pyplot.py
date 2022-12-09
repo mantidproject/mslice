@@ -54,7 +54,7 @@ from matplotlib.text import Text, Annotation
 from matplotlib.patches import Polygon, Rectangle, Circle, Arrow
 from matplotlib.widgets import Button, Slider, Widget
 
-from .ticker import (
+from matplotlib.ticker import (
     TickHelper, Formatter, FixedFormatter, NullFormatter, FuncFormatter,
     FormatStrFormatter, ScalarFormatter, LogFormatter, LogFormatterExponent,
     LogFormatterMathtext, Locator, IndexLocator, FixedLocator, NullLocator,
@@ -88,7 +88,7 @@ def _copy_docstring_and_deprecators(method, func=None):
 ## Global ##
 
 
-def draw_if_interactive():
+def _draw_all_if_interactive():
     # We will always draw because mslice might be running without
     # matplotlib interactive
     for fig in GlobalFigureManager.all_figures():
@@ -344,6 +344,18 @@ def new_figure_manager(*args, **kwargs):
     _warn_if_gui_out_of_main_thread()
     return _get_backend_mod().new_figure_manager(*args, **kwargs)
 
+
+# This function's signature is rewritten upon backend-load by switch_backend.
+def draw_if_interactive(*args, **kwargs):
+    """
+    Redraw the current figure if in interactive mode.
+
+    .. warning::
+
+        End users will typically not have to call this function because the
+        the interactive mode takes care of this.
+    """
+    return _get_backend_mod().draw_if_interactive(*args, **kwargs)
 
 
 # This function's signature is rewritten upon backend-load by switch_backend.
