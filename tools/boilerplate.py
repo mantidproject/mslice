@@ -180,7 +180,7 @@ def generate_function(name, called_fullname, template, **kwargs):
            '{0}'
            if param.kind in [
                Parameter.POSITIONAL_OR_KEYWORD]
-              and param.default is Parameter.empty else
+             and param.default is Parameter.empty else
            # Only pass the data kwarg if it is actually set, to avoid forcing
            # third-party subclasses to support it.
            '**({{"data": data}} if data is not None else {{}})'
@@ -198,7 +198,7 @@ def generate_function(name, called_fullname, template, **kwargs):
            if param.kind is Parameter.VAR_KEYWORD else
            # Intentionally crash for Parameter.POSITIONAL_ONLY.
            None).format(param.name)
-       for param in params) + ')'
+         for param in params) + ')'
     MAX_CALL_PREFIX = 18  # len('    __ret = gca().')
     if MAX_CALL_PREFIX + max(len(name), len(called_name)) + len(call) >= 80:
         call = '(\n' + text_wrapper.fill(call[1:]).replace('\0', ' ')
@@ -406,5 +406,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         pyplot_path = Path(sys.argv[1])
     else:
-        pyplot_path = Path(__file__).parent / "../mslice\plotting/pyplot.py"
+        pyplot_path = Path(__file__).parent / "../mslice/plotting/pyplot.py"
     build_pyplot(pyplot_path)
