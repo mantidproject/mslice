@@ -174,31 +174,37 @@ def generate_function(name, called_fullname, template, **kwargs):
         # Move opening parenthesis before newline.
         signature = '(\n' + text_wrapper.fill(signature).replace('(', '', 1)
     # How to call the wrapped function.
-    call = '(' + ', '.join((
-           # Pass "intended-as-positional" parameters positionally to avoid
-           # forcing third-party subclasses to reproduce the parameter names.
-           '{0}'
-           if param.kind in [
-               Parameter.POSITIONAL_OR_KEYWORD]
-             and param.default is Parameter.empty else
-           # Only pass the data kwarg if it is actually set, to avoid forcing
-           # third-party subclasses to support it.
-           '**({{"data": data}} if data is not None else {{}})'
-           # Avoid linebreaks in the middle of the expression, by using \0 as a
-           # placeholder that will be substituted after wrapping.
-           .replace(' ', '\0')
-           if param.name == "data" else
-           '{0}={0}'
-           if param.kind in [
-               Parameter.POSITIONAL_OR_KEYWORD,
-               Parameter.KEYWORD_ONLY] else
-           '*{0}'
-           if param.kind is Parameter.VAR_POSITIONAL else
-           '**{0}'
-           if param.kind is Parameter.VAR_KEYWORD else
-           # Intentionally crash for Parameter.POSITIONAL_ONLY.
-           None).format(param.name)
-         for param in params) + ')'
+    call = (
+        "("
+        + ", ".join(
+            (
+                # Pass "intended-as-positional" parameters positionally to avoid
+                # forcing third-party subclasses to reproduce the parameter names.
+                "{0}"
+                if param.kind in [Parameter.POSITIONAL_OR_KEYWORD]
+                and param.default is Parameter.empty
+                else
+                # Only pass the data kwarg if it is actually set, to avoid forcing
+                # third-party subclasses to support it.
+                '**({{"data": data}} if data is not None else {{}})'
+                # Avoid linebreaks in the middle of the expression, by using \0 as a
+                # placeholder that will be substituted after wrapping.
+                .replace(" ", "\0")
+                if param.name == "data"
+                else "{0}={0}"
+                if param.kind in [Parameter.POSITIONAL_OR_KEYWORD, Parameter.KEYWORD_ONLY]
+                else "*{0}"
+                if param.kind is Parameter.VAR_POSITIONAL
+                else "**{0}"
+                if param.kind is Parameter.VAR_KEYWORD
+                else
+                # Intentionally crash for Parameter.POSITIONAL_ONLY.
+                None
+            ).format(param.name)
+            for param in params
+        )
+        + ")"
+    )
     MAX_CALL_PREFIX = 18  # len('    __ret = gca().')
     if MAX_CALL_PREFIX + max(len(name), len(called_name)) + len(call) >= 80:
         call = '(\n' + text_wrapper.fill(call[1:]).replace('\0', ' ')
