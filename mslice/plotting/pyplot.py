@@ -287,7 +287,7 @@ def switch_backend(newbackend):
 
         def draw_if_interactive():
             if matplotlib.is_interactive():
-                manager = GlobalFigureManager.get_active()
+                manager = _pylab_helpers.Gcf.get_active()
                 if manager:
                     manager.canvas.draw_idle()
 
@@ -308,6 +308,7 @@ def switch_backend(newbackend):
     # Need to keep a global reference to the backend for compatibility reasons.
     # See https://github.com/matplotlib/matplotlib/issues/6092
     matplotlib.backends.backend = newbackend
+
     # make sure the repl display hook is installed in case we become
     # interactive
     install_repl_displayhook()
