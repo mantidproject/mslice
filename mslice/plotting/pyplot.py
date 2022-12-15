@@ -152,9 +152,6 @@ def uninstall_repl_displayhook():
     _REPL_DISPLAYHOOK = _ReplDisplayHook.NONE
 
 
-#draw_all = _pylab_helpers.Gcf.draw_all
-
-
 @_copy_docstring_and_deprecators(matplotlib.set_loglevel)
 def set_loglevel(*args, **kwargs):  # Ensure this appears in the pyplot docs.
     return matplotlib.set_loglevel(*args, **kwargs)
@@ -290,7 +287,7 @@ def switch_backend(newbackend):
 
         def draw_if_interactive():
             if matplotlib.is_interactive():
-                manager = _pylab_helpers.Gcf.get_active()
+                manager = GlobalFigureManager.get_active()
                 if manager:
                     manager.canvas.draw_idle()
 
@@ -311,7 +308,6 @@ def switch_backend(newbackend):
     # Need to keep a global reference to the backend for compatibility reasons.
     # See https://github.com/matplotlib/matplotlib/issues/6092
     matplotlib.backends.backend = newbackend
-
     # make sure the repl display hook is installed in case we become
     # interactive
     install_repl_displayhook()
@@ -355,7 +351,10 @@ def draw_if_interactive(*args, **kwargs):
         End users will typically not have to call this function because the
         the interactive mode takes care of this.
     """
-    return _get_backend_mod().draw_if_interactive(*args, **kwargs)
+    # We will always draw because mslice might be running without
+    # matplotlib interactive
+    for fig in GlobalFigureManager.all_figures():
+        fig.canvas.draw()
 
 
 # This function's signature is rewritten upon backend-load by switch_backend.
@@ -403,8 +402,7 @@ def show(*args, **kwargs):
     the end of every cell by default. Thus, you usually don't have to call it
     explicitly there.
     """
-    _warn_if_gui_out_of_main_thread()
-    return _get_backend_mod().show(*args, **kwargs)
+    return gcf().show(*args, **kwargs)
 
 
 def isinteractive():
