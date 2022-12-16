@@ -46,6 +46,10 @@ from matplotlib.scale import get_scale_names
 
 from matplotlib import cm
 from matplotlib.cm import _colormaps as colormaps, register_cmap
+try:
+    from matplotlib.cm import _get_cmap as get_cmap
+except ImportError:
+    from matplotlib.cm import get_cmap
 
 import numpy as np
 
@@ -1937,13 +1941,6 @@ def clim(vmin=None, vmax=None):
         raise RuntimeError('You must first define an image, e.g., with imshow')
 
     im.set_clim(vmin, vmax)
-
-
-# eventually this implementation should move here, use indirection for now to
-# avoid having two copies of the code floating around.
-def get_cmap(name=None, lut=None):
-    return cm._get_cmap(name=name, lut=lut)
-get_cmap.__doc__ = cm._get_cmap.__doc__
 
 
 def set_cmap(cmap):
