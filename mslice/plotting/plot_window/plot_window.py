@@ -258,6 +258,9 @@ class PlotWindow(QtWidgets.QMainWindow):
     @waterfall.setter
     def waterfall(self, value):
         self.action_waterfall.setChecked(value)
+        if value:
+            self.action_waterfall.setVisible(True)
+            self.action_waterfall.setEnabled(True)
         self.toggle_waterfall_edit()
 
     @property

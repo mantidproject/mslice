@@ -61,7 +61,7 @@ def _set_label_options(view, target):
 
 def check_latex(value):
     if '$' in value:
-        parser = MathTextParser('ps')
+        parser = MathTextParser('agg')
         try:
             parser.parse(value)
         except ValueError:
