@@ -16,6 +16,9 @@ class ColorsTest(unittest.TestCase):
     def test_known_color_name_gives_expected_hex(self):
         self.assertEqual("#2ca02c", name_to_color("green"))
 
+    def test_unknown_color_returns_hex_if_it_is_a_hex_code(self):
+        self.assertEqual("#9933ff", name_to_color("#9933ff"))
+
     def test_known_hex_gives_expected_color_name(self):
         self.assertEqual("green", color_to_name("#2ca02c"))
 
@@ -28,6 +31,9 @@ class ColorsTest(unittest.TestCase):
     def test_basic_color_is_known(self):
         self.assertEqual('cyan', color_to_name('#17becf'))
         self.assertEqual('navy', color_to_name('#000080'))
+
+    def test_unknown_color_is_returned_if_it_is_a_hex_code(self):
+        self.assertEqual("#9933ff", color_to_name("#9933ff"))
 
     def test_pretty_name(self):
         self.assertEqual('blue', pretty_name('tab:blue'))
