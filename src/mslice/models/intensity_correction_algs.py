@@ -187,10 +187,10 @@ def _get_slice_axis(pixel_limits, cut_axis, is_icut):
 
 def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment):
     signal = np.nansum(_get_slice_signal_array(slice_gdos), axis=cut_axis_id, keepdims=True)
-    error_squared = np.nansum(_get_slice_error_array(slice_gdos), cut_axis_id, keepdims=True)
+    error = np.nansum(_get_slice_error_array(slice_gdos), cut_axis_id, keepdims=True)
     if not cut_slice_alignment:
         signal = signal.transpose()
-        error_squared = error_squared.transpose()
+        error = error.transpose()
     if algorithm == 'Integration':
         signal = signal * int_axis.step
 
@@ -204,7 +204,7 @@ def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_a
     names = f"{x_dim.name},{y_dim.name}"
     units = f"{x_dim.getUnits()},{y_dim.getUnits()}"
 
-    new_ws = CreateMDHistoWorkspace(Dimensionality=2, Extents=extents, SignalInput=signal, ErrorInput=error_squared,
+    new_ws = CreateMDHistoWorkspace(Dimensionality=2, Extents=extents, SignalInput=signal, ErrorInput=error,
                     NumberOfBins=no_of_bins, Names=names, Units=units)
 
     int_axis.step = 0
@@ -224,23 +224,11 @@ def _get_slice_dimensions(slice, x_units):
 
 
 def _get_slice_signal_array(slice):
-    if hasattr(slice, 'get_signal'):
-        signal_array = slice.get_signal()
-    else:
-        signal_array = slice._raw_ws.getSignalArray()
-    return signal_array
+    return slice.get_signal()
 
 
 def _get_slice_error_array(slice):
-    if hasattr(slice, 'get_variance'):
-        error_array = slice.get_variance()
-    else:
-        error_array = slice._raw_ws.getErrorSquaredArray()
-    return error_array
-
-
-def _adjust_first_and_last_bins(array):
-    return array
+    return slice.get_error()
 
 
 def sample_temperature(ws_name, sample_temp_fields):

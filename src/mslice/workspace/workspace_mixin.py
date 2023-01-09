@@ -49,9 +49,9 @@ class WorkspaceMixin(object):
         for i in range(raw_ws.getNumberHistograms()):
             raw_ws.setY(i, signal[i])
 
-    def _set_error_raw(self, raw_ws, variance):
+    def _set_error_raw(self, raw_ws, error):
         for i in range(raw_ws.getNumberHistograms()):
-            raw_ws.setE(i, variance[i])
+            raw_ws.setE(i, error[i])
 
     def _binary_op_array(self, operator, other):
         """Perform binary operation using a numpy array with the same number of elements as an axis of _raw_ws signal"""
