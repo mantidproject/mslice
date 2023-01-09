@@ -131,7 +131,7 @@ def _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, nor
     slice_e_axis = _get_slice_axis(e_limits, e_axis, is_icut)
     slice_x_axis = slice_e_axis if rotated else slice_q_axis
     slice_y_axis = slice_q_axis if rotated else slice_e_axis
-    rebin_slice = compute_slice(parent_ws, slice_x_axis, slice_y_axis, norm_to_one)
+    rebin_slice = compute_slice(parent_ws, slice_x_axis, slice_y_axis, norm_to_one, store_in_ADS=False)
     slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, slice_q_axis, slice_e_axis, rotated)
     cut_axis = slice_e_axis if rotated else slice_q_axis
     int_axis = slice_q_axis if rotated else slice_e_axis
@@ -155,7 +155,7 @@ def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotate
 
     rebin_slice_x_axis = rebin_slice_e_axis if slice_rotated else rebin_slice_q_axis
     rebin_slice_y_axis = rebin_slice_q_axis if slice_rotated else rebin_slice_e_axis
-    rebin_slice = compute_slice(pixel_ws, rebin_slice_x_axis, rebin_slice_y_axis, norm_to_one)
+    rebin_slice = compute_slice(pixel_ws, rebin_slice_x_axis, rebin_slice_y_axis, norm_to_one, store_in_ADS=False)
 
     rebin_slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, rebin_slice_q_axis, rebin_slice_e_axis, slice_rotated)
 
