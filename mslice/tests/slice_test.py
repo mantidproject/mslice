@@ -56,7 +56,8 @@ class SliceTest(unittest.TestCase):
 
         test_slice = self._create_slice(workspace=test_output_workspace, e_axis=test_energy_axis)
         test_slice.d2sigma
-        compute_d2sigma_fn.assert_called_once_with(test_output_workspace, test_energy_axis)
+        compute_d2sigma_fn.assert_called_once_with(test_output_workspace, test_energy_axis,
+                                                   test_output_workspace.scattering_function.e_fixed)
 
     def test_d2sigma_returns_if_already_computed(self):
         test_d2sigma = 5.0
@@ -74,7 +75,7 @@ class SliceTest(unittest.TestCase):
         test_slice = self._create_slice(workspace=test_output_workspace, sample_temp=test_sample_temp,
                                         q_axis=test_momentum_axis, e_axis=test_energy_axis)
         test_slice.symmetrised
-        compute_symmetrised_fn.assert_called_once_with(test_output_workspace, test_sample_temp,test_momentum_axis, test_energy_axis)
+        compute_symmetrised_fn.assert_called_once_with(test_output_workspace, test_sample_temp,test_momentum_axis, test_energy_axis, None)
 
     def test_symmetrised_returns_if_already_computed(self):
         test_symmetrised = 5.0
@@ -91,7 +92,7 @@ class SliceTest(unittest.TestCase):
         test_slice = self._create_slice(workspace=test_output_workspace, sample_temp=test_sample_temp,
                                         e_axis=test_energy_axis)
         test_slice.gdos
-        compute_gdos_fn.assert_called_once_with(test_output_workspace, test_sample_temp, test_energy_axis)
+        compute_gdos_fn.assert_called_once_with(test_output_workspace, test_sample_temp, None, test_energy_axis, None)
 
     def test_gdos_returns_if_already_computed(self):
         test_gdos = 5.0
