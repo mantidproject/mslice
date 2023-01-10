@@ -136,7 +136,7 @@ def _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, nor
     cut_axis = slice_e_axis if rotated else slice_q_axis
     int_axis = slice_q_axis if rotated else slice_e_axis
     cut_axis_id = 0 if rotated else 1
-    return _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, True)
+    return _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, True, scattering_data.name)
 
 
 def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
@@ -164,7 +164,8 @@ def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotate
 
     cut_slice_alignment = slice_rotated == rotated
     cut_axis_id = 1 if cut_slice_alignment else 0
-    return _reduce_bins_along_int_axis(rebin_slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment)
+    return _reduce_bins_along_int_axis(rebin_slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment,
+                                       scattering_data.name)
 
 
 def _get_slice_axis(pixel_limits, cut_axis, is_icut):
@@ -185,7 +186,7 @@ def _get_slice_axis(pixel_limits, cut_axis, is_icut):
     return ret_axis
 
 
-def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment):
+def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment, output_name):
     signal = np.nansum(_get_slice_signal_array(slice_gdos), axis=cut_axis_id, keepdims=True)
     error = np.nansum(_get_slice_error_array(slice_gdos), cut_axis_id, keepdims=True)
     if not cut_slice_alignment:
@@ -209,6 +210,7 @@ def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_a
 
     int_axis.step = 0
     new_ws.axes = (cut_axis, int_axis)
+    new_ws.name = output_name
     return new_ws
 
 
