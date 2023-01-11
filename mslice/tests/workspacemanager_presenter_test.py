@@ -266,8 +266,9 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter = WorkspaceManagerPresenter(self.view)
         self.view.get_workspace_index = mock.Mock(return_value=0)
         get_ws_name_mock.return_value = 'ws'
-        self.presenter.set_selected_workspaces([mock.Mock()])
-        get_ws_name_mock.assert_called_once_with(None)
+        ws_mock = mock.Mock()
+        self.presenter.set_selected_workspaces([ws_mock])
+        get_ws_name_mock.assert_called_once_with(ws_mock)
         self.view.get_workspace_index.assert_called_once_with('ws')
         self.view.set_workspace_selected.assert_called_once_with([0])
 
