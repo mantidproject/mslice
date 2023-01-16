@@ -18,6 +18,8 @@ the string cyan
 """
 from __future__ import (absolute_import, division)
 
+import re
+
 from matplotlib import rcParams
 
 from six import iteritems
@@ -39,6 +41,7 @@ except ImportError:
 _BASIC_COLORS_HEX_MAPPING = {'blue': '#1f77b4', 'orange': '#ff7f0e', 'green': '#2ca02c', 'red': '#d62728',
                              'purple': '#9467bd', 'brown': '#8c564b', 'pink': '#e377c2', 'gray': '#7f7f7f',
                              'olive': '#bcbd22', 'cyan': '#17becf', 'yellow': '#bfbf00', 'magenta': '#bf00bf'}
+HEX_COLOR_REGEX = re.compile(r'^#(?:[0-9a-fA-F]{3}){1,2}$')
 
 
 def pretty_name(name):
@@ -75,16 +78,20 @@ def name_to_color(name):
     Translate between our string names and the mpl color
     representation
     :param name: One of our known string names
-    :return: The string identifier we have chosen
-    :raises: ValueError if the color is not known
+    :return: The string identifier we have chosen, or a HEX code if an identifier does not exist
+    :raises: ValueError if the color is not known and is not a HEX code
     """
-    try:
+    if name in _BASIC_COLORS_HEX_MAPPING:
         return _BASIC_COLORS_HEX_MAPPING[name]
-    except KeyError:
-        try:
-            return mpl_named_colors()[name]
-        except KeyError:
-            raise ValueError("Color name {} unknown".format(name))
+
+    mpl_colors = mpl_named_colors()
+    if name in mpl_colors:
+        return mpl_colors[name]
+
+    if re.match(HEX_COLOR_REGEX, name):
+        return name
+
+    raise ValueError(f"Unknown color name '{name}'")
 
 
 def color_to_name(color):
@@ -92,16 +99,19 @@ def color_to_name(color):
     Translate between a matplotlib color representation
     and our string names.
     :param color: Any matplotlib color representation
-    :return: The string identifier we have chosen
-    :raises: ValueError if the color is not known
+    :return: The string identifier we have chosen, or a HEX code if an identifier does not exist
+    :raises: ValueError if the color is not known and is not a HEX code
     """
     color_as_hex = to_hex(color)
     for name, hexvalue in iteritems(_BASIC_COLORS_HEX_MAPPING):
         if color_as_hex == hexvalue:
             return name
-    else:
-        for name, value in iteritems(mpl_named_colors()):
-            if color_as_hex == to_hex(value):
-                return pretty_name(name)
-        else:
-            raise ValueError("matplotlib color {} unknown".format(color))
+
+    for name, value in iteritems(mpl_named_colors()):
+        if color_as_hex == to_hex(value):
+            return pretty_name(name)
+
+    if re.match(HEX_COLOR_REGEX, color):
+        return color
+
+    raise ValueError(f"Unknown matplotlib color '{color}'")
