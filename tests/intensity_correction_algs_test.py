@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
-from mock import patch, MagicMock, call, ANY
+from mock import patch, MagicMock, call
 import numpy as np
 import unittest
 from copy import copy

@@ -206,8 +206,8 @@ def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_a
     names = f"{x_dim.name},{y_dim.name}"
     units = f"{x_dim.getUnits()},{y_dim.getUnits()}"
 
-    new_ws = CreateMDHistoWorkspace(Dimensionality=2, Extents=extents, SignalInput=signal, ErrorInput=error,
-                    NumberOfBins=no_of_bins, Names=names, Units=units)
+    new_ws = CreateMDHistoWorkspace(Dimensionality=2, Extents=extents, SignalInput=signal, ErrorInput=error, NumberOfBins=no_of_bins,
+                                    Names=names, Units=units)
 
     int_axis.step = 0
     new_ws.axes = (cut_axis, int_axis)

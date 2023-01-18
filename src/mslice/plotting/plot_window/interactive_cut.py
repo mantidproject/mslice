@@ -142,4 +142,3 @@ class InteractiveCut(object):
     def refresh_current_cut(self):
         if self._drawn_rect_exists():
             self.plot_cut(*self.rect.extents)
-
