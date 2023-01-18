@@ -173,10 +173,10 @@ def _get_slice_axis(pixel_limits, cut_axis, is_icut):
     if is_icut:  # avoid loss of resolution by aligning icut with slice bins
         data_start = pixel_limits[0]
         steps_before_cut = trunc((cut_axis.start - data_start) / slice_step_size)
-        step_aligned_cut_start = data_start + steps_before_cut * slice_step_size
+        step_aligned_cut_start = round(data_start + steps_before_cut * slice_step_size, 8)
 
         steps_to_cut_end = ceil((cut_axis.end - data_start) / slice_step_size)
-        step_aligned_cut_end = data_start + steps_to_cut_end * slice_step_size
+        step_aligned_cut_end = round(data_start + steps_to_cut_end * slice_step_size, 8)
         ret_axis = Axis(cut_axis.units, step_aligned_cut_start, step_aligned_cut_end, slice_step_size, cut_axis.e_unit)
     else:  # if not icut (user specified), retain user input unless smaller than data steps.
         step_size = cut_axis.step if cut_axis.step != 0 else pixel_limits[2]
@@ -194,6 +194,7 @@ def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_a
         error = error.transpose()
     if algorithm == 'Integration':
         signal = signal * int_axis.step
+        error = error * int_axis.step
 
     int_axis_id = 0 if cut_axis_id else 1
     slice_x, slice_y = _get_slice_dimensions(slice_gdos, cut_axis.units)
