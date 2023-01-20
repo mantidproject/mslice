@@ -4,19 +4,19 @@ on: push
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
 
     steps:
       - name: Checkout MSlice
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2.1.1
+        uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           miniforge-version: latest
           miniforge-variant: Mambaforge
@@ -27,7 +27,8 @@ jobs:
 
       - name: Install Mantid
         run: |
-          conda install -c mantid mantid=6.5.0 mantidqt=6.5.0
+          conda install -c mantid/label/nightly mantid mantidqt
+          conda install -c conda-forge setuptools==47.0.0
 
       - name: Flake8
         run: |
