@@ -10,13 +10,13 @@ from qtpy.QtTest import QTest
 import unittest
 
 from unittest import mock
-from mantidqt.utils.qt.testing import start_qapplication
+#from mantidqt.utils.qt.testing import start_qapplication
 from mslice.widgets.plotselector.column_info import Column
 from mslice.widgets.plotselector.view import EXPORT_TYPES, PlotSelectorView
 from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
 
 
-@start_qapplication
+#@start_qapplication
 class PlotSelectorWidgetTest(unittest.TestCase):
 
     def setUp(self):
