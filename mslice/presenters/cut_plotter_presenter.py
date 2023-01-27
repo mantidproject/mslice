@@ -7,7 +7,7 @@ from mslice.models.workspacemanager.workspace_algorithms import export_workspace
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from matplotlib import pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
-from mslice.plotting.globalfiguremanager import CATEGORY_CUT, GlobalFigureManager
+from mslice.plotting.globalfiguremanager import CATEGORY_CUT#, GlobalFigureManager
 from mslice.plotting.plot_window.overplot_interface import remove_line, plot_overplot_line
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
@@ -232,7 +232,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     def set_is_icut(self, is_icut):
         if cut_figure_exists():
-            cur_fig = GlobalFigureManager.get_active_figure().figure
+            cur_fig = plt.gcf()#GlobalFigureManager.get_active_figure().figure
             cur_fig.canvas.manager.set_is_icut(is_icut)
 
     def update_main_window(self):
