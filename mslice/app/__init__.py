@@ -22,7 +22,7 @@ def main():
     """Start the application.
     """
     # Set the global figure manager in matplotlib. Very important this happens first.
-    init_mpl_gcf()
+    #init_mpl_gcf()
 
     qapp_ref = create_qapp_if_required()
 

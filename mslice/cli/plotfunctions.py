@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-#from matplotlib import pyplot as plt
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.cli.helperfunctions import _check_workspace_type, _check_workspace_name, _rescale_energy_cut_plot
@@ -25,7 +24,6 @@ def errorbar(axes, workspace, *args, **kwargs):
     Same as the cli PlotCut but returns the relevant axes object.
     """
     from mslice.app.presenters import get_cut_plotter_presenter
-    #cur_fig = plt.gcf()
     cur_fig = GlobalFigureManager.get_active_figure().figure
     cur_canvas = cur_fig.canvas
 

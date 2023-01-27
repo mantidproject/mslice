@@ -14,10 +14,6 @@ from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.util.qt.qapp import call_in_qapp_thread
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
-# This is not compatible with mslice as we use a separate
-# global figure manager see _mslice_commands.Show
-#del show  # noqa: F821
-
 
 # MSlice Matplotlib Projection
 class MSliceAxes(Axes):

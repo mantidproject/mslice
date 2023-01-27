@@ -7,7 +7,6 @@ PICKER_TOL_PTS = 3
 
 
 def draw_interactive_cut(workspace):
-    #cur_fig = plt.gcf()
     cur_fig = GlobalFigureManager.get_active_figure().figure
     cur_canvas = cur_fig.canvas
     ax = plt.gca()
@@ -31,7 +30,6 @@ def draw_interactive_cut(workspace):
 
 @set_category(CATEGORY_CUT)
 def plot_cut_impl(workspace, intensity_range=None, plot_over=False, legend=None, en_conversion=True):
-    #cur_fig = plt.gcf()
     cur_fig = GlobalFigureManager.get_active_figure().figure
     axes = cur_fig.axes
     if len(axes) == 0:

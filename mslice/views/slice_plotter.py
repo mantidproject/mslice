@@ -12,7 +12,6 @@ def plot_cached_slice(slice_cache, slice_workspace):
 
 @set_category(CATEGORY_SLICE)
 def create_slice_figure(workspace_name, presenter):
-    #fig_canvas = plt.gcf().canvas
     cur_fig = GlobalFigureManager.get_active_figure().figure
     fig_canvas = cur_fig.canvas
     fig_canvas.manager.set_window_title(workspace_name)
