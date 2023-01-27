@@ -5,7 +5,6 @@ from matplotlib import __version__ as mpl_version
 from mslice.util.intensity_correction import IntensityType, IntensityCache
 import re
 
-#COMMON_PACKAGES = ["import mslice.cli as mc", "import mslice.plotting.pyplot as plt\n\n"]
 COMMON_PACKAGES = ["import mslice.cli as mc", "from matplotlib import pyplot as plt\n\n"]
 MPL_COLORS_IMPORT = ["\nimport matplotlib.colors as colors\n"]
 NUMPY_IMPORT = ["\nimport numpy as np\n"]

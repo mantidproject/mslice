@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-#import mslice.plotting.pyplot as plt
 from matplotlib import pyplot as plt
 import mslice.app as app
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle

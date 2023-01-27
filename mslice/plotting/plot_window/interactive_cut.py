@@ -7,7 +7,6 @@ from mslice.models.units import EnergyUnits
 from mslice.models.workspacemanager.workspace_algorithms import (get_limits)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
-#from mslice.plotting.pyplot import GlobalFigureManager
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 class InteractiveCut(object):

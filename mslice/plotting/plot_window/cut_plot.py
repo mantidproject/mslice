@@ -19,7 +19,6 @@ from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line, \
     cif_file_powder_line, _update_powder_lines
-#from mslice.plotting.pyplot import CATEGORY_CUT
 from mslice.plotting.globalfiguremanager import CATEGORY_CUT
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable

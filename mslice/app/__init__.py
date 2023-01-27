@@ -26,10 +26,11 @@ def main():
 
     qapp_ref = create_qapp_if_required()
 
+    show_gui()
+
     #from mslice.plotting.config import initialize_matplotlib  # noqa
     initialize_matplotlib()
 
-    show_gui()
     return qapp_ref.exec_()
 
 
