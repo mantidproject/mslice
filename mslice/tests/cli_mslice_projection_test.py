@@ -6,7 +6,8 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 import mslice.cli._mslice_commands as mc
 from mslice.workspace import wrap_workspace
 #import mslice.plotting.pyplot as plt
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.cli.plotfunctions import pcolormesh, errorbar
 from mslice.cli.helperfunctions import _get_overplot_key
@@ -21,7 +22,8 @@ class CLIProjectionTest(unittest.TestCase):
         self.slice = None
         self.workspace = None
 
-        fig = plt.gcf()
+        #fig = plt.gcf()
+        fig = GlobalFigureManager.get_active_figure().figure
         self.ax = fig.add_subplot(111, projection='mslice')
         self.workspace = self.create_workspace('workspace')
         self.cut = mc.Cut(self.workspace)
@@ -144,7 +146,8 @@ class CLIProjectionTest(unittest.TestCase):
         active_figure = mock.MagicMock()
         active_figure.plot_handler = mock.MagicMock(spec=CutPlot)
 
-        fig = plt.gcf()
+        #fig = plt.gcf()
+        fig = GlobalFigureManager.get_active_figure().figure
         ax = fig.add_subplot(111, projection='mslice')
         with mock.patch('mslice.cli._mslice_commands.GlobalFigureManager.get_active_figure') as gaf:
             gaf.return_value = active_figure
