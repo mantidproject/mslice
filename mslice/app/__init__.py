@@ -3,9 +3,9 @@ and entry points.
 """
 import sys
 
+from mslice.plotting.config import initialize_matplotlib, init_mpl_gcf  # noqa
 import mslice.util.mantid.init_mantid # noqa: F401
 from mslice.util.mantid import in_mantid
-from qtpy import QT_VERSION
 from mslice.util.qt.qapp import create_qapp_if_required
 
 
@@ -21,9 +21,14 @@ def is_gui():
 def main():
     """Start the application.
     """
+    # Set the global figure manager in matplotlib. Very important this happens first.
+    init_mpl_gcf()
+
     qapp_ref = create_qapp_if_required()
-    import matplotlib as mpl
-    mpl.use('Qt{}Agg'.format(QT_VERSION[0]))
+
+    #from mslice.plotting.config import initialize_matplotlib  # noqa
+    initialize_matplotlib()
+
     show_gui()
     return qapp_ref.exec_()
 
