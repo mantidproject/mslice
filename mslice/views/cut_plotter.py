@@ -60,12 +60,13 @@ def plot_cut_impl(workspace, intensity_range=None, plot_over=False, legend=None,
 
 
 def _create_cut():
-    canvas = plt.gcf().canvas
+    cur_fig = GlobalFigureManager.get_active_figure().figure
+    canvas = cur_fig.canvas
     # don't include axis ticks in the saved background
     canvas.figure.gca().xaxis.set_visible(False)
     canvas.figure.gca().yaxis.set_visible(False)
     canvas.draw()
-    canvas.manager.set_cut_background(canvas.copy_from_bbox(plt.gcf().canvas.figure.bbox))
+    canvas.manager.set_cut_background(canvas.copy_from_bbox(cur_fig.canvas.figure.bbox))
 
     canvas.figure.gca().xaxis.set_visible(True)
     canvas.figure.gca().yaxis.set_visible(True)

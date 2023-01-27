@@ -23,7 +23,7 @@ def create_slice_figure(workspace_name, presenter):
 
 @set_category(CATEGORY_SLICE)
 def _show_plot(slice_cache, workspace):
-    cur_fig = plt.gcf()
+    cur_fig = GlobalFigureManager.get_active_figure().figure
     cur_fig.clf()
     ax = cur_fig.add_subplot(111, projection='mslice')
     image = ax.pcolormesh(workspace, cmap=slice_cache.colourmap, norm=slice_cache.norm)
@@ -52,4 +52,5 @@ def _show_plot(slice_cache, workspace):
 
 
 def set_colorbar_label(label):
-    plt.gcf().get_axes()[1].set_ylabel(label, rotation=270, labelpad=20)
+    cur_fig = GlobalFigureManager.get_active_figure().figure
+    cur_fig.get_axes()[1].set_ylabel(label, rotation=270, labelpad=20)

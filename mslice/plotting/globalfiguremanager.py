@@ -556,8 +556,6 @@ class GlobalFigureManager(object):
         cls.notify_observers(FigureAction.VisibilityChanged, figure_number)
 
 
-# WARNING: If you change the name or parameter list here then the corresponding changes
-# to tools/boilerplate.py must be made and that script reran to regenerate pyplot.py
 def set_category(category):
     """A decorator to mark a function as part of the given category. For details
     of the category mechanism see the docstring on the currentfigure

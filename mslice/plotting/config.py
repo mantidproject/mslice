@@ -27,6 +27,11 @@ def initialize_matplotlib():
 
 
 def add_decorators():
+    """A decorator to mark a function as part of the given category with 'cut'
+    or 'slice' to denote the category of the plot produced. For details
+    of the category mechanism see the docstring on the currentfigure
+    module.
+    """
     for method in SLICE_METHOD:
         method = set_category(CATEGORY_SLICE)(method)
     for method in CUT_METHOD:

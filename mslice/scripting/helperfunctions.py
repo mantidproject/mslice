@@ -40,7 +40,7 @@ def add_plot_statements(script_lines, plot_handler, ax):
 
     add_header(script_lines, plot_handler)
 
-    script_lines.append('fig = plt.gcf()\n')
+    script_lines.append('fig = GlobalFigureManager.get_active_figure().figure\n')
     script_lines.append('fig.clf()\n')
     script_lines.append('ax = fig.add_subplot(111, projection="mslice")\n')
 

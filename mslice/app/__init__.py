@@ -28,7 +28,7 @@ def main():
 
     show_gui()
 
-    #from mslice.plotting.config import initialize_matplotlib  # noqa
+    # Setup our custom backend
     initialize_matplotlib()
 
     return qapp_ref.exec_()
