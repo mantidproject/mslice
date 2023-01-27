@@ -1,8 +1,8 @@
 import matplotlib as mpl
-#import matplotlib._pylab_helpers as _pylab_helpers
+import matplotlib._pylab_helpers as _pylab_helpers
 from qtpy import QT_VERSION
 
-from mslice.plotting.globalfiguremanager import CATEGORY_CUT, CATEGORY_SLICE, set_category
+from mslice.plotting.globalfiguremanager import CATEGORY_CUT, CATEGORY_SLICE, GlobalFigureManager, set_category
 
 
 SLICE_METHOD = ['contour', 'contourf', 'hexbin', 'scatter', 'pcolor', 'pcolormesh', 'hist2d', 'imshow', 'quiver', 'specgram', 'streamplot',
@@ -14,11 +14,11 @@ CUT_METHOD = ['acorr', 'angle_spectrum', 'arrow', 'axhline', 'axhspan', 'axline'
               'xcorr']
 
 
-#def init_mpl_gcf():
-#    """
-#    Replace vanilla Gcf with our custom manager
-#    """
-#    setattr(_pylab_helpers, "Gcf", GlobalFigureManager.get_active_figure())
+def init_mpl_gcf():
+    """
+    Replace vanilla Gcf with our custom manager
+    """
+    setattr(_pylab_helpers, "Gcf", GlobalFigureManager.get_active_figure())
 
 
 def initialize_matplotlib():
