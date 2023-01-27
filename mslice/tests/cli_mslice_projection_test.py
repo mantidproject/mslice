@@ -5,7 +5,8 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 
 import mslice.cli._mslice_commands as mc
 from mslice.workspace import wrap_workspace
-import mslice.plotting.pyplot as plt
+#import mslice.plotting.pyplot as plt
+from matplotlib import pyplot as plt
 from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.cli.plotfunctions import pcolormesh, errorbar
 from mslice.cli.helperfunctions import _get_overplot_key

@@ -11,7 +11,8 @@ from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
 from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.cut_plot import CutPlot
-import mslice.plotting.pyplot as plt
+#import mslice.plotting.pyplot as plt
+from matplotlib import pyplot as plt
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 

@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
-import mslice.plotting.pyplot as plt
+#import mslice.plotting.pyplot as plt
+from matplotlib import pyplot as plt
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 PICKER_TOL_PTS = 3

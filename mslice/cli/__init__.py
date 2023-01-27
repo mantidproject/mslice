@@ -1,7 +1,8 @@
 from __future__ import (absolute_import, division, print_function)
 
 import mslice.util.mantid.init_mantid # noqa: F401
-from mslice.plotting.pyplot import *  # noqa: F401
+#from mslice.plotting.pyplot import *  # noqa: F401
+#from matplotlib.pyplot import pyplot
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
 from mslice.cli.helperfunctions import is_slice, is_cut, is_hs_workspace

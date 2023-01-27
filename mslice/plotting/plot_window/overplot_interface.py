@@ -3,7 +3,8 @@ from qtpy.QtWidgets import QFileDialog
 import os.path as path
 
 from mslice.models.labels import get_recoil_label
-import mslice.plotting.pyplot as plt
+#import mslice.plotting.pyplot as plt
+from matplotlib import pyplot as plt
 
 OVERPLOT_COLORS = {1: 'b', 2: 'g', 4: 'r', 'Aluminium': 'g',
                    'Copper': 'm', 'Niobium': 'y', 'Tantalum': 'b'}

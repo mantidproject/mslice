@@ -5,7 +5,8 @@ from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-import mslice.plotting.pyplot as plt
+#import mslice.plotting.pyplot as plt
+from matplotlib import pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.plotting.plot_window.overplot_interface import remove_line, plot_overplot_line
 from mslice.models.powder.powder_functions import compute_powder_line
