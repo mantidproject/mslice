@@ -6,7 +6,7 @@ from matplotlib import pyplot # noqa: F401
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
 from mslice.cli.helperfunctions import is_slice, is_cut, is_hs_workspace
-from ._mslice_commands import *  # noqa: F401
+from mslice.cli._mslice_commands import *  # noqa: F401
 from mslice.app import is_gui
 from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_type, _get_workspace_type, _get_overplot_key,
                                         _update_overplot_checklist, _update_legend)
@@ -17,7 +17,7 @@ from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 # This is not compatible with mslice as we use a separate
 # global figure manager see _mslice_commands.Show
-del show  # noqa: F821
+#del show  # noqa: F821
 
 
 # MSlice Matplotlib Projection

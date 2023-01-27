@@ -8,6 +8,7 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 #import mslice.plotting.pyplot as plt
 from matplotlib import pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
+from mslice.plotting.globalfiguremanager import CATEGORY_CUT
 from mslice.plotting.plot_window.overplot_interface import remove_line, plot_overplot_line
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
@@ -351,7 +352,7 @@ class CutPlotterPresenter(PresenterUtility):
         return get_current_plot().trigger_action_from_type(intensity_type)
 
     def _cache_intensity_correction_methods(self):
-        cat = plt.CATEGORY_CUT
+        cat = CATEGORY_CUT
         IntensityCache.cache_method(cat, IntensityType.SCATTERING_FUNCTION, self.show_scattering_function.__name__)
         IntensityCache.cache_method(cat, IntensityType.CHI, self.show_dynamical_susceptibility.__name__)
         IntensityCache.cache_method(cat, IntensityType.CHI_MAGNETIC, self.show_dynamical_susceptibility_magnetic.__name__)
