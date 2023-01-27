@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 #import mslice.plotting.pyplot as plt
 from matplotlib import pyplot as plt
-from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.plotting.globalfiguremanager import CATEGORY_CUT, GlobalFigureManager, set_category
 
 PICKER_TOL_PTS = 3
 
@@ -28,7 +28,7 @@ def draw_interactive_cut(workspace):
     plt.show()
 
 
-@plt.set_category(plt.CATEGORY_CUT)
+@set_category(CATEGORY_CUT)
 def plot_cut_impl(workspace, intensity_range=None, plot_over=False, legend=None, en_conversion=True):
     cur_fig = plt.gcf()
     axes = cur_fig.axes

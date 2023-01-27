@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 #import mslice.plotting.pyplot as plt
 from matplotlib import pyplot as plt
+from mslice.plotting.globalfiguremanager import CATEGORY_SLICE, set_category
 
 PICKER_TOL_PTS = 5
 
@@ -10,7 +11,7 @@ def plot_cached_slice(slice_cache, slice_workspace):
     _show_plot(slice_cache, slice_workspace)
 
 
-@plt.set_category(plt.CATEGORY_SLICE)
+@set_category(CATEGORY_SLICE)
 def create_slice_figure(workspace_name, presenter):
     fig_canvas = plt.gcf().canvas
     fig_canvas.manager.set_window_title(workspace_name)
@@ -19,7 +20,7 @@ def create_slice_figure(workspace_name, presenter):
     plt.draw_all()
 
 
-@plt.set_category(plt.CATEGORY_SLICE)
+@set_category(CATEGORY_SLICE)
 def _show_plot(slice_cache, workspace):
     cur_fig = plt.gcf()
     cur_fig.clf()

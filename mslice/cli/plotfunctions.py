@@ -17,10 +17,10 @@ import mantid.plots.axesfunctions as axesfunctions
 from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
 from mslice.views.cut_plotter import PICKER_TOL_PTS as CUT_PICKER_TOL_PTS
-from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.plotting.globalfiguremanager import CATEGORY_CUT, CATEGORY_SLICE, GlobalFigureManager, set_category
 
 
-@plt.set_category(plt.CATEGORY_CUT)
+@set_category(CATEGORY_CUT)
 def errorbar(axes, workspace, *args, **kwargs):
     """
     Same as the cli PlotCut but returns the relevant axes object.
@@ -93,7 +93,7 @@ def create_and_cache_cut(presenter, mpl_axes, plot_over, workspace, intensity_ra
         presenter.cache_prepared_cut(mpl_axes, plot_over)
 
 
-@plt.set_category(plt.CATEGORY_SLICE)
+@set_category(CATEGORY_SLICE)
 def pcolormesh(axes, workspace, *args, **kwargs):
     """
     Same as the CLI PlotSlice but returns the relevant axes object.
