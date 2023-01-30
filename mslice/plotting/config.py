@@ -18,7 +18,7 @@ def init_mpl_gcf():
     """
     Replace vanilla Gcf with our custom manager
     """
-    setattr(_pylab_helpers, "Gcf", GlobalFigureManager.get_active_figure())
+    setattr(_pylab_helpers, "Gcf", GlobalFigureManager)
 
 
 def initialize_matplotlib():

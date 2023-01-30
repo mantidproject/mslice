@@ -317,6 +317,10 @@ class GlobalFigureManager(object):
             return cls._new_figure(num)[0]
 
     @classmethod
+    def get_fig_manager(cls, num=None, create_if_not_found=True):
+        return cls.get_figure_number(num, create_if_not_found)
+
+    @classmethod
     def get_active_figure(cls):
         if cls._active_category:
             if cls._active_figure in cls._unclassified_figures:
