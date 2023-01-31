@@ -3,7 +3,6 @@ ignore = E2,E3,F403,W503
 exclude =
     docs/source/conf.py,
     *_ui.py,
-    misc/MDUtils.py,
-    mslice/plotting/pyplot.py
+    src/plotting/pyplot.py
 max-complexity = 14
 max-line-length = 140

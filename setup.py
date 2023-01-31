@@ -49,7 +49,7 @@ def get_data_files():
     """Return data_files in a platform dependent manner"""
     if sys.platform.startswith('linux'):
         data_files = [('share/applications', ['scripts/mslice.desktop']),
-                      ('share/pixmaps', ['resources/images/mslice_logo.png'])]
+                      ('share/pixmaps', ['src/images/mslice_logo.png'])]
     else:
         data_files = []
     return data_files
@@ -64,7 +64,7 @@ setup_args = dict(name=NAME,
                   author_email='mantid-help@mantidproject.org',
                   url=__project_url__,
                   keywords=['PyQt5'],
-                  packages=find_packages(exclude=["misc"]),
+                  packages=find_packages(),
                   package_data=get_package_data(),
                   data_files=get_data_files(),
                   entry_points={"console_scripts" : ["mslice = mslice.app:main"]},

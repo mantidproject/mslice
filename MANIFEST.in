@@ -1,5 +1,5 @@
-recursive-include mslice *.ui
-recursive-include resources *.png *.ico
+recursive-include src *.ui
+recursive-include src/images *.png *.ico
 include scripts/mslice.desktop
 include setup-requirements.txt
 include install-requirements.txt
