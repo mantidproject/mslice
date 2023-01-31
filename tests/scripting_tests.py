@@ -8,7 +8,7 @@ from mslice.models.cut.cut import Cut
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import add_workspace
 from mslice.scripting import preprocess_lines, generate_script_lines, get_algorithm_kwargs, generate_script
-from mslice.tests.testhelpers.fake_objects import FakeClipboard, FakeFile
+from tests.testhelpers.fake_objects import FakeClipboard, FakeFile
 
 
 class ScriptingTest(unittest.TestCase):

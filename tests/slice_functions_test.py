@@ -12,7 +12,7 @@ from mslice.models.slice.slice_algorithm import Slice
 from mslice.models.slice.slice_functions import (compute_slice, compute_recoil_line, is_sliceable)
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
-from mslice.tests.testhelpers.workspace_creator import create_pixel_workspace
+from tests.testhelpers.workspace_creator import create_pixel_workspace
 from mslice.models.powder.powder_functions import compute_powder_line
 
 

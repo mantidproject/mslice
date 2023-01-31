@@ -10,7 +10,7 @@ from mantid.dataobjects import MDHistoWorkspace, RebinnedOutput, Workspace2D
 
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
-from mslice.tests.testhelpers.workspace_creator import create_md_workspace
+from tests.testhelpers.workspace_creator import create_md_workspace
 from mslice.models.axis import Axis
 
 

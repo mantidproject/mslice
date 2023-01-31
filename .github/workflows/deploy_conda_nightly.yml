@@ -1,11 +1,11 @@
 name: Deploy MSlice nightly
 
-on:
-  workflow_run:
-    workflows: ["MSlice nightly build"]
-    branches: [main]
-    types:
-      - completed
+on: push
+  #workflow_run:
+    #workflows: ["MSlice nightly build"]
+    #branches: [main]
+    #types:
+    #  - completed
 
 jobs:
   build_conda_and_upload:
@@ -19,14 +19,15 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: main
+          #ref: main
+          ref: mslice_packaging
 
       - name: Check for changes since last build
         run: |
           echo "recentCommits=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo false || echo true)" >> $GITHUB_ENV
 
       - name: Setup Miniconda
-        if: ${{ env.recentCommits == 'true'}}
+        #if: ${{ env.recentCommits == 'true'}}
         uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           miniforge-version: latest
@@ -37,8 +38,9 @@ jobs:
           auto-activate-base: false
 
       - name: Build MSlice nightly conda package
-        if: ${{ env.recentCommits == 'true'}}
+        #if: ${{ env.recentCommits == 'true'}}
         uses: ./.github/actions/publish-package
         with:
-          label: nightly
+          #label: nightly
+          label: unstable-toml
           token: ${{ secrets.ANACONDA_API_TOKEN }}

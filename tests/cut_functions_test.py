@@ -10,7 +10,7 @@ from mslice.models.axis import Axis
 from mslice.models.cut.cut_algorithm import Cut
 from mslice.models.cut.cut_functions import compute_cut, is_cuttable, output_workspace_name
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
-from mslice.tests.testhelpers.workspace_creator import create_pixel_workspace
+from tests.testhelpers.workspace_creator import create_pixel_workspace
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 
 

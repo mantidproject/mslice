@@ -1,0 +1,106 @@
+[build-system]
+requires = ["setuptools >= 47.0.0",
+            "wheel",
+            "versioningit",]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mslice"
+dynamic = ["version"]
+authors = [
+  { name="The Mantid Project", email="mantid-help@mantidproject.org" },
+]
+description = "Visualise and slice data from Mantid"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "ipython",
+    "numpy",
+    "matplotlib>=1.5",
+    "six",
+    "qtawesome",
+    "pre-commit",
+    "flake8",
+    "qtpy",
+]
+
+[project.optional-dependencies]
+tests_require = [
+    "coverage",
+    "mock>=2.0",
+    "nose>=1.0",
+]
+
+[project.urls]
+"Homepage" = "https://mantidproject.github.io/mslice/"
+"Bug Tracker" = "https://github.com/mantidproject/mslice/issues"
+
+[project.entry-points]
+console_scripts = { mslice = "mslice.app:main" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"mslice.images" = ["*.ico", "*.png", "*.svg"]
+"mslice.app" = ["*.ui"]
+"mslice.plotting.plot_window" = ["*.ui"]
+"mslice.widgets.cut" = ["*.ui"]
+"mslice.widgets.dataloader" = ["*.ui"]
+"mslice.widgets.projection.powder" = ["*.ui"]
+"mslice.widgets.slice" = ["*.ui"]
+"mslice.widgets.status" = ["*.ui"]
+"mslice.widgets.workspacemanager" = ["*.ui"]
+
+[tool.coverage.report]
+omit = [
+    "*/src/mslice/presenters/interfaces/*",
+    "*/src/mslice/util/mantid/__init__.py",
+    "*/src/mslice/util/mantid/mantid_algorithms.py",
+    "*/src/mslice/workspace/base.py",
+    "*/src/mslice/models/workspacemanager/file_io.py",
+    "*/src/mslice/models/workspacemanager/rebose_algorithm.py",
+    "*/src/mslice/models/projection/powder/make_projection.py",
+    "*/src/mslice/models/projection/powder/projection_calculator.py",
+    "*/src/mslice/models/slice*",
+    "*/src/mslice/models/cut/cut_algorithm.py",
+    "*/src/mslice/models/labels.py",
+    "*/src/mslice/models/colors.py",
+]
+show_missing = "true"
+
+[tool.flake8]
+ignore = [
+    "E2",
+    "E3",
+    "F403",
+    "W503",
+]
+exclude = [
+    "docs/source/conf.py",
+    "*_ui.py",
+    "src/mslice/plotting/pyplot.py",
+]
+max-complexity = 14
+max-line-length = 140
+
+[tool.versioningit.vcs]
+method = "git"
+default-tag = "0.0.0"
+
+[tool.versioningit.next-version]
+method = "minor"
+
+[tool.versioningit.format]
+distance = "{version}.dev{distance}"
+dirty = "{version}+uncommitted"
+distance-dirty = "{version}.dev{distance}+uncommitted"
+
+[tool.versioningit.write]
+file = "src/mslice/__init__.py"

@@ -21,8 +21,8 @@ When you are using MSlice as an interface in *MantidWorkbench*, the **File** men
 increase and ``Ctrl+-`` to decrease the font size within the Script Editor or the IPython Console.
 
 Alternatively, Mslice is available as a conda package via anaconda.org on the `mantid channel <https://anaconda.org/mantid/mslice>`_.
-To install the released conda package do ``conda install -c mantid mslice``.
-To install the latest nightly conda package do ``conda install -c mantid/label/nightly mslice``.
+To install the released conda package do ``mamba install -c mantid mslice``.
+To install the latest nightly conda package do ``mamba install -c mantid/label/nightly mslice``.
 
 Loading Data
 ------------
