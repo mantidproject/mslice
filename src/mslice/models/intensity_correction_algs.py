@@ -125,18 +125,15 @@ def cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm
 def _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
     parent_ws = get_workspace_handle(scattering_data.parent)
 
-    q_limits = parent_ws.limits[q_axis.units]
-    e_limits = parent_ws.limits[e_axis.units]
-    slice_q_axis = _get_slice_axis(q_limits, q_axis, is_icut)
-    slice_e_axis = _get_slice_axis(e_limits, e_axis, is_icut)
-    slice_x_axis = slice_e_axis if rotated else slice_q_axis
-    slice_y_axis = slice_q_axis if rotated else slice_e_axis
-    rebin_slice = compute_slice(parent_ws, slice_x_axis, slice_y_axis, norm_to_one, store_in_ADS=False)
-    slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, slice_q_axis, slice_e_axis, rotated)
-    cut_axis = slice_e_axis if rotated else slice_q_axis
-    int_axis = slice_q_axis if rotated else slice_e_axis
+    # Take a slice from parent_ws with bins to match cut, then gdos correct
+    rebin_slice_e_axis, rebin_slice_q_axis = _get_rebin_slice_q_and_e_axis(parent_ws, q_axis, e_axis, is_icut)
+    rebin_slice_gdos = _rebin_slice_and_gdos_correct(parent_ws, sample_temp, rebin_slice_q_axis, rebin_slice_e_axis,
+                                                     rotated, norm_to_one)
+
+    cut_axis = rebin_slice_e_axis if rotated else rebin_slice_q_axis
+    int_axis = rebin_slice_q_axis if rotated else rebin_slice_e_axis
     cut_axis_id = 0 if rotated else 1
-    return _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, True, scattering_data.name)
+    return _reduce_bins_along_int_axis(rebin_slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, True, scattering_data.name)
 
 
 def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
@@ -147,25 +144,34 @@ def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotate
     else:
         slice_rotated = not is_momentum(pixel_ws.raw_ws.getXDimension().getUnits())  # no pre existing slice, use pixel ws.
 
-    q_limits = pixel_ws.limits[q_axis.units]
-    e_limits = pixel_ws.limits[e_axis.units]
-
-    rebin_slice_q_axis = _get_slice_axis(q_limits, q_axis, is_icut)
-    rebin_slice_e_axis = _get_slice_axis(e_limits, e_axis, is_icut)
-
-    rebin_slice_x_axis = rebin_slice_e_axis if slice_rotated else rebin_slice_q_axis
-    rebin_slice_y_axis = rebin_slice_q_axis if slice_rotated else rebin_slice_e_axis
-    rebin_slice = compute_slice(pixel_ws, rebin_slice_x_axis, rebin_slice_y_axis, norm_to_one, store_in_ADS=False)
-
-    rebin_slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, rebin_slice_q_axis, rebin_slice_e_axis, slice_rotated)
+    # Take a slice from initial pixel ws with bins to match cut, then gdos correct
+    rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(pixel_ws, q_axis, e_axis, is_icut)
+    rebin_slice_gdos = _rebin_slice_and_gdos_correct(pixel_ws, sample_temp, rebin_slice_q_axis, rebin_slice_e_axis,
+                                                     slice_rotated, norm_to_one)
 
     cut_axis = rebin_slice_e_axis if rotated else rebin_slice_q_axis
     int_axis = rebin_slice_q_axis if rotated else rebin_slice_e_axis
-
     cut_slice_alignment = slice_rotated == rotated
     cut_axis_id = 1 if cut_slice_alignment else 0
     return _reduce_bins_along_int_axis(rebin_slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment,
                                        scattering_data.name)
+
+
+def _get_rebin_slice_q_and_e_axis(workspace, q_axis, e_axis, is_icut):
+    q_limits = workspace.limits[q_axis.units]
+    e_limits = workspace.limits[e_axis.units]
+    rebin_slice_q_axis = _get_slice_axis(q_limits, q_axis, is_icut)
+    rebin_slice_e_axis = _get_slice_axis(e_limits, e_axis, is_icut)
+    return rebin_slice_q_axis, rebin_slice_e_axis
+
+
+def _rebin_slice_and_gdos_correct(workspace, sample_temp, rebin_slice_q_axis, rebin_slice_e_axis, rotated, norm_to_one):
+    rebin_slice_x_axis = rebin_slice_e_axis if rotated else rebin_slice_q_axis
+    rebin_slice_y_axis = rebin_slice_q_axis if rotated else rebin_slice_e_axis
+    rebin_slice = compute_slice(workspace, rebin_slice_x_axis, rebin_slice_y_axis, norm_to_one, store_in_ADS=False)
+
+    rebin_slice_gdos = slice_compute_gdos(rebin_slice, sample_temp, rebin_slice_q_axis, rebin_slice_e_axis, rotated)
+    return rebin_slice_gdos
 
 
 def _get_slice_axis(pixel_limits, cut_axis, is_icut):
