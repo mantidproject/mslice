@@ -126,7 +126,7 @@ def _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, nor
     parent_ws = get_workspace_handle(scattering_data.parent)
 
     # Take a slice from parent_ws with bins to match cut, then gdos correct
-    rebin_slice_e_axis, rebin_slice_q_axis = _get_rebin_slice_q_and_e_axis(parent_ws, q_axis, e_axis, is_icut)
+    rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(parent_ws, q_axis, e_axis, is_icut)
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(parent_ws, sample_temp, rebin_slice_q_axis, rebin_slice_e_axis,
                                                      rotated, norm_to_one)
 
