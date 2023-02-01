@@ -15,8 +15,12 @@ from mslice.workspace.pixel_workspace import PixelWorkspace
 from mantid.simpleapi import AddSampleLog
 
 
-def invert_axes(matrix):
+def _invert_axes(matrix):
     return np.rot90(np.flipud(matrix))
+
+def _tag_and_return_mock(mock_obj):
+    mock_obj.processed = True
+    return mock_obj
 
 
 class IntensityCorrectionAlgsTest(unittest.TestCase):
@@ -99,15 +103,30 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
                          self.algorithm, True)
         cut_compute_gdos_pixel_mock.assert_called_once()
 
+    @patch('mslice.models.intensity_correction_algs.slice_compute_gdos')
     @patch('mslice.models.intensity_correction_algs._reduce_bins_along_int_axis')
     @patch('mslice.models.intensity_correction_algs.compute_slice')
     @patch('mslice.models.intensity_correction_algs._get_slice_axis')
     @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
-    def test_cut_compute_gdos_pixel_impl(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock):
+    def test_cut_compute_gdos_impl(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock, slice_compute_gdos_mock):
+        self._internal_tst_cut_compute_gdos_impl(ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
+                                                 slice_compute_gdos_mock, _cut_compute_gdos, [call(self.test_ws.parent)])
+
+    @patch('mslice.models.intensity_correction_algs.slice_compute_gdos')
+    @patch('mslice.models.intensity_correction_algs._reduce_bins_along_int_axis')
+    @patch('mslice.models.intensity_correction_algs.compute_slice')
+    @patch('mslice.models.intensity_correction_algs._get_slice_axis')
+    @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
+    def test_cut_compute_gdos_impl_pixel(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock, slice_compute_gdos_mock):
+        self._internal_tst_cut_compute_gdos_impl(ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
+                                                 slice_compute_gdos_mock, _cut_compute_gdos_pixel,
+                                                 [call(self.test_ws.parent), call('__' + self.test_ws.parent)])
+
+    def _internal_tst_cut_compute_gdos_impl(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
+                                            slice_compute_gdos_mock, test_fn, ws_handle_calls):
         parent_workspace = MagicMock()
-        parent_workspace.limits = {self.q_axis.units: [0.1, 3.1, 0.1], self.e_axis.units: [0.1, 3.1, 0.1]}
+        parent_workspace.limits = {self.q_axis.units: [0.1, 3.1, 0.1], self.e_axis.units: [0.1, 6.2, 0.2]}
         x_dim_mock = MagicMock()
-        x_dim_mock.getUnits.return_value = self.q_axis.units
         y_dim_mock = MagicMock()
         x_dim_mock.getUnits.return_value = self.q_axis.units
         y_dim_mock.getUnits.return_value = self.e_axis.units
@@ -117,13 +136,20 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         ws_handle_mock.return_value = parent_workspace
 
         get_slice_axis_mock.side_effect = lambda a, b, c: b
-        compute_slice_mock.side_effect = lambda a, b, c, d, store_in_ADS: a
+        compute_slice_mock.side_effect = lambda a, b, c, d, store_in_ADS: _tag_and_return_mock(a)
+        slice_compute_gdos_mock.side_effect = lambda a, b, c, d, e: slice_compute_gdos(a, b, c, d, e)
 
-        _cut_compute_gdos_pixel(self.test_ws, 10, self.q_axis, self.e_axis, self.rotated, self.norm_to_one, self.algorithm, True)
-        ws_handle_mock.assert_has_calls([call(self.test_ws.parent), call('__' + self.test_ws.parent)])
+        test_fn(self.test_ws, 10, self.q_axis, self.e_axis, self.rotated, self.norm_to_one, self.algorithm, True)
+        for mock_call in ws_handle_calls:
+            ws_handle_mock.assert_has_calls([mock_call])
         self.assertEqual(2, get_slice_axis_mock.call_count)
         compute_slice_mock.assert_called_once()
-        reduce_bins_mock.assert_called_once()
+        slice_compute_gdos_mock.assert_called_once_with(parent_workspace, 10, self.q_axis, self.e_axis, self.rotated)
+        self.assertTrue(slice_compute_gdos_mock.call_args.args[0].processed)
+
+        # parent_workspace.__truediv__().__imul__().__imul__() = workspace that has been divided then multiplied twice
+        reduce_bins_mock.assert_called_once_with(parent_workspace.__truediv__().__imul__().__imul__(), self.algorithm, self.q_axis,
+                                                 self.e_axis, 1, True, "test_ws")
 
     @patch('mslice.models.intensity_correction_algs._cut_compute_gdos')
     @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
@@ -134,41 +160,6 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         cut_compute_gdos(self.test_ws, 10, self.q_axis, self.e_axis, self.rotated, self.norm_to_one,
                          self.algorithm, True)
         cut_compute_gdos_mock.assert_called_once()
-
-    @staticmethod
-    def _tag_and_return_mock(mock_obj):
-        mock_obj.processed = True
-        return mock_obj
-
-    @patch('mslice.models.intensity_correction_algs.slice_compute_gdos')
-    @patch('mslice.models.intensity_correction_algs._reduce_bins_along_int_axis')
-    @patch('mslice.models.intensity_correction_algs.compute_slice')
-    @patch('mslice.models.intensity_correction_algs._get_slice_axis')
-    @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
-    def test_cut_compute_gdos_impl(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock, slice_compute_gdos_mock):
-        parent_workspace = MagicMock()
-        parent_workspace.limits = {self.q_axis.units: [0.1, 3.1, 0.1], self.e_axis.units: [0.1, 6.2, 0.2]}
-        x_dim_mock = MagicMock()
-        y_dim_mock = MagicMock()
-        x_dim_mock.getUnits.return_value = self.q_axis.units
-        y_dim_mock.getUnits.return_value = self.e_axis.units
-        parent_workspace._raw_ws.getXDimension.return_value = x_dim_mock
-        parent_workspace._raw_ws.getYDimension.return_value = y_dim_mock
-        ws_handle_mock.return_value = parent_workspace
-        get_slice_axis_mock.side_effect = lambda a, b, c: b
-        compute_slice_mock.side_effect = lambda a, b, c, d, store_in_ADS: self._tag_and_return_mock(a)
-        slice_compute_gdos_mock.side_effect = lambda a, b, c, d, e: slice_compute_gdos(a, b, c, d, e)
-
-        _cut_compute_gdos(self.test_ws, 10, self.q_axis, self.e_axis, self.rotated, self.norm_to_one, self.algorithm, True)
-        ws_handle_mock.assert_called_once_with(self.test_ws.parent)
-        self.assertEqual(2, get_slice_axis_mock.call_count)
-        compute_slice_mock.assert_called_once()
-        slice_compute_gdos_mock.assert_called_once_with(parent_workspace, 10, self.q_axis, self.e_axis, self.rotated)
-        self.assertTrue(slice_compute_gdos_mock.call_args.args[0].processed)
-
-        # parent_workspace.__truediv__().__imul__().__imul__() = workspace that has been divided then multiplied twice
-        reduce_bins_mock.assert_called_once_with(parent_workspace.__truediv__().__imul__().__imul__(), self.algorithm, self.q_axis,
-                                                 self.e_axis, 1, True, "test_ws")
 
     def test_get_slice_axis_enforces_data_minimum_step_if_input_smaller(self):
         data_limits = [0.002, 0.005, 0.004]
