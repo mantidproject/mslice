@@ -103,29 +103,20 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
                          self.algorithm, True)
         cut_compute_gdos_pixel_mock.assert_called_once()
 
-    @patch('mslice.models.intensity_correction_algs.slice_compute_gdos')
-    @patch('mslice.models.intensity_correction_algs._reduce_bins_along_int_axis')
-    @patch('mslice.models.intensity_correction_algs.compute_slice')
-    @patch('mslice.models.intensity_correction_algs._get_slice_axis')
-    @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
-    def test_cut_compute_gdos_impl(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
-                                   slice_compute_gdos_mock):
-        self._internal_tst_cut_compute_gdos_impl(ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
-                                                 slice_compute_gdos_mock, _cut_compute_gdos, [call(self.test_ws.parent)])
+    def test_cut_compute_gdos_impl(self):
+        self._internal_tst_cut_compute_gdos_impl(_cut_compute_gdos, [call(self.test_ws.parent)])
 
-    @patch('mslice.models.intensity_correction_algs.slice_compute_gdos')
-    @patch('mslice.models.intensity_correction_algs._reduce_bins_along_int_axis')
-    @patch('mslice.models.intensity_correction_algs.compute_slice')
-    @patch('mslice.models.intensity_correction_algs._get_slice_axis')
-    @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
-    def test_cut_compute_gdos_impl_pixel(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
-                                         slice_compute_gdos_mock):
-        self._internal_tst_cut_compute_gdos_impl(ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
-                                                 slice_compute_gdos_mock, _cut_compute_gdos_pixel,
+    def test_cut_compute_gdos_impl_pixel(self):
+        self._internal_tst_cut_compute_gdos_impl(_cut_compute_gdos_pixel,
                                                  [call(self.test_ws.parent), call('__' + self.test_ws.parent)])
 
-    def _internal_tst_cut_compute_gdos_impl(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
-                                            slice_compute_gdos_mock, test_fn, ws_handle_calls):
+    @patch('mslice.models.intensity_correction_algs.slice_compute_gdos')
+    @patch('mslice.models.intensity_correction_algs._reduce_bins_along_int_axis')
+    @patch('mslice.models.intensity_correction_algs.compute_slice')
+    @patch('mslice.models.intensity_correction_algs._get_slice_axis')
+    @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
+    def _internal_tst_cut_compute_gdos_impl(self, test_fn, ws_handle_calls, ws_handle_mock, get_slice_axis_mock, compute_slice_mock,
+                                            reduce_bins_mock, slice_compute_gdos_mock):
         parent_workspace = MagicMock()
         parent_workspace.limits = {self.q_axis.units: [0.1, 3.1, 0.1], self.e_axis.units: [0.1, 6.2, 0.2]}
         x_dim_mock = MagicMock()
@@ -178,19 +169,17 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         ret_axis = _get_slice_axis(data_limits, self.q_axis, True)
         self.assertEqual(Axis(self.q_axis.units, 0.0005, 0.0505, self.q_axis.step, self.q_axis.e_unit), ret_axis)
 
-    @patch('mslice.models.intensity_correction_algs.CreateMDHistoWorkspace')
-    def test_reduce_bins_cut(self, createMDHistoWorkspaceMock):
-        self._internal_tst_reduce_bins(createMDHistoWorkspaceMock, 'Rebin', False)
+    def test_reduce_bins_cut(self):
+        self._internal_tst_reduce_bins('Rebin', False)
+
+    def test_reduce_bins_integration(self):
+        self._internal_tst_reduce_bins('Integration', False)
+
+    def test_reduce_bins_cut_rotated(self):
+        self._internal_tst_reduce_bins('Rebin', True)
 
     @patch('mslice.models.intensity_correction_algs.CreateMDHistoWorkspace')
-    def test_reduce_bins_integration(self, createMDHistoWorkspaceMock):
-        self._internal_tst_reduce_bins(createMDHistoWorkspaceMock, 'Integration', False)
-
-    @patch('mslice.models.intensity_correction_algs.CreateMDHistoWorkspace')
-    def test_reduce_bins_cut_rotated(self, createMDHistoWorkspaceMock):
-        self._internal_tst_reduce_bins(createMDHistoWorkspaceMock, 'Rebin', True)
-
-    def _internal_tst_reduce_bins(self, createMDHistoWorkspaceMock, algorithm, rotated):
+    def _internal_tst_reduce_bins(self, algorithm, rotated, createMDHistoWorkspace_mock):
         if rotated:
             units = 'meV,'
             names = 'Energy transfer,Spectrum'
@@ -214,15 +203,15 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         shape_string = f'{signal_result.shape[1]},{signal_result.shape[0]}' if rotated else f'{signal_result.shape[0]},' \
                                                                                             f'{signal_result.shape[1]}'
 
-        createMDHistoWorkspaceMock.assert_called_once()
-        self.assertEqual(2, createMDHistoWorkspaceMock.call_args[1]['Dimensionality'])
+        createMDHistoWorkspace_mock.assert_called_once()
+        self.assertEqual(2, createMDHistoWorkspace_mock.call_args[1]['Dimensionality'])
         self.assertEqual(f'{cut_x_dim.getMinimum()},{cut_x_dim.getMaximum()},{cut_y_dim.getMinimum()},{cut_y_dim.getMaximum()}',
-                         createMDHistoWorkspaceMock.call_args[1]['Extents'])
-        self.assertTrue(np.allclose(signal_result, createMDHistoWorkspaceMock.call_args[1]['SignalInput'], atol=1e-08))
-        self.assertTrue(np.allclose(error_result, createMDHistoWorkspaceMock.call_args[1]['ErrorInput'], atol=1e-08))
-        self.assertEqual(shape_string, createMDHistoWorkspaceMock.call_args[1]['NumberOfBins'])
-        self.assertEqual(names, createMDHistoWorkspaceMock.call_args[1]['Names'])
-        self.assertEqual(units, createMDHistoWorkspaceMock.call_args[1]['Units'])
+                         createMDHistoWorkspace_mock.call_args[1]['Extents'])
+        self.assertTrue(np.allclose(signal_result, createMDHistoWorkspace_mock.call_args[1]['SignalInput'], atol=1e-08))
+        self.assertTrue(np.allclose(error_result, createMDHistoWorkspace_mock.call_args[1]['ErrorInput'], atol=1e-08))
+        self.assertEqual(shape_string, createMDHistoWorkspace_mock.call_args[1]['NumberOfBins'])
+        self.assertEqual(names, createMDHistoWorkspace_mock.call_args[1]['Names'])
+        self.assertEqual(units, createMDHistoWorkspace_mock.call_args[1]['Units'])
 
 
     def test_sample_temperature(self):
