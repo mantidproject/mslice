@@ -4,7 +4,6 @@ from mslice.models.labels import are_units_equivalent, is_momentum, is_twotheta
 from mslice.util.intensity_correction import IntensityType
 
 import numpy as np
-import warnings
 
 
 class Cut(object):
@@ -188,8 +187,6 @@ class Cut(object):
 
     @property
     def gdos(self):
-        warnings.warn("Please note that GDOS intensity correction with regards to cuts is not functioning as expected "
-                      "(Github Issue #843). This will be fixed imminently and made available in the next release/nightly. ")
         if self._gdos is None:
             self._gdos = cut_compute_gdos(self._cut_ws, self.sample_temp, self.q_axis, self.e_axis, self.rotated,
                                           self.norm_to_one, self.algorithm, bool(self.icut))
