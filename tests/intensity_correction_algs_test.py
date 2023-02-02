@@ -108,7 +108,8 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
     @patch('mslice.models.intensity_correction_algs.compute_slice')
     @patch('mslice.models.intensity_correction_algs._get_slice_axis')
     @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
-    def test_cut_compute_gdos_impl(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock, slice_compute_gdos_mock):
+    def test_cut_compute_gdos_impl(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
+                                   slice_compute_gdos_mock):
         self._internal_tst_cut_compute_gdos_impl(ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
                                                  slice_compute_gdos_mock, _cut_compute_gdos, [call(self.test_ws.parent)])
 
@@ -117,7 +118,8 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
     @patch('mslice.models.intensity_correction_algs.compute_slice')
     @patch('mslice.models.intensity_correction_algs._get_slice_axis')
     @patch('mslice.models.intensity_correction_algs.get_workspace_handle')
-    def test_cut_compute_gdos_impl_pixel(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock, slice_compute_gdos_mock):
+    def test_cut_compute_gdos_impl_pixel(self, ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
+                                         slice_compute_gdos_mock):
         self._internal_tst_cut_compute_gdos_impl(ws_handle_mock, get_slice_axis_mock, compute_slice_mock, reduce_bins_mock,
                                                  slice_compute_gdos_mock, _cut_compute_gdos_pixel,
                                                  [call(self.test_ws.parent), call('__' + self.test_ws.parent)])
@@ -209,7 +211,8 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         integration_factor = int_axis.step if algorithm == 'Integration' else 1
         signal_result = np.nansum(self.sim_scattering_data, int(rotated), keepdims=True) * integration_factor
         error_result = np.nansum(self.test_ws.get_error(), int(rotated), keepdims=True) * integration_factor
-        shape_string = f'{signal_result.shape[1]},{signal_result.shape[0]}' if rotated else f'{signal_result.shape[0]},{signal_result.shape[1]}'
+        shape_string = f'{signal_result.shape[1]},{signal_result.shape[0]}' if rotated else f'{signal_result.shape[0]},' \
+                                                                                            f'{signal_result.shape[1]}'
 
         createMDHistoWorkspaceMock.assert_called_once()
         self.assertEqual(2, createMDHistoWorkspaceMock.call_args[1]['Dimensionality'])
