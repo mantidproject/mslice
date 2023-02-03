@@ -72,7 +72,7 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
     if data_rotated and scattering_data.is_PSD:
         transposed_signal = np.transpose(signal)
         signal_modification_array = generate_modification_array(boltzmann_dist, negative_de_len, transposed_signal)
-        symm_workspace = np.transpose(transposed_signal * signal_modification_array)
+        symm_workspace = scattering_data * np.transpose(signal_modification_array)
     else:
         signal_modification_array = generate_modification_array(boltzmann_dist, negative_de_len, signal)
         symm_workspace = scattering_data * signal_modification_array
