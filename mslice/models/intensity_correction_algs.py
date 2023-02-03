@@ -6,12 +6,9 @@ from functools import partial
 from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
-from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.axis import Axis
-from mslice.util.mantid.mantid_algorithms import CloneWorkspace
-from mslice.util.numpy_helper import apply_with_swapped_axes, transform_array_to_workspace
 from mslice.models.cut.cut_functions import compute_cut
 
 
@@ -71,25 +68,26 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
     negative_de_len = len(negative_de)
     boltzmann_dist = compute_boltzmann_dist(sample_temp, negative_de)
     signal = scattering_data.get_signal()
+
     if data_rotated and scattering_data.is_PSD:
-        new_signal = apply_with_swapped_axes(partial(modify_part_of_signal, boltzmann_dist, negative_de_len), signal)
+        transposed_signal = np.transpose(signal)
+        signal_modification_array = generate_modification_array(boltzmann_dist, negative_de_len, transposed_signal)
+        symm_workspace = np.transpose(transposed_signal * signal_modification_array)
     else:
-        new_signal = modify_part_of_signal(boltzmann_dist, negative_de_len, signal)
-    new_ws = CloneWorkspace(InputWorkspace=scattering_data, OutputWorkspace=scattering_data.name, store=True)
-    propagate_properties(scattering_data, new_ws)
-    new_signal = transform_array_to_workspace(new_signal, new_ws.raw_ws)
-    new_ws.set_signal(new_signal)
-    return new_ws
+        signal_modification_array = generate_modification_array(boltzmann_dist, negative_de_len, signal)
+        symm_workspace = scattering_data * signal_modification_array
+    return symm_workspace
 
 
-def modify_part_of_signal(multiplier, up_to_index, signal):
+def generate_modification_array(multiplier, up_to_index, signal):
+    modification_array = np.ones_like(signal)
     if len(signal.shape) < 2:  #cut
-        lhs = signal[:up_to_index] * multiplier
-        rhs = signal[up_to_index:]
+        lhs = modification_array[:up_to_index] * multiplier
+        rhs = modification_array[up_to_index:]
         axis_index = 0
     else:  #slice
-        lhs = signal[:, :up_to_index] * multiplier
-        rhs = signal[:, up_to_index:]
+        lhs = modification_array[:, :up_to_index] * multiplier
+        rhs = modification_array[:, up_to_index:]
         axis_index = 1
     return np.concatenate((lhs, rhs), axis_index)
 
