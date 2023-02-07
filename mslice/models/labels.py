@@ -23,7 +23,7 @@ def is_momentum(unit):
     return any([unit in val for val in MOMENTUM_UNITS])
 
 
-def is_engergy(unit):
+def is_energy(unit):
     return unit == 'DeltaE'
 
 
@@ -32,7 +32,7 @@ def are_units_equivalent(unit_lhs, unit_rhs):
         return True
     elif is_momentum(unit_lhs) and is_momentum(unit_rhs):
         return True
-    elif is_engergy(unit_lhs) and is_engergy(unit_rhs):
+    elif is_energy(unit_lhs) and is_energy(unit_rhs):
         return True
     else:
         return False
