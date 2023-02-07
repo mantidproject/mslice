@@ -23,6 +23,21 @@ def is_momentum(unit):
     return any([unit in val for val in MOMENTUM_UNITS])
 
 
+def is_engergy(unit):
+    return unit == 'DeltaE'
+
+
+def are_units_equivalent(unit_lhs, unit_rhs):
+    if is_twotheta(unit_lhs) and is_twotheta(unit_rhs):
+        return True
+    elif is_momentum(unit_lhs) and is_momentum(unit_rhs):
+        return True
+    elif is_engergy(unit_lhs) and is_engergy(unit_rhs):
+        return True
+    else:
+        return False
+
+
 def get_recoil_key(label):
     for key, value in recoil_labels.items():
         if value == label:

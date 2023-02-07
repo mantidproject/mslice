@@ -1,6 +1,6 @@
 from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
                                                      compute_symmetrised, cut_compute_gdos)
-from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.labels import are_units_equivalent, is_momentum, is_twotheta
 from mslice.util.intensity_correction import IntensityType
 
 import numpy as np
@@ -227,8 +227,7 @@ class Cut(object):
 
     def _update_cut_axis(self):
         x_dim = self._cut_ws.raw_ws.getXDimension()
-        if self.cut_axis.units == x_dim.getUnits() or self.cut_axis.units in x_dim.getDimensionId()\
-                or is_twotheta(self.cut_axis.units) and is_twotheta(x_dim.getUnits()):
+        if are_units_equivalent(self.cut_axis.units, x_dim.getUnits()) or self.cut_axis.units in x_dim.getDimensionId():
             ws_cut_axis = x_dim
         else:
             ws_cut_axis = self._cut_ws.raw_ws.getYDimension()
