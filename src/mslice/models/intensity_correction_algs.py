@@ -12,7 +12,7 @@ from mslice.models.axis import Axis
 from mslice.util.mantid.mantid_algorithms import CloneWorkspace, CreateMDHistoWorkspace
 from mslice.util.numpy_helper import apply_with_swapped_axes, transform_array_to_workspace
 from mslice.models.slice.slice_functions import compute_slice
-from mslice.models.labels import is_momentum
+from mslice.models.labels import is_momentum, is_twotheta
 from math import trunc, ceil
 
 
@@ -140,9 +140,9 @@ def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotate
     pixel_ws = get_workspace_handle(scattering_data.parent)
     if is_icut:
         slice_ws = get_workspace_handle("__" + scattering_data.parent)
-        slice_rotated = not is_momentum(slice_ws.raw_ws.getXDimension().getUnits())  # fn arg rotated refers to cut.
+        slice_rotated = not _is_momentum_or_two_theta(slice_ws.raw_ws.getXDimension().getUnits())  # fn arg rotated refers to cut.
     else:
-        slice_rotated = not is_momentum(pixel_ws.raw_ws.getXDimension().getUnits())  # no pre existing slice, use pixel ws.
+        slice_rotated = not _is_momentum_or_two_theta(pixel_ws.raw_ws.getXDimension().getUnits())  # no pre existing slice, use pixel ws.
 
     # Take a slice from initial pixel ws with bins to match cut, then gdos correct
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(pixel_ws, q_axis, e_axis, is_icut)
@@ -222,10 +222,11 @@ def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_a
 
 
 def _get_slice_dimensions(slice, x_units):
-    x_is_momentum = is_momentum(x_units)
+    x_is_momentum = _is_momentum_or_two_theta(x_units)
     dim1 = slice._raw_ws.getXDimension()
     dim2 = slice._raw_ws.getYDimension()
-    if (x_is_momentum and is_momentum(dim1.getUnits())) or (not x_is_momentum and not is_momentum(dim1.getUnits())):
+    if (x_is_momentum and _is_momentum_or_two_theta(dim1.getUnits())) or \
+            (not x_is_momentum and not _is_momentum_or_two_theta(dim1.getUnits())):
         ret_val = (dim1, dim2)
     else:
         ret_val = (dim2, dim1)
@@ -261,3 +262,10 @@ def sample_temperature(ws_name, sample_temp_fields):
     if isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
         sample_temp = np.mean(sample_temp)
     return sample_temp
+
+
+def _is_momentum_or_two_theta(units):
+    if is_momentum(units) or is_twotheta(units):
+        return True
+    else:
+        return False
