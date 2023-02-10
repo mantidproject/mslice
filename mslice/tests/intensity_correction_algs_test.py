@@ -68,6 +68,14 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         self.assertAlmostEqual(symmetrised[15][10], 0.532, 6)
         self.assertAlmostEqual(symmetrised[24][29], 1.5, 6)
 
+    def test_compute_symmetrised_rotated_psd(self):
+        self.test_ws.is_PSD = True
+        symmetrised = compute_symmetrised(self.test_ws, 10, self.e_axis, True).get_signal()
+        self.assertAlmostEqual(symmetrised[0][0], 0.002, 6)
+        self.assertAlmostEqual(symmetrised[15][10], 0.532, 6)
+        self.assertAlmostEqual(symmetrised[24][29], 1.5, 6)
+        self.test_ws.is_PSD = None  # reset workspace for other tests.
+
     def test_compute_gdos_slice(self):
         gdos = slice_compute_gdos(self.test_ws, 10, self.q_axis, self.e_axis, self.rotated).get_signal()
         self.assertAlmostEqual(gdos[0][0], 0.002318, 6)
