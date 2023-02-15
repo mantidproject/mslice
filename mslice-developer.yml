@@ -1,0 +1,13 @@
+name: mantidnightly
+
+channels:
+  - conda-forge
+  - mantid/label/nightly
+
+dependencies:
+  - mantid
+  - mantidqt
+  - qtconsole
+  - nose
+  - coverage
+  - mock
