@@ -24,7 +24,7 @@ def is_momentum(unit):
 
 
 def is_energy(unit):
-    return unit == 'DeltaE'
+    return unit == DELTA_E_LABEL 
 
 
 def are_units_equivalent(unit_lhs, unit_rhs):
