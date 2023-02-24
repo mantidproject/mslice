@@ -41,5 +41,4 @@ jobs:
         uses: ./.github/actions/publish-package
         with:
           label: nightly
-          label: unstable-toml
           token: ${{ secrets.ANACONDA_API_TOKEN }}
