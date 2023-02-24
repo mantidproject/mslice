@@ -9,20 +9,21 @@ MSlice is included in the Mantid distribution so the easiest way to start it is 
 .. image:: images/quickstart/mantid_interfaces_menu.png
 
 The version of *MSlice* distributed with Mantid is the last stable version. However, there is currently quite rapid ongoing
-development to the program, which is available only in the development version on `GitHub`. To get this version, please
+development to the program, which is available in the development version on `GitHub`. To get this version, please
 download this `zip <https://github.com/mantidproject/mslice/archive/main.zip>`_ and extract it to a folder on your computer.
-You can then either copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the
-``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*, or run the
-``mslicedevel.bat`` (or ``mslicedevel.sh`` for Linux) script to start *MSlice*. You may have to edit the file first if
-you did not install *Mantid* in the default location.
+You can then copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the
+``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*.
+
+Alternatively, Mslice is available as a conda package via anaconda.org on the `mantid channel <https://anaconda.org/mantid/mslice>`_.
+To install the released conda package do ``mamba install -c mantid mslice``.
+To install the latest nightly conda package do ``mamba install -c mantid/label/nightly mslice``. The nightly conda package includes
+all recent changes of the development version up to and including the day before and is only created when all tests have run
+successfully.
+In both cases MSlice can be started by typing ``mslice`` on the command line after activating your conda environment.
 
 When you are using MSlice as an interface in *MantidWorkbench*, the **File** menu allows changing the font size of the GUI via the
 ``General`` tab in ``Settings``. Please note that the font size change is only applied after a restart of Mantid. Use ``Ctrl++`` to
 increase and ``Ctrl+-`` to decrease the font size within the Script Editor or the IPython Console.
-
-Alternatively, Mslice is available as a conda package via anaconda.org on the `mantid channel <https://anaconda.org/mantid/mslice>`_.
-To install the released conda package do ``mamba install -c mantid mslice``.
-To install the latest nightly conda package do ``mamba install -c mantid/label/nightly mslice``.
 
 Loading Data
 ------------
