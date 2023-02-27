@@ -41,7 +41,7 @@ The project layout should be displayed. The first run may take some time to open
 
 You will also need to edit the run configurations:  
 
-![example pycharm run configuration](resources/images/pycharm_run_config.png)
+![example pycharm run configuration](src/mslice/images/pycharm_run_config.png)
 
 - The startup script is `start_mslice.py`.
 - The `bin` directory of an installed version of Mantid must be on the `PATH`.
