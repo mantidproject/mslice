@@ -1,8 +1,0 @@
-recursive-include mslice *.ui
-recursive-include resources *.png *.ico
-include scripts/mslice.desktop
-include setup-requirements.txt
-include install-requirements.txt
-include test-requirements.txt
-include MANIFEST.in
-include README.md

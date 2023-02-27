@@ -1,0 +1,5 @@
+python:
+  - 3.8
+
+setuptools:
+  - 62.0

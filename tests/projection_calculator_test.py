@@ -3,7 +3,7 @@ from unittest import TestCase
 from mantid.api import AnalysisDataService
 
 from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
-from mslice.tests.testhelpers.workspace_creator import create_simulation_workspace
+from tests.testhelpers.workspace_creator import create_simulation_workspace
 from mslice.util.mantid import mantid_algorithms
 from mslice.workspace.pixel_workspace import PixelWorkspace
 

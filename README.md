@@ -56,7 +56,7 @@ click the cog on the right side to add an existing interpreter and select `Conda
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
 Specify `start_mslice.py` as the startup script.
 To run tests, create a `Nosetests` configuration and specify the `Target` as `Custom` with `mslice.tests`
-with the working directory being the mslice package folder (e.g. `<mslice_root>/mslice`).
+with the working directory being the mslice package folder (e.g. `<mslice_root>/src/mslice`).
 
 ### Automated testing and nightly conda build
 
