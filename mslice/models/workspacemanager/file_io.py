@@ -86,6 +86,7 @@ def save_matlab(workspace, path, is_slice):
             x = []
             for dim in [workspace.raw_ws.getDimension(i) for i in range(2)]:
                 x.append(np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins()))
+            x = np.array(x, dtype=object)
             # We're saving a 2D RebinnedWorkspace which always has DeltaE along x
             ix = [i for i, ax in enumerate(workspace.axes) if 'DeltaE' in ax.units][0]
             iy = 0 if ix == 1 else 1
