@@ -58,4 +58,4 @@ else
   MANTIDPYTHON=python
 fi
 
-env PYTHONPATH=$(dirname $0):$PYTHONPATH $MANTIDPYTHON scripts/start_mslice.py
+env PYTHONPATH=$(dirname $0)/src:$PYTHONPATH $MANTIDPYTHON scripts/start_mslice.py
