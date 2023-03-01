@@ -9,8 +9,7 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.workspace.pixel_workspace import PixelWorkspace, HistogramWorkspace
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.axis import Axis
-from mslice.util.mantid.mantid_algorithms import CloneWorkspace, CreateMDHistoWorkspace
-from mslice.util.numpy_helper import apply_with_swapped_axes, transform_array_to_workspace
+from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace
 from mslice.models.slice.slice_functions import compute_slice
 from mslice.models.labels import is_momentum, is_twotheta
 from math import trunc, ceil
