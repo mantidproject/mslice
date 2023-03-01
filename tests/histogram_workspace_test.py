@@ -3,7 +3,7 @@ import numpy as np
 
 from mantid.simpleapi import CreateMDHistoWorkspace
 
-from mslice.tests.workspace_test import BaseWorkspaceTest
+from tests.workspace_test import BaseWorkspaceTest
 from mslice.models.workspacemanager.workspace_provider import add_workspace, remove_workspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 

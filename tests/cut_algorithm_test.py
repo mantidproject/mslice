@@ -7,7 +7,7 @@ from mantid.dataobjects import MDHistoWorkspace
 
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_algorithm import compute_cut, Cut
-from mslice.tests.testhelpers.workspace_creator import create_simulation_workspace, create_md_workspace
+from tests.testhelpers.workspace_creator import create_simulation_workspace, create_md_workspace
 
 
 class MockProperty:

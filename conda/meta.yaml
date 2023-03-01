@@ -13,7 +13,7 @@ source:
 
 build:
   noarch: python
-  script: python setup.py install --single-version-externally-managed --record=record.txt
+  script: python -m pip install --ignore-installed .
   entry_points:
     - mslice = mslice.app:main
 
@@ -22,10 +22,12 @@ requirements:
     - python {{ python }}
     - flake8
     - qtpy
-    - setuptools
+    - setuptools {{ setuptools }}
+    - versioningit
 
   run:
   - python
+  - pip
   - mantid
   - mantidqt
   - ipython
@@ -36,7 +38,7 @@ requirements:
   - qtawesome
   - qtconsole
   - qtpy
-  - setuptools
+  - setuptools {{ setuptools }}
   - six
 
 test:

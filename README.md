@@ -41,7 +41,7 @@ The project layout should be displayed. The first run may take some time to open
 
 You will also need to edit the run configurations:  
 
-![example pycharm run configuration](resources/images/pycharm_run_config.png)
+![example pycharm run configuration](src/mslice/images/pycharm_run_config.png)
 
 - The startup script is `start_mslice.py`.
 - The `bin` directory of an installed version of Mantid must be on the `PATH`.
@@ -55,8 +55,8 @@ then add this interpreter by going to the `File->Settings` in PyCharm, then `Pro
 click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.8 (mantidnightly)`.
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
 Specify `start_mslice.py` as the startup script.
-To run tests, create a `Nosetests` configuration and specify the `Target` as `Custom` with `mslice.tests`
-with the working directory being the mslice package folder (e.g. `<mslice_root>/mslice`).
+To run tests, create a `Nosetests` configuration and specify the `Target` as `Custom` with `tests`
+with the working directory being the mslice package folder (e.g. `<mslice_root>/src/mslice`).
 
 ### Automated testing and nightly conda build
 

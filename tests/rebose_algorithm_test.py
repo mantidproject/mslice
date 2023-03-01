@@ -3,7 +3,7 @@ import unittest
 import mslice.util.mantid.init_mantid # noqa: F401
 
 from mantid.api import AnalysisDataService
-from mslice.tests.testhelpers.workspace_creator import create_workspace
+from tests.testhelpers.workspace_creator import create_workspace
 from mslice.util.mantid.mantid_algorithms import Rebose
 
 

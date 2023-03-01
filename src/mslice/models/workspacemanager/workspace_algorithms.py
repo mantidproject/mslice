@@ -383,7 +383,6 @@ def propagate_properties(old_workspace, new_workspace):
         if old_prop:
             setattr(new_workspace, prop, old_prop)
 
-
 def get_comment(workspace):
     if hasattr(workspace, 'getComment'):
         return workspace.getComment()

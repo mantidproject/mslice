@@ -7,8 +7,8 @@ from mslice.models.workspacemanager.workspace_algorithms import (process_limits,
                                                                  export_workspace_to_ads, is_pixel_workspace,
                                                                  get_axis_from_dimension, get_comment)
 from mslice.models.workspacemanager.workspace_provider import add_workspace
-from mslice.tests.testhelpers.workspace_creator import (create_md_histo_workspace, create_workspace,
-                                                        create_simulation_workspace)
+from tests.testhelpers.workspace_creator import (create_md_histo_workspace, create_workspace,
+                                                 create_simulation_workspace)
 from mslice.util.mantid.mantid_algorithms import (AppendSpectra, CreateSimulationWorkspace,
                                                   CreateWorkspace, ConvertToMD, AddSampleLog)
 from mslice.workspace.histogram_workspace import HistogramWorkspace
