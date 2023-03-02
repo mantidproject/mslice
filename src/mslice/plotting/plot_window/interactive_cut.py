@@ -55,6 +55,7 @@ class InteractiveCut(object):
             workspace = get_workspace_handle(self._ws_title)
             cut = Cut(ax, integration_axis, None, None, sample_temp=self.slice_plot.temp, e_fixed=workspace.e_fixed)
             cut.parent_ws_name = self._ws_title
+            cut.icut = self
             self._cut_plotter_presenter.plot_interactive_cut(workspace, cut, store, self.slice_plot.intensity_type)
             self._cut_plotter_presenter.set_is_icut(True)
             if self._is_initial_cut_plotter_presenter:
@@ -132,6 +133,12 @@ class InteractiveCut(object):
     def set_icut_intensity_category(self, intensity_type):
         self._cut_plotter_presenter.set_icut_intensity_category(intensity_type)
 
+    def _drawn_rect_exists(self):
+        if not all(pos == 0 for pos in self._rect_pos_cache):
+            return True
+        else:
+            return False
+
     def refresh_current_cut(self):
-        if not all(pos == 0 for pos in self._rect_pos_cache):  # if rect has been drawn.
+        if self._drawn_rect_exists():
             self.plot_cut(*self.rect.extents)
