@@ -37,9 +37,8 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     @mock.patch('mslice.presenters.slice_plotter_presenter.plot_cached_slice')
     @mock.patch('mslice.presenters.slice_plotter_presenter.create_slice_figure')
     @mock.patch('mslice.presenters.slice_plotter_presenter.get_workspace_handle')
-    @mock.patch('mslice.presenters.slice_plotter_presenter.sample_temperature')
     @mock.patch('mslice.presenters.slice_plotter_presenter.compute_slice')
-    def test_plot_slice_success(self, compute_slice_mock, sample_temp_mock, get_workspace_handle_mock,
+    def test_plot_slice_success(self, compute_slice_mock, get_workspace_handle_mock,
                                 create_slice_mock, plot_cached_slice_mock):
         workspace_mock = mock.MagicMock()
         name = mock.PropertyMock(return_value='workspace')
@@ -48,7 +47,6 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_name = mock.PropertyMock(return_value='__workspace')
         type(slice_mock).name = slice_name
         get_workspace_handle_mock.return_value = workspace_mock
-        sample_temp_mock.return_value = 5
         compute_slice_mock.return_value = slice_mock
         x_axis = Axis('x', 0, 1, 0.1)
         y_axis = Axis('y', 0, 1, 0.1)
