@@ -23,6 +23,8 @@ from mslice.util.compat import legend_set_draggable
 from mslice.util.intensity_correction import IntensityType, IntensityCache
 from mslice.models.intensity_correction_algs import sample_temperature
 
+from typing import Callable
+
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
 
@@ -331,7 +333,7 @@ class SlicePlot(IPlot):
         self._update_lines()
         self._canvas.draw()
 
-    def _run_temp_dependent(self, slice_plotter_method, previous):
+    def _run_temp_dependent(self, slice_plotter_method: Callable, previous: QtWidgets.QAction) -> bool:
         try:
             slice_plotter_method(self.ws_name)
         except ValueError:  # sample temperature not yet set, get it and reattempt method
@@ -341,7 +343,7 @@ class SlicePlot(IPlot):
                 return False
         return True
 
-    def _set_sample_temperature(self, previous):
+    def _set_sample_temperature(self, previous: QtWidgets.QAction) -> bool:
         try:
             temp_value_raw, field = self.ask_sample_temperature_field(str(self.ws_name))
             temperature_found = self._handle_temperature_input(temp_value_raw, field)
@@ -351,7 +353,7 @@ class SlicePlot(IPlot):
             self.set_intensity(previous)
         return temperature_found
 
-    def _handle_temperature_input(self, temp_value_raw, field):
+    def _handle_temperature_input(self, temp_value_raw: str, field: bool) -> bool:
         if field:
             temp_value = sample_temperature(self.ws_name, [temp_value_raw])
         else:
@@ -361,13 +363,13 @@ class SlicePlot(IPlot):
             self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
                                             or a sample log field.")
             return False
-        else:
-            self.default_options['temp'] = temp_value
-            self.temp = temp_value
-            self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
-            return True
 
-    def ask_sample_temperature_field(self, ws_name):
+        self.default_options['temp'] = temp_value
+        self.temp = temp_value
+        self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
+        return True
+
+    def ask_sample_temperature_field(self, ws_name: str) -> str:
         text = 'Sample temperature not found. Select the sample temperature field or enter a value in Kelvin:'
         ws = get_workspace_handle(ws_name)
         try:
