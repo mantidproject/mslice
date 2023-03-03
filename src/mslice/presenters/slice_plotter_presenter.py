@@ -6,7 +6,6 @@ from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice import Slice
 from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.units import convert_energy_to_meV
-from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, create_slice_figure)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.plot_window.overplot_interface import plot_overplot_line, remove_line
@@ -20,7 +19,6 @@ class SlicePlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._slice_cache = {}
-        self._sample_temp_fields = []
 
     def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
         workspace = get_workspace_handle(selected_ws)
@@ -28,10 +26,9 @@ class SlicePlotterPresenter(PresenterUtility):
         self.plot_from_cache(workspace)
 
     def create_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
-        sample_temp = sample_temperature(selected_ws, self._sample_temp_fields)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         slice = compute_slice(selected_ws, x_axis, y_axis, norm_to_one)
-        self._cache_slice(slice, colourmap, norm, sample_temp, x_axis, y_axis)
+        self._cache_slice(slice, colourmap, norm, None, x_axis, y_axis)
         self._slice_cache[selected_ws.name].norm_to_one = norm_to_one
         return slice
 
@@ -111,14 +108,6 @@ class SlicePlotterPresenter(PresenterUtility):
         if intensity_start is not None and intensity_end is not None and intensity_start > intensity_end:
             raise ValueError()
         return intensity_start, intensity_end
-
-    def add_sample_temperature_field(self, field_name):
-        self._sample_temp_fields.append(field_name)
-
-    def update_sample_temperature_from_field(self, workspace_name):
-        temp = sample_temperature(workspace_name, self._sample_temp_fields)
-        self.set_sample_temperature(workspace_name, temp)
-        return temp
 
     def set_sample_temperature(self, workspace_name, temp):
         self._slice_cache[workspace_name].sample_temp = temp
