@@ -69,7 +69,7 @@ class MainPresenterTests(unittest.TestCase):
                 client.set_energy_default = mock.NonCallableMagicMock()
             main_presenter.subscribe_to_energy_default_monitor(client)
 
-        for client, enable in clients:
+        for client in clients:
             client.set_energy_default.assert_not_called()
 
         main_presenter.set_energy_default('meV')
@@ -92,7 +92,7 @@ class MainPresenterTests(unittest.TestCase):
                 client.set_cut_algorithm_default = mock.NonCallableMagicMock()
             main_presenter.subscribe_to_cut_algo_default_monitor(client)
 
-        for client, enable in clients:
+        for client in clients:
             client.set_energy_default.assert_not_called()
 
         main_presenter.set_cut_algorithm_default('Rebin')

@@ -46,7 +46,7 @@ class CurrentFigureTest(unittest.TestCase):
         mock_figures = [mock.Mock() for i in range(n)]
         mock_figure_class.side_effect = mock_figures
 
-        for i in range(n):
+        for _ in range(n):
             GlobalFigureManager.get_figure_number()  # Create a new figure
         for i in range(1, n + 1):
             self.assertTrue(i in GlobalFigureManager.all_figure_numbers(

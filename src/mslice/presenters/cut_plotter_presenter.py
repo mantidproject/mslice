@@ -187,7 +187,7 @@ class CutPlotterPresenter(PresenterUtility):
                           intensity_correction=IntensityType.SCATTERING_FUNCTION):
         cache = self._cut_cache_dict[plt.gca()][0]
         if cache.rotated:
-            warnings.warn("No Bragg peak found as cut has no |Q| dimension.")
+            warnings.warn("No Bragg peak found as cut has no |Q| dimension.", stacklevel=2)
             return
         try:
             ws_handle = get_workspace_handle(workspace_name)
@@ -208,7 +208,7 @@ class CutPlotterPresenter(PresenterUtility):
 
             self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
         except (ValueError, IndexError):
-            warnings.warn("No Bragg peak found.")
+            warnings.warn("No Bragg peak found.", stacklevel=2)
 
     def _get_overall_q_axis(self):
         min_q = float_info.max
@@ -286,7 +286,7 @@ class CutPlotterPresenter(PresenterUtility):
             for cut in cut_dict[parent_ws_name]:
                 cut.sample_temp = temp
         else:
-            warnings.warn("Sample temperature not set, cut not found in cache")
+            warnings.warn("Sample temperature not set, cut not found in cache", stacklevel=2)
 
     def propagate_sample_temperatures_throughout_cache(self, axes):
         if len(self._cut_cache_dict[axes]) <= 1:

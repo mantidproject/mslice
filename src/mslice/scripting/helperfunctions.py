@@ -160,7 +160,7 @@ def hide_lines(script_lines, plot_handler, ax):
     script_lines.append("visible_handles = []\n")
     script_lines.append("visible_labels = []\n")
     idx = -1
-    for container in ax.containers:
+    for _ in ax.containers:
         idx += 1
         line_visible = plot_handler.get_line_visible(idx)
         if line_visible:

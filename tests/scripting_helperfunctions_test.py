@@ -330,7 +330,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
     def test_that_add_cut_lines_with_width_works_as_expected_with_multiple_cuts(self):
         x_data, y_data = np.arange(0, 10), np.arange(0, 10)
         for i, color in enumerate(['red', 'blue', 'green']):
-            plt.errorbar(x_data, y_data, linestyle='-', linewidth=1.5, color='blue', label='error_label_{}'.format(i))
+            plt.errorbar(x_data, y_data, linestyle='-', linewidth=1.5, color=color, label='error_label_{}'.format(i))
         errorbars = plt.gca().containers
         cut_0 = Cut(Axis('|Q|', '1', '3', '1'), Axis('DeltaE', '-1', '1', '0'), 1.0, 2.0, True, '1')
         cut_0.parent_ws_name = 'ws_0'

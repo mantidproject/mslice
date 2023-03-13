@@ -85,7 +85,7 @@ class CutWidgetPresenter(PresenterUtility):
                                                    self._cut_view.get_cut_axis_end(),
                                                    "%0.5f" % step)
                 self._cut_view.display_error("Invalid cut step parameter, using default.")
-                warnings.warn("Invalid cut step, using default value")
+                warnings.warn("Invalid cut step, using default value", stacklevel=2)
 
     def _parse_input(self):
         """Gets values entered by user. Validation is performed by the CutCache object."""

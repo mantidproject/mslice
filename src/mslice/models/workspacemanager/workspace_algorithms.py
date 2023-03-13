@@ -174,7 +174,7 @@ def load(filename, output_workspace):
             workspace = ConvertUnits(InputWorkspace=workspace, Target="DeltaE", EMode=workspace.e_mode,
                                      OutputWorkspace=workspace.name)
         _processLoadedWSLimits(workspace)
-    except: # noqa: E722
+    except Exception: # noqa: E722
         delete_workspace(workspace)
         raise
     return workspace
