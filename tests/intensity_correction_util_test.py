@@ -18,6 +18,9 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
         cls.enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
                      IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
 
+        cls.e_axis=Axis("DeltaE", -10, 15, 1)
+        cls.q_axis=Axis("|Q|", 0.1, 3.1, 0.1)
+
     def test_enum_conversion(self):
         descs = [IntensityCache.get_desc_from_type(e) for e in self.enums]
         final_enums = [IntensityCache.get_intensity_type_from_desc(d) for d in descs]
@@ -79,7 +82,6 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
                       q_axis=None, e_axis=None, rotated=None):
         return Slice(workspace, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
-    @staticmethod
-    def _create_cut(q_axis=Axis("|Q|", 0.1, 3.1, 0.1), e_axis=Axis("DeltaE", -10, 15, 1), intensity_start=0,
-                    intensity_end=100, norm_to_one=False, width=None, algorithm='Rebin', sample_temp=None, e_fixed=None):
-        return Cut(e_axis, q_axis, intensity_start, intensity_end, norm_to_one, width, algorithm, sample_temp, e_fixed)
+    def _create_cut(self, intensity_start=0, intensity_end=100, norm_to_one=False, width=None, algorithm='Rebin', sample_temp=None,
+                    e_fixed=None):
+        return Cut(self.e_axis, self.q_axis, intensity_start, intensity_end, norm_to_one, width, algorithm, sample_temp, e_fixed)
