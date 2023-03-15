@@ -14,4 +14,3 @@ dependencies:
   - qtpy
   - pip:
       - nose
-      - flake8-pyproject
