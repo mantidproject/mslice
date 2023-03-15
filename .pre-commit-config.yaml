@@ -21,4 +21,5 @@ repos:
     hooks:
       - id: flake8
       # Have to manually copy this from the .flake8 as flake8 will just ignore the config if the file is passed
-        exclude: tools/boilerplate.py
+        exclude: docs/source/conf.py|src/mslice/plotting/pyplot.p|tools/boilerplate.py
+        args: ['--extend-ignore=E2,E3,F403,W503', '--max-complexity=14', '--max-line-length=140']
