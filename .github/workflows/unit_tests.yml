@@ -33,8 +33,6 @@ jobs:
       - name: Install Mantid
         run: |
           mamba install -c mantid/label/nightly mantid mantidqt
-          # conda install -c conda-forge setuptools==47.0.
-          python -c "from mantid import simpleapi"
 
       - name: Nosetests
         run: |
