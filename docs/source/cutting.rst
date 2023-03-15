@@ -32,7 +32,7 @@ Cuts with the same range from multiple datasets can be plotted by first selectin
 
 There are two different methods to compute cuts: ``Rebin`` and ``Integration``, which can be selected from the
 ``Cut Algorithm`` drop down menu. The difference between these methods are described in the :ref:`Cutting_Algorithms`
-section below and in more detail in the :ref:`Mathematical_Reference`. 
+section below and in more detail in the :ref:`Mathematical_Reference`.
 
 Clicking on the ``Norm to 1`` check box will cause the resulting cut data to be normalised such that the maximum of the data
 of each cut is unity.
