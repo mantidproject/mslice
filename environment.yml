@@ -5,7 +5,6 @@ channels:
   - mantid/label/nightly
 dependencies:
   - coverage
-  - flake8
   - ipython
   - mock
   - pip
@@ -14,4 +13,3 @@ dependencies:
   - qtpy
   - pip:
       - nose
-      - flake8-pyproject

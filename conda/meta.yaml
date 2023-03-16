@@ -20,7 +20,6 @@ build:
 requirements:
   build:
     - python {{ python }}
-    - flake8
     - qtpy
     - setuptools {{ setuptools }}
     - versioningit

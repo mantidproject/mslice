@@ -58,6 +58,12 @@ Specify `start_mslice.py` as the startup script.
 To run tests, create a `Nosetests` configuration and specify the `Target` as `Custom` with `tests`
 with the working directory being the mslice package folder (e.g. `<mslice_root>/src/mslice`).
 
+Optionally, you can also install pre-commit locally to ensure formatting issues are resolved when committing:
+
+```sh
+pre-commit install
+```
+
 ### Automated testing and nightly conda build
 
 Every night the MSlice unit tests are run [automatically](https://github.com/mantidproject/mslice/actions/workflows/unit_tests_nighly.yml) using the latest nightly conda
