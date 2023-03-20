@@ -14,8 +14,8 @@ class Cut(object):
         self._cut_ws = None
         self.cut_axis = cut_axis
         self.integration_axis = integration_axis
-        self.intensity_start = intensity_start
-        self.intensity_end = intensity_end
+        self._intensity_start = intensity_start
+        self._intensity_end = intensity_end
         self.norm_to_one = norm_to_one
         self.icut = None
         # These are here to save the integration range as the integration axis is
