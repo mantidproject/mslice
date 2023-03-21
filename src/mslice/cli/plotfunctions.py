@@ -17,7 +17,7 @@ from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
 from mslice.views.cut_plotter import PICKER_TOL_PTS as CUT_PICKER_TOL_PTS
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from typing import Callable
+from typing import Callable, Tuple
 
 
 @plt.set_category(plt.CATEGORY_CUT)
@@ -60,8 +60,9 @@ def errorbar(axes, workspace, *args, **kwargs):
                     raise RuntimeError('Wrong energy unit for cut. '
                                        'Expected {}, got {}'.format(cached_cuts[0].cut_axis.e_unit, cut_axis.e_unit))
 
+    y_filter, label = _get_y_filter(intensity_min, intensity_max, label)
     axesfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs,
-                           y_filter=_get_y_filter(intensity_min, intensity_max))
+                           y_filter=y_filter)
 
     axes.autoscale()
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
@@ -81,18 +82,20 @@ def errorbar(axes, workspace, *args, **kwargs):
     return axes.lines
 
 
-def _get_y_filter(intensity_min: str, intensity_max: str) -> Callable:
+def _get_y_filter(intensity_min: str, intensity_max: str, label: str) -> Tuple[Callable, str]:
     """
     Return a lambda to be used as a condition to filter the y array. Return None if we do not want any filtering.
+    Also returns an updated label which includes the intensity limits.
     """
     if intensity_min is not None and intensity_max is not None:
-        return lambda y: (y <= float(intensity_max)) & (y >= float(intensity_min))
+        return (lambda y: (y <= float(intensity_max)) & (y >= float(intensity_min)),
+                f"{label}, {intensity_min}<I<{intensity_max}")
     elif intensity_max is not None:
-        return lambda y: y <= float(intensity_max)
+        return lambda y: y <= float(intensity_max), f"{label}, I<{intensity_max}"
     elif intensity_min is not None:
-        return lambda y: y >= float(intensity_min)
+        return lambda y: y >= float(intensity_min), f"{label}, I>{intensity_min}"
     else:
-        return None
+        return None, label
 
 
 def create_and_cache_cut(presenter, mpl_axes, plot_over, workspace, intensity_range):
