@@ -64,13 +64,7 @@ pre-commit install
 
 ### Running tests
 
-To run the unit tests in the MSlice repository, you can run them from the command line or from PyCharm.
-
-To run them from the command line, make sure you have your conda developer environment active, and cd to the root of this repository. You can then run the tests using the following command:
-
-```sh
-PYTHONPATH=$PWD/src/ pytest tests/
-```
+To run the unit tests in the MSlice repository, you can run them from PyCharm or from the command line.
 
 To run them from PyCharm, create a `pytest` configuration and specify the `Target` as `Custom`. Enter the following configuration:
 
@@ -78,6 +72,19 @@ To run them from PyCharm, create a `pytest` configuration and specify the `Targe
 - `Environment variables` should be `PYTHONPATH=src/`
 - `Python Interpreter` should be your `mantidnightly` python executable
 - `Working directory` should be the root of your Mslice repository
+
+To run them from the command line, make sure you have your conda developer environment active, and cd to the root of this repository. You can then run the tests using the following command:
+
+```sh
+PYTHONPATH=$PWD/src/ pytest tests/
+```
+
+To check the coverage of your tests, you can run the following commands:
+
+```sh
+PYTHONPATH=$PWD/src/ coverage run -m pytest tests/
+coverage report
+```
 
 ### Nightly conda build
 

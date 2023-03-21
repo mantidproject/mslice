@@ -57,23 +57,6 @@ where = ["src"]
 "mslice.widgets.status" = ["*.ui"]
 "mslice.widgets.workspacemanager" = ["*.ui"]
 
-[tool.coverage.report]
-omit = [
-    "*/src/mslice/presenters/interfaces/*",
-    "*/src/mslice/util/mantid/__init__.py",
-    "*/src/mslice/util/mantid/mantid_algorithms.py",
-    "*/src/mslice/workspace/base.py",
-    "*/src/mslice/models/workspacemanager/file_io.py",
-    "*/src/mslice/models/workspacemanager/rebose_algorithm.py",
-    "*/src/mslice/models/projection/powder/make_projection.py",
-    "*/src/mslice/models/projection/powder/projection_calculator.py",
-    "*/src/mslice/models/slice*",
-    "*/src/mslice/models/cut/cut_algorithm.py",
-    "*/src/mslice/models/labels.py",
-    "*/src/mslice/models/colors.py",
-]
-show_missing = "true"
-
 [tool.versioningit.vcs]
 method = "git"
 default-tag = "0.0.0"

@@ -29,6 +29,10 @@ jobs:
         run: |
           mamba install -c mantid/label/nightly mantid mantidqt
 
-      - name: Run Tests
+      - name: Run Tests and Coverage
         run: |
-          PYTHONPATH=$PWD/src/ xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum pytest tests/
+          PYTHONPATH=$PWD/src/ xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum coverage run -m pytest tests/
+
+      - name: Report Coverage
+        run: |
+          coverage report
