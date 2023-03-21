@@ -68,21 +68,20 @@ To run the unit tests in the MSlice repository, you can run them from PyCharm or
 
 To run them from PyCharm, create a `pytest` configuration and specify the `Target` as `Custom`. Enter the following configuration:
 
-- `Additional Arguments` should be `tests/`. To run a specific test, you can use `tests/<test_name>.py`
-- `Environment variables` should be `PYTHONPATH=src/`
+- `Additional Arguments` can be left empty to run all tests, or you can specify a test name.
 - `Python Interpreter` should be your `mantidnightly` python executable
 - `Working directory` should be the root of your Mslice repository
 
-To run them from the command line, make sure you have your conda developer environment active, and cd to the root of this repository. You can then run the tests using the following command:
+To run them from the command line, make sure you have your conda developer environment active, and cd to the root of this repository. You can then run a test using the following command:
 
 ```sh
-PYTHONPATH=$PWD/src/ pytest tests/
+pytest <test_name>
 ```
 
-To check the coverage of your tests, you can run the following commands:
+To check the coverage of all the tests in MSlice, you can run the following commands:
 
 ```sh
-PYTHONPATH=$PWD/src/ coverage run -m pytest tests/
+coverage run -m pytest
 coverage report
 ```
 
