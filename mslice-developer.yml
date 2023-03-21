@@ -8,6 +8,6 @@ dependencies:
   - mantid
   - mantidqt
   - qtconsole
-  - nose
   - coverage
   - mock
+  - pytest

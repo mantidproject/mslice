@@ -11,5 +11,4 @@ dependencies:
   - pyqt
   - qtconsole
   - qtpy
-  - pip:
-      - nose
+  - pytest

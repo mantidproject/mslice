@@ -55,8 +55,6 @@ then add this interpreter by going to the `File->Settings` in PyCharm, then `Pro
 click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.8 (mantidnightly)`.
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
 Specify `start_mslice.py` as the startup script.
-To run tests, create a `Nosetests` configuration and specify the `Target` as `Custom` with `tests`
-with the working directory being the mslice package folder (e.g. `<mslice_root>/src/mslice`).
 
 Optionally, you can also install pre-commit locally to ensure formatting issues are resolved when committing:
 
@@ -64,7 +62,30 @@ Optionally, you can also install pre-commit locally to ensure formatting issues 
 pre-commit install
 ```
 
-### Automated testing and nightly conda build
+### Running tests
+
+To run the unit tests in the MSlice repository, you can run them from PyCharm or from the command line.
+
+To run them from PyCharm, create a `pytest` configuration and specify the `Target` as `Custom`. Enter the following configuration:
+
+- `Additional Arguments` can be left empty to run all tests, or you can specify a test name.
+- `Python Interpreter` should be your `mantidnightly` python executable
+- `Working directory` should be the root of your Mslice repository
+
+To run them from the command line, make sure you have your conda developer environment active, and cd to the root of this repository. You can then run a test using the following command:
+
+```sh
+pytest <test_name>
+```
+
+To check the coverage of all the tests in MSlice, you can run the following commands:
+
+```sh
+coverage run -m pytest
+coverage report
+```
+
+### Nightly conda build
 
 Every night the MSlice unit tests are run [automatically](https://github.com/mantidproject/mslice/actions/workflows/unit_tests_nighly.yml) using the latest nightly conda
 packages for mantid and mantidqt, as well as the ``main`` branch of MSlice. If the unit tests run successfully, and if changes have been made to the ``main`` MSlice branch within

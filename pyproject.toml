@@ -33,7 +33,7 @@ dependencies = [
 tests_require = [
     "coverage",
     "mock>=2.0",
-    "nose>=1.0",
+    "pytest",
 ]
 
 [project.urls]
@@ -57,12 +57,26 @@ where = ["src"]
 "mslice.widgets.status" = ["*.ui"]
 "mslice.widgets.workspacemanager" = ["*.ui"]
 
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
 [tool.coverage.report]
+include = [
+    "*/src/mslice/presenters/*",
+    "*/src/mslice/models/*",
+    "*/src/mslice/scripting/*",
+    "*/src/mslice/workspace/*",
+    "*/src/mslice/util/mantid/*",
+    "*/src/mslice/plotting/globalfiguremanager.py"
+]
+
 omit = [
     "*/src/mslice/presenters/interfaces/*",
     "*/src/mslice/util/mantid/__init__.py",
     "*/src/mslice/util/mantid/mantid_algorithms.py",
     "*/src/mslice/workspace/base.py",
+    "*/src/mslice/scripting/__init__.py",
     "*/src/mslice/models/workspacemanager/file_io.py",
     "*/src/mslice/models/workspacemanager/rebose_algorithm.py",
     "*/src/mslice/models/projection/powder/make_projection.py",
@@ -72,6 +86,8 @@ omit = [
     "*/src/mslice/models/labels.py",
     "*/src/mslice/models/colors.py",
 ]
+
+fail_under = 85
 show_missing = "true"
 
 [tool.versioningit.vcs]
