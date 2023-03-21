@@ -17,6 +17,7 @@ from mslice.views.slice_plotter import create_slice_figure
 from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
 from mslice.views.cut_plotter import PICKER_TOL_PTS as CUT_PICKER_TOL_PTS
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from typing import Callable
 
 
 @plt.set_category(plt.CATEGORY_CUT)
@@ -36,9 +37,9 @@ def errorbar(axes, workspace, *args, **kwargs):
     presenter = get_cut_plotter_presenter()
 
     plot_over = kwargs.pop('plot_over', True)
-    intensity_range = kwargs.pop('intensity_range', (None, None))
-    intensity_range = intensity_range if intensity_range else (None, None)
-    intensity_min, intensity_max = intensity_range
+    intensity_min, intensity_max = kwargs.pop('intensity_range', (None, None))
+    intensity_min = intensity_min if intensity_min and intensity_min.strip() != '' else None
+    intensity_max = intensity_max if intensity_max and intensity_max.strip() != '' else None
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
     en_conversion_allowed = kwargs.pop('en_conversion', True)
@@ -59,7 +60,8 @@ def errorbar(axes, workspace, *args, **kwargs):
                     raise RuntimeError('Wrong energy unit for cut. '
                                        'Expected {}, got {}'.format(cached_cuts[0].cut_axis.e_unit, cut_axis.e_unit))
 
-    axesfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
+    axesfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs,
+                           y_filter=_get_y_filter(intensity_min, intensity_max))
 
     axes.autoscale()
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
@@ -77,6 +79,20 @@ def errorbar(axes, workspace, *args, **kwargs):
     cur_canvas.manager.update_axes(plot_over, workspace.name)
 
     return axes.lines
+
+
+def _get_y_filter(intensity_min: str, intensity_max: str) -> Callable:
+    """
+    Return a lambda to be used as a condition to filter the y array. Return None if we do not want any filtering.
+    """
+    if intensity_min is not None and intensity_max is not None:
+        return lambda y: (y <= float(intensity_max)) & (y >= float(intensity_min))
+    elif intensity_max is not None:
+        return lambda y: y <= float(intensity_max)
+    elif intensity_min is not None:
+        return lambda y: y >= float(intensity_min)
+    else:
+        return None
 
 
 def create_and_cache_cut(presenter, mpl_axes, plot_over, workspace, intensity_range):
