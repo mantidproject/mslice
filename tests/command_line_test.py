@@ -247,7 +247,28 @@ class CommandLineTest(unittest.TestCase):
         ax.lines = mock.Mock
 
         errorbar(ax, cut, plot_over=False)
-        mantid_errorbar.assert_called_once_with(ax, cut.raw_ws, label=cut.name)
+        mantid_errorbar.assert_called_once_with(ax, cut.raw_ws, label=cut.name, y_filter=None)
+
+        with mock.patch('mslice.app.presenters.get_cut_plotter_presenter') as get_cpp:
+            get_cpp().get_cache().__getitem__().cut_axis.units = '|Q|'
+            errorbar(ax, cut, plot_over=True)
+            get_cpp().get_cache.assert_called()
+
+    @mock.patch('mslice.cli.plotfunctions._get_y_filter')
+    @mock.patch('mantid.plots.axesfunctions.errorbar')
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
+    def test_errorbar_command_with_intensity(self, is_gui, mantid_errorbar, get_y_filter):
+        is_gui.return_value = True
+        workspace = self.create_workspace('test_plot_cut_non_psd_cli')
+        cut = Cut(workspace)
+        ax = mock.Mock(spec=Axes)
+        ax.get_ylim.return_value = (0., 1.)
+        ax.lines = mock.Mock
+        y_filter, label = lambda y: (y <= 1.5) & (y >= 1.1), f"{cut.name}, 1.1<I<1.5"
+        get_y_filter.return_value = (y_filter, label)
+
+        errorbar(ax, cut, plot_over=False, intensity_range=('1.1', '1.5'))
+        mantid_errorbar.assert_called_once_with(ax, cut.raw_ws, label=label, y_filter=y_filter)
 
         with mock.patch('mslice.app.presenters.get_cut_plotter_presenter') as get_cpp:
             get_cpp().get_cache().__getitem__().cut_axis.units = '|Q|'
