@@ -33,7 +33,7 @@ dependencies = [
 tests_require = [
     "coverage",
     "mock>=2.0",
-    "nose>=1.0",
+    "pytest",
 ]
 
 [project.urls]

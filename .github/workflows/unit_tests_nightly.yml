@@ -29,6 +29,6 @@ jobs:
         run: |
           mamba install -c mantid/label/nightly mantid mantidqt
 
-      - name: Nosetests
+      - name: Run Tests
         run: |
-          xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum nosetests
+          PYTHONPATH=$PWD/src/ xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum pytest tests/
