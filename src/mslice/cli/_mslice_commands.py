@@ -21,7 +21,6 @@ from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MSliceWorkspace
 
-from mslice.util.mantid.mantid_algorithms import *  # noqa: F401
 
 # -----------------------------------------------------------------------------
 # Command functions
