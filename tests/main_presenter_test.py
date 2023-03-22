@@ -43,6 +43,7 @@ class MainPresenterTests(unittest.TestCase):
 
     def test_subscribe_invalid_listener_fail(self):
         main_presenter = MainPresenter(self.mainview)
+
         class x:
             def __init__(self):
                 self.attr = 1
@@ -50,6 +51,7 @@ class MainPresenterTests(unittest.TestCase):
 
     def test_subscribe_invalid_listener_non_callable_handle_fail(self):
         main_presenter = MainPresenter(self.mainview)
+
         class x:
             def __init__(self):
                 self.workspace_selection_changed = 1
