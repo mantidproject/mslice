@@ -65,4 +65,5 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
         attribute_from_log(None, self.raw_ws)
 
     def __del__(self):
-        delete_workspace(self, self._raw_ws)
+        if hasattr(self, "_raw_ws"):
+            delete_workspace(self, self._raw_ws)

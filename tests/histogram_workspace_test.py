@@ -21,7 +21,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
                                                                   ), 'testHistoWorkspace')
 
     def test_invalid_workspace(self):
-        self.assertRaises(TypeError, lambda: HistogramWorkspace(4, 'name'))
+        self.assertRaisesRegex(TypeError, "HistogramWorkspace expected IMDHistoWorkspace, got int", lambda: HistogramWorkspace(4, 'name'))
 
     def test_convert_to_matrix(self):
         # workspace needs to be registered with mslice for conversion
