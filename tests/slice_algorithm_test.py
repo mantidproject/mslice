@@ -274,7 +274,7 @@ class SliceAlgorithmTest(unittest.TestCase):
                                                           self.test_objects['norm_to_one'])
 
         self.assertTrue(isinstance(computed_slice, RebinnedOutput))
-        self.assertEquals(computed_slice.getNumberBins(), (x_dict['end'].value - x_dict['start'].value)
+        self.assertEquals(computed_slice.blocksize(), (x_dict['end'].value - x_dict['start'].value)
                           / x_dict['step'].value)
         self.assertEquals(computed_slice.getNumberHistograms(), (y_dict['end'].value - y_dict['start'].value)
                           / y_dict['step'].value)
