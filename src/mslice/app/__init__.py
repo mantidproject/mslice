@@ -3,7 +3,7 @@ and entry points.
 """
 import sys
 
-import mslice.util.mantid.init_mantid # noqa: F401
+import mslice.util.mantid.init_mantid  # noqa: F401
 from mslice.util.mantid import in_mantid
 from qtpy import QT_VERSION
 from mslice.util.qt.qapp import create_qapp_if_required

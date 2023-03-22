@@ -217,7 +217,7 @@ class CurrentFigureTest(unittest.TestCase):
         self.assertTrue(mock_managers[1].mock_calls[-1] == call.fig_kept())
 
         cat1_get_active_figure().test(3)  # This should go to fig1
-        GlobalFigureManager.get_active_figure().test(4) # so should this
+        GlobalFigureManager.get_active_figure().test(4)  # so should this
 
         mock_figures[0].test.assert_has_calls([call(1), call(3), call(4)])
         mock_figures[1].test.assert_has_calls([call(2)])

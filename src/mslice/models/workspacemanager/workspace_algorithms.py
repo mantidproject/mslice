@@ -13,7 +13,7 @@ import numpy as np
 from scipy import constants
 from six import string_types
 
-import mslice.util.mantid.init_mantid # noqa: F401
+import mslice.util.mantid.init_mantid  # noqa: F401
 
 from mantid.api import WorkspaceUnitValidator
 from mantid.api import MatrixWorkspace
@@ -174,7 +174,7 @@ def load(filename, output_workspace):
             workspace = ConvertUnits(InputWorkspace=workspace, Target="DeltaE", EMode=workspace.e_mode,
                                      OutputWorkspace=workspace.name)
         _processLoadedWSLimits(workspace)
-    except: # noqa: E722
+    except:  # noqa: E722
         delete_workspace(workspace)
         raise
     return workspace
@@ -326,7 +326,7 @@ def get_EMode(workspace):
 def _get_ws_EMode(ws_handle):
     try:
         emode = ws_handle.getEMode()
-    except AttributeError: # workspace is not matrix workspace
+    except AttributeError:  # workspace is not matrix workspace
         try:
             emode = _get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEMode())
         except ValueError:
@@ -356,7 +356,7 @@ def get_EFixed(raw_ws):
 def _get_ws_EFixed(raw_ws):
     try:
         efixed = raw_ws.getEFixed(raw_ws.getDetector(0).getID())
-    except AttributeError: # workspace is not matrix workspace
+    except AttributeError:  # workspace is not matrix workspace
         try:
             efixed = _get_exp_info_using(raw_ws, lambda e: raw_ws.getExperimentInfo(e).getEFixed(1))
         except ValueError:
