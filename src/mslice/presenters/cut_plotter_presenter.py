@@ -337,7 +337,7 @@ class CutPlotterPresenter(PresenterUtility):
 
     @staticmethod
     def set_icut_intensity_category(intensity_type):
-        icut_plot = get_current_plot() #icut is locked to current
+        icut_plot = get_current_plot()  # icut is locked to current
         if hasattr(icut_plot, "set_intensity_from_type"):
             icut_plot.set_intensity_from_type(intensity_type)
 

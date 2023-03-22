@@ -34,9 +34,9 @@ class CurrentFigureTest(unittest.TestCase):
 
         GlobalFigureManager.get_figure_number()
         self.assertTrue(1 in GlobalFigureManager.all_figure_numbers()
-                        )  #Check that a new figure with number=1 was created
+                        )  # Check that a new figure with number=1 was created
         self.assertRaises(KeyError, GlobalFigureManager.get_category,
-                          1)  #Check that figure has no category
+                          1)  # Check that figure has no category
         self.assertTrue(
             GlobalFigureManager.get_active_figure() == mock_figures[0])
 
@@ -50,9 +50,9 @@ class CurrentFigureTest(unittest.TestCase):
             GlobalFigureManager.get_figure_number()  # Create a new figure
         for i in range(1, n + 1):
             self.assertTrue(i in GlobalFigureManager.all_figure_numbers(
-            ))  #Check that a new figure with number=i was created
+            ))  # Check that a new figure with number=i was created
             self.assertRaises(KeyError, GlobalFigureManager.get_category,
-                              i)  #Check that figure has no category
+                              i)  # Check that figure has no category
 
     def test_create_single_categorised_figure(self, mock_figure_class):
         mock_figures = [mock.Mock()]

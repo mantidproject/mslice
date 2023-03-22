@@ -344,7 +344,7 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def set_is_icut(self, is_icut):
-        if is_icut: #disconnect quick options if icut
+        if is_icut:  # disconnect quick options if icut
             self.manager.button_pressed_connected(False)
             self.manager.picking_connected(False)
 

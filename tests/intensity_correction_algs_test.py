@@ -97,8 +97,8 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
     def test_cut_compute_gdos_pixel(self, ws_handle_mock, cut_compute_gdos_pixel_mock, pixel_ws_init_mock):
         pixel_ws_init_mock.return_value = None
         workspace = PixelWorkspace()
-        workspace._histo_ws = MagicMock() #avoid error with destructor
-        workspace._raw_ws = MagicMock() #avoid error with destructor
+        workspace._histo_ws = MagicMock()  # avoid error with destructor
+        workspace._raw_ws = MagicMock()  # avoid error with destructor
         ws_handle_mock.return_value = workspace
         cut_compute_gdos(self.test_ws, 10, self.q_axis, self.e_axis, self.rotated, self.norm_to_one,
                          self.algorithm, True)
