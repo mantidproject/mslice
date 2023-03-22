@@ -19,7 +19,7 @@ class MakeProjection(PythonAlgorithm):
 
     def PyExec(self):
         """Calculate the projection workspace AND return a python handle to it"""
-        input_workspace  = self.getProperty('InputWorkspace').value
+        input_workspace = self.getProperty('InputWorkspace').value
         axis1 = self.getProperty('Axis1').value
         axis2 = self.getProperty('Axis2').value
         emode = self.getProperty('EMode').value

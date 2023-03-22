@@ -171,7 +171,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
         try:
-            background_ws, ssf  = self._workspace_manager_view.subtraction_input()
+            background_ws, ssf = self._workspace_manager_view.subtraction_input()
         except RuntimeError:
             return
         try:
