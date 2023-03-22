@@ -1,7 +1,6 @@
 from mock import MagicMock, PropertyMock, Mock, patch
-from distutils.version import LooseVersion
+from packaging import version
 import unittest
-
 
 from matplotlib import text
 from matplotlib.lines import Line2D
@@ -22,10 +21,10 @@ def setup_line_values(qlo_mock):
     type(quick_line_options).width = PropertyMock(return_value='5.0')
     type(quick_line_options).label = PropertyMock(return_value='label2')
     type(quick_line_options).shown = PropertyMock(return_value=True)
-    if LooseVersion(mpl_version) < LooseVersion('3.6.2'):
-        target = Line2D([], [], 3.0, '-', '#d62728', 'o', label='label1')
+    if version.parse(mpl_version) < version.parse('3.6.2'):
+        target = Line2D([], [], linewidth=3.0, linestyle='-', color='#d62728', marker='o', label='label1')
     else:
-        target = Line2D([], [], 3.0, '-', '#d62728', None, 'o', label='label1')
+        target = Line2D([], [], linewidth=3.0, linestyle='-', color='#d62728', gapcolor=None, marker='o', label='label1')
     return qlo_mock, target
 
 
@@ -47,10 +46,10 @@ class QuickOptionsTest(unittest.TestCase):
     @patch.object(QuickLineOptions, 'exec_', lambda x: None)
     @patch('mslice.presenters.quick_options_presenter.quick_line_options')
     def test_line(self, line_options_mock):
-        if LooseVersion(mpl_version) < LooseVersion('3.6.2'):
-            target = Line2D([], [], 3.0, '-', 'red', 'o', label='label1')
+        if version.parse(mpl_version) < version.parse('3.6.2'):
+            target = Line2D([], [], linewidth=3.0, linestyle='-', color='red', marker='o', label='label1')
         else:
-            target = Line2D([], [], 3.0, '-', 'red', None, 'o', label='label1')
+            target = Line2D([], [], linewidth=3.0, linestyle='-', color='red', gapcolor=None, marker='o', label='label1')
         quick_options(target, self.model)
         line_options_mock.assert_called_once_with(None, target, self.model)
 
