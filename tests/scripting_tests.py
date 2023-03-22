@@ -103,7 +103,7 @@ class ScriptingTest(unittest.TestCase):
         get_alg_kwargs.return_value = ('some args', 'workspace')
 
         script_lines = generate_script_lines(raw_ws, ws_name)
-        self.assertEquals(get_alg_kwargs.call_count, 2)
+        self.assertEqual(get_alg_kwargs.call_count, 2)
 
         self.assertIn(mock.call(load_alg, []), get_alg_kwargs.call_args_list)
         self.assertIn(mock.call(make_projection_alg, []), get_alg_kwargs.call_args_list)
@@ -132,7 +132,7 @@ class ScriptingTest(unittest.TestCase):
         script_lines = generate_script_lines(raw_ws, ws_name)
 
         self.assertIn(mock.call(load_alg, []), get_alg_kwargs.call_args_list)
-        self.assertEquals(get_alg_kwargs.call_count, 2)
+        self.assertEqual(get_alg_kwargs.call_count, 2)
 
         load_kwargs, output_ws = get_alg_kwargs(load_alg, ws_name)
         self.assertIn("ws_{} = mc.{}({})\n".format(ws_name, load_alg.name(), load_kwargs), script_lines)

@@ -12,7 +12,7 @@ class PixelMixin(object):
             for x in range(6):
                 try:
                     dim = self._raw_ws.getDimension(x)
-                    dim_info = dim.getName() + ',' + str(dim.getMinimum()) + ',' + str(dim.getMaximum()) + ',' + str(100)
+                    dim_info = dim.name + ',' + str(dim.getMinimum()) + ',' + str(dim.getMaximum()) + ',' + str(100)
                 except RuntimeError:
                     dim_info = None
                 dim_values.append(dim_info)

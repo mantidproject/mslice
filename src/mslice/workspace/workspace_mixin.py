@@ -27,7 +27,7 @@ class WorkspaceMixin(object):
         coords = {}
         for i in range(self._raw_ws.getNumDims()):
             dim = self._raw_ws.getDimension(i)
-            coords[dim.getName()] = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
+            coords[dim.name] = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
         return coords
 
     def get_signal(self):

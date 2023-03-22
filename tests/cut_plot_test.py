@@ -1,10 +1,8 @@
 from mock import MagicMock, patch, ANY
-from distutils.version import LooseVersion
 import numpy as np
 import unittest
 
 from matplotlib.lines import Line2D
-from matplotlib import __version__ as mpl_version
 from mslice.plotting.plot_window.cut_plot import CutPlot, get_min
 
 
@@ -60,12 +58,8 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.update_bragg_peaks = MagicMock()
         self.cut_plot.change_axis_scale(xy_config)
 
-        if LooseVersion(mpl_version) < LooseVersion('3.3'):
-            self.axes.set_xscale.assert_called_once_with('symlog', linthreshx=10.0)
-            self.axes.set_yscale.assert_called_once_with('symlog', linthreshy=1.0)
-        else:
-            self.axes.set_xscale.assert_called_once_with('symlog', linthresh=10.0)
-            self.axes.set_yscale.assert_called_once_with('symlog', linthresh=1.0)
+        self.axes.set_xscale.assert_called_once_with('symlog', linthresh=10.0)
+        self.axes.set_yscale.assert_called_once_with('symlog', linthresh=1.0)
 
         self.cut_plot.update_bragg_peaks.assert_called_once_with(refresh=True)
         self.assertEqual(self.cut_plot.x_range, (0, 20))

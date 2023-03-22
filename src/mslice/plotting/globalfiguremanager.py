@@ -137,7 +137,6 @@ class GlobalFigureManager(object):
             return
         if num in cls._unclassified_figures:
             cls._unclassified_figures.remove(num)
-            return
         if cls._active_figure == num:
             cls._active_figure = None
         try:

@@ -1,9 +1,7 @@
-from distutils.version import LooseVersion
 from functools import partial
 
 from qtpy import QtWidgets
 
-from matplotlib import __version__ as mpl_version
 from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
@@ -205,8 +203,7 @@ class CutPlot(IPlot):
             self.x_axis_min = get_min(xdata, absolute_minimum=0.)
             linthresh_val = pow(10, np.floor(np.log10(self.x_axis_min)))
 
-            kwargs = {'linthreshx': linthresh_val} if LooseVersion(mpl_version) < LooseVersion('3.3') \
-                else {'linthresh': linthresh_val}
+            kwargs = {'linthresh': linthresh_val}
             current_axis.set_xscale('symlog', **kwargs)
 
             if xmin > 0:
@@ -219,8 +216,7 @@ class CutPlot(IPlot):
             self.y_axis_min = get_min(ydata, absolute_minimum=0.)
             linthresh_val = pow(10, np.floor(np.log10(self.y_axis_min)))
 
-            kwargs = {'linthreshy': linthresh_val} if LooseVersion(mpl_version) < LooseVersion('3.3') \
-                else {'linthresh': linthresh_val}
+            kwargs = {'linthresh': linthresh_val}
             current_axis.set_yscale('symlog', **kwargs)
 
             if ymin > 0:

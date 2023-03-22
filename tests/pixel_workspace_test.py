@@ -21,7 +21,8 @@ class PixelWorkspaceTest(unittest.TestCase):
         cls.workspace = PixelWorkspace(cls.workspace, 'convert_ws')
 
     def test_invalid_workspace(self):
-        self.assertRaises(TypeError, lambda: PixelWorkspace(4))
+        self.assertRaisesRegex(TypeError, "PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got int",
+                               lambda: PixelWorkspace(4, "WorkspaceName"))
 
     def test_get_coordinates(self):
         coords = self.workspace.get_coordinates()

@@ -5,7 +5,6 @@ are defined, but they are separated into a module for possible future expansion.
 """
 
 from __future__ import (absolute_import, division, print_function)
-from mslice.util import MPL_COMPAT
 
 import numpy as np
 
@@ -79,10 +78,7 @@ class EnergyUnits(object):
         return (_scale_string_or_float(x, self.factor_to(unit_to)) for x in args)
 
     def label(self):
-        if MPL_COMPAT:
-            return 'Energy Transfer (' + self._unit + ')'
-        else:
-            return 'Energy Transfer (' + self._label_latex[self._unit] + ')'
+        return 'Energy Transfer (' + self._label_latex[self._unit] + ')'
 
     @classmethod
     def get_index(cls, unit_name):

@@ -70,7 +70,7 @@ class WorkspaceTest(BaseWorkspaceTest):
         cls.workspace = Workspace(CreateWorkspace(x, y, e, OutputWorkspace="testBaseWorkspace"), 'testBaseWorkspace')
 
     def test_invalid_workspace(self):
-        self.assertRaises(TypeError, lambda: Workspace(4))
+        self.assertRaisesRegex(TypeError, "Workspace expected matrixWorkspace, got int", lambda: Workspace(4, "WorkspaceName"))
 
     def test_get_coordinates(self):
         expected_values = np.linspace(0, 99, 100)

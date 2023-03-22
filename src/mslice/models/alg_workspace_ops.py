@@ -39,7 +39,7 @@ def get_available_axes(workspace):
         return ['|Q|', '2Theta', 'DeltaE']
     dim_names = []
     for i in range(workspace.raw_ws.getNumDims()):
-        dim_names.append(workspace.raw_ws.getDimension(i).getName())
+        dim_names.append(workspace.raw_ws.getDimension(i).name)
         if 'Degrees' in dim_names:
             dim_names.remove('Degrees')
             dim_names.append('2Theta')

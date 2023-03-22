@@ -1,7 +1,6 @@
 """Module to create axis and legend labels"""
 
 from __future__ import (absolute_import, division, print_function)
-from mslice.util import MPL_COMPAT
 from mslice.models.units import EnergyUnits
 
 CUT_INTENSITY_LABEL = 'Signal/#Events'
@@ -50,18 +49,15 @@ def get_display_name(axis):
         return EnergyUnits(axis.e_unit).label()
     elif is_momentum(axis.units):
         # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX
-        return '|Q| (recip. Ang.)' if MPL_COMPAT else r'$|Q|$ ($\mathrm{\AA}^{-1}$)'
+        return r'$|Q|$ ($\mathrm{\AA}^{-1}$)'
     elif is_twotheta(axis.units):
-        return 'Scattering Angle (degrees)' if MPL_COMPAT else r'Scattering Angle 2$\theta$ ($^{\circ}$)'
+        return r'Scattering Angle 2$\theta$ ($^{\circ}$)'
     else:
         return axis.units
 
 
 def generate_legend(workspace_name, integrated_dim, integration_start, integration_end):
-    if MPL_COMPAT:
-        mappings = {'DeltaE': 'E', 'MomentumTransfer': '|Q|', 'Degrees': r'2Theta'}
-    else:
-        mappings = {'DeltaE': 'E', 'MomentumTransfer': '|Q|', 'Degrees': r'2$\theta$'}
+    mappings = {'DeltaE': 'E', 'MomentumTransfer': '|Q|', 'Degrees': r'2$\theta$'}
     integrated_dim = mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
     return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
         "%.2f" % integration_end
