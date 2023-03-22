@@ -9,7 +9,7 @@ import mslice.plotting.pyplot as plt
 from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.cli.plotfunctions import pcolormesh, errorbar
 from mslice.cli.helperfunctions import _get_overplot_key
-
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 class CLIProjectionTest(unittest.TestCase):
 
@@ -20,11 +20,15 @@ class CLIProjectionTest(unittest.TestCase):
         self.slice = None
         self.workspace = None
 
-        fig = plt.gcf()
-        self.ax = fig.add_subplot(111, projection='mslice')
+        self.fig_num = 1
+        self.fig = GlobalFigureManager.get_figure_number(self.fig_num).canvas.figure
+        self.ax = self.fig.add_subplot(111, projection='mslice')
         self.workspace = self.create_workspace('workspace')
         self.cut = mc.Cut(self.workspace)
         self.slice = mc.Slice(self.workspace)
+
+    def tearDown(self) -> None:
+        GlobalFigureManager.destroy(self.fig_num)
 
     def create_workspace(self, name):
         workspace = CreateSampleWorkspace(OutputWorkspace=name, NumBanks=1, BankPixelWidth=5, XMin=0.1,

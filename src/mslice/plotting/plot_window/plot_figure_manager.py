@@ -289,7 +289,7 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def move_window(self, x, y):
         center = QtWidgets.QDesktopWidget().screenGeometry().center()
-        self.window.move(center.x() - x, center.y() - y)
+        self.window.move(int(center.x() - x), int(center.y() - y))
 
     def get_window_title(self):
         return six.text_type(self.window.windowTitle())
