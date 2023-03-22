@@ -115,8 +115,8 @@ class PlotFigureManagerQT(QtCore.QObject):
             # Move the top right corner of all slice plot windows to the left of the screen centre by 1.05
             # the window width and above the screen center by half the window height to prevent cuts/interactive cuts
             # and slices from overlapping
-            self.move_window(self.window.width() * 1.05,
-                             self.window.height() / 2)
+            self.move_window(int(self.window.width() * 1.05),
+                             int(self.window.height() / 2))
         else:
             self.plot_handler.disconnect(self.window)
         self.plot_handler = SlicePlot(self, slice_plotter_presenter, workspace)
