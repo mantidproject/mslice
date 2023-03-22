@@ -24,7 +24,6 @@ class Slice:
         self.rotated = rotated
         self.overplot_lines = {}
 
-        #intensities
         self._chi = None
         self._chi_magnetic = None
         self._d2sigma = None

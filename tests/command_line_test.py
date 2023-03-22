@@ -147,13 +147,13 @@ class CommandLineTest(unittest.TestCase):
         is_gui.return_value = True
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_workspace('test_workspace_cut_cli')
-        #test rebin
+        # test rebin
         rebin_result = Cut(workspace)
         rebin_signal = rebin_result.get_signal()
         self.assertEqual(type(rebin_result), HistogramWorkspace)
         self.assertAlmostEqual(1.129, rebin_signal[5], 2)
         self.assertAlmostEqual(1.375, rebin_signal[8], 2)
-        #test integration
+        # test integration
         int_result = Cut(workspace, Algorithm='Integration')
         int_signal = int_result.get_signal()
         self.assertAlmostEqual(2.258, int_signal[5], 2)
@@ -176,14 +176,14 @@ class CommandLineTest(unittest.TestCase):
         is_gui.return_value = True
         get_cpp.return_value = CutPlotterPresenter()
         workspace = self.create_pixel_workspace('test_workspace_cut_psd_cli')
-        #test rebin
+        # test rebin
         rebin_result = Cut(workspace)
         rebin_signal = rebin_result.get_signal()
         self.assertEqual(type(rebin_result), HistogramWorkspace)
         self.assertEqual(128, rebin_signal[0])
         self.assertEqual(192, rebin_signal[29])
         self.assertEqual(429, rebin_signal[15])
-        #test Integration
+        # test Integration
         int_result = Cut(workspace, Algorithm='Integration')
         int_signal = int_result.get_signal()
         self.assertEqual(type(int_result), HistogramWorkspace)
