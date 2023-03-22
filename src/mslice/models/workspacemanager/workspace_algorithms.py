@@ -301,7 +301,7 @@ def _get_slice_mdhisto(workspace, ws_name):
 
 
 def get_axis_from_dimension(workspace, ws_name, id):
-    dim = workspace.raw_ws.getDimension(id).getName()
+    dim = workspace.raw_ws.getDimension(id).name
     min, max, step = workspace.limits[dim]
     return Axis(dim, min, max, step)
 

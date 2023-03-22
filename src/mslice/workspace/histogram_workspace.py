@@ -47,7 +47,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
         ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization',
                                                   FindXAxis=False, OutputWorkspace='__mat'+self.name)
         coord = self.get_coordinates()
-        first_dim = coord[self.raw_ws.getDimension(0).getName()]
+        first_dim = coord[self.raw_ws.getDimension(0).name]
         bin_size = first_dim[1] - first_dim[0]
         ws_conv = Scale(ws_conv, bin_size, OutputWorkspace='__mat'+self.name)
         ConvertToDistribution(ws_conv)

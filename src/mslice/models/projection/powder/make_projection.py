@@ -40,9 +40,9 @@ class MakeProjection(PythonAlgorithm):
         dim0 = output_workspace.getDimension(1)
         dim1 = output_workspace.getDimension(0)
         # format into dimension string as expected
-        dim0 = dim0.getName() + ',' + str(dim0.getMinimum()) + ',' +\
+        dim0 = dim0.name + ',' + str(dim0.getMinimum()) + ',' +\
             str(dim0.getMaximum()) + ',' + str(dim0.getNBins())
-        dim1 = dim1.getName() + ',' + str(dim1.getMinimum()) + ',' +\
+        dim1 = dim1.name + ',' + str(dim1.getMinimum()) + ',' +\
             str(dim1.getMaximum()) + ',' + str(dim1.getNBins())
         return SliceMD(outputWorkspace=output_workspace, StoreInADS=False, InputWorkspace=output_workspace,
                        AlignedDim0=dim0, AlignedDim1=dim1)
