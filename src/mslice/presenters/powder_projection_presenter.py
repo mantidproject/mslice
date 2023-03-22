@@ -74,7 +74,7 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         num_items = len(self._available_axes)
         axes = [self._powder_view.get_powder_u1(), self._powder_view.get_powder_u2()]
         axes_set = [self._powder_view.set_powder_u1, self._powder_view.set_powder_u2]
-        name_to_index = dict((val,id) for id, val in enumerate(self._available_axes))
+        name_to_index = dict((val, id) for id, val in enumerate(self._available_axes))
         if axes[curr_axis] == axes[other_axis]:
             new_index = (name_to_index[axes[other_axis]] + 1) % num_items
             axes_set[other_axis](self._available_axes[new_index])

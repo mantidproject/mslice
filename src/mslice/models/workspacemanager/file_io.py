@@ -95,7 +95,7 @@ def save_matlab(workspace, path, is_slice):
             x = workspace.raw_ws.extractX()
         y = workspace.raw_ws.extractY()
         e = workspace.raw_ws.extractE()
-    mdict = {'x': x, 'y': y, 'e': e, 'labels':labels}
+    mdict = {'x': x, 'y': y, 'e': e, 'labels': labels}
     savemat(path, mdict=mdict)
 
 

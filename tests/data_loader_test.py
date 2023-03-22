@@ -41,7 +41,7 @@ class DataLoaderTest(unittest.TestCase):
 
         with patch('mslice.models.workspacemanager.workspace_algorithms.get_workspace_handle') as gwh:
             gwh.return_value = ws_mock
-            limits = PropertyMock(side_effect=({} if i < 2 else {'DeltaE':[-1, 1]} for i in range(6)))
+            limits = PropertyMock(side_effect=({} if i < 2 else {'DeltaE': [-1, 1]} for i in range(6)))
             type(ws_mock).limits = limits
             e_fixed.return_value = 1.845
             self.presenter.load_workspace([path_to_nexus])

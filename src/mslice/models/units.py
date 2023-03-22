@@ -31,8 +31,8 @@ def get_sample_temperature_from_string(string):
 class EnergyUnits(object):
 
     _available_units = ['meV', 'cm-1']
-    _label_latex = {'meV':'meV', 'cm-1':'cm$^{-1}$'}
-    _name_to_index = {'meV':0, 'cm-1':1, 'DeltaE':0, 'DeltaE_inWavenumber':1}
+    _label_latex = {'meV': 'meV', 'cm-1': 'cm$^{-1}$'}
+    _name_to_index = {'meV': 0, 'cm-1': 1, 'DeltaE': 0, 'DeltaE_inWavenumber': 1}
     # The following is a conversion matrix between the different units e_to = m[from][to] * e_from
     # E.g. meV = m[1][0] * cm; and cm = m[0][1] * meV
     _conversion_factors = [[1.,    8.065544],

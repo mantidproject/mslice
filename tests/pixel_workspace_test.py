@@ -80,7 +80,7 @@ class PixelWorkspaceTest(unittest.TestCase):
         self.assertAlmostEqual(84, result[3][52], 8)
 
     def test_attribute_propagation(self):
-        self.attr = {'axes':[1, object]}
+        self.attr = {'axes': [1, object]}
         attribute_to_log(self.attr, self.workspace.raw_ws)
         new_workspace = PixelWorkspace(self.workspace.raw_ws, 'new')
         assert (hasattr(new_workspace, 'axes'))

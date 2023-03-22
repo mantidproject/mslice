@@ -57,7 +57,7 @@ def _set_axis_options(view, target, model, has_logarithmic, grid):
 
 
 def _set_label_options(view, target):
-    _set_label(view,target)
+    _set_label(view, target)
     _set_font_size(view, target)
 
 

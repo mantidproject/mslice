@@ -47,7 +47,7 @@ class MainPresenterTests(unittest.TestCase):
         class x:
             def __init__(self):
                 self.attr = 1
-        self.assertRaises(TypeError,main_presenter.subscribe_to_workspace_selection_monitor, x())
+        self.assertRaises(TypeError, main_presenter.subscribe_to_workspace_selection_monitor, x())
 
     def test_subscribe_invalid_listener_non_callable_handle_fail(self):
         main_presenter = MainPresenter(self.mainview)

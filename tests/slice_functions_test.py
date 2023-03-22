@@ -20,7 +20,7 @@ class SliceFunctionsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30,25).transpose()
+        cls.sim_scattering_data = np.arange(0, 1.5, 0.002).reshape(30, 25).transpose()
         cls.e_axis = Axis('DeltaE', -10, 15, 1)
         cls.q_axis = Axis('|Q|', 0.1, 3.1, 0.1)
         cls.q_axis_degrees = Axis('Degrees', 3, 33, 1)

@@ -44,7 +44,7 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         slice_widget_presenter = SliceWidgetPresenter(self.slice_view)
         slice_widget_presenter.register_master(self.main_presenter)
         slice_widget_presenter.set_slice_plotter_presenter(self.slice_plotter_presenter)
-        x = Axis('x', '0', '10' ,'1')
+        x = Axis('x', '0', '10', '1')
         y = Axis('y', '2', '8', '3')
         intensity_start = '7'
         intensity_end = '8'
@@ -143,7 +143,7 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         slice_widget_presenter = SliceWidgetPresenter(self.slice_view)
         slice_widget_presenter.register_master(self.main_presenter)
         workspace = "a"
-        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace,workspace])
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace, workspace])
         slice_widget_presenter.workspace_selection_changed()
         self.assertTrue(self.slice_view.clear_input_fields.called)
 
