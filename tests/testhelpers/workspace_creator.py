@@ -29,10 +29,10 @@ def _create_num_of_bins(n_dims: int) -> str:
 def create_simulation_workspace(e_mode: str, output_name: str, psd: bool = False):
     """Creates a basic simulation workspace for testing purposes."""
     if e_mode == "Direct":
-        workspace = mantid_algorithms.CreateSimulationWorkspace(Instrument="MAR", BinParams=[-15, 1, 15],
+        workspace = mantid_algorithms.CreateSimulationWorkspace(Instrument="MAR", BinParams=[-0.15, 0.01, 0.15],
                                                                 UnitX="DeltaE", OutputWorkspace=output_name)
     else:
-        workspace = mantid_algorithms.CreateSimulationWorkspace(Instrument="OSIRIS", BinParams=[-15, 1, 15],
+        workspace = mantid_algorithms.CreateSimulationWorkspace(Instrument="OSIRIS", BinParams=[-0.15, 0.01, 0.15],
                                                                 UnitX="DeltaE", OutputWorkspace=output_name)
     AddSampleLog(workspace=workspace.raw_ws, LogName='Ei', LogText='3.', LogType='Number', StoreInADS=False)
 
