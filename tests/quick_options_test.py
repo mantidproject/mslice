@@ -126,7 +126,7 @@ class QuickOptionsTest(unittest.TestCase):
         qopt.font_size.return_value.value.return_value = 10
         qopt.redraw_signal = PropertyMock()
         qopt.ok_clicked.connect.call_args[0][0]()  # Call the connected signal directly
-        self.assertEquals(self.model.y_grid, True)
+        self.assertEqual(self.model.y_grid, True)
 
 
 @patch('mslice.presenters.quick_options_presenter.QuickAxisOptions')
@@ -152,8 +152,8 @@ class QuickAxisTest(unittest.TestCase):
         qopt = quick_axis_options(None, 'x_range', self.model)
         qopt.redraw_signal = PropertyMock()
         qopt.ok_clicked.connect.call_args[0][0]()  # Call the connected signal directly
-        self.assertEquals(self.model.x_range, (5, 10))
-        self.assertEquals(self.model.x_grid, True)
+        self.assertEqual(self.model.x_range, (5, 10))
+        self.assertEqual(self.model.x_grid, True)
 
     def test_reject(self, quick_axis_options_view):
         quick_axis_options_view.return_value = self.view

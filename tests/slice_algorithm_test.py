@@ -248,19 +248,19 @@ class SliceAlgorithmTest(unittest.TestCase):
         computed_slice = test_slice._compute_slice_PSD(workspace, mock_x_axis, mock_y_axis, None)
 
         self.assertTrue(isinstance(computed_slice, MDHistoWorkspace))
-        self.assertEquals(computed_slice.getSignalArray().shape, (mock_get_no_steps.return_value,
-                          mock_get_no_steps.return_value))
-        self.assertEquals(np.sum(computed_slice.getNumEventsArray()), workspace.getNPoints())
+        self.assertEqual(computed_slice.getSignalArray().shape, (mock_get_no_steps.return_value,
+                         mock_get_no_steps.return_value))
+        self.assertEqual(np.sum(computed_slice.getNumEventsArray()), workspace.getNPoints())
 
         x_dim = computed_slice.getXDimension()
-        self.assertEquals(x_dim.name, '|Q|')
-        self.assertEquals(x_dim.getMinimum(), mock_x_axis.start_meV)
-        self.assertEquals(x_dim.getMaximum(), mock_x_axis.end_meV)
+        self.assertEqual(x_dim.name, '|Q|')
+        self.assertEqual(x_dim.getMinimum(), mock_x_axis.start_meV)
+        self.assertEqual(x_dim.getMaximum(), mock_x_axis.end_meV)
 
         y_dim = computed_slice.getYDimension()
-        self.assertEquals(y_dim.name, 'DeltaE')
-        self.assertEquals(y_dim.getMinimum(), mock_y_axis.start_meV)
-        self.assertEquals(y_dim.getMaximum(), mock_y_axis.end_meV)
+        self.assertEqual(y_dim.name, 'DeltaE')
+        self.assertEqual(y_dim.getMinimum(), mock_y_axis.start_meV)
+        self.assertEqual(y_dim.getMaximum(), mock_y_axis.end_meV)
 
     def test_compute_slice_nonPSD_direct(self):
         x_dict = self._create_axis_dict()
@@ -274,11 +274,11 @@ class SliceAlgorithmTest(unittest.TestCase):
                                                           self.test_objects['norm_to_one'])
 
         self.assertTrue(isinstance(computed_slice, RebinnedOutput))
-        self.assertEquals(computed_slice.blocksize(), (x_dict['end'].value - x_dict['start'].value)
-                          / x_dict['step'].value)
-        self.assertEquals(computed_slice.getNumberHistograms(), (y_dict['end'].value - y_dict['start'].value)
-                          / y_dict['step'].value)
-        self.assertEquals(computed_slice.getNPoints(), self.test_objects['workspace'].raw_ws.getNPoints())
+        self.assertEqual(computed_slice.blocksize(), (x_dict['end'].value - x_dict['start'].value)
+                         / x_dict['step'].value)
+        self.assertEqual(computed_slice.getNumberHistograms(), (y_dict['end'].value - y_dict['start'].value)
+                         / y_dict['step'].value)
+        self.assertEqual(computed_slice.getNPoints(), self.test_objects['workspace'].raw_ws.getNPoints())
 
     @patch('mslice.models.slice.slice_algorithm.SofQW3')
     def test_compute_slice_nonPSD_indirect(self, mock_SofQW3):
@@ -320,15 +320,15 @@ class SliceAlgorithmTest(unittest.TestCase):
                                                           self.test_objects['norm_to_one'])
 
         self.assertTrue(isinstance(computed_slice, Workspace2D))
-        self.assertEquals(computed_slice.getNPoints(), self.test_objects['workspace'].raw_ws.getNPoints())
+        self.assertEqual(computed_slice.getNPoints(), self.test_objects['workspace'].raw_ws.getNPoints())
 
         x_dim = computed_slice.getXDimension()
-        self.assertEquals(x_dim.name, 'Energy transfer')
-        self.assertEquals(x_dim.getMinimum(), x_dict['start'].value)
-        self.assertEquals(x_dim.getMaximum(), x_dict['end'].value)
+        self.assertEqual(x_dim.name, 'Energy transfer')
+        self.assertEqual(x_dim.getMinimum(), x_dict['start'].value)
+        self.assertEqual(x_dim.getMaximum(), x_dict['end'].value)
 
         y_dim = computed_slice.getYDimension()
-        self.assertEquals(y_dim.name, 'Scattering angle')
+        self.assertEqual(y_dim.name, 'Scattering angle')
 
     def test_compute_slice_nonPSD_error_if_unsupported_axes(self):
         x_dict = self._create_axis_dict()

@@ -175,11 +175,11 @@ class CutPlotterPresenterTest(unittest.TestCase):
 
     def test_store_and_get_icut(self):
         return_value = self.cut_plotter_presenter.get_icut()
-        self.assertEquals(return_value, None)
+        self.assertEqual(return_value, None)
 
         self.cut_plotter_presenter.store_icut('icut')
         return_value = self.cut_plotter_presenter.get_icut()
-        self.assertEquals(return_value, 'icut')
+        self.assertEqual(return_value, 'icut')
 
     def test_workspace_selection_changed(self):
         self.cut_plotter_presenter.workspace_selection_changed()
