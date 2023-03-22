@@ -15,6 +15,7 @@ def _attribute_from_string(ws, comstr):
                 if hasattr(ws, k):
                     setattr(ws, k, v)
 
+
 def attribute_from_comment(ws, raw_ws):
     try:
         comstr = raw_ws.getComment()
@@ -22,6 +23,7 @@ def attribute_from_comment(ws, raw_ws):
         return
     else:
         _attribute_from_string(ws, comstr)
+
 
 def attribute_from_log(ws, raw_ws):
     try:
@@ -39,6 +41,7 @@ def attribute_from_log(ws, raw_ws):
     else:
         _attribute_from_string(ws, comstr)
 
+
 def attribute_to_comment(attrdict, raw_ws, append=False):
     if append:
         try:
@@ -54,6 +57,7 @@ def attribute_to_comment(attrdict, raw_ws, append=False):
         raw_ws.setComment(str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()))
     except AttributeError:
         pass
+
 
 def attribute_to_log(attrdict, raw_ws, append=False):
     try:
@@ -77,6 +81,7 @@ def attribute_to_log(attrdict, raw_ws, append=False):
                 if k not in attrdict:
                     attrdict[k] = v
         runinfo.addProperty('MSlice', str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()), True)
+
 
 def delete_workspace(workspace, ws):
     try:

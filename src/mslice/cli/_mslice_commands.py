@@ -211,6 +211,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
 
     return cut
 
+
 def Rebose(InputWorkspace, CurrentTemperature=300, TargetTemperature=5, OutputWorkspace=None):
     """
     Rescales a workspace by the Bose temperature factor from one temperature to another

@@ -5,6 +5,7 @@ from mantid.kernel import FloatArrayProperty, Direction, StringMandatoryValidato
 from mantid.simpleapi import (DeleteWorkspace, SliceMD, PreprocessDetectorsToMD, ConvertToMD, SofQW3, ConvertSpectrumAxis)
 from ...labels import DELTA_E_LABEL, MOD_Q_LABEL, THETA_LABEL
 
+
 class MakeProjection(PythonAlgorithm):
 
     def PyInit(self):

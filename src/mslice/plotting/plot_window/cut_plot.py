@@ -30,6 +30,7 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
 
+
 def get_min(data, absolute_minimum=-np.inf):
     """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
     masked_data = [np.extract(np.greater(row, absolute_minimum), row) for row in data]

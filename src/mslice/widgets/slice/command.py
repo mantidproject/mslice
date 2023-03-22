@@ -8,5 +8,6 @@
 # Classes and functions
 # -----------------------------------------------------------------------------
 
+
 class Command(object):
     DisplaySlice = 12

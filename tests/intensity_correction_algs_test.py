@@ -18,6 +18,7 @@ from mantid.simpleapi import AddSampleLog
 def _invert_axes(matrix):
     return np.rot90(np.flipud(matrix))
 
+
 def _tag_and_return_mock(mock_obj):
     mock_obj.processed = True
     return mock_obj

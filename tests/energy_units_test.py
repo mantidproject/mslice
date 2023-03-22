@@ -2,6 +2,7 @@ import unittest
 from mslice.models.units import EnergyUnits
 from six import string_types
 
+
 class EnergyUnitsTest(unittest.TestCase):
 
     def test_success(self):

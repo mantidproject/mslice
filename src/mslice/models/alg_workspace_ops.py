@@ -14,6 +14,7 @@ def get_number_of_steps(axis):
         else:
             return int(step_num_ceil)
 
+
 def get_axis_range(workspace, dimension_name):
     workspace = get_workspace_handle(workspace)
     return tuple(workspace.limits[dimension_name])
@@ -44,6 +45,7 @@ def get_available_axes(workspace):
             dim_names.remove('Degrees')
             dim_names.append('2Theta')
     return dim_names
+
 
 def get_other_axis(workspace, axis):
     all_axis = get_available_axes(workspace)

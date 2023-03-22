@@ -1,5 +1,6 @@
 from mslice.models.units import EnergyUnits
 
+
 class Axis(object):
     def __init__(self, units, start, end, step, e_unit='meV'):
         self.units = units

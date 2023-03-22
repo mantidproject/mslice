@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from qtpy.QtWidgets import QDialog, QFormLayout, QLabel, QDoubleSpinBox, QPushButton, QCheckBox
 
+
 class EfInputDialog(QDialog):
     def __init__(self, parent = None):
         super(EfInputDialog, self).__init__(parent)

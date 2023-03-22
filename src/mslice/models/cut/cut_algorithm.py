@@ -146,6 +146,7 @@ def _cut_nonPSD_theta(ax1_binning, ax2_binning, selected_workspace, algo):
                          StoreInADS=False, UseFractionalArea=True, EnableLogging=False)
     return ws_out
 
+
 def _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace):
     if 'Indirect' in emode and selected_workspace.run().hasProperty('Efix'):
         ws_out = SofQW3(InputWorkspace=selected_workspace, QAxisBinning=q_binning, EAxisBinning=e_binning, EMode=emode,
@@ -154,6 +155,7 @@ def _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace):
         ws_out = SofQW3(InputWorkspace=selected_workspace, OutputWorkspace='out', EMode=emode, QAxisBinning=q_binning,
                         EAxisBinning=e_binning, StoreInADS=False, EnableLogging=False)
     return ws_out
+
 
 def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace, algo):
     if 'Integration' in algo:

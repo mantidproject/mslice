@@ -223,6 +223,7 @@ def rebose_single(ws, from_temp, to_temp):
     propagate_properties(ws, results)
     return results
 
+
 def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None):
     if scale_factor is None:
         if from_temp is None or to_temp is None:
@@ -382,6 +383,7 @@ def propagate_properties(old_workspace, new_workspace):
         old_prop = getattr(old_workspace, prop)
         if old_prop:
             setattr(new_workspace, prop, old_prop)
+
 
 def get_comment(workspace):
     if hasattr(workspace, 'getComment'):

@@ -1,6 +1,7 @@
 import unittest
 from mslice.models.axis import Axis
 
+
 class AxisTest(unittest.TestCase):
 
     def test_success_int(self):

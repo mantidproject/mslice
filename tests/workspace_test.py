@@ -60,6 +60,7 @@ class BaseWorkspaceTest(unittest.TestCase):
         assert (hasattr(new_workspace, 'axes'))
         assert (new_workspace.axes == self.attr['axes'])
 
+
 class WorkspaceTest(BaseWorkspaceTest):
 
     @classmethod

@@ -55,9 +55,11 @@ def _set_axis_options(view, target, model, has_logarithmic, grid):
 
     setattr(model, target + "_font_size", view.font_size.value())
 
+
 def _set_label_options(view, target):
     _set_label(view,target)
     _set_font_size(view, target)
+
 
 def check_latex(value):
     if '$' in value:
@@ -76,9 +78,11 @@ def _set_label(view, target):
     else:
         QuickError('Invalid LaTeX in label string')
 
+
 def _set_font_size(view, target):
     size = view.label_font_size
     target.set_size(size)
+
 
 def _set_line_options(view, model, line):
     line_options = {}

@@ -278,6 +278,7 @@ class PlotWindow(QtWidgets.QMainWindow):
     def waterfall_y(self, value):
         self.waterfall_y_edt.setText(str(value))
 
+
 def create_attribute_name(text):
     """Create the name of an action attribute based on the text"""
     return "action_" + text.replace(" ", "_").lower()
