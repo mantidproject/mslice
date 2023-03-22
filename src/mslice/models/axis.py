@@ -56,7 +56,7 @@ class Axis(object):
             end_float = float(value)
         except ValueError:
             if str(value) == '':
-                raise(ValueError("Invalid axis parameter on {}: End value required!".format(self.units)))
+                raise ValueError("Invalid axis parameter on {}: End value required!".format(self.units))
             else:
                 raise ValueError("Invalid axis parameter on {}: "
                                  "End value {} is not a valid float!".format(self.units, value))

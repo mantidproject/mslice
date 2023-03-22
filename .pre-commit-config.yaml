@@ -22,4 +22,4 @@ repos:
       - id: flake8
       # Have to manually copy this from the .flake8 as flake8 will just ignore the config if the file is passed
         exclude: docs/source/conf.py|src/mslice/plotting/pyplot.p|tools/boilerplate.py
-        args: ['--extend-ignore=E203,E211,E221,E225,E231,E251,E261,E262,E265,E275', '--max-complexity=14', '--max-line-length=140']
+        args: ['--extend-ignore=E203,E211,E221,E225,E231,E251,E261,E262,E265', '--max-complexity=14', '--max-line-length=140']

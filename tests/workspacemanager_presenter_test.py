@@ -187,7 +187,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         delete_calls = [call(workspace1), call(workspace2)]
         delete_ws_mock.assert_has_calls(delete_calls, any_order=True)
-        assert(self.view.display_loaded_workspaces.called)
+        self.assertTrue(self.view.display_loaded_workspaces.called)
 
     @patch('mslice.presenters.workspace_manager_presenter.delete_workspace')
     def test_remove_workspace_non_selected_prompt_user(self, delete_ws_mock):
@@ -199,7 +199,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.error_select_one_or_more_workspaces.assert_called_once_with()
         delete_ws_mock.assert_not_called()
-        assert(not self.view.display_loaded_workspaces.called)
+        self.assertTrue(not self.view.display_loaded_workspaces.called)
 
     def test_broadcast_success(self):
         self.presenter = WorkspaceManagerPresenter(self.view)
@@ -245,7 +245,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
                 presenter.notify(command)
             except ValueError:
                 pass
-            assert(self.view.clear_displayed_error.called)
+            self.assertTrue(self.view.clear_displayed_error.called)
             self.view.reset_mock()
 
     def test_set_selected_workspace_index(self):
@@ -308,7 +308,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         check_calls = [call('ws1'), call('ws2')]
         is_pixel_ws_mock.assert_has_calls(check_calls, any_order=True)
-        assert(self.view.error_select_more_than_one_workspaces.called)
+        self.assertTrue(self.view.error_select_more_than_one_workspaces.called)
 
     @patch('mslice.presenters.workspace_manager_presenter.combine_workspace')
     @patch('mslice.presenters.workspace_manager_presenter.is_pixel_workspace')
@@ -321,7 +321,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
         self.presenter.notify(Command.CombineWorkspace)
         self.view.get_workspace_selected.assert_called()
-        assert(not self.view.error_select_more_than_one_workspaces.called)
+        self.assertTrue(not self.view.error_select_more_than_one_workspaces.called)
         combine_ws_mock.assert_called_once_with(selected_workspaces, selected_workspaces[0]+'_combined')
 
     @patch('mslice.presenters.workspace_manager_presenter.add_workspace_runs')
@@ -381,7 +381,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.Scale)
         self.view.get_workspace_selected.assert_called()
         self.view.scale_input.assert_called()
-        assert(not self.view.error_select_more_than_one_workspaces.called)
+        self.assertTrue(not self.view.error_select_more_than_one_workspaces.called)
         scale_ws_mock.assert_called_once_with(selected_workspaces, scale_factor=0.5)
 
     @patch('mslice.presenters.workspace_manager_presenter.scale_workspaces')
@@ -394,7 +394,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.Bose)
         self.view.get_workspace_selected.assert_called()
         self.view.scale_input.assert_called()
-        assert(not self.view.error_select_more_than_one_workspaces.called)
+        self.assertTrue(not self.view.error_select_more_than_one_workspaces.called)
         scale_ws_mock.assert_called_once_with(selected_workspaces, from_temp=250, to_temp=2)
 
     @patch('mslice.presenters.workspace_manager_presenter.scale_workspaces')
@@ -412,8 +412,8 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.Scale)
         self.view.get_workspace_selected.assert_called()
         self.view.scale_input.assert_called()
-        assert(not self.view.error_select_more_than_one_workspaces.called)
-        assert(not scale_ws_mock.called)
+        self.assertTrue(not self.view.error_select_more_than_one_workspaces.called)
+        self.assertTrue(not scale_ws_mock.called)
 
         self.view.get_workspace_selected = mock.Mock(return_value=selected_workspaces)
         self.view.scale_input = mock.Mock(return_value=(0.5, None))
@@ -422,7 +422,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.Scale)
         self.view.get_workspace_selected.assert_called()
         self.view.scale_input.assert_called()
-        assert(not self.view.error_select_more_than_one_workspaces.called)
+        self.assertTrue(not self.view.error_select_more_than_one_workspaces.called)
         scale_ws_mock.assert_called_once_with(selected_workspaces, scale_factor=0.5)
         self.view._display_error.assert_called()
 

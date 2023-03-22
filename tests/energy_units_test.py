@@ -12,10 +12,10 @@ class EnergyUnitsTest(unittest.TestCase):
         self.assertEqual(en_unit.factor_from_meV(), 1.)
         self.assertEqual(en_unit.factor_to_meV(), 1.)
         val = list(en_unit.convert_from('meV',1.))[0]
-        assert(isinstance(val, string_types))
+        self.assertTrue(isinstance(val, string_types))
         self.assertAlmostEqual(float(val),  1., 3)
         val = list(en_unit.convert_to('meV',1.))[0]
-        assert(isinstance(val, string_types))
+        self.assertTrue(isinstance(val, string_types))
         self.assertAlmostEqual(float(val),  1., 3)
 
     def test_invalid(self):

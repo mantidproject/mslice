@@ -7,20 +7,20 @@ class AxisTest(unittest.TestCase):
     def test_success_int(self):
         axis = Axis('x', 0, 5, 1)
         self.assertEqual(axis.start, 0.0)
-        assert(isinstance(axis.start, float))
+        self.assertTrue(isinstance(axis.start, float))
         self.assertEqual(axis.end, 5.0)
-        assert(isinstance(axis.end, float))
+        self.assertTrue(isinstance(axis.end, float))
         self.assertEqual(axis.step, 1.0)
-        assert(isinstance(axis.end, float))
+        self.assertTrue(isinstance(axis.end, float))
 
     def test_success_string(self):
         axis = Axis('x', '0', '5', '1')
         self.assertEqual(axis.start, 0.0)
-        assert(isinstance(axis.start, float))
+        self.assertTrue(isinstance(axis.start, float))
         self.assertEqual(axis.end, 5.0)
-        assert(isinstance(axis.end, float))
+        self.assertTrue(isinstance(axis.end, float))
         self.assertEqual(axis.step, 1.0)
-        assert(isinstance(axis.end, float))
+        self.assertTrue(isinstance(axis.end, float))
 
     def test_invalid_string_start(self):
         with self.assertRaises(ValueError):
