@@ -31,11 +31,11 @@ class MantidProjectionCalculator(ProjectionCalculator):
         # can have Q-E or 2theta-E or their transpose.
         if axis1 != DELTA_E_LABEL and axis2 != DELTA_E_LABEL:
             raise NotImplementedError("Must have a '%s' axis" % DELTA_E_LABEL)
-        if (axis1 == MOD_Q_LABEL or axis2 == MOD_Q_LABEL):
-            projection_type='QE'
+        if axis1 == MOD_Q_LABEL or axis2 == MOD_Q_LABEL:
+            projection_type = 'QE'
             output_workspace_name = workspace.name + ('_QE' if axis1 == MOD_Q_LABEL else '_EQ')
-        elif (axis1 == THETA_LABEL or axis2 == THETA_LABEL):
-            projection_type='Theta'
+        elif axis1 == THETA_LABEL or axis2 == THETA_LABEL:
+            projection_type = 'Theta'
             output_workspace_name = workspace.name + ('_ThE' if axis1 == THETA_LABEL else '_ETh')
         else:
             raise NotImplementedError(" Axis '%s' not recognised. Must be '|Q|' or '2Theta'." % (axis1 if
