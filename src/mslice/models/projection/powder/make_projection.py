@@ -30,7 +30,6 @@ class MakeProjection(PythonAlgorithm):
             new_ws = self._calcThetaEproj(input_workspace, emode, axis1, axis2)
         self.setProperty('OutputWorkspace', new_ws)
 
-
     def category(self):
         return 'MSlice'
 

@@ -43,7 +43,6 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 file_paths = ['+'.join(file_paths)]
             self._load_ws(file_paths, ws_names, force_overwrite)
 
-
     def _load_ws(self, file_paths, ws_names, force_overwrite):
         not_loaded = []
         not_opened = []

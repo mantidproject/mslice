@@ -145,7 +145,6 @@ class CutWidgetPresenterTest(unittest.TestCase):
         cut_widget_presenter.notify(Command.Plot)
         self.assertEqual([], run_cut.call_args_list)
 
-
     @patch('mslice.presenters.cut_widget_presenter.is_cuttable')
     @patch('mslice.presenters.cut_widget_presenter.get_workspace_handle')
     @patch('mslice.models.alg_workspace_ops.get_workspace_handle')

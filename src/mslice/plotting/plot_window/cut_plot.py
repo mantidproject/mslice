@@ -129,7 +129,6 @@ class CutPlot(IPlot):
         plot_window.action_symmetrised_sqe.triggered.connect(partial(self.show_intensity_plot, IntensityType.SYMMETRISED, True))
         plot_window.action_gdos.triggered.connect(partial(self.show_intensity_plot, IntensityType.GDOS, True))
 
-
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
         plot_window.action_flip_axis.triggered.disconnect()

@@ -213,7 +213,6 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         self.assertEqual(names, createMDHistoWorkspace_mock.call_args[1]['Names'])
         self.assertEqual(units, createMDHistoWorkspace_mock.call_args[1]['Units'])
 
-
     def test_sample_temperature(self):
         self.assertEqual(sample_temperature(self.test_ws.name, ['Ei']), 3.0)
 

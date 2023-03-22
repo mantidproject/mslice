@@ -28,7 +28,6 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             slice_presenter.validate_intensity('j', '8')
 
-
     def test_validate_intensity_end_less_than_intensity_start_fail(self):
         slice_presenter = SlicePlotterPresenter()
         with self.assertRaises(ValueError):

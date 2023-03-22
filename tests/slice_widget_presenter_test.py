@@ -139,7 +139,6 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         self.slice_plotter_presenter.plot_slice = mock.Mock(side_effect=ValueError('something bad'))
         self.assertRaises(ValueError, slice_widget_presenter.notify, Command.DisplaySlice)
 
-
     def test_workspace_selection_changed_multiple_selected_empty_options_success(self):
         slice_widget_presenter = SliceWidgetPresenter(self.slice_view)
         slice_widget_presenter.register_master(self.main_presenter)

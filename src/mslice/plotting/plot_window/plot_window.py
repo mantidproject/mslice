@@ -136,7 +136,6 @@ class PlotWindow(QtWidgets.QMainWindow):
         menu.addAction(self.action_gdos)
         IntensityCache.cache_action(IntensityType.GDOS, "action_gdos")
 
-
     def create_toolbar(self):
         self.toolbar = QtWidgets.QToolBar()
         self.add_toolbar_actions(self.toolbar)

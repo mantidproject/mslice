@@ -69,7 +69,6 @@ class ScriptingTest(unittest.TestCase):
         self.assertIn(mock.call(ws2.raw_ws, ws_name2), gen_lines.call_args_list)
         self.assertEqual(2, gen_lines.call_count)
 
-
     @mock.patch('mslice.scripting.get_workspace_handle')
     @mock.patch('mslice.scripting.generate_script_lines')
     def test_that_preprocess_lines_works_as_expected_for_single_plots(self, gen_lines, workspace_handle):

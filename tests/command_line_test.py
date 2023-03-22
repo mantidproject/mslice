@@ -159,7 +159,6 @@ class CommandLineTest(unittest.TestCase):
         self.assertAlmostEqual(2.258, int_signal[5], 2)
         self.assertAlmostEqual(1.375, int_signal[8], 2)
 
-
     @mock.patch('mslice.app.presenters.get_slice_plotter_presenter')
     def test_slice_psd(self, get_spp):
         get_spp.return_value = SlicePlotterPresenter()
@@ -263,7 +262,6 @@ class CommandLineTest(unittest.TestCase):
     def test_that_keep_figure_works_on_figure_number(self, gfm):
         KeepFigure(1)
         gfm.set_figure_as_kept.assert_called_with(1)
-
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_make_current_works_on_last_figure_number(self, gfm):
