@@ -31,7 +31,8 @@ jobs:
 
       - name: Install Mantid
         run: |
-          conda install -c mantid/label/nightly mantid mantidqt
+          mamba install -c conda-forge mamba
+          mamba install -c mantid/label/nightly mantid mantidqt
 
       - name: Nosetests
         run: |
