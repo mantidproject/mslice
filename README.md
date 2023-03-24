@@ -1,8 +1,8 @@
 # Mantid MSlice
 
 ## Build status
-[![Build Status](https://travis-ci.org/mantidproject/mslice.svg?branch=master)](https://travis-ci.org/mantidproject/mslice/)
-[![Coverage Status](https://coveralls.io/repos/github/mantidproject/mslice/badge.svg?branch=master)](https://coveralls.io/github/mantidproject/mslice?branch=master)
+![Build Status](https://github.com/mantidproject/mslice/actions/workflows/unit_tests_nightly.yml/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/mantidproject/mslice/badge.svg?branch=main)](https://coveralls.io/github/mantidproject/mslice?branch=main)
 
 ## Overview
 
