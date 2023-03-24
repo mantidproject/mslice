@@ -1,8 +1,9 @@
 from __future__ import (absolute_import, division, print_function)
 from qtpy.QtWidgets import QDialog, QFormLayout, QLabel, QDoubleSpinBox, QPushButton, QCheckBox
 
+
 class EfInputDialog(QDialog):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(EfInputDialog, self).__init__(parent)
         self.setWindowTitle('Indirect Ef')
         layout = QFormLayout(self)
@@ -25,7 +26,7 @@ class EfInputDialog(QDialog):
         return self.efspin.value(), self.allchk.isChecked()
 
     @staticmethod
-    def getEf(workspace, hasMultipleWS=False, default_value = None, parent = None):
+    def getEf(workspace, hasMultipleWS=False, default_value=None, parent=None):
         """Static method to get an Ef"""
         dialog = EfInputDialog(parent)
         dialog.text.setText('Input Fixed Final Energy in meV for %s:' % (workspace))

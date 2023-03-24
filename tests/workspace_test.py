@@ -53,12 +53,13 @@ class BaseWorkspaceTest(unittest.TestCase):
         self.assertTrue((result == expected_values).all())
 
     def set_attribute(self):
-        self.attr = {'axes':[1, object]}
+        self.attr = {'axes': [1, object]}
         attribute_to_log(self.attr, self.workspace.raw_ws)
 
     def check_attribute_propagation(self, new_workspace):
         assert (hasattr(new_workspace, 'axes'))
         assert (new_workspace.axes == self.attr['axes'])
+
 
 class WorkspaceTest(BaseWorkspaceTest):
 

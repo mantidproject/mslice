@@ -86,7 +86,7 @@ class SliceView:
     def error_invalid_plot_parameters(self):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
-    def populate_colormap_options(self,colormaps):
+    def populate_colormap_options(self, colormaps):
         raise NotImplementedError("This method must be implemented in a concrete view before being called")
 
     def populate_slice_x_options(self, options):

@@ -1,11 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
 
-import mslice.util.mantid.init_mantid # noqa: F401
-from mslice.plotting.pyplot import *  # noqa: F401
+from mslice.plotting.pyplot import *  # noqa: F401, F403
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
 from mslice.cli.helperfunctions import is_slice, is_cut, is_hs_workspace
-from ._mslice_commands import *  # noqa: F401
+from ._mslice_commands import *  # noqa: F401, F403
 from mslice.app import is_gui
 from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_type, _get_workspace_type, _get_overplot_key,
                                         _update_overplot_checklist, _update_legend)

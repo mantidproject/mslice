@@ -17,6 +17,7 @@ _binary_operator_map = {
     "Xor": operator.xor
 }
 
+
 def _binary_op(self, other, algorithm, result_info, inplace, reverse):
     """
     Delegate binary operations (+,-,*,/) performed on a workspace depending on type.
@@ -49,12 +50,14 @@ def _binary_op(self, other, algorithm, result_info, inplace, reverse):
         inner_res = _do_binary_operation(algorithm, self._raw_ws, other, result_info, inplace, reverse)
     return self.rewrap(inner_res)
 
+
 def _check_dimensions(self, workspace_to_check):
     """check if a workspace has the same number of bins as self for each dimension"""
     for i in range(self._raw_ws.getNumDims()):
         if self._raw_ws.getDimension(i).getNBins() != workspace_to_check._raw_ws.getDimension(i).getNBins():
             return False
     return True
+
 
 def _attach_binary_operators():
     def add_operator_func(attr, algorithm, inplace, reverse):

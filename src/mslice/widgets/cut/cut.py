@@ -26,7 +26,7 @@ from .command import Command
 class CutWidget(CutView, QWidget):
     error_occurred = Signal('QString')
     busy = Signal(bool)
-    _name_to_index = {'Rebin':0, 'Integration':1}
+    _name_to_index = {'Rebin': 0, 'Integration': 1}
 
     def __init__(self, parent=None, *args, **kwargs):
         QWidget.__init__(self, parent, *args, **kwargs)

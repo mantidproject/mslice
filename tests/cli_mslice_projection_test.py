@@ -11,6 +11,7 @@ from mslice.cli.plotfunctions import pcolormesh, errorbar
 from mslice.cli.helperfunctions import _get_overplot_key
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
+
 class CLIProjectionTest(unittest.TestCase):
 
     def setUp(self):

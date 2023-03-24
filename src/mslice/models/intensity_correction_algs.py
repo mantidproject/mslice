@@ -84,11 +84,11 @@ def compute_symmetrised(scattering_data, sample_temp, e_axis, data_rotated):
 
 def generate_modification_array(multiplier, up_to_index, signal):
     modification_array = np.ones_like(signal)
-    if len(signal.shape) < 2:  #cut
+    if len(signal.shape) < 2:  # cut
         lhs = modification_array[:up_to_index] * multiplier
         rhs = modification_array[up_to_index:]
         axis_index = 0
-    else:  #slice
+    else:  # slice
         lhs = modification_array[:, :up_to_index] * multiplier
         rhs = modification_array[:, up_to_index:]
         axis_index = 1

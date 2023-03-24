@@ -9,6 +9,7 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.plotting.pyplot import GlobalFigureManager
 
+
 class InteractiveCut(object):
 
     def __init__(self, slice_plot, canvas, ws_title):

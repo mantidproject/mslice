@@ -34,9 +34,9 @@ class CurrentFigureTest(unittest.TestCase):
 
         GlobalFigureManager.get_figure_number()
         self.assertTrue(1 in GlobalFigureManager.all_figure_numbers()
-                        )  #Check that a new figure with number=1 was created
+                        )  # Check that a new figure with number=1 was created
         self.assertRaises(KeyError, GlobalFigureManager.get_category,
-                          1)  #Check that figure has no category
+                          1)  # Check that figure has no category
         self.assertTrue(
             GlobalFigureManager.get_active_figure() == mock_figures[0])
 
@@ -50,9 +50,9 @@ class CurrentFigureTest(unittest.TestCase):
             GlobalFigureManager.get_figure_number()  # Create a new figure
         for i in range(1, n + 1):
             self.assertTrue(i in GlobalFigureManager.all_figure_numbers(
-            ))  #Check that a new figure with number=i was created
+            ))  # Check that a new figure with number=i was created
             self.assertRaises(KeyError, GlobalFigureManager.get_category,
-                              i)  #Check that figure has no category
+                              i)  # Check that figure has no category
 
     def test_create_single_categorised_figure(self, mock_figure_class):
         mock_figures = [mock.Mock()]
@@ -217,7 +217,7 @@ class CurrentFigureTest(unittest.TestCase):
         self.assertTrue(mock_managers[1].mock_calls[-1] == call.fig_kept())
 
         cat1_get_active_figure().test(3)  # This should go to fig1
-        GlobalFigureManager.get_active_figure().test(4) # so should this
+        GlobalFigureManager.get_active_figure().test(4)  # so should this
 
         mock_figures[0].test.assert_has_calls([call(1), call(3), call(4)])
         mock_figures[1].test.assert_has_calls([call(2)])

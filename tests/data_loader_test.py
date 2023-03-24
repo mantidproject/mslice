@@ -41,7 +41,7 @@ class DataLoaderTest(unittest.TestCase):
 
         with patch('mslice.models.workspacemanager.workspace_algorithms.get_workspace_handle') as gwh:
             gwh.return_value = ws_mock
-            limits = PropertyMock(side_effect=({} if i < 2 else {'DeltaE':[-1, 1]} for i in range(6)))
+            limits = PropertyMock(side_effect=({} if i < 2 else {'DeltaE': [-1, 1]} for i in range(6)))
             type(ws_mock).limits = limits
             e_fixed.return_value = 1.845
             self.presenter.load_workspace([path_to_nexus])
@@ -70,7 +70,7 @@ class DataLoaderTest(unittest.TestCase):
         # Makes the first file not load because of a name collision
         self.view.confirm_overwrite_workspace = mock.Mock(side_effect=[False, True, True])
         # Makes the second file fail to load, to check if it raise the correct error
-        load_mock.side_effect=[RuntimeError, 0, 0]
+        load_mock.side_effect = [RuntimeError, 0, 0]
         self.presenter.load_workspace([path1, path2, path3])
         # Because of the name collision, the first file name is not loaded.
         load_calls = [call(filename=path2, output_workspace=ws_name2),
@@ -100,8 +100,8 @@ class DataLoaderTest(unittest.TestCase):
         tempdir = gettempdir()  # To ensure sample paths are valid on platform of execution
         path_to_nexus = join(tempdir, 'cde.nxs')
         workspace_name = 'cde'
-        get_ws_names_mock.return_value=[workspace_name]
-        load_mock.side_effect=RuntimeError
+        get_ws_names_mock.return_value = [workspace_name]
+        load_mock.side_effect = RuntimeError
 
         self.presenter.load_workspace([path_to_nexus])
         self.view.error_unable_to_open_file.assert_called_once()

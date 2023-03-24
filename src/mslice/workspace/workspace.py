@@ -8,6 +8,7 @@ from mantid.api import MatrixWorkspace
 
 import re
 
+
 class Workspace(WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWorkspaceProperties):
     """workspace wrapper for MatrixWorkspace"""
 

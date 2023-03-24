@@ -39,7 +39,7 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
         if (file_dialog.exec_()):
             path = str(file_dialog.selectedFiles()[0])
             filename = os.path.basename(path)
-            if '.' not in filename: # add extension unless there's one in the name
+            if '.' not in filename:  # add extension unless there's one in the name
                 try:
                     sel = file_dialog.selectedFilter()
                 except AttributeError:   # Qt5 only has selectedNameFilter
@@ -95,7 +95,7 @@ def save_matlab(workspace, path, is_slice):
             x = workspace.raw_ws.extractX()
         y = workspace.raw_ws.extractY()
         e = workspace.raw_ws.extractE()
-    mdict = {'x': x, 'y': y, 'e': e, 'labels':labels}
+    mdict = {'x': x, 'y': y, 'e': e, 'labels': labels}
     savemat(path, mdict=mdict)
 
 

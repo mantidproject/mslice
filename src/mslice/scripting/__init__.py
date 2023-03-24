@@ -70,6 +70,7 @@ def generate_script_lines(raw_ws, workspace_name):
             lines += [f"ws_{ws_name} = mc.{alg_name}({kwargs})\n"]
     return lines
 
+
 def _parse_prop(prop):
     pval = prop.value()
     pname = prop.name()
@@ -82,6 +83,7 @@ def _parse_prop(prop):
         if "_HIDDEN" in prop.value():
             hidden = True
     return pname, pval, output_ws, hidden
+
 
 def get_algorithm_kwargs(algorithm, existing_ws_refs):
     arguments = []

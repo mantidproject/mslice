@@ -30,6 +30,7 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
 
+
 def get_min(data, absolute_minimum=-np.inf):
     """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
     masked_data = [np.extract(np.greater(row, absolute_minimum), row) for row in data]
@@ -128,7 +129,6 @@ class CutPlot(IPlot):
         plot_window.action_d2sig_dw_de.triggered.connect(partial(self.show_intensity_plot, IntensityType.D2SIGMA, False))
         plot_window.action_symmetrised_sqe.triggered.connect(partial(self.show_intensity_plot, IntensityType.SYMMETRISED, True))
         plot_window.action_gdos.triggered.connect(partial(self.show_intensity_plot, IntensityType.GDOS, True))
-
 
     def disconnect(self, plot_window):
         plot_window.action_save_cut.triggered.disconnect()
@@ -344,7 +344,7 @@ class CutPlot(IPlot):
                 element.set_alpha(1)
 
     def set_is_icut(self, is_icut):
-        if is_icut: #disconnect quick options if icut
+        if is_icut:  # disconnect quick options if icut
             self.manager.button_pressed_connected(False)
             self.manager.picking_connected(False)
 

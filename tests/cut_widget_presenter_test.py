@@ -92,7 +92,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         cut_widget_presenter.register_master(self.main_presenter)
         workspace = 'workspace'
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace])
-        is_cuttable_mock.return_value=True
+        is_cuttable_mock.return_value = True
 
         ws_mock = mock.Mock()
         ws_mock.is_PSD = False
@@ -112,7 +112,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         fields['axes'] = available_dimensions
         self.view.get_input_fields = mock.Mock(return_value=fields)
         self.view.is_fields_cleared = mock.Mock(return_value=False)
-        ws_mock.get_saved_cut_parameters.return_value=(fields, available_dimensions[0])
+        ws_mock.get_saved_cut_parameters.return_value = (fields, available_dimensions[0])
         ws_mock.is_axis_saved = mock.Mock(return_value=False)
         self.view.get_cut_axis = mock.Mock(return_value=available_dimensions[0])
         cut_widget_presenter.workspace_selection_changed()
@@ -144,7 +144,6 @@ class CutWidgetPresenterTest(unittest.TestCase):
         cut_widget_presenter.set_cut_plotter_presenter(cut_plotter_presenter)
         cut_widget_presenter.notify(Command.Plot)
         self.assertEqual([], run_cut.call_args_list)
-
 
     @patch('mslice.presenters.cut_widget_presenter.is_cuttable')
     @patch('mslice.presenters.cut_widget_presenter.get_workspace_handle')

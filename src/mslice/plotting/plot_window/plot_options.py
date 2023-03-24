@@ -311,7 +311,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         self.width_label = QtWidgets.QLabel(self)
         self.width_label.setText("Width:")
         self.line_width = QtWidgets.QComboBox(self)
-        self.line_width.addItems([str(x) for x in np_arange(1,10.5,0.5)])
+        self.line_width.addItems([str(x) for x in np_arange(1, 10.5, 0.5)])
         self.line_width.setCurrentIndex(self.line_width.findText(line_options['width']))
 
         self.marker_label = QtWidgets.QLabel(self)

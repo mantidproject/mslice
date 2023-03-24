@@ -71,10 +71,10 @@ class CutView:
     def display_error(self, string):
         pass
 
-    def populate_cut_axis_options(self,options):
+    def populate_cut_axis_options(self, options):
         pass
 
-    def populate_integration_axis_options(self,options):
+    def populate_integration_axis_options(self, options):
         pass
 
     def populate_cut_params(self, cut_start=None, cut_end=None, cut_step=None):

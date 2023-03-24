@@ -18,6 +18,7 @@ from mantid.simpleapi import AddSampleLog
 def _invert_axes(matrix):
     return np.rot90(np.flipud(matrix))
 
+
 def _tag_and_return_mock(mock_obj):
     mock_obj.processed = True
     return mock_obj
@@ -96,8 +97,8 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
     def test_cut_compute_gdos_pixel(self, ws_handle_mock, cut_compute_gdos_pixel_mock, pixel_ws_init_mock):
         pixel_ws_init_mock.return_value = None
         workspace = PixelWorkspace()
-        workspace._histo_ws = MagicMock() #avoid error with destructor
-        workspace._raw_ws = MagicMock() #avoid error with destructor
+        workspace._histo_ws = MagicMock()  # avoid error with destructor
+        workspace._raw_ws = MagicMock()  # avoid error with destructor
         ws_handle_mock.return_value = workspace
         cut_compute_gdos(self.test_ws, 10, self.q_axis, self.e_axis, self.rotated, self.norm_to_one,
                          self.algorithm, True)
@@ -212,7 +213,6 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         self.assertEqual(shape_string, createMDHistoWorkspace_mock.call_args[1]['NumberOfBins'])
         self.assertEqual(names, createMDHistoWorkspace_mock.call_args[1]['Names'])
         self.assertEqual(units, createMDHistoWorkspace_mock.call_args[1]['Units'])
-
 
     def test_sample_temperature(self):
         self.assertEqual(sample_temperature(self.test_ws.name, ['Ei']), 3.0)

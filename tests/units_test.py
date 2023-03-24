@@ -2,6 +2,7 @@ import unittest
 
 from mslice.models.units import EnergyUnits, _scale_string_or_float, get_sample_temperature_from_string
 
+
 class UnitsTest(unittest.TestCase):
 
     @classmethod

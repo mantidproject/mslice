@@ -44,7 +44,7 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         slice_widget_presenter = SliceWidgetPresenter(self.slice_view)
         slice_widget_presenter.register_master(self.main_presenter)
         slice_widget_presenter.set_slice_plotter_presenter(self.slice_plotter_presenter)
-        x = Axis('x', '0', '10' ,'1')
+        x = Axis('x', '0', '10', '1')
         y = Axis('y', '2', '8', '3')
         intensity_start = '7'
         intensity_end = '8'
@@ -139,14 +139,13 @@ class SliceWidgetPresenterTest(unittest.TestCase):
         self.slice_plotter_presenter.plot_slice = mock.Mock(side_effect=ValueError('something bad'))
         self.assertRaises(ValueError, slice_widget_presenter.notify, Command.DisplaySlice)
 
-
     def test_workspace_selection_changed_multiple_selected_empty_options_success(self):
         slice_widget_presenter = SliceWidgetPresenter(self.slice_view)
         slice_widget_presenter.register_master(self.main_presenter)
         workspace = "a"
-        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace,workspace])
+        self.main_presenter.get_selected_workspaces = mock.Mock(return_value=[workspace, workspace])
         slice_widget_presenter.workspace_selection_changed()
-        assert(self.slice_view.clear_input_fields.called)
+        self.assertTrue(self.slice_view.clear_input_fields.called)
 
     @mock.patch('mslice.presenters.slice_widget_presenter.get_workspace_handle')
     @mock.patch('mslice.models.alg_workspace_ops.get_workspace_handle')

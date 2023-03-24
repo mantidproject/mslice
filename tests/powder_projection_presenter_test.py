@@ -64,9 +64,9 @@ class PowderProjectionPresenterTest(unittest.TestCase):
         self.powder_view.get_powder_u1.assert_called_once_with()
         self.powder_view.get_powder_u2.assert_called_once_with()
         # TODO edit after recieving binning specs (test binning recieved from user if appropriate)
-        #TODO make test more strict after recieving binning specs
-        #self.projection_calculator.calculate_projection.assert_called_once_with(input_workspace=selected_workspace,
-        #                           output_workspace=output_workspace,qbinning=???,axis1=u1,axis2=u2)
+        # TODO make test more strict after recieving binning specs
+        # self.projection_calculator.calculate_projection.assert_called_once_with(input_workspace=selected_workspace,
+        #                            output_workspace=output_workspace,qbinning=???,axis1=u1,axis2=u2)
         self.projection_calculator.calculate_projection.assert_called_once()
         self.main_presenter.update_displayed_workspaces.assert_called_once()
         self.main_presenter.set_selected_workspaces.assert_called_once()

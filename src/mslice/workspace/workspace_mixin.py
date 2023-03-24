@@ -57,7 +57,7 @@ class WorkspaceMixin(object):
         """Perform binary operation using a numpy array with the same number of elements as an axis of _raw_ws signal"""
         signal = self.get_signal()
         error = self.get_error()
-        new_ws = CloneWorkspace(InputWorkspace= self._raw_ws, StoreInADS=False)
+        new_ws = CloneWorkspace(InputWorkspace=self._raw_ws, StoreInADS=False)
         array_size_error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
         new_signal = apply_with_corrected_shape(operator, signal, other, array_size_error)
         self._set_signal_raw(new_ws, new_signal)

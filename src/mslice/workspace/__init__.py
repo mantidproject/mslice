@@ -3,6 +3,7 @@ from .workspace import Workspace as MatrixWorkspace
 from .pixel_workspace import PixelWorkspace
 from .histogram_workspace import HistogramWorkspace
 
+
 def wrap_workspace(raw_ws, name):
     if isinstance(raw_ws, IMDEventWorkspace):
         wrapped = PixelWorkspace(raw_ws, name)

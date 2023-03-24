@@ -13,7 +13,7 @@ import numpy as np
 from scipy import constants
 from six import string_types
 
-import mslice.util.mantid.init_mantid # noqa: F401
+import mslice.util.mantid.init_mantid  # noqa: F401
 
 from mantid.api import WorkspaceUnitValidator
 from mantid.api import MatrixWorkspace
@@ -117,7 +117,7 @@ def _get_property_from_history(name, history):
 
 
 def get_q_limits(theta, en, efix):
-    #calculates the Q(E) line for the given two theta and then finds the min and max values
+    # calculates the Q(E) line for the given two theta and then finds the min and max values
     qlines = [np.sqrt(E2q * (2 * efix - en - 2 * np.sqrt(efix * (efix - en)) * np.cos(tth)) * meV2J) / 1e10 for tth in theta[:2]]
     qmin = np.nanmin(qlines[0])
     qmax = np.nanmax(qlines[1])
@@ -174,7 +174,7 @@ def load(filename, output_workspace):
             workspace = ConvertUnits(InputWorkspace=workspace, Target="DeltaE", EMode=workspace.e_mode,
                                      OutputWorkspace=workspace.name)
         _processLoadedWSLimits(workspace)
-    except: # noqa: E722
+    except:  # noqa: E722
         delete_workspace(workspace)
         raise
     return workspace
@@ -222,6 +222,7 @@ def rebose_single(ws, from_temp, to_temp):
                      OutputWorkspace=ws.name+'_bosed')
     propagate_properties(ws, results)
     return results
+
 
 def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None):
     if scale_factor is None:
@@ -325,7 +326,7 @@ def get_EMode(workspace):
 def _get_ws_EMode(ws_handle):
     try:
         emode = ws_handle.getEMode()
-    except AttributeError: # workspace is not matrix workspace
+    except AttributeError:  # workspace is not matrix workspace
         try:
             emode = _get_exp_info_using(ws_handle, lambda e: ws_handle.getExperimentInfo(e).getEMode())
         except ValueError:
@@ -355,7 +356,7 @@ def get_EFixed(raw_ws):
 def _get_ws_EFixed(raw_ws):
     try:
         efixed = raw_ws.getEFixed(raw_ws.getDetector(0).getID())
-    except AttributeError: # workspace is not matrix workspace
+    except AttributeError:  # workspace is not matrix workspace
         try:
             efixed = _get_exp_info_using(raw_ws, lambda e: raw_ws.getExperimentInfo(e).getEFixed(1))
         except ValueError:
@@ -382,6 +383,7 @@ def propagate_properties(old_workspace, new_workspace):
         old_prop = getattr(old_workspace, prop)
         if old_prop:
             setattr(new_workspace, prop, old_prop)
+
 
 def get_comment(workspace):
     if hasattr(workspace, 'getComment'):

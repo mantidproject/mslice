@@ -5,6 +5,7 @@ from mantid.kernel import FloatArrayProperty, Direction, StringMandatoryValidato
 from mantid.simpleapi import (DeleteWorkspace, SliceMD, PreprocessDetectorsToMD, ConvertToMD, SofQW3, ConvertSpectrumAxis)
 from ...labels import DELTA_E_LABEL, MOD_Q_LABEL, THETA_LABEL
 
+
 class MakeProjection(PythonAlgorithm):
 
     def PyInit(self):
@@ -18,7 +19,7 @@ class MakeProjection(PythonAlgorithm):
 
     def PyExec(self):
         """Calculate the projection workspace AND return a python handle to it"""
-        input_workspace  = self.getProperty('InputWorkspace').value
+        input_workspace = self.getProperty('InputWorkspace').value
         axis1 = self.getProperty('Axis1').value
         axis2 = self.getProperty('Axis2').value
         emode = self.getProperty('EMode').value
@@ -29,7 +30,6 @@ class MakeProjection(PythonAlgorithm):
         else:
             new_ws = self._calcThetaEproj(input_workspace, emode, axis1, axis2)
         self.setProperty('OutputWorkspace', new_ws)
-
 
     def category(self):
         return 'MSlice'

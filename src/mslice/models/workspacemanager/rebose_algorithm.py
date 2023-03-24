@@ -40,8 +40,8 @@ class Rebose(PythonAlgorithm):
         e = e * bose_old / bose_new
         result = CloneWorkspace(workspace, StoreInADS=False, EnableLogging=False)
         for j in range(len(y)):
-            result.setY(j, y[j,:])
-            result.setE(j, e[j,:])
+            result.setY(j, y[j, :])
+            result.setE(j, e[j, :])
         self.setProperty('OutputWorkspace', result)
 
     def category(self):

@@ -1,6 +1,7 @@
 import abc
 from six import add_metaclass
 
+
 @add_metaclass(abc.ABCMeta)
 class DataLoaderPresenterInterface(object):
 

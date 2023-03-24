@@ -21,7 +21,6 @@ from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MSliceWorkspace
 
-from mslice.util.mantid.mantid_algorithms import *  # noqa: F401
 
 # -----------------------------------------------------------------------------
 # Command functions
@@ -211,6 +210,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
     get_cut_plotter_presenter().update_main_window()
 
     return cut
+
 
 def Rebose(InputWorkspace, CurrentTemperature=300, TargetTemperature=5, OutputWorkspace=None):
     """

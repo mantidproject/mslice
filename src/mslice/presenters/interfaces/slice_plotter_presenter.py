@@ -10,7 +10,7 @@ class SlicePlotterPresenterInterface(object):
         pass
 
     @abc.abstractmethod
-    def notify(self,command):
+    def notify(self, command):
         pass
 
     @abc.abstractmethod
