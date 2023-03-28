@@ -36,9 +36,9 @@ def errorbar(axes, workspace, *args, **kwargs):
     presenter = get_cut_plotter_presenter()
 
     plot_over = kwargs.pop('plot_over', True)
-    intensity_range = kwargs.pop('intensity_range', (None, None))
-    intensity_range = intensity_range if intensity_range else (None, None)
-    intensity_min, intensity_max = intensity_range
+    intensity_min, intensity_max = kwargs.pop('intensity_range', (None, None))
+    intensity_min = intensity_min if intensity_min and intensity_min != '' else None
+    intensity_max = intensity_max if intensity_max and intensity_max != '' else None
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
     en_conversion_allowed = kwargs.pop('en_conversion', True)
@@ -62,6 +62,9 @@ def errorbar(axes, workspace, *args, **kwargs):
     axesfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
 
     axes.autoscale()
+    if intensity_min is not None or intensity_max is not None:
+        axes.set_ylim(intensity_min, intensity_max)
+
     if cur_canvas.manager.window.action_toggle_legends.isChecked():
         leg = axes.legend(fontsize='medium')
         legend_set_draggable(leg, True)

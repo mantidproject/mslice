@@ -246,12 +246,28 @@ class CommandLineTest(unittest.TestCase):
         ax.lines = mock.Mock
 
         errorbar(ax, cut, plot_over=False)
+        ax.autoscale.assert_called_once_with()
         mantid_errorbar.assert_called_once_with(ax, cut.raw_ws, label=cut.name)
 
         with mock.patch('mslice.app.presenters.get_cut_plotter_presenter') as get_cpp:
             get_cpp().get_cache().__getitem__().cut_axis.units = '|Q|'
             errorbar(ax, cut, plot_over=True)
             get_cpp().get_cache.assert_called()
+
+    @mock.patch('mantid.plots.axesfunctions.errorbar')
+    @mock.patch('mslice.cli._mslice_commands.is_gui')
+    def test_errorbar_command_with_intensity(self, is_gui, mantid_errorbar):
+        is_gui.return_value = True
+        workspace = self.create_workspace('test_plot_cut_non_psd_cli')
+        cut = Cut(workspace)
+        ax = mock.Mock(spec=Axes)
+        ax.get_ylim.return_value = (0., 1.)
+        ax.lines = mock.Mock
+
+        errorbar(ax, cut, plot_over=False, intensity_range=('1.1', '1.5'))
+        ax.autoscale.assert_called_once_with()
+        ax.set_ylim.assert_called_once_with('1.1', '1.5')
+        mantid_errorbar.assert_called_once_with(ax, cut.raw_ws, label=cut.name)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_keep_figure_works_for_last_figure_number(self, gfm):
