@@ -31,7 +31,7 @@ jobs:
 
       - name: Install Mantid
         run: |
-           mamba install -c mantid/label/nightly mantid mantidqt
+           mamba install -c mantid mantid mantidqt
 
       - name: Nosetests
         run: |
