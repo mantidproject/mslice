@@ -13,7 +13,6 @@ dependencies:
   - qtconsole
   - qtpy
   - qt=5.15.8
-  - openssl=1.1.*
   - pip:
       - nose
       - flake8-pyproject
