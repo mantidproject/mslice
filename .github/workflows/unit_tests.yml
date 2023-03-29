@@ -32,13 +32,14 @@ jobs:
       - name: Install Mantid
         run: |
            conda config --set always_yes yes --set changeps1 no
-           conda create -n test-env python=3.8 -f environment.yml
+           conda env create python=3.8 -f environment.yml
            source /usr/share/miniconda/etc/profile.d/conda.sh
-           conda activate test-env
+           conda activate mslice-env
+           mamba install -c conda-forge mamba
            mamba install -c mantid mantid mantidqt
 
       - name: Nosetests
         run: |
           source /usr/share/miniconda/etc/profile.d/conda.sh
-          conda activate test-env
+          conda activate mslice-env
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum nosetests
