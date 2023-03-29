@@ -31,8 +31,8 @@ jobs:
 
       - name: Install Mantid
         run: |
-           mamba install pulseaudio<=14.0
-           mamba install -c mantid/label/nightly mantid mantidqt
+           mamba install pulseaudio==14.0
+           mamba install -c mantid mantid mantidqt
 
       - name: Nosetests
         run: |
