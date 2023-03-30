@@ -37,8 +37,8 @@ jobs:
            conda activate mslice-env
            conda config --add channels conda-forge
            conda config --add channels mantid
-           conda install -c conda-forge mamba
-           mamba install -c mantid/label/nightly mantid mantidqt
+           #conda install -c conda-forge mamba
+           conda install -c mantid/label/nightly mantid mantidqt
 
       - name: Nosetests
         run: |
