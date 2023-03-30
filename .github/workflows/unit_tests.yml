@@ -35,8 +35,6 @@ jobs:
            conda env create python=3.8 -f environment.yml
            source /usr/share/miniconda/etc/profile.d/conda.sh
            conda activate mslice-env
-           conda config --add channels conda-forge
-           conda config --add channels mantid
            conda install -c conda-forge mamba
            mamba install -c mantid/label/nightly mantid mantidqt
 
