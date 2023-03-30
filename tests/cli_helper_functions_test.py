@@ -1,5 +1,7 @@
+import logging
 import unittest
 import numpy as np
+from pytest import fixture
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHistoWorkspace, CreateSimulationWorkspace,
                               ConvertToMD)
 from unittest import mock
@@ -17,6 +19,10 @@ from mslice.cli.helperfunctions import append_visible_label, append_visible_hand
 
 
 class CLIHelperFunctionsTest(unittest.TestCase):
+
+    @fixture(autouse=True)
+    def inject_fixtures(self, caplog):
+        self._caplog = caplog
 
     def create_workspace(self, name):
         workspace = CreateSampleWorkspace(OutputWorkspace=name, NumBanks=1, BankPixelWidth=5, XMin=0.1,
@@ -120,6 +126,27 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         return_value = _process_axis(axis, fallback_index, workspace)
 
         self.assertEqual(return_value, Axis(units='DeltaE', start=-10, end=15, step=1))
+
+    def test_that_process_axis_logs_a_width_warning_if_its_smaller_than_the_x_data_width_in_the_workspace(self):
+        axis = 'DeltaE, -0.5,0.5,0.01'
+        workspace = self.create_workspace("test_workspace")
+        fallback_index = 0
+
+        with self._caplog.at_level(logging.WARNING):
+            return_value = _process_axis(axis, fallback_index, workspace)
+            self.assertEqual(return_value, Axis(units='DeltaE', start=-0.5, end=0.5, step=0.01))
+        self.assertEqual("The DeltaE step provided (0.01) is smaller than the data step in the workspace (1). "
+                         "Please provide a larger DeltaE step.", self._caplog.records[0].message)
+
+    def test_that_process_axis_does_not_log_a_warning_for_an_axis_index_of_one(self):
+        axis = '|Q|, -0.5,0.5,0.01'
+        workspace = self.create_workspace("test_workspace")
+        fallback_index = 1
+
+        with self._caplog.at_level(logging.WARNING):
+            return_value = _process_axis(axis, fallback_index, workspace)
+            self.assertEqual(return_value, Axis(units='|Q|', start=-0.5, end=0.5, step=0.01))
+        self.assertEqual(0, len(self._caplog.records))
 
     def test_that_check_workspace_name_works_as_expected(self):
         workspace = self.create_workspace('test_workspace')
