@@ -63,7 +63,9 @@ class CutWidgetPresenter(PresenterUtility):
                 workspace = get_workspace_handle(workspace)
                 cut = Cut(*(params + (None, workspace.e_fixed)))  # add non-parsed cut params
                 cut.parent_ws_name = workspace.name
-                self._cut_plotter_presenter.run_cut(workspace, cut, plot_over=plot_over, save_only=save_only)
+                message = self._cut_plotter_presenter.run_cut(workspace, cut, plot_over=plot_over, save_only=save_only)
+                if message is not None:
+                    self._cut_view.display_warning(message)
             except RuntimeError as e:
                 self._cut_view.display_error(str(e))
             plot_over = True  # The first plot will respect which button the user pressed. The rest will over plot

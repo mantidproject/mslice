@@ -68,6 +68,9 @@ class CutView:
     def set_energy_units_default(self, unit):
         pass
 
+    def display_warning(self, string):
+        pass
+
     def display_error(self, string):
         pass
 
