@@ -25,22 +25,19 @@ jobs:
           python-version: 3.8
           auto-activate-base: false
 
-      - name: Flake8
-        run: |
-          #python -m flake8
-
       - name: Install Mantid
         run: |
-          conda config --set always_yes yes --set changeps1 no
-          conda create -n test-env python=3.8
-          conda activate test-env
-          mamba install -c conda-forge mamba conda-build anaconda-client conda-verify
-          conda config --add channels mantid
-          conda config --add channels mantid/label/nightly
-          mamba install mantid mantidqt
+          #conda config --set always_yes yes --set changeps1 no
+          #conda create -n test-env python=3.8
+          #conda activate test-env
+          #mamba install -c conda-forge mamba conda-build anaconda-client conda-verify
+          #conda config --add channels mantid
+          #conda config --add channels mantid/label/nightly
+          #mamba install mantid mantidqt
+          mamba install -c mantid/label/nightly mantid mantidqt
 
       - name: Nosetests
         run: |
-          source /usr/share/miniconda/etc/profile.d/conda.sh
-          conda activate test-env
+          #source /usr/share/miniconda/etc/profile.d/conda.sh
+          #conda activate test-env
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum nosetests
