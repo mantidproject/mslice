@@ -135,7 +135,7 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         with self._caplog.at_level(logging.WARNING):
             return_value = _process_axis(axis, fallback_index, workspace)
             self.assertEqual(return_value, Axis(units='DeltaE', start=-0.5, end=0.5, step=0.01))
-        self.assertEqual("The DeltaE step provided (0.01) is smaller than the data step in the workspace (1). "
+        self.assertEqual("The DeltaE step provided (0.0100) is smaller than the data step in the workspace (1.0000). "
                          "Please provide a larger DeltaE step.", self._caplog.records[0].message)
 
     def test_that_process_axis_does_not_log_a_warning_for_an_axis_index_of_one(self):

@@ -80,8 +80,8 @@ def _process_axis(axis, fallback_index, input_workspace, string_function=_string
             return axis
         x_step = get_axis_range(input_workspace, axis.units)[-1]
         if axis.step < x_step:
-            logging.warning(f"The {axis.units} step provided ({axis.step}) is smaller than the data step in "
-                            f"the workspace ({x_step}). Please provide a larger {axis.units} step.")
+            logging.warning(f"The {axis.units} step provided ({axis.step:.4f}) is smaller than the data step in "
+                            f"the workspace ({x_step:.4f}). Please provide a larger {axis.units} step.")
     elif axis in available_axes:
         range = get_axis_range(input_workspace, axis)
         range = list(map(float, range))
