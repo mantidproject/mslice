@@ -15,15 +15,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      #- name: Setup Miniconda
-      #  uses: conda-incubator/setup-miniconda@v2.2.0
-      #  with:
-      #    miniforge-version: latest
-      #    miniforge-variant: Mambaforge
-      #    activate-environment: mslice-env
-      #    environment-file: environment.yml
-      #    python-version: 3.8
-      #    auto-activate-base: false
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
+          activate-environment: mslice-env
+          environment-file: environment.yml
+          python-version: 3.8
+          auto-activate-base: false
 
       - name: Flake8
         run: |
@@ -31,17 +31,16 @@ jobs:
 
       - name: Install Mantid
         run: |
-           conda config --set always_yes yes --set changeps1 no
-           conda env create python=3.8 -f environment.yml
-           source /usr/share/miniconda/etc/profile.d/conda.sh
-           conda activate mslice-env
-           conda config --add channels conda-forge
-           conda config --add channels mantid
-           #conda install -c conda-forge mamba
-           conda install -c mantid mantid mantidqt
+          conda config --set always_yes yes --set changeps1 no
+          conda create -n test-env python=3.8
+          conda activate test-env
+          mamba install -c conda-forge mamba conda-build anaconda-client conda-verify
+          conda config --add channels mantid
+          conda config --add channels mantid/label/nightly
+          mamba install mantid mantidqt
 
       - name: Nosetests
         run: |
           source /usr/share/miniconda/etc/profile.d/conda.sh
-          conda activate mslice-env
+          conda activate test-env
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum nosetests
