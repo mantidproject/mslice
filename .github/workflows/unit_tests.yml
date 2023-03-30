@@ -32,9 +32,11 @@ jobs:
       - name: Install Mantid
         run: |
            conda config --set always_yes yes --set changeps1 no
-           conda env create python=3.8 -f environment.yml
+           conda env create python=3.9 -f environment.yml
            source /usr/share/miniconda/etc/profile.d/conda.sh
            conda activate mslice-env
+           conda config --add channels conda-forge
+           conda config --add channels mantid
            conda install -c conda-forge mamba
            mamba install -c mantid/label/nightly mantid mantidqt
 
