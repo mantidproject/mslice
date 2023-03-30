@@ -4,6 +4,7 @@ channels:
   - mantid
   - mantid/label/nightly
 dependencies:
+  - python=3.8.*
   - coverage
   - flake8
   - ipython
