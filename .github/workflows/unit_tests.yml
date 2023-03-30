@@ -35,7 +35,7 @@ jobs:
            conda env create python=3.8 -f environment.yml
            source /usr/share/miniconda/etc/profile.d/conda.sh
            conda activate mslice-env
-           mamba install -c conda-forge mamba
+           conda install -c conda-forge mamba
            mamba install -c mantid mantid mantidqt
 
       - name: Nosetests
