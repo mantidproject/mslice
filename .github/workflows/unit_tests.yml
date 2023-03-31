@@ -30,7 +30,7 @@ jobs:
           conda config --set always_yes yes --set changeps1 no
           conda create -n test-env python=3.8
           conda activate test-env
-          mamba install -c conda-forge mamba conda-build anaconda-client conda-verify nose
+          mamba install -c conda-forge mamba conda-build anaconda-client conda-verify nose mock coverage
           conda config --add channels mantid
           conda config --add channels mantid/label/nightly
           mamba install mantid mantidqt
