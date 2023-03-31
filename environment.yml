@@ -9,6 +9,7 @@ dependencies:
   - flake8
   - ipython
   - mock
+  - nose
   - pip
   - pyqt
   - qtconsole
