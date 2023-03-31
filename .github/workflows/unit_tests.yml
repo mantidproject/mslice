@@ -33,7 +33,7 @@ jobs:
           #mamba install -c conda-forge mamba conda-build anaconda-client conda-verify #nose mock coverage qtconsole ipython
           #conda config --add channels mantid
           #conda config --add channels mantid/label/nightly
-          mamba install -c mantid/label/nightly mantid mantidqt
+          mamba install mantid=6.6.0 mantidqt=6.6.0
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum nosetests
           #mamba install -c mantid/label/nightly mantid mantidqt
 
