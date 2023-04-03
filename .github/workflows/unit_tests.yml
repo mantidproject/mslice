@@ -27,7 +27,7 @@ jobs:
 
       - name: Install Mantid
         run: |
-          mamba install qt_main=5.15.4
+          mamba install qt-main=5.15.4
           mamba install -c mantid/label/nightly mantid mantidqt
 
       - name: Run Tests and Coverage
