@@ -30,7 +30,8 @@ jobs:
           #mamba install -c mantid/label/nightly mantid mantidqt
           mamba install openssl=3.1.0
           #mamba install qt=5.12.9
-          mamba install mantid=6.4.0 mantidqt=6.4.0
+          #mamba install mantid=6.4.0 mantidqt=6.4.0
+          mamba install -c mantid/label/nightly mantid mantidqt
 
       - name: Run Tests and Coverage
         run: |
