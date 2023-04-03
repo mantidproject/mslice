@@ -7,8 +7,9 @@ dependencies:
   - coverage
   - ipython
   - mock
+  - openssl=1.1.*  # Pinned to the same version as Mantid
   - pip
+  - pytest
   - pyqt
   - qtconsole
   - qtpy
-  - pytest
