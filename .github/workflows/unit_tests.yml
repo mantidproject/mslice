@@ -28,7 +28,7 @@ jobs:
       - name: Install Mantid
         run: |
           #mamba install -c mantid/label/nightly mantid mantidqt
-          amba install mantid<=6.5.0 mantidqt<=6.5.0
+          mamba install mantid=6.4.0 mantidqt=6.4.0
 
       - name: Run Tests and Coverage
         run: |
