@@ -7,8 +7,9 @@ dependencies:
   - coverage
   - ipython
   - mock
+  - openssl=1.1.*
   - pip
+  - pytest
   - pyqt
   - qtconsole
   - qtpy
-  - pytest
