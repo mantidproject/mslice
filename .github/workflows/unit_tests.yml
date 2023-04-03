@@ -27,7 +27,7 @@ jobs:
 
       - name: Install Mantid
         run: |
-          mamba install pulseaudio=14.0
+          conda install pulseaudio=14.0
           mamba install qt-main=5.15.4
           mamba install -c mantid/label/nightly mantid mantidqt
 
