@@ -28,7 +28,7 @@ jobs:
       - name: Install Mantid
         run: |
           #mamba install -c mantid/label/nightly mantid mantidqt
-          mamba install openssl=1.1.11
+          mamba install openssl=1.1.1l
           mamba install qt=5.12.9
           mamba install mantid=6.4.0 mantidqt=6.4.0
 
