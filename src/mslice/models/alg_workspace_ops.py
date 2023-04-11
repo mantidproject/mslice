@@ -20,6 +20,12 @@ def get_axis_range(workspace, dimension_name):
     return tuple(workspace.limits[dimension_name])
 
 
+def get_axis_step(workspace, dimension_name: str) -> float:
+    axis_range = get_axis_range(workspace, dimension_name)
+    assert len(axis_range) == 3  # Assert that the axis_range tuple is the length we expect
+    return axis_range[2]
+
+
 def fill_in_missing_input(axis, workspace):
     dim = workspace.getDimensionIndexByName(axis.units)
     dim = workspace.getDimension(dim)

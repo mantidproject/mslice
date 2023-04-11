@@ -20,10 +20,13 @@ TAB_SLICE = 1
 TAB_CUT = 2
 TAB_POWDER = 0
 
+ERROR_STATUS_STYLESHEET = "color: red;"
+WARNING_STATUS_STYLESHEET = "color: orange;"
 
 # ==============================================================================
 # Classes
 # ==============================================================================
+
 
 class MainWindow(MainView, QMainWindow):
 
@@ -85,6 +88,8 @@ class MainWindow(MainView, QMainWindow):
         self.btnSaveToADS.clicked.connect(self.button_savetoads)
         self.btnCompose.clicked.connect(self.button_compose)
         self.ws_tab_changed(0)
+
+        self.wgtCut.warning_occurred.connect(self.show_warning)
 
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)
@@ -207,8 +212,14 @@ class MainWindow(MainView, QMainWindow):
         self.splitter.addWidget(ipython)
         self.splitter.setSizes([500, 250])
 
+    def show_warning(self, msg):
+        """Show a warning message on status bar. If msg ==""  the function will clear the displayed message """
+        self.statusbar.setStyleSheet(WARNING_STATUS_STYLESHEET)
+        self.statusbar.showMessage(msg)
+
     def show_error(self, msg):
         """Show an error message on status bar. If msg ==""  the function will clear the displayed message """
+        self.statusbar.setStyleSheet(ERROR_STATUS_STYLESHEET)
         self.statusbar.showMessage(msg)
 
     def get_presenter(self):

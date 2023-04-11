@@ -24,6 +24,7 @@ from .command import Command
 # -----------------------------------------------------------------------------
 
 class CutWidget(CutView, QWidget):
+    warning_occurred = Signal('QString')
     error_occurred = Signal('QString')
     busy = Signal(bool)
     _name_to_index = {'Rebin': 0, 'Integration': 1}
@@ -90,6 +91,9 @@ class CutWidget(CutView, QWidget):
                 self.populate_integration_params(int_start, int_end)
                 self.lneCutIntegrationWidth.setText(int_width)
         self._en = EnergyUnits(new_unit)
+
+    def display_warning(self, warning_string):
+        self.warning_occurred.emit(warning_string)
 
     def display_error(self, error_string):
         self.error_occurred.emit(error_string)

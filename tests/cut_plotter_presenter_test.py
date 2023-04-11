@@ -108,12 +108,14 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(1 * len(intensity_correction_types), update_main_window_mock.call_count)
         self.assertEqual(2, compute_chi_mock.call_count)
 
+    @mock.patch('mslice.presenters.cut_plotter_presenter.get_axis_step')
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut')
-    def test_multiple_cuts_with_width(self, plot_cut_mock, get_ws_handle_mock):
+    def test_multiple_cuts_with_width(self, plot_cut_mock, get_ws_handle_mock, get_axis_step_mock):
         mock_ws = mock.MagicMock()
         mock_ws.name = 'workspace'
         get_ws_handle_mock.return_value = mock_ws
+        get_axis_step_mock.return_value = 0.05
         cut_cache = self.create_cut_cache()
         cut_cache.width = '25'
 
@@ -299,3 +301,37 @@ class CutPlotterPresenterTest(unittest.TestCase):
         cut_2_call = mock.call(cut_2._cut_ws, cut_2, plot_over=True, intensity_correction='dynamical_susceptibility')
         cut_3_call = mock.call(cut_3._cut_ws, cut_3, plot_over=True, intensity_correction='dynamical_susceptibility')
         mock_plot_cut.assert_has_calls([cut_1_call, cut_2_call, cut_3_call])
+
+    @mock.patch('mslice.presenters.cut_plotter_presenter.get_axis_step')
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut')
+    def test_plot_with_width_returns_none_if_the_cut_width_is_larger_than_the_data_x_width(self, mock_plot_cut,
+                                                                                           mock_get_axis_step):
+        mock_ws = mock.MagicMock()
+        mock_get_axis_step.return_value = 0.05
+        mock_cut = mock.MagicMock()
+        mock_cut.cut_axis.units = 'DeltaE'
+        mock_cut.cut_axis.step = 0.05
+        mock_cut.integration_axis.start = 0.2
+        mock_cut.integration_axis.end = 0.3
+        mock_cut.width = 0.01
+
+        self.assertEqual(None, self.cut_plotter_presenter._plot_with_width(mock_ws, mock_cut, False))
+        mock_plot_cut.assert_called()
+
+    @mock.patch('mslice.presenters.cut_plotter_presenter.get_axis_step')
+    @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut')
+    def test_plot_with_width_returns_a_warning_if_the_cut_width_is_smaller_than_the_data_x_width(self, mock_plot_cut,
+                                                                                                 mock_get_axis_step):
+        mock_ws = mock.MagicMock()
+        mock_get_axis_step.return_value = 0.05
+        mock_cut = mock.MagicMock()
+        mock_cut.cut_axis.units = 'DeltaE'
+        mock_cut.cut_axis.step = 0.04  # Smaller cut step than the x axis data
+        mock_cut.integration_axis.start = 0.2
+        mock_cut.integration_axis.end = 0.3
+        mock_cut.width = 0.01
+
+        self.assertEqual("The DeltaE step provided (0.0400) is smaller than the data step in the workspace (0.0500). "
+                         "Please provide a larger DeltaE step.",
+                         self.cut_plotter_presenter._plot_with_width(mock_ws, mock_cut, False))
+        mock_plot_cut.assert_called()
