@@ -308,8 +308,6 @@ class SlicePlot(IPlot):
             self.set_intensity(action)
             cbar_log = self.colorbar_log
             cbar_range = self.colorbar_range
-            x_range = self.x_range
-            y_range = self.y_range
             title = self.title
             if temp_dependent:
                 if not self._run_temp_dependent(slice_plotter_method, previous):
@@ -317,17 +315,15 @@ class SlicePlot(IPlot):
                     return
             else:
                 slice_plotter_method(self.ws_name)
-            self.update_canvas(cbar_range, cbar_log, x_range, y_range, title)
+            self.update_canvas(cbar_range, cbar_log, title)
         else:
             action.setChecked(True)
         self.manager.reset_current_figure_as_previous(last_active_figure_number, disable_make_current_after_plot)
         if self.icut:
             self.icut.refresh_current_cut()
 
-    def update_canvas(self, cbar_range, cbar_log, x_range, y_range, title):
+    def update_canvas(self, cbar_range, cbar_log, title):
         self.change_axis_scale(cbar_range, cbar_log)
-        self.x_range = x_range
-        self.y_range = y_range
         self.title = title
         self.manager.update_grid()
         self._update_lines()
