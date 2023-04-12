@@ -200,11 +200,12 @@ class CutPlotterPresenter(PresenterUtility):
         try:
             ws_handle = get_workspace_handle(workspace_name)
             workspace_name = ws_handle.parent
-            scale_fac = self._get_overall_max_signal(intensity_correction) / 10
         except KeyError:
             # Workspace is interactively generated and is not in the workspace list
-            scale_fac = 90
             workspace_name = workspace_name.split('(')[0][:-4]
+
+        # Get 10% of the maximum signal
+        scale_fac = self._get_overall_max_signal(intensity_correction) / 10
 
         q_axis = self._get_overall_q_axis()
         x, y = compute_powder_line(workspace_name, q_axis, key, cif_file=cif)

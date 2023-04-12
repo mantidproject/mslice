@@ -1,5 +1,6 @@
 import unittest
 import mock
+import numpy as np
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
@@ -287,6 +288,30 @@ class CutPlotterPresenterTest(unittest.TestCase):
 
         max_signal = self.cut_plotter_presenter._get_overall_max_signal(IntensityType.SCATTERING_FUNCTION)
         self.assertEqual(max_signal, 100)
+
+    @mock.patch("mslice.presenters.cut_plotter_presenter.compute_powder_line")
+    @mock.patch("mslice.presenters.cut_plotter_presenter.plot_overplot_line")
+    def test_add_overplot_line_will_use_ten_percent_of_max_signal(self, mock_plot_overplot_line, mock_compute_powder_list):
+        cache = mock.MagicMock()
+        cache.rotated = False
+        self.cut_plotter_presenter._cut_cache_dict = mock.MagicMock()
+        self.cut_plotter_presenter._cut_cache_dict.__getitem__.return_value = [cache]
+
+        self.cut_plotter_presenter._get_overall_max_signal = mock.MagicMock()
+        self.cut_plotter_presenter._get_overall_max_signal.return_value = 4.0
+
+        self.cut_plotter_presenter._get_overall_q_axis = mock.MagicMock()
+        self.cut_plotter_presenter._get_overall_q_axis.return_value = Axis("A-1", "1.0", "2.0", "0.1")
+
+        x, y = np.array([1.0, 2.0]), np.array([3.0, 4.0])
+        key, recoil = "Copper", False
+        mock_compute_powder_list.return_value = (x, y)
+
+        self.cut_plotter_presenter.add_overplot_line("test_ws (-5.5,5.5)", key, recoil)
+
+        args = mock_plot_overplot_line.call_args.args
+        np.testing.assert_allclose(args[0], x)
+        np.testing.assert_allclose(args[1], y / 10)
 
     @mock.patch('mslice.presenters.cut_plotter_presenter.get_workspace_handle')
     @mock.patch('mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut')
