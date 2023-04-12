@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 from qtpy.QtWidgets import QFileDialog
 from mantid.api import MDNormalization
-from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace, SaveAscii, SaveMD, SaveNexus
+from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace, SaveAscii, SaveMD, SaveNexus, SaveNXSPE
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.axis import Axis
 from mslice.models.labels import get_display_name
@@ -57,7 +57,15 @@ def save_nexus(workspace, path, is_slice):
             workspace = get_workspace_handle(workspace.name[2:])
         save_alg = SaveMD
     else:
-        save_alg = SaveNexus
+        loader_name = get_workspace_handle(workspace).loader_name()
+        if loader_name == "LoadNXSPE":
+            # If the loaded workspace uses the old SPE format, save it in SPE format to prevent loss of metadata
+            save_alg = SaveNXSPE
+            # Make sure the extension uses *.nxspe
+            path.replace(".nxs", ".nxspe")
+        else:
+            save_alg = SaveNexus
+
     with WrapWorkspaceAttribute(workspace):
         save_alg(InputWorkspace=workspace, Filename=path)
 
