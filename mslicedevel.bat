@@ -44,13 +44,13 @@
 :NoConda
 :: This allows to start MSlice when there is no conda available or activating mantidnightly failed
 @set MANTIDPATH=C:\MantidInstall\bin
-@set PYTHONPATH=%MANTIDPATH%;%THIS_DIR%;%PYTHONPATH%
+@set PYTHONPATH=%MANTIDPATH%;%THIS_DIR%src;%PYTHONPATH%
 @set QT_PLUGIN_PATH=%MANTIDPATH%\..\plugins\qt5
 %MANTIDPATH%\python.exe %THIS_DIR%scripts\start_mslice.py
 @goto End
 
 :Conda
-@set PYTHONPATH=%THIS_DIR%; %CONDA_PREFIX%
+@set PYTHONPATH=%THIS_DIR%src; %CONDA_PREFIX%
 
 python %THIS_DIR%scripts\start_mslice.py
 
