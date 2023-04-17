@@ -56,11 +56,12 @@ def save_nexus(workspace, path, is_slice):
         _save_histogram_workspace(workspace, path, is_slice)
         return
 
+    loader_name = get_workspace_handle(workspace).loader_name()
+    if loader_name is not None and loader_name == "LoadNXSPE":
+        raise RuntimeError("An NXSPE file cannot be saved as a Nexus - metadata may be lost.")
+
     with WrapWorkspaceAttribute(workspace):
         SaveNexus(InputWorkspace=workspace, Filename=path)
-
-    loader_name = get_workspace_handle(workspace).loader_name()
-    assert loader_name != "LoadNXSPE", "An NXSPE file was saved as a Nexus - metadata may be lost."
 
 
 def save_nxspe(workspace, path, is_slice):
@@ -68,11 +69,12 @@ def save_nxspe(workspace, path, is_slice):
         _save_histogram_workspace(workspace, path, is_slice)
         return
 
+    loader_name = get_workspace_handle(workspace).loader_name()
+    if loader_name is not None and loader_name != "LoadNXSPE":
+        raise RuntimeError("A Nexus cannot be saved as an NXSPE file - metadata may be lost.")
+
     with WrapWorkspaceAttribute(workspace):
         SaveNXSPE(InputWorkspace=workspace, Filename=path)
-
-    loader_name = get_workspace_handle(workspace).loader_name()
-    assert loader_name == "LoadNXSPE", "A Nexus was saved as an NXSPE file - metadata may be lost."
 
 
 def save_ascii(workspace, path, is_slice):

@@ -99,10 +99,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         try:
             save_workspaces(selected_workspaces, save_directory, save_name, extension)
-        except AssertionError as ex:
-            self._workspace_manager_view.display_warning(str(ex))
-        except RuntimeError:
-            self._workspace_manager_view.error_unable_to_save()
+        except RuntimeError as e:
+            self._workspace_manager_view._display_error(str(e))
 
     def _save_to_ads(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()

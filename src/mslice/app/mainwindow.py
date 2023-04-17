@@ -90,7 +90,6 @@ class MainWindow(MainView, QMainWindow):
         self.ws_tab_changed(0)
 
         self.wgtCut.warning_occurred.connect(self.show_warning)
-        self.wgtWorkspacemanager.warning_occurred.connect(self.show_warning)
 
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)
