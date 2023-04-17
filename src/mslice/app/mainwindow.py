@@ -90,6 +90,7 @@ class MainWindow(MainView, QMainWindow):
         self.ws_tab_changed(0)
 
         self.wgtCut.warning_occurred.connect(self.show_warning)
+        self.wgtWorkspacemanager.warning_occurred.connect(self.show_warning)
 
         self.wgtCut.error_occurred.connect(self.show_error)
         self.wgtSlice.error_occurred.connect(self.show_error)
@@ -121,6 +122,7 @@ class MainWindow(MainView, QMainWindow):
     def setup_save(self):
         menu = QMenu()
         menu.addAction("Nexus (*.nxs)", lambda: self.button_save('Nexus'))
+        menu.addAction("NXSPE (*.nxspe)", lambda: self.button_save('NXSPE'))
         menu.addAction("ASCII (*.txt)", lambda: self.button_save('Ascii'))
         menu.addAction("Matlab (*.mat)", lambda: self.button_save('Matlab'))
         self.btnSave.setMenu(menu)

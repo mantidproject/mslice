@@ -28,13 +28,13 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
         file_dialog = QFileDialog()
         file_dialog.setAcceptMode(QFileDialog.AcceptSave)
 
-        filter = "Nexus (*.nxs);; Ascii (*.txt);; Matlab (*.mat)"
+        filter = "Nexus (*.nxs);; NXSPE (*.nxspe);; Ascii (*.txt);; Matlab (*.mat)"
         if save_as_image:
             filter = "Image (*.png);; PDF (*.pdf);; " + filter
         file_dialog.setNameFilter(filter)
 
         if default_ext:
-            ext_to_qtfilter = {'.nxs': 'Nexus (*.nxs)', '.txt': 'Ascii (*.txt)', '.mat': 'Matlab (*.mat)', }
+            ext_to_qtfilter = {'.nxs': 'Nexus (*.nxs)', '.nxspe': 'NXSPE (*.nxspe)', '.txt': 'Ascii (*.txt)', '.mat': 'Matlab (*.mat)', }
             file_dialog.selectNameFilter(ext_to_qtfilter[default_ext])
         if (file_dialog.exec_()):
             path = str(file_dialog.selectedFiles()[0])
@@ -53,21 +53,26 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
 
 def save_nexus(workspace, path, is_slice):
     if isinstance(workspace, HistogramWorkspace):
-        if is_slice:
-            workspace = get_workspace_handle(workspace.name[2:])
-        save_alg = SaveMD
-    else:
-        loader_name = get_workspace_handle(workspace).loader_name()
-        if loader_name == "LoadNXSPE":
-            # If the loaded workspace uses the old SPE format, save it in SPE format to prevent loss of metadata
-            save_alg = SaveNXSPE
-            # Make sure the extension uses *.nxspe
-            path.replace(".nxs", ".nxspe")
-        else:
-            save_alg = SaveNexus
+        _save_histogram_workspace(workspace, path, is_slice)
+        return
 
     with WrapWorkspaceAttribute(workspace):
-        save_alg(InputWorkspace=workspace, Filename=path)
+        SaveNexus(InputWorkspace=workspace, Filename=path)
+
+    loader_name = get_workspace_handle(workspace).loader_name()
+    assert loader_name != "LoadNXSPE", "An NXSPE file was saved as a Nexus - metadata may be lost."
+
+
+def save_nxspe(workspace, path, is_slice):
+    if isinstance(workspace, HistogramWorkspace):
+        _save_histogram_workspace(workspace, path, is_slice)
+        return
+
+    with WrapWorkspaceAttribute(workspace):
+        SaveNXSPE(InputWorkspace=workspace, Filename=path)
+
+    loader_name = get_workspace_handle(workspace).loader_name()
+    assert loader_name == "LoadNXSPE", "A Nexus was saved as an NXSPE file - metadata may be lost."
 
 
 def save_ascii(workspace, path, is_slice):
@@ -105,6 +110,14 @@ def save_matlab(workspace, path, is_slice):
         e = workspace.raw_ws.extractE()
     mdict = {'x': x, 'y': y, 'e': e, 'labels': labels}
     savemat(path, mdict=mdict)
+
+
+def _save_histogram_workspace(workspace, path, is_slice):
+    if is_slice:
+        workspace = get_workspace_handle(workspace.name[2:])
+
+    with WrapWorkspaceAttribute(workspace):
+        SaveMD(InputWorkspace=workspace, Filename=path)
 
 
 def _save_cut_to_ascii(workspace, ws_name, output_path):

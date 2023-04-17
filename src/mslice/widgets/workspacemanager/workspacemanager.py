@@ -19,6 +19,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
 
     error_occurred = Signal('QString')
+    warning_occurred = Signal('QString')
     tab_changed = Signal(int)
     busy = Signal(bool)
 
@@ -40,6 +41,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def _display_error(self, error_string):
         self.error_occurred.emit(error_string)
+
+    def display_warning(self, warning_string):
+        self.warning_occurred.emit(warning_string)
 
     def tab_changed_method(self, tab_index):
         self.clear_selection()

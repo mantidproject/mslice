@@ -27,7 +27,7 @@ from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace
 
-from .file_io import save_ascii, save_matlab, save_nexus
+from .file_io import save_ascii, save_matlab, save_nexus, save_nxspe
 
 # -----------------------------------------------------------------------------
 # Classes and functions
@@ -247,6 +247,8 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
     """
     if extension == '.nxs':
         save_method = save_nexus
+    elif extension == '.nxspe':
+        save_method = save_nxspe
     elif extension == '.txt':
         save_method = save_ascii
     elif extension == '.mat':
