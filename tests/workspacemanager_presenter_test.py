@@ -67,9 +67,9 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
         # Test save failure
         save_ws_mock.side_effect = RuntimeError()
-        self.view.error_unable_to_save = mock.Mock()
+        self.view._display_error = mock.Mock()
         self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
-        self.view.error_unable_to_save.assert_called_once_with()
+        self.view._display_error.assert_called_once()
 
         # Test user cancellation
         save_dir_mock.reset_mock()
@@ -232,7 +232,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_call_presenter_with_unknown_command(self):
         self.presenter = WorkspaceManagerPresenter(self.view)
-        unknown_command = 10
+        unknown_command = 55
         self.assertRaises(ValueError, self.presenter.notify, unknown_command)
 
     def test_notify_presenter_clears_error(self):

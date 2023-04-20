@@ -121,6 +121,7 @@ class MainWindow(MainView, QMainWindow):
     def setup_save(self):
         menu = QMenu()
         menu.addAction("Nexus (*.nxs)", lambda: self.button_save('Nexus'))
+        menu.addAction("NXSPE (*.nxspe)", lambda: self.button_save('NXSPE'))
         menu.addAction("ASCII (*.txt)", lambda: self.button_save('Ascii'))
         menu.addAction("Matlab (*.mat)", lambda: self.button_save('Matlab'))
         self.btnSave.setMenu(menu)

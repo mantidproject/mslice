@@ -82,6 +82,26 @@ class WorkspaceMixin(object):
     def is_axis_saved(self, axis):
         return True if axis in self._cut_params else False
 
+    def loader_name(self) -> str:
+        """
+        Searches the algorithm history for the name of the Load algorithm used to load the workspace.
+        If the Load algorithm is not found to be the first algorithm in the history, then return None.
+        """
+        history = self._raw_ws.getHistory()
+        if history.empty():
+            return None
+
+        alg_histories = history.getAlgorithmHistories()
+        if len(alg_histories) == 0:
+            return None
+
+        # Assume the first algorithm in the history is Load
+        first_alg_history = alg_histories[0]
+        if first_alg_history.name() != "Load":
+            return None
+
+        return first_alg_history.getPropertyValue("LoaderName")
+
     @property
     def name(self):
         return self._name

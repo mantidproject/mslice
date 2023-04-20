@@ -23,6 +23,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._psd = True
         self._command_map = {
             Command.SaveSelectedWorkspaceNexus: lambda: self._save_selected_workspace('.nxs'),
+            Command.SaveSelectedWorkspaceNXSPE: lambda: self._save_selected_workspace('.nxspe'),
             Command.SaveSelectedWorkspaceAscii: lambda: self._save_selected_workspace('.txt'),
             Command.SaveSelectedWorkspaceMatlab: lambda: self._save_selected_workspace('.mat'),
             Command.RemoveSelectedWorkspaces: self._remove_selected_workspaces,
@@ -98,8 +99,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         try:
             save_workspaces(selected_workspaces, save_directory, save_name, extension)
-        except RuntimeError:
-            self._workspace_manager_view.error_unable_to_save()
+        except RuntimeError as e:
+            self._workspace_manager_view._display_error(str(e))
 
     def _save_to_ads(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()

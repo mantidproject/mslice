@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 import unittest
+import mock
 
 import numpy as np
 from mantid.simpleapi import CreateWorkspace
@@ -111,3 +112,39 @@ class WorkspaceTest(BaseWorkspaceTest):
         self.set_attribute()
         new_workspace = Workspace(self.workspace.raw_ws, 'new')
         self.check_attribute_propagation(new_workspace)
+
+    def test_loader_name_returns_none_when_the_load_algorithm_is_not_in_the_algorithm_history(self):
+        mock_history = mock.MagicMock()
+        mock_history.empty.return_value = True
+
+        self.workspace._raw_ws.getHistory = mock.MagicMock(return_value=mock_history)
+
+        self.assertEqual(None, self.workspace.loader_name())
+
+    def test_loader_name_returns_LoadNXSPE_when_it_is_found_in_the_first_alg_history(self):
+        load_history = mock.MagicMock()
+        load_history.name.return_value = "Load"
+        load_history.getPropertyValue.return_value = "LoadNXSPE"
+
+        mock_history = mock.MagicMock()
+        mock_history.empty.return_value = False
+        mock_history.getAlgorithmHistories.return_value = [load_history]
+
+        self.workspace._raw_ws.getHistory = mock.MagicMock(return_value=mock_history)
+
+        self.assertEqual("LoadNXSPE", self.workspace.loader_name())
+
+    def test_loader_name_returns_none_when_it_load_is_not_the_first_alg_in_the_history(self):
+        rebin_history = mock.MagicMock()
+        rebin_history.name.return_value = "Rebin"
+        load_history = mock.MagicMock()
+        load_history.name.return_value = "Load"
+        load_history.getPropertyValue.return_value = "LoadNXSPE"
+
+        mock_history = mock.MagicMock()
+        mock_history.empty.return_value = False
+        mock_history.getAlgorithmHistories.return_value = [rebin_history, load_history]
+
+        self.workspace._raw_ws.getHistory = mock.MagicMock(return_value=mock_history)
+
+        self.assertEqual(None, self.workspace.loader_name())

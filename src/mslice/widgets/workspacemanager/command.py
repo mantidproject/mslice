@@ -19,6 +19,7 @@ class Command(object):
     SaveSelectedWorkspaceAscii = 7
     SaveSelectedWorkspaceMatlab = 8
     SaveToADS = 9
+    SaveSelectedWorkspaceNXSPE = 10
     RenameWorkspace = 1000
     CombineWorkspace = 1010
     SelectionChanged = -1799
