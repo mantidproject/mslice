@@ -100,7 +100,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
             get_current_plot_intensity_mock.return_value = intensity
             self.cut_plotter_presenter._plot_cut(mock_ws, cut_cache, False, intensity_correction=intensity)
             compute_cut_mock.assert_called_with(mock_ws, cut_cache.cut_axis, cut_cache.integration_axis,
-                                                cut_cache.norm_to_one, cut_cache.algorithm, True)
+                                                cut_cache.norm_to_one, cut_cache.algorithm, True, False)
             cut_cache._cut_ws = None
 
         self.assertEqual(1 * len(intensity_correction_types), plot_cut_impl_mock.call_count)

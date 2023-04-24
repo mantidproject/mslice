@@ -302,4 +302,4 @@ class CutWidgetPresenterTest(unittest.TestCase):
         cut_widget_presenter.notify(Command.Plot)
         self.view.display_error.assert_not_called()
         mock_cut_obj.assert_called_once_with(axis, integration_axis, intensity_start, intensity_end,
-                                             is_norm, width, 'Integration', None, 1)
+                                             is_norm, width, 'Integration', True, None, 1)

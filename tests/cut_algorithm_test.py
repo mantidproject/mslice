@@ -84,7 +84,7 @@ class CutAlgorithmTest(TestCase):
     def test_that_compute_cut_returns_the_expected_size_for_a_rebin_cut_axis_in_units_of_2theta(self):
         non_psd_workspace = create_simulation_workspace("Direct", "non_psd_ws", psd=False)
 
-        cut = compute_cut(non_psd_workspace.raw_ws, self.theta_axis, self.e_axis, "Direct", False, False, "Rebin")
+        cut = compute_cut(non_psd_workspace.raw_ws, self.theta_axis, self.e_axis, "Direct", False, False, False, "Rebin")
 
         self.assertTrue(isinstance(cut, MDHistoWorkspace))
         self.assertEqual(cut.getSignalArray().shape, (25, ))
@@ -95,7 +95,7 @@ class CutAlgorithmTest(TestCase):
         cut_algo = Cut()
         cut_algo.PyInit()
 
-        self.assertEqual(mock_declare_property.call_count, 8)
+        self.assertEqual(mock_declare_property.call_count, 9)
 
     @patch('mslice.models.cut.cut_algorithm.PythonAlgorithm.setProperty')
     @patch('mslice.models.cut.cut_algorithm.PythonAlgorithm.getProperty')
@@ -108,7 +108,8 @@ class CutAlgorithmTest(TestCase):
                   "step": MockProperty(1), "e_unit": MockProperty("DeltaE")}
         mock_get_property.side_effect = [MockProperty("md_ws"), MockProperty(q_axis),
                                          MockProperty(e_axis), MockProperty("Direct"),
-                                         MockProperty(True), MockProperty(False), MockProperty("Rebin")]
+                                         MockProperty(True), MockProperty(False), MockProperty("Rebin"),
+                                         MockProperty(False)]
         mock_compute_cut.return_value = MagicMock()
 
         cut_algo = Cut()
@@ -130,7 +131,7 @@ class CutAlgorithmTest(TestCase):
     def _test_non_psd_cut(self, normalized: bool, algorithm: str):
         non_psd_workspace = create_simulation_workspace("Direct", "non_psd_ws", psd=False)
 
-        cut = compute_cut(non_psd_workspace.raw_ws, self.q_axis, self.e_axis, "Direct", False, normalized, algorithm)
+        cut = compute_cut(non_psd_workspace.raw_ws, self.q_axis, self.e_axis, "Direct", False, normalized, True, algorithm)
 
         self.assertTrue(isinstance(cut, MDHistoWorkspace))
         self.assertEqual(cut.getSignalArray().shape, (30, ))
