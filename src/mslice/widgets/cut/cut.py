@@ -154,6 +154,9 @@ class CutWidget(CutView, QWidget):
     def get_intensity_is_norm_to_one(self):
         return self.rdoCutNormToOne.isChecked()
 
+    def get_ignore_partial_overlaps(self):
+        return self.rdoIgnorePartialOverlaps.isChecked()
+
     def get_energy_units(self):
         return self.cmbCutEUnits.currentText()
 

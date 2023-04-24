@@ -38,6 +38,9 @@ class CutView:
     def get_intensity_is_norm_to_one(self):
         pass
 
+    def get_ignore_partial_overlaps(self):
+        pass
+
     def get_presenter(self):
         pass
 

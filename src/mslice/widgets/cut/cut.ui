@@ -214,6 +214,13 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="5">
+      <widget class="QCheckBox" name="rdoIgnorePartialOverlaps">
+       <property name="text">
+        <string>Ignore partial overlaps</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>
