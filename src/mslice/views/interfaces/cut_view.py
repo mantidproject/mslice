@@ -98,9 +98,6 @@ class CutView:
     def disable(self):
         pass
 
-    def plotting_params_only(self):
-        pass
-
     def force_normalization(self):
         pass
 

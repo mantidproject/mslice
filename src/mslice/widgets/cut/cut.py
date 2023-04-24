@@ -100,6 +100,7 @@ class CutWidget(CutView, QWidget):
 
     def cut_algorithm_changed(self, _changed_index):
         self.get_input_fields()
+        self.rdoIgnorePartialOverlaps.setChecked(_changed_index == 1)
 
     def axis_changed(self, _changed_index):
         self._presenter.notify(Command.AxisChanged)
@@ -238,7 +239,8 @@ class CutWidget(CutView, QWidget):
                           'integration_range': ['', ''],
                           'integration_width': '',
                           'normtounity': False,
-                          'cut_algorithm_index': ''}
+                          'cut_algorithm_index': '',
+                          'ignorepartialoverlaps': False}
         for k in cleared_fields:
             if current_fields[k] != cleared_fields[k]:
                 return False
@@ -253,6 +255,7 @@ class CutWidget(CutView, QWidget):
         self.cmbCutAlg.setCurrentIndex(saved_input['cut_algorithm_index'])
         self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(saved_input['energy_unit']))
         self._en = EnergyUnits(saved_input['energy_unit'])
+        self.rdoIgnorePartialOverlaps.setChecked(saved_input['ignorepartialoverlaps'])
         self.cmbCutEUnits.blockSignals(False)
 
     def get_input_fields(self):
@@ -266,6 +269,7 @@ class CutWidget(CutView, QWidget):
         saved_input['normtounity'] = self.get_intensity_is_norm_to_one()
         saved_input['cut_algorithm_index'] = self.get_cut_algorithm()
         saved_input['energy_unit'] = self.get_energy_units()
+        saved_input['ignorepartialoverlaps'] = self.get_ignore_partial_overlaps()
         return saved_input
 
     def enable(self):
@@ -275,6 +279,7 @@ class CutWidget(CutView, QWidget):
         self.cmbCutAxis.setEnabled(True)
         self.cmbCutEUnits.setEnabled(True)
         self.cmbCutAlg.setEnabled(True)
+        self.rdoIgnorePartialOverlaps.setEnabled(True)
 
         self.lneCutIntegrationStart.setEnabled(True)
         self.lneCutIntegrationEnd.setEnabled(True)
@@ -302,6 +307,7 @@ class CutWidget(CutView, QWidget):
         self.cmbCutAxis.setEnabled(False)
         self.cmbCutEUnits.setEnabled(False)
         self.cmbCutAlg.setEnabled(False)
+        self.rdoIgnorePartialOverlaps.setEnabled(False)
 
         self.lneCutIntegrationStart.setEnabled(False)
         self.lneCutIntegrationEnd.setEnabled(False)
@@ -314,15 +320,6 @@ class CutWidget(CutView, QWidget):
         self.btnCutSaveToWorkbench.setEnabled(False)
         self.btnCutPlot.setEnabled(False)
         self.btnCutPlotOver.setEnabled(False)
-
-    def plotting_params_only(self):
-        self.disable()
-        self.lneEditCutIntensityStart.setEnabled(True)
-        self.lneCutIntensityEnd.setEnabled(True)
-        self.rdoCutNormToOne.setEnabled(True)
-
-        self.btnCutPlot.setEnabled(True)
-        self.btnCutPlotOver.setEnabled(True)
 
     def set_validators(self):
         line_edits = [self.lneCutStart, self.lneCutEnd, self.lneCutIntegrationStart,
