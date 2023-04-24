@@ -102,9 +102,11 @@ class CutWidgetPresenter(PresenterUtility):
         intensity_end = self._cut_view.get_intensity_end()
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
+        ignore_partial_overlaps = bool(self._cut_view.get_ignore_partial_overlaps())
+
         width = self._cut_view.get_integration_width()
         algo = ['Rebin', 'Integration'][self._cut_view.get_cut_algorithm()]
-        return cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width, algo
+        return cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width, algo, ignore_partial_overlaps
 
     def _set_minimum_step(self, workspace, axis):
         """Gets axes limits and then sets the minimumStep dictionary with those values"""

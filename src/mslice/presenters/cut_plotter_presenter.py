@@ -48,7 +48,8 @@ class CutPlotterPresenter(PresenterUtility):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
         if not cut.cut_ws:
-            cut.cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store)
+            cut.cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store,
+                                     cut.ignore_partial_overlaps)
             self.prepare_cut_for_cache(cut)
         if intensity_correction == IntensityType.SCATTERING_FUNCTION:
             cut_ws = cut.cut_ws
@@ -146,7 +147,8 @@ class CutPlotterPresenter(PresenterUtility):
         return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
 
     def save_cut_to_workspace(self, workspace, cut):
-        cut_ws = compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one, cut.algorithm)
+        cut_ws = compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one, cut.algorithm,
+                             ignore_partial_overlaps=cut.ignore_partial_overlaps)
         self._main_presenter.update_displayed_workspaces()
         export_workspace_to_ads(cut_ws)
 
