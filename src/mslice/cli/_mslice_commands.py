@@ -168,7 +168,7 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
 
 
 def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin',
-        IntensityCorrection=False, SampleTemperature=None):
+        IntensityCorrection=False, SampleTemperature=None, IgnorePartialOverlaps=False):
     """
     Cuts workspace.
     :param InputWorkspace: Workspace to cut. The parameter can be either a python
@@ -189,6 +189,7 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
             'dynamical_susceptibility', 'dynamical_susceptibility_magnetic', 'd2sigma', or 'symmetrised'.
     :param SampleTemperature: if a temperature dependant intensity correction is input, a SampleTemperature in Kelvin
            must be provided.
+    :param IgnorePartialOverlaps: If true, ignore the bins where the sum of the weights is not unity (1.0)
     :return:
     """
     from mslice.app.presenters import get_cut_plotter_presenter
@@ -199,7 +200,8 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
     cut_axis = _process_axis(CutAxis, 0, workspace)
     integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
                                      workspace, string_function=_string_to_integration_axis)
-    cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True)
+    cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True,
+                      ignore_partial_overlaps=IgnorePartialOverlaps)
 
     rotated = not is_twotheta(cut_axis.units) and not is_momentum(cut_axis.units)
     e_axis = cut_axis if rotated else integration_axis
