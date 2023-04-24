@@ -25,6 +25,7 @@ class Cut(PythonAlgorithm):
         self.declareProperty('EMode', 'Direct', StringMandatoryValidator())
         self.declareProperty('PSD', False)
         self.declareProperty('NormToOne', False)
+        self.declareProperty('IgnorePartialOverlaps', False)
         self.declareProperty('Algorithm', 'Rebin', StringListValidator(['Rebin', 'Integration']))
         self.declareProperty(WorkspaceProperty('OutputWorkspace', '', direction=Direction.Output))
 
@@ -39,8 +40,9 @@ class Cut(PythonAlgorithm):
         e_mode = self.getProperty('EMode').value
         PSD = self.getProperty('PSD').value
         norm_to_one = self.getProperty('NormToOne').value
+        ignore_partial_overlaps = self.getProperty('IgnorePartialOverlaps').value
         algo = self.getProperty('Algorithm').value
-        cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one, algo)
+        cut = compute_cut(workspace, cut_axis, int_axis, e_mode, PSD, norm_to_one, ignore_partial_overlaps, algo)
         if 'DeltaE' in cut_axis.units and cut_axis.scale != 1.:
             cut = TransformMD(InputWorkspace=cut, Scaling=[EnergyUnits(cut_axis.e_unit).factor_from_meV()])
         attribute_to_log({'axes': [cut_axis, int_axis], 'norm_to_one': norm_to_one, 'algorithm': algo}, cut)
@@ -50,17 +52,18 @@ class Cut(PythonAlgorithm):
         return 'MSlice'
 
 
-def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_norm, algo):
+def compute_cut(selected_workspace, cut_axis, integration_axis, e_mode, PSD, is_norm, ignore_partial_overlaps, algo):
     if PSD:
         cut = _compute_cut_PSD(selected_workspace, cut_axis, integration_axis, algo)
     else:
-        cut = _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, e_mode, algo)
+        cut = _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, e_mode, ignore_partial_overlaps, algo)
     if is_norm:
         normalize_workspace(cut)
     return cut
 
 
 def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis, algo):
+    # Do we need to pass ignore_partial_overlaps into here (PSD data)?
     cut_axis.units = cut_axis.units.replace('2Theta', 'Degrees')
     integration_axis.units = integration_axis.units.replace('2Theta', 'Degrees')
     fill_in_missing_input(cut_axis, selected_workspace)
@@ -81,7 +84,7 @@ def _compute_cut_PSD(selected_workspace, cut_axis, integration_axis, algo):
     return ws
 
 
-def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, algo):
+def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, ignore_partial_overlaps, algo):
     cut_binning = " ,".join(map(str, (cut_axis.start_meV, cut_axis.step_meV, cut_axis.end_meV)))
     int_binning = " ,".join(map(str, (integration_axis.start_meV, integration_axis.end_meV - integration_axis.start_meV,
                                       integration_axis.end_meV)))
@@ -89,17 +92,17 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, a
     unit = 'DeltaE'
     name = '__MSL_EnergyTransfer'
     if is_momentum(cut_axis.units):
-        ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace, algo)
+        ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace, ignore_partial_overlaps, algo)
         idx = 1
         unit = 'MomentumTransfer'
         name = '__MSL_|Q|'
     elif is_twotheta(cut_axis.units):
-        ws_out = _cut_nonPSD_theta(int_binning, cut_binning, selected_workspace, algo)
+        ws_out = _cut_nonPSD_theta(int_binning, cut_binning, selected_workspace, ignore_partial_overlaps, algo)
         idx = 1 if 'Rebin' in algo else 0
         unit = 'Degrees'
         name = '__MSL_Theta'
     elif integration_axis.units == '|Q|':
-        ws_out = _cut_nonPSD_momentum(int_binning, cut_binning, emode, selected_workspace, algo)
+        ws_out = _cut_nonPSD_momentum(int_binning, cut_binning, emode, selected_workspace, ignore_partial_overlaps, algo)
     else:
         ws_out = _cut_nonPSD_theta(cut_binning, int_binning, selected_workspace, algo)
     xdim = ws_out.getDimension(idx)
@@ -126,7 +129,8 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, a
     return ws_out
 
 
-def _cut_nonPSD_theta(ax1_binning, ax2_binning, selected_workspace, algo):
+def _cut_nonPSD_theta(ax1_binning, ax2_binning, selected_workspace, ignore_partial_overlaps, algo):
+    # Pass ignore_partial_overlaps to the Rebin2D algo, and possibly Rebin too
 
     converted_nonpsd = ConvertSpectrumAxis(InputWorkspace=selected_workspace, Target='theta', StoreInADS=False)
 
@@ -147,7 +151,8 @@ def _cut_nonPSD_theta(ax1_binning, ax2_binning, selected_workspace, algo):
     return ws_out
 
 
-def _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace):
+def _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace, ignore_partial_overlaps):
+    # Pass ignore_partial_overlaps to the SofQW3 algorithm
     if 'Indirect' in emode and selected_workspace.run().hasProperty('Efix'):
         ws_out = SofQW3(InputWorkspace=selected_workspace, QAxisBinning=q_binning, EAxisBinning=e_binning, EMode=emode,
                         StoreInADS=False, EFixed=selected_workspace.run().getProperty('Efix').value, EnableLogging=False)
@@ -157,19 +162,19 @@ def _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace):
     return ws_out
 
 
-def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace, algo):
+def _cut_nonPSD_momentum(q_binning, e_binning, emode, selected_workspace, ignore_partial_overlaps, algo):
     if 'Integration' in algo:
         qbins = [float(q) for q in q_binning.split(',')]
         ebins = [float(e) for e in e_binning.split(',')]
         if np.abs((qbins[2]-qbins[0]) - qbins[1]) < 0.0001:
             qbinstr = ','.join(map(str, [qbins[0], (qbins[2]-qbins[0])/100., qbins[2]]))
-            ws_out = _cut_indirect_or_direct(qbinstr, e_binning, emode, selected_workspace)
+            ws_out = _cut_indirect_or_direct(qbinstr, e_binning, emode, selected_workspace, ignore_partial_overlaps)
             ws_out = Transpose(InputWorkspace=ws_out, EnableLogging=False)
             ws_out = Integration(InputWorkspace=ws_out, RangeLower=qbins[0], RangeUpper=qbins[2], EnableLogging=False)
         else:
             ebinstr = ','.join(map(str, [ebins[0], (ebins[2]-ebins[0])/100., ebins[2]]))
-            ws_out = _cut_indirect_or_direct(q_binning, ebinstr, emode, selected_workspace)
+            ws_out = _cut_indirect_or_direct(q_binning, ebinstr, emode, selected_workspace, ignore_partial_overlaps)
             ws_out = Integration(InputWorkspace=ws_out, RangeLower=ebins[0], RangeUpper=ebins[2], EnableLogging=False)
     else:
-        ws_out = _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace)
+        ws_out = _cut_indirect_or_direct(q_binning, e_binning, emode, selected_workspace, ignore_partial_overlaps)
     return ws_out
