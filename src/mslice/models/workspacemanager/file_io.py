@@ -83,7 +83,7 @@ def save_ascii(workspace, path, is_slice):
         _save_slice_to_ascii(workspace, path)
     else:
         if isinstance(workspace, HistogramWorkspace):
-            _save_cut_to_ascii(workspace, workspace.name, path)
+            _save_cut_to_ascii(workspace, path)
         else:
             SaveAscii(InputWorkspace=workspace, Filename=path)
 
@@ -123,7 +123,7 @@ def _save_histogram_workspace(workspace, path, is_slice):
         SaveMD(InputWorkspace=workspace, Filename=path)
 
 
-def _save_cut_to_ascii(workspace, ws_name, output_path):
+def _save_cut_to_ascii(workspace, output_path):
     # get integration ranges from the name
     cut_axis, integration_axis = tuple(workspace.axes)
 
