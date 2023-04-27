@@ -104,12 +104,12 @@ class FileIOTest(unittest.TestCase):
                                                                       [10, -10, 2, 4], [10, 10, 4, 6]])
 
     def test_to_absolute_path_returns_the_same_path_if_it_is_already_absolute(self):
-        abs_path = "C:/User/Documents/filename.txt"
+        abs_path = "/c/user/documents/filename.txt"
         self.assertEqual(abs_path, _to_absolute_path(abs_path))
 
     def test_to_absolute_path_returns_a_path_in_the_default_save_dir_if_the_path_provided_is_relative(self):
-        default_save_directory = "D:/User/Documents/default_save_dir/"
+        default_save_directory = "/d/user/documents/default_save_dir"
         ConfigService.setString("defaultsave.directory", default_save_directory)
 
         rel_path = "datadir/filename.txt"
-        self.assertEqual(f"{default_save_directory}{rel_path}", _to_absolute_path(rel_path))
+        self.assertEqual(f"{default_save_directory}/{rel_path}", _to_absolute_path(rel_path))
