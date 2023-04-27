@@ -6,10 +6,12 @@ from os.path import join
 from tempfile import gettempdir
 import unittest
 from mantid.simpleapi import CreateMDHistoWorkspace
+from mantid.kernel import ConfigService
 
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_functions import output_workspace_name
-from mslice.models.workspacemanager.file_io import _save_cut_to_ascii, _save_slice_to_ascii, get_save_directory
+from mslice.models.workspacemanager.file_io import (_save_cut_to_ascii, _save_slice_to_ascii, get_save_directory,
+                                                    _to_absolute_path)
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
@@ -100,3 +102,14 @@ class FileIOTest(unittest.TestCase):
         self.assertEqual(output_method.call_args[0][0], 'path1')
         np.testing.assert_array_equal(output_method.call_args[0][1], [[-10, -10, 1, 3], [-10, 10, 3, 5],
                                                                       [10, -10, 2, 4], [10, 10, 4, 6]])
+
+    def test_to_absolute_path_returns_the_same_path_if_it_is_already_absolute(self):
+        abs_path = "C:/User/Documents/filename.txt"
+        self.assertEqual(abs_path, _to_absolute_path(abs_path))
+
+    def test_to_absolute_path_returns_a_path_in_the_default_save_dir_if_the_path_provided_is_relative(self):
+        default_save_directory = "D:/User/Documents/default_save_dir/"
+        ConfigService.setString("defaultsave.directory", default_save_directory)
+
+        rel_path = "datadir/filename.txt"
+        self.assertEqual(f"{default_save_directory}{rel_path}", _to_absolute_path(rel_path))
