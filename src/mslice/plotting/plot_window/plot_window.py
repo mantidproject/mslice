@@ -4,9 +4,9 @@ from qtpy import QtCore, QtWidgets
 
 from matplotlib.figure import Figure
 from mantidqt.icons import get_icon
+from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
 
 from mslice.plotting.backend import get_canvas_and_toolbar_cls
-from mslice.util.qt.validator_helper import double_validator_without_separator
 from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 FigureCanvas, NavigationToolbar2QT = get_canvas_and_toolbar_cls()
@@ -183,9 +183,10 @@ class PlotWindow(QtWidgets.QMainWindow):
         sz.setWidth(60)
         self.waterfall_x_edt.setMaximumSize(sz)
         self.waterfall_y_edt.setMaximumSize(sz)
-        validator = double_validator_without_separator()
-        self.waterfall_x_edt.setValidator(validator)
-        self.waterfall_y_edt.setValidator(validator)
+        self.waterfall_x_edt_validator = LineEditDoubleValidator(self.waterfall_x_edt, 0.0)
+        self.waterfall_x_edt.setValidator(self.waterfall_x_edt_validator)
+        self.waterfall_y_edt_validator = LineEditDoubleValidator(self.waterfall_y_edt, 0.0)
+        self.waterfall_y_edt.setValidator(self.waterfall_y_edt_validator)
         self.waterfall_x_lbl_act = parent.addWidget(self.waterfall_x_lbl)
         self.waterfall_x_edt_act = parent.addWidget(self.waterfall_x_edt)
         self.waterfall_y_lbl_act = parent.addWidget(self.waterfall_y_lbl)
