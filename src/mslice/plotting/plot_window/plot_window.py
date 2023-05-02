@@ -114,27 +114,27 @@ class PlotWindow(QtWidgets.QMainWindow):
     def add_intensity_actions(self, menu):
         self.action_sqe = add_action(menu, self, "S(Q,E)", checkable=True, checked=True, visible=True)
         menu.addAction(self.action_sqe)
-        IntensityCache.cache_action(IntensityType.SCATTERING_FUNCTION, self.action_sqe)
+        IntensityCache.cache_action(IntensityType.SCATTERING_FUNCTION, "action_sqe")
 
         self.action_chi_qe = add_action(menu, self, "Chi''(Q,E)", checkable=True, visible=True)
         menu.addAction(self.action_chi_qe)
-        IntensityCache.cache_action(IntensityType.CHI, self.action_chi_qe)
+        IntensityCache.cache_action(IntensityType.CHI, "action_chi_qe")
 
         self.action_chi_qe_magnetic = add_action(menu, self, "Chi''(Q,E) magnetic", checkable=True, visible=True)
         menu.addAction(self.action_chi_qe_magnetic)
-        IntensityCache.cache_action(IntensityType.CHI_MAGNETIC, self.action_chi_qe_magnetic)
+        IntensityCache.cache_action(IntensityType.CHI_MAGNETIC, "action_chi_qe_magnetic")
 
         self.action_d2sig_dw_de = add_action(menu, self, "d2sigma/dOmega.dE", checkable=True, visible=True)
         menu.addAction(self.action_d2sig_dw_de)
-        IntensityCache.cache_action(IntensityType.D2SIGMA, self.action_d2sig_dw_de)
+        IntensityCache.cache_action(IntensityType.D2SIGMA, "action_d2sig_dw_de")
 
         self.action_symmetrised_sqe = add_action(menu, self, "Symmetrised S(Q,E)", checkable=True, visible=True)
         menu.addAction(self.action_symmetrised_sqe)
-        IntensityCache.cache_action(IntensityType.SYMMETRISED, self.action_symmetrised_sqe)
+        IntensityCache.cache_action(IntensityType.SYMMETRISED, "action_symmetrised_sqe")
 
         self.action_gdos = add_action(menu, self, "GDOS", checkable=True, visible=True)
         menu.addAction(self.action_gdos)
-        IntensityCache.cache_action(IntensityType.GDOS, self.action_gdos)
+        IntensityCache.cache_action(IntensityType.GDOS, "action_gdos")
 
     def create_toolbar(self):
         self.toolbar = QtWidgets.QToolBar()

@@ -71,7 +71,7 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
                  IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
         actions = [IntensityCache.get_action(e) for e in enums]
         for action in actions:
-            self.assertTrue(isinstance(action, MagicMock))
+            self.assertTrue(hasattr(plot_window, action))
         mock_setup_ui.assert_called_once()
 
     @staticmethod
