@@ -55,3 +55,15 @@ def clean_array(arr):
         except ValueError:
             pass
     return arr_clean
+
+
+def is_real_number(value) -> bool:
+    """
+    Checks that the value provided is a real number. i.e. that it can be converted to a float and is not NaN or Inf
+    :param value: The value to check. It can have a type of None, string or float.
+    """
+    try:
+        num = float(value)
+        return not np.isnan(num) and not np.isinf(num)
+    except (TypeError, ValueError):
+        return False

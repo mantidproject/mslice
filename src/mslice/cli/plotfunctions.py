@@ -8,6 +8,7 @@ from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.app import is_gui
 from mslice.util.compat import legend_set_draggable
 from mslice.util.mantid.mantid_algorithms import Transpose
+from mslice.util.numpy_helper import is_real_number
 from mslice.util.intensity_correction import IntensityType, IntensityCache
 from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
 from mslice.models.cut.cut import Cut
@@ -37,8 +38,8 @@ def errorbar(axes, workspace, *args, **kwargs):
 
     plot_over = kwargs.pop('plot_over', True)
     intensity_min, intensity_max = kwargs.pop('intensity_range', (None, None))
-    intensity_min = intensity_min if intensity_min and intensity_min != '' else None
-    intensity_max = intensity_max if intensity_max and intensity_max != '' else None
+    intensity_min = intensity_min if is_real_number(intensity_min) else None
+    intensity_max = intensity_max if is_real_number(intensity_max) else None
     label = kwargs.pop('label', None)
     label = workspace.name if label is None else label
     en_conversion_allowed = kwargs.pop('en_conversion', True)
