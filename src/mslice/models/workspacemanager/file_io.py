@@ -146,7 +146,9 @@ def _save_slice_to_ascii(workspace, output_path):
         x[1] = x[1].T
         y = workspace.raw_ws.extractY()
         e = workspace.raw_ws.extractE()
-        ix = [i for i, ax in enumerate(workspace.axes) if 'DeltaE' in ax.units][0]
+        e_axes = [i for i, ax in enumerate(workspace.axes) if 'DeltaE' in ax.units]
+        assert len(e_axes) > 0
+        ix = e_axes[0]
         iy = 0 if ix == 1 else 1
     dim_sz = [workspace.raw_ws.getDimension(i).getNBins() for i in range(workspace.raw_ws.getNumDims())]
     nbins = np.prod(dim_sz)
