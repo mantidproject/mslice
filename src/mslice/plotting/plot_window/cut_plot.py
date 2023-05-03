@@ -640,8 +640,7 @@ class CutPlot(IPlot):
 
     def _set_intensity_to_previous(self, previous_type):
         self._intensity_type = previous_type
-        previous_action = IntensityCache.get_action(previous_type)
-        self.set_intensity_from_action(previous_action)
+        self.set_intensity_from_type(previous_type)
 
     def ask_sample_temperature_field(self, ws_name):
         ws = get_workspace_handle(ws_name)
