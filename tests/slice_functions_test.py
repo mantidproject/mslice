@@ -43,6 +43,7 @@ class SliceFunctionsTest(unittest.TestCase):
         alg_mock.Slice = wrap_algorithm(_create_algorithm_function('Slice', 1, Slice()))
         plot = compute_slice('slice_functions_test_ws', self.q_axis, self.e_axis, False)
         self.assertEqual(plot.get_signal().shape, (30, 25))
+        self.assertTrue(plot.is_slice)
 
     @patch('mslice.models.slice.slice_functions.get_workspace_handle')
     def test_recoil_line(self, ws_handle_mock):
