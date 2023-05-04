@@ -34,8 +34,5 @@ jobs:
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum coverage run -m pytest
 
       - name: Report Coverage
-        env:
-          COVERALLS_REPO_TOKEN : ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
-          coveralls
           coverage report
