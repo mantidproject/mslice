@@ -12,3 +12,4 @@ class CommonWorkspaceProperties:
         self.e_mode = None
         self.limits = None
         self.e_fixed = None
+        self.is_slice: bool = False

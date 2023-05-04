@@ -14,7 +14,7 @@ import mslice.app as app
 from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
-                                        _check_workspace_type, is_slice, _correct_intensity)
+                                        _check_workspace_type, _correct_intensity)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
@@ -100,7 +100,7 @@ def SaveData(InputWorkspace, Path, format='ascii'):
     else:
         workspace = InputWorkspace
     save_fun = {'ascii': save_ascii, 'matlab': save_matlab, 'nexus': save_nexus}
-    save_fun[format](workspace, Path, is_slice(workspace))
+    save_fun[format](workspace, Path)
 
 
 def SaveAscii(InputWorkspace, Path):

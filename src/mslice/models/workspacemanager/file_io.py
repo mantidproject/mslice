@@ -51,9 +51,9 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
             return None, None, None
 
 
-def save_nexus(workspace, path, is_slice):
+def save_nexus(workspace, path):
     if isinstance(workspace, HistogramWorkspace):
-        _save_histogram_workspace(workspace, path, is_slice)
+        _save_histogram_workspace(workspace, path)
         return
 
     loader_name = get_workspace_handle(workspace).loader_name()
@@ -64,9 +64,9 @@ def save_nexus(workspace, path, is_slice):
         SaveNexus(InputWorkspace=workspace, Filename=path)
 
 
-def save_nxspe(workspace, path, is_slice):
+def save_nxspe(workspace, path):
     if isinstance(workspace, HistogramWorkspace):
-        _save_histogram_workspace(workspace, path, is_slice)
+        _save_histogram_workspace(workspace, path)
         return
 
     loader_name = get_workspace_handle(workspace).loader_name()
@@ -77,27 +77,27 @@ def save_nxspe(workspace, path, is_slice):
         SaveNXSPE(InputWorkspace=workspace, Filename=path)
 
 
-def save_ascii(workspace, path, is_slice):
-    if is_slice:
+def save_ascii(workspace, path):
+    if workspace.is_slice:
         _save_slice_to_ascii(workspace, path)
     else:
         if isinstance(workspace, HistogramWorkspace):
-            _save_cut_to_ascii(workspace, workspace.name, path)
+            _save_cut_to_ascii(workspace, path)
         else:
             SaveAscii(InputWorkspace=workspace, Filename=path)
 
 
-def save_matlab(workspace, path, is_slice):
+def save_matlab(workspace, path):
     labels = {}
     if isinstance(workspace, HistogramWorkspace):
-        if is_slice:
+        if workspace.is_slice:
             x, y, e = _get_slice_mdhisto_xye(workspace.raw_ws)
             labels = {'x': get_display_name(workspace.axes[0]), 'y': get_display_name(workspace.axes[1])}
         else:
             x, y, e = _get_md_histo_xye(workspace.raw_ws)
             labels = {'x': get_display_name(workspace.axes[0])}
     else:
-        if is_slice:
+        if workspace.is_slice:
             x = []
             for dim in [workspace.raw_ws.getDimension(i) for i in range(2)]:
                 x.append(np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins()))
@@ -114,15 +114,15 @@ def save_matlab(workspace, path, is_slice):
     savemat(path, mdict=mdict)
 
 
-def _save_histogram_workspace(workspace, path, is_slice):
-    if is_slice:
+def _save_histogram_workspace(workspace, path):
+    if workspace.is_slice:
         workspace = get_workspace_handle(workspace.name[2:])
 
     with WrapWorkspaceAttribute(workspace):
         SaveMD(InputWorkspace=workspace, Filename=path)
 
 
-def _save_cut_to_ascii(workspace, ws_name, output_path):
+def _save_cut_to_ascii(workspace, output_path):
     # get integration ranges from the name
     cut_axis, integration_axis = tuple(workspace.axes)
 

@@ -131,15 +131,6 @@ def _rescale_energy_cut_plot(presenter, cuts, new_e_unit):
 
 
 # Arguments Validation
-def is_slice(*args):
-    """
-    Checks if args[0] is a WorkspaceBase or HistogramWorkspace
-    """
-    if not isinstance(args[0], Workspace) or is_cut(*args):
-        return False
-    if isinstance(args[0], Workspace) or args[0]._raw_ws.getNumDims() == 2:
-        return True
-
 
 def is_cut(*args):
     """

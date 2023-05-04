@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function)
 from mslice.plotting.pyplot import *  # noqa: F401, F403
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
-from mslice.cli.helperfunctions import is_slice, is_cut, is_hs_workspace
+from mslice.cli.helperfunctions import is_cut, is_hs_workspace
 from ._mslice_commands import *  # noqa: F401, F403
 from mslice.app import is_gui
 from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_type, _get_workspace_type, _get_overplot_key,
@@ -31,7 +31,7 @@ class MSliceAxes(Axes):
 
     def pcolormesh(self, *args, **kwargs):
         from mslice.cli.plotfunctions import pcolormesh
-        if is_slice(*args):
+        if hasattr(args[0], "is_slice") and args[0].is_slice:
             return pcolormesh(self, *args, **kwargs)
         else:
             return Axes.pcolormesh(self, *args, **kwargs)
