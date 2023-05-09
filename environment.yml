@@ -5,9 +5,9 @@ channels:
   - mantid/label/nightly
 dependencies:
   - coverage
+  - coveralls=3.3.1  # Pinned to a version that works with more recent versions of coverage
   - ipython
   - mock
-  - openssl=1.1.*  # Pinned to the same version as Mantid
   - pip
   - pytest
   - pyqt
