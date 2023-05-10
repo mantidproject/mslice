@@ -61,9 +61,9 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
             process_limits_event(self.pixel_workspace)
 
     def test_get_axis_from_dimension(self):
-        return_value = get_axis_from_dimension(self.pixel_workspace, self.pixel_workspace.name, 0)
+        return_value = get_axis_from_dimension(self.pixel_workspace, 0)
         self.assertEqual(return_value, Axis('|Q|', '0.1', '3.1', '0.1'))
-        return_value = get_axis_from_dimension(self.pixel_workspace, self.pixel_workspace.name, 1)
+        return_value = get_axis_from_dimension(self.pixel_workspace, 1)
         self.assertEqual(return_value, Axis('DeltaE', '-10.0', '15.0', '1.0'))
 
     def test_scale_workspaces_without_parameters(self):

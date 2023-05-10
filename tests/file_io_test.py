@@ -83,7 +83,7 @@ class FileIOTest(unittest.TestCase):
                                         NumberOfBins=2, Names='Dim1', Units="units", OutputWorkspace=ws_name)
         ws = HistogramWorkspace(raw_ws, ws_name)
         ws.axes = [Axis('DeltaE', 0, 1, 0.1), Axis('Q', 0, 2, 0.2)]
-        _save_cut_to_ascii(ws, ws_name, "some_path")
+        _save_cut_to_ascii(ws, "some_path")
         output_method.assert_called_once()
         self.assertEqual(output_method.call_args[0][0], 'some_path')
         np.testing.assert_array_equal(output_method.call_args[0][1], [[-1, 1, 4], [5, 2, 5]])

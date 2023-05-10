@@ -7,9 +7,9 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHisto
 from unittest import mock
 from mslice.workspace import wrap_workspace
 from mslice.cli.helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
-    _check_workspace_name, _check_workspace_type, _get_workspace_type, is_slice, is_cut, _get_overplot_key, _update_overplot_checklist, \
+    _check_workspace_name, _check_workspace_type, _get_workspace_type, is_cut, _get_overplot_key, _update_overplot_checklist, \
     _update_legend
-from mslice.cli._mslice_commands import Cut, Slice
+from mslice.cli._mslice_commands import Cut
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
@@ -179,17 +179,6 @@ class CLIHelperFunctionsTest(unittest.TestCase):
 
         return_value = _get_workspace_type(workspace_histo)
         self.assertEqual(return_value, "HistogramWorkspace")
-
-    def test_that_is_slice_works_as_expected(self):
-        workspace = self.create_workspace('workspace')
-        slice_ws = Slice(workspace)
-        hist_ws = self.create_histo_workspace('hist_workspace')
-
-        return_value = is_slice(slice_ws)
-        self.assertEqual(return_value, True)
-
-        return_value = is_slice(hist_ws)
-        self.assertEqual(return_value, True)
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     def test_that_is_cut_works_as_expected(self, is_gui):

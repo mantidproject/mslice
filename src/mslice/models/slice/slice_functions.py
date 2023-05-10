@@ -21,6 +21,7 @@ def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one, store_in_ADS=
     propagate_properties(workspace, slice)
     if norm_to_one:
         slice = _norm_to_one(slice)
+    slice.is_slice = True
     return slice
 
 
