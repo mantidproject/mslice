@@ -43,6 +43,7 @@ class Workspace(WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWor
         new_ws.ef_defined = self.ef_defined
         new_ws.limits = self.limits
         new_ws.axes = self.axes
+        new_ws.is_slice = self.is_slice
         attribute_from_log(new_ws, mantid_ws)
         return new_ws
 

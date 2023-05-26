@@ -376,7 +376,7 @@ def _get_exp_info_using(raw_ws, get_exp_info):
 
 def propagate_properties(old_workspace, new_workspace):
     """Propagates MSlice only properties of workspaces, e.g. limits"""
-    properties = ['is_PSD', 'parent', 'intensity_corrected', 'axes', 'ef_defined', 'e_mode', 'limits', 'e_fixed']
+    properties = ['is_PSD', 'parent', 'intensity_corrected', 'axes', 'ef_defined', 'e_mode', 'limits', 'e_fixed', 'is_slice']
     for prop in properties:
         old_prop = getattr(old_workspace, prop)
         if old_prop:
