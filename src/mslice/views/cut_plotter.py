@@ -28,7 +28,7 @@ def draw_interactive_cut(workspace):
 
 
 @plt.set_category(plt.CATEGORY_CUT)
-def plot_cut_impl(workspace, intensity_range=None, plot_over=False, legend=None, en_conversion=True):
+def plot_cut_impl(workspace, intensity_range, plot_over=False, legend=None, en_conversion=True):
     cur_fig = plt.gcf()
     axes = cur_fig.axes
     if len(axes) == 0:
