@@ -4,7 +4,7 @@ import logging
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.base import WorkspaceBase as Workspace
 from mslice.workspace.workspace import Workspace as MatrixWorkspace
-from mslice.models.alg_workspace_ops import get_axis_range, get_axis_step, get_available_axes
+from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
@@ -78,10 +78,9 @@ def _process_axis(axis, fallback_index, input_workspace, string_function=_string
         axis = string_function(axis)
         if fallback_index != 0:
             return axis
-        x_step = get_axis_step(input_workspace, axis.units)
-        if axis.step < x_step:
-            logging.warning(f"The {axis.units} step provided ({axis.step:.4f}) is smaller than the data step in "
-                            f"the workspace ({x_step:.4f}). Please provide a larger {axis.units} step.")
+        validation_error = axis.validate_step_against_workspace(input_workspace)
+        if validation_error:
+            logging.warning(validation_error)
     elif axis in available_axes:
         range = get_axis_range(input_workspace, axis)
         range = list(map(float, range))

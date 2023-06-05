@@ -1,7 +1,6 @@
 import numpy as np
 
 from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists, get_current_plot
-from mslice.models.alg_workspace_ops import get_axis_step
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
@@ -93,12 +92,7 @@ class CutPlotterPresenter(PresenterUtility):
             plot_over = True
         cut.reset_integration_axis(cut.start, cut.end)
 
-        cut_axis = cut.cut_axis
-
-        x_step = get_axis_step(workspace, cut_axis.units)
-        if cut_axis.step < x_step:
-            return f"The {cut_axis.units} step provided ({cut_axis.step:.4f}) is smaller than the data step in " \
-                   f"the workspace ({x_step:.4f}). Please provide a larger {cut_axis.units} step."
+        return cut.cut_axis.validate_step_against_workspace(workspace)
 
     def save_cache(self, ax, cut, plot_over=False):
         # If plot over is True you want to save all plotted cuts for use by the cli
