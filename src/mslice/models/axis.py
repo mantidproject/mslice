@@ -1,4 +1,7 @@
 from mslice.models.units import EnergyUnits
+from mslice.models.alg_workspace_ops import get_axis_step
+
+STEP_TOLERANCE = 1e-5
 
 
 class Axis(object):
@@ -104,3 +107,9 @@ class Axis(object):
         if old_e_unit is not None and 'DeltaE' in self.units and old_e_unit != self._e_unit:
             # This means the axes had a different previous e_unit set so (start, end, step) should be rescaled
             self.start, self.step, self.end = new_e_unit.convert_from(old_e_unit, self.start, self.step, self.end)
+
+    def validate_step_against_workspace(self, workspace) -> str:
+        x_step = get_axis_step(workspace, self.units)
+        if self.step < x_step - STEP_TOLERANCE:
+            return f"The {self.units} step provided ({self.step:.4f}) is smaller than the data step in " \
+                   f"the workspace ({x_step:.4f}). Please provide a larger {self.units} step."
