@@ -12,6 +12,7 @@ from mslice.models.axis import Axis
 from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace
 from mslice.models.slice.slice_functions import compute_slice
 from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.cut.cut_algorithm import _cut_nonPSD_general
 from math import trunc, ceil
 
 
@@ -103,12 +104,14 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     signal = scattering_data.get_signal() if isinstance(scattering_data, HistogramWorkspace) else scattering_data.get_signal().transpose()
     n_bins_energy = signal.shape[x_dim_shape_index] if rotated else signal.shape[y_dim_shape_index]
     n_bins_momentum = signal.shape[y_dim_shape_index] if rotated else signal.shape[x_dim_shape_index]
-    energy_transfer = axis_values(e_axis, n_bins_energy)
+    # The expression for the Boltzmann factor and DOS energy scaling refer to the phonon energy
+    # which is the absolute value of the energy transfer (negative energy transfer is phonon anihilation).
+    energy = np.abs(axis_values(e_axis, n_bins_energy))
     momentum_transfer = axis_values(q_axis, n_bins_momentum)
     momentum_transfer = np.square(momentum_transfer, out=momentum_transfer)
-    boltzmann_dist = compute_boltzmann_dist(sample_temp, energy_transfer)
+    boltzmann_dist = compute_boltzmann_dist(sample_temp, energy)
     gdos = scattering_data / momentum_transfer
-    gdos *= energy_transfer
+    gdos *= energy
     gdos *= (1 - boltzmann_dist)
     return gdos
 
@@ -192,14 +195,11 @@ def _get_slice_axis(pixel_limits, cut_axis, is_icut):
 
 
 def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment, output_name):
-    signal = np.nansum(_get_slice_signal_array(slice_gdos), axis=cut_axis_id, keepdims=True)
-    error = np.nansum(_get_slice_error_array(slice_gdos), cut_axis_id, keepdims=True)
-    if not cut_slice_alignment:
-        signal = signal.transpose()
-        error = error.transpose()
-    if algorithm == 'Integration':
-        signal = signal * int_axis.step
-        error = error * int_axis.step
+    ax1 = f'{cut_axis.start}, {cut_axis.step}, {cut_axis.end}'
+    ax2 = f'{int_axis.start}, {int_axis.end - int_axis.start}, {int_axis.end}'
+    ws_out = _cut_nonPSD_general(ax1, ax2, slice_gdos.raw_ws, algorithm)
+    signal = ws_out.extractY()
+    error = ws_out.extractE()
 
     int_axis_id = 0 if cut_axis_id else 1
     slice_x, slice_y = _get_slice_dimensions(slice_gdos, cut_axis.units)
@@ -230,14 +230,6 @@ def _get_slice_dimensions(slice, x_units):
     else:
         ret_val = (dim2, dim1)
     return ret_val
-
-
-def _get_slice_signal_array(slice):
-    return slice.get_signal()
-
-
-def _get_slice_error_array(slice):
-    return slice.get_error()
 
 
 def sample_temperature(ws_name, sample_temp_fields):
