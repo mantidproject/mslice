@@ -179,8 +179,9 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
     def test_reduce_bins_cut_rotated(self):
         self._internal_tst_reduce_bins('Rebin', True)
 
+    @patch('mslice.models.intensity_correction_algs._cut_nonPSD_general')
     @patch('mslice.models.intensity_correction_algs.CreateMDHistoWorkspace')
-    def _internal_tst_reduce_bins(self, algorithm, rotated, createMDHistoWorkspace_mock):
+    def _internal_tst_reduce_bins(self, algorithm, rotated, createMDHistoWorkspace_mock, cutalgo_mock):
         if rotated:
             units = 'meV,'
             names = 'Energy transfer,Spectrum'
@@ -188,6 +189,7 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
             int_axis = self.q_axis
             cut_x_dim = self.test_ws.raw_ws.getYDimension()
             cut_y_dim = self.test_ws.raw_ws.getXDimension()
+            axstr = f'{int_axis.start}, {int_axis.end - int_axis.start}, {int_axis.end}'
         else:
             units = ',meV'
             names = 'Spectrum,Energy transfer'
@@ -195,22 +197,15 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
             int_axis = self.e_axis
             cut_x_dim = self.test_ws.raw_ws.getXDimension()
             cut_y_dim = self.test_ws.raw_ws.getYDimension()
+            axstr = f'{cut_axis.start}, {cut_axis.step}, {cut_axis.end}'
 
         _reduce_bins_along_int_axis(self.test_ws, algorithm, cut_axis, copy(int_axis), int(rotated), True, "test")
-
-        integration_factor = int_axis.step if algorithm == 'Integration' else 1
-        signal_result = np.nansum(self.sim_scattering_data, int(rotated), keepdims=True) * integration_factor
-        error_result = np.nansum(self.test_ws.get_error(), int(rotated), keepdims=True) * integration_factor
-        shape_string = f'{signal_result.shape[1]},{signal_result.shape[0]}' if rotated else f'{signal_result.shape[0]},' \
-                                                                                            f'{signal_result.shape[1]}'
 
         createMDHistoWorkspace_mock.assert_called_once()
         self.assertEqual(2, createMDHistoWorkspace_mock.call_args[1]['Dimensionality'])
         self.assertEqual(f'{cut_x_dim.getMinimum()},{cut_x_dim.getMaximum()},{cut_y_dim.getMinimum()},{cut_y_dim.getMaximum()}',
                          createMDHistoWorkspace_mock.call_args[1]['Extents'])
-        self.assertTrue(np.allclose(signal_result, createMDHistoWorkspace_mock.call_args[1]['SignalInput'], atol=1e-08))
-        self.assertTrue(np.allclose(error_result, createMDHistoWorkspace_mock.call_args[1]['ErrorInput'], atol=1e-08))
-        self.assertEqual(shape_string, createMDHistoWorkspace_mock.call_args[1]['NumberOfBins'])
+        self.assertEqual(axstr, cutalgo_mock.call_args[0][0])
         self.assertEqual(names, createMDHistoWorkspace_mock.call_args[1]['Names'])
         self.assertEqual(units, createMDHistoWorkspace_mock.call_args[1]['Units'])
 

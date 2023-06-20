@@ -197,7 +197,10 @@ def _get_slice_axis(pixel_limits, cut_axis, is_icut):
 def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment, output_name):
     ax1 = f'{cut_axis.start}, {cut_axis.step}, {cut_axis.end}'
     ax2 = f'{int_axis.start}, {int_axis.end - int_axis.start}, {int_axis.end}'
-    ws_out = _cut_nonPSD_general(ax1, ax2, slice_gdos.raw_ws, algorithm)
+    if cut_axis_id == 0:
+        ws_out = _cut_nonPSD_general(ax1, ax2, slice_gdos.raw_ws, algorithm)
+    else:
+        ws_out = _cut_nonPSD_general(ax2, ax1, slice_gdos.raw_ws, algorithm)
     signal = ws_out.extractY()
     error = ws_out.extractE()
 
