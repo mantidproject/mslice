@@ -4,7 +4,7 @@ from mantid.api import PythonAlgorithm, WorkspaceProperty
 from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator, StringListValidator
 from mantid.simpleapi import BinMD, ConvertSpectrumAxis, CreateMDHistoWorkspace, Rebin2D, SofQW3, TransformMD, \
     ConvertToMD, DeleteWorkspace, CreateSimulationWorkspace, AddSampleLog, CopyLogs, Integration, Rebin, Transpose, \
-    IntegrateMDHistoWorkspace
+    IntegrateMDHistoWorkspace, RenameWorkspace
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
 from mslice.models.axis import Axis
@@ -145,7 +145,8 @@ def _cut_nonPSD_general(ax1_binning, ax2_binning, selected_workspace, algo):
 
 
 def _cut_nonPSD_theta(ax1_binning, ax2_binning, selected_workspace, algo):
-    converted_nonpsd = ConvertSpectrumAxis(InputWorkspace=selected_workspace, Target='theta', StoreInADS=False)
+    converted_nonpsd = ConvertSpectrumAxis(InputWorkspace=selected_workspace, Target='theta',
+                                           StoreInADS=False)
     ws_out = _cut_nonPSD_general(ax1_binning, ax2_binning, converted_nonpsd, algo)
     return ws_out
 

@@ -196,24 +196,9 @@ def _get_slice_axis(pixel_limits, cut_axis, is_icut):
 
 def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id, cut_slice_alignment, output_name):
     if isinstance(slice_gdos, HistogramWorkspace):
-        # PSD type workspace, just sum all the bins
-        signal = np.nansum(_get_slice_signal_array(slice_gdos), axis=cut_axis_id, keepdims=True)
-        error = np.sqrt(np.nansum(_get_slice_variance_array(slice_gdos), cut_axis_id, keepdims=True))
-        if not cut_slice_alignment:
-            signal = signal.transpose()
-            error = error.transpose()
-        if algorithm == 'Integration':
-            signal = signal * int_axis.step
-            error = error * int_axis.step
+        signal, error = _reduce_bins_and_return_signal_error_PSD(slice_gdos, algorithm, int_axis, cut_axis_id, cut_slice_alignment)
     else:
-        ax1 = f'{cut_axis.start}, {cut_axis.step}, {cut_axis.end}'
-        ax2 = f'{int_axis.start}, {int_axis.end - int_axis.start}, {int_axis.end}'
-        if cut_axis_id == 0:
-            ws_out = _cut_nonPSD_general(ax1, ax2, slice_gdos.raw_ws, algorithm)
-        else:
-            ws_out = _cut_nonPSD_general(ax2, ax1, slice_gdos.raw_ws, algorithm)
-        signal = ws_out.extractY()
-        error = ws_out.extractE()
+        signal, error = _reduce_bins_and_return_signal_error(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id)
 
     int_axis_id = 0 if cut_axis_id else 1
     slice_x, slice_y = _get_slice_dimensions(slice_gdos, cut_axis.units)
@@ -234,6 +219,31 @@ def _reduce_bins_along_int_axis(slice_gdos, algorithm, cut_axis, int_axis, cut_a
     return new_ws
 
 
+def _reduce_bins_and_return_signal_error(slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id):
+    ax1 = f'{cut_axis.start}, {cut_axis.step}, {cut_axis.end}'
+    ax2 = f'{int_axis.start}, {int_axis.end - int_axis.start}, {int_axis.end}'
+    if cut_axis_id == 0:
+        ws_out = _cut_nonPSD_general(ax1, ax2, slice_gdos.raw_ws, algorithm)
+    else:
+        ws_out = _cut_nonPSD_general(ax2, ax1, slice_gdos.raw_ws, algorithm)
+    signal = ws_out.extractY()
+    error = ws_out.extractE()
+    return signal, error
+
+
+def _reduce_bins_and_return_signal_error_PSD(slice_gdos, algorithm, int_axis, cut_axis_id, cut_slice_alignment):
+    # PSD type workspace, just sum all the bins
+    signal = np.nansum(slice_gdos.get_signal(), axis=cut_axis_id, keepdims=True)
+    error = np.nansum(np.sqrt(slice_gdos.get_variance()), cut_axis_id, keepdims=True)
+    if not cut_slice_alignment:
+        signal = signal.transpose()
+        error = error.transpose()
+    if algorithm == 'Integration':
+        signal = signal * int_axis.step
+        error = error * int_axis.step
+    return signal, error
+
+
 def _get_slice_dimensions(slice, x_units):
     x_is_momentum = _is_momentum_or_two_theta(x_units)
     dim1 = slice._raw_ws.getXDimension()
@@ -244,14 +254,6 @@ def _get_slice_dimensions(slice, x_units):
     else:
         ret_val = (dim2, dim1)
     return ret_val
-
-
-def _get_slice_signal_array(slice):
-    return slice.get_signal()
-
-
-def _get_slice_variance_array(slice):
-    return slice.get_variance()
 
 
 def sample_temperature(ws_name, sample_temp_fields):

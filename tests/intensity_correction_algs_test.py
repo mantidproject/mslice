@@ -10,7 +10,7 @@ from mslice.models.intensity_correction_algs import (compute_boltzmann_dist, com
                                                      compute_symmetrised, sample_temperature, cut_compute_gdos,
                                                      slice_compute_gdos, _cut_compute_gdos, _cut_compute_gdos_pixel,
                                                      _get_slice_axis, _reduce_bins_along_int_axis)
-from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
+from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace, CreateMDHistoWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mantid.simpleapi import AddSampleLog
 
@@ -43,6 +43,14 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         for i in range(cls.test_ws.raw_ws.getNumberHistograms()):
             cls.test_ws.raw_ws.setY(i, cls.sim_scattering_data[i])
         cls.test_ws.e_fixed = 20
+        cls.test_ws.raw_ws.getAxis(1).setUnit('MomentumTransfer')
+
+        cls.test_psd = CreateMDHistoWorkspace(OutputWorkspace='test_psd', Dimensionality=2, Extents=[0.1, 3.1, 1., 25.],
+                                              NumberOfBins=[25, 30], Names='Energy transfer,q', Units='meV,Angstrom^-1',
+                                              SignalInput=cls.test_ws.get_signal(), ErrorInput=cls.test_ws.get_error())
+        cls.test_psd.axes = (cls.e_axis, cls.q_axis)
+        cls.test_psd.name = 'test_psd'
+        cls.test_psd.parent = 'parent_test_psd'
 
     def test_boltzmann_dist(self):
         e_axis = np.arange(self.e_axis.start, self.e_axis.end, self.e_axis.step)
@@ -171,43 +179,63 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         self.assertEqual(Axis(self.q_axis.units, 0.0005, 0.0505, self.q_axis.step, self.q_axis.e_unit), ret_axis)
 
     def test_reduce_bins_cut(self):
-        self._internal_tst_reduce_bins('Rebin', False)
+        self._internal_tst_reduce_bins('Rebin', False, False)
 
     def test_reduce_bins_integration(self):
-        self._internal_tst_reduce_bins('Integration', False)
+        self._internal_tst_reduce_bins('Integration', False, False)
 
     def test_reduce_bins_cut_rotated(self):
-        self._internal_tst_reduce_bins('Rebin', True)
+        self._internal_tst_reduce_bins('Rebin', True, False)
+
+    def test_reduce_bins_cut_psd(self):
+        self._internal_tst_reduce_bins('Rebin', False, True)
+
+    def test_reduce_bins_integration_psd(self):
+        self._internal_tst_reduce_bins('Integration', False, True)
+
+    def test_reduce_bins_cut_rotated_psd(self):
+        self._internal_tst_reduce_bins('Rebin', True, True)
 
     @patch('mslice.models.intensity_correction_algs._cut_nonPSD_general')
     @patch('mslice.models.intensity_correction_algs.CreateMDHistoWorkspace')
-    def _internal_tst_reduce_bins(self, algorithm, rotated, createMDHistoWorkspace_mock, cutalgo_mock):
+    def _internal_tst_reduce_bins(self, algorithm, rotated, use_psd, createMDHistoWorkspace_mock, cutalgo_mock):
         if rotated:
-            units = 'meV,'
-            names = 'Energy transfer,Spectrum'
+            units = 'meV,Angstrom^-1'
+            names = 'Energy transfer,q'
             cut_axis = self.e_axis
             int_axis = self.q_axis
             cut_x_dim = self.test_ws.raw_ws.getYDimension()
             cut_y_dim = self.test_ws.raw_ws.getXDimension()
             axstr = f'{int_axis.start}, {int_axis.end - int_axis.start}, {int_axis.end}'
         else:
-            units = ',meV'
-            names = 'Spectrum,Energy transfer'
+            units = 'Angstrom^-1,meV'
+            names = 'q,Energy transfer'
             cut_axis = self.q_axis
             int_axis = self.e_axis
             cut_x_dim = self.test_ws.raw_ws.getXDimension()
             cut_y_dim = self.test_ws.raw_ws.getYDimension()
             axstr = f'{cut_axis.start}, {cut_axis.step}, {cut_axis.end}'
 
-        _reduce_bins_along_int_axis(self.test_ws, algorithm, cut_axis, copy(int_axis), int(rotated), True, "test")
+        selected_test_ws = self.test_psd if use_psd else self.test_ws
+        _reduce_bins_along_int_axis(selected_test_ws, algorithm, cut_axis, copy(int_axis), int(rotated), True, "test")
 
         createMDHistoWorkspace_mock.assert_called_once()
         self.assertEqual(2, createMDHistoWorkspace_mock.call_args[1]['Dimensionality'])
         self.assertEqual(f'{cut_x_dim.getMinimum()},{cut_x_dim.getMaximum()},{cut_y_dim.getMinimum()},{cut_y_dim.getMaximum()}',
                          createMDHistoWorkspace_mock.call_args[1]['Extents'])
-        self.assertEqual(axstr, cutalgo_mock.call_args[0][0])
         self.assertEqual(names, createMDHistoWorkspace_mock.call_args[1]['Names'])
         self.assertEqual(units, createMDHistoWorkspace_mock.call_args[1]['Units'])
+        if use_psd:
+            integration_factor = int_axis.step if algorithm == 'Integration' else 1
+            signal_result = np.nansum(selected_test_ws.get_signal(), int(rotated), keepdims=True) * integration_factor
+            error_result = np.nansum(selected_test_ws.get_error(), int(rotated), keepdims=True) * integration_factor
+            shape_string = f'{signal_result.shape[1]},{signal_result.shape[0]}' if rotated else f'{signal_result.shape[0]},' \
+                                                                                                f'{signal_result.shape[1]}'
+            self.assertEqual(shape_string, createMDHistoWorkspace_mock.call_args[1]['NumberOfBins'])
+            self.assertTrue(np.allclose(signal_result, createMDHistoWorkspace_mock.call_args[1]['SignalInput'], atol=1e-08))
+            self.assertTrue(np.allclose(error_result, createMDHistoWorkspace_mock.call_args[1]['ErrorInput'], atol=1e-08))
+        else:
+            self.assertEqual(axstr, cutalgo_mock.call_args[0][0])
 
     def test_sample_temperature(self):
         self.assertEqual(sample_temperature(self.test_ws.name, ['Ei']), 3.0)

@@ -40,6 +40,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
         new_ws = HistogramWorkspace(ws, self.name)
         new_ws.is_PSD = self.is_PSD
         new_ws.axes = self.axes
+        new_ws.is_slice = self.is_slice
         return new_ws
 
     def convert_to_matrix(self):

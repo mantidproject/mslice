@@ -33,7 +33,7 @@ class HistoMixin(object):
         """
         signal = self.get_signal()
         error = self.get_variance()
-        new_ws = CloneWorkspace(InputWorkspace=self._raw_ws, StoreInADS=False)
+        new_ws = CloneWorkspace(InputWorkspace=self._raw_ws, OutputWorkspace=self._raw_ws.getName() + "_binOP", StoreInADS=True)
         array_size_error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
 
         new_signal = apply_with_corrected_shape(operator, signal, other, array_size_error)
