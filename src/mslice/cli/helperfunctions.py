@@ -208,7 +208,7 @@ def _correct_intensity(scattering_data, intensity_correction, e_axis, q_axis, No
         return compute_symmetrised(scattering_data, sample_temp, e_axis, rotated)
     elif intensity_correction == IntensityType.GDOS:
         _check_sample_temperature(sample_temp, scattering_data.name)
-        return cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, NormToOne, Algorithm)
+        return cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, NormToOne, Algorithm, is_icut=False)
 
 
 def _check_sample_temperature(sample_temperature, workspace_name):

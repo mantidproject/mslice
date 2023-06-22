@@ -126,24 +126,28 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, a
     return ws_out
 
 
-def _cut_nonPSD_theta(ax1_binning, ax2_binning, selected_workspace, algo):
-
-    converted_nonpsd = ConvertSpectrumAxis(InputWorkspace=selected_workspace, Target='theta', StoreInADS=False)
-
+def _cut_nonPSD_general(ax1_binning, ax2_binning, selected_workspace, algo):
     if 'Integration' in algo:
         ax1 = [float(x1) for x1 in ax1_binning.split(',')]
         ax2 = [float(x2) for x2 in ax2_binning.split(',')]
         if np.abs((ax1[2]-ax1[0]) - ax1[1]) < 0.0001:
-            ws_out = Integration(InputWorkspace=converted_nonpsd, RangeLower=ax1[0], RangeUpper=ax1[2], EnableLogging=False)
+            ws_out = Integration(InputWorkspace=selected_workspace, RangeLower=ax1[0], RangeUpper=ax1[2], EnableLogging=False)
             ws_out = Transpose(InputWorkspace=ws_out, EnableLogging=False)
             ws_out = Rebin(InputWorkspace=ws_out, Params=ax2_binning, EnableLogging=False)
         else:
-            ws_out = Rebin(InputWorkspace=converted_nonpsd, Params=ax1_binning, EnableLogging=False)
+            ws_out = Rebin(InputWorkspace=selected_workspace, Params=ax1_binning, EnableLogging=False)
             ws_out = Transpose(InputWorkspace=ws_out, EnableLogging=False)
             ws_out = Integration(InputWorkspace=ws_out, RangeLower=ax2[0], RangeUpper=ax2[2], EnableLogging=False)
     else:
-        ws_out = Rebin2D(InputWorkspace=converted_nonpsd, Axis1Binning=ax1_binning, Axis2Binning=ax2_binning,
+        ws_out = Rebin2D(InputWorkspace=selected_workspace, Axis1Binning=ax1_binning, Axis2Binning=ax2_binning,
                          StoreInADS=False, UseFractionalArea=True, EnableLogging=False)
+    return ws_out
+
+
+def _cut_nonPSD_theta(ax1_binning, ax2_binning, selected_workspace, algo):
+    converted_nonpsd = ConvertSpectrumAxis(InputWorkspace=selected_workspace, Target='theta',
+                                           StoreInADS=False)
+    ws_out = _cut_nonPSD_general(ax1_binning, ax2_binning, converted_nonpsd, algo)
     return ws_out
 
 

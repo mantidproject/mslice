@@ -80,7 +80,7 @@ The different options are related to the default :math:`S(Q, \omega)` view by:
 * The cross-section, :math:`\frac{d^2\sigma}{d\Omega dE} = \frac{k_i}{k_f} S(Q, \omega)`
 * A "symmetrised" :math:`S(Q, \omega)` where the intensities for the neutron energy gain (negative energy) side is
   multiplied by the :math:`\exp(|E|/k_BT)` factor.
-* The general (neutron weighted) density of states defined by :math:`S(Q, \omega) \frac{E}{Q^2} (1-\exp(-E/k_BT))`
+* The general (neutron weighted) density of states defined by :math:`S(Q, \omega) \frac{|E|}{Q^2} (1-\exp(-|E|/k_BT))`
 
 Where :math:`<n+\frac{1}{2}\pm\frac{1}{2}>` is the boson population factor for neutron energy loss (boson creation,
 positive sign) or neutron energy gain (boson anihilation, negative sign). In particular the code uses:
