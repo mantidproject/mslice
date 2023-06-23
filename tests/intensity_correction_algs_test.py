@@ -228,7 +228,7 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         if use_psd:
             integration_factor = int_axis.step if algorithm == 'Integration' else 1
             signal_result = np.nansum(selected_test_ws.get_signal(), int(rotated), keepdims=True) * integration_factor
-            error_result = np.nansum(selected_test_ws.get_error(), int(rotated), keepdims=True) * integration_factor
+            error_result = np.sqrt(np.nansum(selected_test_ws.get_variance(), int(rotated), keepdims=True)) * integration_factor
             shape_string = f'{signal_result.shape[1]},{signal_result.shape[0]}' if rotated else f'{signal_result.shape[0]},' \
                                                                                                 f'{signal_result.shape[1]}'
             self.assertEqual(shape_string, createMDHistoWorkspace_mock.call_args[1]['NumberOfBins'])
