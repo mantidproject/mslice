@@ -234,7 +234,7 @@ def _reduce_bins_and_return_signal_error(slice_gdos, algorithm, cut_axis, int_ax
 def _reduce_bins_and_return_signal_error_PSD(slice_gdos, algorithm, int_axis, cut_axis_id, cut_slice_alignment):
     # PSD type workspace, just sum all the bins
     signal = np.nansum(slice_gdos.get_signal(), axis=cut_axis_id, keepdims=True)
-    error = np.nansum(np.sqrt(slice_gdos.get_variance()), cut_axis_id, keepdims=True)
+    error = np.sqrt(np.nansum(slice_gdos.get_variance(), cut_axis_id, keepdims=True))
     if not cut_slice_alignment:
         signal = signal.transpose()
         error = error.transpose()
