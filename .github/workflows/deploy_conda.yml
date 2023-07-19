@@ -24,7 +24,7 @@ jobs:
           miniforge-variant: Mambaforge
           activate-environment: mslice-env
           environment-file: environment.yml
-          python-version: 3.8
+          python-version: 3.10
           auto-activate-base: false
 
       - name: Publish conda package
