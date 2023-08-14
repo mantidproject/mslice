@@ -1,8 +1,7 @@
 name: mslice-env
 channels:
   - conda-forge
-  - mantid
-  - mantid/label/nightly
+  - thomashampson/label/python310
 dependencies:
   - coverage
   - coveralls=3.3.1  # Pinned to a version that works with more recent versions of coverage
@@ -13,3 +12,4 @@ dependencies:
   - pyqt
   - qtconsole
   - qtpy
+  - python=3.10
