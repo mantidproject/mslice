@@ -3,6 +3,7 @@ from qtpy.QtCore import Qt, QTimer
 import unittest
 from mock import patch
 from mslice.app.mainwindow import MainWindow
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 qapp = None
 
@@ -15,6 +16,8 @@ class AppTests(unittest.TestCase):
             qapp = QtWidgets.QApplication([' '])
 
     def tearDown(self):
+        GlobalFigureManager.destroy_all()
+
         # Required to sendPostedEvents twice to ensure the MainWindow is deleted
         qapp.sendPostedEvents()
         qapp.sendPostedEvents()
