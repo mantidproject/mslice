@@ -19,16 +19,17 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           miniforge-version: latest
-          #miniforge-variant: Mambaforge
+          miniforge-variant: Mambaforge
           activate-environment: mslice-env
           environment-file: environment.yml
-          python-version: 3.10
+          #python-version: 3.10
           auto-activate-base: false
 
       - name: Install Mantid
         run: |
           # mamba install -c mantid/label/nightly mantid mantidqt
-          conda install -c "thomashampson/label/python310" mantid mantidqt
+          mamba install python=3.10
+          mamba install -c "thomashampson/label/python310" mantid mantidqt
 
       - name: Run Tests and Coverage
         run: |
