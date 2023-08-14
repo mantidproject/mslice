@@ -196,7 +196,7 @@ class PlotSelectorView(QWidget):
         :return: The context menu, and export sub-menu with a list of
                  export types
         """
-        context_menu = QMenu()
+        context_menu = QMenu(self)
         context_menu.addAction("Show", self.presenter.show_multiple_selected)
         context_menu.addAction("Hide", self.presenter.hide_selected_plots)
         context_menu.addAction("Delete", self.presenter.close_action_called)
@@ -448,7 +448,7 @@ class PlotSelectorView(QWidget):
         :return: The sort menu button
         """
         sort_button = QPushButton("Sort")
-        sort_menu = QMenu()
+        sort_menu = QMenu(sort_button)
 
         ascending_action = QAction("Ascending", sort_menu, checkable=True)
         ascending_action.setChecked(True)
@@ -575,7 +575,7 @@ class PlotSelectorView(QWidget):
         :return: The export button menu
         """
         export_button = QPushButton("Export")
-        export_menu = QMenu()
+        export_menu = QMenu(export_button)
         for text, extension in EXPORT_TYPES:
             export_menu.addAction(text, lambda ext=extension: self.presenter.export_plots_called(ext))
         export_button.setMenu(export_menu)
