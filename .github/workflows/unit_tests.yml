@@ -22,13 +22,14 @@ jobs:
           miniforge-variant: Mambaforge
           activate-environment: mslice-env
           environment-file: environment.yml
-          #python-version: 3.10
+          python-version: 3.10
           auto-activate-base: false
 
       - name: Install Mantid
         run: |
-          #mamba install -c mantid/label/nightly mantid mantidqt
-          mamba install -c "thomashampson/label/python310" mantidworkbench
+          # mamba install -c mantid/label/nightly mantid mantidqt
+          conda config --add channels thomashampson/label/python310
+          mamba install -c "thomashampson/label/python310" mantid mantidqt
 
       - name: Run Tests and Coverage
         run: |
