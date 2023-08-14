@@ -28,7 +28,7 @@ jobs:
       - name: Install Mantid
         run: |
           #mamba install -c mantid/label/nightly mantid mantidqt
-          mamba install -c "thomashampson/label/python310" mantid mantidqt
+          mamba install -c "thomashampson/label/python310" mantidworkbench
 
       - name: Run Tests and Coverage
         run: |
