@@ -110,8 +110,7 @@ class SlicePlotTest(unittest.TestCase):
         self.assertEqual(self.slice_plot._canvas.manager.plot_handler.icut.rect.ax, self.axes)
 
     def test_update_legend_in_slice_plot(self):
-        with patch.object(self.axes, 'legend') as mock_add_legend,\
-                patch.object(self.axes, 'get_legend') as mock_get_legend:
+        with patch.object(self.axes, 'legend') as mock_add_legend, patch.object(self.axes, 'get_legend') as mock_get_legend:
 
             mock_get_legend.return_value = MagicMock()
 

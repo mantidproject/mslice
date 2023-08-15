@@ -84,7 +84,7 @@ def _attach_binary_operators():
     }
 
     for alg, attributes in operations.items():
-        if type(attributes) == str:
+        if isinstance(attributes, str):
             attributes = [attributes]
         for attr in attributes:
             add_operator_func(attr, alg, attr.startswith('__i'), attr.startswith('__r'))
