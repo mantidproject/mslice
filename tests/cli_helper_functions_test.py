@@ -6,9 +6,9 @@ from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace, CreateMDHisto
                               ConvertToMD)
 from unittest import mock
 from mslice.workspace import wrap_workspace
-from mslice.cli.helperfunctions import _string_to_axis, _string_to_integration_axis, _process_axis,\
-    _check_workspace_name, _check_workspace_type, _get_workspace_type, is_cut, _get_overplot_key, _update_overplot_checklist, \
-    _update_legend
+from mslice.cli.helperfunctions import (_string_to_axis, _string_to_integration_axis, _process_axis, _check_workspace_name,
+                                        _check_workspace_type, _get_workspace_type, is_cut, _get_overplot_key,
+                                        _update_overplot_checklist, _update_legend)
 from mslice.cli._mslice_commands import Cut
 from mslice.models.axis import Axis
 from mslice.workspace.histogram_workspace import HistogramWorkspace

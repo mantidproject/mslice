@@ -11,8 +11,8 @@ from mslice.views.interfaces.mainview import MainView
 from mslice.views.interfaces.workspace_view import WorkspaceView
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
-from mslice.util.mantid.mantid_algorithms import AddSampleLog, CreateWorkspace, CreateSimulationWorkspace,\
-    ConvertToMD, CloneWorkspace
+from mslice.util.mantid.mantid_algorithms import (AddSampleLog, CreateWorkspace, CreateSimulationWorkspace,
+                                                  ConvertToMD, CloneWorkspace)
 
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):
