@@ -31,9 +31,7 @@ runs:
   - name: Build package
     shell: bash -l {0}
     run: |
-      #mamba install conda=23.5.2
       conda activate build-env
-      #conda config --set anaconda_upload yes
-      conda config --set anaconda_upload no
+      conda config --set anaconda_upload yes
       conda build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
       grep "Upload complete" upload.log
