@@ -32,6 +32,6 @@ runs:
     shell: bash -l {0}
     run: |
       conda activate build-env
-      conda config --set anaconda_upload yes
-      mamba build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
+      conda config --set anaconda_upload no #yes
+      conda build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
       grep "Upload complete" upload.log
