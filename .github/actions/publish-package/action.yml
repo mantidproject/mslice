@@ -25,13 +25,14 @@ runs:
       conda create -n build-env python=3.10
       conda activate build-env
       mamba install -c conda-forge mamba conda-build anaconda-client conda-verify
-      conda config --add channels mantid
-      conda config --add channels mantid/label/nightly
+      conda config --add channels thomashampson/label/python310
+      #conda config --add channels mantid
+      #conda config --add channels mantid/label/nightly
 
   - name: Build package
     shell: bash -l {0}
     run: |
       conda activate build-env
-      conda config --set anaconda_upload no #yes
-      conda build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
+      conda config --set anaconda_upload yes
+      mamba build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
       grep "Upload complete" upload.log

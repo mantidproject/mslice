@@ -39,5 +39,5 @@ jobs:
         #if: ${{ env.recentCommits == 'true'}}
         uses: ./.github/actions/publish-package
         with:
-          label: nightly
+          label: python310 #nightly
           token: ${{ secrets.ANACONDA_API_TOKEN }}
