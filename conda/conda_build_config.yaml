@@ -1,5 +1,2 @@
 python:
-  - 3.8
-
-setuptools:
-  - 62.0
+  - 3.10

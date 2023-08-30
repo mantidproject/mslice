@@ -13,3 +13,4 @@ dependencies:
   - pyqt
   - qtconsole
   - qtpy
+  - python=3.10

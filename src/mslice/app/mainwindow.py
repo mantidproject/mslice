@@ -119,7 +119,7 @@ class MainWindow(MainView, QMainWindow):
         self.print_startup_notifications()
 
     def setup_save(self):
-        menu = QMenu()
+        menu = QMenu(self.btnSave)
         menu.addAction("Nexus (*.nxs)", lambda: self.button_save('Nexus'))
         menu.addAction("NXSPE (*.nxspe)", lambda: self.button_save('NXSPE'))
         menu.addAction("ASCII (*.txt)", lambda: self.button_save('Ascii'))
@@ -131,7 +131,7 @@ class MainWindow(MainView, QMainWindow):
         self.stackLayout.addWidget(self.btnSaveToADS)
         self.stackLayout.addWidget(self.composeFrame)
         self.stackFrame.setLayout(self.stackLayout)
-        menu = QMenu()
+        menu = QMenu(self.btnComposeMenu)
         menu.addAction("Scale", lambda: self.button_compose('Scale'))
         menu.addAction("Bose", lambda: self.button_compose('Bose'))
         self.btnComposeMenu.setMenu(menu)

@@ -186,6 +186,7 @@ class GlobalFigureManager(object):
         }
         cls._activeQue = []
         cls._figures.clear()
+        cls.observers = []
 
     @classmethod
     def has_fignum(cls, num):

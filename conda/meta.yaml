@@ -21,7 +21,7 @@ requirements:
   build:
     - python {{ python }}
     - qtpy
-    - setuptools {{ setuptools }}
+    - setuptools
     - versioningit
 
   run:
@@ -37,7 +37,7 @@ requirements:
   - qtawesome
   - qtconsole
   - qtpy
-  - setuptools {{ setuptools }}
+  - setuptools
   - six
 
 test:
