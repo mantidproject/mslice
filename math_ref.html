@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>5. Mathematical Reference &#8212; MSlice 2.6 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=0a676766" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=c812edd6"></script>
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=d59dc883" />
+    <script src="_static/documentation_options.js?v=0f2af99e"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="4. Command Line Interface" href="cli.html" /> 
@@ -35,7 +35,7 @@
           <div class="body" role="main">
             
   <section id="mathematical-reference">
-<span id="id1"></span><h1><span class="section-number">5. </span>Mathematical Reference<a class="headerlink" href="#mathematical-reference" title="Permalink to this heading">¶</a></h1>
+<span id="id1"></span><h1><span class="section-number">5. </span>Mathematical Reference<a class="headerlink" href="#mathematical-reference" title="Link to this heading">¶</a></h1>
 <p>This page describes the mathematical operations behind the <code class="docutils literal notranslate"><span class="pre">Slice</span></code> and <code class="docutils literal notranslate"><span class="pre">Cut</span></code> operations of MSlice</p>
 <p>In general, MSlice handles “reduced” (processed) inelastic neutron scattering data which has been
 binned (histogrammed) in energy transfer for each detector / position-sensitive-detector (PSD) element.
@@ -54,7 +54,7 @@ As discussed in the <a class="reference internal" href="quickstart.html#psd-and-
 integration into a one dimensional output.
 For each type of data (<strong>PSD</strong> and <strong>non-PSD</strong>) we will describe each operation in turn.</p>
 <section id="psd-slice">
-<h2><span class="section-number">5.1. </span>PSD Slice<a class="headerlink" href="#psd-slice" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">5.1. </span>PSD Slice<a class="headerlink" href="#psd-slice" title="Link to this heading">¶</a></h2>
 <p>For <strong>PSD</strong> data, MSlice uses <em>centre-point rebinning</em>, treating each input bin (“pixel”) as a
 point and summing the full signal of each pixel whose centres lie within an output bin
 (illustrated in the image by the darker green shading in top left, with dots marking centres).
@@ -69,7 +69,7 @@ same as that adopted by the <a class="reference external" href="https://pace-neu
 The error values are considered to be standard deviations and are summed in quadrature.</p>
 </section>
 <section id="psd-cut">
-<h2><span class="section-number">5.2. </span>PSD Cut<a class="headerlink" href="#psd-cut" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">5.2. </span>PSD Cut<a class="headerlink" href="#psd-cut" title="Link to this heading">¶</a></h2>
 <p>Since MSlice allows users to specify bins in the non-integrating direction which are not
 necessarily aligned with respect to the original data, a rebinning step as described above
 is needed for the <code class="docutils literal notranslate"><span class="pre">Cut</span></code> operation too.</p>
@@ -104,7 +104,7 @@ then the two cuts <em>may</em> look very different because <img class="math" src
 regions with data more heavily than regions without data.</p>
 </section>
 <section id="non-psd-slice">
-<h2><span class="section-number">5.3. </span>Non-PSD Slice<a class="headerlink" href="#non-psd-slice" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">5.3. </span>Non-PSD Slice<a class="headerlink" href="#non-psd-slice" title="Link to this heading">¶</a></h2>
 <p>For <strong>non-PSD</strong> data, MSlice uses <em>fractional rebinning</em>, where it first calculates the
 overlap area between the input and output bins, and then sums only the fraction of the
 signal of the input bins which overlaps the output bin.</p>
@@ -122,7 +122,7 @@ The blue and orange shading illustrates the fractional overlap areas which weigh
 the signal in the top left and top right input bins (large parallelograms) respectively.</p>
 </section>
 <section id="non-psd-cuts">
-<h2><span class="section-number">5.4. </span>Non-PSD Cuts<a class="headerlink" href="#non-psd-cuts" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">5.4. </span>Non-PSD Cuts<a class="headerlink" href="#non-psd-cuts" title="Link to this heading">¶</a></h2>
 <p>Like for <strong>PSD</strong> data, there are two <code class="docutils literal notranslate"><span class="pre">Cut</span></code> “algorithms” for <strong>non-PSD</strong> data also.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> cut algorithm performs the same operation described in the previous section
 but with a single bin in the integration axis, yielding</p>
@@ -164,7 +164,7 @@ and we see that at that point the (normalised) <code class="docutils literal not
 the (normalised) <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> cut.</p>
 </section>
 <section id="a-note-on-units">
-<h2><span class="section-number">5.5. </span>A note on units<a class="headerlink" href="#a-note-on-units" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">5.5. </span>A note on units<a class="headerlink" href="#a-note-on-units" title="Link to this heading">¶</a></h2>
 <p>One advantage of inelastic neutron scattering over other techniques is that it is (relatively)
 easy to normalise the measured data to absolute units.
 At the ISIS Neutron and Muon Source if this normalisation is done, then the signal will be in
@@ -179,7 +179,7 @@ are in absolute units or not, so MSlice cannot automatically display the correct
 - this is left to the user.</p>
 </section>
 <section id="a-note-on-the-regions-of-validity-of-the-two-algorithms">
-<h2><span class="section-number">5.6. </span>A note on the regions of validity of the two algorithms<a class="headerlink" href="#a-note-on-the-regions-of-validity-of-the-two-algorithms" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">5.6. </span>A note on the regions of validity of the two algorithms<a class="headerlink" href="#a-note-on-the-regions-of-validity-of-the-two-algorithms" title="Link to this heading">¶</a></h2>
 <p>As can be seen in the example above, the <code class="docutils literal notranslate"><span class="pre">Integration</span></code> cut algorithm will produce low signals
 where there is less data, whereas the <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> cut algorithm will amplify the signals in such
 regions. In effect, it assumes that the signal is constant across the integration range and
@@ -259,7 +259,7 @@ in the cut will vary with the integration range and would not be a cross-section
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Mantid Project.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.4.
     </div>
   </body>
 </html>
