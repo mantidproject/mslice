@@ -53,7 +53,7 @@ class MSliceAxes(Axes):
         _update_overplot_checklist(key)
         _update_legend()
 
-    def bragg(self, workspace, element=None, cif=None):
+    def bragg(self, workspace, element=None, cif=None, **kwargs):
         from mslice.app.presenters import get_cut_plotter_presenter, get_slice_plotter_presenter
         _check_workspace_name(workspace)
         workspace = get_workspace_handle(workspace)
@@ -62,9 +62,9 @@ class MSliceAxes(Axes):
 
         ws_type = _get_workspace_type(workspace)
         if ws_type == 'HistogramWorkspace':
-            get_cut_plotter_presenter().add_overplot_line(workspace.name, key, recoil=True, cif=None)
+            get_cut_plotter_presenter().add_overplot_line(workspace.name, key, recoil=True, cif=None, **kwargs)
         elif ws_type == 'MatrixWorkspace':
-            get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=False, cif=cif)
+            get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=False, cif=cif, **kwargs)
 
         _update_overplot_checklist(key)
         _update_legend()
