@@ -36,7 +36,7 @@ class MSliceAxes(Axes):
         else:
             return Axes.pcolormesh(self, *args, **kwargs)
 
-    def recoil(self, workspace, element=None, rmm=None):
+    def recoil(self, workspace, element=None, rmm=None, **kwargs):
         from mslice.app.presenters import get_slice_plotter_presenter
         _check_workspace_name(workspace)
         workspace = get_workspace_handle(workspace)
@@ -48,7 +48,7 @@ class MSliceAxes(Axes):
             plot_handler = GlobalFigureManager.get_active_figure().plot_handler
             plot_handler._arb_nuclei_rmm = rmm
 
-        get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=True, cif=None)
+        get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=True, cif=None, **kwargs)
 
         _update_overplot_checklist(key)
         _update_legend()
