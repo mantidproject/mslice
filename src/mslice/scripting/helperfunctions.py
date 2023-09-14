@@ -97,6 +97,7 @@ def add_overplot_statements(script_lines, plot_handler):
     line_artists = ax.lines
 
     for line in line_artists:
+        color = line._color
         label = line._label
         if "nolegend" in label:
             continue
@@ -108,15 +109,15 @@ def add_overplot_statements(script_lines, plot_handler):
 
         if recoil:
             if element is None:
-                script_lines.append("ax.recoil(workspace='{}', rmm={})\n".format(plot_handler.ws_name, rmm))
+                script_lines.append(f"ax.recoil(workspace='{plot_handler.ws_name}', rmm={rmm}, color='{color}')\n")
             else:
-                script_lines.append("ax.recoil(workspace='{}', element='{}')\n".format(plot_handler.ws_name, element))
+                script_lines.append(f"ax.recoil(workspace='{plot_handler.ws_name}', element='{element}', color='{color}')\n")
         else:
             if cif is None:
-                script_lines.append("ax.bragg(workspace='{}', element='{}')\n".format(plot_handler.ws_name, element))
+                script_lines.append(f"ax.bragg(workspace='{plot_handler.ws_name}', element='{element}', color='{color}')\n")
 
             else:
-                script_lines.append("ax.bragg(workspace='{}', cif='{}')\n".format(plot_handler.ws_name, cif))
+                script_lines.append(f"ax.bragg(workspace='{plot_handler.ws_name}', cif='{cif}', color='{color}')\n")
 
 
 def add_cut_plot_statements(script_lines, plot_handler, ax):
