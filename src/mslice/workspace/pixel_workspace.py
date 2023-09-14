@@ -40,10 +40,10 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
     def name(self, new_name: str):
         if self.raw_ws is not None:
             raw_name = str(self.raw_ws)
-            rename_workspace(raw_name, re.sub(rf"{self.name}\w*", new_name, raw_name))
+            rename_workspace(raw_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, raw_name))
         elif self._histo_ws is not None:
             histo_name = str(self._histo_ws)
-            rename_workspace(histo_name, re.sub(rf"{self.name}\w*", new_name, histo_name))
+            rename_workspace(histo_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, histo_name))
 
         self._name = new_name
 

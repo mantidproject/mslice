@@ -101,6 +101,10 @@ class WorkspaceTest(BaseWorkspaceTest):
     def test_neg_workspace(self):
         self.check_neg_workspace()
 
+    def test_rename_workspace_which_contains_special_character(self):
+        self.workspace.name = "specialcharacter)"
+        self.workspace.name = "secondname"
+
     def test_add_list(self):
         list_to_add = np.linspace(0, 99, 100)
         result = self.workspace + list_to_add

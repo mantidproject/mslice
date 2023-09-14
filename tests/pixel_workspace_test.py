@@ -24,6 +24,10 @@ class PixelWorkspaceTest(unittest.TestCase):
         self.assertRaisesRegex(TypeError, "PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got int",
                                lambda: PixelWorkspace(4, "WorkspaceName"))
 
+    def test_rename_workspace_which_contains_special_character(self):
+        self.workspace.name = "specialcharacter)"
+        self.workspace.name = "secondname"
+
     def test_get_coordinates(self):
         coords = self.workspace.get_coordinates()
         self.assertEqual(set(coords), {'|Q|', 'DeltaE'})
