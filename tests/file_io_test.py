@@ -112,4 +112,4 @@ class FileIOTest(unittest.TestCase):
         ConfigService.setString("defaultsave.directory", default_save_directory)
 
         rel_path = "datadir/filename.txt"
-        self.assertEqual(f"{default_save_directory}/{rel_path}", _to_absolute_path(rel_path))
+        self.assertEqual(join(default_save_directory, rel_path), _to_absolute_path(rel_path))

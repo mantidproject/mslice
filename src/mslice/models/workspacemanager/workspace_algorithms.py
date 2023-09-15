@@ -236,13 +236,12 @@ def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None
             propagate_properties(ws, result)
 
 
-def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
+def save_workspaces(workspaces, path, save_name, extension):
     """
     :param workspaces: list of workspaces to save
     :param path: directory to save to
     :param save_name: name to save the file as (plus file extension). Pass none to use workspace name
     :param extension: file extension (such as .txt)
-    :param slice_nonpsd: whether the selection is in non_psd mode
     """
     if extension == '.nxs':
         save_method = save_nexus
@@ -265,7 +264,7 @@ def save_workspaces(workspaces, path, save_name, extension, slice_nonpsd=False):
         if len(save_names) != len(workspaces):
             save_names = [None] * len(workspaces)
     for workspace, save_name_single in zip(workspaces, save_names):
-        _save_single_ws(workspace, save_name_single, save_method, path, extension, slice_nonpsd)
+        _save_single_ws(workspace, save_name_single, save_method, path, extension)
 
 
 def export_workspace_to_ads(workspace):
@@ -279,11 +278,12 @@ def export_workspace_to_ads(workspace):
     add_to_ads(workspace)
 
 
-def _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd):
+def _save_single_ws(workspace, save_name, save_method, path, extension):
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
     workspace = get_workspace_handle(workspace)
-    if workspace.is_slice:
+    non_psd_slice = isinstance(workspace, Workspace) and not workspace.is_PSD
+    if is_pixel_workspace(workspace) or non_psd_slice:
         workspace = _get_slice_mdhisto(workspace, get_workspace_name(workspace))
     save_method(workspace, full_path)
 
