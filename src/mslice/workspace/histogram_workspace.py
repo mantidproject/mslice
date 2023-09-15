@@ -32,7 +32,7 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
     @WorkspaceMixin.name.setter
     def name(self, new_name: str):
         raw_name = str(self.raw_ws)
-        rename_workspace(raw_name, re.sub(rf"{self.name}\w*", new_name, raw_name))
+        rename_workspace(raw_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, raw_name))
 
         self._name = new_name
 

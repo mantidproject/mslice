@@ -35,6 +35,10 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
             # remove mslice tracking
             remove_workspace(self.workspace)
 
+    def test_rename_workspace_which_contains_special_character(self):
+        self.workspace.name = "specialcharacter)"
+        self.workspace.name = "secondname"
+
     def test_get_coordinates(self):
         expected = np.linspace(0, 100, 10)
         self.assertTrue((self.workspace.get_coordinates()['Dim1'] == expected).all())
