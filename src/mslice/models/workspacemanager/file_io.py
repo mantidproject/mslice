@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 from qtpy.QtWidgets import QFileDialog
 from mantid.api import MDNormalization
+from mantid.kernel import ConfigService
 from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace, SaveAscii, SaveMD, SaveNexus, SaveNXSPE
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.axis import Axis
@@ -111,7 +112,7 @@ def save_matlab(workspace, path):
         y = workspace.raw_ws.extractY()
         e = workspace.raw_ws.extractE()
     mdict = {'x': x, 'y': y, 'e': e, 'labels': labels}
-    savemat(path, mdict=mdict)
+    savemat(_to_absolute_path(path), mdict=mdict)
 
 
 def _save_histogram_workspace(workspace, path):
@@ -220,4 +221,11 @@ def _get_slice_mdhisto_xye(histo_ws):
 
 
 def _output_data_to_ascii(output_path, out_data, header):
-    np.savetxt(str(output_path), out_data, fmt='%12.9e', header=header)
+    np.savetxt(_to_absolute_path(str(output_path)), out_data, fmt='%12.9e', header=header)
+
+
+def _to_absolute_path(filepath: str) -> str:
+    """Returns an absolute path in which a file should be saved."""
+    if os.path.isabs(filepath):
+        return filepath
+    return os.path.join(ConfigService.getString("defaultsave.directory"), filepath)
