@@ -275,7 +275,7 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
         raise RuntimeError("Incorrect workspace type.")
 
     if IntensityStart == 0 and IntensityEnd == 0:
-        intensity_range = None
+        intensity_range = (None, None)
     else:
         intensity_range = (IntensityStart, IntensityEnd)
     from mslice.app.presenters import cli_cut_plotter_presenter
