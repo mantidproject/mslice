@@ -186,7 +186,7 @@ class CutPlotterPresenter(PresenterUtility):
         return np.resize(np.array([10 ** adj_factor, 10 ** (-adj_factor), np.nan]), size) * datum
 
     def add_overplot_line(self, workspace_name, key, recoil, cif=None, e_is_logarithmic=None, datum=0,
-                          intensity_correction=IntensityType.SCATTERING_FUNCTION):
+                          intensity_correction=IntensityType.SCATTERING_FUNCTION, **kwargs):
         cache = self._cut_cache_dict[plt.gca()][0]
         if cache.rotated:
             warnings.warn("No Bragg peak found as cut has no |Q| dimension.")
@@ -209,7 +209,7 @@ class CutPlotterPresenter(PresenterUtility):
             else:
                 y = self._get_log_bragg_y_coords(len(y), BRAGG_SIZE_ON_AXES, datum)
 
-            self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache)
+            self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache, **kwargs)
         except (ValueError, IndexError):
             warnings.warn("No Bragg peak found.")
 

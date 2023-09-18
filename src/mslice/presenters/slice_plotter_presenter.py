@@ -93,14 +93,14 @@ class SlicePlotterPresenter(PresenterUtility):
             remove_line(line)
 
     def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=None,
-                          intensity_correction=None):
+                          intensity_correction=None, **kwargs):
         cache = self._slice_cache[workspace_name]
         if recoil:
             x, y = compute_recoil_line(workspace_name, cache.momentum_axis, key)
         else:
             x, y = compute_powder_line(workspace_name, cache.momentum_axis, key, cif_file=cif)
         y = convert_energy_to_meV(y, cache.energy_axis.e_unit)
-        cache.overplot_lines[key] = plot_overplot_line(x, y, key, recoil, cache)
+        cache.overplot_lines[key] = plot_overplot_line(x, y, key, recoil, cache, **kwargs)
 
     def validate_intensity(self, intensity_start, intensity_end):
         intensity_start = self._to_float(intensity_start)

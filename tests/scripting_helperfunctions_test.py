@@ -179,32 +179,32 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn("ax.recoil(workspace='{}', element='{}')\n".format(workspace_name, "Hydrogen"), script_lines)
+        self.assertIn(f"ax.recoil(workspace='{workspace_name}', element='Hydrogen', color='C0')\n", script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_overplot_statements_works_as_expected_with_arbitrary_nuclei(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
         self.assign_slice_parameters(plot_handler)
-        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Relative Mass 55")]
+        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Relative Mass 55", color="red")]
         workspace_name = plot_handler.ws_name
         script_lines = []
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn("ax.recoil(workspace='{}', rmm={})\n".format(workspace_name, 55), script_lines)
+        self.assertIn(f"ax.recoil(workspace='{workspace_name}', rmm=55, color='red')\n", script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_overplot_statements_works_as_expected_with_bragg_peaks_elements(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
-        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Tantalum")]
+        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Tantalum", color="green")]
         workspace_name = plot_handler.ws_name
         script_lines = []
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn("ax.bragg(workspace='{}', element='{}')\n".format(workspace_name, "Tantalum"), script_lines)
+        self.assertIn(f"ax.bragg(workspace='{workspace_name}', element='Tantalum', color='green')\n", script_lines)
 
     @mock.patch('mslice.scripting.helperfunctions.add_plot_options')
     @mock.patch('mslice.scripting.helperfunctions.add_cut_lines')
