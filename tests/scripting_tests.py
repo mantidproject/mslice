@@ -253,3 +253,18 @@ class ScriptingTest(unittest.TestCase):
         mock_clipboard.assert_called_once()
 
         self.assertEqual(fake_clipboard.text, fake_file.text)
+
+    def test_that_get_algorithm_kwargs_produces_raw_string_for_loaded_filename(self):
+        some_alg = mock.MagicMock()
+        some_alg.name.return_value = 'Load'
+
+        some_alg_prop = mock.MagicMock()
+        some_alg_prop.name.return_value = "Filename"
+        some_alg_prop.isDefault.return_value = False
+        some_alg_prop.value.return_value = "test_filename"
+
+        some_alg.getProperties.return_value = [some_alg_prop]
+
+        args, _ = get_algorithm_kwargs(some_alg, 'workspace_name')
+
+        self.assertEqual("Filename=r'test_filename'", args)
