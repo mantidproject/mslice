@@ -201,15 +201,16 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
                                 '\n'.format(index, replace_ws_special_chars(cut.parent_ws_name), cut_axis, integration_axis,
                                             norm_to_one, algo_str, intensity_correction_arg, cut.raw_sample_temp))
 
+            plot_over = False if index == 0 else True
             if intensity_range != (None, None):
                 script_lines.append(
                     'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", '
-                    'lw={}, intensity_range={})\n\n'.format(index, label, colour, marker, style, width,
-                                                            intensity_range))
+                    'lw={}, intensity_range={}, plot_over={})\n\n'.format(index, label, colour, marker, style, width,
+                                                            intensity_range, plot_over))
             else:
                 script_lines.append(
                     'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", '
-                    'lw={})\n\n'.format(index, label, colour, marker, style, width))
+                    'lw={}, plot_over={})\n\n'.format(index, label, colour, marker, style, width, plot_over))
 
             cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
             index += 1
