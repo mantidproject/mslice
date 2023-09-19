@@ -15,6 +15,9 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 class ScriptingHelperFunctionsTest(unittest.TestCase):
 
+    def tearDown(self) -> None:
+        plt.gcf().clf()
+
     def assign_slice_parameters(self, plot_handler, intensity=True, temp_dependent=True):
         plot_handler.colorbar_label = 'colorbar_label'
         plot_handler.colorbar_label_size = 10
