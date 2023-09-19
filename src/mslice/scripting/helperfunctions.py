@@ -63,16 +63,16 @@ def add_slice_plot_statements(script_lines, plot_handler):
     energy_axis = str(slice.energy_axis)
     norm = slice.norm_to_one
 
-    script_lines.append(f'slice_ws = mc.Slice(ws_{plot_handler.ws_name.replace(".", "_")}, Axis1="{momentum_axis}", Axis2="{energy_axis}",'
+    script_lines.append(f'slice_ws = mc.Slice(ws_{plot_handler.ws_name.replace(".", "_")}, Axis1="{momentum_axis}", Axis2="{energy_axis}", '
                         f'NormToOne={norm})\n\n')
 
     if plot_handler.intensity is True:
         intensity = IntensityCache.get_desc_from_type(plot_handler.intensity_type)
         if plot_handler.temp_dependent:
-            script_lines.append(f'mesh = ax.pcolormesh(slice_ws, cmap="{cache[plot_handler.ws_name].colourmap}", intensity="{intensity}",'
+            script_lines.append(f'mesh = ax.pcolormesh(slice_ws, cmap="{cache[plot_handler.ws_name].colourmap}", intensity="{intensity}", '
                                 f'temperature={plot_handler.temp})\n')
         else:
-            script_lines.append(f'mesh = ax.pcolormesh(slice_ws, cmap="{cache[plot_handler.ws_name].colourmap}",'
+            script_lines.append(f'mesh = ax.pcolormesh(slice_ws, cmap="{cache[plot_handler.ws_name].colourmap}", '
                                 f'intensity="{intensity}")\n')
     else:
         script_lines.append(f'mesh = ax.pcolormesh(slice_ws, cmap="{cache[plot_handler.ws_name].colourmap}")\n')
@@ -197,7 +197,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
             intensity_correction_arg = f"'{IntensityCache.get_desc_from_type(intensity_correction)}'" \
                 if not intensity_correction == IntensityType.SCATTERING_FUNCTION else False
             script_lines.append(f'cut_ws_{index} = mc.Cut(ws_{replace_ws_special_chars(cut.parent_ws_name)}, CutAxis="{cut_axis}", '
-                                f'IntegrationAxis="{integration_axis}", NormToOne={norm_to_one}{algo_str},'
+                                f'IntegrationAxis="{integration_axis}", NormToOne={norm_to_one}{algo_str}, '
                                 f'IntensityCorrection={intensity_correction_arg}, SampleTemperature={cut.raw_sample_temp})\n')
 
             plot_over = False if index == 0 else True

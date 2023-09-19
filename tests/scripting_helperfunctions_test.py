@@ -299,8 +299,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
                                              False, None), script_lines)
 
         self.assertIn(
-            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={})\n\n'.format(
-                0, 'errorbar_label', 'blue', None, '-', 1.5), script_lines)
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, plot_over={})\n\n'.format(
+                0, 'errorbar_label', 'blue', None, '-', 1.5, False), script_lines)
 
     def test_that_add_cut_lines_with_width_works_as_expected_with_intensity_range(self):
         x_data, y_data = np.arange(0, 10), np.arange(0, 10)
@@ -316,7 +316,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
 
         self.assertIn(
             'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
-            'intensity_range={})\n\n'.format(0, 'errorbar_label', 'blue', None, '-', 1.5, (1.0, 2.0)),
+            'intensity_range={}, plot_over={})\n\n'.format(0, 'errorbar_label', 'blue', None, '-', 1.5, (1.0, 2.0), False),
             script_lines)
 
     def test_that_add_cut_lines_with_width_works_as_expected_with_multiple_cuts(self):
@@ -350,8 +350,20 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             'SampleTemperature={})\n'.format(2, 'ws_1', cuts[1].cut_axis, cuts[1].integration_axis, cuts[1].norm_to_one,
                                              False, None), script_lines)
 
-        # Each mc.Cut statement has a corresponding errorbar statement
-        self.assertEqual(len(script_lines), 6)
+        self.assertIn(
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
+            'intensity_range={}, plot_over={})\n\n'.format(0, 'error_label_0', 'blue', None, '-', 1.5, (1.0, 2.0), False),
+            script_lines)
+
+        self.assertIn(
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
+            'intensity_range={}, plot_over={})\n\n'.format(1, 'error_label_1', 'blue', None, '-', 1.5, (1.0, 2.0), True),
+            script_lines)
+
+        self.assertIn(
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
+            'intensity_range={}, plot_over={})\n\n'.format(2, 'error_label_2', 'blue', None, '-', 1.5, (1.0, 2.0), True),
+            script_lines)
 
     def test_show_or_hide_containers_in_script(self):
         fig, ax = plt.subplots()
