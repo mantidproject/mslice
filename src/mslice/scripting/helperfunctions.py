@@ -91,7 +91,7 @@ def add_slice_plot_statements(script_lines, plot_handler):
     add_plot_options(script_lines, plot_handler)
 
 
-def add_overplot_statements(script_lines, plot_handler, cut_ws_vars):
+def add_overplot_statements(script_lines, plot_handler, ws_vars=None):
     """Adds overplot line statements to the script if they were plotted"""
     ax = plot_handler._canvas.figure.gca()
     line_artists = ax.lines
@@ -107,7 +107,7 @@ def add_overplot_statements(script_lines, plot_handler, cut_ws_vars):
         recoil = True if rmm is not None or key in [1, 2, 4] else False
         cif = None  # Does not yet account for CIF files
 
-        ws_var = cut_ws_vars.pop(0)
+        ws_var = ws_vars.pop(0) if ws_vars else f"'{plot_handler.ws_name}'"
         if recoil:
             if element is None:
                 script_lines.append(f"ax.recoil(workspace={ws_var}, rmm={rmm}, color='{color}')\n")

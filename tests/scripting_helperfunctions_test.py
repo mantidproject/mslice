@@ -82,11 +82,12 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         fig = mock.MagicMock()
         ax = fig.add_subplot(111, projection='mslice')
 
+        add_cut.return_value = mock.MagicMock()
         add_plot_statements(script_lines, plot_handler, ax)
 
         add_header.assert_called_once_with(script_lines, plot_handler)
         add_cut.assert_called_once_with(script_lines, plot_handler, ax)
-        add_overplot.assert_called_once_with(script_lines, plot_handler)
+        add_overplot.assert_called_once_with(script_lines, plot_handler, add_cut.return_value)
 
         self.assertIn("mc.Show()\n", script_lines)
         self.assertIn('fig = plt.gcf()\n', script_lines)
@@ -175,39 +176,39 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
     def test_that_add_overplot_statements_works_as_expected_with_recoil_element(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
+        plot_handler.ws_name = 'test_ws_name'
         self.assign_slice_parameters(plot_handler)
         plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Hydrogen")]
-        workspace_name = plot_handler.ws_name
         script_lines = []
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn(f"ax.recoil(workspace='{workspace_name}', element='Hydrogen', color='C0')\n", script_lines)
+        self.assertIn(f"ax.recoil(workspace='{plot_handler.ws_name}', element='Hydrogen', color='C0')\n", script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_overplot_statements_works_as_expected_with_arbitrary_nuclei(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
+        plot_handler.ws_name = 'test_ws_name'
         self.assign_slice_parameters(plot_handler)
         plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Relative Mass 55", color="red")]
-        workspace_name = plot_handler.ws_name
         script_lines = []
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn(f"ax.recoil(workspace='{workspace_name}', rmm=55, color='red')\n", script_lines)
+        self.assertIn(f"ax.recoil(workspace='{plot_handler.ws_name}', rmm=55, color='red')\n", script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_overplot_statements_works_as_expected_with_bragg_peaks_elements(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
         plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Tantalum", color="green")]
-        workspace_name = plot_handler.ws_name
+        plot_handler.ws_name = 'test_ws_name'
         script_lines = []
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn(f"ax.bragg(workspace='{workspace_name}', element='Tantalum', color='green')\n", script_lines)
+        self.assertIn(f"ax.bragg(workspace='{plot_handler.ws_name}', element='Tantalum', color='green')\n", script_lines)
 
     @mock.patch('mslice.scripting.helperfunctions.add_plot_options')
     @mock.patch('mslice.scripting.helperfunctions.add_cut_lines')
