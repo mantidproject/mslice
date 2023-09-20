@@ -140,9 +140,9 @@ def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
     intensity_correction = plot_handler.intensity_type
-    return_cut_vars = add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction)
+    return_ws_vars = add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction)
     hide_lines(script_lines, plot_handler, ax)
-    return return_cut_vars
+    return return_ws_vars
 
 
 def hide_lines(script_lines, plot_handler, ax):
