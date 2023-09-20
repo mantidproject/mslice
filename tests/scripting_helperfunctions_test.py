@@ -186,6 +186,18 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         self.assertIn(f"ax.recoil(workspace='{plot_handler.ws_name}', element='Hydrogen', color='C0')\n", script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_add_overplot_statements_works_as_expected_with_recoil_element_with_cut_ws_var(self, gfm):
+        plot_handler = gfm.get_active_figure().plot_handler
+        plot_handler.add_mock_spec(CutPlot)
+        self.assign_cut_parameters(plot_handler)
+        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Hydrogen")]
+        script_lines = []
+
+        add_overplot_statements(script_lines, plot_handler, ['test_ws_name'])
+
+        self.assertIn("ax.recoil(workspace=test_ws_name, element='Hydrogen', color='C0')\n", script_lines)
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_overplot_statements_works_as_expected_with_arbitrary_nuclei(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
