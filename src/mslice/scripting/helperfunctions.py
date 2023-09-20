@@ -115,7 +115,6 @@ def add_overplot_statements(script_lines, plot_handler):
         else:
             if cif is None:
                 script_lines.append(f"ax.bragg(workspace='{plot_handler.ws_name}', element='{element}', color='{color}')\n")
-
             else:
                 script_lines.append(f"ax.bragg(workspace='{plot_handler.ws_name}', cif='{cif}', color='{color}')\n")
 
