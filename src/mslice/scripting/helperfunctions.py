@@ -47,8 +47,8 @@ def add_plot_statements(script_lines, plot_handler, ax):
             add_slice_plot_statements(script_lines, plot_handler)
             add_overplot_statements(script_lines, plot_handler)
         elif isinstance(plot_handler, CutPlot):
-            add_cut_plot_statements(script_lines, plot_handler, ax)
-            add_overplot_statements(script_lines, plot_handler)
+            return_ws_vars = add_cut_plot_statements(script_lines, plot_handler, ax)
+            add_overplot_statements(script_lines, plot_handler, return_ws_vars)
 
         script_lines.append("mc.Show()\n")
 
@@ -91,7 +91,7 @@ def add_slice_plot_statements(script_lines, plot_handler):
     add_plot_options(script_lines, plot_handler)
 
 
-def add_overplot_statements(script_lines, plot_handler):
+def add_overplot_statements(script_lines, plot_handler, cut_ws_vars):
     """Adds overplot line statements to the script if they were plotted"""
     ax = plot_handler._canvas.figure.gca()
     line_artists = ax.lines
@@ -107,22 +107,23 @@ def add_overplot_statements(script_lines, plot_handler):
         recoil = True if rmm is not None or key in [1, 2, 4] else False
         cif = None  # Does not yet account for CIF files
 
+        ws_var = cut_ws_vars.pop(0)
         if recoil:
             if element is None:
-                script_lines.append(f"ax.recoil(workspace='{plot_handler.ws_name}', rmm={rmm}, color='{color}')\n")
+                script_lines.append(f"ax.recoil(workspace={ws_var}, rmm={rmm}, color='{color}')\n")
             else:
-                script_lines.append(f"ax.recoil(workspace='{plot_handler.ws_name}', element='{element}', color='{color}')\n")
+                script_lines.append(f"ax.recoil(workspace={ws_var}, element='{element}', color='{color}')\n")
         else:
             if cif is None:
-                script_lines.append(f"ax.bragg(workspace='{plot_handler.ws_name}', element='{element}', color='{color}')\n")
+                script_lines.append(f"ax.bragg(workspace={ws_var}, element='{element}', color='{color}')\n")
             else:
-                script_lines.append(f"ax.bragg(workspace='{plot_handler.ws_name}', cif='{cif}', color='{color}')\n")
+                script_lines.append(f"ax.bragg(workspace={ws_var}, cif='{cif}', color='{color}')\n")
 
 
 def add_cut_plot_statements(script_lines, plot_handler, ax):
     """Adds cut specific statements to the script"""
 
-    add_cut_lines(script_lines, plot_handler, ax)
+    return_ws_vars = add_cut_lines(script_lines, plot_handler, ax)
     add_plot_options(script_lines, plot_handler)
 
     if plot_handler.is_changed("x_log"):
@@ -132,14 +133,16 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
     if plot_handler.is_changed("y_log"):
         script_lines.append(f"ax.set_yscale('symlog', "
                             f"linthresh=pow(10, np.floor(np.log10({plot_handler.y_axis_min}))))\n")
+    return return_ws_vars
 
 
 def add_cut_lines(script_lines, plot_handler, ax):
     cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
     errorbars = plot_handler._canvas.figure.gca().containers
     intensity_correction = plot_handler.intensity_type
-    add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction)
+    return_cut_vars = add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction)
     hide_lines(script_lines, plot_handler, ax)
+    return return_cut_vars
 
 
 def hide_lines(script_lines, plot_handler, ax):
@@ -172,6 +175,7 @@ def hide_lines(script_lines, plot_handler, ax):
 def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction):
     """Adds the cut statements for each interval of the cuts that were plotted"""
     index = 0  # Required as we run through the loop multiple times for each cut
+    return_ws_vars = []
     for cut in cuts:
         integration_start = cut.integration_axis.start
         integration_end = cut.integration_axis.end
@@ -195,10 +199,11 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
 
             intensity_correction_arg = f"'{IntensityCache.get_desc_from_type(intensity_correction)}'" \
                 if not intensity_correction == IntensityType.SCATTERING_FUNCTION else False
-            script_lines.append(f'cut_ws_{index} = mc.Cut(ws_{replace_ws_special_chars(cut.parent_ws_name)}, CutAxis="{cut_axis}", '
+            cut_ws = f'cut_ws_{index}'
+            script_lines.append(f'{cut_ws} = mc.Cut(ws_{replace_ws_special_chars(cut.parent_ws_name)}, CutAxis="{cut_axis}", '
                                 f'IntegrationAxis="{integration_axis}", NormToOne={norm_to_one}{algo_str}, '
                                 f'IntensityCorrection={intensity_correction_arg}, SampleTemperature={cut.raw_sample_temp})\n')
-
+            return_ws_vars.append(cut_ws)
             plot_over = False if index == 0 else True
             if intensity_range != (None, None):
                 script_lines.append(
@@ -212,6 +217,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
             cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
             index += 1
         cut.reset_integration_axis(cut.start, cut.end)
+    return return_ws_vars
 
 
 def add_plot_options(script_lines, plot_handler):
