@@ -191,8 +191,10 @@ class CutPlot(IPlot):
                     handles_to_show.append(handles[i])
                     labels_to_show.append(line_data[i]['label'])
                 self._legends_visible[i] = line_data[i]['legend']
-        legend = axes.legend(handles_to_show, labels_to_show, fontsize='medium')  # add new legends
-        legend_set_draggable(legend, True)
+
+        if self._legends_shown:
+            legend = axes.legend(handles_to_show, labels_to_show, fontsize='medium')  # add new legends
+            legend_set_draggable(legend, True)
 
     def change_axis_scale(self, xy_config):
         current_axis = self._canvas.figure.gca()
