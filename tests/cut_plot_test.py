@@ -112,6 +112,8 @@ class CutPlotTest(unittest.TestCase):
         self.axes.get_legend_handles_labels = MagicMock(return_value=(
             [mock_line, another_mock_line], ['mock_label', 'another_mock_label']
         ))
+        self.cut_plot._legends_shown = True
+
         self.cut_plot.update_legend(line_data)
         self.assertEqual(self.cut_plot._legends_visible, [2, 0])
         self.axes.legend.assert_called_with([mock_line], ['visible_line_data_label'], fontsize=ANY)
