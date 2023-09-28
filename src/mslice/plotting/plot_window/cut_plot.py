@@ -178,19 +178,16 @@ class CutPlot(IPlot):
         handles_to_show = []
         handles, labels = axes.get_legend_handles_labels()
         if line_data is None:
-            i = 0
-            for handle, label in zip(handles, labels):
+            for i, (handle, label) in enumerate(zip(handles, labels)):
                 if self.legend_visible(i):
                     labels_to_show.append(label)
                     handles_to_show.append(handle)
-                i += 1
         else:
-            containers = axes.containers
-            for i in range(len(containers)):
-                if line_data[i]['legend']:
-                    handles_to_show.append(handles[i])
-                    labels_to_show.append(line_data[i]['label'])
-                self._legends_visible[i] = line_data[i]['legend']
+            for line, handle in zip(line_data, handles):
+                if line['legend']:
+                    handles_to_show.append(handle)
+                    labels_to_show.append(line['label'])
+            self._legends_visible = [line['legend'] for line in line_data]
 
         if self._legends_shown:
             legend = axes.legend(handles_to_show, labels_to_show, fontsize='medium')  # add new legends
