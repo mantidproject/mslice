@@ -85,7 +85,7 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.update_legend.assert_called_once()
         self.cut_plot._canvas.draw.assert_called_once()
 
-    def test_update_legend(self):
+    def test_update_legend_legends_not_shown(self):
         line = Line2D([], [])
         self.axes.get_legend_handles_labels = MagicMock(return_value=([line], ['some_label']))
         self.cut_plot._legends_shown = False
@@ -93,6 +93,9 @@ class CutPlotTest(unittest.TestCase):
         self.assertTrue(self.cut_plot._legends_visible[0])
         self.axes.legend.assert_not_called()
 
+    def test_update_legend_legends_shown(self):
+        line = Line2D([], [])
+        self.axes.get_legend_handles_labels = MagicMock(return_value=([line], ['some_label']))
         self.cut_plot._legends_shown = True
         self.cut_plot.update_legend()
         self.assertTrue(self.cut_plot._legends_visible[0])
