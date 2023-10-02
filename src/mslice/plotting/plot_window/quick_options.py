@@ -46,6 +46,7 @@ class QuickAxisOptions(QuickOptions):
         self.font_size = QtWidgets.QDoubleSpinBox()
         self.decimals = 1
         self.font_size.setValue(font_size)
+        self.all_fonts_size = QtWidgets.QCheckBox("Update All Fonts")
 
         row1 = QtWidgets.QHBoxLayout()
         row2 = QtWidgets.QHBoxLayout()
@@ -71,6 +72,7 @@ class QuickAxisOptions(QuickOptions):
             row5 = QtWidgets.QHBoxLayout()
             row5.addWidget(self.log_scale)
             self.layout.addLayout(row5)
+        self.layout.addWidget(self.all_fonts_size)   # Tick box for all font sizes
         self.layout.addLayout(self.button_row)
         self.layout.addWidget(self.keep_open)
         self.ok_button.clicked.disconnect()
