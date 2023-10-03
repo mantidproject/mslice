@@ -722,6 +722,10 @@ class CutPlot(IPlot):
     def x_label_size(self):
         return self.manager.x_label_size
 
+    @x_label_size.setter
+    def x_label_size(self, value):
+        self.manager.x_label_size = value
+
     @property
     def y_label(self):
         return self.manager.y_label
@@ -736,6 +740,10 @@ class CutPlot(IPlot):
     @property
     def y_label_size(self):
         return self.manager.y_label_size
+
+    @y_label_size.setter
+    def y_label_size(self, value):
+        self.manager.y_label_size = value
 
     @property
     def x_range(self):

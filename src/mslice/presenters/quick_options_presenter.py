@@ -55,10 +55,16 @@ def _set_axis_options(view, target, model, has_logarithmic, grid):
 
     setattr(model, target + "_font_size", view.font_size.value())
 
-    # Experiment with setting both axis font size
     if view.all_fonts_size.isChecked():
-        setattr(model, "x_range_font_size", view.font_size.value())
-        setattr(model, "y_range_font_size", view.font_size.value())
+        _set_all_font_sizes(view, model)
+
+
+def _set_all_font_sizes(view, model):
+    setattr(model, "x_range_font_size", view.font_size.value())
+    setattr(model, "y_range_font_size", view.font_size.value())
+    setattr(model, "y_label_size", view.font_size.value())
+    setattr(model, "x_label_size", view.font_size.value())
+
 
 def _set_label_options(view, target):
     _set_label(view, target)
