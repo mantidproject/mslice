@@ -196,6 +196,39 @@
        </widget>
       </item>
       <item>
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="title">
+         <string>Text</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Font Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="allFontsSize">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="chkAllFonts">
+           <property name="text">
+            <string>Set All Fonts</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QGroupBox" name="groupBox_4">
         <property name="title">
          <string>Colorbar</string>

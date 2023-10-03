@@ -134,6 +134,18 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     def is_kept_open(self):
         return self.keep_open.isChecked()
 
+    @property
+    def all_fonts_size(self):
+        try:
+            size = float(str(self.allFontsSize.text()))
+        except ValueError:
+            return None
+        return size
+
+    @all_fonts_size.setter
+    def all_fonts_size(self, value):
+        self.allFontsSize.setText(str(value))
+
 
 class SlicePlotOptions(PlotOptionsDialog):
 

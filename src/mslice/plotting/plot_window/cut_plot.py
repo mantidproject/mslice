@@ -825,3 +825,7 @@ class CutPlot(IPlot):
     @property
     def intensity_type(self):
         return self._intensity_type
+
+    @property
+    def all_fonts_size(self):
+        return DEFAULT_LABEL_SIZE
