@@ -19,6 +19,7 @@ class PlotOptionsPresenter(object):
         self._view.yRangeEdited.connect(partial(self._xy_config_modified, 'y_range'))
         self._view.xGridEdited.connect(partial(self._value_modified, 'x_grid'))
         self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
+        self._view.allFontSizeEdited.connect(partial(self._value_modified, 'all_fonts_size'))
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
@@ -107,13 +108,3 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
             self._model.manager.window.action_toggle_legends.trigger()
 
         self._model.set_all_line_options(line_options, new_show_legends)
-
-        if self._view.chkAllFonts.isChecked():
-            self._set_all_font_size()
-
-    def _set_all_font_size(self):
-        font_size = float(str(self._view.allFontsSize.text()))
-        setattr(self._model, "x_range_font_size", font_size)
-        setattr(self._model, "y_range_font_size", font_size)
-        setattr(self._model, "y_label_size", font_size)
-        setattr(self._model, "x_label_size", font_size)

@@ -209,7 +209,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="allFontsSize">
+          <widget class="QLineEdit" name="allFntSize">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -219,7 +219,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QCheckBox" name="chkAllFonts">
+          <widget class="QCheckBox" name="chkAllFntSize">
            <property name="text">
             <string>Set All Fonts</string>
            </property>

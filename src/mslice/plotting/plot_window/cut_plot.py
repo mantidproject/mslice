@@ -829,3 +829,10 @@ class CutPlot(IPlot):
     @property
     def all_fonts_size(self):
         return DEFAULT_LABEL_SIZE
+
+    @all_fonts_size.setter
+    def all_fonts_size(self, value):
+        self.x_range_font_size = value
+        self.y_range_font_size = value
+        self.x_label_size = value
+        self.y_label_size = value
