@@ -27,6 +27,7 @@ from typing import Callable
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
+DEFAULT_SCALE_FONT_SIZE = 0
 
 
 class SlicePlot(IPlot):
@@ -639,3 +640,17 @@ class SlicePlot(IPlot):
         self.y_label_size = value
         self.colorbar_label_size = value
         self.colorbar_range_font_size = value
+
+    @property 
+    def scale_all_fonts(self):
+        return DEFAULT_SCALE_FONT_SIZE
+
+    @scale_all_fonts.setter
+    def scale_all_fonts(self, value):
+        self.title_size += value
+        self.x_range_font_size += value
+        self.y_range_font_size += value
+        self.x_label_size += value
+        self.y_label_size += value
+        self.colorbar_label_size += value
+        self.colorbar_range_font_size += value

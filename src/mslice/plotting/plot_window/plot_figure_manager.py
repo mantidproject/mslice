@@ -303,11 +303,11 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     @property
     def title(self):
-        return self.figure.gca().get_title()
+        return self.figure.gca().title.get_text()
 
     @title.setter
     def title(self, value):
-        self.figure.gca().set_title(value)
+        self.figure.gca().title.set_text(value)
         self.window.setWindowTitle(value)
 
     @property

@@ -21,6 +21,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     xGridEdited = Signal()
     yGridEdited = Signal()
     allFontSizeEdited = Signal()
+    scaleAllFontsEdited = Signal()
     ok_clicked = Signal()
 
     def __init__(self, parent, redraw_signal=None):
@@ -48,6 +49,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.chkXGrid.stateChanged.connect(self.xGridEdited)
         self.chkYGrid.stateChanged.connect(self.yGridEdited)
         self.allFntSize.textEdited.connect(self.allFontSizeEdited)
+        self.sclAllFntSize.valueChanged.connect(self.scaleAllFontsEdited)
         self.redraw_signal = redraw_signal
 
     def _ok_clicked(self):
@@ -147,6 +149,18 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     @all_fonts_size.setter
     def all_fonts_size(self, value):
         self.allFntSize.setText(str(value))
+
+    @property
+    def scale_all_fonts(self):
+        try:
+            scl_factor = float(self.sclAllFntSize.value())
+        except ValueError:
+            return None
+        return scl_factor
+
+    @scale_all_fonts.setter
+    def scale_all_fonts(self, value):
+        self.sclAllFntSize.setValue(value)
 
 
 class SlicePlotOptions(PlotOptionsDialog):

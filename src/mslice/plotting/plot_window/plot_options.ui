@@ -240,7 +240,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
-            <string>All fonts size</string>
+            <string>Set all fonts size</string>
            </property>
           </widget>
          </item>
@@ -251,6 +251,23 @@
              <width>16777215</width>
              <height>16777215</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Scale all fonts by</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="sclAllFntSize">
+           <property name="maximum">
+             <double>50</double>
+           </property>
+           <property name="minimum">
+             <double>-50</double>
            </property>
           </widget>
          </item>

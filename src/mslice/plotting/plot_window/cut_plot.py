@@ -1,4 +1,5 @@
 from functools import partial
+from mantid import PropertyManagerDataService
 
 from qtpy import QtWidgets
 
@@ -29,6 +30,7 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
+DEFAULT_SCALE_FONT_SIZE = 0
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -841,3 +843,15 @@ class CutPlot(IPlot):
         self.y_range_font_size = value
         self.x_label_size = value
         self.y_label_size = value
+
+    @property 
+    def scale_all_fonts(self):
+        return DEFAULT_SCALE_FONT_SIZE
+
+    @scale_all_fonts.setter
+    def scale_all_fonts(self, value):
+        self.title_size += value
+        self.x_range_font_size += value
+        self.y_range_font_size += value
+        self.x_label_size += value
+        self.y_label_size += value
