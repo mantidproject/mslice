@@ -314,6 +314,10 @@ class PlotFigureManagerQT(QtCore.QObject):
     def title_size(self):
         return self.figure.gca().title.get_size()
 
+    @title_size.setter
+    def title_size(self, value):
+        self.figure.gca().title.set_size(value)
+
     @property
     def x_label(self):
         return self.figure.gca().get_xlabel()

@@ -707,6 +707,10 @@ class CutPlot(IPlot):
     def title_size(self):
         return self.manager.title_size
 
+    @title_size.setter
+    def title_size(self, value):
+        self.manager.title_size = value
+
     @property
     def x_label(self):
         return self.manager.x_label
@@ -832,6 +836,7 @@ class CutPlot(IPlot):
 
     @all_fonts_size.setter
     def all_fonts_size(self, value):
+        self.title_size = value
         self.x_range_font_size = value
         self.y_range_font_size = value
         self.x_label_size = value

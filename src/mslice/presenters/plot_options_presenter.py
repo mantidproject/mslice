@@ -43,7 +43,7 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
 
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_grid', 'y_grid',
-                      'colorbar_range', 'colorbar_log']
+                      'colorbar_range', 'colorbar_log', 'all_fonts_size']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 

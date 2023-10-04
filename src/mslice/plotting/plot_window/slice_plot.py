@@ -469,6 +469,10 @@ class SlicePlot(IPlot):
     def colorbar_label_size(self):
         return self._canvas.figure.get_axes()[1].yaxis.label.get_size()
 
+    @colorbar_label_size.setter
+    def colorbar_label_size(self, value):
+        self._canvas.figure.get_axes()[1].yaxis.label.set_size(value)
+
     @property
     def colorbar_range(self):
         return self._canvas.figure.gca().collections[0].get_clim()
@@ -508,6 +512,10 @@ class SlicePlot(IPlot):
     def title_size(self):
         return self.manager.title_size
 
+    @title_size.setter
+    def title_size(self, value):
+        self.manager.title_size = value
+
     @property
     def x_label(self):
         return self.manager.x_label
@@ -523,6 +531,10 @@ class SlicePlot(IPlot):
     def x_label_size(self):
         return self.manager.x_label_size
 
+    @x_label_size.setter
+    def x_label_size(self, value):
+        self.manager.x_label_size = value
+
     @property
     def y_label(self):
         return self.manager.y_label
@@ -537,6 +549,10 @@ class SlicePlot(IPlot):
     @property
     def y_label_size(self):
         return self.manager.y_label_size
+
+    @y_label_size.setter
+    def y_label_size(self, value):
+        self.manager.y_label_size = value
 
     @property
     def x_range(self):
@@ -609,3 +625,17 @@ class SlicePlot(IPlot):
 
     def set_cross_cursor(self):
         self._canvas.setCursor(Qt.CrossCursor)
+
+    @property
+    def all_fonts_size(self):
+        return DEFAULT_LABEL_SIZE
+
+    @all_fonts_size.setter
+    def all_fonts_size(self, value):
+        self.title_size = value
+        self.x_range_font_size = value
+        self.y_range_font_size = value
+        self.x_label_size = value
+        self.y_label_size = value
+        self.colorbar_label_size = value
+        self.colorbar_range_font_size = value
