@@ -47,7 +47,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.chkXGrid.stateChanged.connect(self.xGridEdited)
         self.chkYGrid.stateChanged.connect(self.yGridEdited)
-        self.chkAllFntSize.stateChanged.connect(self.allFontSizeEdited)
+        self.allFntSize.textEdited.connect(self.allFontSizeEdited)
         self.redraw_signal = redraw_signal
 
     def _ok_clicked(self):
