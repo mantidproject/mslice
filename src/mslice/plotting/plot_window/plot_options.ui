@@ -238,14 +238,14 @@
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_8">
+          <widget class="QCheckBox" name="chkAllFntSz">
            <property name="text">
             <string>Set all fonts size</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="allFntSize">
+          <widget class="QLineEdit" name="allFntSz">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -255,14 +255,14 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_9">
+          <widget class="QCheckBox" name="chkSclAllFntSz">
            <property name="text">
-            <string>Scale all fonts by</string>
+            <string>Scale all fonts</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QDoubleSpinBox" name="sclAllFntSize">
+          <widget class="QDoubleSpinBox" name="sclAllFntSz">
            <property name="maximum">
              <double>50</double>
            </property>

@@ -20,9 +20,12 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     yRangeEdited = Signal()
     xGridEdited = Signal()
     yGridEdited = Signal()
-    allFontSizeEdited = Signal()
-    scaleAllFontsEdited = Signal()
     ok_clicked = Signal()
+
+    allFontSizeIncluded = Signal()
+    allFontSizeRemoved = Signal()
+    scaleAllFontsIncluded = Signal()
+    scaleAllFontsRemoved = Signal()
 
     def __init__(self, parent, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
@@ -48,8 +51,16 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.chkXGrid.stateChanged.connect(self.xGridEdited)
         self.chkYGrid.stateChanged.connect(self.yGridEdited)
-        self.allFntSize.textEdited.connect(self.allFontSizeEdited)
-        self.sclAllFntSize.valueChanged.connect(self.scaleAllFontsEdited)
+
+        self.chkAllFntSz.setCheckState(False)
+        self.chkAllFntSz.stateChanged.connect(self._all_fonts_size_state_changed)
+        self.chkSclAllFntSz.setCheckState(False)
+        self.chkSclAllFntSz.stateChanged.connect(self._scale_all_fonts_state_changed)
+        self.allFntSz.setEnabled(False)
+        self.allFntSz.editingFinished.connect(self.allFontSizeIncluded)
+        self.sclAllFntSz.setEnabled(False)
+        self.sclAllFntSz.editingFinished.connect(self.scaleAllFontsIncluded)
+
         self.redraw_signal = redraw_signal
 
     def _ok_clicked(self):
@@ -57,6 +68,42 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.redraw_signal.emit()
         if not self.is_kept_open:
             self.accept()
+
+    def _all_fonts_size_state_changed(self):
+        self._chk_box_state_changed(
+            chk_box=self.chkAllFntSz,
+            txt_box=self.allFntSz,
+            include_signal=self.allFontSizeIncluded,
+            remove_signal=self.allFontSizeRemoved,
+            other_chk_box=self.chkSclAllFntSz
+        )
+
+    def _scale_all_fonts_state_changed(self):
+        self._chk_box_state_changed(
+            chk_box=self.chkSclAllFntSz,
+            txt_box=self.sclAllFntSz,
+            include_signal=self.scaleAllFontsIncluded,
+            remove_signal=self.scaleAllFontsRemoved,
+            other_chk_box=self.chkAllFntSz
+        )
+
+    def _chk_box_state_changed(self, chk_box, txt_box, include_signal, remove_signal, other_chk_box):
+        self._set_txt_to_match_chk(txt_box, chk_box)
+        self._choose_signal_to_emit(chk_box, include_signal, remove_signal)
+        self._uncheck_other_chk_box(chk_box, other_chk_box)
+
+    def _set_txt_to_match_chk(self, txt_box, chk_box):
+        txt_box.setEnabled(chk_box.isChecked())
+
+    def _choose_signal_to_emit(self, chk_box, include_signal, remove_signal):
+        if chk_box.isChecked():
+            include_signal.emit()
+        else:
+            remove_signal.emit()
+
+    def _uncheck_other_chk_box(self, chk_box_current, chk_box_other):
+        if chk_box_current.isChecked():
+            chk_box_other.setCheckState(False)
 
     @property
     def x_range(self):
@@ -141,26 +188,26 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     @property
     def all_fonts_size(self):
         try:
-            size = float(str(self.allFntSize.text()))
+            size = float(str(self.allFntSz.text()))
         except ValueError:
             return None
         return size
 
     @all_fonts_size.setter
     def all_fonts_size(self, value):
-        self.allFntSize.setText(str(value))
+        self.allFntSz.setText(str(value))
 
     @property
     def scale_all_fonts(self):
         try:
-            scl_factor = float(self.sclAllFntSize.value())
+            scl_factor = float(self.sclAllFntSz.value())
         except ValueError:
             return None
         return scl_factor
 
     @scale_all_fonts.setter
     def scale_all_fonts(self, value):
-        self.sclAllFntSize.setValue(value)
+        self.sclAllFntSz.setValue(value)
 
 
 class SlicePlotOptions(PlotOptionsDialog):

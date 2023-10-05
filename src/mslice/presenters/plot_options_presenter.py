@@ -19,8 +19,10 @@ class PlotOptionsPresenter(object):
         self._view.yRangeEdited.connect(partial(self._xy_config_modified, 'y_range'))
         self._view.xGridEdited.connect(partial(self._value_modified, 'x_grid'))
         self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
-        self._view.allFontSizeEdited.connect(partial(self._value_modified, 'all_fonts_size'))
-        self._view.scaleAllFontsEdited.connect(partial(self._value_modified, 'scale_all_fonts'))
+        self._view.allFontSizeIncluded.connect(partial(self._value_modified, 'all_fonts_size'))
+        self._view.allFontSizeRemoved.connect(partial(self._remove_value_modified, 'all_fonts_size'))
+        self._view.scaleAllFontsIncluded.connect(partial(self._value_modified, 'scale_all_fonts'))
+        self._view.scaleAllFontsRemoved.connect(partial(self._remove_value_modified, 'scale_all_fonts'))
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
@@ -28,6 +30,9 @@ class PlotOptionsPresenter(object):
     def _xy_config_modified(self, key):
         getattr(self, '_xy_config')[key] = getattr(self._view, key)
         self._xy_config['modified'] = True
+
+    def _remove_value_modified(self, value_name):
+        del self._modified_values[value_name]
 
 
 class SlicePlotOptionsPresenter(PlotOptionsPresenter):
