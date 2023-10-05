@@ -208,7 +208,7 @@ def subtract(workspaces, background_ws, ssf):
                          InputWorkspace=str(background_ws), Factor=ssf, store=False)
     try:
         for ws_name in workspaces:
-            result = Minus(OutputWorkspace=ws_name + f'_subtracted_by_{ssf:.2f}', LHSWorkspace=ws_name,
+            result = Minus(OutputWorkspace=ws_name + '_subtracted', LHSWorkspace=ws_name,
                            RHSWorkspace=scaled_bg_ws)
             propagate_properties(get_workspace_handle(ws_name), result)
     except ValueError as e:
