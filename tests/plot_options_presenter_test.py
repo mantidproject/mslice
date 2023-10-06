@@ -216,3 +216,65 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         # check line with correct index removed
         self.presenter.remove_container(9)
         self.model.remove_line_by_index.assert_called_once_with(9)
+
+    def test_all_fonts_size(self):
+        model_all_fonts_size = PropertyMock()
+        view_all_fonts_size = PropertyMock()
+        type(self.model).all_fonts_size = model_all_fonts_size
+        type(self.view).all_fonts_size = view_all_fonts_size
+
+        # model -> view
+        model_all_fonts_size.return_value = 12
+        self.presenter = CutPlotOptionsPresenter(self.view, self.model)
+        model_all_fonts_size.assert_called_once_with()
+        view_all_fonts_size.assert_called_once_with(12)
+
+        model_all_fonts_size.reset_mock()
+        view_all_fonts_size.reset_mock()
+
+        # view -> model
+        view_all_fonts_size.return_value = 20
+        self.presenter._value_modified('all_fonts_size')
+        self.presenter.get_new_config()
+        view_all_fonts_size.assert_called_once_with()
+        model_all_fonts_size.assert_called_once_with(20)
+
+        model_all_fonts_size.reset_mock()
+        view_all_fonts_size.reset_mock()
+
+        self.presenter._remove_value_modified('all_fonts_size')
+        self.presenter.get_new_config()
+        view_all_fonts_size.assert_not_called()
+        model_all_fonts_size.assert_not_called()
+
+    def test_scale_all_fonts(self):
+        model_scale_all_fonts = PropertyMock()
+        view_scale_all_fonts = PropertyMock()
+        type(self.model).scale_all_fonts = model_scale_all_fonts
+        type(self.view).scale_all_fonts = view_scale_all_fonts
+
+        # model -> view
+        model_scale_all_fonts.return_value = 12
+        self.presenter = CutPlotOptionsPresenter(self.view, self.model)
+        model_scale_all_fonts.assert_called_once_with()
+        view_scale_all_fonts.assert_called_once_with(12)
+
+        model_scale_all_fonts.reset_mock()
+        view_scale_all_fonts.reset_mock()
+
+        # view -> model
+        view_scale_all_fonts.return_value = 20
+        self.presenter._value_modified('scale_all_fonts')
+        self.presenter.get_new_config()
+        view_scale_all_fonts.assert_called_once_with()
+        model_scale_all_fonts.assert_called_once_with(20)
+
+        model_scale_all_fonts.reset_mock()
+        view_scale_all_fonts.reset_mock()
+
+        self.presenter._remove_value_modified('scale_all_fonts')
+        self.presenter.get_new_config()
+        view_scale_all_fonts.assert_not_called()
+        model_scale_all_fonts.assert_not_called()
+        
+

@@ -104,3 +104,20 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.toggle_waterfall()
         self.cut_plot._apply_offset.assert_called_with(0, 0)
         self.cut_plot.update_bragg_peaks.assert_called_with(refresh=True)
+
+    def test_all_fonts_size(self):
+        self.cut_plot.all_fonts_size = 14
+        self.assertEqual(self.cut_plot.title_size, 14)
+        self.assertEqual(self.cut_plot.x_range_font_size, 14)
+        self.assertEqual(self.cut_plot.y_range_font_size, 14)
+        self.assertEqual(self.cut_plot.x_label_size, 14)
+        self.assertEqual(self.cut_plot.y_label_size, 14)
+
+    def test_scale_all_fonts(self):
+        self.cut_plot.all_fonts_size = 12
+        self.cut_plot.scale_all_fonts = 3
+        self.assertEqual(self.cut_plot.title_size, 15)
+        self.assertEqual(self.cut_plot.x_range_font_size, 15)
+        self.assertEqual(self.cut_plot.y_range_font_size, 15)
+        self.assertEqual(self.cut_plot.x_label_size, 15)
+        self.assertEqual(self.cut_plot.y_label_size, 15)
