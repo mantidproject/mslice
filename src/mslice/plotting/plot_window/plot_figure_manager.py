@@ -217,7 +217,10 @@ class PlotFigureManagerQT(QtCore.QObject):
         if hasattr(self.plot_handler, 'ws_list'):
             workspaces = self.plot_handler.ws_list
         else:
-            workspaces = [self.plot_handler.ws_name]
+            if isinstance(self.plot_handler, SlicePlot):
+                workspaces = [self.plot_handler.get_slice_cache().scattering_function]
+            else:
+                workspaces = [self.plot_handler.ws_name]
         try:
             save_workspaces(workspaces,
                             file_path,

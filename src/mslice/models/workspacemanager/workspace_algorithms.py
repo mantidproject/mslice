@@ -20,7 +20,7 @@ from mantid.api import MatrixWorkspace
 
 from mslice.models.axis import Axis
 from mslice.util.mantid.algorithm_wrapper import add_to_ads
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name, delete_workspace
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, delete_workspace
 from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits, Rebose
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
@@ -282,21 +282,9 @@ def export_workspace_to_ads(workspace):
 def _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd):
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
-    workspace = get_workspace_handle(workspace)
-    if workspace.is_slice:
-        workspace = _get_slice_mdhisto(workspace, get_workspace_name(workspace))
+    if isinstance(workspace, str):
+        workspace = get_workspace_handle(workspace)
     save_method(workspace, full_path)
-
-
-def _get_slice_mdhisto(workspace, ws_name):
-    from mslice.models.slice.slice_functions import compute_slice
-    try:
-        return get_workspace_handle('__' + ws_name)
-    except KeyError:
-        x_axis = get_axis_from_dimension(workspace, 0)
-        y_axis = get_axis_from_dimension(workspace, 1)
-        compute_slice(ws_name, x_axis, y_axis, False)
-        return get_workspace_handle('__' + ws_name)
 
 
 def get_axis_from_dimension(workspace, id):
