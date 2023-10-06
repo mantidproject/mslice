@@ -1,5 +1,4 @@
 from functools import partial
-from mantid import PropertyManagerDataService
 
 from qtpy import QtWidgets
 
