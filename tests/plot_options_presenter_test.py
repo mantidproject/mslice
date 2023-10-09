@@ -185,7 +185,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter._xy_config_modified('y_log')
         self.presenter.get_new_config()
         self.model.change_axis_scale.assert_called_once_with({'x_range': (1, 2), 'y_range': (3, 4), 'modified': True,
-                                                              'x_log': False,    'y_log': True})
+                                                              'x_log': False, 'y_log': True})
 
     def test_line_options(self):
         #  model -> view
@@ -276,5 +276,3 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter.get_new_config()
         view_scale_all_fonts.assert_not_called()
         model_scale_all_fonts.assert_not_called()
-
-
