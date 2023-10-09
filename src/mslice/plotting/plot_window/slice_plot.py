@@ -438,7 +438,7 @@ class SlicePlot(IPlot):
 
     def get_cached_workspace(self):
         cached_slice = self.get_slice_cache()
-        return getattr(cached_slice, IntensityCache.get_slice_type(self.intensity_type))
+        return getattr(cached_slice, self.intensity_type.name.lower())
 
     def update_workspaces(self):
         self._slice_plotter_presenter.update_displayed_workspaces()

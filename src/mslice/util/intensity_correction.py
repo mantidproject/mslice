@@ -15,7 +15,6 @@ class IntensityCache:
     __action_dict = {}
     __method_dict_cut = {}
     __method_dict_slice = {}
-    __slice_cache_type = {}
     __description_dict = {IntensityType.SCATTERING_FUNCTION: "scattering_function",
                           IntensityType.CHI: "dynamical_susceptibility",
                           IntensityType.CHI_MAGNETIC: "dynamical_susceptibility_magnetic",
@@ -62,17 +61,6 @@ class IntensityCache:
             return method_dict[intensity_correction_type]
         else:
             raise KeyError("method related to the intensity correction type not found")
-
-    @classmethod
-    def cache_slice_type(cls, intensity_correction_type, name):
-        if intensity_correction_type not in cls.__slice_cache_type:
-            cls.__slice_cache_type[intensity_correction_type] = name
-
-    @classmethod
-    def get_slice_type(cls, intensity_correction_type):
-        if intensity_correction_type not in cls.__slice_cache_type:
-            raise KeyError("intensity correction cached type not found")
-        return cls.__slice_cache_type[intensity_correction_type]
 
     @classmethod
     def get_intensity_type_from_desc(cls, description):

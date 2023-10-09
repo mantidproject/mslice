@@ -10,8 +10,6 @@ from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, c
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.plot_window.overplot_interface import plot_overplot_line, remove_line
 from mslice.presenters.presenter_utility import PresenterUtility
-from mslice.plotting.pyplot import CATEGORY_SLICE
-from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 
 class SlicePlotterPresenter(PresenterUtility):
@@ -19,7 +17,6 @@ class SlicePlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._slice_cache = {}
-        self._cache_intensity_correction_methods()
 
     def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
         workspace = get_workspace_handle(selected_ws)
@@ -115,19 +112,3 @@ class SlicePlotterPresenter(PresenterUtility):
 
     def workspace_selection_changed(self):
         pass
-
-    def _cache_intensity_correction_methods(self):
-        cat = CATEGORY_SLICE
-        IntensityCache.cache_method(cat, IntensityType.SCATTERING_FUNCTION, self.show_scattering_function)
-        IntensityCache.cache_method(cat, IntensityType.CHI, self.show_dynamical_susceptibility)
-        IntensityCache.cache_method(cat, IntensityType.CHI_MAGNETIC,
-                                    self.show_dynamical_susceptibility_magnetic)
-        IntensityCache.cache_method(cat, IntensityType.D2SIGMA, self.show_d2sigma)
-        IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised)
-        IntensityCache.cache_method(cat, IntensityType.GDOS, self.show_gdos)
-        IntensityCache.cache_slice_type(IntensityType.SCATTERING_FUNCTION, "scattering_function")
-        IntensityCache.cache_slice_type(IntensityType.CHI, "chi")
-        IntensityCache.cache_slice_type(IntensityType.CHI_MAGNETIC, "chi_magnetic")
-        IntensityCache.cache_slice_type(IntensityType.D2SIGMA, "d2sigma")
-        IntensityCache.cache_slice_type(IntensityType.SYMMETRISED, "symmetrised")
-        IntensityCache.cache_slice_type(IntensityType.GDOS, "gdos")
