@@ -276,5 +276,5 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter.get_new_config()
         view_scale_all_fonts.assert_not_called()
         model_scale_all_fonts.assert_not_called()
-        
+
 
