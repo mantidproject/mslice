@@ -218,7 +218,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             workspaces = self.plot_handler.ws_list
         else:
             if isinstance(self.plot_handler, SlicePlot):
-                workspaces = [self.plot_handler.get_slice_cache().scattering_function]
+                workspaces = [self.plot_handler.get_cached_workspace()]
             else:
                 workspaces = [self.plot_handler.ws_name]
         try:

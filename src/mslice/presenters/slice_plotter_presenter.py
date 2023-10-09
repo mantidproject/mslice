@@ -19,6 +19,7 @@ class SlicePlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._slice_cache = {}
+        self._cache_intensity_correction_methods()
 
     def plot_slice(self, selected_ws, x_axis, y_axis, intensity_start, intensity_end, norm_to_one, colourmap):
         workspace = get_workspace_handle(selected_ws)
@@ -123,3 +124,10 @@ class SlicePlotterPresenter(PresenterUtility):
                                     self.show_dynamical_susceptibility_magnetic)
         IntensityCache.cache_method(cat, IntensityType.D2SIGMA, self.show_d2sigma)
         IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised)
+        IntensityCache.cache_method(cat, IntensityType.GDOS, self.show_gdos)
+        IntensityCache.cache_slice_type(IntensityType.SCATTERING_FUNCTION, "scattering_function")
+        IntensityCache.cache_slice_type(IntensityType.CHI, "chi")
+        IntensityCache.cache_slice_type(IntensityType.CHI_MAGNETIC, "chi_magnetic")
+        IntensityCache.cache_slice_type(IntensityType.D2SIGMA, "d2sigma")
+        IntensityCache.cache_slice_type(IntensityType.SYMMETRISED, "symmetrised")
+        IntensityCache.cache_slice_type(IntensityType.GDOS, "gdos")

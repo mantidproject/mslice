@@ -282,7 +282,7 @@ def export_workspace_to_ads(workspace):
 def _save_single_ws(workspace, save_name, save_method, path, extension, slice_nonpsd):
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
-    if isinstance(workspace, str):
+    if isinstance(workspace, string_types):
         workspace = get_workspace_handle(workspace)
     save_method(workspace, full_path)
 
