@@ -13,6 +13,7 @@ from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresen
 from mslice.widgets.workspacemanager.command import Command
 from mantid.simpleapi import AddSampleLog
 from mslice.views.interfaces.workspace_view import WorkspaceView
+from mslice.workspace.helperfunctions import WorkspaceNameAppender
 
 
 class MantidWorkspaceProviderTest(unittest.TestCase):
@@ -44,16 +45,16 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def test_subtract_workspace(self):
         subtract(['test_ws_2d'], 'test_ws_2d', 0.95)
-        result = get_workspace_handle('test_ws_2d_subtracted')
+        result = get_workspace_handle(WorkspaceNameAppender.subtract('test_ws_2d', 0.95))
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [0.05] * 20)
         np.testing.assert_array_almost_equal(self.test_ws_2d.raw_ws.dataY(0), [1] * 20)
-        self.assertFalse('test_ws_2d_scaled' in get_visible_workspace_names())
+        self.assertFalse(WorkspaceNameAppender.scale('test_ws_2d', 0.95) in get_visible_workspace_names())
         self.assertRaises(ValueError, subtract, ['test_ws_2d'], 'test_ws_md', 1.0)
 
     def test_add_workspace(self):
         original_data = self.test_ws_2d.raw_ws.dataY(0)
         add_workspace_runs(['test_ws_2d', 'test_ws_2d'])
-        result = get_workspace_handle('test_ws_2d_sum')
+        result = get_workspace_handle(WorkspaceNameAppender.sum('test_ws_2d'))
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [2.0] * 20)
         np.testing.assert_array_almost_equal(original_data, [1] * 20)
 

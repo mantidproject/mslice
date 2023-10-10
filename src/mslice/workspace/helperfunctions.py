@@ -116,3 +116,20 @@ class WrapWorkspaceAttribute(object):
         if self.workspace:
             self.workspace.remove_saved_attributes()
         return True
+
+
+class WorkspaceNameAppender:
+
+    def scale(ws_name: str, scaling_factor: float) -> str:
+        return ws_name + f"_ssf_{scaling_factor:.2f}"
+        # return ws_name + "_scaled"
+
+    def subtract(ws_name: str, scaling_factor: float) -> str:
+        return ws_name + f"_minus_ssf_{scaling_factor:.2f}"
+        # return ws_name + "_subtracted"
+
+    def sum(ws_name: str) -> str:
+        return ws_name + "_sum"
+
+    def rebose(ws_name: str) -> str:
+        return ws_name + "_bosed"
