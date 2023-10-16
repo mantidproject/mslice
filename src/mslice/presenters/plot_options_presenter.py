@@ -21,8 +21,8 @@ class PlotOptionsPresenter(object):
         self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
         self._view.allFontSizeIncluded.connect(partial(self._value_modified, 'all_fonts_size'))
         self._view.allFontSizeRemoved.connect(partial(self._remove_value_modified, 'all_fonts_size'))
-        self._view.scaleAllFontsIncluded.connect(partial(self._value_modified, 'scale_all_fonts'))
-        self._view.scaleAllFontsRemoved.connect(partial(self._remove_value_modified, 'scale_all_fonts'))
+        self._view.incrAllFontsIncluded.connect(partial(self._value_modified, 'increment_all_fonts'))
+        self._view.incrAllFontsRemoved.connect(partial(self._remove_value_modified, 'increment_all_fonts'))
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
@@ -49,7 +49,7 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
 
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_grid', 'y_grid',
-                      'colorbar_range', 'colorbar_log', 'all_fonts_size', 'scale_all_fonts']
+                      'colorbar_range', 'colorbar_log', 'all_fonts_size', 'increment_all_fonts']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 
@@ -89,7 +89,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
 
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_log', 'y_log',
-                      'x_grid', 'y_grid', 'show_legends', 'all_fonts_size', 'scale_all_fonts']
+                      'x_grid', 'y_grid', 'show_legends', 'all_fonts_size', 'increment_all_fonts']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 

@@ -642,11 +642,11 @@ class SlicePlot(IPlot):
         self.colorbar_range_font_size = value
 
     @property
-    def scale_all_fonts(self):
+    def increment_all_fonts(self):
         return DEFAULT_SCALE_FONT_SIZE
 
-    @scale_all_fonts.setter
-    def scale_all_fonts(self, value):
+    @increment_all_fonts.setter
+    def increment_all_fonts(self, value):
         self.title_size += value
         self.x_range_font_size += value
         self.y_range_font_size += value

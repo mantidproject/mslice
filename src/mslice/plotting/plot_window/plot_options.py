@@ -24,8 +24,8 @@ class PlotOptionsDialog(QtWidgets.QDialog):
 
     allFontSizeIncluded = Signal()
     allFontSizeRemoved = Signal()
-    scaleAllFontsIncluded = Signal()
-    scaleAllFontsRemoved = Signal()
+    incrAllFontsIncluded = Signal()
+    incrAllFontsRemoved = Signal()
 
     def __init__(self, parent, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
@@ -41,7 +41,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.lneYMax.setValidator(self.y_max_validator)
         self.all_fonts_size_validator = LineEditDoubleValidator(self.allFntSz, 0.0)
         self.allFntSz.setValidator(self.all_fonts_size_validator)
-        self.sclAllFntSz.setRange(-20, 20)
+        self.incrAllFntSz.setRange(-20, 20)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
@@ -57,12 +57,12 @@ class PlotOptionsDialog(QtWidgets.QDialog):
 
         self.chkAllFntSz.setCheckState(False)
         self.chkAllFntSz.stateChanged.connect(self._all_fonts_size_state_changed)
-        self.chkSclAllFntSz.setCheckState(False)
-        self.chkSclAllFntSz.stateChanged.connect(self._scale_all_fonts_state_changed)
+        self.chkIncrAllFntSz.setCheckState(False)
+        self.chkIncrAllFntSz.stateChanged.connect(self._increment_all_fonts_state_changed)
         self.allFntSz.setEnabled(False)
         self.allFntSz.editingFinished.connect(self.allFontSizeIncluded)
-        self.sclAllFntSz.setEnabled(False)
-        self.sclAllFntSz.editingFinished.connect(self.scaleAllFontsIncluded)
+        self.incrAllFntSz.setEnabled(False)
+        self.incrAllFntSz.editingFinished.connect(self.incrAllFontsIncluded)
 
         self.redraw_signal = redraw_signal
 
@@ -78,15 +78,15 @@ class PlotOptionsDialog(QtWidgets.QDialog):
             txt_box=self.allFntSz,
             include_signal=self.allFontSizeIncluded,
             remove_signal=self.allFontSizeRemoved,
-            other_chk_box=self.chkSclAllFntSz
+            other_chk_box=self.chkIncrAllFntSz
         )
 
-    def _scale_all_fonts_state_changed(self):
+    def _increment_all_fonts_state_changed(self):
         self._chk_box_state_changed(
-            chk_box=self.chkSclAllFntSz,
-            txt_box=self.sclAllFntSz,
-            include_signal=self.scaleAllFontsIncluded,
-            remove_signal=self.scaleAllFontsRemoved,
+            chk_box=self.chkIncrAllFntSz,
+            txt_box=self.incrAllFntSz,
+            include_signal=self.incrAllFontsIncluded,
+            remove_signal=self.incrAllFontsRemoved,
             other_chk_box=self.chkAllFntSz
         )
 
@@ -209,16 +209,16 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.allFntSz.setText(str(value))
 
     @property
-    def scale_all_fonts(self):
+    def increment_all_fonts(self):
         try:
-            scl_factor = float(self.sclAllFntSz.value())
+            scl_factor = float(self.incrAllFntSz.value())
         except ValueError:
             return None
         return scl_factor
 
-    @scale_all_fonts.setter
-    def scale_all_fonts(self, value):
-        self.sclAllFntSz.setValue(value)
+    @increment_all_fonts.setter
+    def increment_all_fonts(self, value):
+        self.incrAllFntSz.setValue(value)
 
 
 class SlicePlotOptions(PlotOptionsDialog):
