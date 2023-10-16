@@ -134,14 +134,14 @@ class SlicePlotTest(unittest.TestCase):
         self.assertEqual(self.slice_plot.x_label_size, 14)
         self.assertEqual(self.slice_plot.y_label_size, 14)
 
-    def test_scale_all_fonts(self):
+    def test_increment_all_fonts(self):
         slice_plot_colorbar_label_size = PropertyMock(return_value=12)
         slice_plot_colorbar_range_font_size = PropertyMock(return_value=12)
         type(self.slice_plot).colorbar_label_size = slice_plot_colorbar_label_size
         type(self.slice_plot).colorbar_range_font_size = slice_plot_colorbar_range_font_size
 
         self.slice_plot.all_fonts_size = 12
-        self.slice_plot.scale_all_fonts = 3
+        self.slice_plot.increment_all_fonts = 3
 
         slice_plot_colorbar_range_font_size.assert_called_with(15)
         slice_plot_colorbar_label_size.assert_called_with(15)

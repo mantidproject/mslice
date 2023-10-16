@@ -113,9 +113,9 @@ class CutPlotTest(unittest.TestCase):
         self.assertEqual(self.cut_plot.x_label_size, 14)
         self.assertEqual(self.cut_plot.y_label_size, 14)
 
-    def test_scale_all_fonts(self):
+    def test_increment_all_fonts(self):
         self.cut_plot.all_fonts_size = 12
-        self.cut_plot.scale_all_fonts = 3
+        self.cut_plot.increment_all_fonts = 3
         self.assertEqual(self.cut_plot.title_size, 15)
         self.assertEqual(self.cut_plot.x_range_font_size, 15)
         self.assertEqual(self.cut_plot.y_range_font_size, 15)
