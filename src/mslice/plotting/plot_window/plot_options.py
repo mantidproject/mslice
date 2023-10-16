@@ -39,6 +39,9 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.lneYMin.setValidator(self.y_min_validator)
         self.y_max_validator = LineEditDoubleValidator(self.lneYMax, 0.0)
         self.lneYMax.setValidator(self.y_max_validator)
+        self.all_fonts_size_validator = LineEditDoubleValidator(self.allFntSz, 0.0)
+        self.allFntSz.setValidator(self.all_fonts_size_validator)
+        self.sclAllFntSz.setRange(-20, 20)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
@@ -190,7 +193,15 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         try:
             size = float(str(self.allFntSz.text()))
         except ValueError:
-            return None
+            size = 10
+
+        if size > 1000:
+            size = 1000
+
+        elif size < 1:
+            size = 1
+
+        self.all_fonts_size = size
         return size
 
     @all_fonts_size.setter
