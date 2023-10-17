@@ -85,12 +85,38 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.update_legend.assert_called_once()
         self.cut_plot._canvas.draw.assert_called_once()
 
-    def test_update_legend(self):
+    def test_update_legend_legends_not_shown(self):
         line = Line2D([], [])
         self.axes.get_legend_handles_labels = MagicMock(return_value=([line], ['some_label']))
+        self.cut_plot._legends_shown = False
+        self.cut_plot.update_legend()
+        self.assertTrue(self.cut_plot._legends_visible[0])
+        self.axes.legend.assert_not_called()
+
+    def test_update_legend_legends_shown(self):
+        line = Line2D([], [])
+        self.axes.get_legend_handles_labels = MagicMock(return_value=([line], ['some_label']))
+        self.cut_plot._legends_shown = True
         self.cut_plot.update_legend()
         self.assertTrue(self.cut_plot._legends_visible[0])
         self.axes.legend.assert_called_with([line], ['some_label'], fontsize=ANY)
+
+    def test_update_legend_with_line_data(self):
+        line_data = [
+            {'shown': True, 'legend': 2, 'label': 'visible_line_data_label'},
+            {'shown': True, 'legend': 0, 'label': 'non_visible_line_data_label'}
+        ]
+        mock_line = Line2D([], [])
+        another_mock_line = Line2D([], [])
+
+        self.axes.get_legend_handles_labels = MagicMock(return_value=(
+            [mock_line, another_mock_line], ['mock_label', 'another_mock_label']
+        ))
+        self.cut_plot._legends_shown = True
+
+        self.cut_plot.update_legend(line_data)
+        self.assertEqual(self.cut_plot._legends_visible, [2, 0])
+        self.axes.legend.assert_called_with([mock_line], ['visible_line_data_label'], fontsize=ANY)
 
     def test_waterfall(self):
         self.cut_plot._apply_offset = MagicMock()
