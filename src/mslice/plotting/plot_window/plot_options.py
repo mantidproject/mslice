@@ -7,7 +7,8 @@ import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from mslice.models.colors import named_cycle_colors, color_to_name
 from mslice.util.qt import load_ui
-
+from qtpy.QtGui import QDoubleValidator, QRegExpValidator
+from qtpy.QtCore import QRegExp
 from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
 
 
@@ -27,6 +28,8 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     incrAllFontsIncluded = Signal()
     incrAllFontsRemoved = Signal()
 
+    setAllPlotFonts = Signal()
+
     def __init__(self, parent, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
@@ -39,9 +42,11 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.lneYMin.setValidator(self.y_min_validator)
         self.y_max_validator = LineEditDoubleValidator(self.lneYMax, 0.0)
         self.lneYMax.setValidator(self.y_max_validator)
-        self.all_fonts_size_validator = LineEditDoubleValidator(self.allFntSz, 0.0)
+        two_positive_ints_validator = r"^\s*[1-9]?[0-9]?$"
+        self.all_fonts_size_validator = QRegExpValidator(QRegExp(two_positive_ints_validator))
         self.allFntSz.setValidator(self.all_fonts_size_validator)
         self.incrAllFntSz.setRange(-20, 20)
+
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
@@ -64,7 +69,13 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.incrAllFntSz.setEnabled(False)
         self.incrAllFntSz.editingFinished.connect(self.incrAllFontsIncluded)
 
+        self.allFntSz.textEdited.connect(self._font_sizes_changed)
+        
         self.redraw_signal = redraw_signal
+
+    def _font_sizes_changed(self):
+        self.setAllPlotFonts.emit()
+        self.redraw_signal.emit()
 
     def _ok_clicked(self):
         self.ok_clicked.emit()
@@ -201,7 +212,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         elif size < 1:
             size = 1
 
-        self.all_fonts_size = size
+        # self.all_fonts_size = size
         return size
 
     @all_fonts_size.setter

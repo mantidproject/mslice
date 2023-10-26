@@ -24,6 +24,12 @@ class PlotOptionsPresenter(object):
         self._view.incrAllFontsIncluded.connect(partial(self._value_modified, 'increment_all_fonts'))
         self._view.incrAllFontsRemoved.connect(partial(self._remove_value_modified, 'increment_all_fonts'))
 
+        self._view.setAllPlotFonts.connect(self._set_all_plot_fonts)
+
+    def _set_all_plot_fonts(self):
+        p = 'all_fonts_size'
+        setattr(self._model, p, getattr(self._view, p))
+
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
 
@@ -45,6 +51,7 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
         self._view.cLogEdited.connect(self._set_colorbar_log)
         self._view.cRangeEdited.connect(self._set_c_range)
         self._view.ok_clicked.connect(self.get_new_config)
+
         self._view.show()
 
     def set_properties(self):
