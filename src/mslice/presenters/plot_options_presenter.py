@@ -21,6 +21,8 @@ class PlotOptionsPresenter(object):
         self._view.xGridEdited.connect(partial(self._value_modified, 'x_grid'))
         self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
         self._view.allFontSizeEdited.connect(self._set_all_plot_fonts)
+        self._view.fontSizeUpClicked.connect(self._model.increase_all_fonts)
+        self._view.fontSizeDownClicked.connect(self._model.decrease_all_fonts)
 
     def _set_all_plot_fonts(self):
         font_size_view = self._view.all_fonts_size

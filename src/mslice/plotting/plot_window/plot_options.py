@@ -10,6 +10,7 @@ from mslice.util.qt import load_ui
 from qtpy.QtGui import QDoubleValidator, QRegExpValidator
 from qtpy.QtCore import QRegExp
 from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
+from mantidqt.icons import get_icon
 
 
 class PlotOptionsDialog(QtWidgets.QDialog):
@@ -22,11 +23,16 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     xGridEdited = Signal()
     yGridEdited = Signal()
     allFontSizeEdited = Signal()
+    fontSizeUpClicked = Signal()
+    fontSizeDownClicked = Signal()
     ok_clicked = Signal()
 
     def __init__(self, parent, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
+
+        self.sclUpFntSz.setIcon(get_icon("mdi.arrow-up"))
+        self.sclDownFntSz.setIcon(get_icon("mdi.arrow-down"))
 
         self.x_min_validator = LineEditDoubleValidator(self.lneXMin, 0.0)
         self.lneXMin.setValidator(self.x_min_validator)
@@ -53,11 +59,21 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.chkYGrid.stateChanged.connect(self.yGridEdited)
 
         self.allFntSz.textEdited.connect(self._font_sizes_changed)
+        self.sclUpFntSz.clicked.connect(self._scale_up_fonts_clicked)
+        self.sclDownFntSz.clicked.connect(self._scale_down_fonts_clicked)
         
         self.redraw_signal = redraw_signal
 
     def _font_sizes_changed(self):
         self.allFontSizeEdited.emit()
+        self.redraw_signal.emit()
+
+    def _scale_up_fonts_clicked(self):
+        self.fontSizeUpClicked.emit()
+        self.redraw_signal.emit()
+
+    def _scale_down_fonts_clicked(self):
+        self.fontSizeDownClicked.emit()
         self.redraw_signal.emit()
 
     def _ok_clicked(self):

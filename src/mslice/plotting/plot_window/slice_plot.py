@@ -55,6 +55,15 @@ class SlicePlot(IPlot):
         self.temp_dependent = False
         self.temp = None
         self.default_options = None
+        self.plot_fonts_properties = [
+                'title_size',
+                'x_range_font_size',
+                'y_range_font_size', 
+                'x_label_size',
+                'y_label_size',
+                'colorbar_label_size', 
+                'colorbar_range_font_size'
+                ]
 
     def save_default_options(self):
         self.default_options = {
@@ -630,10 +639,7 @@ class SlicePlot(IPlot):
     @property
     def all_fonts_size(self):
         font_sizes_config = {}
-        properties_fonts = ['title_size', 'x_range_font_size', 'y_range_font_size', 
-                            'x_label_size', 'y_label_size', 'colorbar_label_size', 
-                            'colorbar_range_font_size']
-        for p in properties_fonts:
+        for p in self.plot_fonts_properties:
             font_sizes_config[p] = getattr(self, p)
 
         return font_sizes_config
@@ -643,16 +649,10 @@ class SlicePlot(IPlot):
         for key in values:
             setattr(self, key, values[key])
 
-    @property
-    def increment_all_fonts(self):
-        return DEFAULT_SCALE_FONT_SIZE
+    def increase_all_fonts(self):
+        for p in self.plot_fonts_properties:
+            setattr(self, p, getattr(self, p) + 0.5)
 
-    @increment_all_fonts.setter
-    def increment_all_fonts(self, value):
-        self.title_size += value
-        self.x_range_font_size += value
-        self.y_range_font_size += value
-        self.x_label_size += value
-        self.y_label_size += value
-        self.colorbar_label_size += value
-        self.colorbar_range_font_size += value
+    def decrease_all_fonts(self):
+        for p in self.plot_fonts_properties:
+            setattr(self, p, getattr(self, p) - 0.5)
