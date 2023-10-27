@@ -61,7 +61,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.allFntSz.textEdited.connect(self._font_sizes_changed)
         self.sclUpFntSz.clicked.connect(self._scale_up_fonts_clicked)
         self.sclDownFntSz.clicked.connect(self._scale_down_fonts_clicked)
-        
+
         self.redraw_signal = redraw_signal
 
     def _font_sizes_changed(self):

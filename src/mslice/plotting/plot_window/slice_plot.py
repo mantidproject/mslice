@@ -58,10 +58,10 @@ class SlicePlot(IPlot):
         self.plot_fonts_properties = [
                 'title_size',
                 'x_range_font_size',
-                'y_range_font_size', 
+                'y_range_font_size',
                 'x_label_size',
                 'y_label_size',
-                'colorbar_label_size', 
+                'colorbar_label_size',
                 'colorbar_range_font_size'
                 ]
 
