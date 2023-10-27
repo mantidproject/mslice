@@ -244,30 +244,13 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="0" column="0">
           <widget class="QLineEdit" name="allFntSz">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
              <height>16777215</height>
             </size>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="chkIncrAllFntSz">
-           <property name="text">
-            <string>Increment all fonts size</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QDoubleSpinBox" name="incrAllFntSz">
-           <property name="maximum">
-             <double>50</double>
-           </property>
-           <property name="minimum">
-             <double>-50</double>
            </property>
           </widget>
          </item>

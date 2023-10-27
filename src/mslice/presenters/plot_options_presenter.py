@@ -9,6 +9,7 @@ class PlotOptionsPresenter(object):
         self._view = plot_options_dialog
         self._modified_values = {}
         self._xy_config = {'x_range': self._model.x_range, 'y_range': self._model.y_range, 'modified': False}
+        self._font_sizes_config = self._model.all_fonts_size
 
         self.set_properties()  # propagate dialog with existing data
 
@@ -19,16 +20,17 @@ class PlotOptionsPresenter(object):
         self._view.yRangeEdited.connect(partial(self._xy_config_modified, 'y_range'))
         self._view.xGridEdited.connect(partial(self._value_modified, 'x_grid'))
         self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
-        self._view.allFontSizeIncluded.connect(partial(self._value_modified, 'all_fonts_size'))
-        self._view.allFontSizeRemoved.connect(partial(self._remove_value_modified, 'all_fonts_size'))
-        self._view.incrAllFontsIncluded.connect(partial(self._value_modified, 'increment_all_fonts'))
-        self._view.incrAllFontsRemoved.connect(partial(self._remove_value_modified, 'increment_all_fonts'))
-
-        self._view.setAllPlotFonts.connect(self._set_all_plot_fonts)
+        self._view.allFontSizeEdited.connect(self._set_all_plot_fonts)
 
     def _set_all_plot_fonts(self):
-        p = 'all_fonts_size'
-        setattr(self._model, p, getattr(self._view, p))
+        font_size_view = self._view.all_fonts_size
+        new_config_dict = self._font_sizes_config.copy()
+
+        if font_size_view is not None:
+            for key in new_config_dict:
+                new_config_dict[key] = font_size_view
+
+        self._model.all_fonts_size = new_config_dict
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
@@ -36,9 +38,6 @@ class PlotOptionsPresenter(object):
     def _xy_config_modified(self, key):
         getattr(self, '_xy_config')[key] = getattr(self._view, key)
         self._xy_config['modified'] = True
-
-    def _remove_value_modified(self, value_name):
-        del self._modified_values[value_name]
 
 
 class SlicePlotOptionsPresenter(PlotOptionsPresenter):
@@ -56,7 +55,7 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
 
     def set_properties(self):
         properties = ['title', 'x_label', 'y_label', 'x_range', 'y_range', 'x_grid', 'y_grid',
-                      'colorbar_range', 'colorbar_log', 'all_fonts_size', 'increment_all_fonts']
+                      'colorbar_range', 'colorbar_log']
         for p in properties:
             setattr(self._view, p, getattr(self._model, p))
 

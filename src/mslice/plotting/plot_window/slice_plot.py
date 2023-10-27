@@ -629,17 +629,19 @@ class SlicePlot(IPlot):
 
     @property
     def all_fonts_size(self):
-        return DEFAULT_LABEL_SIZE
+        font_sizes_config = {}
+        properties_fonts = ['title_size', 'x_range_font_size', 'y_range_font_size', 
+                            'x_label_size', 'y_label_size', 'colorbar_label_size', 
+                            'colorbar_range_font_size']
+        for p in properties_fonts:
+            font_sizes_config[p] = getattr(self, p)
+
+        return font_sizes_config
 
     @all_fonts_size.setter
-    def all_fonts_size(self, value):
-        self.title_size = value
-        self.x_range_font_size = value
-        self.y_range_font_size = value
-        self.x_label_size = value
-        self.y_label_size = value
-        self.colorbar_label_size = value
-        self.colorbar_range_font_size = value
+    def all_fonts_size(self, values: dict):
+        for key in values:
+            setattr(self, key, values[key])
 
     @property
     def increment_all_fonts(self):
