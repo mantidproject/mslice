@@ -143,7 +143,7 @@ class SlicePlotTest(unittest.TestCase):
         mock_colorbar_range_font_size = PropertyMock(return_value=10)
         type(self.slice_plot).colorbar_label_size = mock_colorbar_label_size
         type(self.slice_plot).colorbar_range_font_size = mock_colorbar_range_font_size
-        
+
         fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
                         'x_label_size': 12, 'y_label_size': 11}
         self.slice_plot.all_fonts_size = fonts_config
