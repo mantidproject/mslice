@@ -9,7 +9,7 @@ class PlotOptionsPresenter(object):
         self._view = plot_options_dialog
         self._modified_values = {}
         self._xy_config = {'x_range': self._model.x_range, 'y_range': self._model.y_range, 'modified': False}
-        self._default_font_sizes_config = self._model.all_fonts_size.copy()
+        self._default_font_sizes_config = {}
 
         self.set_properties()  # propagate dialog with existing data
 
@@ -22,9 +22,9 @@ class PlotOptionsPresenter(object):
         self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
         self._view.allFontSizeFromEmptyToValue.connect(self._update_font_sizes_buffer)
         self._view.allFontSizeEdited.connect(self._set_all_plot_fonts)
-        self._view.fontSizeUpClicked.connect(self._increase_all_fonts)
-        self._view.fontSizeDownClicked.connect(self._decrease_all_fonts)
-        self._set_font_sizes_tooltip()
+        self._view.fontSizeUpClicked.connect(self._model.increase_all_fonts)
+        self._view.fontSizeDownClicked.connect(self._model.decrease_all_fonts)
+        self._view.redraw_signal.connect(self._set_font_sizes_tooltip)
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
@@ -44,23 +44,19 @@ class PlotOptionsPresenter(object):
             new_config_dict = {key: fonts_size for key in new_config_dict}
 
         self._model.all_fonts_size = new_config_dict
-        self._set_font_sizes_tooltip()
-
-    def _increase_all_fonts(self):
-        self._model.increase_all_fonts()
-        self._set_font_sizes_tooltip()
-
-    def _decrease_all_fonts(self):
-        self._model.decrease_all_fonts()
-        self._set_font_sizes_tooltip()
 
     def _set_font_sizes_tooltip(self):
-        font_size_dict = self._model.all_fonts_size.copy()
-        tip = str(font_size_dict)[1:-1].replace(', ', '\n').replace('size', '')
-        tip = tip.replace('_', ' ').replace("'", '').replace('font', '')
+        tip = self._convert_font_config_to_tooltip()
         self._view.allFntSz.setToolTip(tip)
         self._view.sclUpFntSz.setToolTip(tip)
         self._view.sclDownFntSz.setToolTip(tip)
+
+    def _convert_font_config_to_tooltip(self):
+        font_size_dict = self._model.all_fonts_size.copy()
+        tip = str(font_size_dict)[1:-1].replace(', ', '\n').replace('_', ' ')
+        for str_to_remove in ['size', 'font', "'"]:
+            tip = tip.replace(str_to_remove, '')
+        return tip
 
 
 class SlicePlotOptionsPresenter(PlotOptionsPresenter):
