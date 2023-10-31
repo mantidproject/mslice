@@ -8,7 +8,6 @@ class PlotOptionsPresenter(object):
         self._model = plot_handler
         self._view = plot_options_dialog
         self._modified_values = {}
-        self._xy_config = {'x_range': self._model.x_range, 'y_range': self._model.y_range, 'modified': False}
         self._default_font_sizes_config = {}
 
         self.set_properties()  # propagate dialog with existing data
@@ -16,10 +15,11 @@ class PlotOptionsPresenter(object):
         self._view.titleEdited.connect(partial(self._value_modified, 'title'))
         self._view.xLabelEdited.connect(partial(self._value_modified, 'x_label'))
         self._view.yLabelEdited.connect(partial(self._value_modified, 'y_label'))
-        self._view.xRangeEdited.connect(partial(self._xy_config_modified, 'x_range'))
-        self._view.yRangeEdited.connect(partial(self._xy_config_modified, 'y_range'))
+        self._view.xRangeEdited.connect(partial(self._value_modified, 'x_range'))
+        self._view.yRangeEdited.connect(partial(self._value_modified, 'y_range'))
         self._view.xGridEdited.connect(partial(self._value_modified, 'x_grid'))
         self._view.yGridEdited.connect(partial(self._value_modified, 'y_grid'))
+
         self._view.allFontSizeFromEmptyToValue.connect(self._update_font_sizes_buffer)
         self._view.allFontSizeEdited.connect(self._set_all_plot_fonts)
         self._view.fontSizeUpClicked.connect(self._model.increase_all_fonts)
@@ -29,10 +29,6 @@ class PlotOptionsPresenter(object):
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
-
-    def _xy_config_modified(self, key):
-        getattr(self, '_xy_config')[key] = getattr(self._view, key)
-        self._xy_config['modified'] = True
 
     def _update_font_sizes_buffer(self):
         self._default_font_sizes_config = self._model.all_fonts_size.copy()
@@ -84,8 +80,6 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
             self._model.change_axis_scale(self._color_config['c_range'], self._color_config['log'])
         for key, value in list(self._modified_values.items()):
             setattr(self._model, key, value)
-        self._model.x_range = self._xy_config['x_range']
-        self._model.y_range = self._xy_config['y_range']
 
     def _set_c_range(self):
         self._color_config['c_range'] = self._view.colorbar_range
@@ -100,11 +94,10 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
 
     def __init__(self, plot_options_dialog, cut_handler):
         super(CutPlotOptionsPresenter, self).__init__(plot_options_dialog, cut_handler)
-        self._xy_config.update({'x_log': self._model.x_log, 'y_log': self._model.y_log})
 
         self._view.showLegendsEdited.connect(partial(self._value_modified, 'show_legends'))
-        self._view.xLogEdited.connect(partial(self._xy_config_modified, 'x_log'))
-        self._view.yLogEdited.connect(partial(self._xy_config_modified, 'y_log'))
+        self._view.xLogEdited.connect(partial(self._value_modified, 'x_log'))
+        self._view.yLogEdited.connect(partial(self._value_modified, 'y_log'))
         self._view.removed_line.connect(self.remove_container)
 
         line_options = self._model.get_all_line_options()
@@ -126,8 +119,14 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         current_show_legends = getattr(self._model, 'show_legends')
         new_show_legends = current_show_legends
 
-        if self._xy_config['modified']:
-            self._model.change_axis_scale(self._xy_config)
+        self._default_xy_config = {'x_range': self._model.x_range, 'y_range': self._model.y_range,
+                                   'x_log': self._model.x_log, 'y_log': self._model.y_log}
+
+        shared_keys = self._modified_values.keys() & self._default_xy_config.keys()
+        if shared_keys:
+            self._default_xy_config.update({key: self._modified_values[key] for key in shared_keys})
+            self._model.change_axis_scale(self._default_xy_config)
+
         for key, value in list(self._modified_values.items()):
             if key == 'show_legends':
                 new_show_legends = value
