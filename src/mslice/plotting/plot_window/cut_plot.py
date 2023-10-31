@@ -29,7 +29,6 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
-DEFAULT_SCALE_FONT_SIZE = 0
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -66,6 +65,13 @@ class CutPlot(IPlot):
         self._intensity_type = IntensityType.SCATTERING_FUNCTION
         self._intensity_correction_flag = False
         self._temp_dependent = False
+        self.plot_fonts_properties = [
+            'title_size',
+            'x_range_font_size',
+            'y_range_font_size',
+            'x_label_size',
+            'y_label_size',
+        ]
 
     def save_default_options(self):
         self.default_options = {
@@ -833,24 +839,21 @@ class CutPlot(IPlot):
 
     @property
     def all_fonts_size(self):
-        return DEFAULT_LABEL_SIZE
+        font_sizes_config = {}
+        for p in self.plot_fonts_properties:
+            font_sizes_config[p] = getattr(self, p)
+
+        return font_sizes_config
 
     @all_fonts_size.setter
-    def all_fonts_size(self, value):
-        self.title_size = value
-        self.x_range_font_size = value
-        self.y_range_font_size = value
-        self.x_label_size = value
-        self.y_label_size = value
+    def all_fonts_size(self, values: dict):
+        for key in values:
+            setattr(self, key, values[key])
 
-    @property
-    def increment_all_fonts(self):
-        return DEFAULT_SCALE_FONT_SIZE
+    def increase_all_fonts(self):
+        for p in self.plot_fonts_properties:
+            setattr(self, p, getattr(self, p) + 0.5)
 
-    @increment_all_fonts.setter
-    def increment_all_fonts(self, value):
-        self.title_size += value
-        self.x_range_font_size += value
-        self.y_range_font_size += value
-        self.x_label_size += value
-        self.y_label_size += value
+    def decrease_all_fonts(self):
+        for p in self.plot_fonts_properties:
+            setattr(self, p, getattr(self, p) - 0.5)

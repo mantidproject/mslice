@@ -25,6 +25,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     allFontSizeEdited = Signal()
     fontSizeUpClicked = Signal()
     fontSizeDownClicked = Signal()
+    allFontSizeFromEmptyToValue = Signal()
     ok_clicked = Signal()
 
     def __init__(self, parent, redraw_signal=None):
@@ -64,7 +65,13 @@ class PlotOptionsDialog(QtWidgets.QDialog):
 
         self.redraw_signal = redraw_signal
 
+        self.allFntSzBuffer = ''
+
     def _font_sizes_changed(self):
+        if self.allFntSzBuffer == '':
+            self.allFontSizeFromEmptyToValue.emit()
+        self.allFntSzBuffer = str(self.allFntSz.text())
+
         self.allFontSizeEdited.emit()
         self.redraw_signal.emit()
 

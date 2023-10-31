@@ -27,7 +27,6 @@ from typing import Callable
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
-DEFAULT_SCALE_FONT_SIZE = 0
 
 
 class SlicePlot(IPlot):
@@ -56,14 +55,14 @@ class SlicePlot(IPlot):
         self.temp = None
         self.default_options = None
         self.plot_fonts_properties = [
-                'title_size',
-                'x_range_font_size',
-                'y_range_font_size',
-                'x_label_size',
-                'y_label_size',
-                'colorbar_label_size',
-                'colorbar_range_font_size'
-                ]
+            'title_size',
+            'x_range_font_size',
+            'y_range_font_size',
+            'x_label_size',
+            'y_label_size',
+            'colorbar_label_size',
+            'colorbar_range_font_size'
+        ]
 
     def save_default_options(self):
         self.default_options = {
