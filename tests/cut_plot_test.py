@@ -106,18 +106,24 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.update_bragg_peaks.assert_called_with(refresh=True)
 
     def test_all_fonts_size(self):
-        self.cut_plot.all_fonts_size = 14
-        self.assertEqual(self.cut_plot.title_size, 14)
+        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
+                        'x_label_size': 12, 'y_label_size': 11}
+
+        self.cut_plot.all_fonts_size = fonts_config
+        self.assertEqual(self.cut_plot.title_size, 15)
         self.assertEqual(self.cut_plot.x_range_font_size, 14)
-        self.assertEqual(self.cut_plot.y_range_font_size, 14)
-        self.assertEqual(self.cut_plot.x_label_size, 14)
-        self.assertEqual(self.cut_plot.y_label_size, 14)
+        self.assertEqual(self.cut_plot.y_range_font_size, 13)
+        self.assertEqual(self.cut_plot.x_label_size, 12)
+        self.assertEqual(self.cut_plot.y_label_size, 11)
 
     def test_increment_all_fonts(self):
-        self.cut_plot.all_fonts_size = 12
-        self.cut_plot.increment_all_fonts = 3
-        self.assertEqual(self.cut_plot.title_size, 15)
-        self.assertEqual(self.cut_plot.x_range_font_size, 15)
-        self.assertEqual(self.cut_plot.y_range_font_size, 15)
-        self.assertEqual(self.cut_plot.x_label_size, 15)
-        self.assertEqual(self.cut_plot.y_label_size, 15)
+        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
+                        'x_label_size': 12, 'y_label_size': 11}
+        self.cut_plot.all_fonts_size = fonts_config
+
+        self.cut_plot.increase_all_fonts()
+        self.assertEqual(self.cut_plot.title_size, 15.5)
+        self.assertEqual(self.cut_plot.x_range_font_size, 14.5)
+        self.assertEqual(self.cut_plot.y_range_font_size, 13.5)
+        self.assertEqual(self.cut_plot.x_label_size, 12.5)
+        self.assertEqual(self.cut_plot.y_label_size, 11.5)

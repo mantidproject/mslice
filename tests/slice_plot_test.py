@@ -123,34 +123,40 @@ class SlicePlotTest(unittest.TestCase):
         type(self.slice_plot).colorbar_label_size = slice_plot_colorbar_label_size
         type(self.slice_plot).colorbar_range_font_size = slice_plot_colorbar_range_font_size
 
-        self.slice_plot.all_fonts_size = 14
+        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
+                        'x_label_size': 12, 'y_label_size': 11, 'colorbar_label_size': 10,
+                        'colorbar_range_font_size': 9}
 
-        slice_plot_colorbar_range_font_size.assert_called_once_with(14)
-        slice_plot_colorbar_label_size.assert_called_once_with(14)
+        self.slice_plot.all_fonts_size = fonts_config
 
-        self.assertEqual(self.slice_plot.title_size, 14)
-        self.assertEqual(self.slice_plot.x_range_font_size, 14)
-        self.assertEqual(self.slice_plot.y_range_font_size, 14)
-        self.assertEqual(self.slice_plot.x_label_size, 14)
-        self.assertEqual(self.slice_plot.y_label_size, 14)
-
-    def test_increment_all_fonts(self):
-        slice_plot_colorbar_label_size = PropertyMock(return_value=12)
-        slice_plot_colorbar_range_font_size = PropertyMock(return_value=12)
-        type(self.slice_plot).colorbar_label_size = slice_plot_colorbar_label_size
-        type(self.slice_plot).colorbar_range_font_size = slice_plot_colorbar_range_font_size
-
-        self.slice_plot.all_fonts_size = 12
-        self.slice_plot.increment_all_fonts = 3
-
-        slice_plot_colorbar_range_font_size.assert_called_with(15)
-        slice_plot_colorbar_label_size.assert_called_with(15)
+        slice_plot_colorbar_range_font_size.assert_called_once_with(9)
+        slice_plot_colorbar_label_size.assert_called_once_with(10)
 
         self.assertEqual(self.slice_plot.title_size, 15)
-        self.assertEqual(self.slice_plot.x_range_font_size, 15)
-        self.assertEqual(self.slice_plot.y_range_font_size, 15)
-        self.assertEqual(self.slice_plot.x_label_size, 15)
-        self.assertEqual(self.slice_plot.y_label_size, 15)
+        self.assertEqual(self.slice_plot.x_range_font_size, 14)
+        self.assertEqual(self.slice_plot.y_range_font_size, 13)
+        self.assertEqual(self.slice_plot.x_label_size, 12)
+        self.assertEqual(self.slice_plot.y_label_size, 11)
+
+    def test_increase_all_fonts(self):
+        mock_colorbar_label_size = PropertyMock(return_value=9)
+        mock_colorbar_range_font_size = PropertyMock(return_value=10)
+        type(self.slice_plot).colorbar_label_size = mock_colorbar_label_size
+        type(self.slice_plot).colorbar_range_font_size = mock_colorbar_range_font_size
+        
+        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
+                        'x_label_size': 12, 'y_label_size': 11}
+        self.slice_plot.all_fonts_size = fonts_config
+
+        self.slice_plot.increase_all_fonts()
+
+        self.assertEqual(self.slice_plot.title_size, 15.5)
+        self.assertEqual(self.slice_plot.x_range_font_size, 14.5)
+        self.assertEqual(self.slice_plot.y_range_font_size, 13.5)
+        self.assertEqual(self.slice_plot.x_label_size, 12.5)
+        self.assertEqual(self.slice_plot.y_label_size, 11.5)
+        mock_colorbar_label_size.assert_called_with(9.5)
+        mock_colorbar_range_font_size.assert_called_with(10.5)
 
 
 if __name__ == '__main__':

@@ -217,62 +217,33 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter.remove_container(9)
         self.model.remove_line_by_index.assert_called_once_with(9)
 
-    def test_all_fonts_size(self):
+    def test_set_all_fonts_size(self):
         model_all_fonts_size = PropertyMock()
         view_all_fonts_size = PropertyMock()
         type(self.model).all_fonts_size = model_all_fonts_size
         type(self.view).all_fonts_size = view_all_fonts_size
 
-        # model -> view
-        model_all_fonts_size.return_value = 12
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
-        model_all_fonts_size.assert_called_once_with()
-        view_all_fonts_size.assert_called_once_with(12)
-
-        model_all_fonts_size.reset_mock()
-        view_all_fonts_size.reset_mock()
+        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
+                        'x_label_size': 12, 'y_label_size': 11}
+        self.presenter._default_font_sizes_config = fonts_config
 
         # view -> model
         view_all_fonts_size.return_value = 20
-        self.presenter._value_modified('all_fonts_size')
-        self.presenter.get_new_config()
+        self.presenter._set_all_plot_fonts()
+
         view_all_fonts_size.assert_called_once_with()
-        model_all_fonts_size.assert_called_once_with(20)
 
-        model_all_fonts_size.reset_mock()
-        view_all_fonts_size.reset_mock()
+        fonts_updated = {'title_size': 20, 'x_range_font_size': 20, 'y_range_font_size': 20,
+                         'x_label_size': 20, 'y_label_size': 20}
+        model_all_fonts_size.assert_any_call(fonts_updated)   # Not latest call due to copy() methods
 
-        self.presenter._remove_value_modified('all_fonts_size')
-        self.presenter.get_new_config()
-        view_all_fonts_size.assert_not_called()
-        model_all_fonts_size.assert_not_called()
-
-    def test_increment_all_fonts(self):
-        model_increment_all_fonts = PropertyMock()
-        view_increment_all_fonts = PropertyMock()
-        type(self.model).increment_all_fonts = model_increment_all_fonts
-        type(self.view).increment_all_fonts = view_increment_all_fonts
-
-        # model -> view
-        model_increment_all_fonts.return_value = 12
+    def test_increase_all_fonts(self):
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
-        model_increment_all_fonts.assert_called_once_with()
-        view_increment_all_fonts.assert_called_once_with(12)
+        self.presenter._increase_all_fonts()
+        self.model.increase_all_fonts.assert_called_once_with()
 
-        model_increment_all_fonts.reset_mock()
-        view_increment_all_fonts.reset_mock()
-
-        # view -> model
-        view_increment_all_fonts.return_value = 20
-        self.presenter._value_modified('increment_all_fonts')
-        self.presenter.get_new_config()
-        view_increment_all_fonts.assert_called_once_with()
-        model_increment_all_fonts.assert_called_once_with(20)
-
-        model_increment_all_fonts.reset_mock()
-        view_increment_all_fonts.reset_mock()
-
-        self.presenter._remove_value_modified('increment_all_fonts')
-        self.presenter.get_new_config()
-        view_increment_all_fonts.assert_not_called()
-        model_increment_all_fonts.assert_not_called()
+    def test_decrease_all_fonts(self):
+        self.presenter = CutPlotOptionsPresenter(self.view, self.model)
+        self.presenter._decrease_all_fonts()
+        self.model.decrease_all_fonts.assert_called_once_with()
