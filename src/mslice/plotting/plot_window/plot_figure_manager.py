@@ -225,8 +225,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             save_workspaces(workspaces,
                             file_path,
                             save_name,
-                            ext,
-                            slice_nonpsd=True)
+                            ext)
         except RuntimeError as e:
             if str(e) == "unrecognised file extension":
                 supported_image_types = list(

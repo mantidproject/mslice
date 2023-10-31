@@ -15,6 +15,9 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 class ScriptingHelperFunctionsTest(unittest.TestCase):
 
+    def tearDown(self) -> None:
+        plt.gcf().clf()
+
     def assign_slice_parameters(self, plot_handler, intensity=True, temp_dependent=True):
         plot_handler.colorbar_label = 'colorbar_label'
         plot_handler.colorbar_label_size = 10
@@ -79,11 +82,12 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         fig = mock.MagicMock()
         ax = fig.add_subplot(111, projection='mslice')
 
+        add_cut.return_value = mock.MagicMock()
         add_plot_statements(script_lines, plot_handler, ax)
 
         add_header.assert_called_once_with(script_lines, plot_handler)
         add_cut.assert_called_once_with(script_lines, plot_handler, ax)
-        add_overplot.assert_called_once_with(script_lines, plot_handler)
+        add_overplot.assert_called_once_with(script_lines, plot_handler, add_cut.return_value)
 
         self.assertIn("mc.Show()\n", script_lines)
         self.assertIn('fig = plt.gcf()\n', script_lines)
@@ -172,39 +176,51 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
     def test_that_add_overplot_statements_works_as_expected_with_recoil_element(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
+        plot_handler.ws_name = 'test_ws_name'
         self.assign_slice_parameters(plot_handler)
         plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Hydrogen")]
-        workspace_name = plot_handler.ws_name
         script_lines = []
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn("ax.recoil(workspace='{}', element='{}')\n".format(workspace_name, "Hydrogen"), script_lines)
+        self.assertIn(f"ax.recoil(workspace='{plot_handler.ws_name}', element='Hydrogen', color='C0')\n", script_lines)
+
+    @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
+    def test_that_add_overplot_statements_works_as_expected_with_recoil_element_with_cut_ws_var(self, gfm):
+        plot_handler = gfm.get_active_figure().plot_handler
+        plot_handler.add_mock_spec(CutPlot)
+        self.assign_cut_parameters(plot_handler)
+        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Hydrogen")]
+        script_lines = []
+
+        add_overplot_statements(script_lines, plot_handler, ['test_ws_name'])
+
+        self.assertIn("ax.recoil(workspace=test_ws_name, element='Hydrogen', color='C0')\n", script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_overplot_statements_works_as_expected_with_arbitrary_nuclei(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
+        plot_handler.ws_name = 'test_ws_name'
         self.assign_slice_parameters(plot_handler)
-        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Relative Mass 55")]
-        workspace_name = plot_handler.ws_name
+        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Relative Mass 55", color="red")]
         script_lines = []
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn("ax.recoil(workspace='{}', rmm={})\n".format(workspace_name, 55), script_lines)
+        self.assertIn(f"ax.recoil(workspace='{plot_handler.ws_name}', rmm=55, color='red')\n", script_lines)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_overplot_statements_works_as_expected_with_bragg_peaks_elements(self, gfm):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(SlicePlot)
-        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Tantalum")]
-        workspace_name = plot_handler.ws_name
+        plot_handler._canvas.figure.gca().lines = [Line2D([1, 2], [1, 2], label="Tantalum", color="green")]
+        plot_handler.ws_name = 'test_ws_name'
         script_lines = []
 
         add_overplot_statements(script_lines, plot_handler)
 
-        self.assertIn("ax.bragg(workspace='{}', element='{}')\n".format(workspace_name, "Tantalum"), script_lines)
+        self.assertIn(f"ax.bragg(workspace='{plot_handler.ws_name}', element='Tantalum', color='green')\n", script_lines)
 
     @mock.patch('mslice.scripting.helperfunctions.add_plot_options')
     @mock.patch('mslice.scripting.helperfunctions.add_cut_lines')
@@ -217,7 +233,9 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         fig = mock.MagicMock()
         ax = fig.add_subplot(111, projection='mslice')
 
-        add_cut_plot_statements(script_lines, plot_handler, ax)
+        add_cut_lines.return_value = ['test_ws_var']
+
+        ret_val = add_cut_plot_statements(script_lines, plot_handler, ax)
 
         add_cut_lines.assert_called_once_with(script_lines, plot_handler, ax)
         add_plot_options.assert_called_once_with(script_lines, plot_handler)
@@ -226,6 +244,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             plot_handler.x_axis_min), script_lines)
         self.assertIn("ax.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
             plot_handler.y_axis_min), script_lines)
+        self.assertEqual(['test_ws_var'], ret_val)
 
     @mock.patch('mslice.scripting.helperfunctions.add_cut_lines_with_width')
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
@@ -237,14 +256,17 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         plot_handler.add_mock_spec(CutPlot)
         plot_handler.intensity_type = IntensityType.SCATTERING_FUNCTION
 
+        add_cut_lines_with_width.return_value = ['test_ws_var']
+
         script_lines = []
 
-        add_cut_lines(script_lines, plot_handler, ax)
+        ret_val = add_cut_lines(script_lines, plot_handler, ax)
 
         cuts = plot_handler._cut_plotter_presenter._cut_cache_dict[ax]
         errorbars = plot_handler._canvas.figure.gca().containers
 
         add_cut_lines_with_width.assert_called_once_with(errorbars, script_lines, cuts, plot_handler.intensity_type)
+        self.assertEqual(['test_ws_var'], ret_val)
 
     @mock.patch('mslice.cli._mslice_commands.GlobalFigureManager')
     def test_that_add_plot_options_works_as_expected(self, gfm):
@@ -291,7 +313,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cuts = [cut]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
+        ret_val = add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
+        pass
 
         self.assertIn(
             'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
@@ -299,8 +322,10 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
                                              False, None), script_lines)
 
         self.assertIn(
-            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={})\n\n'.format(
-                0, 'errorbar_label', 'blue', None, '-', 1.5), script_lines)
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, plot_over={})\n\n'.format(
+                0, 'errorbar_label', 'blue', None, '-', 1.5, False), script_lines)
+
+        self.assertEqual(['cut_ws_0'], ret_val)
 
     def test_that_add_cut_lines_with_width_works_as_expected_with_intensity_range(self):
         x_data, y_data = np.arange(0, 10), np.arange(0, 10)
@@ -312,12 +337,13 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cuts = [cut]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
+        ret_val = add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
 
         self.assertIn(
             'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
-            'intensity_range={})\n\n'.format(0, 'errorbar_label', 'blue', None, '-', 1.5, (1.0, 2.0)),
+            'intensity_range={}, plot_over={})\n\n'.format(0, 'errorbar_label', 'blue', None, '-', 1.5, (1.0, 2.0), False),
             script_lines)
+        self.assertEqual(['cut_ws_0'], ret_val)
 
     def test_that_add_cut_lines_with_width_works_as_expected_with_multiple_cuts(self):
         x_data, y_data = np.arange(0, 10), np.arange(0, 10)
@@ -333,7 +359,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cuts = [cut_0, cut_2]
         script_lines = []
 
-        add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
+        ret_val = add_cut_lines_with_width(errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION)
 
         self.assertIn(
             'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
@@ -350,8 +376,22 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             'SampleTemperature={})\n'.format(2, 'ws_1', cuts[1].cut_axis, cuts[1].integration_axis, cuts[1].norm_to_one,
                                              False, None), script_lines)
 
-        # Each mc.Cut statement has a corresponding errorbar statement
-        self.assertEqual(len(script_lines), 6)
+        self.assertIn(
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
+            'intensity_range={}, plot_over={})\n\n'.format(0, 'error_label_0', 'blue', None, '-', 1.5, (1.0, 2.0), False),
+            script_lines)
+
+        self.assertIn(
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
+            'intensity_range={}, plot_over={})\n\n'.format(1, 'error_label_1', 'blue', None, '-', 1.5, (1.0, 2.0), True),
+            script_lines)
+
+        self.assertIn(
+            'ax.errorbar(cut_ws_{}, label="{}", color="{}", marker="{}", ls="{}", lw={}, '
+            'intensity_range={}, plot_over={})\n\n'.format(2, 'error_label_2', 'blue', None, '-', 1.5, (1.0, 2.0), True),
+            script_lines)
+
+        self.assertEqual(['cut_ws_0', 'cut_ws_1', 'cut_ws_2'], ret_val)
 
     def test_show_or_hide_containers_in_script(self):
         fig, ax = plt.subplots()

@@ -514,6 +514,7 @@ class CutPlot(IPlot):
         self.plot_window.toggle_waterfall_edit()
         if not plot_over:
             self._reset_plot_window_options()
+            self.ws_name = ws_name
 
         all_lines = [line for container in line_containers for line in container.get_children()]
         for cached_lines in list(self._waterfall_cache.keys()):
