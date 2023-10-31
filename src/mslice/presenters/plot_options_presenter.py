@@ -25,6 +25,7 @@ class PlotOptionsPresenter(object):
         self._view.fontSizeUpClicked.connect(self._model.increase_all_fonts)
         self._view.fontSizeDownClicked.connect(self._model.decrease_all_fonts)
         self._view.redraw_signal.connect(self._set_font_sizes_tooltip)
+        self._set_font_sizes_tooltip()
 
     def _value_modified(self, value_name):
         self._modified_values[value_name] = getattr(self._view, value_name)
