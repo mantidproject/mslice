@@ -7,7 +7,7 @@ import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from mslice.models.colors import named_cycle_colors, color_to_name
 from mslice.util.qt import load_ui
-from qtpy.QtGui import QDoubleValidator, QRegExpValidator
+from qtpy.QtGui import QRegExpValidator
 from qtpy.QtCore import QRegExp
 from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
 from mantidqt.icons import get_icon
