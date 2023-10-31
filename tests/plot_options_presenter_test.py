@@ -237,13 +237,3 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         fonts_updated = {'title_size': 20, 'x_range_font_size': 20, 'y_range_font_size': 20,
                          'x_label_size': 20, 'y_label_size': 20}
         model_all_fonts_size.assert_any_call(fonts_updated)   # Not latest call due to copy() methods
-
-    def test_increase_all_fonts(self):
-        self.presenter = CutPlotOptionsPresenter(self.view, self.model)
-        self.presenter._increase_all_fonts()
-        self.model.increase_all_fonts.assert_called_once_with()
-
-    def test_decrease_all_fonts(self):
-        self.presenter = CutPlotOptionsPresenter(self.view, self.model)
-        self.presenter._decrease_all_fonts()
-        self.model.decrease_all_fonts.assert_called_once_with()
