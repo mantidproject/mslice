@@ -201,43 +201,6 @@ class CutPlot(IPlot):
         legend = axes.legend(handles_to_show, labels_to_show, fontsize='medium')  # add new legends
         legend_set_draggable(legend, True)
 
-    # def change_axis_scale(self, xy_config):
-    #     current_axis = self._canvas.figure.gca()
-    #     orig_y_scale_log = self.y_log
-    #     if xy_config['x_log']:
-    #         xmin = xy_config['x_range'][0]
-    #         xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-    #         self.x_axis_min = get_min(xdata, absolute_minimum=0.)
-    #         linthresh_val = pow(10, np.floor(np.log10(self.x_axis_min)))
-    #
-    #         kwargs = {'linthresh': linthresh_val}
-    #         current_axis.set_xscale('symlog', **kwargs)
-    #
-    #         if xmin > 0:
-    #             xy_config['x_range'] = (xmin, xy_config['x_range'][1])
-    #     else:
-    #         current_axis.set_xscale('linear')
-    #
-    #     if xy_config['y_log']:
-    #         ymin = xy_config['y_range'][0]
-    #         ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-    #         self.y_axis_min = get_min(ydata, absolute_minimum=0.)
-    #         linthresh_val = pow(10, np.floor(np.log10(self.y_axis_min)))
-    #
-    #         kwargs = {'linthresh': linthresh_val}
-    #         current_axis.set_yscale('symlog', **kwargs)
-    #
-    #         if ymin > 0:
-    #             xy_config['y_range'] = (ymin, xy_config['y_range'][1])
-    #     else:
-    #         current_axis.set_yscale('linear')
-    #
-    #     self.x_range = xy_config['x_range']
-    #     self.y_range = xy_config['y_range']
-    #
-    #     if xy_config['y_log'] or (xy_config['y_log'] != orig_y_scale_log):
-    #         self.update_bragg_peaks(refresh=True)
-
     def get_line_options(self, line):
         index = self._get_line_index(line)
         if index >= 0:
@@ -678,6 +641,10 @@ class CutPlot(IPlot):
     @x_log.setter
     def x_log(self, value):
         current_axis = self._canvas.figure.gca()
+        if not self.y_log:
+            # Fixes bug where setting xscale from log to linear distorts plot data
+            current_axis.set_yscale('linear')
+
         if value:
             xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
             x_axis_min = get_min(xdata, absolute_minimum=0.)
@@ -703,6 +670,9 @@ class CutPlot(IPlot):
     def y_log(self, value):
         orig_y_scale_log = self.y_log
         current_axis = self._canvas.figure.gca()
+        if not self.x_log:
+            current_axis.set_xscale('linear')
+
         if value:
             ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
             y_axis_min = get_min(ydata, absolute_minimum=0.)

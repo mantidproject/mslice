@@ -10,7 +10,7 @@ class PlotOptionsPresenter(object):
         self._modified_values = {}
         self._default_font_sizes_config = {}
 
-        self.set_properties()  # propagate dialog with existing data
+        self.set_properties()  # Propagate dialog with existing data
 
         self._view.titleEdited.connect(partial(self._value_modified, 'title'))
         self._view.xLabelEdited.connect(partial(self._value_modified, 'x_label'))
