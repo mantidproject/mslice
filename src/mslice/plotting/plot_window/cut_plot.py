@@ -201,40 +201,42 @@ class CutPlot(IPlot):
         legend = axes.legend(handles_to_show, labels_to_show, fontsize='medium')  # add new legends
         legend_set_draggable(legend, True)
 
-    def change_axis_scale(self, xy_config):
-        current_axis = self._canvas.figure.gca()
-        orig_y_scale_log = self.y_log
-        if xy_config['x_log']:
-            xmin = xy_config['x_range'][0]
-            xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
-            self.x_axis_min = get_min(xdata, absolute_minimum=0.)
-            linthresh_val = pow(10, np.floor(np.log10(self.x_axis_min)))
-
-            kwargs = {'linthresh': linthresh_val}
-            current_axis.set_xscale('symlog', **kwargs)
-
-            if xmin > 0:
-                xy_config['x_range'] = (xmin, xy_config['x_range'][1])
-        else:
-            current_axis.set_xscale('linear')
-        if xy_config['y_log']:
-            ymin = xy_config['y_range'][0]
-            ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
-            self.y_axis_min = get_min(ydata, absolute_minimum=0.)
-            linthresh_val = pow(10, np.floor(np.log10(self.y_axis_min)))
-
-            kwargs = {'linthresh': linthresh_val}
-            current_axis.set_yscale('symlog', **kwargs)
-
-            if ymin > 0:
-                xy_config['y_range'] = (ymin, xy_config['y_range'][1])
-        else:
-            current_axis.set_yscale('linear')
-        self.x_range = xy_config['x_range']
-        self.y_range = xy_config['y_range']
-
-        if xy_config['y_log'] or (xy_config['y_log'] != orig_y_scale_log):
-            self.update_bragg_peaks(refresh=True)
+    # def change_axis_scale(self, xy_config):
+    #     current_axis = self._canvas.figure.gca()
+    #     orig_y_scale_log = self.y_log
+    #     if xy_config['x_log']:
+    #         xmin = xy_config['x_range'][0]
+    #         xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
+    #         self.x_axis_min = get_min(xdata, absolute_minimum=0.)
+    #         linthresh_val = pow(10, np.floor(np.log10(self.x_axis_min)))
+    #
+    #         kwargs = {'linthresh': linthresh_val}
+    #         current_axis.set_xscale('symlog', **kwargs)
+    #
+    #         if xmin > 0:
+    #             xy_config['x_range'] = (xmin, xy_config['x_range'][1])
+    #     else:
+    #         current_axis.set_xscale('linear')
+    #
+    #     if xy_config['y_log']:
+    #         ymin = xy_config['y_range'][0]
+    #         ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
+    #         self.y_axis_min = get_min(ydata, absolute_minimum=0.)
+    #         linthresh_val = pow(10, np.floor(np.log10(self.y_axis_min)))
+    #
+    #         kwargs = {'linthresh': linthresh_val}
+    #         current_axis.set_yscale('symlog', **kwargs)
+    #
+    #         if ymin > 0:
+    #             xy_config['y_range'] = (ymin, xy_config['y_range'][1])
+    #     else:
+    #         current_axis.set_yscale('linear')
+    #
+    #     self.x_range = xy_config['x_range']
+    #     self.y_range = xy_config['y_range']
+    #
+    #     if xy_config['y_log'] or (xy_config['y_log'] != orig_y_scale_log):
+    #         self.update_bragg_peaks(refresh=True)
 
     def get_line_options(self, line):
         index = self._get_line_index(line)
@@ -675,10 +677,23 @@ class CutPlot(IPlot):
 
     @x_log.setter
     def x_log(self, value):
-        config = self.xy_config()
-        config['x_log'] = value
-        self.change_axis_scale(config)
-        self._canvas.draw()
+        current_axis = self._canvas.figure.gca()
+        if value:
+            xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
+            x_axis_min = get_min(xdata, absolute_minimum=0.)
+            linthresh_val = pow(10, np.floor(np.log10(x_axis_min)))
+
+            current_axis.set_xscale('symlog', linthresh=linthresh_val)
+        else:
+            current_axis.set_xscale('linear')
+
+    @property
+    def x_range(self):
+        return self.manager.x_range
+
+    @x_range.setter
+    def x_range(self, value):
+        self.manager.x_range = value
 
     @property
     def y_log(self):
@@ -686,10 +701,27 @@ class CutPlot(IPlot):
 
     @y_log.setter
     def y_log(self, value):
-        config = self.xy_config()
-        config['y_log'] = value
-        self.change_axis_scale(config)
-        self._canvas.draw()
+        orig_y_scale_log = self.y_log
+        current_axis = self._canvas.figure.gca()
+        if value:
+            ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
+            y_axis_min = get_min(ydata, absolute_minimum=0.)
+            linthresh_val = pow(10, np.floor(np.log10(y_axis_min)))
+
+            current_axis.set_yscale('symlog', linthresh=linthresh_val)
+        else:
+            current_axis.set_yscale('linear')
+
+        if value or (value != orig_y_scale_log):
+            self.update_bragg_peaks(refresh=True)
+
+    @property
+    def y_range(self):
+        return self.manager.y_range
+
+    @y_range.setter
+    def y_range(self, value):
+        self.manager.y_range = value
 
     @property
     def show_legends(self):
@@ -757,14 +789,6 @@ class CutPlot(IPlot):
         self.manager.y_label_size = value
 
     @property
-    def x_range(self):
-        return self.manager.x_range
-
-    @x_range.setter
-    def x_range(self, value):
-        self.manager.x_range = value
-
-    @property
     def x_range_font_size(self):
         return self.manager.x_range_font_size
 
@@ -772,13 +796,6 @@ class CutPlot(IPlot):
     def x_range_font_size(self, font_size):
         self.manager.x_range_font_size = font_size
 
-    @property
-    def y_range(self):
-        return self.manager.y_range
-
-    @y_range.setter
-    def y_range(self, value):
-        self.manager.y_range = value
 
     @property
     def y_range_font_size(self):

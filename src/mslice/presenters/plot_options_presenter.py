@@ -119,14 +119,6 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         current_show_legends = getattr(self._model, 'show_legends')
         new_show_legends = current_show_legends
 
-        self._default_xy_config = {'x_range': self._model.x_range, 'y_range': self._model.y_range,
-                                   'x_log': self._model.x_log, 'y_log': self._model.y_log}
-
-        shared_keys = self._modified_values.keys() & self._default_xy_config.keys()
-        if shared_keys:
-            self._default_xy_config.update({key: self._modified_values[key] for key in shared_keys})
-            self._model.change_axis_scale(self._default_xy_config)
-
         for key, value in list(self._modified_values.items()):
             if key == 'show_legends':
                 new_show_legends = value
