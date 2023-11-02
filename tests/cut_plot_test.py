@@ -122,8 +122,8 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.all_fonts_size = fonts_config
 
         self.cut_plot.increase_all_fonts()
-        self.assertEqual(self.cut_plot.title_size, 15.5)
-        self.assertEqual(self.cut_plot.x_range_font_size, 14.5)
-        self.assertEqual(self.cut_plot.y_range_font_size, 13.5)
-        self.assertEqual(self.cut_plot.x_label_size, 12.5)
-        self.assertEqual(self.cut_plot.y_label_size, 11.5)
+        self.assertEqual(self.cut_plot.title_size, 16)
+        self.assertEqual(self.cut_plot.x_range_font_size, 15)
+        self.assertEqual(self.cut_plot.y_range_font_size, 14)
+        self.assertEqual(self.cut_plot.x_label_size, 13)
+        self.assertEqual(self.cut_plot.y_label_size, 12)

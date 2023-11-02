@@ -150,13 +150,13 @@ class SlicePlotTest(unittest.TestCase):
 
         self.slice_plot.increase_all_fonts()
 
-        self.assertEqual(self.slice_plot.title_size, 15.5)
-        self.assertEqual(self.slice_plot.x_range_font_size, 14.5)
-        self.assertEqual(self.slice_plot.y_range_font_size, 13.5)
-        self.assertEqual(self.slice_plot.x_label_size, 12.5)
-        self.assertEqual(self.slice_plot.y_label_size, 11.5)
-        mock_colorbar_label_size.assert_called_with(9.5)
-        mock_colorbar_range_font_size.assert_called_with(10.5)
+        self.assertEqual(self.slice_plot.title_size, 16)
+        self.assertEqual(self.slice_plot.x_range_font_size, 15)
+        self.assertEqual(self.slice_plot.y_range_font_size, 14)
+        self.assertEqual(self.slice_plot.x_label_size, 13)
+        self.assertEqual(self.slice_plot.y_label_size, 12)
+        mock_colorbar_label_size.assert_called_with(10)
+        mock_colorbar_range_font_size.assert_called_with(11)
 
 
 if __name__ == '__main__':
