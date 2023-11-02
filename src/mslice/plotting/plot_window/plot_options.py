@@ -7,8 +7,10 @@ import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from mslice.models.colors import named_cycle_colors, color_to_name
 from mslice.util.qt import load_ui
-
+from qtpy.QtGui import QRegExpValidator
+from qtpy.QtCore import QRegExp
 from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
+from mantidqt.icons import get_icon
 
 
 class PlotOptionsDialog(QtWidgets.QDialog):
@@ -20,11 +22,18 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     yRangeEdited = Signal()
     xGridEdited = Signal()
     yGridEdited = Signal()
+    allFontSizeEdited = Signal()
+    fontSizeUpClicked = Signal()
+    fontSizeDownClicked = Signal()
+    allFontSizeFromEmptyToValue = Signal()
     ok_clicked = Signal()
 
     def __init__(self, parent, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
         load_ui(__file__, 'plot_options.ui', self)
+
+        self.sclUpFntSz.setIcon(get_icon("mdi.arrow-up"))
+        self.sclDownFntSz.setIcon(get_icon("mdi.arrow-down"))
 
         self.x_min_validator = LineEditDoubleValidator(self.lneXMin, 0.0)
         self.lneXMin.setValidator(self.x_min_validator)
@@ -34,6 +43,9 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.lneYMin.setValidator(self.y_min_validator)
         self.y_max_validator = LineEditDoubleValidator(self.lneYMax, 0.0)
         self.lneYMax.setValidator(self.y_max_validator)
+        two_postv_ints_regex = QRegExp(r"^\s*[1-9][0-9]?$")
+        self.all_fonts_size_validator = QRegExpValidator(two_postv_ints_regex)
+        self.allFntSz.setValidator(self.all_fonts_size_validator)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
         self.lneXAxisLabel.editingFinished.connect(self.xLabelEdited)
@@ -46,7 +58,30 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.chkXGrid.stateChanged.connect(self.xGridEdited)
         self.chkYGrid.stateChanged.connect(self.yGridEdited)
+
+        self.allFntSz.textEdited.connect(self._font_sizes_changed)
+        self.sclUpFntSz.clicked.connect(self._scale_up_fonts_clicked)
+        self.sclDownFntSz.clicked.connect(self._scale_down_fonts_clicked)
+
         self.redraw_signal = redraw_signal
+
+        self.allFntSzBuffer = ''
+
+    def _font_sizes_changed(self):
+        if self.allFntSzBuffer == '':
+            self.allFontSizeFromEmptyToValue.emit()
+        self.allFntSzBuffer = str(self.allFntSz.text())
+
+        self.allFontSizeEdited.emit()
+        self.redraw_signal.emit()
+
+    def _scale_up_fonts_clicked(self):
+        self.fontSizeUpClicked.emit()
+        self.redraw_signal.emit()
+
+    def _scale_down_fonts_clicked(self):
+        self.fontSizeDownClicked.emit()
+        self.redraw_signal.emit()
 
     def _ok_clicked(self):
         self.ok_clicked.emit()
@@ -133,6 +168,17 @@ class PlotOptionsDialog(QtWidgets.QDialog):
     @property
     def is_kept_open(self):
         return self.keep_open.isChecked()
+
+    @property
+    def all_fonts_size(self):
+        try:
+            return float(str(self.allFntSz.text()))
+        except ValueError:
+            return None
+
+    @all_fonts_size.setter
+    def all_fonts_size(self, value):
+        self.allFntSz.setText(str(value))
 
 
 class SlicePlotOptions(PlotOptionsDialog):

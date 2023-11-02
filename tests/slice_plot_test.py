@@ -117,6 +117,47 @@ class SlicePlotTest(unittest.TestCase):
             self.slice_plot.update_legend()
             mock_add_legend.assert_called_with(self.line, ['some_label'], fontsize=ANY, loc='upper right')
 
+    def test_all_fonts_size(self):
+        slice_plot_colorbar_label_size = PropertyMock()
+        slice_plot_colorbar_range_font_size = PropertyMock()
+        type(self.slice_plot).colorbar_label_size = slice_plot_colorbar_label_size
+        type(self.slice_plot).colorbar_range_font_size = slice_plot_colorbar_range_font_size
+
+        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
+                        'x_label_size': 12, 'y_label_size': 11, 'colorbar_label_size': 10,
+                        'colorbar_range_font_size': 9}
+
+        self.slice_plot.all_fonts_size = fonts_config
+
+        slice_plot_colorbar_range_font_size.assert_called_once_with(9)
+        slice_plot_colorbar_label_size.assert_called_once_with(10)
+
+        self.assertEqual(self.slice_plot.title_size, 15)
+        self.assertEqual(self.slice_plot.x_range_font_size, 14)
+        self.assertEqual(self.slice_plot.y_range_font_size, 13)
+        self.assertEqual(self.slice_plot.x_label_size, 12)
+        self.assertEqual(self.slice_plot.y_label_size, 11)
+
+    def test_increase_all_fonts(self):
+        mock_colorbar_label_size = PropertyMock(return_value=9)
+        mock_colorbar_range_font_size = PropertyMock(return_value=10)
+        type(self.slice_plot).colorbar_label_size = mock_colorbar_label_size
+        type(self.slice_plot).colorbar_range_font_size = mock_colorbar_range_font_size
+
+        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
+                        'x_label_size': 12, 'y_label_size': 11}
+        self.slice_plot.all_fonts_size = fonts_config
+
+        self.slice_plot.increase_all_fonts()
+
+        self.assertEqual(self.slice_plot.title_size, 16)
+        self.assertEqual(self.slice_plot.x_range_font_size, 15)
+        self.assertEqual(self.slice_plot.y_range_font_size, 14)
+        self.assertEqual(self.slice_plot.x_label_size, 13)
+        self.assertEqual(self.slice_plot.y_label_size, 12)
+        mock_colorbar_label_size.assert_called_with(10)
+        mock_colorbar_range_font_size.assert_called_with(11)
+
 
 if __name__ == '__main__':
     unittest.main()

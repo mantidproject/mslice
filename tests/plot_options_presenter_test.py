@@ -185,7 +185,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter._xy_config_modified('y_log')
         self.presenter.get_new_config()
         self.model.change_axis_scale.assert_called_once_with({'x_range': (1, 2), 'y_range': (3, 4), 'modified': True,
-                                                              'x_log': False,    'y_log': True})
+                                                              'x_log': False, 'y_log': True})
 
     def test_line_options(self):
         #  model -> view
@@ -216,3 +216,24 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         # check line with correct index removed
         self.presenter.remove_container(9)
         self.model.remove_line_by_index.assert_called_once_with(9)
+
+    def test_set_all_fonts_size(self):
+        model_all_fonts_size = PropertyMock()
+        view_all_fonts_size = PropertyMock()
+        type(self.model).all_fonts_size = model_all_fonts_size
+        type(self.view).all_fonts_size = view_all_fonts_size
+
+        self.presenter = CutPlotOptionsPresenter(self.view, self.model)
+        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
+                        'x_label_size': 12, 'y_label_size': 11}
+        self.presenter._default_font_sizes_config = fonts_config
+
+        # view -> model
+        view_all_fonts_size.return_value = 20
+        self.presenter._set_all_plot_fonts()
+
+        view_all_fonts_size.assert_called_once_with()
+
+        fonts_updated = {'title_size': 20, 'x_range_font_size': 20, 'y_range_font_size': 20,
+                         'x_label_size': 20, 'y_label_size': 20}
+        model_all_fonts_size.assert_any_call(fonts_updated)   # Not latest call due to copy() methods

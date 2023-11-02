@@ -27,6 +27,7 @@ from typing import Callable
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
+DEFAULT_FONT_SIZE_STEP = 1
 
 
 class SlicePlot(IPlot):
@@ -54,6 +55,15 @@ class SlicePlot(IPlot):
         self.temp_dependent = False
         self.temp = None
         self.default_options = None
+        self.plot_fonts_properties = [
+            'title_size',
+            'x_range_font_size',
+            'y_range_font_size',
+            'x_label_size',
+            'y_label_size',
+            'colorbar_label_size',
+            'colorbar_range_font_size'
+        ]
 
     def save_default_options(self):
         self.default_options = {
@@ -473,6 +483,10 @@ class SlicePlot(IPlot):
     def colorbar_label_size(self):
         return self._canvas.figure.get_axes()[1].yaxis.label.get_size()
 
+    @colorbar_label_size.setter
+    def colorbar_label_size(self, value):
+        self._canvas.figure.get_axes()[1].yaxis.label.set_size(value)
+
     @property
     def colorbar_range(self):
         return self._canvas.figure.gca().collections[0].get_clim()
@@ -512,6 +526,10 @@ class SlicePlot(IPlot):
     def title_size(self):
         return self.manager.title_size
 
+    @title_size.setter
+    def title_size(self, value):
+        self.manager.title_size = value
+
     @property
     def x_label(self):
         return self.manager.x_label
@@ -527,6 +545,10 @@ class SlicePlot(IPlot):
     def x_label_size(self):
         return self.manager.x_label_size
 
+    @x_label_size.setter
+    def x_label_size(self, value):
+        self.manager.x_label_size = value
+
     @property
     def y_label(self):
         return self.manager.y_label
@@ -541,6 +563,10 @@ class SlicePlot(IPlot):
     @property
     def y_label_size(self):
         return self.manager.y_label_size
+
+    @y_label_size.setter
+    def y_label_size(self, value):
+        self.manager.y_label_size = value
 
     @property
     def x_range(self):
@@ -613,3 +639,24 @@ class SlicePlot(IPlot):
 
     def set_cross_cursor(self):
         self._canvas.setCursor(Qt.CrossCursor)
+
+    @property
+    def all_fonts_size(self):
+        font_sizes_config = {}
+        for p in self.plot_fonts_properties:
+            font_sizes_config[p] = getattr(self, p)
+
+        return font_sizes_config
+
+    @all_fonts_size.setter
+    def all_fonts_size(self, values: dict):
+        for key in values:
+            setattr(self, key, values[key])
+
+    def increase_all_fonts(self):
+        for p in self.plot_fonts_properties:
+            setattr(self, p, getattr(self, p) + DEFAULT_FONT_SIZE_STEP)
+
+    def decrease_all_fonts(self):
+        for p in self.plot_fonts_properties:
+            setattr(self, p, getattr(self, p) - DEFAULT_FONT_SIZE_STEP)

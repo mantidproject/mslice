@@ -29,6 +29,7 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
+DEFAULT_FONT_SIZE_STEP = 1
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -65,6 +66,13 @@ class CutPlot(IPlot):
         self._intensity_type = IntensityType.SCATTERING_FUNCTION
         self._intensity_correction_flag = False
         self._temp_dependent = False
+        self.plot_fonts_properties = [
+            'title_size',
+            'x_range_font_size',
+            'y_range_font_size',
+            'x_label_size',
+            'y_label_size',
+        ]
 
     def save_default_options(self):
         self.default_options = {
@@ -707,6 +715,10 @@ class CutPlot(IPlot):
     def title_size(self):
         return self.manager.title_size
 
+    @title_size.setter
+    def title_size(self, value):
+        self.manager.title_size = value
+
     @property
     def x_label(self):
         return self.manager.x_label
@@ -722,6 +734,10 @@ class CutPlot(IPlot):
     def x_label_size(self):
         return self.manager.x_label_size
 
+    @x_label_size.setter
+    def x_label_size(self, value):
+        self.manager.x_label_size = value
+
     @property
     def y_label(self):
         return self.manager.y_label
@@ -736,6 +752,10 @@ class CutPlot(IPlot):
     @property
     def y_label_size(self):
         return self.manager.y_label_size
+
+    @y_label_size.setter
+    def y_label_size(self, value):
+        self.manager.y_label_size = value
 
     @property
     def x_range(self):
@@ -817,3 +837,24 @@ class CutPlot(IPlot):
     @property
     def intensity_type(self):
         return self._intensity_type
+
+    @property
+    def all_fonts_size(self):
+        font_sizes_config = {}
+        for p in self.plot_fonts_properties:
+            font_sizes_config[p] = getattr(self, p)
+
+        return font_sizes_config
+
+    @all_fonts_size.setter
+    def all_fonts_size(self, values: dict):
+        for key in values:
+            setattr(self, key, values[key])
+
+    def increase_all_fonts(self):
+        for p in self.plot_fonts_properties:
+            setattr(self, p, getattr(self, p) + DEFAULT_FONT_SIZE_STEP)
+
+    def decrease_all_fonts(self):
+        for p in self.plot_fonts_properties:
+            setattr(self, p, getattr(self, p) - DEFAULT_FONT_SIZE_STEP)
