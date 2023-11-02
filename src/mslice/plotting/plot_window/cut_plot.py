@@ -680,7 +680,7 @@ class CutPlot(IPlot):
         else:
             current_axis.set_yscale('linear')
 
-        if value or (value != orig_y_log):
+        if value != orig_y_log:
             self.update_bragg_peaks(refresh=True)
 
     @property
