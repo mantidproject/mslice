@@ -410,9 +410,6 @@ class CutPlot(IPlot):
         bounds['x_label'] = fig_y * 0.05
         return bounds
 
-    def xy_config(self):
-        return {'x_log': self.x_log, 'y_log': self.y_log, 'x_range': self.x_range, 'y_range': self.y_range}
-
     def legend_visible(self, index: int) -> bool:
         try:
             v = self._legends_visible[index]
@@ -669,7 +666,7 @@ class CutPlot(IPlot):
 
     @y_log.setter
     def y_log(self, value):
-        orig_y_scale_log = self.y_log
+        orig_y_log = self.y_log
         current_axis = self._canvas.figure.gca()
         if not self.x_log:
             current_axis.set_xscale('linear')
@@ -683,7 +680,7 @@ class CutPlot(IPlot):
         else:
             current_axis.set_yscale('linear')
 
-        if value or (value != orig_y_scale_log):
+        if value or (value != orig_y_log):
             self.update_bragg_peaks(refresh=True)
 
     @property
