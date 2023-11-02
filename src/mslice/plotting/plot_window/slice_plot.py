@@ -27,6 +27,7 @@ from typing import Callable
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
+DEFAULT_FONT_SIZE_STEP = 1
 
 
 class SlicePlot(IPlot):
@@ -650,8 +651,8 @@ class SlicePlot(IPlot):
 
     def increase_all_fonts(self):
         for p in self.plot_fonts_properties:
-            setattr(self, p, getattr(self, p) + 0.5)
+            setattr(self, p, getattr(self, p) + DEFAULT_FONT_SIZE_STEP)
 
     def decrease_all_fonts(self):
         for p in self.plot_fonts_properties:
-            setattr(self, p, getattr(self, p) - 0.5)
+            setattr(self, p, getattr(self, p) - DEFAULT_FONT_SIZE_STEP)

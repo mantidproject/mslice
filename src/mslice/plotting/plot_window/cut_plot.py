@@ -29,6 +29,7 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
+DEFAULT_FONT_SIZE_STEP = 1
 
 
 def get_min(data, absolute_minimum=-np.inf):
@@ -852,8 +853,8 @@ class CutPlot(IPlot):
 
     def increase_all_fonts(self):
         for p in self.plot_fonts_properties:
-            setattr(self, p, getattr(self, p) + 0.5)
+            setattr(self, p, getattr(self, p) + DEFAULT_FONT_SIZE_STEP)
 
     def decrease_all_fonts(self):
         for p in self.plot_fonts_properties:
-            setattr(self, p, getattr(self, p) - 0.5)
+            setattr(self, p, getattr(self, p) - DEFAULT_FONT_SIZE_STEP)

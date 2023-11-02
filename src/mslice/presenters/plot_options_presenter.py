@@ -49,8 +49,8 @@ class PlotOptionsPresenter(object):
     def _set_font_sizes_tooltip(self):
         tip = self._convert_font_config_to_tooltip()
         self._view.allFntSz.setToolTip(tip)
-        self._view.sclUpFntSz.setToolTip(tip)
-        self._view.sclDownFntSz.setToolTip(tip)
+        self._view.sclUpFntSz.setToolTip("Increase font sizes\n\n" + tip)
+        self._view.sclDownFntSz.setToolTip("Decrease font sizes\n\n" + tip)
 
     def _convert_font_config_to_tooltip(self):
         font_size_dict = self._model.all_fonts_size.copy()
