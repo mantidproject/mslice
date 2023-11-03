@@ -644,7 +644,7 @@ class CutPlot(IPlot):
             current_axis.set_yscale('linear')
 
         if value:
-            xdata = [ll.get_xdata() for ll in current_axis.get_lines()]
+            xdata = [line.get_xdata() for line in current_axis.get_lines()]
             x_axis_min = get_min(xdata, absolute_minimum=0.)
             linthresh_val = pow(10, np.floor(np.log10(x_axis_min)))
 
@@ -672,7 +672,7 @@ class CutPlot(IPlot):
             current_axis.set_xscale('linear')
 
         if value:
-            ydata = [ll.get_ydata() for ll in current_axis.get_lines()]
+            ydata = [line.get_ydata() for line in current_axis.get_lines()]
             y_axis_min = get_min(ydata, absolute_minimum=0.)
             linthresh_val = pow(10, np.floor(np.log10(y_axis_min)))
 

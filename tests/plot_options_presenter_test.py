@@ -122,15 +122,17 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         # passed view -> model through slice presenter
         model_x_range_mock.reset_mock()
         view_x_range_mock.return_value = (2, 10)
-        self.presenter1._xy_config_modified('x_range')
+        self.presenter1._value_modified('x_range')
         self.presenter1.get_new_config()
         model_x_range_mock.assert_called_once_with((2, 10))
 
         # passed view -> model through cut presenter
+        model_x_range_mock.reset_mock()
+        view_x_range_mock.return_value = (3, 11)
         self.presenter2 = CutPlotOptionsPresenter(self.view, self.model)
-        self.presenter2._xy_config_modified('x_range')
+        self.presenter2._value_modified('x_range')
         self.presenter2.get_new_config()
-        self.model.change_axis_scale.assert_called_once()
+        model_x_range_mock.assert_called_with((3, 11))
 
     def test_change_colorbar_config(self):
         view_colorbar_range_mock = PropertyMock()
@@ -164,14 +166,10 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         view_y_log_mock = PropertyMock()
         model_x_log_mock = PropertyMock(return_value=True)
         model_y_log_mock = PropertyMock(return_value=False)
-        model_x_range_mock = PropertyMock(return_value=(1, 2))
-        model_y_range_mock = PropertyMock(return_value=(3, 4))
         type(self.view).x_log = view_x_log_mock
         type(self.view).y_log = view_y_log_mock
         type(self.model).x_log = model_x_log_mock
         type(self.model).y_log = model_y_log_mock
-        type(self.model).x_range = model_x_range_mock
-        type(self.model).y_range = model_y_range_mock
 
         # model -> view
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
@@ -181,11 +179,11 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         # view -> model
         view_x_log_mock.return_value = False
         view_y_log_mock.return_value = True
-        self.presenter._xy_config_modified('x_log')
-        self.presenter._xy_config_modified('y_log')
+        self.presenter._value_modified('x_log')
+        self.presenter._value_modified('y_log')
         self.presenter.get_new_config()
-        self.model.change_axis_scale.assert_called_once_with({'x_range': (1, 2), 'y_range': (3, 4), 'modified': True,
-                                                              'x_log': False, 'y_log': True})
+        model_x_log_mock.assert_called_with(False)
+        model_y_log_mock.assert_called_with(True)
 
     def test_line_options(self):
         #  model -> view

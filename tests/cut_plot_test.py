@@ -34,41 +34,45 @@ class CutPlotTest(unittest.TestCase):
         self.assertEqual(get_min(data), 2)
         self.assertEqual(get_min(data, 4), 6)
 
-    def test_change_scale_linear(self):
+    @patch.object(CutPlot, 'y_log', PropertyMock(return_value=False))
+    def test_change_x_scale_linear(self):
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
-        type(self.cut_plot).y_log = PropertyMock(return_value=False)
         self.cut_plot.x_log = False
         self.axes.set_xscale.assert_called_with('linear')
         self.axes.set_yscale.assert_called_with('linear')
 
+    @patch.object(CutPlot, 'x_log', PropertyMock(return_value=False))
+    def test_change_y_scale_linear(self):
+        self.axes.set_xscale = MagicMock()
+        self.axes.set_yscale = MagicMock()
+        self.cut_plot.y_log = False
+        self.axes.set_xscale.assert_called_with('linear')
+        self.axes.set_yscale.assert_called_with('linear')
+
+    @patch.object(CutPlot, 'y_log', PropertyMock(return_value=False))
     def test_change_x_scale_log(self):
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
-        type(self.cut_plot).y_log = PropertyMock(return_value=False)
         line = MagicMock()
         line.get_xdata = MagicMock(return_value=np.array([20, 60, 12]))
         self.axes.get_lines = MagicMock(return_value=[line])
         self.cut_plot.x_log = True
-
         self.axes.set_yscale.assert_called_with('linear')
         self.axes.set_xscale.assert_called_once_with('symlog', linthresh=10.0)
 
-    # Currently failing, although it's the mirror version of the above
-    # def test_change_y_scale_log(self):
-    #     self.axes.set_xscale = MagicMock()
-    #     self.axes.set_yscale = MagicMock()
-    #     type(self.cut_plot).x_log = PropertyMock(return_value=False)
-    #     line = MagicMock()
-    #     line.get_ydata = MagicMock(return_value=np.array([1, 5, 10]))
-    #     self.axes.get_lines = MagicMock(return_value=[line])
-    #     self.cut_plot.update_bragg_peaks = MagicMock()
-    #
-    #     self.cut_plot.y_log = True
-    #
-    #     self.axes.set_xscale.assert_called_with('linear')
-    #     self.axes.set_yscale.assert_called_once_with('symlog', linthresh=1.0)
-    #     self.cut_plot.update_bragg_peaks.assert_called_once_with(refresh=True)
+    @patch.object(CutPlot, 'x_log', PropertyMock(return_value=False))
+    def test_change_y_scale_log(self):
+        self.axes.set_xscale = MagicMock()
+        self.axes.set_yscale = MagicMock()
+        line = MagicMock()
+        line.get_ydata = MagicMock(return_value=np.array([1, 5, 10]))
+        self.axes.get_lines = MagicMock(return_value=[line])
+        self.cut_plot.update_bragg_peaks = MagicMock()
+        self.cut_plot.y_log = True
+        self.axes.set_xscale.assert_called_with('linear')
+        self.axes.set_yscale.assert_called_once_with('symlog', linthresh=1.0)
+        self.cut_plot.update_bragg_peaks.assert_called_once_with(refresh=True)
 
     @patch('mslice.plotting.plot_window.cut_plot.quick_options')
     def test_line_clicked(self, quick_options_mock):
