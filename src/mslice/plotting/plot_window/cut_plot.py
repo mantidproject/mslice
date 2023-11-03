@@ -764,7 +764,6 @@ class CutPlot(IPlot):
     def x_range_font_size(self, font_size):
         self.manager.x_range_font_size = font_size
 
-
     @property
     def y_range_font_size(self):
         return self.manager.y_range_font_size
