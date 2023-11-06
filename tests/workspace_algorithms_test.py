@@ -86,8 +86,11 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
         self.assertEqual(get_comment(self.test_workspace), "")
 
     def test_remove_workspace_from_ads(self):
-        current_len = len(AnalysisDataService)
         test_workspace2 = CloneWorkspace(OutputWorkspace='test_workspace2', InputWorkspace=self.test_workspace)
         export_workspace_to_ads(test_workspace2)
+        print(AnalysisDataService.getObjectNames())
+        print("~~~~~~~~~~")
+        current_len = len(AnalysisDataService)
         remove_workspace_from_ads(test_workspace2)
+        print(AnalysisDataService.getObjectNames())
         self.assertEqual(len(AnalysisDataService), current_len - 1)
