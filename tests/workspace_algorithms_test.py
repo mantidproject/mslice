@@ -9,7 +9,7 @@ from mslice.models.workspacemanager.workspace_algorithms import (process_limits,
 from mslice.models.workspacemanager.workspace_provider import add_workspace
 from tests.testhelpers.workspace_creator import (create_md_histo_workspace, create_workspace,
                                                  create_simulation_workspace)
-from mslice.util.mantid.mantid_algorithms import (AppendSpectra, CreateSimulationWorkspace,
+from mslice.util.mantid.mantid_algorithms import (AppendSpectra, CloneWorkspace, CreateSimulationWorkspace,
                                                   CreateWorkspace, ConvertToMD, AddSampleLog)
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mantid.api import AnalysisDataService
@@ -87,5 +87,7 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
 
     def test_remove_workspace_from_ads(self):
         current_len = len(AnalysisDataService)
-        remove_workspace_from_ads(self.test_workspace)
+        test_workspace2 = CloneWorkspace(OutputWorkspace='test_workspace2', InputWorkspace=self.test_workspace)
+        export_workspace_to_ads(test_workspace2)
+        remove_workspace_from_ads(test_workspace2)
         self.assertEqual(len(AnalysisDataService), current_len - 1)
