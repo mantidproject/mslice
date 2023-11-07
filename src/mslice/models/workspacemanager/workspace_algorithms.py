@@ -20,12 +20,12 @@ from mantid.api import MatrixWorkspace
 
 from mslice.models.axis import Axis
 from mslice.util.mantid.algorithm_wrapper import add_to_ads
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name, delete_workspace
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, get_workspace_name, delete_workspace, add_workspace
 from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits, Rebose
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace
-from mslice.workspace.helperfunctions import WorkspaceNameAppender
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 
 from .file_io import save_ascii, save_matlab, save_nexus, save_nxspe
 
@@ -199,17 +199,17 @@ def combine_workspace(selected_workspaces, new_name):
 
 
 def add_workspace_runs(selected_ws):
-    sum_ws = MergeRuns(OutputWorkspace=WorkspaceNameAppender.sum(selected_ws[0]),
+    sum_ws = MergeRuns(OutputWorkspace=WorkspaceNameHandler(selected_ws[0]).summed(),
                        InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
-    scaled_bg_ws = Scale(OutputWorkspace=WorkspaceNameAppender.scale(str(background_ws), ssf),
+    scaled_bg_ws = Scale(OutputWorkspace=WorkspaceNameHandler(background_ws).scaled(ssf),
                          InputWorkspace=str(background_ws), Factor=ssf, store=False)
     try:
         for ws_name in workspaces:
-            result = Minus(OutputWorkspace=WorkspaceNameAppender.subtract(ws_name, ssf),
+            result = Minus(OutputWorkspace=WorkspaceNameHandler(ws_name).subtracted(ssf),
                            LHSWorkspace=ws_name, RHSWorkspace=scaled_bg_ws)
             propagate_properties(get_workspace_handle(ws_name), result)
     except ValueError as e:
@@ -218,7 +218,7 @@ def subtract(workspaces, background_ws, ssf):
 
 def rebose_single(ws, from_temp, to_temp):
     ws = get_workspace_handle(ws)
-    results = Rebose(OutputWorkspace=WorkspaceNameAppender.rebose(ws.name),
+    results = Rebose(OutputWorkspace=WorkspaceNameHandler(ws.name).rebosed(),
                      InputWorkspace=ws, CurrentTemperature=from_temp, TargetTemperature=to_temp)
     propagate_properties(ws, results)
     return results
@@ -233,7 +233,7 @@ def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None
     else:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result = Scale(OutputWorkspace=WorkspaceNameAppender.scale(ws_name, scale_factor),
+            result = Scale(OutputWorkspace=WorkspaceNameHandler(ws_name).scaled(scale_factor),
                            InputWorkspace=ws.raw_ws, Factor=scale_factor)
             propagate_properties(ws, result)
 

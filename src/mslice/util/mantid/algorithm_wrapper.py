@@ -10,6 +10,8 @@ from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as MsliceWorkspace
 from mslice.workspace.workspace import Workspace as MsliceWorkspace2D
 
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
+
 
 def _parse_ws_names(args, kwargs):
     input_workspace = kwargs.get('InputWorkspace', None)
@@ -56,7 +58,8 @@ def wrap_algorithm(algorithm):
             ads_name = '__MSL' + output_name if output_name else '__MSLTMP' + str(uuid4())[:8]
             store = kwargs.pop('store', True)
             if not store:
-                ads_name += '_HIDDEN'
+                # ads_name += '_HIDDEN'
+                ads_name = WorkspaceNameHandler(ads_name).make_hidden()
             result = algorithm(*args, OutputWorkspace=ads_name, **kwargs)
         else:
             result = algorithm(*args, **kwargs)

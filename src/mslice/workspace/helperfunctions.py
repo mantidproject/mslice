@@ -85,7 +85,8 @@ def attribute_to_log(attrdict, raw_ws, append=False):
 
 def delete_workspace(workspace, ws):
     try:
-        if hasattr(workspace, str(ws)) and ws is not None and ws.name().endswith('_HIDDEN'):
+        # if hasattr(workspace, str(ws)) and ws is not None and ws.name().endswith('_HIDDEN'):
+        if hasattr(workspace, str(ws)) and ws is not None and WorkspaceNameHandler(ws.name()).is_hidden():
             DeleteWorkspace(ws)
             ws = None
     except RuntimeError:
@@ -118,16 +119,31 @@ class WrapWorkspaceAttribute(object):
         return True
 
 
-class WorkspaceNameAppender:
+class WorkspaceNameHandler:
 
-    def scale(ws_name: str, scaling_factor: float) -> str:
-        return ws_name + f"_ssf_{scaling_factor:.2f}"
+    def __init__(self, ws_name: str):
+        self.ws_name = ws_name
 
-    def subtract(ws_name: str, scaling_factor: float) -> str:
-        return ws_name + f"_minus_ssf_{scaling_factor:.2f}"
+    def add_prefix(self, prefix) -> str:
+        return prefix + self.ws_name
 
-    def sum(ws_name: str) -> str:
-        return ws_name + "_sum"
+    def add_sufix(self, sufix) -> str:
+        return self.ws_name + sufix
 
-    def rebose(ws_name: str) -> str:
-        return ws_name + "_bosed"
+    def scaled(self, scaling_factor: float) -> str:
+        return self.add_sufix(f"_ssf_{scaling_factor:.2f}")
+
+    def subtracted(self, scaling_factor: float) -> str:
+        return self.add_sufix(f"_minus_ssf_{scaling_factor:.2f}")
+
+    def summed(self) -> str:
+        return self.add_sufix("_sum")
+
+    def rebosed(self) -> str:
+        return self.add_sufix('_bosed')
+
+    def is_hidden(self) -> bool:
+        return self.ws_name.endswith('_HIDDEN')
+
+    def make_hidden(self) -> str:
+        return self.add_sufix('_HIDDEN')
