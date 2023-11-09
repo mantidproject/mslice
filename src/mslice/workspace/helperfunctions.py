@@ -86,7 +86,6 @@ def attribute_to_log(attrdict, raw_ws, append=False):
 
 def delete_workspace(workspace, ws):
     try:
-        # if hasattr(workspace, str(ws)) and ws is not None and ws.name().endswith('_HIDDEN'):
         if hasattr(workspace, str(ws)) and ws is not None and WorkspaceNameHandler(ws.name()).isHiddenFromMsl():
             DeleteWorkspace(ws)
             ws = None
