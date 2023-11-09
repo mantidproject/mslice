@@ -85,8 +85,7 @@ def attribute_to_log(attrdict, raw_ws, append=False):
 
 def delete_workspace(workspace, ws):
     try:
-        if hasattr(workspace, str(ws)) and ws is not None \
-           and (ws.name().endswith('_HIDDEN') or ws.name().startswith('__MSL')):
+        if hasattr(workspace, str(ws)) and ws is not None and ws.name().endswith('_HIDDEN'):
             DeleteWorkspace(ws)
             ws = None
     except RuntimeError:

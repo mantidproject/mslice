@@ -97,10 +97,8 @@ def add_to_ads(workspaces):
         AnalysisDataService.Instance().addOrReplace(workspace.name[startid:], workspace.raw_ws)
 
 
-def remove_from_ads(workspaces):
-    try:
-        workspaces = iter(workspaces)
-    except TypeError:
-        workspaces = [workspaces]
-    for workspace in workspaces:
-        AnalysisDataService.Instance().remove('__MSL' + workspace.name)
+def remove_from_ads(workspacename):
+    print("ws name:")
+    print(workspacename)
+    if workspacename in AnalysisDataService.Instance().getObjectNames():
+        AnalysisDataService.Instance().remove(workspacename)
