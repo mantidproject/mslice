@@ -1,4 +1,5 @@
 import pickle
+from uuid import uuid4
 import codecs
 
 from mantid.simpleapi import DeleteWorkspace, RenameWorkspace
@@ -86,7 +87,7 @@ def attribute_to_log(attrdict, raw_ws, append=False):
 def delete_workspace(workspace, ws):
     try:
         # if hasattr(workspace, str(ws)) and ws is not None and ws.name().endswith('_HIDDEN'):
-        if hasattr(workspace, str(ws)) and ws is not None and WorkspaceNameHandler(ws.name()).is_hidden():
+        if hasattr(workspace, str(ws)) and ws is not None and WorkspaceNameHandler(ws.name()).isHiddenFromMsl():
             DeleteWorkspace(ws)
             ws = None
     except RuntimeError:
@@ -141,9 +142,30 @@ class WorkspaceNameHandler:
 
     def rebosed(self) -> str:
         return self.add_sufix('_bosed')
+    
+    def isHiddenFromMsl(self) -> bool:
+        return '_HIDDEN' in self.ws_name
 
-    def is_hidden(self) -> bool:
-        return self.ws_name.endswith('_HIDDEN')
-
-    def make_hidden(self) -> str:
+    def hideFromMsl(self) -> str:
         return self.add_sufix('_HIDDEN')
+
+    def removeHideFlags(self):
+        return self.ws_name.replace('__MSL', '').replace('_HIDDEN', '')
+
+    def hideMslInAds(self):
+        return self.add_prefix('__MSL')
+
+    def isMslHiddenInAds(self):
+        return '__MSL' in self.ws_name
+
+    def hideTmpMslInAds(self):
+        return self.add_prefix('__MSLTMP')
+
+    def hideInAds(self):
+        return self.add_prefix('__')
+
+    def isHiddenInAds(self):
+        return self.ws_name.startswith('__')
+
+    def makeVisibleInAds(self):
+        return self.ws_name.lstrip('__')

@@ -22,9 +22,7 @@ def _parse_ws_names(args, kwargs):
             input_workspace = get_workspace_handle(args[0])
         args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
 
-    output_name = ''
-    if 'OutputWorkspace' in kwargs:
-        output_name = kwargs.pop('OutputWorkspace')
+    output_name = kwargs.pop('OutputWorkspace', '')
 
     for key in kwargs.keys():
         if input_workspace is None and 'LHS' in key:
@@ -51,15 +49,14 @@ def wrap_algorithm(algorithm):
             kwargs['InputWorkspaces'] = [_name_or_wrapper_to_workspace(arg) for arg in kwargs['InputWorkspaces']]
 
         for ky in [k for k in kwargs.keys() if 'Workspace' in k]:
-            if isinstance(kwargs[ky], string_types) and '__MSL' not in kwargs[ky]:
+            if isinstance(kwargs[ky], string_types) and not WorkspaceNameHandler(kwargs[ky]).isMslHiddenInAds():
                 kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
 
         if _alg_has_outputws(algorithm):
-            ads_name = '__MSL' + output_name if output_name else '__MSLTMP' + str(uuid4())[:8]
+            ads_name = WorkspaceNameHandler(output_name).hideMslInAds() if output_name else WorkspaceNameHandler(str(uuid4())[:8]).hideTmpMslInAds()
             store = kwargs.pop('store', True)
             if not store:
-                # ads_name += '_HIDDEN'
-                ads_name = WorkspaceNameHandler(ads_name).make_hidden()
+                ads_name = WorkspaceNameHandler(ads_name).hideFromMsl()
             result = algorithm(*args, OutputWorkspace=ads_name, **kwargs)
         else:
             result = algorithm(*args, **kwargs)
@@ -96,5 +93,5 @@ def add_to_ads(workspaces):
     except TypeError:
         workspaces = [workspaces]
     for workspace in workspaces:
-        startid = (5 if workspace.name.startswith('__mat') else 2) if workspace.name.startswith('__') else 0
+        startid = (5 if workspace.name.startswith('__mat') else 2) if WorkspaceNameHandler(workspace.name).isHiddenInAds() else 0
         AnalysisDataService.Instance().addOrReplace(workspace.name[startid:], workspace.raw_ws)

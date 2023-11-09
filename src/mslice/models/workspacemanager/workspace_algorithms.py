@@ -293,12 +293,12 @@ def _save_single_ws(workspace, save_name, save_method, path, extension, slice_no
 def _get_slice_mdhisto(workspace, ws_name):
     from mslice.models.slice.slice_functions import compute_slice
     try:
-        return get_workspace_handle('__' + ws_name)
+        return get_workspace_handle(WorkspaceNameHandler(ws_name).hideInAds())
     except KeyError:
         x_axis = get_axis_from_dimension(workspace, 0)
         y_axis = get_axis_from_dimension(workspace, 1)
         compute_slice(ws_name, x_axis, y_axis, False)
-        return get_workspace_handle('__' + ws_name)
+        return get_workspace_handle(WorkspaceNameHandler(ws_name).hideInAds())
 
 
 def get_axis_from_dimension(workspace, id):

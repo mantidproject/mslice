@@ -78,12 +78,12 @@ def _parse_prop(prop):
     hidden = False
     output_ws = None
 
+    if isinstance(pval, string_types):
+        pval = WorkspaceNameHandler(pval).removeHideFlags()
+
     if prop.name() == "OutputWorkspace":
         output_ws = replace_ws_special_chars(pval)
-        hidden = WorkspaceNameHandler(pval).is_hidden()
-
-    if isinstance(pval, string_types):
-        pval = pval.replace("__MSL", "").replace("_HIDDEN", "")
+        hidden = WorkspaceNameHandler(prop.value()).isHiddenFromMsl()
 
     return pname, pval, output_ws, hidden
 

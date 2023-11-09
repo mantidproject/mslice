@@ -13,6 +13,7 @@ from mslice.models.units import EnergyUnits
 from mslice.workspace.helperfunctions import attribute_to_log
 from .cut_normalisation import normalize_workspace
 
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 
 class Cut(PythonAlgorithm):
 
@@ -87,17 +88,17 @@ def _compute_cut_nonPSD(selected_workspace, cut_axis, integration_axis, emode, a
                                       integration_axis.end_meV)))
     idx = 0 if 'Rebin' in algo else 1
     unit = 'DeltaE'
-    name = '__MSL_EnergyTransfer'
+    name = WorkspaceNameHandler('_EnergyTransfer').hideMslInAds()
     if is_momentum(cut_axis.units):
         ws_out = _cut_nonPSD_momentum(cut_binning, int_binning, emode, selected_workspace, algo)
         idx = 1
         unit = 'MomentumTransfer'
-        name = '__MSL_|Q|'
+        name = WorkspaceNameHandler('_|Q|').hideMslInAds()
     elif is_twotheta(cut_axis.units):
         ws_out = _cut_nonPSD_theta(int_binning, cut_binning, selected_workspace, algo)
         idx = 1 if 'Rebin' in algo else 0
         unit = 'Degrees'
-        name = '__MSL_Theta'
+        name = WorkspaceNameHandler('_Theta').hideMslInAds()
     elif integration_axis.units == '|Q|':
         ws_out = _cut_nonPSD_momentum(int_binning, cut_binning, emode, selected_workspace, algo)
     else:

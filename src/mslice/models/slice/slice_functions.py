@@ -11,11 +11,12 @@ from mslice.util.mantid import mantid_algorithms
 
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 
 
 def compute_slice(selected_workspace, x_axis, y_axis, norm_to_one, store_in_ADS=True):
     workspace = get_workspace_handle(selected_workspace)
-    slice = mantid_algorithms.Slice(OutputWorkspace='__' + workspace.name, InputWorkspace=workspace,
+    slice = mantid_algorithms.Slice(OutputWorkspace=WorkspaceNameHandler(workspace.name).hideInAds(), InputWorkspace=workspace,
                                     XAxis=x_axis.to_dict(), YAxis=y_axis.to_dict(), PSD=workspace.is_PSD,
                                     EMode=workspace.e_mode, NormToOne=norm_to_one, StoreInADS=store_in_ADS)
     propagate_properties(workspace, slice)
