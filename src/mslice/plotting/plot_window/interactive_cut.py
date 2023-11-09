@@ -28,8 +28,7 @@ class InteractiveCut(object):
         self._cut_plotter_presenter = CutPlotterPresenter()
         self._is_initial_cut_plotter_presenter = True
         self._rect_pos_cache = [0, 0, 0, 0, 0, 0]
-        self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event,
-                                      drawtype='box', useblit=True,
+        self.rect = RectangleSelector(self._canvas.figure.gca(), self.plot_from_mouse_event, useblit=True,
                                       button=[1, 3], spancoords='pixels', interactive=True)
 
         self.connect_event[3] = self._canvas.mpl_connect('draw_event', self.redraw_rectangle)
@@ -120,8 +119,7 @@ class InteractiveCut(object):
 
     def refresh_rect_selector(self, ax):
         extents = self.rect.extents
-        self.rect = RectangleSelector(ax, self.plot_from_mouse_event,
-                                      drawtype='box', useblit=True,
+        self.rect = RectangleSelector(ax, self.plot_from_mouse_event, useblit=True,
                                       button=[1, 3], spancoords='pixels', interactive=True)
         self.rect.to_draw.set_visible(True)
         self.rect.extents = extents
