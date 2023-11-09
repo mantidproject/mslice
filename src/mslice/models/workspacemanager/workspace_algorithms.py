@@ -278,9 +278,8 @@ def export_workspace_to_ads(workspace):
     add_to_ads(workspace)
 
 
-def remove_workspace_from_ads(workspace):
-    workspace = get_workspace_handle(workspace)
-    remove_from_ads('__MSL' + workspace.name)
+def remove_workspace_from_ads(workspacename):
+    remove_from_ads(workspacename)
 
 
 def _save_single_ws(workspace, save_name, save_method, path, extension):
