@@ -131,16 +131,22 @@ class WorkspaceNameHandler:
         return self.ws_name + sufix
 
     def scaled(self, scaling_factor: float) -> str:
-        return self.add_sufix(f"_ssf_{scaling_factor:.2f}")
+        return self.add_sufix(f"_ssf_{str(scaling_factor).replace('.', '_')}")
 
     def subtracted(self, scaling_factor: float) -> str:
-        return self.add_sufix(f"_minus_ssf_{scaling_factor:.2f}")
+        return self.add_sufix(f"_minus_ssf_{str(scaling_factor).replace('.', '_')}")
 
     def summed(self) -> str:
         return self.add_sufix("_sum")
 
     def rebosed(self) -> str:
         return self.add_sufix('_bosed')
+
+    def combined(self) -> str:
+        return self.add_sufix('_combined')
+
+    def merged(self) -> str:
+        return self.add_sufix('_merged')
     
     def isHiddenFromMsl(self) -> bool:
         return '_HIDDEN' in self.ws_name
@@ -148,23 +154,23 @@ class WorkspaceNameHandler:
     def hideFromMsl(self) -> str:
         return self.add_sufix('_HIDDEN')
 
-    def removeHideFlags(self):
+    def removeHideFlags(self) -> str:
         return self.ws_name.replace('__MSL', '').replace('_HIDDEN', '')
 
-    def hideMslInAds(self):
+    def hideMslInAds(self) -> str:
         return self.add_prefix('__MSL')
 
-    def isMslHiddenInAds(self):
+    def isMslHiddenInAds(self) -> bool:
         return '__MSL' in self.ws_name
 
-    def hideTmpMslInAds(self):
+    def hideTmpMslInAds(self) -> str:
         return self.add_prefix('__MSLTMP')
 
-    def hideInAds(self):
+    def hideInAds(self) -> str:
         return self.add_prefix('__')
 
-    def isHiddenInAds(self):
+    def isHiddenInAds(self) -> bool:
         return self.ws_name.startswith('__')
 
-    def makeVisibleInAds(self):
+    def makeVisibleInAds(self) -> str:
         return self.ws_name.lstrip('__')
