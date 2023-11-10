@@ -1,4 +1,4 @@
-name: mantidnightly_3_7
+name: mantidnightly
 
 channels:
   - conda-forge
