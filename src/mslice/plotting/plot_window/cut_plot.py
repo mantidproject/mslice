@@ -644,10 +644,7 @@ class CutPlot(IPlot):
             current_axis.set_yscale('linear')
 
         if value:
-            xdata = [line.get_xdata() for line in current_axis.get_lines()]
-            x_axis_min = get_min(xdata, absolute_minimum=0.)
-            linthresh_val = pow(10, np.floor(np.log10(x_axis_min)))
-
+            linthresh_val = self._gca_sym_log_linear_threshold()
             current_axis.set_xscale('symlog', linthresh=linthresh_val)
         else:
             current_axis.set_xscale('linear')
@@ -672,16 +669,20 @@ class CutPlot(IPlot):
             current_axis.set_xscale('linear')
 
         if value:
-            ydata = [line.get_ydata() for line in current_axis.get_lines()]
-            y_axis_min = get_min(ydata, absolute_minimum=0.)
-            linthresh_val = pow(10, np.floor(np.log10(y_axis_min)))
-
+            linthresh_val = self._gca_sym_log_linear_threshold()
             current_axis.set_yscale('symlog', linthresh=linthresh_val)
         else:
             current_axis.set_yscale('linear')
 
         if value != orig_y_log:
             self.update_bragg_peaks(refresh=True)
+
+    def _gca_sym_log_linear_threshold(self):
+        current_axis = self._canvas.figure.gca()
+        data = [line.get_ydata() for line in current_axis.get_lines()]
+        axis_min = get_min(data, absolute_minimum=0.)
+        linthresh = pow(10, np.floor(np.log10(axis_min)))
+        return linthresh
 
     @property
     def y_range(self):
