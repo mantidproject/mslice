@@ -32,10 +32,11 @@ DEFAULT_TITLE_SIZE = 12
 DEFAULT_FONT_SIZE_STEP = 1
 
 
-def get_min(data, absolute_minimum=-np.inf):
-    """Determines the minimum value in a set of numpy arrays (ignoring values below absolute_minimum)"""
-    masked_data = [np.extract(np.greater(row, absolute_minimum), row) for row in data]
-    return np.min([np.min(row) for row in masked_data])
+def _gca_sym_log_linear_threshold(axis_data):
+    axis_data = np.array(axis_data)
+    axis_min = np.min(axis_data[axis_data > 0])
+    linthresh = pow(10, np.floor(np.log10(axis_min)))
+    return linthresh
 
 
 class CutPlot(IPlot):
@@ -640,11 +641,12 @@ class CutPlot(IPlot):
     def x_log(self, value):
         current_axis = self._canvas.figure.gca()
         if not self.y_log:
-            # Fixes bug where setting xscale from log to linear distorts plot data
+            # Settig y-axis before x-axis fixes weird bug to allow x-axis being set to linear
             current_axis.set_yscale('linear')
 
         if value:
-            linthresh_val = self._gca_sym_log_linear_threshold()
+            axis_data = [line.get_xdata() for line in current_axis.get_lines()]
+            linthresh_val = _gca_sym_log_linear_threshold(axis_data)
             current_axis.set_xscale('symlog', linthresh=linthresh_val)
         else:
             current_axis.set_xscale('linear')
@@ -669,20 +671,14 @@ class CutPlot(IPlot):
             current_axis.set_xscale('linear')
 
         if value:
-            linthresh_val = self._gca_sym_log_linear_threshold()
+            axis_data = [line.get_ydata() for line in current_axis.get_lines()]
+            linthresh_val = _gca_sym_log_linear_threshold(axis_data)
             current_axis.set_yscale('symlog', linthresh=linthresh_val)
         else:
             current_axis.set_yscale('linear')
 
         if value != orig_y_log:
             self.update_bragg_peaks(refresh=True)
-
-    def _gca_sym_log_linear_threshold(self):
-        current_axis = self._canvas.figure.gca()
-        data = [line.get_ydata() for line in current_axis.get_lines()]
-        axis_min = get_min(data, absolute_minimum=0.)
-        linthresh = pow(10, np.floor(np.log10(axis_min)))
-        return linthresh
 
     @property
     def y_range(self):

@@ -3,7 +3,7 @@ import numpy as np
 import unittest
 
 from matplotlib.lines import Line2D
-from mslice.plotting.plot_window.cut_plot import CutPlot, get_min
+from mslice.plotting.plot_window.cut_plot import CutPlot, _gca_sym_log_linear_threshold
 
 
 class CutPlotTest(unittest.TestCase):
@@ -29,10 +29,11 @@ class CutPlotTest(unittest.TestCase):
         self.assertEqual(self.cut_plot.is_changed('y_grid'), False)
         self.assertEqual(self.cut_plot.is_changed('x_grid'), True)
 
-    def test_get_min(self):
-        data = [np.array([3, 6, 10]), np.array([3, 2, 7])]
-        self.assertEqual(get_min(data), 2)
-        self.assertEqual(get_min(data, 4), 6)
+    def tests_gca_sym_log_linear_threshold(self):
+        self.assertEqual(_gca_sym_log_linear_threshold([np.array([20, 60, 12])]), 10)
+        self.assertEqual(_gca_sym_log_linear_threshold([np.array([1, 5, 10])]), 1)
+        self.assertEqual(_gca_sym_log_linear_threshold([np.array([-1, 5, -10])]), 1)
+        self.assertEqual(_gca_sym_log_linear_threshold([np.array([300, 500, 1000])]), 100)
 
     @patch.object(CutPlot, 'y_log', PropertyMock(return_value=False))
     def test_change_x_scale_linear(self):
@@ -59,6 +60,7 @@ class CutPlotTest(unittest.TestCase):
         self.axes.get_lines = MagicMock(return_value=[line])
         self.cut_plot.x_log = True
         self.axes.set_yscale.assert_called_with('linear')
+        self.axes.set_xscale.assert_called_once()
         self.axes.set_xscale.assert_called_once_with('symlog', linthresh=10.0)
 
     @patch.object(CutPlot, 'x_log', PropertyMock(return_value=False))
