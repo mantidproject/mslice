@@ -33,7 +33,7 @@ DEFAULT_FONT_SIZE_STEP = 1
 
 
 def _gca_sym_log_linear_threshold(axis_data):
-    axis_data = np.array(axis_data)
+    axis_data = np.concatenate(axis_data)
     axis_min = np.min(axis_data[axis_data > 0])
     linthresh = pow(10, np.floor(np.log10(axis_min)))
     return linthresh
