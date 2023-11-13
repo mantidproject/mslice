@@ -145,7 +145,7 @@ class WorkspaceNameHandler:
 
     def merged(self) -> str:
         return self.add_sufix('_merged')
-    
+
     def isHiddenFromMsl(self) -> bool:
         return '_HIDDEN' in self.ws_name
 
