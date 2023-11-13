@@ -217,13 +217,15 @@ class PlotFigureManagerQT(QtCore.QObject):
         if hasattr(self.plot_handler, 'ws_list'):
             workspaces = self.plot_handler.ws_list
         else:
-            workspaces = [self.plot_handler.ws_name]
+            if isinstance(self.plot_handler, SlicePlot):
+                workspaces = [self.plot_handler.get_cached_workspace()]
+            else:
+                workspaces = [self.plot_handler.ws_name]
         try:
             save_workspaces(workspaces,
                             file_path,
                             save_name,
-                            ext,
-                            slice_nonpsd=True)
+                            ext)
         except RuntimeError as e:
             if str(e) == "unrecognised file extension":
                 supported_image_types = list(
@@ -303,16 +305,20 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     @property
     def title(self):
-        return self.figure.gca().get_title()
+        return self.figure.gca().title.get_text()
 
     @title.setter
     def title(self, value):
-        self.figure.gca().set_title(value)
+        self.figure.gca().title.set_text(value)
         self.window.setWindowTitle(value)
 
     @property
     def title_size(self):
         return self.figure.gca().title.get_size()
+
+    @title_size.setter
+    def title_size(self, value):
+        self.figure.gca().title.set_size(value)
 
     @property
     def x_label(self):
@@ -326,6 +332,10 @@ class PlotFigureManagerQT(QtCore.QObject):
     def x_label_size(self):
         return self.figure.gca().xaxis.label.get_size()
 
+    @x_label_size.setter
+    def x_label_size(self, value):
+        self.figure.gca().xaxis.label.set_size(value)
+
     @property
     def y_label(self):
         return self.figure.gca().get_ylabel()
@@ -337,6 +347,10 @@ class PlotFigureManagerQT(QtCore.QObject):
     @property
     def y_label_size(self):
         return self.figure.gca().yaxis.label.get_size()
+
+    @y_label_size.setter
+    def y_label_size(self, value):
+        self.figure.gca().yaxis.label.set_size(value)
 
     @property
     def x_range(self):

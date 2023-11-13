@@ -224,7 +224,7 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_pixel_workspace('test_plot_cut_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
+        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=(None, None), plot_over=False)
 
     @mock.patch('mslice.cli._mslice_commands.is_gui')
     @mock.patch('mslice.app.presenters.cli_cut_plotter_presenter')
@@ -233,7 +233,7 @@ class CommandLineTest(unittest.TestCase):
         workspace = self.create_workspace('test_plot_cut_non_psd_cli')
         cut = Cut(workspace)
         PlotCut(cut)
-        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=None, plot_over=False)
+        cpp.plot_cut_from_workspace.assert_called_once_with(cut, intensity_range=(None, None), plot_over=False)
 
     @mock.patch('mantid.plots.axesfunctions.errorbar')
     @mock.patch('mslice.cli._mslice_commands.is_gui')

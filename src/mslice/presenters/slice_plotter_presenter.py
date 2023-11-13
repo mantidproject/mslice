@@ -94,14 +94,14 @@ class SlicePlotterPresenter(PresenterUtility):
             remove_line(line)
 
     def add_overplot_line(self, workspace_name, key, recoil, cif=None, y_has_logarithmic=None, datum=None,
-                          intensity_correction=None):
+                          intensity_correction=None, **kwargs):
         cache = self._slice_cache[workspace_name]
         if recoil:
             x, y = compute_recoil_line(workspace_name, cache.momentum_axis, key)
         else:
             x, y = compute_powder_line(workspace_name, cache.momentum_axis, key, cif_file=cif)
         y = convert_energy_to_meV(y, cache.energy_axis.e_unit)
-        cache.overplot_lines[key] = plot_overplot_line(x, y, key, recoil, cache)
+        cache.overplot_lines[key] = plot_overplot_line(x, y, key, recoil, cache, **kwargs)
 
     def validate_intensity(self, intensity_start, intensity_end):
         intensity_start = self._to_float(intensity_start)
@@ -115,12 +115,3 @@ class SlicePlotterPresenter(PresenterUtility):
 
     def workspace_selection_changed(self):
         pass
-
-    def _cache_intensity_correction_methods(self):
-        cat = CATEGORY_SLICE
-        IntensityCache.cache_method(cat, IntensityType.SCATTERING_FUNCTION, self.show_scattering_function)
-        IntensityCache.cache_method(cat, IntensityType.CHI, self.show_dynamical_susceptibility)
-        IntensityCache.cache_method(cat, IntensityType.CHI_MAGNETIC,
-                                    self.show_dynamical_susceptibility_magnetic)
-        IntensityCache.cache_method(cat, IntensityType.D2SIGMA, self.show_d2sigma)
-        IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised)

@@ -71,8 +71,8 @@ def remove_line(line):
     plt.gca().lines.remove(line)
 
 
-def plot_overplot_line(x, y, key, recoil, cache):
-    color = OVERPLOT_COLORS[key] if key in OVERPLOT_COLORS else 'c'
+def plot_overplot_line(x, y, key, recoil, cache, **kwargs):
+    color = kwargs.get('color', OVERPLOT_COLORS.get(key, 'c'))
     if recoil:
         return overplot_line(x, y, color, get_recoil_label(key), cache.rotated)
     else:

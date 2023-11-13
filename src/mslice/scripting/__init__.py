@@ -101,7 +101,7 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
                 continue
             if algorithm.name() == "Load":
                 if prop.name() == "Filename":
-                    arguments += [f"{prop.name()}='{pval}'"]
+                    arguments += [f"{prop.name()}=r'{pval}'"]
                     continue
                 elif prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
                     continue
