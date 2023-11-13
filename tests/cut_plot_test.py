@@ -1,9 +1,9 @@
-from mock import MagicMock, patch, ANY
+from mock import MagicMock, PropertyMock, patch, ANY
 import numpy as np
 import unittest
 
 from matplotlib.lines import Line2D
-from mslice.plotting.plot_window.cut_plot import CutPlot, get_min
+from mslice.plotting.plot_window.cut_plot import CutPlot, _gca_sym_log_linear_threshold
 
 
 class CutPlotTest(unittest.TestCase):
@@ -29,41 +29,52 @@ class CutPlotTest(unittest.TestCase):
         self.assertEqual(self.cut_plot.is_changed('y_grid'), False)
         self.assertEqual(self.cut_plot.is_changed('x_grid'), True)
 
-    def test_get_min(self):
-        data = [np.array([3, 6, 10]), np.array([3, 2, 7])]
-        self.assertEqual(get_min(data), 2)
-        self.assertEqual(get_min(data, 4), 6)
+    def tests_gca_sym_log_linear_threshold(self):
+        self.assertEqual(_gca_sym_log_linear_threshold([np.array([20, 60, 12])]), 10)
+        self.assertEqual(_gca_sym_log_linear_threshold([np.array([1, 5, 10])]), 1)
+        self.assertEqual(_gca_sym_log_linear_threshold([np.array([-1, 5, -10])]), 1)
+        self.assertEqual(_gca_sym_log_linear_threshold([np.array([300, 500, 1000])]), 100)
 
-    def test_change_scale_linear(self):
+    @patch.object(CutPlot, 'y_log', PropertyMock(return_value=False))
+    def test_change_x_scale_linear(self):
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
-        xy_config = {'x_log': False, 'y_log': False, 'x_range': (0, 10), 'y_range': (1, 7)}
+        self.cut_plot.x_log = False
+        self.axes.set_xscale.assert_called_with('linear')
+        self.axes.set_yscale.assert_called_with('linear')
 
-        self.cut_plot.change_axis_scale(xy_config)
-        self.axes.set_xscale.assert_called_once_with('linear')
-        self.axes.set_yscale.assert_called_once_with('linear')
-        self.assertEqual(self.cut_plot.x_range, (0, 10))
-        self.assertEqual(self.cut_plot.y_range, (1, 7))
+    @patch.object(CutPlot, 'x_log', PropertyMock(return_value=False))
+    def test_change_y_scale_linear(self):
+        self.axes.set_xscale = MagicMock()
+        self.axes.set_yscale = MagicMock()
+        self.cut_plot.y_log = False
+        self.axes.set_xscale.assert_called_with('linear')
+        self.axes.set_yscale.assert_called_with('linear')
 
-    def test_change_scale_log(self):
-        self.cut_plot.save_default_options()
+    @patch.object(CutPlot, 'y_log', PropertyMock(return_value=False))
+    def test_change_x_scale_log(self):
+        self.axes.set_xscale = MagicMock()
+        self.axes.set_yscale = MagicMock()
+        line = MagicMock()
+        line.get_xdata = MagicMock(return_value=np.array([20, 60, 12]))
+        self.axes.get_lines = MagicMock(return_value=[line])
+        self.cut_plot.x_log = True
+        self.axes.set_yscale.assert_called_with('linear')
+        self.axes.set_xscale.assert_called_once()
+        self.axes.set_xscale.assert_called_once_with('symlog', linthresh=10.0)
+
+    @patch.object(CutPlot, 'x_log', PropertyMock(return_value=False))
+    def test_change_y_scale_log(self):
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
         line = MagicMock()
         line.get_ydata = MagicMock(return_value=np.array([1, 5, 10]))
-        line.get_xdata = MagicMock(return_value=np.array([20, 60, 12]))
         self.axes.get_lines = MagicMock(return_value=[line])
-        self.canvas.figure.gca = MagicMock(return_value=self.axes)
-        xy_config = {'x_log': True, 'y_log': True, 'x_range': (0, 20), 'y_range': (1, 7)}
         self.cut_plot.update_bragg_peaks = MagicMock()
-        self.cut_plot.change_axis_scale(xy_config)
-
-        self.axes.set_xscale.assert_called_once_with('symlog', linthresh=10.0)
+        self.cut_plot.y_log = True
+        self.axes.set_xscale.assert_called_with('linear')
         self.axes.set_yscale.assert_called_once_with('symlog', linthresh=1.0)
-
         self.cut_plot.update_bragg_peaks.assert_called_once_with(refresh=True)
-        self.assertEqual(self.cut_plot.x_range, (0, 20))
-        self.assertEqual(self.cut_plot.y_range, (1, 7))
 
     @patch('mslice.plotting.plot_window.cut_plot.quick_options')
     def test_line_clicked(self, quick_options_mock):
