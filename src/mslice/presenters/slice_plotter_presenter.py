@@ -10,8 +10,6 @@ from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, c
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.plot_window.overplot_interface import plot_overplot_line, remove_line
 from mslice.presenters.presenter_utility import PresenterUtility
-from mslice.plotting.pyplot import CATEGORY_SLICE
-from mslice.util.intensity_correction import IntensityType, IntensityCache
 from mslice.workspace.helperfunctions import WorkspaceNameHandler
 
 
