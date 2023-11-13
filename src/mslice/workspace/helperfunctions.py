@@ -131,10 +131,10 @@ class WorkspaceNameHandler:
         return self.ws_name + sufix
 
     def scaled(self, scaling_factor: float) -> str:
-        return self.add_sufix(f"_ssf_{str(scaling_factor).replace('.', '_')}")
+        return self.add_sufix("_ssf_" + f"{scaling_factor:.2f}".replace('.', '_'))
 
     def subtracted(self, scaling_factor: float) -> str:
-        return self.add_sufix(f"_minus_ssf_{str(scaling_factor).replace('.', '_')}")
+        return self.add_sufix("_minus_ssf_" + f"{scaling_factor:.2f}".replace('.', '_'))
 
     def summed(self) -> str:
         return self.add_sufix("_sum")
