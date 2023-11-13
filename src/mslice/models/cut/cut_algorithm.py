@@ -12,8 +12,8 @@ from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.units import EnergyUnits
 from mslice.workspace.helperfunctions import attribute_to_log
 from .cut_normalisation import normalize_workspace
-
 from mslice.workspace.helperfunctions import WorkspaceNameHandler
+
 
 class Cut(PythonAlgorithm):
 
