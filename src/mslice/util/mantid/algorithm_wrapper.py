@@ -53,7 +53,11 @@ def wrap_algorithm(algorithm):
                 kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
 
         if _alg_has_outputws(algorithm):
-            ads_name = WorkspaceNameHandler(output_name).hideMslInAds() if output_name else WorkspaceNameHandler(str(uuid4())[:8]).hideTmpMslInAds()
+            if output_name:
+                ads_name = WorkspaceNameHandler(output_name).hideMslInAds()
+            else:
+                ads_name = WorkspaceNameHandler(str(uuid4())[:8]).hideTmpMslInAds()
+
             store = kwargs.pop('store', True)
             if not store:
                 ads_name = WorkspaceNameHandler(ads_name).hideFromMsl()

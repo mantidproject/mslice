@@ -1,7 +1,5 @@
 import pickle
-from uuid import uuid4
 import codecs
-
 from mantid.simpleapi import DeleteWorkspace, RenameWorkspace
 
 
