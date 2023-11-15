@@ -31,8 +31,9 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self._presenter = DataLoaderPresenter(self)
         self.btnload.setEnabled(False)
         self.btnmerge.setEnabled(False)
-
+        print("before activated")
         self.table_view.activated.connect(self.activated)
+        print("after activated")
         self.table_view.clicked.connect(self.validate_selection)
         self.txtpath.editingFinished.connect(self.refresh)
         self.btnback.clicked.connect(self.back)
@@ -104,6 +105,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.table_view.setRootIndex(self.file_system.index(new_path))
         self.txtpath.setText(new_path)
         self._clear_displayed_error()
+        print("end update from path")
 
     def back(self):
         self.directory.cdUp()
