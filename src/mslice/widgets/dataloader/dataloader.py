@@ -89,16 +89,24 @@ class DataLoaderWidget(QWidget):  # and some view interface
 
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
+        print("1")
         try:
             rel_path = os.path.relpath(new_path, self.root_path)
+            print("2")
         except ValueError:   # We are in windows and user changed to another drive
             rel_path = '..'
+            print("3")
         if rel_path.startswith('..'):
             self.file_system.setRootPath(new_path)
+            print("4")
             self.root_path = new_path
+            print("5")
         self.table_view.setRootIndex(self.file_system.index(new_path))
+        print("6")
         self.txtpath.setText(new_path)
+        print("7")
         self._clear_displayed_error()
+        print("8")
 
     def back(self):
         self.directory.cdUp()
