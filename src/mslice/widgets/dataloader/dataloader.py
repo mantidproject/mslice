@@ -49,18 +49,16 @@ class DataLoaderWidget(QWidget):  # and some view interface
             event.accept()
 
     def activated(self, file_clicked):
-        print("1")
         file_clicked = file_clicked.sibling(file_clicked.row(), 0)  # so clicking anywhere on row gives filename
-        print("2")
         if self.file_system.isDir(file_clicked):
             self.enter_dir(self.file_system.fileName(file_clicked))
-            print("3")
         else:
             self.load(False)
-            print("4")
 
     def enter_dir(self, directory):
+        print("1")
         self.directory.cd(directory)
+        print("2")
         self._update_from_path()
 
     def refresh(self):
@@ -77,11 +75,13 @@ class DataLoaderWidget(QWidget):  # and some view interface
 
     def reload_model(self):
         # Redefines the QFileSystemModel - hopefully to refresh any changes not caught because of filesystem issues
+        print("3")
         self.file_system = QFileSystemModel()
         self.root_path = self.directory.absolutePath()
         self.file_system.setRootPath(self.root_path)
         self.file_system.setNameFilters(MSLICE_EXTENSIONS)
         self.file_system.setNameFilterDisables(False)
+        print("4")
         self.table_view.setModel(self.file_system)
         self.table_view.setRootIndex(self.file_system.index(self.root_path))
         self.table_view.setColumnWidth(0, 320)    # Make name wide
@@ -89,6 +89,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.table_view.setColumnWidth(2, 123)
         self.table_view.setColumnWidth(3, 140)    # Show date modified
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        print("5")
         self.sort_files(self._sort_column)
 
     def _update_from_path(self):
@@ -120,13 +121,17 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self._update_from_path()
 
     def validate_selection(self):
+        print("6")
         self.btnload.setEnabled(False)
         self.btnmerge.setEnabled(False)
+        print("7")
         selected = self.get_selected_file_paths()
+        print("8")
         for selection in selected:
             if self.file_system.isDir(self.file_system.index(selection)):
                 return
         self.btnload.setEnabled(True)
+        print("9")
         if len(selected) > 1:
             self.btnmerge.setEnabled(True)
 
