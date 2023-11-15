@@ -49,11 +49,15 @@ class DataLoaderWidget(QWidget):  # and some view interface
             event.accept()
 
     def activated(self, file_clicked):
+        print("1")
         file_clicked = file_clicked.sibling(file_clicked.row(), 0)  # so clicking anywhere on row gives filename
+        print("2")
         if self.file_system.isDir(file_clicked):
             self.enter_dir(self.file_system.fileName(file_clicked))
+            print("3")
         else:
             self.load(False)
+            print("4")
 
     def enter_dir(self, directory):
         self.directory.cd(directory)
@@ -89,24 +93,16 @@ class DataLoaderWidget(QWidget):  # and some view interface
 
     def _update_from_path(self):
         new_path = self.directory.absolutePath()
-        print("1")
         try:
             rel_path = os.path.relpath(new_path, self.root_path)
-            print("2")
         except ValueError:   # We are in windows and user changed to another drive
             rel_path = '..'
-            print("3")
         if rel_path.startswith('..'):
             self.file_system.setRootPath(new_path)
-            print("4")
             self.root_path = new_path
-            print("5")
         self.table_view.setRootIndex(self.file_system.index(new_path))
-        print("6")
         self.txtpath.setText(new_path)
-        print("7")
         self._clear_displayed_error()
-        print("8")
 
     def back(self):
         self.directory.cdUp()
