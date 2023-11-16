@@ -31,7 +31,6 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self._presenter = DataLoaderPresenter(self)
         self.btnload.setEnabled(False)
         self.btnmerge.setEnabled(False)
-
         self.table_view.activated.connect(self.activated)
         self.table_view.clicked.connect(self.validate_selection)
         self.txtpath.editingFinished.connect(self.refresh)
