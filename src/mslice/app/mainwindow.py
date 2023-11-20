@@ -287,3 +287,6 @@ class MainWindow(MainView, QMainWindow):
         for item in print_list:
             for strn in item.split('\n'):
                 self._console.execute(f'print("{strn}")', hidden=True)
+
+    def closeEvent(self, event):
+        self._console.cleanup()
