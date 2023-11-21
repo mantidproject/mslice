@@ -118,7 +118,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         for workspace in selected_workspaces:
             ws = get_workspace_handle(workspace)
-            remove_workspace_from_ads(ws)
+            remove_workspace_from_ads(ws.name)
             delete_workspace(workspace)
             self.update_displayed_workspaces()
 
