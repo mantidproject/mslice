@@ -119,7 +119,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         for workspace in selected_workspaces:
             # Remove hidden workspaces from ADS
             ws = get_workspace_handle(workspace)
-            remove_workspace_from_ads('__MSL' + ws.name)
+            remove_workspace_from_ads(ws.name)
+            # remove_workspace_from_ads('__MSL' + ws.name)
             delete_workspace(workspace)
             self.update_displayed_workspaces()
 

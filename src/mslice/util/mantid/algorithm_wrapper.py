@@ -98,5 +98,9 @@ def add_to_ads(workspaces):
 
 
 def remove_from_ads(workspacename):
+    print(AnalysisDataService.Instance().getObjectNames())
+    if workspacename in AnalysisDataService.Instance().getObjectNames():
+        AnalysisDataService.Instance().remove(workspacename)
+    workspacename = '__MSL' + workspacename
     if workspacename in AnalysisDataService.Instance().getObjectNames():
         AnalysisDataService.Instance().remove(workspacename)
