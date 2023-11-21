@@ -117,10 +117,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
         for workspace in selected_workspaces:
-            # Remove hidden workspaces from ADS
             ws = get_workspace_handle(workspace)
-            remove_workspace_from_ads(ws.name)
-            # remove_workspace_from_ads('__MSL' + ws.name)
+            remove_workspace_from_ads(ws)
             delete_workspace(workspace)
             self.update_displayed_workspaces()
 
