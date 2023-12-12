@@ -5,6 +5,7 @@ from six import string_types
 
 from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle
 from mantid.api import AnalysisDataService, AlgorithmManager, Workspace
+from mantid.kernel import ConfigService
 
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as MsliceWorkspace
@@ -102,5 +103,14 @@ def remove_from_ads(workspacename):
         AnalysisDataService.Instance().remove(workspacename)
     # Remove hidden workspaces from ADS
     workspacename = '__MSL' + workspacename
-    if workspacename in AnalysisDataService.Instance().getObjectNames():
+    original_setting = True
+    # Temporarily enable showing hidden objects in ADS in case the user setting is not enabled
+    if ConfigService.getString("MantidOptions.InvisibleWorkspaces").lower() != ("true" or "1"):
+        ConfigService.setString("MantidOptions.InvisibleWorkspaces", "1")
+        original_setting = False
+    ws_known_to_ads = AnalysisDataService.Instance().getObjectNames()
+    # Restore original user setting
+    if not original_setting:
+        ConfigService.setString("MantidOptions.InvisibleWorkspaces", "0")
+    if workspacename in ws_known_to_ads:
         AnalysisDataService.Instance().remove(workspacename)
