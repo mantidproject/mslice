@@ -7,7 +7,8 @@ from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
 from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads, subtract,
                                                                  is_pixel_workspace, combine_workspace,
-                                                                 add_workspace_runs, scale_workspaces)
+                                                                 add_workspace_runs, scale_workspaces,
+                                                                 remove_workspace_from_ads)
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
                                                                get_workspace_name, delete_workspace, rename_workspace)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
@@ -116,6 +117,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_one_or_more_workspaces()
             return
         for workspace in selected_workspaces:
+            ws = get_workspace_handle(workspace)
+            remove_workspace_from_ads(ws.name)
             delete_workspace(workspace)
             self.update_displayed_workspaces()
 

@@ -95,3 +95,12 @@ def add_to_ads(workspaces):
     for workspace in workspaces:
         startid = (5 if workspace.name.startswith('__mat') else 2) if workspace.name.startswith('__') else 0
         AnalysisDataService.Instance().addOrReplace(workspace.name[startid:], workspace.raw_ws)
+
+
+def remove_from_ads(workspacename):
+    if AnalysisDataService.Instance().doesExist(workspacename):
+        AnalysisDataService.Instance().remove(workspacename)
+    # Remove hidden workspaces from ADS
+    workspacename = '__MSL' + workspacename
+    if AnalysisDataService.Instance().doesExist(workspacename):
+        AnalysisDataService.Instance().remove(workspacename)
