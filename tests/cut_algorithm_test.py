@@ -1,6 +1,7 @@
 import numpy as np
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+import warnings
 
 from mantid.api import AnalysisDataService
 from mantid.dataobjects import MDHistoWorkspace
@@ -27,7 +28,9 @@ class CutAlgorithmTest(TestCase):
         self.theta_axis = Axis("2Theta", -10, 15, 1)
 
     def tearDown(self) -> None:
-        AnalysisDataService.clear()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            AnalysisDataService.clear()
 
     def xtest_that_compute_cut_returns_a_result_with_the_expected_size_for_normalized_psd_rebin_data(self):
         normalized = True

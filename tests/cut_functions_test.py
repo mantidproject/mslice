@@ -2,6 +2,7 @@ import numpy as np
 
 from mock import patch
 from unittest import TestCase
+import warnings
 
 from mantid.api import AlgorithmFactory, AnalysisDataService
 from mantid.simpleapi import AddSampleLog, _create_algorithm_function
@@ -41,7 +42,9 @@ class CutFunctionsTest(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        AnalysisDataService.clear()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            AnalysisDataService.clear()
 
     def test_that_output_workspace_name_returns_the_expected_result(self):
         self.assertEqual(output_workspace_name(self.workspace_name, self.integration_start, self.integration_end),
