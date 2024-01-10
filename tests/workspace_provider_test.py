@@ -45,16 +45,16 @@ class MantidWorkspaceProviderTest(unittest.TestCase):
 
     def test_subtract_workspace(self):
         subtract(['test_ws_2d'], 'test_ws_2d', 0.95)
-        result = get_workspace_handle(WorkspaceNameHandler('test_ws_2d').subtracted(0.95))
+        result = get_workspace_handle(WorkspaceNameHandler('test_ws_2d').get_name(subtracted=True, scaling_factor=0.95))
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [0.05] * 20)
         np.testing.assert_array_almost_equal(self.test_ws_2d.raw_ws.dataY(0), [1] * 20)
-        self.assertFalse(WorkspaceNameHandler('test_ws_2d').scaled(0.95) in get_visible_workspace_names())
+        self.assertFalse(WorkspaceNameHandler('test_ws_2d').get_name(scaled=True, scaling_factor=0.95) in get_visible_workspace_names())
         self.assertRaises(ValueError, subtract, ['test_ws_2d'], 'test_ws_md', 1.0)
 
     def test_add_workspace(self):
         original_data = self.test_ws_2d.raw_ws.dataY(0)
         add_workspace_runs(['test_ws_2d', 'test_ws_2d'])
-        result = get_workspace_handle(WorkspaceNameHandler('test_ws_2d').summed())
+        result = get_workspace_handle(WorkspaceNameHandler('test_ws_2d').get_name(summed=True))
         np.testing.assert_array_almost_equal(result.raw_ws.dataY(0), [2.0] * 20)
         np.testing.assert_array_almost_equal(original_data, [1] * 20)
 

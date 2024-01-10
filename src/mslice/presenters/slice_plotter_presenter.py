@@ -32,19 +32,19 @@ class SlicePlotterPresenter(PresenterUtility):
         return slice
 
     def plot_from_cache(self, workspace):
-        ws_name = WorkspaceNameHandler(workspace.name).makeVisibleInAds()
+        ws_name = WorkspaceNameHandler(workspace.name).get_name(make_ws_visible_in_ADS=True)
         create_slice_figure(ws_name, self)
         self.show_scattering_function(ws_name)
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):
-        workspace_name = WorkspaceNameHandler(workspace_name).makeVisibleInAds()
+        workspace_name = WorkspaceNameHandler(workspace_name).get_name(make_ws_visible_in_ADS=True)
         intensity_start, intensity_end = self.validate_intensity(intensity_start, intensity_end)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._slice_cache[workspace_name].norm = norm
 
     def change_colourmap(self, workspace_name, colourmap):
         if colourmap in ALLOWED_CMAPS:
-            workspace_name = WorkspaceNameHandler(workspace_name).makeVisibleInAds()
+            workspace_name = WorkspaceNameHandler(workspace_name).get_name(make_ws_visible_in_ADS=True)
             self._slice_cache[workspace_name].colourmap = colourmap
         else:
             raise ValueError('colourmap not recognised')

@@ -40,7 +40,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 if not self.file_types_match(file_paths):
                     self._view.error_merge_different_file_formats()
                     return
-                ws_names = [WorkspaceNameHandler(ws_names[0]).merged()]
+                ws_names = [WorkspaceNameHandler(ws_names[0]).get_name(merged=True)]
                 file_paths = ['+'.join(file_paths)]
             self._load_ws(file_paths, ws_names, force_overwrite)
 

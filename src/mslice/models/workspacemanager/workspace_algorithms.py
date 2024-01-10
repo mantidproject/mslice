@@ -199,17 +199,17 @@ def combine_workspace(selected_workspaces, new_name):
 
 
 def add_workspace_runs(selected_ws):
-    sum_ws = MergeRuns(OutputWorkspace=WorkspaceNameHandler(selected_ws[0]).summed(),
+    sum_ws = MergeRuns(OutputWorkspace=WorkspaceNameHandler(selected_ws[0]).get_name(summed=True),
                        InputWorkspaces=selected_ws)
     propagate_properties(get_workspace_handle(selected_ws[0]), sum_ws)
 
 
 def subtract(workspaces, background_ws, ssf):
-    scaled_bg_ws = Scale(OutputWorkspace=WorkspaceNameHandler(background_ws).scaled(ssf),
+    scaled_bg_ws = Scale(OutputWorkspace=WorkspaceNameHandler(background_ws).get_name(scaling_factor=ssf, scaled=True),
                          InputWorkspace=str(background_ws), Factor=ssf, store=False)
     try:
         for ws_name in workspaces:
-            result = Minus(OutputWorkspace=WorkspaceNameHandler(ws_name).subtracted(ssf),
+            result = Minus(OutputWorkspace=WorkspaceNameHandler(ws_name).get_name(scaling_factor=ssf, subtracted=True),
                            LHSWorkspace=ws_name, RHSWorkspace=scaled_bg_ws)
             propagate_properties(get_workspace_handle(ws_name), result)
     except ValueError as e:
@@ -218,7 +218,7 @@ def subtract(workspaces, background_ws, ssf):
 
 def rebose_single(ws, from_temp, to_temp):
     ws = get_workspace_handle(ws)
-    results = Rebose(OutputWorkspace=WorkspaceNameHandler(ws.name).rebosed(),
+    results = Rebose(OutputWorkspace=WorkspaceNameHandler(ws.name).get_name(rebosed=True),
                      InputWorkspace=ws, CurrentTemperature=from_temp, TargetTemperature=to_temp)
     propagate_properties(ws, results)
     return results
@@ -233,7 +233,7 @@ def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None
     else:
         for ws_name in workspaces:
             ws = get_workspace_handle(ws_name)
-            result = Scale(OutputWorkspace=WorkspaceNameHandler(ws_name).scaled(scale_factor),
+            result = Scale(OutputWorkspace=WorkspaceNameHandler(ws_name).get_name(scaling_factor=scale_factor, scaled=True),
                            InputWorkspace=ws.raw_ws, Factor=scale_factor)
             propagate_properties(ws, result)
 

@@ -88,7 +88,7 @@ def Load(Filename, OutputWorkspace=None):
     if OutputWorkspace is not None:
         old_name = ospath.splitext(ospath.basename(Filename))[0]
         if merge:
-            old_name = WorkspaceNameHandler(old_name).merged()
+            old_name = WorkspaceNameHandler(old_name).get_name(merged=True)
         name = rename_workspace(workspace=old_name, new_name=OutputWorkspace).name
 
     return get_workspace_handle(name)

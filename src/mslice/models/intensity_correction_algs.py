@@ -142,7 +142,7 @@ def _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, nor
 def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
     pixel_ws = get_workspace_handle(scattering_data.parent)
     if is_icut:
-        slice_ws = get_workspace_handle(WorkspaceNameHandler(scattering_data.parent).hideInAds())
+        slice_ws = get_workspace_handle(WorkspaceNameHandler(scattering_data.parent).get_name(hide_from_ADS=True))
         slice_rotated = not _is_momentum_or_two_theta(slice_ws.raw_ws.getXDimension().getUnits())  # fn arg rotated refers to cut.
     else:
         slice_rotated = not _is_momentum_or_two_theta(pixel_ws.raw_ws.getXDimension().getUnits())  # no pre existing slice, use pixel ws.

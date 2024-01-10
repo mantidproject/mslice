@@ -142,7 +142,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         elif len(selected_workspaces) == 1:
             selected_workspaces.append(str(self._workspace_manager_view.add_workspace_dialog()))
-        new_workspace = WorkspaceNameHandler(selected_workspaces[0]).combined()
+        new_workspace = WorkspaceNameHandler(selected_workspaces[0]).get_name(combined=True)
         if all([is_pixel_workspace(workspace) for workspace in selected_workspaces]):
             combine_workspace(selected_workspaces, new_workspace)
         else:

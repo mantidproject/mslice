@@ -79,11 +79,11 @@ def _parse_prop(prop):
     output_ws = None
 
     if isinstance(pval, string_types):
-        pval = WorkspaceNameHandler(pval).removeHideFlags()
+        pval = WorkspaceNameHandler(pval).get_name(make_ws_visible_in_ADS=True, make_ws_visible_in_mslice=True)
 
     if prop.name() == "OutputWorkspace":
         output_ws = replace_ws_special_chars(pval)
-        hidden = WorkspaceNameHandler(prop.value()).isHiddenFromMsl()
+        hidden = WorkspaceNameHandler(prop.value()).assert_name(is_hidden_from_mslice=True)
 
     return pname, pval, output_ws, hidden
 
