@@ -66,7 +66,9 @@ def _attach_binary_operators():
             result_info = lhs_info()
             # Replace output workspace name with a unique temporary name hidden in ADS
             if result_info[0] > 0:
-                temp_name = WorkspaceNameHandler(str(uuid4())[:8]).get_name(hide_from_ADS=True, mslice_signature=True, temporary_signature=True)
+                temp_name = WorkspaceNameHandler(str(uuid4())[:8]).get_name(
+                    hide_from_ADS=True, mslice_signature=True, temporary_signature=True
+                )
                 result_info = (result_info[0], (temp_name,) + result_info[1][1:])
             return _binary_op(self, other, algorithm, result_info, inplace, reverse)
 
