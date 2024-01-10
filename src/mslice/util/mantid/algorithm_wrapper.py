@@ -49,15 +49,18 @@ def wrap_algorithm(algorithm):
             kwargs['InputWorkspaces'] = [_name_or_wrapper_to_workspace(arg) for arg in kwargs['InputWorkspaces']]
 
         for ky in [k for k in kwargs.keys() if 'Workspace' in k]:
-            if isinstance(kwargs[ky], string_types) and not WorkspaceNameHandler(kwargs[ky]).assert_name(is_hidden_from_ADS=True, has_mslice_signature=True):
-                kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
+            if isinstance(kwargs[ky], string_types):
+                if not WorkspaceNameHandler(kwargs[ky]).assert_name(is_hidden_from_ADS=True, has_mslice_signature=True):
+                    kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
 
         if _alg_has_outputws(algorithm):
             if output_name:
                 ads_name = WorkspaceNameHandler(output_name).get_name(hide_from_ADS=True, mslice_signature=True)
             else:
                 print("Missing output workspace!")
-                ads_name = WorkspaceNameHandler(str(uuid4())[:8]).get_name(hide_from_ADS=True, mslice_signature=True, temporary_signature=True)
+                ads_name = WorkspaceNameHandler(str(uuid4())[:8]).get_name(
+                    hide_from_ADS=True, mslice_signature=True, temporary_signature=True
+                )
 
             store = kwargs.pop('store', True)
             if not store:
@@ -98,5 +101,6 @@ def add_to_ads(workspaces):
     except TypeError:
         workspaces = [workspaces]
     for workspace in workspaces:
-        startid = (5 if workspace.name.startswith('__mat') else 2) if WorkspaceNameHandler(workspace.name).assert_name(is_hidden_from_ADS=True) else 0
+        is_hidden_ws = WorkspaceNameHandler(workspace.name).assert_name(is_hidden_from_ADS=True)
+        startid = (5 if workspace.name.startswith('__mat') else 2) if is_hidden_ws else 0
         AnalysisDataService.Instance().addOrReplace(workspace.name[startid:], workspace.raw_ws)
