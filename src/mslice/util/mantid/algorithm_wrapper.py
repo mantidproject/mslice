@@ -110,6 +110,6 @@ def remove_from_ads(workspacename):
     if AnalysisDataService.Instance().doesExist(workspacename):
         AnalysisDataService.Instance().remove(workspacename)
     # Remove hidden workspaces from ADS
-    workspacename = WorkspaceNameHandler(workspacename).get_name(mslice_signature=True, hide_from_ADS=True)  # '__MSL' + workspacename
+    workspacename = WorkspaceNameHandler(workspacename).get_name(mslice_signature=True, hide_from_ADS=True)
     if AnalysisDataService.Instance().doesExist(workspacename):
         AnalysisDataService.Instance().remove(workspacename)
