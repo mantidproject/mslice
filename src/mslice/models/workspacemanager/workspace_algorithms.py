@@ -19,7 +19,7 @@ from mantid.api import WorkspaceUnitValidator
 from mantid.api import MatrixWorkspace
 
 from mslice.models.axis import Axis
-from mslice.util.mantid.algorithm_wrapper import add_to_ads
+from mslice.util.mantid.algorithm_wrapper import add_to_ads, remove_from_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, delete_workspace
 from mslice.util.mantid.mantid_algorithms import Load, MergeMD, MergeRuns, Scale, Minus, ConvertUnits, Rebose
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -278,6 +278,10 @@ def export_workspace_to_ads(workspace):
     if isinstance(workspace, HistogramWorkspace):
         workspace = workspace.convert_to_matrix()
     add_to_ads(workspace)
+
+
+def remove_workspace_from_ads(workspacename):
+    remove_from_ads(workspacename)
 
 
 def _save_single_ws(workspace, save_name, save_method, path, extension):

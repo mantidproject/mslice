@@ -43,3 +43,8 @@ class IPythonWidget(RichIPythonWidget):
             self.execute('from mslice.cli import *', hidden=True)
         else:
             self.execute('import mslice.cli as mc')
+
+    def cleanup(self):
+        if in_mantid():
+            self.execute('cls')
+            self.execute('import mslice.cli as mc')
