@@ -20,7 +20,7 @@ from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MSliceWorkspace
-
+from mslice.util.mantid.mantid_algorithms import *  # noqa: F401, F403
 
 # -----------------------------------------------------------------------------
 # Command functions
