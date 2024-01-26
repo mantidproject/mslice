@@ -68,7 +68,7 @@ def cif_file_powder_line(plot_handler, plotter_presenter, checked):
 
 
 def remove_line(line):
-    plt.gca().lines.remove(line)
+    line.remove()
 
 
 def plot_overplot_line(x, y, key, recoil, cache, **kwargs):
