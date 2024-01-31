@@ -1,6 +1,5 @@
 import numpy as np
 from unittest import TestCase
-import warnings
 
 from mantid.api import AnalysisDataService
 
@@ -15,9 +14,7 @@ class CutNormalisationTest(TestCase):
         self.md_histo_ws = create_md_histo_workspace(2, "md_histo_ws")
 
     def tearDown(self) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
 
     def test_that_normalize_workspace_fails_for_a_non_IMDHistoWorkspace(self):
         try:

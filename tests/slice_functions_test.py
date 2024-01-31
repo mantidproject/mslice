@@ -3,7 +3,6 @@ from __future__ import (absolute_import, division, print_function)
 from mock import patch, MagicMock
 import numpy as np
 import unittest
-import warnings
 
 from mantid.api import AlgorithmFactory
 from mantid.simpleapi import AddSampleLog, _create_algorithm_function, AnalysisDataService
@@ -35,9 +34,7 @@ class SliceFunctionsTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
 
     @patch('mslice.models.slice.slice_functions.mantid_algorithms')
     def test_slice(self, alg_mock):

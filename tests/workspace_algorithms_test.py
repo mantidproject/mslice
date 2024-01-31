@@ -1,7 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 import unittest
-import warnings
 
 from mslice.models.axis import Axis
 from mslice.models.workspacemanager.workspace_algorithms import (process_limits, process_limits_event, scale_workspaces,
@@ -45,9 +44,7 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
 
     def test_process_limits_does_not_fail_for_direct_data(self):
         process_limits(self.direct_workspace)
