@@ -1,6 +1,8 @@
 import unittest
 import mock
 import numpy as np
+import pathlib
+import runpy
 from mslice.workspace import wrap_workspace
 from mantid.simpleapi import AddSampleLog, CreateSampleWorkspace
 from mslice.plotting.plot_window.cut_plot import CutPlot
@@ -268,3 +270,8 @@ class ScriptingTest(unittest.TestCase):
         args, _ = get_algorithm_kwargs(some_alg, 'workspace_name')
 
         self.assertEqual("Filename=r'test_filename'", args)
+
+    def test_script_execution(script):
+        scripts = pathlib.Path(__file__, '..', 'testscripts').resolve().glob('*.py')
+        for script in scripts:
+            runpy.run_path(script)
