@@ -1,6 +1,8 @@
 import unittest
 import mock
 import numpy as np
+import pathlib
+import runpy
 from mantid.simpleapi import (AddSampleLog, CreateSampleWorkspace)
 
 import mslice.cli._mslice_commands as mc
@@ -158,3 +160,8 @@ class CLIProjectionTest(unittest.TestCase):
         self.assertEqual(active_figure.plot_handler.waterfall_x, 1)
         self.assertEqual(active_figure.plot_handler.waterfall_y, 2)
         active_figure.plot_handler.toggle_waterfall.assert_called()
+
+    def test_script_execution(self):
+        scripts = pathlib.Path(__file__, '..', 'testscripts').resolve().glob('*.py')
+        for script in scripts:
+            runpy.run_path(str(script))
