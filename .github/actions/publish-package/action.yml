@@ -24,7 +24,7 @@ runs:
       conda config --set always_yes yes --set changeps1 no
       conda create -n build-env python=3.10
       conda activate build-env
-      mamba install -c conda-forge mamba conda-build anaconda-client conda-verify
+      mamba install -c conda-forge mamba conda-build anaconda-client conda-verify boa
       conda config --add channels mantid
       conda config --add channels mantid/label/nightly
 
@@ -33,5 +33,5 @@ runs:
     run: |
       conda activate build-env
       conda config --set anaconda_upload yes
-      conda build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
+      conda mambabuild --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
       grep "Upload complete" upload.log
