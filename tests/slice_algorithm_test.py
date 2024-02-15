@@ -3,7 +3,6 @@ from __future__ import (absolute_import, division, print_function)
 from mock import patch, MagicMock, call, ANY
 import numpy as np
 import unittest
-import warnings
 
 from mantid.simpleapi import AddSampleLog, AnalysisDataService
 from mantid.kernel import PropertyManager
@@ -56,9 +55,7 @@ class SliceAlgorithmTest(unittest.TestCase):
 
     def tearDown(self) -> None:
         self.test_objects = None  # reset test objects
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
 
     @staticmethod
     def _create_tst_objects(sim_scattering_data, x_dict, y_dict, norm_to_one=False, PSD=False, e_mode='Direct'):

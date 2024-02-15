@@ -1,5 +1,4 @@
 from unittest import TestCase
-import warnings
 
 from mantid.api import AnalysisDataService
 
@@ -21,9 +20,7 @@ class ProjectionCalculatorTest(TestCase):
         self.projection_calculator = MantidProjectionCalculator()
 
     def tearDown(self) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
 
     def test_available_axes(self):
         self.assertEqual(self.projection_calculator.available_axes(), ['|Q|', '2Theta', 'DeltaE'])

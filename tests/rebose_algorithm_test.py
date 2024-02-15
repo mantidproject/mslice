@@ -1,5 +1,4 @@
 import unittest
-import warnings
 
 from mantid.api import AnalysisDataService
 from tests.testhelpers.workspace_creator import create_workspace
@@ -14,9 +13,7 @@ class RebinAlgorithmTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
 
     def test_rebose_algorithm(self):
         results = Rebose(self.test_workspace)
