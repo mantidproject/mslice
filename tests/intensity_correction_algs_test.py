@@ -1,8 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from mock import patch, MagicMock, call
-import warnings
-
+import numpy as np
 import unittest
 from copy import copy
 
@@ -14,12 +13,6 @@ from mslice.models.intensity_correction_algs import (compute_boltzmann_dist, com
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace, CreateMDHistoWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mantid.simpleapi import AddSampleLog
-
-
-warnings.filterwarnings('ignore', category=DeprecationWarning)
-
-
-import numpy as np  # noqa: E402
 
 
 def _invert_axes(matrix):
@@ -254,4 +247,6 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
     def test_sample_temperature_list(self):
         AddSampleLog(workspace=self.test_ws.raw_ws, LogName='ListTemp', LogText='3.', LogType='Number Series',
                      StoreInADS=False)
+        print("listtemp")
+        print(['ListTemp'])
         self.assertEqual(sample_temperature(self.test_ws.name, ['ListTemp']), [3.0])
