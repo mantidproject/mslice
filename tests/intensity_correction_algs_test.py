@@ -242,7 +242,7 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
 
     def test_sample_temperature_string(self):
         AddSampleLog(workspace=self.test_ws.raw_ws, LogName='StrTemp', LogText='3.', LogType='String', StoreInADS=False)
-        self.assertEqual(sample_temperature(self.test_ws.name, ['StrTemp']), '3.0')
+        self.assertEqual(sample_temperature(self.test_ws.name, ['StrTemp']), 3.0)
 
     def test_sample_temperature_list(self):
         AddSampleLog(workspace=self.test_ws.raw_ws, LogName='ListTemp', LogText='3.', LogType='Number Series',
