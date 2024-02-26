@@ -266,16 +266,12 @@ def sample_temperature(ws_name, sample_temp_fields):
             pass
         except AttributeError:
             sample_temp = ws.getExperimentInfo(0).run().getLogData(field_name).value
-    try:
-        float(sample_temp)
-    except (ValueError, TypeError):
-        pass
-    else:
-        return sample_temp
     if isinstance(sample_temp, string_types):
         sample_temp = get_sample_temperature_from_string(sample_temp)
-    if isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
+    elif isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
         sample_temp = np.mean(sample_temp)
+    else:
+        float(sample_temp)
     return sample_temp
 
 
