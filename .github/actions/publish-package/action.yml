@@ -25,8 +25,8 @@ runs:
       conda create -n build-env python=3.10
       conda activate build-env
       mamba install -c conda-forge mamba conda-build anaconda-client conda-verify boa
-      conda config --add channels mantid
       conda config --add channels mantid/label/nightly
+      conda config --add channels mantid
 
   - name: Build package
     shell: bash -l {0}
