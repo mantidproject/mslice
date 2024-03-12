@@ -15,6 +15,7 @@ from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.cut.cut_algorithm import _cut_nonPSD_general
 from math import trunc, ceil
 
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 
 KB_MEV = constants.value('Boltzmann constant in eV/K') * 1000
 E_TO_K = np.sqrt(2 * constants.neutron_mass * constants.elementary_charge / 1000) / constants.hbar
@@ -141,7 +142,7 @@ def _cut_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated, nor
 def _cut_compute_gdos_pixel(scattering_data, sample_temp, q_axis, e_axis, rotated, norm_to_one, algorithm, is_icut):
     pixel_ws = get_workspace_handle(scattering_data.parent)
     if is_icut:
-        slice_ws = get_workspace_handle("__" + scattering_data.parent)
+        slice_ws = get_workspace_handle(WorkspaceNameHandler(scattering_data.parent).get_name(hide_from_ADS=True))
         slice_rotated = not _is_momentum_or_two_theta(slice_ws.raw_ws.getXDimension().getUnits())  # fn arg rotated refers to cut.
     else:
         slice_rotated = not _is_momentum_or_two_theta(pixel_ws.raw_ws.getXDimension().getUnits())  # no pre existing slice, use pixel ws.

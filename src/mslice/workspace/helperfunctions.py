@@ -1,6 +1,5 @@
 import pickle
 import codecs
-
 from mantid.simpleapi import DeleteWorkspace, RenameWorkspace
 
 
@@ -85,7 +84,7 @@ def attribute_to_log(attrdict, raw_ws, append=False):
 
 def delete_workspace(workspace, ws):
     try:
-        if hasattr(workspace, str(ws)) and ws is not None and ws.name().endswith('_HIDDEN'):
+        if hasattr(workspace, str(ws)) and ws is not None and WorkspaceNameHandler(ws.name()).assert_name(is_hidden_from_mslice=True):
             DeleteWorkspace(ws)
             ws = None
     except RuntimeError:
@@ -116,3 +115,93 @@ class WrapWorkspaceAttribute(object):
         if self.workspace:
             self.workspace.remove_saved_attributes()
         return True
+
+
+class WorkspaceNameHandler:
+
+    def __init__(self, ws_name: str):
+        self.ws_name = ws_name
+
+    def _add_prefix(self, prefix) -> str:
+        self.ws_name = prefix + self.ws_name
+
+    def _add_sufix(self, sufix) -> str:
+        self.ws_name = self.ws_name + sufix
+
+    def get_name(
+            self,
+            scaling_factor=None,
+            scaled=False,
+            subtracted=False,
+            summed=False,
+            rebosed=False,
+            combined=False,
+            merged=False,
+            hide_from_mslice=False,
+            hide_from_ADS=False,
+            mslice_signature=False,
+            temporary_signature=False,
+            make_ws_visible_in_ADS=False,
+            make_ws_visible_in_mslice=False):
+
+        singular_arguments = [scaled, subtracted, summed, rebosed, combined, merged]
+        assert sum(singular_arguments) <= 1, "Two or more incompatible arguments were set to True."
+
+        if scaled:
+            assert scaling_factor is not None, "Scaling factor should be provided to build name of workspace"
+            self._add_sufix("_ssf_" + f"{scaling_factor:.2f}".replace('.', '_'))
+
+        if subtracted:
+            assert scaling_factor is not None, "Scaling factor should be provided to build name of workspace"
+            self._add_sufix("_minus_ssf_" + f"{scaling_factor:.2f}".replace('.', '_'))
+
+        if summed:
+            self._add_sufix("_sum")
+
+        if rebosed:
+            self._add_sufix("_bosed")
+
+        if combined:
+            self._add_sufix("_combined")
+
+        if merged:
+            self._add_sufix("_merged")
+
+        if hide_from_mslice:
+            self._add_sufix("_HIDDEN")
+
+        if temporary_signature:
+            self._add_prefix("TMP")
+
+        if mslice_signature:
+            self._add_prefix("MSL")
+
+        if hide_from_ADS:
+            self._add_prefix("__")
+
+        if make_ws_visible_in_ADS:
+            self.ws_name = self.ws_name.replace('__MSL', '').replace('__', '')
+
+        if make_ws_visible_in_mslice:
+            self.ws_name = self.ws_name.replace('_HIDDEN', '')
+
+        return self.ws_name
+
+    def assert_name(
+            self,
+            is_hidden_from_mslice=False,
+            is_hidden_from_ADS=False,
+            has_mslice_signature=False):
+
+        result_flag = True
+
+        if is_hidden_from_mslice:
+            result_flag = result_flag and (self.ws_name.endswith("_HIDDEN"))
+
+        if is_hidden_from_ADS:
+            result_flag = result_flag and (self.ws_name.startswith("__"))
+
+        if has_mslice_signature:
+            result_flag = result_flag and (self.ws_name.startswith("__MSL") or self.ws_name.startswith("MSL"))
+
+        return result_flag

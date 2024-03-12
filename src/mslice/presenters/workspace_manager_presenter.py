@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from six import string_types
 
 from .busy import show_busy
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.workspacemanager.file_io import get_save_directory
@@ -144,7 +145,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         elif len(selected_workspaces) == 1:
             selected_workspaces.append(str(self._workspace_manager_view.add_workspace_dialog()))
-        new_workspace = selected_workspaces[0] + '_combined'
+        new_workspace = WorkspaceNameHandler(selected_workspaces[0]).get_name(combined=True)
         if all([is_pixel_workspace(workspace) for workspace in selected_workspaces]):
             combine_workspace(selected_workspaces, new_workspace)
         else:
