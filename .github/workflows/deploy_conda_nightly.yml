@@ -27,7 +27,7 @@ jobs:
 
       - name: Setup Miniconda
         if: ${{ env.recentCommits == 'true'}}
-        uses: conda-incubator/setup-miniconda@v2.2.0
+        uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
           miniforge-variant: Mambaforge
