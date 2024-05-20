@@ -10,6 +10,8 @@ from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as MsliceWorkspace
 from mslice.workspace.workspace import Workspace as MsliceWorkspace2D
 
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
+
 
 def _parse_ws_names(args, kwargs):
     input_workspace = kwargs.get('InputWorkspace', None)
@@ -20,9 +22,7 @@ def _parse_ws_names(args, kwargs):
             input_workspace = get_workspace_handle(args[0])
         args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
 
-    output_name = ''
-    if 'OutputWorkspace' in kwargs:
-        output_name = kwargs.pop('OutputWorkspace')
+    output_name = kwargs.pop('OutputWorkspace', '')
 
     for key in kwargs.keys():
         if input_workspace is None and 'LHS' in key:
@@ -49,14 +49,22 @@ def wrap_algorithm(algorithm):
             kwargs['InputWorkspaces'] = [_name_or_wrapper_to_workspace(arg) for arg in kwargs['InputWorkspaces']]
 
         for ky in [k for k in kwargs.keys() if 'Workspace' in k]:
-            if isinstance(kwargs[ky], string_types) and '__MSL' not in kwargs[ky]:
-                kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
+            if isinstance(kwargs[ky], string_types):
+                if not WorkspaceNameHandler(kwargs[ky]).assert_name(is_hidden_from_ADS=True, has_mslice_signature=True):
+                    kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
 
         if _alg_has_outputws(algorithm):
-            ads_name = '__MSL' + output_name if output_name else '__MSLTMP' + str(uuid4())[:8]
+            if output_name:
+                ads_name = WorkspaceNameHandler(output_name).get_name(hide_from_ADS=True, mslice_signature=True)
+            else:
+                print("Missing output workspace!")
+                ads_name = WorkspaceNameHandler(str(uuid4())[:8]).get_name(
+                    hide_from_ADS=True, mslice_signature=True, temporary_signature=True
+                )
+
             store = kwargs.pop('store', True)
             if not store:
-                ads_name += '_HIDDEN'
+                ads_name = WorkspaceNameHandler(ads_name).get_name(hide_from_mslice=True)
             result = algorithm(*args, OutputWorkspace=ads_name, **kwargs)
         else:
             result = algorithm(*args, **kwargs)
@@ -93,7 +101,8 @@ def add_to_ads(workspaces):
     except TypeError:
         workspaces = [workspaces]
     for workspace in workspaces:
-        startid = (5 if workspace.name.startswith('__mat') else 2) if workspace.name.startswith('__') else 0
+        is_hidden_ws = WorkspaceNameHandler(workspace.name).assert_name(is_hidden_from_ADS=True)
+        startid = (5 if workspace.name.startswith('__mat') else 2) if is_hidden_ws else 0
         AnalysisDataService.Instance().addOrReplace(workspace.name[startid:], workspace.raw_ws)
 
 
@@ -101,6 +110,6 @@ def remove_from_ads(workspacename):
     if AnalysisDataService.Instance().doesExist(workspacename):
         AnalysisDataService.Instance().remove(workspacename)
     # Remove hidden workspaces from ADS
-    workspacename = '__MSL' + workspacename
+    workspacename = WorkspaceNameHandler(workspacename).get_name(mslice_signature=True, hide_from_ADS=True)
     if AnalysisDataService.Instance().doesExist(workspacename):
         AnalysisDataService.Instance().remove(workspacename)
