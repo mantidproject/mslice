@@ -247,6 +247,8 @@ class PlotFigureManagerQT(QtCore.QObject):
                     self.save_image(os.path.join(file_path, save_name))
             elif str(e) == "dialog cancelled":
                 pass
+            elif "metadata may be lost" in str(e):
+                self.error_box(str(e))
             else:
                 raise RuntimeError(e)
         except KeyError:  # Could be case of interactive cuts when the workspace has not been saved yet
