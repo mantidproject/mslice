@@ -7,9 +7,9 @@
 
     <title>1. Quick Start &#8212; MSlice 2.9 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=d59dc883" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=87629129" />
     <script src="_static/documentation_options.js?v=e7305a5c"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -61,7 +61,8 @@ increase and <code class="docutils literal notranslate"><span class="pre">Ctrl+-
 </section>
 <section id="loading-data">
 <h2><span class="section-number">1.2. </span>Loading Data<a class="headerlink" href="#loading-data" title="Link to this heading">¶</a></h2>
-<a class="reference internal image-reference" href="_images/load_tab.png"><img alt="_images/load_tab.png" src="_images/load_tab.png" style="width: 789.6px; height: 531.2px;" /></a>
+<a class="reference internal image-reference" href="_images/load_tab.png"><img alt="_images/load_tab.png" src="_images/load_tab.png" style="width: 789.6px; height: 531.2px;" />
+</a>
 <p>The GUI is divided into three main tabs, a <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Loading</span></code> tab which shows the filesystem and allows the user to load reduced
 data files, a <code class="docutils literal notranslate"><span class="pre">Workspace</span> <span class="pre">Manager</span></code> which handles the loaded data, and a <code class="docutils literal notranslate"><span class="pre">Plots</span></code> tab which provides an easy way to interact with
 all currently open plots. To reach a particular data folder you can either
@@ -97,21 +98,24 @@ directly rebin the powder data.</p>
 </section>
 <section id="plotting-a-slice">
 <h2><span class="section-number">1.4. </span>Plotting a Slice<a class="headerlink" href="#plotting-a-slice" title="Link to this heading">¶</a></h2>
-<a class="reference internal image-reference" href="_images/data_tab.png"><img alt="_images/data_tab.png" src="_images/data_tab.png" style="width: 785.6px; height: 513.6px;" /></a>
+<a class="reference internal image-reference" href="_images/data_tab.png"><img alt="_images/data_tab.png" src="_images/data_tab.png" style="width: 785.6px; height: 513.6px;" />
+</a>
 <p>Once the <code class="docutils literal notranslate"><span class="pre">Slice</span></code> tab is enabled (either directly for loaded <strong>non-PSD</strong> data, or after calculating projections for
 <strong>PSD</strong> data) you can click <code class="docutils literal notranslate"><span class="pre">Display</span></code> to show a 2D slice of the data. The default values of the limits of the data and
 step sizes are taken from the input data file. You can change these values and replot. Note that there is a minimum step
 size which is 1/100 of the default step size which is to ensure that the program does not run out of memory for very
 small step sizes (which have large number of points). For step sizes smaller than the data step size, some pixels will
 contain no data and will appear empty (white) in the 2D slice. For more details see <a class="reference internal" href="slicing.html#slicing-from-the-gui"><span class="std std-ref">Slicing from the GUI</span></a>.</p>
-<a class="reference internal image-reference" href="_images/slice_intensity.png"><img alt="_images/slice_intensity.png" src="_images/slice_intensity.png" style="width: 641.6px; height: 513.6px;" /></a>
+<a class="reference internal image-reference" href="_images/slice_intensity.png"><img alt="_images/slice_intensity.png" src="_images/slice_intensity.png" style="width: 641.6px; height: 513.6px;" />
+</a>
 <p>Once the slice is displayed (in a separate window), double clicking on the plot or colorbar axes will allow you to change the
 plot limits, and whether to use a linear or logarithmic axis. Double clicking on the plot or axes titles will allow you to edit
 them. Both changing the limits and titles can be done using the options menu accessible from the toolbar.</p>
 </section>
 <section id="interactive-cuts">
 <span id="id2"></span><h2><span class="section-number">1.5. </span>Interactive Cuts<a class="headerlink" href="#interactive-cuts" title="Link to this heading">¶</a></h2>
-<a class="reference internal image-reference" href="_images/interactive_cuts.png"><img alt="_images/interactive_cuts.png" src="_images/interactive_cuts.png" style="width: 640.8000000000001px; height: 908.0px;" /></a>
+<a class="reference internal image-reference" href="_images/interactive_cuts.png"><img alt="_images/interactive_cuts.png" src="_images/interactive_cuts.png" style="width: 640.8000000000001px; height: 908.0px;" />
+</a>
 <p>From the slice window, you can also select an <code class="docutils literal notranslate"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> which will allow you to select a region of data to
 integrate into a 1D and dynamically change this region and the corresponding cut. Clicking <code class="docutils literal notranslate"><span class="pre">Interactive</span> <span class="pre">Cut</span></code> will
 change the cursor to a cross-hair. You should then select a rectangular region in the 2D slice, after which a separate
@@ -128,14 +132,16 @@ Only when you click <code class="docutils literal notranslate"><span class="pre"
 </section>
 <section id="plotting-a-cut">
 <h2><span class="section-number">1.6. </span>Plotting a Cut<a class="headerlink" href="#plotting-a-cut" title="Link to this heading">¶</a></h2>
-<a class="reference internal image-reference" href="_images/cut_q.png"><img alt="_images/cut_q.png" src="_images/cut_q.png" style="width: 639.2px; height: 693.6px;" /></a>
+<a class="reference internal image-reference" href="_images/cut_q.png"><img alt="_images/cut_q.png" src="_images/cut_q.png" style="width: 639.2px; height: 693.6px;" />
+</a>
 <p>Instead of an interactive cut, you can use the main GUI to specify more specific limits and step sizes for cuts.
 This will also allow you to overplot multiple cuts from the same dataset with different integration ranges, or
 from different datasets. To overplot multiple ranges, you can also use the <code class="docutils literal notranslate"><span class="pre">width</span></code> parameter. This splits in
 specified integration ranges into chunks of the widths specified. For example, if <code class="docutils literal notranslate"><span class="pre">from</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">to</span></code>
 is <code class="docutils literal notranslate"><span class="pre">10</span></code> and <code class="docutils literal notranslate"><span class="pre">width</span></code> is <code class="docutils literal notranslate"><span class="pre">3</span></code>, <em>Mslice</em> will plot 4 cuts which integrate over [0,3], [3,6], [6,9] and [9,10]
 respectively.</p>
-<a class="reference internal image-reference" href="_images/multi_cut.png"><img alt="_images/multi_cut.png" src="_images/multi_cut.png" style="width: 787.2px; height: 720.0px;" /></a>
+<a class="reference internal image-reference" href="_images/multi_cut.png"><img alt="_images/multi_cut.png" src="_images/multi_cut.png" style="width: 787.2px; height: 720.0px;" />
+</a>
 <p>To overplot multiple datasets, you can select multiple workspaces in the left pane (using <code class="docutils literal notranslate"><span class="pre">Shift</span></code> or <code class="docutils literal notranslate"><span class="pre">Ctrl</span></code>)
 and then give common limits, step sizes and integration range, and click <code class="docutils literal notranslate"><span class="pre">Plot</span></code>. For more details see
 <a class="reference internal" href="cutting.html#cutting-from-the-gui"><span class="std std-ref">Cutting from the GUI</span></a>.</p>
@@ -161,7 +167,8 @@ in <strong>PSD</strong> mode), only merging workspaces are supported. This is in
 detector scattering angles.</p>
 <p>In order to sum several workspaces, select multiple workspaces in the workspace panel and click <code class="docutils literal notranslate"><span class="pre">Add</span></code>. A new workspace
 named after the first selected workspace with <code class="docutils literal notranslate"><span class="pre">_sum</span></code> appended will be created.</p>
-<a class="reference internal image-reference" href="_images/subtract_dialog.png"><img alt="_images/subtract_dialog.png" src="_images/subtract_dialog.png" style="width: 788.8000000000001px; height: 528.8000000000001px;" /></a>
+<a class="reference internal image-reference" href="_images/subtract_dialog.png"><img alt="_images/subtract_dialog.png" src="_images/subtract_dialog.png" style="width: 788.8000000000001px; height: 528.8000000000001px;" />
+</a>
 <p>To subtract a background dataset from sample dataset(s), first select one or more sample workspace(s). Then click
 <code class="docutils literal notranslate"><span class="pre">Subtract</span></code>. A dialog will appear asking you to select the background dataset to subtract and optionally allow you to
 specify a self-shielding factor. This self-shielding factor is applied to the background dataset first before it
@@ -171,7 +178,8 @@ Then the dataset <code class="docutils literal notranslate"><span class="pre">MA
 a self-shielding factor of <code class="docutils literal notranslate"><span class="pre">1.00</span></code>. Clicking <code class="docutils literal notranslate"><span class="pre">Ok</span></code> will produce two subtracted workspaces,
 <code class="docutils literal notranslate"><span class="pre">MAR28237_Ei10.00meV_subtracted</span></code> and <code class="docutils literal notranslate"><span class="pre">MAR28236_Ei10.00meV_subtracted</span></code>. The subtracted dataset can be sliced or cut
 as usual.</p>
-<a class="reference internal image-reference" href="_images/subtract_slice.png"><img alt="_images/subtract_slice.png" src="_images/subtract_slice.png" style="width: 786.4000000000001px; height: 730.4000000000001px;" /></a>
+<a class="reference internal image-reference" href="_images/subtract_slice.png"><img alt="_images/subtract_slice.png" src="_images/subtract_slice.png" style="width: 786.4000000000001px; height: 730.4000000000001px;" />
+</a>
 </section>
 <section id="energy-transfer-units">
 <h2><span class="section-number">1.9. </span>Energy transfer units<a class="headerlink" href="#energy-transfer-units" title="Link to this heading">¶</a></h2>
@@ -232,7 +240,7 @@ replot everything in the new unit. If you don’t want this behaviour, you can t
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
@@ -240,7 +248,7 @@ replot everything in the new unit. If you don’t want this behaviour, you can t
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -264,7 +272,7 @@ replot everything in the new unit. If you don’t want this behaviour, you can t
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Mantid Project.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>
