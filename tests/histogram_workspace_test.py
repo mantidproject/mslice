@@ -20,7 +20,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
                                                                   Units='U,U', OutputWorkspace='testHistoWorkspace',
                                                                   ), 'testHistoWorkspace')
         cls.workspace1Bin = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=1, Extents=[1, 5],
-                                                                      SignalInput=[1, 2], ErrorInput=[4, 5],
+                                                                      SignalInput=[1], ErrorInput=[4],
                                                                       NumberOfBins=1, Names='Dim1',
                                                                       Units='U', OutputWorkspace='testHistoWorkspace1Bin',
                                                                       ), 'testHistoWorkspace1Bin')
