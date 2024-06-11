@@ -19,6 +19,11 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
                                                                   NumberOfBins='10,10', Names='Dim1,Dim2',
                                                                   Units='U,U', OutputWorkspace='testHistoWorkspace',
                                                                   ), 'testHistoWorkspace')
+        cls.workspace1Bin = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
+                                                                      SignalInput=signal, ErrorInput=error,
+                                                                      NumberOfBins='1,1', Names='Dim1,Dim2',
+                                                                      Units='U,U', OutputWorkspace='testHistoWorkspace1Bin',
+                                                                      ), 'testHistoWorkspace1Bin')
 
     def test_invalid_workspace(self):
         self.assertRaisesRegex(TypeError, "HistogramWorkspace expected IMDHistoWorkspace, got int", lambda: HistogramWorkspace(4, 'name'))
@@ -34,6 +39,16 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         finally:
             # remove mslice tracking
             remove_workspace(self.workspace)
+
+    def test_convert_to_matrix_error(self):
+        # workspace needs to be registered with mslice for conversion
+        try:
+            add_workspace(self.workspace1Bin, self.workspace1Bin.name)
+            with self.assertRaises(TypeError):
+                self.workspace1Bin.convert_to_matrix()
+        finally:
+            # remove mslice tracking
+            remove_workspace(self.workspace1Bin)
 
     def test_rename_workspace_which_contains_special_character(self):
         self.workspace.name = "specialcharacter)"
