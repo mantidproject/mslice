@@ -40,11 +40,11 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
             # remove mslice tracking
             remove_workspace(self.workspace)
 
-    def test_convert_to_matrix_error(self):
+    def test_convert_to_matrix_fail(self):
         # workspace needs to be registered with mslice for conversion
         try:
             add_workspace(self.workspace1Bin, self.workspace1Bin.name)
-            with self.assertRaises(TypeError):
+            with self.assertRaises(AssertionError):
                 self.workspace1Bin.convert_to_matrix()
         finally:
             # remove mslice tracking
