@@ -21,7 +21,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
                                                                   ), 'testHistoWorkspace')
         cls.workspace1Bin = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
                                                                       SignalInput=signal, ErrorInput=error,
-                                                                      NumberOfBins='1,100', Names='Dim1,Dim2',
+                                                                      NumberOfBins='100,1', Names='Dim1,Dim2',
                                                                       Units='U,U', OutputWorkspace='testHistoWorkspace1Bin',
                                                                       ), 'testHistoWorkspace1Bin')
 
@@ -44,7 +44,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         # workspace needs to be registered with mslice for conversion
         try:
             add_workspace(self.workspace1Bin, self.workspace1Bin.name)
-            with self.assertRaises(AssertionError):
+            with self.assertRaises(TypeError):
                 self.workspace1Bin.convert_to_matrix()
         finally:
             # remove mslice tracking
