@@ -22,7 +22,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         cls.workspace1Bin = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
                                                                       SignalInput=signal, ErrorInput=error,
                                                                       NumberOfBins='1,100', Names='Dim1,Dim2',
-                                                                      Units='U', OutputWorkspace='testHistoWorkspace1Bin',
+                                                                      Units='U,U', OutputWorkspace='testHistoWorkspace1Bin',
                                                                       ), 'testHistoWorkspace1Bin')
 
     def test_invalid_workspace(self):
