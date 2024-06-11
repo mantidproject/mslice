@@ -19,10 +19,10 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
                                                                   NumberOfBins='10,10', Names='Dim1,Dim2',
                                                                   Units='U,U', OutputWorkspace='testHistoWorkspace',
                                                                   ), 'testHistoWorkspace')
-        cls.workspace1Bin = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
-                                                                      SignalInput=signal, ErrorInput=error,
-                                                                      NumberOfBins='1,10', Names='Dim1,Dim2',
-                                                                      Units='U,U', OutputWorkspace='testHistoWorkspace1Bin',
+        cls.workspace1Bin = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=1, Extents=[1, 5],
+                                                                      SignalInput=[1, 2], ErrorInput=[4, 5],
+                                                                      NumberOfBins=1, Names='Dim1',
+                                                                      Units='U', OutputWorkspace='testHistoWorkspace1Bin',
                                                                       ), 'testHistoWorkspace1Bin')
 
     def test_invalid_workspace(self):
