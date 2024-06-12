@@ -48,8 +48,17 @@ class HistogramWorkspace(HistoMixin, WorkspaceOperatorMixin, WorkspaceMixin, Wor
         ws_conv = ConvertMDHistoToMatrixWorkspace(self.name, Normalization='NumEventsNormalization',
                                                   FindXAxis=False, OutputWorkspace='__mat'+self.name)
         coord = self.get_coordinates()
-        first_dim = coord[self.raw_ws.getDimension(0).name]
-        bin_size = first_dim[1] - first_dim[0]
+        bin_size = 1
+        if self.raw_ws.getNumDims() == 2:
+            # for a 2 dimensional workspace use the second dimension to determine bin size
+            # this is the case after changing the intensity to GDOS for a cut
+            first_dim = coord[self.raw_ws.getDimension(1).name]
+        elif self.raw_ws.getNumDims() == 1:
+            first_dim = coord[self.raw_ws.getDimension(0).name]
+        if len(first_dim) > 1:
+            bin_size = first_dim[1] - first_dim[0]
+        else:
+            raise TypeError('Workspace has only one bin.')
         ws_conv = Scale(ws_conv, bin_size, OutputWorkspace='__mat'+self.name)
         ConvertToDistribution(ws_conv)
         return ws_conv
