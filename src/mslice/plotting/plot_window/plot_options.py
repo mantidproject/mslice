@@ -314,7 +314,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     """This is a widget that has various legend and line controls for each line of a plot"""
 
     # dictionaries used to convert from matplotlib arguments to UI selection and vice versa
-    styles = {'-': 'Solid', '--': 'Dashed', '-.': 'Dashdot', ':': 'Dotted'}
+    styles = {'-': 'Solid', '--': 'Dashed', '-.': 'Dashdot', ':': 'Dotted', 'None': 'None'}
 
     markers = {'o': 'Circle', ',': 'Pixel', '.': 'Point', 'v': 'Triangle down', '^': 'Triangle up',
                     '<': 'Triangle_left', '>': 'Triangle right', '1': 'Arrow down', '2': 'Arrow up',
