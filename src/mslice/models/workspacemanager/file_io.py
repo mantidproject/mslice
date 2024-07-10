@@ -85,7 +85,7 @@ def save_ascii(workspace, path):
         if isinstance(workspace, HistogramWorkspace):
             _save_cut_to_ascii(workspace, path)
         else:
-            SaveAscii(InputWorkspace=workspace, Filename=path)
+            SaveAscii(InputWorkspace=workspace, Filename=path, WriteSpectrumID=False)
 
 
 def save_matlab(workspace, path):
