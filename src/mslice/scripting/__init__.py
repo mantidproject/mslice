@@ -2,6 +2,7 @@ from qtpy import QtGui, QtWidgets
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.scripting.helperfunctions import add_plot_statements, replace_ws_special_chars
 from mslice.app.presenters import get_cut_plotter_presenter
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 from six import string_types
 
 
@@ -76,12 +77,14 @@ def _parse_prop(prop):
     pname = prop.name()
     hidden = False
     output_ws = None
+
     if isinstance(pval, string_types):
-        pval = pval.replace("__MSL", "").replace("_HIDDEN", "")
+        pval = WorkspaceNameHandler(pval).get_name(make_ws_visible_in_ADS=True, make_ws_visible_in_mslice=True)
+
     if prop.name() == "OutputWorkspace":
         output_ws = replace_ws_special_chars(pval)
-        if "_HIDDEN" in prop.value():
-            hidden = True
+        hidden = WorkspaceNameHandler(prop.value()).assert_name(is_hidden_from_mslice=True)
+
     return pname, pval, output_ws, hidden
 
 
