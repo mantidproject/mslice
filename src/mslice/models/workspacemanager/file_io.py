@@ -186,12 +186,14 @@ def load_from_ascii(file_path, ws_name):
 
 def _get_md_histo_xye(histo_ws):
     dim = histo_ws.getDimension(0)
+    if dim.getNBins() == 1:
+        dim = histo_ws.getDimension(1)
     start = dim.getMinimum()
     end = dim.getMaximum()
     nbin = dim.getNBins()
     x = np.linspace(start, end, nbin)
-    y = histo_ws.getSignalArray()
-    e = np.sqrt(histo_ws.getErrorSquaredArray())
+    y = np.squeeze(histo_ws.getSignalArray())
+    e = np.squeeze(np.sqrt(histo_ws.getErrorSquaredArray()))
     if histo_ws.displayNormalization() == MDNormalization.NumEventsNormalization:
         num_events = histo_ws.getNumEventsArray()
         y = y / num_events
