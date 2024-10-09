@@ -1,9 +1,9 @@
 name: MSlice online documentation update
 
-on:
-  push:
-    branches:
-      - main
+on: push
+#  push:
+#    branches:
+#      - main
 
 jobs:
   build:
