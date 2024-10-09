@@ -19,7 +19,7 @@ import sys
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('../../src'))
 sys.path.insert(0, os.path.abspath(os.path.join("../..", "src")))
-
+print(sys.path)
 from mslice import version_info
 
 # -- General configuration ------------------------------------------------
