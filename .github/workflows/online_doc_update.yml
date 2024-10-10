@@ -9,6 +9,11 @@ jobs:
   pages:
     runs-on: ubuntu-latest
     steps:
+    - name: Update dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install texlive-latex-base texlive-latex-recommended \
+            texlive-fonts-recommended texlive-latex-extra dvipng
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
