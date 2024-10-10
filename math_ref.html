@@ -59,12 +59,12 @@ For each type of data (<strong>PSD</strong> and <strong>non-PSD</strong>) we wil
 <p>For <strong>PSD</strong> data, MSlice uses <em>centre-point rebinning</em>, treating each input bin (“pixel”) as a
 point and summing the full signal of each pixel whose centres lie within an output bin
 (illustrated in the image by the darker green shading in top left, with dots marking centres).
-Thus the output signal in the <img class="math" src="_images/math/fbe9c7293ddf4f78748f42b124db0d413169e320.png" alt="(i,j)"/>th bin, <img class="math" src="_images/math/87d58544f78a16edc4385dd48d3c416ec70ee3f8.png" alt="Y_{ij}"/>, is:</p>
+Thus the output signal in the <span class="math">(i,j)</span>th bin, <span class="math">Y_{ij}</span>, is:</p>
 <div class="math">
-<p><img src="_images/math/1ed0c58e3002e6d0a5c6262f4ef766400c1c92aa.png" alt="Y_{ij} = \frac{1}{N_{kl}} \sum_{kl} y_{kl}"/></p>
-</div><p>where <img class="math" src="_images/math/0d2a1284b464d91e7880c8261ef238aa7d338a5f.png" alt="y_{kl}"/> is the input signal in the input <img class="math" src="_images/math/04984fc61316a1ec35cad78f7a1e13aeead022a9.png" alt="(k,l)"/>th bin
-and the sum runs over the <img class="math" src="_images/math/a39a8b4982aac231a2f93a9483f45973cd5986a7.png" alt="N_{kl}"/> number of bins whose centres lie within the
-boundaries of the <img class="math" src="_images/math/fbe9c7293ddf4f78748f42b124db0d413169e320.png" alt="(i,j)"/>th output bin.</p>
+<p><span class="math">Y_{ij} = \frac{1}{N_{kl}} \sum_{kl} y_{kl}</span></p>
+</div><p>where <span class="math">y_{kl}</span> is the input signal in the input <span class="math">(k,l)</span>th bin
+and the sum runs over the <span class="math">N_{kl}</span> number of bins whose centres lie within the
+boundaries of the <span class="math">(i,j)</span>th output bin.</p>
 <p>The above expression uses the <code class="docutils literal notranslate"><span class="pre">NumEventsNormalization</span></code> convention of Mantid which is the
 same as that adopted by the <a class="reference external" href="https://pace-neutrons.github.io/Horace">Horace</a> program.
 The error values are considered to be standard deviations and are summed in quadrature.</p>
@@ -80,28 +80,28 @@ in the <a class="reference internal" href="cutting.html#cutting-algorithms"><spa
 <li><p>The default <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> method just uses the rebinning described above with one axis having
 only a single bin.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">Integration</span></code> method first rebins the data as described above with the integration axis
-divided into <img class="math" src="_images/math/8983717da7d8fd88b4cef0200a8c1fd9e16a859c.png" alt="N_{\mathrm{int}} ="/> 100 bins.
+divided into <span class="math">N_{\mathrm{int}} =</span> 100 bins.
 It then calls the relevant Mantid algorithm
 (<a class="reference external" href="https://docs.mantidproject.org/nightly/algorithms/IntegrateMDHistoWorkspace-v1.html">IntegrateMDHistoWorkspace</a>)
 to integrate (sums the signal) in those 100 bins.</p></li>
 </ul>
-<p>Taking the <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> index to be over the integration axis, the integrated <code class="docutils literal notranslate"><span class="pre">Cut</span></code> signal
-<img class="math" src="_images/math/113ecc79d1fabbf0ca98becf9d3728be649e9cc7.png" alt="C_i"/> is then given by:</p>
+<p>Taking the <span class="math">j</span> index to be over the integration axis, the integrated <code class="docutils literal notranslate"><span class="pre">Cut</span></code> signal
+<span class="math">C_i</span> is then given by:</p>
 <div class="math">
-<p><img src="_images/math/19e3d9491a9629fede24e0a13b04ee5fdc07f644.png" alt="C_i^{\mathrm{integration}} = w_i \sum_{j \in \mathcal{D}} Y_{ij}"/></p>
-</div><p>where the index <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> only runs over regions with data <img class="math" src="_images/math/2ce8ffee5291a235c5c417ff429a259f9854475c.png" alt="\mathcal{D}"/>, and the width
-<img class="math" src="_images/math/34f0b79ed6d30a918ca4c0f385adea6f3072a673.png" alt="w_i = \sum_{j \in \mathcal{D}} w_{ij}"/> where <img class="math" src="_images/math/b17690fc896faa8d151aa4a2dd8d2fd16a34b439.png" alt="w_{ij}"/> is the width in the
-<img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/>th direction of the <img class="math" src="_images/math/fbe9c7293ddf4f78748f42b124db0d413169e320.png" alt="(i,j)"/>th bin.</p>
+<p><span class="math">C_i^{\mathrm{integration}} = w_i \sum_{j \in \mathcal{D}} Y_{ij}</span></p>
+</div><p>where the index <span class="math">j</span> only runs over regions with data <span class="math">\mathcal{D}</span>, and the width
+<span class="math">w_i = \sum_{j \in \mathcal{D}} w_{ij}</span> where <span class="math">w_{ij}</span> is the width in the
+<span class="math">j</span>th direction of the <span class="math">(i,j)</span>th bin.</p>
 <p>Note that the equivalent expression for a <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> cut is simply:</p>
 <div class="math">
-<p><img src="_images/math/b317945d8ae3d5e74c3e63342a305b4b06ca788a.png" alt="C_i^{\mathrm{rebin}} = \sum_{j \in \mathcal{F}} Y_{ij}"/></p>
-</div><p>where now the index <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> runs over the full integration range <img class="math" src="_images/math/1c407cadee66a3a40c25f2119e3a8c44f681beb2.png" alt="\mathcal{F}"/>.
-The difference is thus a coordinate-dependent weighting factor <img class="math" src="_images/math/00ab1d47834bf57ac5b018a21ace10aae5798cfd.png" alt="w_i"/>.
-If the integration range <em>does not include regions without data</em> (e.g. <img class="math" src="_images/math/d3027d9075a26051443d70489d958932f607fe06.png" alt="\mathcal{D} \equiv \mathcal{F}"/>)
-then all the <img class="math" src="_images/math/00ab1d47834bf57ac5b018a21ace10aae5798cfd.png" alt="w_i"/> will be equal to the full integration width and the difference between
-<img class="math" src="_images/math/1073977e3ca2a39abf82565e3f17b5d45bf9699c.png" alt="C_i^{\mathrm{integration}}"/> and <img class="math" src="_images/math/47199aa59391846aeb288083337f89cbfa6bb9d9.png" alt="C_i^{\mathrm{rebin}}"/> is a constant.</p>
+<p><span class="math">C_i^{\mathrm{rebin}} = \sum_{j \in \mathcal{F}} Y_{ij}</span></p>
+</div><p>where now the index <span class="math">j</span> runs over the full integration range <span class="math">\mathcal{F}</span>.
+The difference is thus a coordinate-dependent weighting factor <span class="math">w_i</span>.
+If the integration range <em>does not include regions without data</em> (e.g. <span class="math">\mathcal{D} \equiv \mathcal{F}</span>)
+then all the <span class="math">w_i</span> will be equal to the full integration width and the difference between
+<span class="math">C_i^{\mathrm{integration}}</span> and <span class="math">C_i^{\mathrm{rebin}}</span> is a constant.</p>
 <p>However, if the integration range covers region with no data (e.g. beyond the kinematic limits)
-then the two cuts <em>may</em> look very different because <img class="math" src="_images/math/1073977e3ca2a39abf82565e3f17b5d45bf9699c.png" alt="C_i^{\mathrm{integration}}"/> will weight
+then the two cuts <em>may</em> look very different because <span class="math">C_i^{\mathrm{integration}}</span> will weight
 regions with data more heavily than regions without data.</p>
 </section>
 <section id="non-psd-slice">
@@ -111,12 +111,12 @@ overlap area between the input and output bins, and then sums only the fraction 
 signal of the input bins which overlaps the output bin.</p>
 <p>The output signal is computed as:</p>
 <div class="math">
-<p><img src="_images/math/02756d082c5f4dac00a0747671e3030d9bf4f457.png" alt="Y_{ij} = \left. \sum_{kl} y_{kl} f_{kl} \right/ \sum_{kl} f_{kl}"/></p>
+<p><span class="math">Y_{ij} = \left. \sum_{kl} y_{kl} f_{kl} \right/ \sum_{kl} f_{kl}</span></p>
 </div><p>and the output uncertainty as:</p>
 <div class="math">
-<p><img src="_images/math/9581134c99568a1591dc67f7f7cc31034e57ffe2.png" alt="E_{ij} = \left. \sqrt{\sum_{kl} e^2_{kl} f_{kl}} \right/ \sum_{kl} f_{kl}"/></p>
-</div><p>where <img class="math" src="_images/math/fe2d98919b60834face9dc00f55cca0fec106c2f.png" alt="f_{kl}"/> is the fractional overlap of the input <img class="math" src="_images/math/04984fc61316a1ec35cad78f7a1e13aeead022a9.png" alt="(k,l)"/>th bin with
-the output <img class="math" src="_images/math/fbe9c7293ddf4f78748f42b124db0d413169e320.png" alt="(i,j)"/>th bin.</p>
+<p><span class="math">E_{ij} = \left. \sqrt{\sum_{kl} e^2_{kl} f_{kl}} \right/ \sum_{kl} f_{kl}</span></p>
+</div><p>where <span class="math">f_{kl}</span> is the fractional overlap of the input <span class="math">(k,l)</span>th bin with
+the output <span class="math">(i,j)</span>th bin.</p>
 <p>This is illustrated in the <a class="reference internal" href="#grid-figure"><span class="std std-ref">figure</span></a> at the start of the page by the square on the right
 hand side with blue triangular and orange quadrilateral shaded regions.
 The blue and orange shading illustrates the fractional overlap areas which weights
@@ -128,39 +128,39 @@ the signal in the top left and top right input bins (large parallelograms) respe
 <p>The <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> cut algorithm performs the same operation described in the previous section
 but with a single bin in the integration axis, yielding</p>
 <div class="math">
-<p><img src="_images/math/4ff66472ba39bf3d823c64b14efc38f5965392a8.png" alt="C_i^{\mathrm{rebin}} = \left. \sum_{j \in \mathcal{F}} Y_{ij} \right/ \sum_{j \in \mathcal{F}} F_{ij}"/></p>
-</div><p>where <img class="math" src="_images/math/5e2bd6c04f1d8be59945141183b3864cb3202016.png" alt="F_{ij} = \sum_{kl} f_{kl}"/>, and <img class="math" src="_images/math/1c407cadee66a3a40c25f2119e3a8c44f681beb2.png" alt="\mathcal{F}"/> indicates the full integration range.</p>
+<p><span class="math">C_i^{\mathrm{rebin}} = \left. \sum_{j \in \mathcal{F}} Y_{ij} \right/ \sum_{j \in \mathcal{F}} F_{ij}</span></p>
+</div><p>where <span class="math">F_{ij} = \sum_{kl} f_{kl}</span>, and <span class="math">\mathcal{F}</span> indicates the full integration range.</p>
 <p>In order to support rebinning in the non-integration axis, the <code class="docutils literal notranslate"><span class="pre">Integration</span></code> algorithm
 first rebins the data into the desired bins in the non-integration axis,
 and 100 bins in the integration axis and then sums them as:</p>
 <div class="math">
-<p><img src="_images/math/fb8bbc7d9dd0f7783ce1a3e8f32668f98667391e.png" alt="C_i^{\mathrm{integration}} = \left. N_i \sum_{j \in \mathcal{F}} Y_{ij} w_{ij} \right/ \sum_{j \in \mathcal{F}} F_{ij}"/></p>
-</div><p>where <img class="math" src="_images/math/d52cd9cddcfad690a71ece2d312bc3c7cd6a81f1.png" alt="N_i = \sum_{j \in \mathcal{D}} 1"/> is the number of <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> bins at a given
-<img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> <em>with non-zero fraction</em> (e.g. if the integration contains only regions with data
-then <img class="math" src="_images/math/a1e65dd6ea883f18f45686583a0e34bbe9a836ce.png" alt="N_i"/> = 100, otherwise <img class="math" src="_images/math/a1e65dd6ea883f18f45686583a0e34bbe9a836ce.png" alt="N_i"/> will be less),
-and <img class="math" src="_images/math/b17690fc896faa8d151aa4a2dd8d2fd16a34b439.png" alt="w_{ij}"/> is the width along the <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/>th axis of the <img class="math" src="_images/math/fbe9c7293ddf4f78748f42b124db0d413169e320.png" alt="(i,j)"/>th bin.
-The <img class="math" src="_images/math/a1e65dd6ea883f18f45686583a0e34bbe9a836ce.png" alt="N_i"/> normalisation is needed because in the limiting case where all the fractions
-<img class="math" src="_images/math/0cc0c61536b88f299aba24faaa7413bf8d0074eb.png" alt="F_{ij}"/> are unity, the denominator would be <img class="math" src="_images/math/a1e65dd6ea883f18f45686583a0e34bbe9a836ce.png" alt="N_i"/>, so we recover the usual
+<p><span class="math">C_i^{\mathrm{integration}} = \left. N_i \sum_{j \in \mathcal{F}} Y_{ij} w_{ij} \right/ \sum_{j \in \mathcal{F}} F_{ij}</span></p>
+</div><p>where <span class="math">N_i = \sum_{j \in \mathcal{D}} 1</span> is the number of <span class="math">j</span> bins at a given
+<span class="math">i</span> <em>with non-zero fraction</em> (e.g. if the integration contains only regions with data
+then <span class="math">N_i</span> = 100, otherwise <span class="math">N_i</span> will be less),
+and <span class="math">w_{ij}</span> is the width along the <span class="math">j</span>th axis of the <span class="math">(i,j)</span>th bin.
+The <span class="math">N_i</span> normalisation is needed because in the limiting case where all the fractions
+<span class="math">F_{ij}</span> are unity, the denominator would be <span class="math">N_i</span>, so we recover the usual
 expression for integrating over a distribution.
-Note that as previously, <img class="math" src="_images/math/2ce8ffee5291a235c5c417ff429a259f9854475c.png" alt="\mathcal{D}"/> indicates the region within the integration
+Note that as previously, <span class="math">\mathcal{D}</span> indicates the region within the integration
 range with data (in this case equivalent to regions with non-zero fractions).</p>
-<p>Like with the <strong>PSD</strong> case there is thus an <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> dependent scaling factor <img class="math" src="_images/math/c1a4896bdb92738959da9692ca954a97a660e379.png" alt="N_i w"/>
+<p>Like with the <strong>PSD</strong> case there is thus an <span class="math">i</span> dependent scaling factor <span class="math">N_i w</span>
 (assuming all the bins have the same width) between <code class="docutils literal notranslate"><span class="pre">Cuts</span></code> computed using the <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> or
 <code class="docutils literal notranslate"><span class="pre">Integration</span></code> algorithm.
 This scaling factor is a constant if the integration range includes only regions with data
-(e.g. <img class="math" src="_images/math/d3027d9075a26051443d70489d958932f607fe06.png" alt="\mathcal{D} \equiv \mathcal{F}"/>), but will not be constant if the integration
+(e.g. <span class="math">\mathcal{D} \equiv \mathcal{F}</span>), but will not be constant if the integration
 overlaps regions without data.</p>
 <p>The difference is illustrated below:</p>
 <img alt="_images/rebin_cuts.png" src="_images/rebin_cuts.png" />
 <p>The cuts have been normalised to the peak intensity so that the constant scaling factor between
 the two algorithms factorises out.
-In the top cut, integrating over <img class="math" src="_images/math/77508007bd8bb87a436cc0d8d3571a950da3ae38.png" alt="6 \leq |Q| &lt; 8 \mathrm{\AA}^{-1}"/> there are no regions
+In the top cut, integrating over <span class="math">6 \leq |Q| &lt; 8 \mathrm{\AA}^{-1}</span> there are no regions
 without data so the two cuts are equivalent except for a constant scaling factor.
-In the bottom cut, integrating over <img class="math" src="_images/math/b8ab048de3222b10abe90b35e20c3789717b4395.png" alt="8 \leq |Q| &lt; 10 \mathrm{\AA}^{-1}"/> there is a large
+In the bottom cut, integrating over <span class="math">8 \leq |Q| &lt; 10 \mathrm{\AA}^{-1}</span> there is a large
 region with no data, so now cuts from the two techniques differ markedly.
-At <img class="math" src="_images/math/9762edc49ca8d443627ff780395837b842375fad.png" alt="E&lt;0"/> meV Where the data covers the full integration range, we have <img class="math" src="_images/math/a1e65dd6ea883f18f45686583a0e34bbe9a836ce.png" alt="N_i"/> = 100
+At <span class="math">E&lt;0</span> meV Where the data covers the full integration range, we have <span class="math">N_i</span> = 100
 and the two cuts are equivalent.
-As <img class="math" src="_images/math/1815f600df7845409443aed470eac2d449e4ddb0.png" alt="E"/> increases, <img class="math" src="_images/math/a1e65dd6ea883f18f45686583a0e34bbe9a836ce.png" alt="N_i"/> decreases until at around 20 meV, it is <img class="math" src="_images/math/a1e65dd6ea883f18f45686583a0e34bbe9a836ce.png" alt="N_i"/> = 50,
+As <span class="math">E</span> increases, <span class="math">N_i</span> decreases until at around 20 meV, it is <span class="math">N_i</span> = 50,
 and we see that at that point the (normalised) <code class="docutils literal notranslate"><span class="pre">Integration</span></code> cut is half the intensity of
 the (normalised) <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> cut.</p>
 </section>
@@ -172,7 +172,7 @@ At the ISIS Neutron and Muon Source if this normalisation is done, then the sign
 units of [milibarns per steradian per meV per formula unit] or [mb/sr/meV/f.u.].</p>
 <p>An <code class="docutils literal notranslate"><span class="pre">Integration</span></code> over energy would then yield a differential cross-section in [mb/sr/f.u.],
 whereas a <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> over energy would leave the units unchanged at [mb/sr/meV/f.u.].</p>
-<p>However, an <code class="docutils literal notranslate"><span class="pre">Integration</span></code> over <img class="math" src="_images/math/03aee60ec0d5d7064d95c77e43648c9b14bea2a9.png" alt="|Q|"/> instead of energy will yield units of
+<p>However, an <code class="docutils literal notranslate"><span class="pre">Integration</span></code> over <span class="math">|Q|</span> instead of energy will yield units of
 [mb/Å/sr/meV/f.u.] rather [mb/meV/f.u.] and as such it may be more useful to perform an
 average <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> which will leave the units unchanged.</p>
 <p>Unfortunately, the input files read by MSlice do not indicate if the signal values saved
@@ -187,9 +187,9 @@ regions. In effect, it assumes that the signal is constant across the integratio
 can be extrapolated over regions without data (so the only manifestation of the lack of data
 are larger errorbars associated with these bins).</p>
 <p>This assumption <em>may</em> be valid for density-of-states (DOS) type cuts where one would expect
-that the signal is approximately constant over <img class="math" src="_images/math/03aee60ec0d5d7064d95c77e43648c9b14bea2a9.png" alt="|Q|"/> and only varies in energy.
+that the signal is approximately constant over <span class="math">|Q|</span> and only varies in energy.
 Thus for these applications, it may be suitable to chose the <code class="docutils literal notranslate"><span class="pre">Rebin</span></code> algorithm, and to
-extrapolate the high-energy, high-<img class="math" src="_images/math/03aee60ec0d5d7064d95c77e43648c9b14bea2a9.png" alt="|Q|"/> regions which are kinematically inaccessible.</p>
+extrapolate the high-energy, high-<span class="math">|Q|</span> regions which are kinematically inaccessible.</p>
 <p>Conversely, for integration over energy - for example over the elastic line to compute a
 differential cross-section or over a finite energy crystal field excitation to obtain a
 magnetic cross-section, the <code class="docutils literal notranslate"><span class="pre">Integration</span></code> algorithm should be chosen else the signal

@@ -165,7 +165,7 @@ plotting.</p>
 <h2><span class="section-number">4.5. </span>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
 <section id="loading-and-cutting-slicing">
 <h3><span class="section-number">4.5.1. </span>Loading and Cutting / Slicing<a class="headerlink" href="#loading-and-cutting-slicing" title="Link to this heading">¶</a></h3>
-<p>To load and plot a slice in <img class="math" src="_images/math/03aee60ec0d5d7064d95c77e43648c9b14bea2a9.png" alt="|Q|"/> and energy transfer, and a cut along <img class="math" src="_images/math/03aee60ec0d5d7064d95c77e43648c9b14bea2a9.png" alt="|Q|"/>, integrating over <img class="math" src="_images/math/9abd84466d4ead6e7c9537084aa8ed0c4de3a153.png" alt="-1\leq E\leq 1"/>:</p>
+<p>To load and plot a slice in <span class="math">|Q|</span> and energy transfer, and a cut along <span class="math">|Q|</span>, integrating over <span class="math">-1\leq E\leq 1</span>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mslice.cli</span> <span class="k">as</span> <span class="nn">mc</span>
 
 <span class="n">ws</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">Load</span><span class="p">(</span><span class="s1">&#39;data.nxspe&#39;</span><span class="p">)</span>
@@ -176,8 +176,8 @@ plotting.</p>
 <span class="n">mc</span><span class="o">.</span><span class="n">PlotSlice</span><span class="p">(</span><span class="n">ws2d</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In the above <code class="docutils literal notranslate"><span class="pre">Slice</span></code> function rebins the data between <img class="math" src="_images/math/37d160f74ff7951c9fdc80dba0245d84e5ba4ca6.png" alt="0\leq |Q|\leq 10"/> in steps of 0.01 <img class="math" src="_images/math/d0057b9f833ae7b620fd26d830a3b91b8f0a852d.png" alt="\mathrm{\AA}^{-1}"/>
-and between <img class="math" src="_images/math/f72249117dd26a32c13e5b60ff7e73de3ab1b17f.png" alt="-5\leq E\leq 55"/> in steps of 0.5 meV.</p>
+<p>In the above <code class="docutils literal notranslate"><span class="pre">Slice</span></code> function rebins the data between <span class="math">0\leq |Q|\leq 10</span> in steps of 0.01 <span class="math">\mathrm{\AA}^{-1}</span>
+and between <span class="math">-5\leq E\leq 55</span> in steps of 0.5 meV.</p>
 </section>
 <section id="plotting-a-series-of-cuts">
 <h3><span class="section-number">4.5.2. </span>Plotting a series of cuts<a class="headerlink" href="#plotting-a-series-of-cuts" title="Link to this heading">¶</a></h3>
