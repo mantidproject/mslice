@@ -17,10 +17,10 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.insert(0, os.path.abspath(os.path.join("../..", "src")))
+sys.path.insert(0, os.path.abspath(os.path.join("../..", "src")))
 
-# from mslice import version_info  # noqa: E402
-version_info = (2, 9, 1)
+from mslice import version_info  # noqa: E402
+# version_info = (2, 9, 1)
 
 # -- General configuration ------------------------------------------------
 
@@ -56,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MSlice'
-copyright = u'2021, Mantid Project'
+copyright = u'2024, Mantid Project'
 author = u'Mantid Project'
 
 # The version info for the project you're documenting, acts as replacement for
