@@ -6,29 +6,14 @@ on: push
 #      - main
 
 jobs:
-  build:
+  pages:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-    permissions:
-      pages: write
-      id-token: write
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Update dependencies
-      run: |
-        sudo apt-get update -qq
-        sudo apt-get install texlive-latex-base texlive-latex-recommended \
-            texlive-fonts-recommended texlive-latex-extra dvipng
-    - name: Build and Commit
+    - id: deployment
       uses: sphinx-notes/pages@v3
       with:
-        documentation_path: docs/source
-    - name: Push changes
-      uses: ad-m/github-push-action@v0.6.0
+        publish: false
+    - uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
+        publish_dir: ${{ steps.deployment.outputs.artifact }}
