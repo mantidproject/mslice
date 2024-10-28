@@ -1,8 +1,8 @@
 name: Deploy MSlice
 
-on:
-  release:
-    types: [published]
+on: push
+#  release:
+#    types: [published]
 
 jobs:
   build_conda_and_upload:
@@ -28,5 +28,5 @@ jobs:
       - name: Publish conda package
         uses: ./.github/actions/publish-package
         with:
-          label: main
+          label: separate_mslice_test # main
           token: ${{ secrets.ANACONDA_API_TOKEN }}

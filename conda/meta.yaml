@@ -27,8 +27,8 @@ requirements:
   run:
   - python
   - pip
-  - mantid
-  - mantidqt
+  - mantid>=6.11
+  - mantidqt>=6.11
   - ipython
   - matplotlib
   - numpy
