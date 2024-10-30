@@ -177,7 +177,7 @@ Plotting a series of cuts
 
 .. code:: python
 
-    import mslice.cli as m
+    import mslice.cli as mc
 
     # Plot a series of energy cuts at different Q (similar to putting something in the width box in GUI).
     ws = mc.Load('data.nxspe')
@@ -191,4 +191,16 @@ Plotting a series of cuts
         wss.append(mc.Load('SEQ_%06d_powder.nxspe' % (rr)))
         mc.PlotCut(mc.Cut(wss[-1], 'DeltaE', '|Q|, 0, 2'), PlotOver=True)
 
+Saving a series of cuts
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    import mslice.cli as mc
+
+    # Save a series of energy cuts at different Q (similar to putting something in the width box in GUI).
+    ws = mc.Load('data.nxspe')
+    for qq in np.linspace(0.5, 2, 4):
+        cutws = mc.Cut(ws, 'DeltaE', '|Q|, %f, %f' % (qq-0.5, qq+0.5))
+        mc.save_ascii(cutws, '/home/user/'+cutws.name)
 
