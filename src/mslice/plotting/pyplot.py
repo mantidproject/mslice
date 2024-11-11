@@ -175,7 +175,7 @@ def _draw_all_if_interactive() -> None:
         fig.canvas.draw()
 
 
-def draw_all(): -> None:
+def draw_all() -> None:
     for fig in GlobalFigureManager.all_figures():
         fig.canvas.draw_idle()
 
