@@ -26,7 +26,6 @@ from cycler import cycler
 import matplotlib
 import matplotlib.colorbar
 import matplotlib.image
-from matplotlib.image import FigureImage
 from matplotlib import _api
 from matplotlib import rcsetup, style
 from matplotlib import _pylab_helpers, interactive
@@ -2185,7 +2184,7 @@ def figimage(
     origin: Literal["upper", "lower"] | None = None,
     resize: bool = False,
     **kwargs,
-) -> FigureImage:
+) -> matplotlib.image.FigureImage:
     return gcf().figimage(
         X,
         xo=xo,
