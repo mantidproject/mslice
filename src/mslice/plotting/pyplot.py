@@ -26,6 +26,7 @@ from cycler import cycler
 import matplotlib
 import matplotlib.colorbar
 import matplotlib.image
+from matplotlib.image import FigureImage
 from matplotlib import _api
 from matplotlib import rcsetup, style
 from matplotlib import _pylab_helpers, interactive
