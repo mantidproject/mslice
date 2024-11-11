@@ -29,6 +29,7 @@ from matplotlib import _api
 from matplotlib import rcsetup, style
 from matplotlib import _pylab_helpers, interactive
 from matplotlib import cbook
+
 try:
     from matplotlib import _docstring as docstring
 except ImportError:
@@ -46,6 +47,7 @@ from matplotlib.scale import get_scale_names
 
 from matplotlib import cm
 from matplotlib.cm import _colormaps as colormaps, register_cmap
+
 try:
     from matplotlib.cm import _get_cmap as get_cmap
 except ImportError:
@@ -61,15 +63,33 @@ from matplotlib.patches import Polygon, Rectangle, Circle, Arrow
 from matplotlib.widgets import Button, Slider, Widget
 
 from matplotlib.ticker import (
-    TickHelper, Formatter, FixedFormatter, NullFormatter, FuncFormatter,
-    FormatStrFormatter, ScalarFormatter, LogFormatter, LogFormatterExponent,
-    LogFormatterMathtext, Locator, IndexLocator, FixedLocator, NullLocator,
-    LinearLocator, LogLocator, AutoLocator, MultipleLocator, MaxNLocator)
+    TickHelper,
+    Formatter,
+    FixedFormatter,
+    NullFormatter,
+    FuncFormatter,
+    FormatStrFormatter,
+    ScalarFormatter,
+    LogFormatter,
+    LogFormatterExponent,
+    LogFormatterMathtext,
+    Locator,
+    IndexLocator,
+    FixedLocator,
+    NullLocator,
+    LinearLocator,
+    LogLocator,
+    AutoLocator,
+    MultipleLocator,
+    MaxNLocator,
+)
 
 from mslice.plotting.globalfiguremanager import set_category
-from mslice.plotting.globalfiguremanager import (CATEGORY_CUT,
-                                                 CATEGORY_SLICE,
-                                                 GlobalFigureManager)
+from mslice.plotting.globalfiguremanager import (
+    CATEGORY_CUT,
+    CATEGORY_SLICE,
+    GlobalFigureManager,
+)
 
 _log = logging.getLogger(__name__)
 
@@ -142,6 +162,7 @@ def install_repl_displayhook():
     _REPL_DISPLAYHOOK = _ReplDisplayHook.IPYTHON
 
     from IPython.core.pylabtools import backend2gui
+
     # trigger IPython's eventloop integration, if available
     ipython_gui_name = backend2gui.get(get_backend())
     if ipython_gui_name:
@@ -153,6 +174,7 @@ def uninstall_repl_displayhook():
     global _REPL_DISPLAYHOOK
     if _REPL_DISPLAYHOOK is _ReplDisplayHook.IPYTHON:
         from IPython import get_ipython
+
         ip = get_ipython()
         ip.events.unregister("post_execute", _draw_all_if_interactive)
     _REPL_DISPLAYHOOK = _ReplDisplayHook.NONE
@@ -171,14 +193,18 @@ def findobj(o=None, match=None, include_self=True):
 
 
 def _get_required_interactive_framework(backend_mod):
-    if not hasattr(getattr(backend_mod, "FigureCanvas", None),
-                   "required_interactive_framework"):
+    if not hasattr(
+        getattr(backend_mod, "FigureCanvas", None), "required_interactive_framework"
+    ):
         _api.warn_deprecated(
-            "3.6", name="Support for FigureCanvases without a "
-            "required_interactive_framework attribute")
+            "3.6",
+            name="Support for FigureCanvases without a "
+            "required_interactive_framework attribute",
+        )
         return None
     # Inline this once the deprecation elapses.
     return backend_mod.FigureCanvas.required_interactive_framework
+
 
 _backend_mod = None
 
@@ -213,25 +239,27 @@ def switch_backend(newbackend):
     global _backend_mod
     # make sure the init is pulled up so we can assign to it later
     import matplotlib.backends
+
     close("all")
 
     if newbackend is rcsetup._auto_backend_sentinel:
         current_framework = cbook._get_running_interactive_framework()
-        mapping = {'qt': 'qtagg',
-                   'gtk3': 'gtk3agg',
-                   'gtk4': 'gtk4agg',
-                   'wx': 'wxagg',
-                   'tk': 'tkagg',
-                   'macosx': 'macosx',
-                   'headless': 'agg'}
+        mapping = {
+            "qt": "qtagg",
+            "gtk3": "gtk3agg",
+            "gtk4": "gtk4agg",
+            "wx": "wxagg",
+            "tk": "tkagg",
+            "macosx": "macosx",
+            "headless": "agg",
+        }
 
         best_guess = mapping.get(current_framework, None)
         if best_guess is not None:
             candidates = [best_guess]
         else:
             candidates = []
-        candidates += [
-            "macosx", "qtagg", "gtk4agg", "gtk3agg", "tkagg", "wxagg"]
+        candidates += ["macosx", "qtagg", "gtk4agg", "gtk3agg", "tkagg", "wxagg"]
 
         # Don't try to fallback on the cairo-based backends as they each have
         # an additional dependency (pycairo) over the agg-based backend, and
@@ -242,7 +270,7 @@ def switch_backend(newbackend):
             except ImportError:
                 continue
             else:
-                rcParamsOrig['backend'] = candidate
+                rcParamsOrig["backend"] = candidate
                 return
         else:
             # Switching to Agg should always succeed; if it doesn't, let the
@@ -251,24 +279,29 @@ def switch_backend(newbackend):
             rcParamsOrig["backend"] = "agg"
             return
 
-    backend_mod = importlib.import_module(
-        cbook._backend_module_name(newbackend))
+    backend_mod = importlib.import_module(cbook._backend_module_name(newbackend))
 
     required_framework = _get_required_interactive_framework(backend_mod)
     if required_framework is not None:
         current_framework = cbook._get_running_interactive_framework()
-        if (current_framework and required_framework
-                and current_framework != required_framework):
+        if (
+            current_framework
+            and required_framework
+            and current_framework != required_framework
+        ):
             raise ImportError(
                 "Cannot load backend {!r} which requires the {!r} interactive "
                 "framework, as {!r} is currently running".format(
-                    newbackend, required_framework, current_framework))
+                    newbackend, required_framework, current_framework
+                )
+            )
 
     # Load the new_figure_manager() and show() functions from the backend.
 
     # Classically, backends can directly export these functions.  This should
     # keep working for backcompat.
     new_figure_manager = getattr(backend_mod, "new_figure_manager", None)
+
     # show = getattr(backend_mod, "show", None)
     # In that classical approach, backends are implemented as modules, but
     # "inherit" default method implementations from backend_bases._Backend.
@@ -284,6 +317,7 @@ def switch_backend(newbackend):
     if new_figure_manager is None:
         # only try to get the canvas class if have opted into the new scheme
         canvas_class = backend_mod.FigureCanvas
+
         def new_figure_manager_given_figure(num, figure):
             return canvas_class.new_manager(figure, num)
 
@@ -297,19 +331,18 @@ def switch_backend(newbackend):
                 if manager:
                     manager.canvas.draw_idle()
 
-        backend_mod.new_figure_manager_given_figure = \
-            new_figure_manager_given_figure
+        backend_mod.new_figure_manager_given_figure = new_figure_manager_given_figure
         backend_mod.new_figure_manager = new_figure_manager
         backend_mod.draw_if_interactive = draw_if_interactive
 
-    _log.debug("Loaded backend %s version %s.",
-               newbackend, backend_mod.backend_version)
+    _log.debug("Loaded backend %s version %s.", newbackend, backend_mod.backend_version)
 
-    rcParams['backend'] = rcParamsDefault['backend'] = newbackend
+    rcParams["backend"] = rcParamsDefault["backend"] = newbackend
     _backend_mod = backend_mod
     for func_name in ["new_figure_manager", "draw_if_interactive", "show"]:
         globals()[func_name].__signature__ = inspect.signature(
-            getattr(backend_mod, func_name))
+            getattr(backend_mod, func_name)
+        )
 
     # Need to keep a global reference to the backend for compatibility reasons.
     # See https://github.com/matplotlib/matplotlib/issues/6092
@@ -323,7 +356,7 @@ def switch_backend(newbackend):
 def _warn_if_gui_out_of_main_thread():
     warn = False
     if _get_required_interactive_framework(_get_backend_mod()):
-        if hasattr(threading, 'get_native_id'):
+        if hasattr(threading, "get_native_id"):
             # This compares native thread ids because even if Python-level
             # Thread objects match, the underlying OS thread (which is what
             # really matters) may be different on Python implementations with
@@ -337,8 +370,8 @@ def _warn_if_gui_out_of_main_thread():
                 warn = True
     if warn:
         _api.warn_external(
-            "Starting a Matplotlib GUI outside of the main thread will likely "
-            "fail.")
+            "Starting a Matplotlib GUI outside of the main thread will likely " "fail."
+        )
 
 
 # This function's signature is rewritten upon backend-load by switch_backend.
@@ -621,50 +654,58 @@ def xkcd(scale=1, length=100, randomness=2):
     # This cannot be implemented in terms of contextmanager() or rc_context()
     # because this needs to work as a non-contextmanager too.
 
-    if rcParams['text.usetex']:
-        raise RuntimeError(
-            "xkcd mode is not compatible with text.usetex = True")
+    if rcParams["text.usetex"]:
+        raise RuntimeError("xkcd mode is not compatible with text.usetex = True")
 
     stack = ExitStack()
     stack.callback(dict.update, rcParams, rcParams.copy())
 
     from matplotlib import patheffects
-    rcParams.update({
-        'font.family': ['xkcd', 'xkcd Script', 'Humor Sans', 'Comic Neue',
-                        'Comic Sans MS'],
-        'font.size': 14.0,
-        'path.sketch': (scale, length, randomness),
-        'path.effects': [
-            patheffects.withStroke(linewidth=4, foreground="w")],
-        'axes.linewidth': 1.5,
-        'lines.linewidth': 2.0,
-        'figure.facecolor': 'white',
-        'grid.linewidth': 0.0,
-        'axes.grid': False,
-        'axes.unicode_minus': False,
-        'axes.edgecolor': 'black',
-        'xtick.major.size': 8,
-        'xtick.major.width': 3,
-        'ytick.major.size': 8,
-        'ytick.major.width': 3,
-    })
+
+    rcParams.update(
+        {
+            "font.family": [
+                "xkcd",
+                "xkcd Script",
+                "Humor Sans",
+                "Comic Neue",
+                "Comic Sans MS",
+            ],
+            "font.size": 14.0,
+            "path.sketch": (scale, length, randomness),
+            "path.effects": [patheffects.withStroke(linewidth=4, foreground="w")],
+            "axes.linewidth": 1.5,
+            "lines.linewidth": 2.0,
+            "figure.facecolor": "white",
+            "grid.linewidth": 0.0,
+            "axes.grid": False,
+            "axes.unicode_minus": False,
+            "axes.edgecolor": "black",
+            "xtick.major.size": 8,
+            "xtick.major.width": 3,
+            "ytick.major.size": 8,
+            "ytick.major.width": 3,
+        }
+    )
 
     return stack
 
 
 ## Figures ##
 
+
 @_api.make_keyword_only("3.6", "facecolor")
-def figure(num=None,  # autoincrement if None, else integer from 1-N
-           figsize=None,  # defaults to rc figure.figsize
-           dpi=None,  # defaults to rc figure.dpi
-           facecolor=None,  # defaults to rc figure.facecolor
-           edgecolor=None,  # defaults to rc figure.edgecolor
-           frameon=True,
-           FigureClass=Figure,
-           clear=False,
-           **kwargs
-           ):
+def figure(
+    num=None,  # autoincrement if None, else integer from 1-N
+    figsize=None,  # defaults to rc figure.figsize
+    dpi=None,  # defaults to rc figure.dpi
+    facecolor=None,  # defaults to rc figure.facecolor
+    edgecolor=None,  # defaults to rc figure.edgecolor
+    frameon=True,
+    FigureClass=Figure,
+    clear=False,
+    **kwargs,
+):
 
     return GlobalFigureManager.get_figure_number(num).figure
 
@@ -679,9 +720,12 @@ def _auto_draw_if_interactive(fig, val):
     fig : Figure
         A figure object which is assumed to be associated with a canvas
     """
-    if (val and matplotlib.is_interactive()
-            and not fig.canvas.is_saving()
-            and not fig.canvas._is_idle_drawing):
+    if (
+        val
+        and matplotlib.is_interactive()
+        and not fig.canvas.is_saving()
+        and not fig.canvas._is_idle_drawing
+    ):
         # Some artists can mark themselves as stale in the middle of drawing
         # (e.g. axes position & tick labels being computed at draw time), but
         # this shouldn't trigger a redraw because the current redraw will
@@ -755,11 +799,11 @@ def close(fig=None):
             return
         else:
             GlobalFigureManager.destroy(figManager.num)
-    elif fig == 'all':
+    elif fig == "all":
         GlobalFigureManager.destroy_all()
     elif isinstance(fig, int):
         GlobalFigureManager.destroy(fig)
-    elif hasattr(fig, 'int'):
+    elif hasattr(fig, "int"):
         # if we are dealing with a type UUID, we
         # can use its integer representation
         GlobalFigureManager.destroy(fig.int)
@@ -771,8 +815,10 @@ def close(fig=None):
     elif isinstance(fig, Figure):
         GlobalFigureManager.destroy_fig(fig)
     else:
-        raise TypeError("close() argument must be a Figure, an int, a string, "
-                        "or None, not %s" % type(fig))
+        raise TypeError(
+            "close() argument must be a Figure, an int, a string, "
+            "or None, not %s" % type(fig)
+        )
 
 
 def clf():
@@ -808,11 +854,14 @@ def savefig(*args, **kwargs):
 
 def figlegend(*args, **kwargs):
     return gcf().legend(*args, **kwargs)
+
+
 if Figure.legend.__doc__:
     figlegend.__doc__ = Figure.legend.__doc__.replace("legend(", "figlegend(")
 
 
 ## Axes ##
+
 
 @docstring.dedent_interpd
 def axes(arg=None, **kwargs):
@@ -902,7 +951,7 @@ def axes(arg=None, **kwargs):
         plt.axes((left, bottom, width, height), facecolor='grey')
     """
     fig = gcf()
-    pos = kwargs.pop('position', None)
+    pos = kwargs.pop("position", None)
     if arg is None:
         if pos is None:
             return fig.add_subplot(**kwargs)
@@ -936,6 +985,7 @@ def cla():
 
 
 ## More ways of creating axes ##
+
 
 @docstring.dedent_interpd
 def subplot(*args, **kwargs):
@@ -1076,16 +1126,16 @@ def subplot(*args, **kwargs):
     # Here we will only normalize `polar=True` vs `projection='polar'` and let
     # downstream code deal with the rest.
     unset = object()
-    projection = kwargs.get('projection', unset)
-    polar = kwargs.pop('polar', unset)
+    projection = kwargs.get("projection", unset)
+    polar = kwargs.pop("polar", unset)
     if polar is not unset and polar:
         # if we got mixed messages from the user, raise
-        if projection is not unset and projection != 'polar':
+        if projection is not unset and projection != "polar":
             raise ValueError(
                 f"polar={polar}, yet projection={projection!r}. "
                 "Only one of these arguments should be supplied."
             )
-        kwargs['projection'] = projection = 'polar'
+        kwargs["projection"] = projection = "polar"
 
     # if subplot called without arguments, create subplot(1, 1, 1)
     if len(args) == 0:
@@ -1097,13 +1147,17 @@ def subplot(*args, **kwargs):
     # because what was intended to be the sharex argument is instead treated as
     # a subplot index for subplot()
     if len(args) >= 3 and isinstance(args[2], bool):
-        _api.warn_external("The subplot index argument to subplot() appears "
-                           "to be a boolean. Did you intend to use "
-                           "subplots()?")
+        _api.warn_external(
+            "The subplot index argument to subplot() appears "
+            "to be a boolean. Did you intend to use "
+            "subplots()?"
+        )
     # Check for nrows and ncols, which are not valid subplot args:
-    if 'nrows' in kwargs or 'ncols' in kwargs:
-        raise TypeError("subplot() got an unexpected keyword argument 'ncols' "
-                        "and/or 'nrows'.  Did you intend to call subplots()?")
+    if "nrows" in kwargs or "ncols" in kwargs:
+        raise TypeError(
+            "subplot() got an unexpected keyword argument 'ncols' "
+            "and/or 'nrows'.  Did you intend to call subplots()?"
+        )
 
     fig = gcf()
 
@@ -1112,7 +1166,7 @@ def subplot(*args, **kwargs):
 
     for ax in fig.axes:
         # if we found an Axes at the position sort out if we can re-use it
-        if hasattr(ax, 'get_subplotspec') and ax.get_subplotspec() == key:
+        if hasattr(ax, "get_subplotspec") and ax.get_subplotspec() == key:
             # if the user passed no kwargs, re-use
             if kwargs == {}:
                 break
@@ -1127,22 +1181,37 @@ def subplot(*args, **kwargs):
 
     fig.sca(ax)
 
-    axes_to_delete = [other for other in fig.axes
-                      if other != ax and ax.bbox.fully_overlaps(other.bbox)]
+    axes_to_delete = [
+        other
+        for other in fig.axes
+        if other != ax and ax.bbox.fully_overlaps(other.bbox)
+    ]
     if axes_to_delete:
         _api.warn_deprecated(
-            "3.6", message="Auto-removal of overlapping axes is deprecated "
+            "3.6",
+            message="Auto-removal of overlapping axes is deprecated "
             "since %(since)s and will be removed %(removal)s; explicitly call "
-            "ax.remove() as needed.")
+            "ax.remove() as needed.",
+        )
     for ax_to_del in axes_to_delete:
         delaxes(ax_to_del)
 
     return ax
 
 
-def subplots(nrows=1, ncols=1, *, sharex=False, sharey=False, squeeze=True,
-             width_ratios=None, height_ratios=None,
-             subplot_kw=None, gridspec_kw=None, **fig_kw):
+def subplots(
+    nrows=1,
+    ncols=1,
+    *,
+    sharex=False,
+    sharey=False,
+    squeeze=True,
+    width_ratios=None,
+    height_ratios=None,
+    subplot_kw=None,
+    gridspec_kw=None,
+    **fig_kw,
+):
     """
     Create a figure and a set of subplots.
 
@@ -1287,16 +1356,32 @@ def subplots(nrows=1, ncols=1, *, sharex=False, sharey=False, squeeze=True,
 
     """
     fig = figure(**fig_kw)
-    axs = fig.subplots(nrows=nrows, ncols=ncols, sharex=sharex, sharey=sharey,
-                       squeeze=squeeze, subplot_kw=subplot_kw,
-                       gridspec_kw=gridspec_kw, height_ratios=height_ratios,
-                       width_ratios=width_ratios)
+    axs = fig.subplots(
+        nrows=nrows,
+        ncols=ncols,
+        sharex=sharex,
+        sharey=sharey,
+        squeeze=squeeze,
+        subplot_kw=subplot_kw,
+        gridspec_kw=gridspec_kw,
+        height_ratios=height_ratios,
+        width_ratios=width_ratios,
+    )
     return fig, axs
 
 
-def subplot_mosaic(mosaic, *, sharex=False, sharey=False,
-                   width_ratios=None, height_ratios=None, empty_sentinel='.',
-                   subplot_kw=None, gridspec_kw=None, **fig_kw):
+def subplot_mosaic(
+    mosaic,
+    *,
+    sharex=False,
+    sharey=False,
+    width_ratios=None,
+    height_ratios=None,
+    empty_sentinel=".",
+    subplot_kw=None,
+    gridspec_kw=None,
+    **fig_kw,
+):
     """
     Build a layout of Axes based on ASCII art or nested lists.
 
@@ -1390,10 +1475,14 @@ def subplot_mosaic(mosaic, *, sharex=False, sharey=False,
     """
     fig = figure(**fig_kw)
     ax_dict = fig.subplot_mosaic(
-        mosaic, sharex=sharex, sharey=sharey,
-        height_ratios=height_ratios, width_ratios=width_ratios,
-        subplot_kw=subplot_kw, gridspec_kw=gridspec_kw,
-        empty_sentinel=empty_sentinel
+        mosaic,
+        sharex=sharex,
+        sharey=sharey,
+        height_ratios=height_ratios,
+        width_ratios=width_ratios,
+        subplot_kw=subplot_kw,
+        gridspec_kw=gridspec_kw,
+        empty_sentinel=empty_sentinel,
     )
     return fig, ax_dict
 
@@ -1448,13 +1537,18 @@ def subplot2grid(shape, loc, rowspan=1, colspan=1, fig=None, **kwargs):
     subplotspec = gs.new_subplotspec(loc, rowspan=rowspan, colspan=colspan)
     ax = fig.add_subplot(subplotspec, **kwargs)
 
-    axes_to_delete = [other for other in fig.axes
-                      if other != ax and ax.bbox.fully_overlaps(other.bbox)]
+    axes_to_delete = [
+        other
+        for other in fig.axes
+        if other != ax and ax.bbox.fully_overlaps(other.bbox)
+    ]
     if axes_to_delete:
         _api.warn_deprecated(
-            "3.6", message="Auto-removal of overlapping axes is deprecated "
+            "3.6",
+            message="Auto-removal of overlapping axes is deprecated "
             "since %(since)s and will be removed %(removal)s; explicitly call "
-            "ax.remove() as needed.")
+            "ax.remove() as needed.",
+        )
     for ax_to_del in axes_to_delete:
         delaxes(ax_to_del)
 
@@ -1501,8 +1595,8 @@ def subplot_tool(targetfig=None):
     -------
     `matplotlib.widgets.SubplotTool`
     """
-    tbar = rcParams['toolbar']  # turn off the navigation toolbar for toolfig
-    rcParams['toolbar'] = 'None'
+    tbar = rcParams["toolbar"]  # turn off the navigation toolbar for toolfig
+    rcParams["toolbar"] = "None"
     if targetfig is None:
         manager = get_current_fig_manager()
         targetfig = manager.canvas.figure
@@ -1512,12 +1606,12 @@ def subplot_tool(targetfig=None):
             if manager.canvas.figure == targetfig:
                 break
         else:
-            raise RuntimeError('Could not find manager for targetfig')
+            raise RuntimeError("Could not find manager for targetfig")
 
     toolfig = figure(figsize=(6, 3))
     toolfig.subplots_adjust(top=0.9)
     ret = SubplotTool(targetfig, toolfig)
-    rcParams['toolbar'] = tbar
+    rcParams["toolbar"] = tbar
     GlobalFigureManager.set_active(manager)  # restore the current figure
     return ret
 
@@ -1541,6 +1635,7 @@ def box(on=None):
     if on is None:
         on = not ax.get_frame_on()
     ax.set_frame_on(on)
+
 
 ## Axis ##
 
@@ -1667,8 +1762,9 @@ def xticks(ticks=None, labels=None, *, minor=False, **kwargs):
     if ticks is None:
         locs = ax.get_xticks(minor=minor)
         if labels is not None:
-            raise TypeError("xticks(): Parameter 'labels' can't be set "
-                            "without setting 'ticks'")
+            raise TypeError(
+                "xticks(): Parameter 'labels' can't be set " "without setting 'ticks'"
+            )
     else:
         locs = ax.set_xticks(ticks, minor=minor)
 
@@ -1730,8 +1826,9 @@ def yticks(ticks=None, labels=None, *, minor=False, **kwargs):
     if ticks is None:
         locs = ax.get_yticks(minor=minor)
         if labels is not None:
-            raise TypeError("yticks(): Parameter 'labels' can't be set "
-                            "without setting 'ticks'")
+            raise TypeError(
+                "yticks(): Parameter 'labels' can't be set " "without setting 'ticks'"
+            )
     else:
         locs = ax.set_yticks(ticks, minor=minor)
 
@@ -1806,13 +1903,14 @@ def rgrids(radii=None, labels=None, angle=None, fmt=None, **kwargs):
     """
     ax = gca()
     if not isinstance(ax, PolarAxes):
-        raise RuntimeError('rgrids only defined for polar axes')
+        raise RuntimeError("rgrids only defined for polar axes")
     if all(p is None for p in [radii, labels, angle, fmt]) and not kwargs:
         lines = ax.yaxis.get_gridlines()
         labels = ax.yaxis.get_ticklabels()
     else:
         lines, labels = ax.set_rgrids(
-            radii, labels=labels, angle=angle, fmt=fmt, **kwargs)
+            radii, labels=labels, angle=angle, fmt=fmt, **kwargs
+        )
     return lines, labels
 
 
@@ -1874,19 +1972,23 @@ def thetagrids(angles=None, labels=None, fmt=None, **kwargs):
     """
     ax = gca()
     if not isinstance(ax, PolarAxes):
-        raise RuntimeError('thetagrids only defined for polar axes')
+        raise RuntimeError("thetagrids only defined for polar axes")
     if all(param is None for param in [angles, labels, fmt]) and not kwargs:
         lines = ax.xaxis.get_ticklines()
         labels = ax.xaxis.get_ticklabels()
     else:
-        lines, labels = ax.set_thetagrids(angles,
-                                          labels=labels, fmt=fmt, **kwargs)
+        lines, labels = ax.set_thetagrids(angles, labels=labels, fmt=fmt, **kwargs)
     return lines, labels
 
 
 _NON_PLOT_COMMANDS = {
-    'connect', 'disconnect', 'get_current_fig_manager', 'ginput',
-    'new_figure_manager', 'waitforbuttonpress'}
+    "connect",
+    "disconnect",
+    "get_current_fig_manager",
+    "ginput",
+    "new_figure_manager",
+    "waitforbuttonpress",
+}
 
 
 def get_plot_commands():
@@ -1896,14 +1998,22 @@ def get_plot_commands():
     # This works by searching for all functions in this module and removing
     # a few hard-coded exclusions, as well as all of the colormap-setting
     # functions, and anything marked as private with a preceding underscore.
-    exclude = {'colormaps', 'colors', 'get_plot_commands',
-               *_NON_PLOT_COMMANDS, *colormaps}
+    exclude = {
+        "colormaps",
+        "colors",
+        "get_plot_commands",
+        *_NON_PLOT_COMMANDS,
+        *colormaps,
+    }
     this_module = inspect.getmodule(get_plot_commands)
     return sorted(
-        name for name, obj in globals().items()
-        if not name.startswith('_') and name not in exclude
-           and inspect.isfunction(obj)
-           and inspect.getmodule(obj) is this_module)
+        name
+        for name, obj in globals().items()
+        if not name.startswith("_")
+        and name not in exclude
+        and inspect.isfunction(obj)
+        and inspect.getmodule(obj) is this_module
+    )
 
 
 ## Plotting part 1: manually generated functions and wrappers ##
@@ -1914,10 +2024,12 @@ def colorbar(mappable=None, cax=None, ax=None, **kwargs):
     if mappable is None:
         mappable = gci()
         if mappable is None:
-            raise RuntimeError('No mappable was found to use for colorbar '
-                               'creation. First define a mappable such as '
-                               'an image (with imshow) or a contour set ('
-                               'with contourf).')
+            raise RuntimeError(
+                "No mappable was found to use for colorbar "
+                "creation. First define a mappable such as "
+                "an image (with imshow) or a contour set ("
+                "with contourf)."
+            )
     ret = gcf().colorbar(mappable, cax=cax, ax=ax, **kwargs)
     return ret
 
@@ -1938,7 +2050,7 @@ def clim(vmin=None, vmax=None):
     """
     im = gci()
     if im is None:
-        raise RuntimeError('You must first define an image, e.g., with imshow')
+        raise RuntimeError("You must first define an image, e.g., with imshow")
 
     im.set_clim(vmin, vmax)
 
@@ -1960,7 +2072,7 @@ def set_cmap(cmap):
     """
     cmap = get_cmap(cmap)
 
-    rc('image', cmap=cmap.name)
+    rc("image", cmap=cmap.name)
     im = gci()
 
     if im is not None:
@@ -2044,8 +2156,10 @@ def polar(*args, **kwargs):
     if gcf().get_axes():
         ax = gca()
         if not isinstance(ax, PolarAxes):
-            _api.warn_external('Trying to create polar plot on an Axes '
-                               'that does not have a polar projection.')
+            _api.warn_external(
+                "Trying to create polar plot on an Axes "
+                "that does not have a polar projection."
+            )
     else:
         ax = axes(projection="polar")
     return ax.plot(*args, **kwargs)
@@ -2057,129 +2171,258 @@ def polar(*args, **kwargs):
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure.figimage)
 def figimage(
-        X, xo=0, yo=0, alpha=None, norm=None, cmap=None, vmin=None,
-        vmax=None, origin=None, resize=False, **kwargs):
+    X: ArrayLike,
+    xo: int = 0,
+    yo: int = 0,
+    alpha: float | None = None,
+    norm: str | Normalize | None = None,
+    cmap: str | Colormap | None = None,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    origin: Literal["upper", "lower"] | None = None,
+    resize: bool = False,
+    **kwargs,
+) -> FigureImage:
     return gcf().figimage(
-        X, xo=xo, yo=yo, alpha=alpha, norm=norm, cmap=cmap, vmin=vmin,
-        vmax=vmax, origin=origin, resize=resize, **kwargs)
+        X,
+        xo=xo,
+        yo=yo,
+        alpha=alpha,
+        norm=norm,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        origin=origin,
+        resize=resize,
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure.text)
-def figtext(x, y, s, fontdict=None, **kwargs):
+def figtext(
+    x: float, y: float, s: str, fontdict: dict[str, Any] | None = None, **kwargs
+) -> Text:
     return gcf().text(x, y, s, fontdict=fontdict, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure.gca)
-def gca():
+def gca() -> Axes:
     return gcf().gca()
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure._gci)
-def gci():
+def gci() -> ScalarMappable | None:
     return gcf()._gci()
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure.ginput)
 def ginput(
-        n=1, timeout=30, show_clicks=True,
-        mouse_add=MouseButton.LEFT, mouse_pop=MouseButton.RIGHT,
-        mouse_stop=MouseButton.MIDDLE):
+    n: int = 1,
+    timeout: float = 30,
+    show_clicks: bool = True,
+    mouse_add: MouseButton = MouseButton.LEFT,
+    mouse_pop: MouseButton = MouseButton.RIGHT,
+    mouse_stop: MouseButton = MouseButton.MIDDLE,
+) -> list[tuple[int, int]]:
     return gcf().ginput(
-        n=n, timeout=timeout, show_clicks=show_clicks,
-        mouse_add=mouse_add, mouse_pop=mouse_pop,
-        mouse_stop=mouse_stop)
+        n=n,
+        timeout=timeout,
+        show_clicks=show_clicks,
+        mouse_add=mouse_add,
+        mouse_pop=mouse_pop,
+        mouse_stop=mouse_stop,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure.subplots_adjust)
 def subplots_adjust(
-        left=None, bottom=None, right=None, top=None, wspace=None,
-        hspace=None):
-    return gcf().subplots_adjust(
-        left=left, bottom=bottom, right=right, top=top, wspace=wspace,
-        hspace=hspace)
+    left: float | None = None,
+    bottom: float | None = None,
+    right: float | None = None,
+    top: float | None = None,
+    wspace: float | None = None,
+    hspace: float | None = None,
+) -> None:
+    gcf().subplots_adjust(
+        left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure.suptitle)
-def suptitle(t, **kwargs):
+def suptitle(t: str, **kwargs) -> Text:
     return gcf().suptitle(t, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure.tight_layout)
-def tight_layout(*, pad=1.08, h_pad=None, w_pad=None, rect=None):
-    return gcf().tight_layout(pad=pad, h_pad=h_pad, w_pad=w_pad, rect=rect)
+def tight_layout(
+    *,
+    pad: float = 1.08,
+    h_pad: float | None = None,
+    w_pad: float | None = None,
+    rect: tuple[float, float, float, float] | None = None,
+) -> None:
+    gcf().tight_layout(pad=pad, h_pad=h_pad, w_pad=w_pad, rect=rect)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Figure.waitforbuttonpress)
-def waitforbuttonpress(timeout=-1):
+def waitforbuttonpress(timeout: float = -1) -> None | bool:
     return gcf().waitforbuttonpress(timeout=timeout)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.acorr)
 @set_category(CATEGORY_CUT)
-def acorr(x, *, data=None, **kwargs):
-    return gca().acorr(
-        x, **({"data": data} if data is not None else {}), **kwargs)
+def acorr(
+    x: ArrayLike, *, data=None, **kwargs
+) -> tuple[np.ndarray, np.ndarray, LineCollection | Line2D, Line2D | None]:
+    return gca().acorr(x, **({"data": data} if data is not None else {}), **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.angle_spectrum)
 @set_category(CATEGORY_CUT)
 def angle_spectrum(
-        x, Fs=None, Fc=None, window=None, pad_to=None, sides=None, *,
-        data=None, **kwargs):
+    x: ArrayLike,
+    Fs: float | None = None,
+    Fc: int | None = None,
+    window: Callable[[ArrayLike], ArrayLike] | ArrayLike | None = None,
+    pad_to: int | None = None,
+    sides: Literal["default", "onesided", "twosided"] | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray, Line2D]:
     return gca().angle_spectrum(
-        x, Fs=Fs, Fc=Fc, window=window, pad_to=pad_to, sides=sides,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        Fs=Fs,
+        Fc=Fc,
+        window=window,
+        pad_to=pad_to,
+        sides=sides,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.annotate)
+@set_category(CATEGORY_CUT)
+def annotate(
+    text: str,
+    xy: tuple[float, float],
+    xytext: tuple[float, float] | None = None,
+    xycoords: (
+        str
+        | Artist
+        | Transform
+        | Callable[[RendererBase], Bbox | Transform]
+        | tuple[float, float]
+    ) = "data",
+    textcoords: (
+        str
+        | Artist
+        | Transform
+        | Callable[[RendererBase], Bbox | Transform]
+        | tuple[float, float]
+        | None
+    ) = None,
+    arrowprops: dict[str, Any] | None = None,
+    annotation_clip: bool | None = None,
+    **kwargs,
+) -> Annotation:
+    return gca().annotate(
+        text,
+        xy,
+        xytext=xytext,
+        xycoords=xycoords,
+        textcoords=textcoords,
+        arrowprops=arrowprops,
+        annotation_clip=annotation_clip,
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.arrow)
 @set_category(CATEGORY_CUT)
-def arrow(x, y, dx, dy, **kwargs):
+def arrow(x: float, y: float, dx: float, dy: float, **kwargs) -> FancyArrow:
     return gca().arrow(x, y, dx, dy, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.autoscale)
+@set_category(CATEGORY_CUT)
+def autoscale(
+    enable: bool = True,
+    axis: Literal["both", "x", "y"] = "both",
+    tight: bool | None = None,
+) -> None:
+    gca().autoscale(enable=enable, axis=axis, tight=tight)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.axhline)
 @set_category(CATEGORY_CUT)
-def axhline(y=0, xmin=0, xmax=1, **kwargs):
+def axhline(y: float = 0, xmin: float = 0, xmax: float = 1, **kwargs) -> Line2D:
     return gca().axhline(y=y, xmin=xmin, xmax=xmax, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.axhspan)
 @set_category(CATEGORY_CUT)
-def axhspan(ymin, ymax, xmin=0, xmax=1, **kwargs):
+def axhspan(
+    ymin: float, ymax: float, xmin: float = 0, xmax: float = 1, **kwargs
+) -> Polygon:
     return gca().axhspan(ymin, ymax, xmin=xmin, xmax=xmax, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.axis)
+@set_category(CATEGORY_CUT)
+def axis(
+    arg: tuple[float, float, float, float] | bool | str | None = None,
+    /,
+    *,
+    emit: bool = True,
+    **kwargs,
+) -> tuple[float, float, float, float]:
+    return gca().axis(arg, emit=emit, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.axline)
 @set_category(CATEGORY_CUT)
-def axline(xy1, xy2=None, *, slope=None, **kwargs):
+def axline(
+    xy1: tuple[float, float],
+    xy2: tuple[float, float] | None = None,
+    *,
+    slope: float | None = None,
+    **kwargs,
+) -> AxLine:
     return gca().axline(xy1, xy2=xy2, slope=slope, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.axvline)
 @set_category(CATEGORY_CUT)
-def axvline(x=0, ymin=0, ymax=1, **kwargs):
+def axvline(x: float = 0, ymin: float = 0, ymax: float = 1, **kwargs) -> Line2D:
     return gca().axvline(x=x, ymin=ymin, ymax=ymax, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.axvspan)
 @set_category(CATEGORY_CUT)
-def axvspan(xmin, xmax, ymin=0, ymax=1, **kwargs):
+def axvspan(
+    xmin: float, xmax: float, ymin: float = 0, ymax: float = 1, **kwargs
+) -> Polygon:
     return gca().axvspan(xmin, xmax, ymin=ymin, ymax=ymax, **kwargs)
 
 
@@ -2187,83 +2430,164 @@ def axvspan(xmin, xmax, ymin=0, ymax=1, **kwargs):
 @_copy_docstring_and_deprecators(Axes.bar)
 @set_category(CATEGORY_CUT)
 def bar(
-        x, height, width=0.8, bottom=None, *, align='center',
-        data=None, **kwargs):
+    x: float | ArrayLike,
+    height: float | ArrayLike,
+    width: float | ArrayLike = 0.8,
+    bottom: float | ArrayLike | None = None,
+    *,
+    align: Literal["center", "edge"] = "center",
+    data=None,
+    **kwargs,
+) -> BarContainer:
     return gca().bar(
-        x, height, width=width, bottom=bottom, align=align,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        height,
+        width=width,
+        bottom=bottom,
+        align=align,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.barbs)
 @set_category(CATEGORY_CUT)
-def barbs(*args, data=None, **kwargs):
-    return gca().barbs(
-        *args, **({"data": data} if data is not None else {}),
-        **kwargs)
+def barbs(*args, data=None, **kwargs) -> Barbs:
+    return gca().barbs(*args, **({"data": data} if data is not None else {}), **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.barh)
 @set_category(CATEGORY_CUT)
 def barh(
-        y, width, height=0.8, left=None, *, align='center',
-        data=None, **kwargs):
+    y: float | ArrayLike,
+    width: float | ArrayLike,
+    height: float | ArrayLike = 0.8,
+    left: float | ArrayLike | None = None,
+    *,
+    align: Literal["center", "edge"] = "center",
+    data=None,
+    **kwargs,
+) -> BarContainer:
     return gca().barh(
-        y, width, height=height, left=left, align=align,
-        **({"data": data} if data is not None else {}), **kwargs)
+        y,
+        width,
+        height=height,
+        left=left,
+        align=align,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.bar_label)
 @set_category(CATEGORY_CUT)
 def bar_label(
-        container, labels=None, *, fmt='%g', label_type='edge',
-        padding=0, **kwargs):
+    container: BarContainer,
+    labels: ArrayLike | None = None,
+    *,
+    fmt: str | Callable[[float], str] = "%g",
+    label_type: Literal["center", "edge"] = "edge",
+    padding: float = 0,
+    **kwargs,
+) -> list[Annotation]:
     return gca().bar_label(
-        container, labels=labels, fmt=fmt, label_type=label_type,
-        padding=padding, **kwargs)
+        container,
+        labels=labels,
+        fmt=fmt,
+        label_type=label_type,
+        padding=padding,
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.boxplot)
 @set_category(CATEGORY_CUT)
 def boxplot(
-        x, notch=None, sym=None, vert=None, whis=None,
-        positions=None, widths=None, patch_artist=None,
-        bootstrap=None, usermedians=None, conf_intervals=None,
-        meanline=None, showmeans=None, showcaps=None, showbox=None,
-        showfliers=None, boxprops=None, labels=None, flierprops=None,
-        medianprops=None, meanprops=None, capprops=None,
-        whiskerprops=None, manage_ticks=True, autorange=False,
-        zorder=None, capwidths=None, *, data=None):
+    x: ArrayLike | Sequence[ArrayLike],
+    notch: bool | None = None,
+    sym: str | None = None,
+    vert: bool | None = None,
+    whis: float | tuple[float, float] | None = None,
+    positions: ArrayLike | None = None,
+    widths: float | ArrayLike | None = None,
+    patch_artist: bool | None = None,
+    bootstrap: int | None = None,
+    usermedians: ArrayLike | None = None,
+    conf_intervals: ArrayLike | None = None,
+    meanline: bool | None = None,
+    showmeans: bool | None = None,
+    showcaps: bool | None = None,
+    showbox: bool | None = None,
+    showfliers: bool | None = None,
+    boxprops: dict[str, Any] | None = None,
+    labels: Sequence[str] | None = None,
+    flierprops: dict[str, Any] | None = None,
+    medianprops: dict[str, Any] | None = None,
+    meanprops: dict[str, Any] | None = None,
+    capprops: dict[str, Any] | None = None,
+    whiskerprops: dict[str, Any] | None = None,
+    manage_ticks: bool = True,
+    autorange: bool = False,
+    zorder: float | None = None,
+    capwidths: float | ArrayLike | None = None,
+    *,
+    data=None,
+) -> dict[str, Any]:
     return gca().boxplot(
-        x, notch=notch, sym=sym, vert=vert, whis=whis,
-        positions=positions, widths=widths, patch_artist=patch_artist,
-        bootstrap=bootstrap, usermedians=usermedians,
-        conf_intervals=conf_intervals, meanline=meanline,
-        showmeans=showmeans, showcaps=showcaps, showbox=showbox,
-        showfliers=showfliers, boxprops=boxprops, labels=labels,
-        flierprops=flierprops, medianprops=medianprops,
-        meanprops=meanprops, capprops=capprops,
-        whiskerprops=whiskerprops, manage_ticks=manage_ticks,
-        autorange=autorange, zorder=zorder, capwidths=capwidths,
-        **({"data": data} if data is not None else {}))
+        x,
+        notch=notch,
+        sym=sym,
+        vert=vert,
+        whis=whis,
+        positions=positions,
+        widths=widths,
+        patch_artist=patch_artist,
+        bootstrap=bootstrap,
+        usermedians=usermedians,
+        conf_intervals=conf_intervals,
+        meanline=meanline,
+        showmeans=showmeans,
+        showcaps=showcaps,
+        showbox=showbox,
+        showfliers=showfliers,
+        boxprops=boxprops,
+        labels=labels,
+        flierprops=flierprops,
+        medianprops=medianprops,
+        meanprops=meanprops,
+        capprops=capprops,
+        whiskerprops=whiskerprops,
+        manage_ticks=manage_ticks,
+        autorange=autorange,
+        zorder=zorder,
+        capwidths=capwidths,
+        **({"data": data} if data is not None else {}),
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.broken_barh)
 @set_category(CATEGORY_CUT)
-def broken_barh(xranges, yrange, *, data=None, **kwargs):
+def broken_barh(
+    xranges: Sequence[tuple[float, float]],
+    yrange: tuple[float, float],
+    *,
+    data=None,
+    **kwargs,
+) -> BrokenBarHCollection:
     return gca().broken_barh(
-        xranges, yrange,
-        **({"data": data} if data is not None else {}), **kwargs)
+        xranges, yrange, **({"data": data} if data is not None else {}), **kwargs
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.clabel)
 @set_category(CATEGORY_CUT)
-def clabel(CS, levels=None, **kwargs):
+def clabel(CS: ContourSet, levels: ArrayLike | None = None, **kwargs) -> list[Text]:
     return gca().clabel(CS, levels=levels, **kwargs)
 
 
@@ -2271,35 +2595,61 @@ def clabel(CS, levels=None, **kwargs):
 @_copy_docstring_and_deprecators(Axes.cohere)
 @set_category(CATEGORY_CUT)
 def cohere(
-        x, y, NFFT=256, Fs=2, Fc=0, detrend=mlab.detrend_none,
-        window=mlab.window_hanning, noverlap=0, pad_to=None,
-        sides='default', scale_by_freq=None, *, data=None, **kwargs):
+    x: ArrayLike,
+    y: ArrayLike,
+    NFFT: int = 256,
+    Fs: float = 2,
+    Fc: int = 0,
+    detrend: (
+        Literal["none", "mean", "linear"] | Callable[[ArrayLike], ArrayLike]
+    ) = mlab.detrend_none,
+    window: Callable[[ArrayLike], ArrayLike] | ArrayLike = mlab.window_hanning,
+    noverlap: int = 0,
+    pad_to: int | None = None,
+    sides: Literal["default", "onesided", "twosided"] = "default",
+    scale_by_freq: bool | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray]:
     return gca().cohere(
-        x, y, NFFT=NFFT, Fs=Fs, Fc=Fc, detrend=detrend, window=window,
-        noverlap=noverlap, pad_to=pad_to, sides=sides,
+        x,
+        y,
+        NFFT=NFFT,
+        Fs=Fs,
+        Fc=Fc,
+        detrend=detrend,
+        window=window,
+        noverlap=noverlap,
+        pad_to=pad_to,
+        sides=sides,
         scale_by_freq=scale_by_freq,
-        **({"data": data} if data is not None else {}), **kwargs)
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.contour)
 @set_category(CATEGORY_SLICE)
-def contour(*args, data=None, **kwargs):
+def contour(*args, data=None, **kwargs) -> QuadContourSet:
     __ret = gca().contour(
-        *args, **({"data": data} if data is not None else {}),
-        **kwargs)
-    if __ret._A is not None: sci(__ret)  # noqa
+        *args, **({"data": data} if data is not None else {}), **kwargs
+    )
+    if __ret._A is not None:  # type: ignore[attr-defined]
+        sci(__ret)
     return __ret
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.contourf)
 @set_category(CATEGORY_SLICE)
-def contourf(*args, data=None, **kwargs):
+def contourf(*args, data=None, **kwargs) -> QuadContourSet:
     __ret = gca().contourf(
-        *args, **({"data": data} if data is not None else {}),
-        **kwargs)
-    if __ret._A is not None: sci(__ret)  # noqa
+        *args, **({"data": data} if data is not None else {}), **kwargs
+    )
+    if __ret._A is not None:  # type: ignore[attr-defined]
+        sci(__ret)
     return __ret
 
 
@@ -2307,93 +2657,259 @@ def contourf(*args, data=None, **kwargs):
 @_copy_docstring_and_deprecators(Axes.csd)
 @set_category(CATEGORY_CUT)
 def csd(
-        x, y, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
-        noverlap=None, pad_to=None, sides=None, scale_by_freq=None,
-        return_line=None, *, data=None, **kwargs):
+    x: ArrayLike,
+    y: ArrayLike,
+    NFFT: int | None = None,
+    Fs: float | None = None,
+    Fc: int | None = None,
+    detrend: (
+        Literal["none", "mean", "linear"] | Callable[[ArrayLike], ArrayLike] | None
+    ) = None,
+    window: Callable[[ArrayLike], ArrayLike] | ArrayLike | None = None,
+    noverlap: int | None = None,
+    pad_to: int | None = None,
+    sides: Literal["default", "onesided", "twosided"] | None = None,
+    scale_by_freq: bool | None = None,
+    return_line: bool | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray, np.ndarray, Line2D]:
     return gca().csd(
-        x, y, NFFT=NFFT, Fs=Fs, Fc=Fc, detrend=detrend, window=window,
-        noverlap=noverlap, pad_to=pad_to, sides=sides,
-        scale_by_freq=scale_by_freq, return_line=return_line,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        y,
+        NFFT=NFFT,
+        Fs=Fs,
+        Fc=Fc,
+        detrend=detrend,
+        window=window,
+        noverlap=noverlap,
+        pad_to=pad_to,
+        sides=sides,
+        scale_by_freq=scale_by_freq,
+        return_line=return_line,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.ecdf)
+@set_category(CATEGORY_CUT)
+def ecdf(
+    x: ArrayLike,
+    weights: ArrayLike | None = None,
+    *,
+    complementary: bool = False,
+    orientation: Literal["vertical", "horizonatal"] = "vertical",
+    compress: bool = False,
+    data=None,
+    **kwargs,
+) -> Line2D:
+    return gca().ecdf(
+        x,
+        weights=weights,
+        complementary=complementary,
+        orientation=orientation,
+        compress=compress,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.errorbar)
 @set_category(CATEGORY_CUT)
 def errorbar(
-        x, y, yerr=None, xerr=None, fmt='', ecolor=None,
-        elinewidth=None, capsize=None, barsabove=False, lolims=False,
-        uplims=False, xlolims=False, xuplims=False, errorevery=1,
-        capthick=None, *, data=None, **kwargs):
+    x: float | ArrayLike,
+    y: float | ArrayLike,
+    yerr: float | ArrayLike | None = None,
+    xerr: float | ArrayLike | None = None,
+    fmt: str = "",
+    ecolor: ColorType | None = None,
+    elinewidth: float | None = None,
+    capsize: float | None = None,
+    barsabove: bool = False,
+    lolims: bool | ArrayLike = False,
+    uplims: bool | ArrayLike = False,
+    xlolims: bool | ArrayLike = False,
+    xuplims: bool | ArrayLike = False,
+    errorevery: int | tuple[int, int] = 1,
+    capthick: float | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> ErrorbarContainer:
     return gca().errorbar(
-        x, y, yerr=yerr, xerr=xerr, fmt=fmt, ecolor=ecolor,
-        elinewidth=elinewidth, capsize=capsize, barsabove=barsabove,
-        lolims=lolims, uplims=uplims, xlolims=xlolims,
-        xuplims=xuplims, errorevery=errorevery, capthick=capthick,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        y,
+        yerr=yerr,
+        xerr=xerr,
+        fmt=fmt,
+        ecolor=ecolor,
+        elinewidth=elinewidth,
+        capsize=capsize,
+        barsabove=barsabove,
+        lolims=lolims,
+        uplims=uplims,
+        xlolims=xlolims,
+        xuplims=xuplims,
+        errorevery=errorevery,
+        capthick=capthick,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.eventplot)
 @set_category(CATEGORY_CUT)
 def eventplot(
-        positions, orientation='horizontal', lineoffsets=1,
-        linelengths=1, linewidths=None, colors=None, alpha=None,
-        linestyles='solid', *, data=None, **kwargs):
+    positions: ArrayLike | Sequence[ArrayLike],
+    orientation: Literal["horizontal", "vertical"] = "horizontal",
+    lineoffsets: float | Sequence[float] = 1,
+    linelengths: float | Sequence[float] = 1,
+    linewidths: float | Sequence[float] | None = None,
+    colors: ColorType | Sequence[ColorType] | None = None,
+    alpha: float | Sequence[float] | None = None,
+    linestyles: LineStyleType | Sequence[LineStyleType] = "solid",
+    *,
+    data=None,
+    **kwargs,
+) -> EventCollection:
     return gca().eventplot(
-        positions, orientation=orientation, lineoffsets=lineoffsets,
-        linelengths=linelengths, linewidths=linewidths, colors=colors,
-        alpha=alpha, linestyles=linestyles,
-        **({"data": data} if data is not None else {}), **kwargs)
+        positions,
+        orientation=orientation,
+        lineoffsets=lineoffsets,
+        linelengths=linelengths,
+        linewidths=linewidths,
+        colors=colors,
+        alpha=alpha,
+        linestyles=linestyles,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.fill)
 @set_category(CATEGORY_CUT)
-def fill(*args, data=None, **kwargs):
-    return gca().fill(
-        *args, **({"data": data} if data is not None else {}),
-        **kwargs)
+def fill(*args, data=None, **kwargs) -> list[Polygon]:
+    return gca().fill(*args, **({"data": data} if data is not None else {}), **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.fill_between)
 @set_category(CATEGORY_CUT)
 def fill_between(
-        x, y1, y2=0, where=None, interpolate=False, step=None, *,
-        data=None, **kwargs):
+    x: ArrayLike,
+    y1: ArrayLike | float,
+    y2: ArrayLike | float = 0,
+    where: Sequence[bool] | None = None,
+    interpolate: bool = False,
+    step: Literal["pre", "post", "mid"] | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> PolyCollection:
     return gca().fill_between(
-        x, y1, y2=y2, where=where, interpolate=interpolate, step=step,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        y1,
+        y2=y2,
+        where=where,
+        interpolate=interpolate,
+        step=step,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.fill_betweenx)
 @set_category(CATEGORY_CUT)
 def fill_betweenx(
-        y, x1, x2=0, where=None, step=None, interpolate=False, *,
-        data=None, **kwargs):
+    y: ArrayLike,
+    x1: ArrayLike | float,
+    x2: ArrayLike | float = 0,
+    where: Sequence[bool] | None = None,
+    step: Literal["pre", "post", "mid"] | None = None,
+    interpolate: bool = False,
+    *,
+    data=None,
+    **kwargs,
+) -> PolyCollection:
     return gca().fill_betweenx(
-        y, x1, x2=x2, where=where, step=step, interpolate=interpolate,
-        **({"data": data} if data is not None else {}), **kwargs)
+        y,
+        x1,
+        x2=x2,
+        where=where,
+        step=step,
+        interpolate=interpolate,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.grid)
+@set_category(CATEGORY_CUT)
+def grid(
+    visible: bool | None = None,
+    which: Literal["major", "minor", "both"] = "major",
+    axis: Literal["both", "x", "y"] = "both",
+    **kwargs,
+) -> None:
+    gca().grid(visible=visible, which=which, axis=axis, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.hexbin)
 @set_category(CATEGORY_SLICE)
 def hexbin(
-        x, y, C=None, gridsize=100, bins=None, xscale='linear',
-        yscale='linear', extent=None, cmap=None, norm=None, vmin=None,
-        vmax=None, alpha=None, linewidths=None, edgecolors='face',
-        reduce_C_function=np.mean, mincnt=None, marginals=False, *,
-        data=None, **kwargs):
+    x: ArrayLike,
+    y: ArrayLike,
+    C: ArrayLike | None = None,
+    gridsize: int | tuple[int, int] = 100,
+    bins: Literal["log"] | int | Sequence[float] | None = None,
+    xscale: Literal["linear", "log"] = "linear",
+    yscale: Literal["linear", "log"] = "linear",
+    extent: tuple[float, float, float, float] | None = None,
+    cmap: str | Colormap | None = None,
+    norm: str | Normalize | None = None,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    alpha: float | None = None,
+    linewidths: float | None = None,
+    edgecolors: Literal["face", "none"] | ColorType = "face",
+    reduce_C_function: Callable[[np.ndarray | list[float]], float] = np.mean,
+    mincnt: int | None = None,
+    marginals: bool = False,
+    *,
+    data=None,
+    **kwargs,
+) -> PolyCollection:
     __ret = gca().hexbin(
-        x, y, C=C, gridsize=gridsize, bins=bins, xscale=xscale,
-        yscale=yscale, extent=extent, cmap=cmap, norm=norm, vmin=vmin,
-        vmax=vmax, alpha=alpha, linewidths=linewidths,
-        edgecolors=edgecolors, reduce_C_function=reduce_C_function,
-        mincnt=mincnt, marginals=marginals,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        y,
+        C=C,
+        gridsize=gridsize,
+        bins=bins,
+        xscale=xscale,
+        yscale=yscale,
+        extent=extent,
+        cmap=cmap,
+        norm=norm,
+        vmin=vmin,
+        vmax=vmax,
+        alpha=alpha,
+        linewidths=linewidths,
+        edgecolors=edgecolors,
+        reduce_C_function=reduce_C_function,
+        mincnt=mincnt,
+        marginals=marginals,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
     sci(__ret)
     return __ret
 
@@ -2402,40 +2918,102 @@ def hexbin(
 @_copy_docstring_and_deprecators(Axes.hist)
 @set_category(CATEGORY_CUT)
 def hist(
-        x, bins=None, range=None, density=False, weights=None,
-        cumulative=False, bottom=None, histtype='bar', align='mid',
-        orientation='vertical', rwidth=None, log=False, color=None,
-        label=None, stacked=False, *, data=None, **kwargs):
+    x: ArrayLike | Sequence[ArrayLike],
+    bins: int | Sequence[float] | str | None = None,
+    range: tuple[float, float] | None = None,
+    density: bool = False,
+    weights: ArrayLike | None = None,
+    cumulative: bool | float = False,
+    bottom: ArrayLike | float | None = None,
+    histtype: Literal["bar", "barstacked", "step", "stepfilled"] = "bar",
+    align: Literal["left", "mid", "right"] = "mid",
+    orientation: Literal["vertical", "horizontal"] = "vertical",
+    rwidth: float | None = None,
+    log: bool = False,
+    color: ColorType | Sequence[ColorType] | None = None,
+    label: str | Sequence[str] | None = None,
+    stacked: bool = False,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[
+    np.ndarray | list[np.ndarray],
+    np.ndarray,
+    BarContainer | Polygon | list[BarContainer | Polygon],
+]:
     return gca().hist(
-        x, bins=bins, range=range, density=density, weights=weights,
-        cumulative=cumulative, bottom=bottom, histtype=histtype,
-        align=align, orientation=orientation, rwidth=rwidth, log=log,
-        color=color, label=label, stacked=stacked,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        bins=bins,
+        range=range,
+        density=density,
+        weights=weights,
+        cumulative=cumulative,
+        bottom=bottom,
+        histtype=histtype,
+        align=align,
+        orientation=orientation,
+        rwidth=rwidth,
+        log=log,
+        color=color,
+        label=label,
+        stacked=stacked,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.stairs)
 @set_category(CATEGORY_CUT)
 def stairs(
-        values, edges=None, *, orientation='vertical', baseline=0,
-        fill=False, data=None, **kwargs):
+    values: ArrayLike,
+    edges: ArrayLike | None = None,
+    *,
+    orientation: Literal["vertical", "horizontal"] = "vertical",
+    baseline: float | ArrayLike | None = 0,
+    fill: bool = False,
+    data=None,
+    **kwargs,
+) -> StepPatch:
     return gca().stairs(
-        values, edges=edges, orientation=orientation,
-        baseline=baseline, fill=fill,
-        **({"data": data} if data is not None else {}), **kwargs)
+        values,
+        edges=edges,
+        orientation=orientation,
+        baseline=baseline,
+        fill=fill,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.hist2d)
 @set_category(CATEGORY_SLICE)
 def hist2d(
-        x, y, bins=10, range=None, density=False, weights=None,
-        cmin=None, cmax=None, *, data=None, **kwargs):
+    x: ArrayLike,
+    y: ArrayLike,
+    bins: None | int | tuple[int, int] | ArrayLike | tuple[ArrayLike, ArrayLike] = 10,
+    range: ArrayLike | None = None,
+    density: bool = False,
+    weights: ArrayLike | None = None,
+    cmin: float | None = None,
+    cmax: float | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, QuadMesh]:
     __ret = gca().hist2d(
-        x, y, bins=bins, range=range, density=density,
-        weights=weights, cmin=cmin, cmax=cmax,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        y,
+        bins=bins,
+        range=range,
+        density=density,
+        weights=weights,
+        cmin=cmin,
+        cmax=cmax,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
     sci(__ret[-1])
     return __ret
 
@@ -2444,38 +3022,94 @@ def hist2d(
 @_copy_docstring_and_deprecators(Axes.hlines)
 @set_category(CATEGORY_CUT)
 def hlines(
-        y, xmin, xmax, colors=None, linestyles='solid', label='', *,
-        data=None, **kwargs):
+    y: float | ArrayLike,
+    xmin: float | ArrayLike,
+    xmax: float | ArrayLike,
+    colors: ColorType | Sequence[ColorType] | None = None,
+    linestyles: LineStyleType = "solid",
+    label: str = "",
+    *,
+    data=None,
+    **kwargs,
+) -> LineCollection:
     return gca().hlines(
-        y, xmin, xmax, colors=colors, linestyles=linestyles,
-        label=label, **({"data": data} if data is not None else {}),
-        **kwargs)
+        y,
+        xmin,
+        xmax,
+        colors=colors,
+        linestyles=linestyles,
+        label=label,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.imshow)
 @set_category(CATEGORY_SLICE)
 def imshow(
-        X, cmap=None, norm=None, *, aspect=None, interpolation=None,
-        alpha=None, vmin=None, vmax=None, origin=None, extent=None,
-        interpolation_stage=None, filternorm=True, filterrad=4.0,
-        resample=None, url=None, data=None, **kwargs):
+    X: ArrayLike | PIL.Image.Image,
+    cmap: str | Colormap | None = None,
+    norm: str | Normalize | None = None,
+    *,
+    aspect: Literal["equal", "auto"] | float | None = None,
+    interpolation: str | None = None,
+    alpha: float | ArrayLike | None = None,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    origin: Literal["upper", "lower"] | None = None,
+    extent: tuple[float, float, float, float] | None = None,
+    interpolation_stage: Literal["data", "rgba"] | None = None,
+    filternorm: bool = True,
+    filterrad: float = 4.0,
+    resample: bool | None = None,
+    url: str | None = None,
+    data=None,
+    **kwargs,
+) -> AxesImage:
     __ret = gca().imshow(
-        X, cmap=cmap, norm=norm, aspect=aspect,
-        interpolation=interpolation, alpha=alpha, vmin=vmin,
-        vmax=vmax, origin=origin, extent=extent,
+        X,
+        cmap=cmap,
+        norm=norm,
+        aspect=aspect,
+        interpolation=interpolation,
+        alpha=alpha,
+        vmin=vmin,
+        vmax=vmax,
+        origin=origin,
+        extent=extent,
         interpolation_stage=interpolation_stage,
-        filternorm=filternorm, filterrad=filterrad, resample=resample,
-        url=url, **({"data": data} if data is not None else {}),
-        **kwargs)
+        filternorm=filternorm,
+        filterrad=filterrad,
+        resample=resample,
+        url=url,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
     sci(__ret)
     return __ret
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.legend)
+@set_category(CATEGORY_CUT)
+def legend(*args, **kwargs) -> Legend:
+    return gca().legend(*args, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.locator_params)
+@set_category(CATEGORY_CUT)
+def locator_params(
+    axis: Literal["both", "x", "y"] = "both", tight: bool | None = None, **kwargs
+) -> None:
+    gca().locator_params(axis=axis, tight=tight, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.loglog)
 @set_category(CATEGORY_CUT)
-def loglog(*args, **kwargs):
+def loglog(*args, **kwargs) -> list[Line2D]:
     return gca().loglog(*args, **kwargs)
 
 
@@ -2483,24 +3117,81 @@ def loglog(*args, **kwargs):
 @_copy_docstring_and_deprecators(Axes.magnitude_spectrum)
 @set_category(CATEGORY_CUT)
 def magnitude_spectrum(
-        x, Fs=None, Fc=None, window=None, pad_to=None, sides=None,
-        scale=None, *, data=None, **kwargs):
+    x: ArrayLike,
+    Fs: float | None = None,
+    Fc: int | None = None,
+    window: Callable[[ArrayLike], ArrayLike] | ArrayLike | None = None,
+    pad_to: int | None = None,
+    sides: Literal["default", "onesided", "twosided"] | None = None,
+    scale: Literal["default", "linear", "dB"] | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray, Line2D]:
     return gca().magnitude_spectrum(
-        x, Fs=Fs, Fc=Fc, window=window, pad_to=pad_to, sides=sides,
-        scale=scale, **({"data": data} if data is not None else {}),
-        **kwargs)
+        x,
+        Fs=Fs,
+        Fc=Fc,
+        window=window,
+        pad_to=pad_to,
+        sides=sides,
+        scale=scale,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.margins)
+@set_category(CATEGORY_CUT)
+def margins(
+    *margins: float,
+    x: float | None = None,
+    y: float | None = None,
+    tight: bool | None = True,
+) -> tuple[float, float] | None:
+    return gca().margins(*margins, x=x, y=y, tight=tight)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.minorticks_off)
+@set_category(CATEGORY_CUT)
+def minorticks_off() -> None:
+    gca().minorticks_off()
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.minorticks_on)
+@set_category(CATEGORY_CUT)
+def minorticks_on() -> None:
+    gca().minorticks_on()
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.pcolor)
 @set_category(CATEGORY_SLICE)
 def pcolor(
-        *args, shading=None, alpha=None, norm=None, cmap=None,
-        vmin=None, vmax=None, data=None, **kwargs):
+    *args: ArrayLike,
+    shading: Literal["flat", "nearest", "auto"] | None = None,
+    alpha: float | None = None,
+    norm: str | Normalize | None = None,
+    cmap: str | Colormap | None = None,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    data=None,
+    **kwargs,
+) -> Collection:
     __ret = gca().pcolor(
-        *args, shading=shading, alpha=alpha, norm=norm, cmap=cmap,
-        vmin=vmin, vmax=vmax,
-        **({"data": data} if data is not None else {}), **kwargs)
+        *args,
+        shading=shading,
+        alpha=alpha,
+        norm=norm,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
     sci(__ret)
     return __ret
 
@@ -2509,13 +3200,29 @@ def pcolor(
 @_copy_docstring_and_deprecators(Axes.pcolormesh)
 @set_category(CATEGORY_SLICE)
 def pcolormesh(
-        *args, alpha=None, norm=None, cmap=None, vmin=None,
-        vmax=None, shading=None, antialiased=False, data=None,
-        **kwargs):
+    *args: ArrayLike,
+    alpha: float | None = None,
+    norm: str | Normalize | None = None,
+    cmap: str | Colormap | None = None,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    shading: Literal["flat", "nearest", "gouraud", "auto"] | None = None,
+    antialiased: bool = False,
+    data=None,
+    **kwargs,
+) -> QuadMesh:
     __ret = gca().pcolormesh(
-        *args, alpha=alpha, norm=norm, cmap=cmap, vmin=vmin,
-        vmax=vmax, shading=shading, antialiased=antialiased,
-        **({"data": data} if data is not None else {}), **kwargs)
+        *args,
+        alpha=alpha,
+        norm=norm,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        shading=shading,
+        antialiased=antialiased,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
     sci(__ret)
     return __ret
 
@@ -2524,73 +3231,166 @@ def pcolormesh(
 @_copy_docstring_and_deprecators(Axes.phase_spectrum)
 @set_category(CATEGORY_CUT)
 def phase_spectrum(
-        x, Fs=None, Fc=None, window=None, pad_to=None, sides=None, *,
-        data=None, **kwargs):
+    x: ArrayLike,
+    Fs: float | None = None,
+    Fc: int | None = None,
+    window: Callable[[ArrayLike], ArrayLike] | ArrayLike | None = None,
+    pad_to: int | None = None,
+    sides: Literal["default", "onesided", "twosided"] | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray, Line2D]:
     return gca().phase_spectrum(
-        x, Fs=Fs, Fc=Fc, window=window, pad_to=pad_to, sides=sides,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        Fs=Fs,
+        Fc=Fc,
+        window=window,
+        pad_to=pad_to,
+        sides=sides,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.pie)
 @set_category(CATEGORY_CUT)
 def pie(
-        x, explode=None, labels=None, colors=None, autopct=None,
-        pctdistance=0.6, shadow=False, labeldistance=1.1,
-        startangle=0, radius=1, counterclock=True, wedgeprops=None,
-        textprops=None, center=(0, 0), frame=False,
-        rotatelabels=False, *, normalize=True, hatch=None, data=None):
+    x: ArrayLike,
+    explode: ArrayLike | None = None,
+    labels: Sequence[str] | None = None,
+    colors: ColorType | Sequence[ColorType] | None = None,
+    autopct: str | Callable[[float], str] | None = None,
+    pctdistance: float = 0.6,
+    shadow: bool = False,
+    labeldistance: float | None = 1.1,
+    startangle: float = 0,
+    radius: float = 1,
+    counterclock: bool = True,
+    wedgeprops: dict[str, Any] | None = None,
+    textprops: dict[str, Any] | None = None,
+    center: tuple[float, float] = (0, 0),
+    frame: bool = False,
+    rotatelabels: bool = False,
+    *,
+    normalize: bool = True,
+    hatch: str | Sequence[str] | None = None,
+    data=None,
+) -> tuple[list[Wedge], list[Text]] | tuple[list[Wedge], list[Text], list[Text]]:
     return gca().pie(
-        x, explode=explode, labels=labels, colors=colors,
-        autopct=autopct, pctdistance=pctdistance, shadow=shadow,
-        labeldistance=labeldistance, startangle=startangle,
-        radius=radius, counterclock=counterclock,
-        wedgeprops=wedgeprops, textprops=textprops, center=center,
-        frame=frame, rotatelabels=rotatelabels, normalize=normalize,
-        hatch=hatch, **({"data": data} if data is not None else {}))
+        x,
+        explode=explode,
+        labels=labels,
+        colors=colors,
+        autopct=autopct,
+        pctdistance=pctdistance,
+        shadow=shadow,
+        labeldistance=labeldistance,
+        startangle=startangle,
+        radius=radius,
+        counterclock=counterclock,
+        wedgeprops=wedgeprops,
+        textprops=textprops,
+        center=center,
+        frame=frame,
+        rotatelabels=rotatelabels,
+        normalize=normalize,
+        hatch=hatch,
+        **({"data": data} if data is not None else {}),
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.plot)
 @set_category(CATEGORY_CUT)
-def plot(*args, scalex=True, scaley=True, data=None, **kwargs):
+def plot(
+    *args: float | ArrayLike | str,
+    scalex: bool = True,
+    scaley: bool = True,
+    data=None,
+    **kwargs,
+) -> list[Line2D]:
     return gca().plot(
-        *args, scalex=scalex, scaley=scaley,
-        **({"data": data} if data is not None else {}), **kwargs)
+        *args,
+        scalex=scalex,
+        scaley=scaley,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.plot_date)
 @set_category(CATEGORY_CUT)
 def plot_date(
-        x, y, fmt='o', tz=None, xdate=True, ydate=False, *,
-        data=None, **kwargs):
+    x: ArrayLike,
+    y: ArrayLike,
+    fmt: str = "o",
+    tz: str | datetime.tzinfo | None = None,
+    xdate: bool = True,
+    ydate: bool = False,
+    *,
+    data=None,
+    **kwargs,
+) -> list[Line2D]:
     return gca().plot_date(
-        x, y, fmt=fmt, tz=tz, xdate=xdate, ydate=ydate,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        y,
+        fmt=fmt,
+        tz=tz,
+        xdate=xdate,
+        ydate=ydate,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.psd)
 @set_category(CATEGORY_CUT)
 def psd(
-        x, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
-        noverlap=None, pad_to=None, sides=None, scale_by_freq=None,
-        return_line=None, *, data=None, **kwargs):
+    x: ArrayLike,
+    NFFT: int | None = None,
+    Fs: float | None = None,
+    Fc: int | None = None,
+    detrend: (
+        Literal["none", "mean", "linear"] | Callable[[ArrayLike], ArrayLike] | None
+    ) = None,
+    window: Callable[[ArrayLike], ArrayLike] | ArrayLike | None = None,
+    noverlap: int | None = None,
+    pad_to: int | None = None,
+    sides: Literal["default", "onesided", "twosided"] | None = None,
+    scale_by_freq: bool | None = None,
+    return_line: bool | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray, np.ndarray, Line2D]:
     return gca().psd(
-        x, NFFT=NFFT, Fs=Fs, Fc=Fc, detrend=detrend, window=window,
-        noverlap=noverlap, pad_to=pad_to, sides=sides,
-        scale_by_freq=scale_by_freq, return_line=return_line,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        NFFT=NFFT,
+        Fs=Fs,
+        Fc=Fc,
+        detrend=detrend,
+        window=window,
+        noverlap=noverlap,
+        pad_to=pad_to,
+        sides=sides,
+        scale_by_freq=scale_by_freq,
+        return_line=return_line,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.quiver)
 @set_category(CATEGORY_SLICE)
-def quiver(*args, data=None, **kwargs):
+def quiver(*args, data=None, **kwargs) -> Quiver:
     __ret = gca().quiver(
-        *args, **({"data": data} if data is not None else {}),
-        **kwargs)
+        *args, **({"data": data} if data is not None else {}), **kwargs
+    )
     sci(__ret)
     return __ret
 
@@ -2598,7 +3398,9 @@ def quiver(*args, data=None, **kwargs):
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.quiverkey)
 @set_category(CATEGORY_CUT)
-def quiverkey(Q, X, Y, U, label, **kwargs):
+def quiverkey(
+    Q: Quiver, X: float, Y: float, U: float, label: str, **kwargs
+) -> QuiverKey:
     return gca().quiverkey(Q, X, Y, U, label, **kwargs)
 
 
@@ -2606,14 +3408,40 @@ def quiverkey(Q, X, Y, U, label, **kwargs):
 @_copy_docstring_and_deprecators(Axes.scatter)
 @set_category(CATEGORY_SLICE)
 def scatter(
-        x, y, s=None, c=None, marker=None, cmap=None, norm=None,
-        vmin=None, vmax=None, alpha=None, linewidths=None, *,
-        edgecolors=None, plotnonfinite=False, data=None, **kwargs):
+    x: float | ArrayLike,
+    y: float | ArrayLike,
+    s: float | ArrayLike | None = None,
+    c: ArrayLike | Sequence[ColorType] | ColorType | None = None,
+    marker: MarkerType | None = None,
+    cmap: str | Colormap | None = None,
+    norm: str | Normalize | None = None,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    alpha: float | None = None,
+    linewidths: float | Sequence[float] | None = None,
+    *,
+    edgecolors: Literal["face", "none"] | ColorType | Sequence[ColorType] | None = None,
+    plotnonfinite: bool = False,
+    data=None,
+    **kwargs,
+) -> PathCollection:
     __ret = gca().scatter(
-        x, y, s=s, c=c, marker=marker, cmap=cmap, norm=norm,
-        vmin=vmin, vmax=vmax, alpha=alpha, linewidths=linewidths,
-        edgecolors=edgecolors, plotnonfinite=plotnonfinite,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        y,
+        s=s,
+        c=c,
+        marker=marker,
+        cmap=cmap,
+        norm=norm,
+        vmin=vmin,
+        vmax=vmax,
+        alpha=alpha,
+        linewidths=linewidths,
+        edgecolors=edgecolors,
+        plotnonfinite=plotnonfinite,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
     sci(__ret)
     return __ret
 
@@ -2621,14 +3449,14 @@ def scatter(
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.semilogx)
 @set_category(CATEGORY_CUT)
-def semilogx(*args, **kwargs):
+def semilogx(*args, **kwargs) -> list[Line2D]:
     return gca().semilogx(*args, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.semilogy)
 @set_category(CATEGORY_CUT)
-def semilogy(*args, **kwargs):
+def semilogy(*args, **kwargs) -> list[Line2D]:
     return gca().semilogy(*args, **kwargs)
 
 
@@ -2636,16 +3464,48 @@ def semilogy(*args, **kwargs):
 @_copy_docstring_and_deprecators(Axes.specgram)
 @set_category(CATEGORY_SLICE)
 def specgram(
-        x, NFFT=None, Fs=None, Fc=None, detrend=None, window=None,
-        noverlap=None, cmap=None, xextent=None, pad_to=None,
-        sides=None, scale_by_freq=None, mode=None, scale=None,
-        vmin=None, vmax=None, *, data=None, **kwargs):
+    x: ArrayLike,
+    NFFT: int | None = None,
+    Fs: float | None = None,
+    Fc: int | None = None,
+    detrend: (
+        Literal["none", "mean", "linear"] | Callable[[ArrayLike], ArrayLike] | None
+    ) = None,
+    window: Callable[[ArrayLike], ArrayLike] | ArrayLike | None = None,
+    noverlap: int | None = None,
+    cmap: str | Colormap | None = None,
+    xextent: tuple[float, float] | None = None,
+    pad_to: int | None = None,
+    sides: Literal["default", "onesided", "twosided"] | None = None,
+    scale_by_freq: bool | None = None,
+    mode: Literal["default", "psd", "magnitude", "angle", "phase"] | None = None,
+    scale: Literal["default", "linear", "dB"] | None = None,
+    vmin: float | None = None,
+    vmax: float | None = None,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, AxesImage]:
     __ret = gca().specgram(
-        x, NFFT=NFFT, Fs=Fs, Fc=Fc, detrend=detrend, window=window,
-        noverlap=noverlap, cmap=cmap, xextent=xextent, pad_to=pad_to,
-        sides=sides, scale_by_freq=scale_by_freq, mode=mode,
-        scale=scale, vmin=vmin, vmax=vmax,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        NFFT=NFFT,
+        Fs=Fs,
+        Fc=Fc,
+        detrend=detrend,
+        window=window,
+        noverlap=noverlap,
+        cmap=cmap,
+        xextent=xextent,
+        pad_to=pad_to,
+        sides=sides,
+        scale_by_freq=scale_by_freq,
+        mode=mode,
+        scale=scale,
+        vmin=vmin,
+        vmax=vmax,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
     sci(__ret[-1])
     return __ret
 
@@ -2653,59 +3513,187 @@ def specgram(
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.stackplot)
 @set_category(CATEGORY_CUT)
-def stackplot(
-        x, *args, labels=(), colors=None, baseline='zero', data=None,
-        **kwargs):
+def stackplot(x, *args, labels=(), colors=None, baseline="zero", data=None, **kwargs):
     return gca().stackplot(
-        x, *args, labels=labels, colors=colors, baseline=baseline,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        *args,
+        labels=labels,
+        colors=colors,
+        baseline=baseline,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.stem)
 @set_category(CATEGORY_CUT)
 def stem(
-        *args, linefmt=None, markerfmt=None, basefmt=None, bottom=0,
-        label=None,
-        use_line_collection=_api.deprecation._deprecated_parameter,
-        orientation='vertical', data=None):
+    *args: ArrayLike | str,
+    linefmt: str | None = None,
+    markerfmt: str | None = None,
+    basefmt: str | None = None,
+    bottom: float = 0,
+    label: str | None = None,
+    orientation: Literal["vertical", "horizontal"] = "vertical",
+    data=None,
+) -> StemContainer:
     return gca().stem(
-        *args, linefmt=linefmt, markerfmt=markerfmt, basefmt=basefmt,
-        bottom=bottom, label=label,
-        use_line_collection=use_line_collection,
+        *args,
+        linefmt=linefmt,
+        markerfmt=markerfmt,
+        basefmt=basefmt,
+        bottom=bottom,
+        label=label,
         orientation=orientation,
-        **({"data": data} if data is not None else {}))
+        **({"data": data} if data is not None else {}),
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.step)
 @set_category(CATEGORY_CUT)
-def step(x, y, *args, where='pre', data=None, **kwargs):
+def step(
+    x: ArrayLike,
+    y: ArrayLike,
+    *args,
+    where: Literal["pre", "post", "mid"] = "pre",
+    data=None,
+    **kwargs,
+) -> list[Line2D]:
     return gca().step(
-        x, y, *args, where=where,
-        **({"data": data} if data is not None else {}), **kwargs)
+        x,
+        y,
+        *args,
+        where=where,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.streamplot)
 @set_category(CATEGORY_SLICE)
 def streamplot(
-        x, y, u, v, density=1, linewidth=None, color=None, cmap=None,
-        norm=None, arrowsize=1, arrowstyle='-|>', minlength=0.1,
-        transform=None, zorder=None, start_points=None, maxlength=4.0,
-        integration_direction='both', broken_streamlines=True, *,
-        data=None):
+    x,
+    y,
+    u,
+    v,
+    density=1,
+    linewidth=None,
+    color=None,
+    cmap=None,
+    norm=None,
+    arrowsize=1,
+    arrowstyle="-|>",
+    minlength=0.1,
+    transform=None,
+    zorder=None,
+    start_points=None,
+    maxlength=4.0,
+    integration_direction="both",
+    broken_streamlines=True,
+    *,
+    data=None,
+):
     __ret = gca().streamplot(
-        x, y, u, v, density=density, linewidth=linewidth, color=color,
-        cmap=cmap, norm=norm, arrowsize=arrowsize,
-        arrowstyle=arrowstyle, minlength=minlength,
-        transform=transform, zorder=zorder, start_points=start_points,
+        x,
+        y,
+        u,
+        v,
+        density=density,
+        linewidth=linewidth,
+        color=color,
+        cmap=cmap,
+        norm=norm,
+        arrowsize=arrowsize,
+        arrowstyle=arrowstyle,
+        minlength=minlength,
+        transform=transform,
+        zorder=zorder,
+        start_points=start_points,
         maxlength=maxlength,
         integration_direction=integration_direction,
         broken_streamlines=broken_streamlines,
-        **({"data": data} if data is not None else {}))
+        **({"data": data} if data is not None else {}),
+    )
     sci(__ret.lines)
     return __ret
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.table)
+@set_category(CATEGORY_CUT)
+def table(
+    cellText=None,
+    cellColours=None,
+    cellLoc="right",
+    colWidths=None,
+    rowLabels=None,
+    rowColours=None,
+    rowLoc="left",
+    colLabels=None,
+    colColours=None,
+    colLoc="center",
+    loc="bottom",
+    bbox=None,
+    edges="closed",
+    **kwargs,
+):
+    return gca().table(
+        cellText=cellText,
+        cellColours=cellColours,
+        cellLoc=cellLoc,
+        colWidths=colWidths,
+        rowLabels=rowLabels,
+        rowColours=rowColours,
+        rowLoc=rowLoc,
+        colLabels=colLabels,
+        colColours=colColours,
+        colLoc=colLoc,
+        loc=loc,
+        bbox=bbox,
+        edges=edges,
+        **kwargs,
+    )
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.text)
+@set_category(CATEGORY_CUT)
+def text(
+    x: float, y: float, s: str, fontdict: dict[str, Any] | None = None, **kwargs
+) -> Text:
+    return gca().text(x, y, s, fontdict=fontdict, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.tick_params)
+@set_category(CATEGORY_CUT)
+def tick_params(axis: Literal["both", "x", "y"] = "both", **kwargs) -> None:
+    gca().tick_params(axis=axis, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.ticklabel_format)
+@set_category(CATEGORY_CUT)
+def ticklabel_format(
+    *,
+    axis: Literal["both", "x", "y"] = "both",
+    style: Literal["", "sci", "scientific", "plain"] = "",
+    scilimits: tuple[int, int] | None = None,
+    useOffset: bool | float | None = None,
+    useLocale: bool | None = None,
+    useMathText: bool | None = None,
+) -> None:
+    gca().ticklabel_format(
+        axis=axis,
+        style=style,
+        scilimits=scilimits,
+        useOffset=useOffset,
+        useLocale=useLocale,
+        useMathText=useMathText,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
@@ -2713,7 +3701,8 @@ def streamplot(
 @set_category(CATEGORY_SLICE)
 def tricontour(*args, **kwargs):
     __ret = gca().tricontour(*args, **kwargs)
-    if __ret._A is not None: sci(__ret)  # noqa
+    if __ret._A is not None:  # type: ignore[attr-defined]
+        sci(__ret)
     return __ret
 
 
@@ -2722,7 +3711,8 @@ def tricontour(*args, **kwargs):
 @set_category(CATEGORY_SLICE)
 def tricontourf(*args, **kwargs):
     __ret = gca().tricontourf(*args, **kwargs)
-    if __ret._A is not None: sci(__ret)  # noqa
+    if __ret._A is not None:  # type: ignore[attr-defined]
+        sci(__ret)
     return __ret
 
 
@@ -2730,11 +3720,27 @@ def tricontourf(*args, **kwargs):
 @_copy_docstring_and_deprecators(Axes.tripcolor)
 @set_category(CATEGORY_SLICE)
 def tripcolor(
-        *args, alpha=1.0, norm=None, cmap=None, vmin=None, vmax=None,
-        shading='flat', facecolors=None, **kwargs):
+    *args,
+    alpha=1.0,
+    norm=None,
+    cmap=None,
+    vmin=None,
+    vmax=None,
+    shading="flat",
+    facecolors=None,
+    **kwargs,
+):
     __ret = gca().tripcolor(
-        *args, alpha=alpha, norm=norm, cmap=cmap, vmin=vmin,
-        vmax=vmax, shading=shading, facecolors=facecolors, **kwargs)
+        *args,
+        alpha=alpha,
+        norm=norm,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        shading=shading,
+        facecolors=facecolors,
+        **kwargs,
+    )
     sci(__ret)
     return __ret
 
@@ -2750,390 +3756,600 @@ def triplot(*args, **kwargs):
 @_copy_docstring_and_deprecators(Axes.violinplot)
 @set_category(CATEGORY_CUT)
 def violinplot(
-        dataset, positions=None, vert=True, widths=0.5,
-        showmeans=False, showextrema=True, showmedians=False,
-        quantiles=None, points=100, bw_method=None, *, data=None):
+    dataset: ArrayLike | Sequence[ArrayLike],
+    positions: ArrayLike | None = None,
+    vert: bool = True,
+    widths: float | ArrayLike = 0.5,
+    showmeans: bool = False,
+    showextrema: bool = True,
+    showmedians: bool = False,
+    quantiles: Sequence[float | Sequence[float]] | None = None,
+    points: int = 100,
+    bw_method: (
+        Literal["scott", "silverman"] | float | Callable[[GaussianKDE], float] | None
+    ) = None,
+    *,
+    data=None,
+) -> dict[str, Collection]:
     return gca().violinplot(
-        dataset, positions=positions, vert=vert, widths=widths,
-        showmeans=showmeans, showextrema=showextrema,
-        showmedians=showmedians, quantiles=quantiles, points=points,
+        dataset,
+        positions=positions,
+        vert=vert,
+        widths=widths,
+        showmeans=showmeans,
+        showextrema=showextrema,
+        showmedians=showmedians,
+        quantiles=quantiles,
+        points=points,
         bw_method=bw_method,
-        **({"data": data} if data is not None else {}))
+        **({"data": data} if data is not None else {}),
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.vlines)
 @set_category(CATEGORY_CUT)
 def vlines(
-        x, ymin, ymax, colors=None, linestyles='solid', label='', *,
-        data=None, **kwargs):
+    x: float | ArrayLike,
+    ymin: float | ArrayLike,
+    ymax: float | ArrayLike,
+    colors: ColorType | Sequence[ColorType] | None = None,
+    linestyles: LineStyleType = "solid",
+    label: str = "",
+    *,
+    data=None,
+    **kwargs,
+) -> LineCollection:
     return gca().vlines(
-        x, ymin, ymax, colors=colors, linestyles=linestyles,
-        label=label, **({"data": data} if data is not None else {}),
-        **kwargs)
+        x,
+        ymin,
+        ymax,
+        colors=colors,
+        linestyles=linestyles,
+        label=label,
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.xcorr)
 @set_category(CATEGORY_CUT)
 def xcorr(
-        x, y, normed=True, detrend=mlab.detrend_none, usevlines=True,
-        maxlags=10, *, data=None, **kwargs):
+    x: ArrayLike,
+    y: ArrayLike,
+    normed: bool = True,
+    detrend: Callable[[ArrayLike], ArrayLike] = mlab.detrend_none,
+    usevlines: bool = True,
+    maxlags: int = 10,
+    *,
+    data=None,
+    **kwargs,
+) -> tuple[np.ndarray, np.ndarray, LineCollection | Line2D, Line2D | None]:
     return gca().xcorr(
-        x, y, normed=normed, detrend=detrend, usevlines=usevlines,
+        x,
+        y,
+        normed=normed,
+        detrend=detrend,
+        usevlines=usevlines,
         maxlags=maxlags,
-        **({"data": data} if data is not None else {}), **kwargs)
+        **({"data": data} if data is not None else {}),
+        **kwargs,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.cla)
-def cla():
-    return gca().cla()
+@_copy_docstring_and_deprecators(Axes._sci)
+@set_category(CATEGORY_CUT)
+def sci(im: ScalarMappable) -> None:
+    gca()._sci(im)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.grid)
-def grid(visible=None, which='major', axis='both', **kwargs):
-    return gca().grid(visible=visible, which=which, axis=axis, **kwargs)
+@_copy_docstring_and_deprecators(Axes.set_title)
+@set_category(CATEGORY_CUT)
+def title(
+    label: str,
+    fontdict: dict[str, Any] | None = None,
+    loc: Literal["left", "center", "right"] | None = None,
+    pad: float | None = None,
+    *,
+    y: float | None = None,
+    **kwargs,
+) -> Text:
+    return gca().set_title(label, fontdict=fontdict, loc=loc, pad=pad, y=y, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.legend)
-def legend(*args, **kwargs):
-    return gca().legend(*args, **kwargs)
+@_copy_docstring_and_deprecators(Axes.set_xlabel)
+@set_category(CATEGORY_CUT)
+def xlabel(
+    xlabel: str,
+    fontdict: dict[str, Any] | None = None,
+    labelpad: float | None = None,
+    *,
+    loc: Literal["left", "center", "right"] | None = None,
+    **kwargs,
+) -> Text:
+    return gca().set_xlabel(
+        xlabel, fontdict=fontdict, labelpad=labelpad, loc=loc, **kwargs
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.table)
-def table(
-        cellText=None, cellColours=None, cellLoc='right',
-        colWidths=None, rowLabels=None, rowColours=None,
-        rowLoc='left', colLabels=None, colColours=None,
-        colLoc='center', loc='bottom', bbox=None, edges='closed',
-        **kwargs):
-    return gca().table(
-        cellText=cellText, cellColours=cellColours, cellLoc=cellLoc,
-        colWidths=colWidths, rowLabels=rowLabels,
-        rowColours=rowColours, rowLoc=rowLoc, colLabels=colLabels,
-        colColours=colColours, colLoc=colLoc, loc=loc, bbox=bbox,
-        edges=edges, **kwargs)
+@_copy_docstring_and_deprecators(Axes.set_ylabel)
+@set_category(CATEGORY_CUT)
+def ylabel(
+    ylabel: str,
+    fontdict: dict[str, Any] | None = None,
+    labelpad: float | None = None,
+    *,
+    loc: Literal["bottom", "center", "top"] | None = None,
+    **kwargs,
+) -> Text:
+    return gca().set_ylabel(
+        ylabel, fontdict=fontdict, labelpad=labelpad, loc=loc, **kwargs
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.text)
-def text(x, y, s, fontdict=None, **kwargs):
-    return gca().text(x, y, s, fontdict=fontdict, **kwargs)
+@_copy_docstring_and_deprecators(Axes.set_xscale)
+@set_category(CATEGORY_CUT)
+def xscale(value: str | ScaleBase, **kwargs) -> None:
+    gca().set_xscale(value, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.set_yscale)
+@set_category(CATEGORY_CUT)
+def yscale(value: str | ScaleBase, **kwargs) -> None:
+    gca().set_yscale(value, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.annotate)
 def annotate(
-        text, xy, xytext=None, xycoords='data', textcoords=None,
-        arrowprops=None, annotation_clip=None, **kwargs):
+    text: str,
+    xy: tuple[float, float],
+    xytext: tuple[float, float] | None = None,
+    xycoords: (
+        str
+        | Artist
+        | Transform
+        | Callable[[RendererBase], Bbox | Transform]
+        | tuple[float, float]
+    ) = "data",
+    textcoords: (
+        str
+        | Artist
+        | Transform
+        | Callable[[RendererBase], Bbox | Transform]
+        | tuple[float, float]
+        | None
+    ) = None,
+    arrowprops: dict[str, Any] | None = None,
+    annotation_clip: bool | None = None,
+    **kwargs,
+) -> Annotation:
     return gca().annotate(
-        text, xy, xytext=xytext, xycoords=xycoords,
-        textcoords=textcoords, arrowprops=arrowprops,
-        annotation_clip=annotation_clip, **kwargs)
+        text,
+        xy,
+        xytext=xytext,
+        xycoords=xycoords,
+        textcoords=textcoords,
+        arrowprops=arrowprops,
+        annotation_clip=annotation_clip,
+        **kwargs,
+    )
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.autoscale)
+def autoscale(
+    enable: bool = True,
+    axis: Literal["both", "x", "y"] = "both",
+    tight: bool | None = None,
+) -> None:
+    gca().autoscale(enable=enable, axis=axis, tight=tight)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.axis)
+def axis(
+    arg: tuple[float, float, float, float] | bool | str | None = None,
+    /,
+    *,
+    emit: bool = True,
+    **kwargs,
+) -> tuple[float, float, float, float]:
+    return gca().axis(arg, emit=emit, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.grid)
+def grid(
+    visible: bool | None = None,
+    which: Literal["major", "minor", "both"] = "major",
+    axis: Literal["both", "x", "y"] = "both",
+    **kwargs,
+) -> None:
+    gca().grid(visible=visible, which=which, axis=axis, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.legend)
+def legend(*args, **kwargs) -> Legend:
+    return gca().legend(*args, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.locator_params)
+def locator_params(
+    axis: Literal["both", "x", "y"] = "both", tight: bool | None = None, **kwargs
+) -> None:
+    gca().locator_params(axis=axis, tight=tight, **kwargs)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.margins)
+def margins(
+    *margins: float,
+    x: float | None = None,
+    y: float | None = None,
+    tight: bool | None = True,
+) -> tuple[float, float] | None:
+    return gca().margins(*margins, x=x, y=y, tight=tight)
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.minorticks_off)
+def minorticks_off() -> None:
+    gca().minorticks_off()
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.minorticks_on)
+def minorticks_on() -> None:
+    gca().minorticks_on()
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.table)
+def table(
+    cellText=None,
+    cellColours=None,
+    cellLoc="right",
+    colWidths=None,
+    rowLabels=None,
+    rowColours=None,
+    rowLoc="left",
+    colLabels=None,
+    colColours=None,
+    colLoc="center",
+    loc="bottom",
+    bbox=None,
+    edges="closed",
+    **kwargs,
+):
+    return gca().table(
+        cellText=cellText,
+        cellColours=cellColours,
+        cellLoc=cellLoc,
+        colWidths=colWidths,
+        rowLabels=rowLabels,
+        rowColours=rowColours,
+        rowLoc=rowLoc,
+        colLabels=colLabels,
+        colColours=colColours,
+        colLoc=colLoc,
+        loc=loc,
+        bbox=bbox,
+        edges=edges,
+        **kwargs,
+    )
+
+
+# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
+@_copy_docstring_and_deprecators(Axes.text)
+def text(
+    x: float, y: float, s: str, fontdict: dict[str, Any] | None = None, **kwargs
+) -> Text:
+    return gca().text(x, y, s, fontdict=fontdict, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.ticklabel_format)
 def ticklabel_format(
-        *, axis='both', style='', scilimits=None, useOffset=None,
-        useLocale=None, useMathText=None):
-    return gca().ticklabel_format(
-        axis=axis, style=style, scilimits=scilimits,
-        useOffset=useOffset, useLocale=useLocale,
-        useMathText=useMathText)
-
-
-# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.locator_params)
-def locator_params(axis='both', tight=None, **kwargs):
-    return gca().locator_params(axis=axis, tight=tight, **kwargs)
+    *,
+    axis: Literal["both", "x", "y"] = "both",
+    style: Literal["", "sci", "scientific", "plain"] = "",
+    scilimits: tuple[int, int] | None = None,
+    useOffset: bool | float | None = None,
+    useLocale: bool | None = None,
+    useMathText: bool | None = None,
+) -> None:
+    gca().ticklabel_format(
+        axis=axis,
+        style=style,
+        scilimits=scilimits,
+        useOffset=useOffset,
+        useLocale=useLocale,
+        useMathText=useMathText,
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.tick_params)
-def tick_params(axis='both', **kwargs):
-    return gca().tick_params(axis=axis, **kwargs)
-
-
-# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.margins)
-def margins(*margins, x=None, y=None, tight=True):
-    return gca().margins(*margins, x=x, y=y, tight=tight)
-
-
-# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.autoscale)
-def autoscale(enable=True, axis='both', tight=None):
-    return gca().autoscale(enable=enable, axis=axis, tight=tight)
-
-
-# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.axis)
-def axis(arg=None, /, *, emit=True, **kwargs):
-    return gca().axis(arg, emit=emit, **kwargs)
-
-
-# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.minorticks_off)
-def minorticks_off():
-    return gca().minorticks_off()
-
-
-# Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-@_copy_docstring_and_deprecators(Axes.minorticks_on)
-def minorticks_on():
-    return gca().minorticks_on()
+def tick_params(axis: Literal["both", "x", "y"] = "both", **kwargs) -> None:
+    gca().tick_params(axis=axis, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes._sci)
-def sci(im):
-    return gca()._sci(im)
+def sci(im: ScalarMappable) -> None:
+    gca()._sci(im)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.set_title)
-def title(label, fontdict=None, loc=None, pad=None, *, y=None, **kwargs):
-    return gca().set_title(
-        label, fontdict=fontdict, loc=loc, pad=pad, y=y, **kwargs)
+def title(
+    label: str,
+    fontdict: dict[str, Any] | None = None,
+    loc: Literal["left", "center", "right"] | None = None,
+    pad: float | None = None,
+    *,
+    y: float | None = None,
+    **kwargs,
+) -> Text:
+    return gca().set_title(label, fontdict=fontdict, loc=loc, pad=pad, y=y, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.set_xlabel)
-def xlabel(xlabel, fontdict=None, labelpad=None, *, loc=None, **kwargs):
+def xlabel(
+    xlabel: str,
+    fontdict: dict[str, Any] | None = None,
+    labelpad: float | None = None,
+    *,
+    loc: Literal["left", "center", "right"] | None = None,
+    **kwargs,
+) -> Text:
     return gca().set_xlabel(
-        xlabel, fontdict=fontdict, labelpad=labelpad, loc=loc,
-        **kwargs)
+        xlabel, fontdict=fontdict, labelpad=labelpad, loc=loc, **kwargs
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.set_ylabel)
-def ylabel(ylabel, fontdict=None, labelpad=None, *, loc=None, **kwargs):
+def ylabel(
+    ylabel: str,
+    fontdict: dict[str, Any] | None = None,
+    labelpad: float | None = None,
+    *,
+    loc: Literal["bottom", "center", "top"] | None = None,
+    **kwargs,
+) -> Text:
     return gca().set_ylabel(
-        ylabel, fontdict=fontdict, labelpad=labelpad, loc=loc,
-        **kwargs)
+        ylabel, fontdict=fontdict, labelpad=labelpad, loc=loc, **kwargs
+    )
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.set_xscale)
-def xscale(value, **kwargs):
-    return gca().set_xscale(value, **kwargs)
+def xscale(value: str | ScaleBase, **kwargs) -> None:
+    gca().set_xscale(value, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
 @_copy_docstring_and_deprecators(Axes.set_yscale)
-def yscale(value, **kwargs):
-    return gca().set_yscale(value, **kwargs)
+def yscale(value: str | ScaleBase, **kwargs) -> None:
+    gca().set_yscale(value, **kwargs)
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def autumn():
+def autumn() -> None:
     """
     Set the colormap to 'autumn'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('autumn')
+    set_cmap("autumn")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def bone():
+def bone() -> None:
     """
     Set the colormap to 'bone'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('bone')
+    set_cmap("bone")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def cool():
+def cool() -> None:
     """
     Set the colormap to 'cool'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('cool')
+    set_cmap("cool")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def copper():
+def copper() -> None:
     """
     Set the colormap to 'copper'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('copper')
+    set_cmap("copper")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def flag():
+def flag() -> None:
     """
     Set the colormap to 'flag'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('flag')
+    set_cmap("flag")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def gray():
+def gray() -> None:
     """
     Set the colormap to 'gray'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('gray')
+    set_cmap("gray")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def hot():
+def hot() -> None:
     """
     Set the colormap to 'hot'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('hot')
+    set_cmap("hot")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def hsv():
+def hsv() -> None:
     """
     Set the colormap to 'hsv'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('hsv')
+    set_cmap("hsv")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def jet():
+def jet() -> None:
     """
     Set the colormap to 'jet'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('jet')
+    set_cmap("jet")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def pink():
+def pink() -> None:
     """
     Set the colormap to 'pink'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('pink')
+    set_cmap("pink")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def prism():
+def prism() -> None:
     """
     Set the colormap to 'prism'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('prism')
+    set_cmap("prism")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def spring():
+def spring() -> None:
     """
     Set the colormap to 'spring'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('spring')
+    set_cmap("spring")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def summer():
+def summer() -> None:
     """
     Set the colormap to 'summer'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('summer')
+    set_cmap("summer")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def winter():
+def winter() -> None:
     """
     Set the colormap to 'winter'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('winter')
+    set_cmap("winter")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def magma():
+def magma() -> None:
     """
     Set the colormap to 'magma'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('magma')
+    set_cmap("magma")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def inferno():
+def inferno() -> None:
     """
     Set the colormap to 'inferno'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('inferno')
+    set_cmap("inferno")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def plasma():
+def plasma() -> None:
     """
     Set the colormap to 'plasma'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('plasma')
+    set_cmap("plasma")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def viridis():
+def viridis() -> None:
     """
     Set the colormap to 'viridis'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('viridis')
+    set_cmap("viridis")
 
 
 # Autogenerated by boilerplate.py.  Do not edit as changes will be lost.
-def nipy_spectral():
+def nipy_spectral() -> None:
     """
     Set the colormap to 'nipy_spectral'.
 
     This changes the default colormap as well as the colormap of the current
     image if there is one. See ``help(colormaps)`` for more information.
     """
-    set_cmap('nipy_spectral')
+    set_cmap("nipy_spectral")
