@@ -20,6 +20,7 @@ import re
 import sys
 import threading
 import time
+from typing import Literal
 
 from cycler import cycler
 import matplotlib
