@@ -22,7 +22,7 @@ runs:
     shell: bash -l {0}
     run: |
       conda config --set always_yes yes --set changeps1 no
-      conda create -n build-env python=3.10
+      conda create -n build-env python=3.12
       conda activate build-env
       mamba install -c conda-forge mamba conda-build anaconda-client conda-verify boa
       conda config --add channels mantid/label/nightly

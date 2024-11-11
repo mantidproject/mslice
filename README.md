@@ -52,7 +52,7 @@ You will also need to edit the run configurations:
 You can now also develop MSlice using a Mantid conda environment.
 First install Mantid using `conda env create -f mslice-developer.yml`,
 then add this interpreter by going to the `File->Settings` in PyCharm, then `Project: mslice -> Python Interpreter`,
-click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.10 (mantidnightly)`.
+click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.12 (mantidnightly)`.
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
 Specify `start_mslice.py` as the startup script.
 
