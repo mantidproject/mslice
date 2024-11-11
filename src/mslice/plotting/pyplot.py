@@ -45,6 +45,15 @@ from matplotlib.axes import Axes, Subplot
 from matplotlib.projections import PolarAxes
 from matplotlib import mlab  # for detrend_none, window_hanning
 from matplotlib.scale import get_scale_names
+from matplotlib.collections import (
+    BrokenBarHCollection,
+    Collection,
+    EventCollection,
+    LineCollection,
+    PathCollection,
+    PolyCollection,
+    QuadMesh
+)
 
 from matplotlib import cm
 from matplotlib.cm import _colormaps as colormaps, register_cmap
