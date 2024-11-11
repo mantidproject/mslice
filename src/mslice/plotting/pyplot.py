@@ -54,6 +54,7 @@ except ImportError:
     from matplotlib.cm import get_cmap
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 # We may not need the following imports here:
 from matplotlib.colors import Normalize
