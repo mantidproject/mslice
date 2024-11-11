@@ -168,7 +168,7 @@ def _copy_docstring_and_deprecators(
 ## Global ##
 
 
-def _draw_all_if_interactive(): -> None:
+def _draw_all_if_interactive() -> None:
     # We will always draw because mslice might be running without
     # matplotlib interactive
     for fig in GlobalFigureManager.all_figures():
