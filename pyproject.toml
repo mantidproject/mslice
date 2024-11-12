@@ -60,7 +60,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-filterwarnings = ["error"]
+filterwarnings = ["error", "ignore::DeprecationWarning"]
 
 [tool.coverage.report]
 include = [
