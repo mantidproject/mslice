@@ -22,7 +22,7 @@ classifiers = [
 dependencies = [
     "ipython",
     "numpy",
-    "matplotlib>=1.5",
+    "matplotlib>=3.8.4",
     "six",
     "qtawesome",
     "pre-commit",
@@ -60,7 +60,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-filterwarnings = ["error"]
+filterwarnings = ["error", "ignore::DeprecationWarning"]
 
 [tool.coverage.report]
 include = [

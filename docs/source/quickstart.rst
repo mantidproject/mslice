@@ -15,8 +15,8 @@ You can then copy the ``mslice`` subfolder (the folder containing a file called 
 ``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*.
 
 Alternatively, Mslice is available as a conda package via anaconda.org on the `mantid channel <https://anaconda.org/mantid/mslice>`_.
-To install the released conda package do ``conda install -c mantid mslice``.
-To install the latest nightly conda package do ``conda install -c mantid/label/nightly mslice``. The nightly conda package includes
+To install the released conda package do ``mamba install -c mantid mslice``.
+To install the latest nightly conda package do ``mamba install -c mantid/label/nightly mslice``. The nightly conda package includes
 all recent changes of the development version up to and including the day before and is only created when all tests have run
 successfully.
 In both cases MSlice can be started by typing ``mslice`` on the command line after activating your conda environment.

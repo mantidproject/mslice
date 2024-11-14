@@ -25,7 +25,7 @@ jobs:
 
       - name: Install Mantid
         run: |
-          conda install -c mantid/label/nightly mantid mantidqt
+          mamba install -c mantid/label/nightly mantid mantidqt
 
       - name: Run Tests and Coverage
         run: |
