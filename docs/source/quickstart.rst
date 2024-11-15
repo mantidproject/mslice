@@ -11,7 +11,7 @@ MSlice is included in the Mantid distribution so the easiest way to start it is 
 The version of *MSlice* distributed with Mantid is the last stable version. Starting with *MantidWorkbench* version 6.12, MSlice is
 included as a conda package within *MantidWorkbench*. This enables users to replace the MSlice version within the conda environment
 where *MantidWorkbench* is set up.
-For versions of *MantidWorkbench* prior to 6.12. it is possible to replace MSlice with the latest development version on `GitHub`.
+For versions of *MantidWorkbench* prior to 6.12., it is possible to replace MSlice with the latest development version on `GitHub`.
 To get this version, please download this `zip <https://github.com/mantidproject/mslice/archive/main.zip>`_ and extract it to a
 folder on your computer. You can then copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the
 ``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*.
