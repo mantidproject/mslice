@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools >= 65.0.0",
-            "wheel",
+requires = ["setuptools = 75.1.0", # >= 65.0.0",
+            "wheel = 0.44.0",
             "versioningit",]
 build-backend = "setuptools.build_meta"
 
@@ -101,8 +101,7 @@ method = "minor"
 [tool.versioningit.format]
 distance = "{version}.dev{distance}"
 dirty = "{version}+uncommitted"
-distance-dirty = "{version}.dev{distance}"
-# distance-dirty = "{version}.dev{distance}+uncommitted"
+distance-dirty = "{version}.dev{distance}+uncommitted"
 
 [tool.versioningit.write]
 file = "src/mslice/__init__.py"
