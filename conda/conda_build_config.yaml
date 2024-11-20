@@ -1,2 +1,5 @@
 python:
   - 3.12
+
+setuptools:
+  - 75.1.0
