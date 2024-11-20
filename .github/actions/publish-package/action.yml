@@ -25,6 +25,8 @@ runs:
       conda create -n build-env
       conda activate build-env
       mamba install -c conda-forge mamba conda-build anaconda-client conda-verify boa
+      mamba install wheel=0.44.0
+      mamba install setuptools=75.1.0
       conda config --add channels mantid/label/nightly
       conda config --add channels mantid
 
