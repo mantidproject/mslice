@@ -1,11 +1,11 @@
 name: Deploy MSlice nightly
 
-on:
-  workflow_run:
-    workflows: ["MSlice nightly build"]
-    branches: [main]
-    types:
-      - completed
+on: push
+#  workflow_run:
+#    workflows: ["MSlice nightly build"]
+#    branches: [main]
+#    types:
+#      - completed
 
 jobs:
   build_conda_and_upload:
