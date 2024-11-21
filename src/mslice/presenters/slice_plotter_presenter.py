@@ -10,6 +10,7 @@ from mslice.views.slice_plotter import (set_colorbar_label, plot_cached_slice, c
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.plot_window.overplot_interface import plot_overplot_line, remove_line
 from mslice.presenters.presenter_utility import PresenterUtility
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 
 
 class SlicePlotterPresenter(PresenterUtility):
@@ -31,19 +32,19 @@ class SlicePlotterPresenter(PresenterUtility):
         return slice
 
     def plot_from_cache(self, workspace):
-        ws_name = workspace.name.lstrip('__')
+        ws_name = WorkspaceNameHandler(workspace.name).get_name(make_ws_visible_in_ADS=True)
         create_slice_figure(ws_name, self)
         self.show_scattering_function(ws_name)
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):
-        workspace_name = workspace_name.lstrip('__')
+        workspace_name = WorkspaceNameHandler(workspace_name).get_name(make_ws_visible_in_ADS=True)
         intensity_start, intensity_end = self.validate_intensity(intensity_start, intensity_end)
         norm = Normalize(vmin=intensity_start, vmax=intensity_end)
         self._slice_cache[workspace_name].norm = norm
 
     def change_colourmap(self, workspace_name, colourmap):
         if colourmap in ALLOWED_CMAPS:
-            workspace_name = workspace_name.lstrip('__')
+            workspace_name = WorkspaceNameHandler(workspace_name).get_name(make_ws_visible_in_ADS=True)
             self._slice_cache[workspace_name].colourmap = colourmap
         else:
             raise ValueError('colourmap not recognised')
