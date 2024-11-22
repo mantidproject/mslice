@@ -21,7 +21,7 @@ requirements:
   build:
     - python {{ python }}
     - qtpy
-    - setuptools
+    - setuptools {{ setuptools }}
     - versioningit
 
   run:
