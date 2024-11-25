@@ -31,7 +31,7 @@ requirements:
   - mantidqt
   - ipython
   - matplotlib
-  - numpy
+  - numpy {{ numpy }}
   - pre-commit
   - pyqt
   - qtawesome
