@@ -466,8 +466,8 @@ class CutPlot(IPlot):
             for line in line_containers.get_children():
                 line not in self._waterfall_cache and self._cache_line(line)
                 if isinstance(line, Line2D):
-                    line.set_xdata(self._waterfall_cache[line][0] + ind * x)
-                    line.set_ydata(self._waterfall_cache[line][1] + ind * y)
+                    line.set_xdata([self._waterfall_cache[line][0] + ind * x])
+                    line.set_ydata([self._waterfall_cache[line][1] + ind * y])
                 elif isinstance(line, LineCollection):
                     for index, path in enumerate(line._paths):
                         if not np.isnan(path.vertices).any():
