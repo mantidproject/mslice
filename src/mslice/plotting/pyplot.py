@@ -47,7 +47,6 @@ from matplotlib import mlab  # for detrend_none, window_hanning
 from matplotlib.scale import get_scale_names
 
 from matplotlib.cm import _colormaps
-from matplotlib.cm import register_cmap  # type: ignore
 from matplotlib.colors import _color_sequences
 
 import numpy as np
