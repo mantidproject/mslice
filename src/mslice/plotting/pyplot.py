@@ -75,8 +75,7 @@ from matplotlib import rcsetup, rcParamsDefault, rcParamsOrig
 from matplotlib.artist import Artist
 from matplotlib.axes import Axes
 from matplotlib.axes import Subplot  # noqa: F401
-from matplotlib.backends import backend_registry
-from matplotlib.backends.registry import BackendFilter
+from matplotlib.backends import BackendFilter, backend_registry
 from matplotlib.projections import PolarAxes
 from matplotlib import mlab  # for detrend_none, window_hanning
 from matplotlib.scale import get_scale_names  # noqa: F401
