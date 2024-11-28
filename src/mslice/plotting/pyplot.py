@@ -142,7 +142,7 @@ from matplotlib.patches import Arrow, Circle, Rectangle  # noqa: F401
 from matplotlib.patches import Polygon
 from matplotlib.widgets import Button, Slider, Widget  # noqa: F401
 
-from .ticker import (  # noqa: F401
+from matplotlib.ticker import (  # noqa: F401
     TickHelper, Formatter, FixedFormatter, NullFormatter, FuncFormatter,
     FormatStrFormatter, ScalarFormatter, LogFormatter, LogFormatterExponent,
     LogFormatterMathtext, Locator, IndexLocator, FixedLocator, NullLocator,
