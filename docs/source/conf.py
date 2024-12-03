@@ -20,7 +20,7 @@
 # sys.path.insert(0, os.path.abspath(os.path.join("../..", "src")))
 
 # from mslice import version_info  # noqa: E402
-version_info = (2, 9, 1)
+version_info = (2, 10, 1)
 
 # -- General configuration ------------------------------------------------
 
