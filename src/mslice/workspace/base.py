@@ -1,38 +1,37 @@
-import abc
-from six import add_metaclass
+from abc import ABCMeta, abstractmethod
 
 
-@add_metaclass(abc.ABCMeta)
 class WorkspaceBase(object):
+    __metaclass__ = ABCMeta
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_coordinates(self):
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_signal(self):
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_error(self):
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_variance(self):
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def rewrap(self, ws):
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def __neg__(self):
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def save_attributes(self):
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def remove_saved_attributes(self):
         return

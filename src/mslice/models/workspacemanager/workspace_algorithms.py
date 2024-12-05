@@ -11,7 +11,6 @@ from os.path import splitext
 
 import numpy as np
 from scipy import constants
-from six import string_types
 
 import mslice.util.mantid.init_mantid  # noqa: F401
 
@@ -253,7 +252,7 @@ def save_workspaces(workspaces, path, save_name, extension):
         save_method = save_matlab
     else:
         raise RuntimeError("unrecognised file extension")
-    if isinstance(save_name, string_types):
+    if isinstance(save_name, str):
         if len(workspaces) == 1:
             save_names = [save_name]
         else:
@@ -285,7 +284,7 @@ def remove_workspace_from_ads(workspacename):
 def _save_single_ws(workspace, save_name, save_method, path, extension):
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
-    if isinstance(workspace, string_types):
+    if isinstance(workspace, str):
         workspace = get_workspace_handle(workspace)
     save_method(workspace, full_path)
 

@@ -1,5 +1,4 @@
 from __future__ import (absolute_import, division, print_function)
-from six import string_types
 import numpy as np
 
 from scipy import constants
@@ -265,7 +264,7 @@ def sample_temperature(ws_name, sample_temp_fields):
             pass
         except AttributeError:
             sample_temp = ws.getExperimentInfo(0).run().getLogData(field_name).value
-    if isinstance(sample_temp, string_types):
+    if isinstance(sample_temp, str):
         sample_temp = get_sample_temperature_from_string(sample_temp)
     elif isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
         sample_temp = np.mean(sample_temp)

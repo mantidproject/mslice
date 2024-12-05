@@ -4,11 +4,10 @@ from mantid.simpleapi import *  # noqa: F401, F403
 from mantid.simpleapi import _create_algorithm_function
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 from mantid.api import AlgorithmFactory, AlgorithmManager
-from six import iteritems
 
 algorithms = AlgorithmFactory.getRegisteredAlgorithms(False)
 
-for algorithm, versions in iteritems(algorithms):
+for algorithm, versions in algorithms.items():
     try:
         globals()[algorithm] = wrap_algorithm(globals()[algorithm])
     except KeyError:   # Possibly a user defined algorithm

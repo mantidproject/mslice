@@ -17,7 +17,6 @@ from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_ax
                                         _check_workspace_type, _correct_intensity)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
-from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.workspace import Workspace as MSliceWorkspace
 from mslice.util.mantid.mantid_algorithms import *  # noqa: F401, F403
@@ -73,7 +72,7 @@ def Load(Filename, OutputWorkspace=None):
     """
     from mslice.app.presenters import get_dataloader_presenter
 
-    if not isinstance(Filename, string_types):
+    if not isinstance(Filename, str):
         raise RuntimeError('path given to load must be a string')
     merge = False
     if not ospath.exists(Filename):

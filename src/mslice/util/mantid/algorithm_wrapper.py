@@ -1,7 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 from uuid import uuid4
-from six import string_types
 
 from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle
 from mantid.api import AnalysisDataService, AlgorithmManager, Workspace
@@ -16,7 +15,7 @@ def _parse_ws_names(args, kwargs):
     if input_workspace:
         kwargs['InputWorkspace'] = _name_or_wrapper_to_workspace(input_workspace)
     elif len(args) > 0:
-        if isinstance(args[0], MsliceWorkspace) or isinstance(args[0], string_types):
+        if isinstance(args[0], MsliceWorkspace) or isinstance(args[0], str):
             input_workspace = get_workspace_handle(args[0])
         args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
 
@@ -49,7 +48,7 @@ def wrap_algorithm(algorithm):
             kwargs['InputWorkspaces'] = [_name_or_wrapper_to_workspace(arg) for arg in kwargs['InputWorkspaces']]
 
         for ky in [k for k in kwargs.keys() if 'Workspace' in k]:
-            if isinstance(kwargs[ky], string_types) and '__MSL' not in kwargs[ky]:
+            if isinstance(kwargs[ky], str) and '__MSL' not in kwargs[ky]:
                 kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
 
         if _alg_has_outputws(algorithm):
@@ -81,7 +80,7 @@ def wrap_algorithm(algorithm):
 def _name_or_wrapper_to_workspace(input_ws):
     if isinstance(input_ws, MsliceWorkspace):
         return input_ws.raw_ws
-    elif isinstance(input_ws, string_types):
+    elif isinstance(input_ws, str):
         return get_workspace_handle(input_ws).raw_ws
     else:
         return input_ws

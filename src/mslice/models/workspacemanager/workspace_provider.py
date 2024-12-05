@@ -1,5 +1,3 @@
-from six import iterkeys, string_types
-
 from mslice.workspace.base import WorkspaceBase as Workspace
 
 _loaded_workspaces = {}
@@ -33,12 +31,12 @@ def rename_workspace(workspace, new_name):
 
 
 def get_visible_workspace_names():
-    return [key for key in iterkeys(_loaded_workspaces) if key[:2] != '__']
+    return [key for key in _loaded_workspaces.keys() if key[:2] != '__']
 
 
 def get_workspace_name(workspace):
     """Returns the name of a workspace given the workspace handle"""
-    if isinstance(workspace, string_types):
+    if isinstance(workspace, str):
         return workspace
     return workspace.name
 

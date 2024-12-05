@@ -1,26 +1,25 @@
-import abc
-from six import add_metaclass
+from abc import ABCMeta, abstractmethod
 
 
-@add_metaclass(abc.ABCMeta)
 class WorkspaceManagerPresenterInterface(object):
+    __metaclass__ = ABCMeta
 
-    @abc.abstractmethod
+    @abstractmethod
     def register_master(self, main_view):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def notify(self, command):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_selected_workspaces(self):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def set_selected_workspaces(self, workspace_list):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def update_displayed_workspaces(self):
         pass
