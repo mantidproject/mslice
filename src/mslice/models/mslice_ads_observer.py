@@ -23,16 +23,14 @@ def _catch_exceptions(func):
 
 
 class MSliceADSObserver(AnalysisDataServiceObserver):
-    def __init__(self, delete_callback, clear_callback, replace_callback, rename_callback):
+    def __init__(self, delete_callback, clear_callback, rename_callback):
         super(MSliceADSObserver, self).__init__()
         self.delete_callback = delete_callback
         self.clear_callback = clear_callback
-        self.replace_callback = replace_callback
         self.rename_callback = rename_callback
 
         self.observeDelete(True)
         self.observeRename(True)
-        self.observeReplace(True)
         self.observeClear(True)
 
     @_catch_exceptions
@@ -59,19 +57,3 @@ class MSliceADSObserver(AnalysisDataServiceObserver):
         Called when the ADS has been cleared, removes all data.
         """
         self.clear_callback()
-
-    @_catch_exceptions
-    def replaceHandle(self, name, workspace):
-        """
-        Called when the ADS has replaced a workspace with one of the same name.
-        Updates the workspace stored in the dict.
-        :param name: The name of the workspace.
-        :param workspace: A reference to the new workspace
-        """
-        self.replace_callback(name, workspace)
-
-    def unsubscribe(self):
-        self.observeDelete(False)
-        self.observeRename(False)
-        self.observeClear(False)
-        self.observeReplace(False)
