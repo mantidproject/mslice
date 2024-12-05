@@ -1,22 +1,21 @@
-import abc
-from six import add_metaclass
+from abc import ABCMeta, abstractmethod
 
 
-@add_metaclass(abc.ABCMeta)
 class DataLoaderPresenterInterface(object):
+    __metaclass__ = ABCMeta
 
-    @abc.abstractmethod
+    @abstractmethod
     def register_master(self, main_view):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def load_workspace(self, file_paths, merge):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def _report_load_errors(self, ws_names, not_opened, not_loaded):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def workspace_selection_changed(self):
         pass

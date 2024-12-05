@@ -22,7 +22,6 @@ import re
 
 from matplotlib import rcParams
 
-from six import iteritems
 try:
     from matplotlib.colors import to_hex
 except ImportError:
@@ -103,11 +102,11 @@ def color_to_name(color):
     :raises: ValueError if the color is not known and is not a HEX code
     """
     color_as_hex = to_hex(color)
-    for name, hexvalue in iteritems(_BASIC_COLORS_HEX_MAPPING):
+    for name, hexvalue in _BASIC_COLORS_HEX_MAPPING.items():
         if color_as_hex == hexvalue:
             return name
 
-    for name, value in iteritems(mpl_named_colors()):
+    for name, value in mpl_named_colors().items():
         if color_as_hex == to_hex(value):
             return pretty_name(name)
 

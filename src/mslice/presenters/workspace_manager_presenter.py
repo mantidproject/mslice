@@ -1,5 +1,4 @@
 from __future__ import (absolute_import, division, print_function)
-from six import string_types
 
 from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
@@ -210,7 +209,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         get_index = self._workspace_manager_view.get_workspace_index
         index_list = []
         for item in workspace_list:
-            if isinstance(item, string_types):
+            if isinstance(item, str):
                 index_list.append(get_index(item))
             elif isinstance(item, int):
                 index_list.append(item)
