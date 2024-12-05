@@ -436,7 +436,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.ComposeWorkspace)
         self.view._display_error.assert_called()
 
-    def test_ensure_that_the_ads_observer_calls_delete_handle(self, _):
+    def test_ensure_that_the_ads_observer_calls_delete_handle(self):
         presenter = WorkspaceManagerPresenter(self.view)
         presenter.delete_handle = mock.Mock()
         self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
@@ -451,7 +451,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
         presenter.delete_handle.assert_called_once_with("ws")
 
-    def test_ensure_that_the_ads_observer_calls_clear_handle(self, _):
+    def test_ensure_that_the_ads_observer_calls_clear_handle(self):
         presenter = WorkspaceManagerPresenter(self.view)
         presenter.clear_handle = mock.Mock()
         self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
@@ -466,7 +466,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
         presenter.clear_handle.assert_called_once()
 
-    def test_ensure_that_the_ads_observer_calls_rename_handle(self, _):
+    def test_ensure_that_the_ads_observer_calls_rename_handle(self):
         presenter = WorkspaceManagerPresenter(self.view)
         presenter.rename_handle = mock.Mock()
         self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
