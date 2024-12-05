@@ -445,7 +445,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         )
 
         # Ensure ADS is empty before test
-        AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
         CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
         AnalysisDataService.remove("ws")
 
@@ -460,9 +460,9 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         )
 
         # Ensure ADS is empty before test
-        AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
         CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
-        AnalysisDataService.clear()
+        AnalysisDataService.clear(True)
 
         presenter.clear_handle.assert_called_once()
 
