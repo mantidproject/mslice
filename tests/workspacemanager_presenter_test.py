@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import unittest
 
 import mock
-from mock import call, patch
+from mock import call, patch, MagicMock
 import numpy as np
 
 from mantid.api import AnalysisDataService
@@ -438,7 +438,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_ensure_that_the_ads_observer_calls_clear_handle(self):
         presenter = WorkspaceManagerPresenter(self.view)
-        presenter.clear_handle = mock.Mock()
+        presenter.clear_handle = MagicMock()
         self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
         presenter._ads_observer = MSliceADSObserver(
             presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
@@ -451,7 +451,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_ensure_that_the_ads_observer_calls_delete_handle(self):
         presenter = WorkspaceManagerPresenter(self.view)
-        presenter.delete_handle = mock.Mock()
+        presenter.delete_handle = MagicMock()
         self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
         presenter._ads_observer = MSliceADSObserver(
             presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
@@ -464,7 +464,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     def test_ensure_that_the_ads_observer_calls_rename_handle(self):
         presenter = WorkspaceManagerPresenter(self.view)
-        presenter.rename_handle = mock.Mock()
+        presenter.rename_handle = MagicMock()
         self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
         presenter._ads_observer = MSliceADSObserver(
             presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
