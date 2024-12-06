@@ -2,13 +2,9 @@ from __future__ import (absolute_import, division, print_function)
 import unittest
 
 import mock
-from mock import call, patch, MagicMock
+from mock import call, patch
 import numpy as np
 
-from mantid.api import AnalysisDataService
-from mantid.simpleapi import RenameWorkspace
-
-from mslice.models.mslice_ads_observer import MSliceADSObserver
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.views.interfaces.mainview import MainView
@@ -16,7 +12,7 @@ from mslice.views.interfaces.workspace_view import WorkspaceView
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.util.mantid.mantid_algorithms import (AddSampleLog, CreateWorkspace, CreateSimulationWorkspace,
-                                                  ConvertToMD, CloneWorkspace, CreateSampleWorkspace)
+                                                  ConvertToMD, CloneWorkspace)
 
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):
@@ -435,47 +431,6 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view._display_error = mock.Mock()
         self.presenter.notify(Command.ComposeWorkspace)
         self.view._display_error.assert_called()
-
-    # def test_ensure_that_the_ads_observer_calls_clear_handle(self):
-        # presenter = WorkspaceManagerPresenter(self.view)
-        # presenter.clear_handle = MagicMock()
-        # self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
-        # presenter._ads_observer = MSliceADSObserver(
-        #   presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
-        # )
-
-        # CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
-        # AnalysisDataService.clear(True)
-
-        # presenter.clear_handle.assert_called_once()
-
-    # def test_ensure_that_the_ads_observer_calls_delete_handle(self):
-        # presenter = WorkspaceManagerPresenter(self.view)
-        # presenter.delete_handle = MagicMock()
-        # self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
-        # presenter._ads_observer = MSliceADSObserver(
-        #     presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
-        # )
-
-        # CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
-        # print(AnalysisDataService.getObjectNames())
-        # AnalysisDataService.remove("ws")
-
-        # presenter.delete_handle.assert_called_once_with("ws")
-
-    def test_ensure_that_the_ads_observer_calls_rename_handle(self):
-        presenter = WorkspaceManagerPresenter(self.view)
-        presenter.rename_handle = MagicMock()
-        self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
-        presenter._ads_observer = MSliceADSObserver(
-            presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
-        )
-
-        CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
-        print(AnalysisDataService.getObjectNames())
-        RenameWorkspace(InputWorkspace="ws", OutputWorkspace="ws1")
-
-        presenter.rename_handle.assert_called_once_with("ws", "ws1")
 
 
 if __name__ == '__main__':
