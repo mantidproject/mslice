@@ -458,6 +458,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         )
 
         CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
+        print(AnalysisDataService.getObjectNames())
         AnalysisDataService.remove("ws")
 
         presenter.delete_handle.assert_called_once_with("ws")
@@ -471,6 +472,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         )
 
         CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
+        print(AnalysisDataService.getObjectNames())
         RenameWorkspace(InputWorkspace="ws", OutputWorkspace="ws1")
 
         presenter.rename_handle.assert_called_once_with("ws", "ws1")
