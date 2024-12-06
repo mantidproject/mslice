@@ -3,28 +3,24 @@ import unittest
 
 import mock
 from mock import MagicMock
-import numpy as np
 
 from mantid.api import AnalysisDataService
 from mantid.simpleapi import RenameWorkspace
 
 from mslice.models.mslice_ads_observer import MSliceADSObserver
+from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.views.interfaces.mainview import MainView
 from mslice.views.interfaces.workspace_view import WorkspaceView
-from mslice.util.mantid.mantid_algorithms import CreateWorkspace
-from mslice.util.mantid.algorithm_wrapper import add_to_ads
+from tests.testhelpers.workspace_creator import create_workspace
 
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        x = np.linspace(0, 99, 100)
-        y = x * 1
-        e = y * 0 + 2
-        cls.m_workspace = CreateWorkspace(x, y, e, OutputWorkspace="ws")
+        cls.test_workspace = create_workspace('ws')
 
     def setUp(self):
         self.view = mock.create_autospec(spec=WorkspaceView)
@@ -40,7 +36,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
         )
 
-        add_to_ads(self.m_workspace)
+        export_workspace_to_ads(self.test_workspace)
         AnalysisDataService.remove("ws")
 
         presenter.delete_handle.assert_called_once_with("ws")
@@ -53,7 +49,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
         )
 
-        add_to_ads(self.m_workspace)
+        export_workspace_to_ads(self.test_workspace)
         RenameWorkspace(InputWorkspace="ws", OutputWorkspace="ws1")
 
         presenter.rename_handle.assert_called_once_with("ws", "ws1")
@@ -66,7 +62,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
           presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
         )
 
-        add_to_ads(self.m_workspace)
+        export_workspace_to_ads(self.test_workspace)
         AnalysisDataService.clear(True)
 
         presenter.clear_handle.assert_called_once()
