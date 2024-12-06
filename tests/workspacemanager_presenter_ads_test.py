@@ -31,8 +31,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
           presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
         )
 
-        workspace = CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
-        AnalysisDataService.addOrReplace("ws", workspace)
+        AnalysisDataService.addOrReplace("ws", CreateSampleWorkspace(OutputWorkspace="ws"))
         AnalysisDataService.clear(True)
 
         presenter.clear_handle.assert_called_once()
@@ -45,8 +44,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
         )
 
-        workspace = CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
-        AnalysisDataService.addOrReplace("ws", workspace)
+        AnalysisDataService.addOrReplace("ws", CreateSampleWorkspace(OutputWorkspace="ws"))
         AnalysisDataService.remove("ws")
 
         presenter.delete_handle.assert_called_once_with("ws")
@@ -59,8 +57,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
             presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
         )
 
-        workspace = CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
-        AnalysisDataService.addOrReplace("ws", workspace)
+        AnalysisDataService.addOrReplace("ws", CreateSampleWorkspace(OutputWorkspace="ws"))
         RenameWorkspace(InputWorkspace="ws", OutputWorkspace="ws1")
 
         presenter.rename_handle.assert_called_once_with("ws", "ws1")
