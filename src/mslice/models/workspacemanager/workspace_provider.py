@@ -37,7 +37,7 @@ def get_visible_workspace_names():
 
 
 def get_workspace_names():
-    return [key for key in iterkeys(_loaded_workspaces)]
+    return [key for key in _loaded_workspaces.keys()]
 
 
 def get_workspace_name(workspace):
