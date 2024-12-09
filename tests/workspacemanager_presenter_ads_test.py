@@ -12,6 +12,9 @@ from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresen
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):
 
+    def setUp(self):
+        AnalysisDataService.clear(True)
+
     def test_ensure_that_the_ads_observer_calls_delete_handle(self):
         presenter = WorkspaceManagerPresenter(MagicMock())
         presenter.delete_handle = MagicMock()
