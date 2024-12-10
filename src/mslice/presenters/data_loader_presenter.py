@@ -8,6 +8,7 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.presenters.interfaces.data_loader_presenter import DataLoaderPresenterInterface
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.models.workspacemanager.file_io import load_from_ascii
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 
 
 def apply_fixed_final_energy_to_a_valid_workspace(workspace_name, fixed_final_energy: float):
@@ -39,7 +40,7 @@ class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):
                 if not self.file_types_match(file_paths):
                     self._view.error_merge_different_file_formats()
                     return
-                ws_names = [ws_names[0] + '_merged']
+                ws_names = [WorkspaceNameHandler(ws_names[0]).get_name(merged=True)]
                 file_paths = ['+'.join(file_paths)]
             self._load_ws(file_paths, ws_names, force_overwrite)
 

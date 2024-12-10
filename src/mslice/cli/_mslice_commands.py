@@ -16,6 +16,7 @@ from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
                                         _check_workspace_type, _correct_intensity)
 from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.helperfunctions import WorkspaceNameHandler
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from six import string_types
 from mslice.workspace.histogram_workspace import HistogramWorkspace
@@ -87,7 +88,7 @@ def Load(Filename, OutputWorkspace=None):
     if OutputWorkspace is not None:
         old_name = ospath.splitext(ospath.basename(Filename))[0]
         if merge:
-            old_name = old_name + '_merged'
+            old_name = WorkspaceNameHandler(old_name).get_name(merged=True)
         name = rename_workspace(workspace=old_name, new_name=OutputWorkspace).name
 
     return get_workspace_handle(name)
