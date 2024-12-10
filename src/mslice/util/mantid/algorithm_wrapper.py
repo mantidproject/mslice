@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 from uuid import uuid4
 
 from mslice.models.workspacemanager.workspace_provider import add_workspace, get_workspace_handle

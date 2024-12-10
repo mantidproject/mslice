@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 import unittest
 
 from mslice.models.axis import Axis

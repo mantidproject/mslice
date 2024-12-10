@@ -1,4 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
 from mock import MagicMock, PropertyMock, Mock, ANY
 import unittest
 from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter

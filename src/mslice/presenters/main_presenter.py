@@ -1,4 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
 from .interfaces.main_presenter import MainPresenterInterface
 from mantid.api import IMDHistoWorkspace, IMDEventWorkspace
 from collections.abc import Callable

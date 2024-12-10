@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 from .busy import show_busy
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.presenters.presenter_utility import PresenterUtility

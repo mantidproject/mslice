@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 from mantid.api import WorkspaceUnitValidator
 
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle

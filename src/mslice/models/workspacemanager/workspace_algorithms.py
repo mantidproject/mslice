@@ -4,8 +4,6 @@ Uses mantid algorithms to perform workspace operations
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
-from __future__ import (absolute_import, division, print_function)
-
 import os.path
 from os.path import splitext
 

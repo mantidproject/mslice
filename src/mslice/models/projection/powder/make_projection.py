@@ -1,4 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
 import uuid
 from mantid.api import PythonAlgorithm, MatrixWorkspaceProperty, IMDEventWorkspaceProperty
 from mantid.kernel import FloatArrayProperty, Direction, StringMandatoryValidator

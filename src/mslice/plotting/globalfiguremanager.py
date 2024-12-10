@@ -26,7 +26,6 @@ be added to the category of the command
 
 Currently there are only two categories ('1d' and '2d') hard coded into the manager.
 """
-from __future__ import (absolute_import, division, print_function)
 # system imports
 from functools import wraps
 
