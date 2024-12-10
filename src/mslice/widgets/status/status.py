@@ -5,8 +5,6 @@ Displays information/errors to the user
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
-from __future__ import (absolute_import, division, print_function)
-
 from qtpy.QtWidgets import QWidget
 
 from mslice.util.qt import load_ui

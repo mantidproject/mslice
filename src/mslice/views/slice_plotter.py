@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 import mslice.plotting.pyplot as plt
 
 PICKER_TOL_PTS = 5

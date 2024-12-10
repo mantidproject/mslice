@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 from mslice.app import is_gui
 from mslice.plotting.pyplot import *  # noqa: F401, F403
 from matplotlib.axes import Axes

@@ -16,8 +16,6 @@ In this case we accept that a 1->many mapping if names
 to hex values and both #00bfbf and #00ffff will return
 the string cyan
 """
-from __future__ import (absolute_import, division)
-
 import re
 
 from matplotlib import rcParams
