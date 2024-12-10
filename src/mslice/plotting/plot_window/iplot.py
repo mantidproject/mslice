@@ -1,34 +1,33 @@
-import abc
-from six import add_metaclass
+from abc import ABCMeta, abstractmethod
 
 
-@add_metaclass(abc.ABCMeta)
 class IPlot(object):
+    __metaclass__ = ABCMeta
 
-    @abc.abstractmethod
+    @abstractmethod
     def window_closing(self):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def plot_options(self):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def plot_clicked(self, x, y):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def object_clicked(self, target):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def update_legend(self):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_line_options(self, line):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def set_line_options(self, line, line_options):
         pass

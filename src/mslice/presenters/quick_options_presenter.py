@@ -1,4 +1,3 @@
-from six import string_types
 from matplotlib import text
 from matplotlib.mathtext import MathTextParser
 from mslice.plotting.plot_window.quick_options import QuickAxisOptions, QuickLabelOptions, QuickLineOptions, QuickError
@@ -8,7 +7,7 @@ def quick_options(target, model, has_logarithmic=None, redraw_signal=None):
     """Find which quick_options to use based on type of target"""
     if isinstance(target, text.Text):
         quick_label_options(model.plot_window, target, redraw_signal)
-    elif isinstance(target, string_types):
+    elif isinstance(target, str):
         return quick_axis_options(model.plot_window, target, model, has_logarithmic, redraw_signal)
     else:
         quick_line_options(model.plot_window, target, model)

@@ -1,7 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 from numpy import arange as np_arange
-from six import iteritems
 
 import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
@@ -322,8 +321,8 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
                     '*': 'Star', 'h': 'Hexagon 1', 'H': 'Hexagon 2', '+': 'Plus', 'x': 'X', 'D': 'Diamond',
                     'd': 'Diamond (thin)', '|': 'Vertical line', '_': 'Horizontal line', 'None': 'None'}
 
-    inverse_styles = {v: k for k, v in iteritems(styles)}
-    inverse_markers = {v: k for k, v in iteritems(markers)}
+    inverse_styles = {v: k for k, v in styles.items()}
+    inverse_markers = {v: k for k, v in markers.items()}
 
     def __init__(self, line_options, color_validator, show_legends, remove_line_callback=None):
         super(LegendAndLineOptionsSetter, self).__init__()

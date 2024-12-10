@@ -2,7 +2,6 @@ from qtpy import QtGui, QtWidgets
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.scripting.helperfunctions import add_plot_statements, replace_ws_special_chars
 from mslice.app.presenters import get_cut_plotter_presenter
-from six import string_types
 
 
 def generate_script(ws_name, filename=None, plot_handler=None, window=None, clipboard=False):
@@ -76,7 +75,7 @@ def _parse_prop(prop):
     pname = prop.name()
     hidden = False
     output_ws = None
-    if isinstance(pval, string_types):
+    if isinstance(pval, str):
         pval = pval.replace("__MSL", "").replace("_HIDDEN", "")
     if prop.name() == "OutputWorkspace":
         output_ws = replace_ws_special_chars(pval)

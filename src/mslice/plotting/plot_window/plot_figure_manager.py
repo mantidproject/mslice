@@ -1,7 +1,7 @@
 import os.path
 import weakref
 import io
-import six
+
 from qtpy.QtCore import Qt
 from qtpy import QtCore, QtGui, QtWidgets, QtPrintSupport
 from mslice.util.qt.qapp import (QAppThreadCall, create_qapp_if_required,
@@ -296,7 +296,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.window.move(int(center.x() - x), int(center.y() - y))
 
     def get_window_title(self):
-        return six.text_type(self.window.windowTitle())
+        return str(self.window.windowTitle())
 
     def set_window_title(self, title):
         self.window.setWindowTitle(title)

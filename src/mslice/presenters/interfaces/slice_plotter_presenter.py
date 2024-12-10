@@ -1,18 +1,17 @@
-import abc
-from six import add_metaclass
+from abc import ABCMeta, abstractmethod
 
 
-@add_metaclass(abc.ABCMeta)
 class SlicePlotterPresenterInterface(object):
+    __metaclass__ = ABCMeta
 
-    @abc.abstractmethod
+    @abstractmethod
     def register_master(self, main_view):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def notify(self, command):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def workspace_selection_changed(self):
         pass

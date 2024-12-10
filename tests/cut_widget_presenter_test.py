@@ -4,8 +4,6 @@ from mock import call, patch
 import unittest
 import warnings
 
-from six import string_types
-
 from mslice.models.axis import Axis
 from mslice.models.alg_workspace_ops import get_available_axes
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
@@ -27,7 +25,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         integration_start, integration_end, width = tuple(args[2:5])
         intensity_start, intensity_end, is_norm = tuple(args[5:8])
         workspace, integrated_axis, cut_algorithm = tuple(args[8:11])
-        if isinstance(workspace, string_types):
+        if isinstance(workspace, str):
             workspace = [workspace]
         self.main_presenter.get_selected_workspaces = mock.Mock(return_value=workspace)
         self.view.get_cut_axis = mock.Mock(return_value=axis.units)
