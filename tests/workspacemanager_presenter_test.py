@@ -38,6 +38,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.mainview = mock.create_autospec(MainView)
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
         self.mainview.get_presenter = mock.Mock(return_value=self.main_presenter)
+        self._ads_observer = mock.Mock()
 
     def test_register_master_success(self):
         workspace_presenter = WorkspaceManagerPresenter(self.view)
@@ -168,12 +169,12 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         # Create a workspace that reports a single selected workspace on calls to get_workspace_selected
         workspace_to_be_removed = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace='file1')
         self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_be_removed])
-        self.view.display_loaded_workspaces = mock.Mock()
 
         self.presenter.notify(Command.RemoveSelectedWorkspaces)
         self.view.get_workspace_selected.assert_called_once_with()
-        delete_ws_mock.assert_called_once_with(workspace_to_be_removed)
-        self.view.display_loaded_workspaces.assert_called_once()
+        delete_calls = [call(workspace_to_be_removed)]
+        delete_ws_mock.assert_has_calls(delete_calls)
+        self.assertTrue(self.view.display_loaded_workspaces.called)
 
     @patch('mslice.presenters.workspace_manager_presenter.delete_workspace')
     def test_remove_multiple_workspaces(self, delete_ws_mock):

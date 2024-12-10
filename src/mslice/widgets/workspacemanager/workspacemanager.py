@@ -88,12 +88,15 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
             raise TypeError("Loaded file is not a valid workspace")
 
     def display_loaded_workspaces(self, workspaces):
+        to_be_removed = []
         for workspace in workspaces:
             if workspace not in self.onscreen_workspaces:
                 self.add_workspace(workspace)
         for workspace in self.onscreen_workspaces:
             if workspace not in workspaces:
-                self.remove_workspace(workspace)
+                to_be_removed.append(workspace)
+        for workspace in to_be_removed:
+            self.remove_workspace(workspace)
 
     def remove_workspace(self, workspace):
         """Remove workspace from list.
