@@ -34,6 +34,10 @@ def get_visible_workspace_names():
     return [key for key in _loaded_workspaces.keys() if key[:2] != '__']
 
 
+def get_workspace_names():
+    return [key for key in _loaded_workspaces.keys()]
+
+
 def get_workspace_name(workspace):
     """Returns the name of a workspace given the workspace handle"""
     if isinstance(workspace, str):

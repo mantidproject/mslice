@@ -3,13 +3,15 @@ from __future__ import (absolute_import, division, print_function)
 from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
+from mslice.models.mslice_ads_observer import MSliceADSObserver
 from mslice.models.workspacemanager.file_io import get_save_directory
 from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads, subtract,
                                                                  is_pixel_workspace, combine_workspace,
                                                                  add_workspace_runs, scale_workspaces,
                                                                  remove_workspace_from_ads)
 from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
-                                                               get_workspace_name, delete_workspace, rename_workspace)
+                                                               get_workspace_names, get_workspace_name,
+                                                               delete_workspace, rename_workspace)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -37,6 +39,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 lambda: self._workspace_manager_view._display_error('Please select a Compose action from the dropdown menu'),
             Command.Scale: self._scale_workspace,
             Command.Bose: lambda: self._scale_workspace(is_bose=True)}
+        self._ads_observer = MSliceADSObserver(self.delete_handle, self.clear_handle, self.rename_handle)
 
     def register_master(self, main_presenter):
         assert (isinstance(main_presenter, MainPresenterInterface))
@@ -227,3 +230,19 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def _clear_displayed_error(self):
         self._workspace_manager_view.clear_displayed_error()
+
+    def delete_handle(self, workspace):
+        delete_workspace(workspace)
+        self.update_displayed_workspaces()
+
+    def clear_handle(self):
+        for workspace in get_workspace_names():
+            delete_workspace(workspace)
+        self.update_displayed_workspaces()
+
+    def rename_handle(self, workspace, new_name):
+        if new_name is None:
+            return
+        if workspace in get_visible_workspace_names():
+            rename_workspace(workspace, new_name)
+            self.update_displayed_workspaces()
