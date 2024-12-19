@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 from mslice.views.interfaces.powder_projection_view import PowderView
 
 

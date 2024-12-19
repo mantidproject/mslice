@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 from numpy import arange as np_arange
 
 import qtpy.QtWidgets as QtWidgets

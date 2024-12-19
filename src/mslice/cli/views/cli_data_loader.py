@@ -1,6 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
-
 class CLIDataLoaderWidget:
     """
     A Dataloader Widget dummy class to interface with the presenter classes without doing anything in CLI mode.

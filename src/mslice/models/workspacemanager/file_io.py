@@ -1,4 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
 import os.path
 from qtpy.QtWidgets import QFileDialog
 from mantid.api import MDNormalization

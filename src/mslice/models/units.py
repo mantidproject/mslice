@@ -4,8 +4,6 @@ At present only the energy units "meV" ("DeltaE") and "cm-1" ("DeltaE_inWavenumb
 are defined, but they are separated into a module for possible future expansion.
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import numpy as np
 
 
