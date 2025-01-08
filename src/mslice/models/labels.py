@@ -1,6 +1,5 @@
 """Module to create axis and legend labels"""
 
-from __future__ import (absolute_import, division, print_function)
 from mslice.models.units import EnergyUnits
 
 CUT_INTENSITY_LABEL = 'Signal/#Events'

@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
-
 from .busy import show_busy
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD

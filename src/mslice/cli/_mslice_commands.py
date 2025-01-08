@@ -1,6 +1,4 @@
 """Defines the additional mslice commands on top of the standard matplotlib plotting commands"""
-from __future__ import (absolute_import, division, print_function)
-
 import os.path as ospath
 
 import matplotlib as mpl

@@ -1,4 +1,3 @@
-from __future__ import (absolute_import, division, print_function)
 import numpy as np
 import operator as op
 from mslice.util.numpy_helper import apply_with_corrected_shape, transform_array_to_workspace
