@@ -46,7 +46,10 @@ def get_workspace_name(workspace):
 
 
 def delete_workspace(workspace):
-    workspace = get_workspace_handle(workspace)
+    try:
+        workspace = get_workspace_handle(workspace)
+    except KeyError:
+        return None
     remove_workspace(workspace)
     del workspace
 
