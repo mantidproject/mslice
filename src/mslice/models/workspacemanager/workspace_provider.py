@@ -19,12 +19,18 @@ def add_workspace(workspace, name):
 
 
 def remove_workspace(workspace):
-    workspace = get_workspace_handle(workspace)
+    try:
+        workspace = get_workspace_handle(workspace)
+    except KeyError:
+        return
     del _loaded_workspaces[workspace.name]
 
 
 def rename_workspace(workspace, new_name):
-    workspace = get_workspace_handle(workspace)
+    try:
+        workspace = get_workspace_handle(workspace)
+    except KeyError:
+        return
     _loaded_workspaces[new_name] = _loaded_workspaces.pop(workspace.name)
     workspace.name = new_name
     return workspace
@@ -49,7 +55,7 @@ def delete_workspace(workspace):
     try:
         workspace = get_workspace_handle(workspace)
     except KeyError:
-        return None
+        return
     remove_workspace(workspace)
     del workspace
 
