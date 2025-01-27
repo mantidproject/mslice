@@ -4,7 +4,6 @@ Fake object classes used for the purposes of testing.
 
 
 class FakeClipboard:
-
     Clipboard = None
 
     def __init__(self):
@@ -15,7 +14,6 @@ class FakeClipboard:
 
 
 class FakeFile:
-
     def __init__(self):
         self.text = ""
 

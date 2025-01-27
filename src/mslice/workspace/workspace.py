@@ -1,6 +1,11 @@
 from .base import WorkspaceBase
 from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
-from .helperfunctions import attribute_from_log, attribute_to_log, delete_workspace, rename_workspace
+from .helperfunctions import (
+    attribute_from_log,
+    attribute_to_log,
+    delete_workspace,
+    rename_workspace,
+)
 from .common_workspace_properties import CommonWorkspaceProperties
 
 from mantid.api import MatrixWorkspace
@@ -8,14 +13,19 @@ from mantid.api import MatrixWorkspace
 import re
 
 
-class Workspace(WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWorkspaceProperties):
+class Workspace(
+    WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWorkspaceProperties
+):
     """workspace wrapper for MatrixWorkspace"""
 
     def __init__(self, mantid_ws, name):
         if isinstance(mantid_ws, MatrixWorkspace):
             self._raw_ws = mantid_ws
         else:
-            raise TypeError('Workspace expected matrixWorkspace, got %s' % mantid_ws.__class__.__name__)
+            raise TypeError(
+                "Workspace expected matrixWorkspace, got %s"
+                % mantid_ws.__class__.__name__
+            )
         CommonWorkspaceProperties.__init__(self)
         self._name = name
         self._cut_params = {}
@@ -30,7 +40,9 @@ class Workspace(WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWor
     @WorkspaceMixin.name.setter
     def name(self, new_name: str):
         raw_name = str(self.raw_ws)
-        rename_workspace(raw_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, raw_name))
+        rename_workspace(
+            raw_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, raw_name)
+        )
 
         self._name = new_name
 
@@ -48,7 +60,7 @@ class Workspace(WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWor
 
     def save_attributes(self):
         attrdict = {}
-        for k, v in [['axes', self.axes]]:
+        for k, v in [["axes", self.axes]]:
             if k:
                 attrdict[k] = v
         attribute_to_log(attrdict, self.raw_ws)

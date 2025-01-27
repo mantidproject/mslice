@@ -15,8 +15,12 @@ from mslice.models.workspacemanager.workspace_provider import get_workspace_hand
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
-from mslice.plotting.plot_window.overplot_interface import (_update_overplot_lines, _update_powder_lines,
-                                                            toggle_overplot_line, cif_file_powder_line)
+from mslice.plotting.plot_window.overplot_interface import (
+    _update_overplot_lines,
+    _update_powder_lines,
+    toggle_overplot_line,
+    cif_file_powder_line,
+)
 from mslice.plotting.pyplot import GlobalFigureManager
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
@@ -31,7 +35,6 @@ DEFAULT_FONT_SIZE_STEP = 1
 
 
 class SlicePlot(IPlot):
-
     def __init__(self, figure_manager, slice_plotter_presenter, workspace_name):
         self.manager = figure_manager
         self.plot_window = figure_manager.window
@@ -56,40 +59,39 @@ class SlicePlot(IPlot):
         self.temp = None
         self.default_options = None
         self.plot_fonts_properties = [
-            'title_size',
-            'x_range_font_size',
-            'y_range_font_size',
-            'x_label_size',
-            'y_label_size',
-            'colorbar_label_size',
-            'colorbar_range_font_size'
+            "title_size",
+            "x_range_font_size",
+            "y_range_font_size",
+            "x_label_size",
+            "y_label_size",
+            "colorbar_label_size",
+            "colorbar_range_font_size",
         ]
 
     def save_default_options(self):
         self.default_options = {
-            'colorbar_label': self.colorbar_label,
-            'colorbar_label_size': DEFAULT_LABEL_SIZE,
-            'colorbar_log': self.colorbar_log,
-            'colorbar_range': self.colorbar_range,
-            'colorbar_range_font_size': DEFAULT_LABEL_SIZE,
-            'intensity': self.intensity,
-            'intensity_type': self.intensity_type,
-            'temp': self.temp,
-            'temp_dependent': self.temp_dependent,
-
-            'title': self.ws_name,
-            'title_size': DEFAULT_TITLE_SIZE,
-            'x_label': r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
-            'x_label_size': DEFAULT_LABEL_SIZE,
-            'x_grid': False,
-            'x_range': self.x_range,
-            'x_range_font_size': DEFAULT_LABEL_SIZE,
-            'y_label': 'Energy Transfer (meV)',
-            'y_label_size': DEFAULT_LABEL_SIZE,
-            'y_grid': False,
-            'y_range': self.y_range,
-            'y_range_font_size': DEFAULT_LABEL_SIZE,
-            'legend': True,
+            "colorbar_label": self.colorbar_label,
+            "colorbar_label_size": DEFAULT_LABEL_SIZE,
+            "colorbar_log": self.colorbar_log,
+            "colorbar_range": self.colorbar_range,
+            "colorbar_range_font_size": DEFAULT_LABEL_SIZE,
+            "intensity": self.intensity,
+            "intensity_type": self.intensity_type,
+            "temp": self.temp,
+            "temp_dependent": self.temp_dependent,
+            "title": self.ws_name,
+            "title_size": DEFAULT_TITLE_SIZE,
+            "x_label": r"$|Q|$ ($\mathrm{\AA}^{-1}$)",
+            "x_label_size": DEFAULT_LABEL_SIZE,
+            "x_grid": False,
+            "x_range": self.x_range,
+            "x_range_font_size": DEFAULT_LABEL_SIZE,
+            "y_label": "Energy Transfer (meV)",
+            "y_label_size": DEFAULT_LABEL_SIZE,
+            "y_grid": False,
+            "y_range": self.y_range,
+            "y_range_font_size": DEFAULT_LABEL_SIZE,
+            "legend": True,
         }
 
     def setup_connections(self, plot_window):
@@ -104,47 +106,119 @@ class SlicePlot(IPlot):
         plot_window.action_save_image.setVisible(True)
         plot_window.action_plot_options.setVisible(True)
         plot_window.action_interactive_cuts.setVisible(True)
-        plot_window.action_interactive_cuts.triggered.connect(self.toggle_interactive_cuts)
+        plot_window.action_interactive_cuts.triggered.connect(
+            self.toggle_interactive_cuts
+        )
         plot_window.action_save_cut.setVisible(False)
         plot_window.action_save_cut.triggered.connect(self.save_icut)
         plot_window.action_flip_axis.setVisible(False)
         plot_window.action_flip_axis.triggered.connect(self.flip_icut)
         plot_window.action_waterfall.setVisible(False)
 
-        plot_window.action_sqe.triggered.connect(partial(self.show_intensity_plot, plot_window.action_sqe,
-                                                 self._slice_plotter_presenter.show_scattering_function, False))
-        plot_window.action_chi_qe.triggered.connect(partial(self.show_intensity_plot, plot_window.action_chi_qe,
-                                                    self._slice_plotter_presenter.show_dynamical_susceptibility, True))
+        plot_window.action_sqe.triggered.connect(
+            partial(
+                self.show_intensity_plot,
+                plot_window.action_sqe,
+                self._slice_plotter_presenter.show_scattering_function,
+                False,
+            )
+        )
+        plot_window.action_chi_qe.triggered.connect(
+            partial(
+                self.show_intensity_plot,
+                plot_window.action_chi_qe,
+                self._slice_plotter_presenter.show_dynamical_susceptibility,
+                True,
+            )
+        )
         plot_window.action_chi_qe_magnetic.triggered.connect(
-            partial(self.show_intensity_plot, plot_window.action_chi_qe_magnetic,
-                    self._slice_plotter_presenter.show_dynamical_susceptibility_magnetic, True))
-        plot_window.action_d2sig_dw_de.triggered.connect(partial(self.show_intensity_plot, plot_window.action_d2sig_dw_de,
-                                                         self._slice_plotter_presenter.show_d2sigma, False))
+            partial(
+                self.show_intensity_plot,
+                plot_window.action_chi_qe_magnetic,
+                self._slice_plotter_presenter.show_dynamical_susceptibility_magnetic,
+                True,
+            )
+        )
+        plot_window.action_d2sig_dw_de.triggered.connect(
+            partial(
+                self.show_intensity_plot,
+                plot_window.action_d2sig_dw_de,
+                self._slice_plotter_presenter.show_d2sigma,
+                False,
+            )
+        )
         plot_window.action_symmetrised_sqe.triggered.connect(
-            partial(self.show_intensity_plot, plot_window.action_symmetrised_sqe,
-                    self._slice_plotter_presenter.show_symmetrised, True))
+            partial(
+                self.show_intensity_plot,
+                plot_window.action_symmetrised_sqe,
+                self._slice_plotter_presenter.show_symmetrised,
+                True,
+            )
+        )
         plot_window.action_gdos.triggered.connect(
-            partial(self.show_intensity_plot, plot_window.action_gdos, self._slice_plotter_presenter.show_gdos, True))
+            partial(
+                self.show_intensity_plot,
+                plot_window.action_gdos,
+                self._slice_plotter_presenter.show_gdos,
+                True,
+            )
+        )
 
         plot_window.action_hydrogen.triggered.connect(
-            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 1, True))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 1, True)
+        )
         plot_window.action_deuterium.triggered.connect(
-            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 2, True))
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 2, True)
+        )
         plot_window.action_helium.triggered.connect(
-            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 4, True))
-        plot_window.action_arbitrary_nuclei.triggered.connect(self.arbitrary_recoil_line)
+            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 4, True)
+        )
+        plot_window.action_arbitrary_nuclei.triggered.connect(
+            self.arbitrary_recoil_line
+        )
         plot_window.action_aluminium.triggered.connect(
-            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Aluminium', False))
+            partial(
+                toggle_overplot_line,
+                self,
+                self._slice_plotter_presenter,
+                "Aluminium",
+                False,
+            )
+        )
         plot_window.action_copper.triggered.connect(
-            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Copper', False))
+            partial(
+                toggle_overplot_line,
+                self,
+                self._slice_plotter_presenter,
+                "Copper",
+                False,
+            )
+        )
         plot_window.action_niobium.triggered.connect(
-            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Niobium', False))
+            partial(
+                toggle_overplot_line,
+                self,
+                self._slice_plotter_presenter,
+                "Niobium",
+                False,
+            )
+        )
         plot_window.action_tantalum.triggered.connect(
-            partial(toggle_overplot_line, self, self._slice_plotter_presenter, 'Tantalum', False))
-        plot_window.action_cif_file.triggered.connect(partial(cif_file_powder_line, self,
-                                                              self._slice_plotter_presenter))
+            partial(
+                toggle_overplot_line,
+                self,
+                self._slice_plotter_presenter,
+                "Tantalum",
+                False,
+            )
+        )
+        plot_window.action_cif_file.triggered.connect(
+            partial(cif_file_powder_line, self, self._slice_plotter_presenter)
+        )
         plot_window.action_gen_script.triggered.connect(self.generate_script)
-        plot_window.action_gen_script_clipboard.triggered.connect(lambda: self.generate_script(clipboard=True))
+        plot_window.action_gen_script_clipboard.triggered.connect(
+            lambda: self.generate_script(clipboard=True)
+        )
 
     def disconnect(self, plot_window):
         plot_window.action_interactive_cuts.triggered.disconnect()
@@ -174,18 +248,30 @@ class SlicePlot(IPlot):
             self.icut = None
 
     def plot_options(self):
-        SlicePlotOptionsPresenter(SlicePlotOptions(self.plot_window, redraw_signal=self.plot_window.redraw), self)
+        SlicePlotOptionsPresenter(
+            SlicePlotOptions(self.plot_window, redraw_signal=self.plot_window.redraw),
+            self,
+        )
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
-        if bounds['x_label'] < y < bounds['title']:
-            if bounds['y_label'] < x < bounds['colorbar_label']:
-                if y < bounds['x_range']:
-                    quick_options('x_range', self, redraw_signal=self.plot_window.redraw)
-                elif x < bounds['y_range']:
-                    quick_options('y_range', self, redraw_signal=self.plot_window.redraw)
-                elif x > bounds['colorbar_range']:
-                    quick_options('colorbar_range', self, self.colorbar_log, redraw_signal=self.plot_window.redraw)
+        if bounds["x_label"] < y < bounds["title"]:
+            if bounds["y_label"] < x < bounds["colorbar_label"]:
+                if y < bounds["x_range"]:
+                    quick_options(
+                        "x_range", self, redraw_signal=self.plot_window.redraw
+                    )
+                elif x < bounds["y_range"]:
+                    quick_options(
+                        "y_range", self, redraw_signal=self.plot_window.redraw
+                    )
+                elif x > bounds["colorbar_range"]:
+                    quick_options(
+                        "colorbar_range",
+                        self,
+                        self.colorbar_log,
+                        redraw_signal=self.plot_window.redraw,
+                    )
 
     def object_clicked(self, target):
         if isinstance(target, Legend):
@@ -211,7 +297,7 @@ class SlicePlot(IPlot):
 
         if handles:
             # Uses the 'upper right' location because 'best' causes very slow plotting for large datasets.
-            axes.legend(handles, labels, fontsize='medium', loc='upper right')
+            axes.legend(handles, labels, fontsize="medium", loc="upper right")
             legend_set_draggable(axes.get_legend(), True)
         else:
             legend = axes.get_legend()
@@ -242,34 +328,34 @@ class SlicePlot(IPlot):
 
     def get_line_options(self, target):
         line_options = {
-            'label': target.get_label(),
-            'legend': None,
-            'shown': None,
-            'color': to_hex(target.get_color()),
-            'style': target.get_linestyle(),
-            'width': str(target.get_linewidth()),
-            'marker': target.get_marker(),
-            'error_bar': None
+            "label": target.get_label(),
+            "legend": None,
+            "shown": None,
+            "color": to_hex(target.get_color()),
+            "style": target.get_linestyle(),
+            "width": str(target.get_linewidth()),
+            "marker": target.get_marker(),
+            "error_bar": None,
         }
         return line_options
 
     def set_line_options(self, line, line_options):
-        line.set_label(line_options['label'])
-        line.set_linestyle(line_options['style'])
-        line.set_marker(line_options['marker'])
-        line.set_color(name_to_color(line_options['color']))
-        line.set_linewidth(line_options['width'])
+        line.set_label(line_options["label"])
+        line.set_linestyle(line_options["style"])
+        line.set_marker(line_options["marker"])
+        line.set_color(name_to_color(line_options["color"]))
+        line.set_linewidth(line_options["width"])
 
     def calc_figure_boundaries(self):
         fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
         bounds = {}
-        bounds['y_label'] = fig_x * 0.07
-        bounds['y_range'] = fig_x * 0.12
-        bounds['colorbar_range'] = fig_x * 0.75
-        bounds['colorbar_label'] = fig_x * 0.86
-        bounds['title'] = fig_y * 0.9
-        bounds['x_range'] = fig_y * 0.09
-        bounds['x_label'] = fig_y * 0.05
+        bounds["y_label"] = fig_x * 0.07
+        bounds["y_range"] = fig_x * 0.12
+        bounds["colorbar_range"] = fig_x * 0.75
+        bounds["colorbar_label"] = fig_x * 0.86
+        bounds["title"] = fig_y * 0.9
+        bounds["x_range"] = fig_y * 0.09
+        bounds["x_label"] = fig_y * 0.05
         return bounds
 
     def arbitrary_recoil_line(self):
@@ -277,13 +363,26 @@ class SlicePlot(IPlot):
         checked = self.plot_window.action_arbitrary_nuclei.isChecked()
         if checked:
             self._arb_nuclei_rmm, confirm = QtWidgets.QInputDialog.getInt(
-                self.plot_window, 'Arbitrary Nuclei', 'Enter relative mass:', min=1)
+                self.plot_window, "Arbitrary Nuclei", "Enter relative mass:", min=1
+            )
             if confirm:
-                toggle_overplot_line(self, self._slice_plotter_presenter, self._arb_nuclei_rmm, recoil, checked)
+                toggle_overplot_line(
+                    self,
+                    self._slice_plotter_presenter,
+                    self._arb_nuclei_rmm,
+                    recoil,
+                    checked,
+                )
             else:
                 self.plot_window.action_arbitrary_nuclei.setChecked(not checked)
         else:
-            toggle_overplot_line(self, self._slice_plotter_presenter, self._arb_nuclei_rmm, recoil, checked)
+            toggle_overplot_line(
+                self,
+                self._slice_plotter_presenter,
+                self._arb_nuclei_rmm,
+                recoil,
+                checked,
+            )
 
     def _reset_intensity(self):
         options = self.plot_window.menu_intensity.actions()
@@ -301,17 +400,21 @@ class SlicePlot(IPlot):
         intensity.setChecked(True)
 
     def show_intensity_plot(self, action, slice_plotter_method, temp_dependent):
-        last_active_figure_number, disable_make_current_after_plot = \
+        last_active_figure_number, disable_make_current_after_plot = (
             self.manager.report_as_current_and_return_previous_status()
+        )
         if not self.default_options:
             self.save_default_options()
-        self.default_options['temp_dependent'] = temp_dependent
+        self.default_options["temp_dependent"] = temp_dependent
         self.temp_dependent = temp_dependent
-        self.default_options['intensity'] = True
+        self.default_options["intensity"] = True
         self.intensity = True
-        self.default_options['intensity_type'] = \
-            IntensityCache.get_intensity_type_from_desc(slice_plotter_method.__name__[5:])
-        self.intensity_type = self.default_options['intensity_type']
+        self.default_options["intensity_type"] = (
+            IntensityCache.get_intensity_type_from_desc(
+                slice_plotter_method.__name__[5:]
+            )
+        )
+        self.intensity_type = self.default_options["intensity_type"]
 
         if action.isChecked():
             previous = self.selected_intensity()
@@ -321,14 +424,18 @@ class SlicePlot(IPlot):
             title = self.title
             if temp_dependent:
                 if not self._run_temp_dependent(slice_plotter_method, previous):
-                    self.manager.reset_current_figure_as_previous(last_active_figure_number, disable_make_current_after_plot)
+                    self.manager.reset_current_figure_as_previous(
+                        last_active_figure_number, disable_make_current_after_plot
+                    )
                     return
             else:
                 slice_plotter_method(self.ws_name)
             self.update_canvas(cbar_range, cbar_log, title)
         else:
             action.setChecked(True)
-        self.manager.reset_current_figure_as_previous(last_active_figure_number, disable_make_current_after_plot)
+        self.manager.reset_current_figure_as_previous(
+            last_active_figure_number, disable_make_current_after_plot
+        )
         if self.icut:
             self.icut.refresh_current_cut()
 
@@ -339,10 +446,14 @@ class SlicePlot(IPlot):
         self._update_lines()
         self._canvas.draw()
 
-    def _run_temp_dependent(self, slice_plotter_method: Callable, previous: QtWidgets.QAction) -> bool:
+    def _run_temp_dependent(
+        self, slice_plotter_method: Callable, previous: QtWidgets.QAction
+    ) -> bool:
         try:
             slice_plotter_method(self.ws_name)
-        except ValueError:  # sample temperature not yet set, get it and reattempt method
+        except (
+            ValueError
+        ):  # sample temperature not yet set, get it and reattempt method
             if self._set_sample_temperature(previous):
                 slice_plotter_method(self.ws_name)
             else:  # failed to get sample temperature
@@ -366,38 +477,44 @@ class SlicePlot(IPlot):
             temp_value = get_sample_temperature_from_string(temp_value_raw)
 
         if temp_value is None or temp_value < 0:
-            self.plot_window.display_error("Invalid value entered for sample temperature. Enter a value in Kelvin \
-                                            or a sample log field.")
+            self.plot_window.display_error(
+                "Invalid value entered for sample temperature. Enter a value in Kelvin \
+                                            or a sample log field."
+            )
             return False
 
-        self.default_options['temp'] = temp_value
+        self.default_options["temp"] = temp_value
         self.temp = temp_value
         self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value)
         return True
 
     def ask_sample_temperature_field(self, ws_name: str) -> str:
-        text = 'Sample temperature not found. Select the sample temperature field or enter a value in Kelvin:'
+        text = "Sample temperature not found. Select the sample temperature field or enter a value in Kelvin:"
         ws = get_workspace_handle(ws_name)
         try:
             keys = ws.raw_ws.run().keys()
         except AttributeError:
             keys = ws.raw_ws.getExperimentInfo(0).run().keys()
-        temp_field, confirm = QtWidgets.QInputDialog.getItem(self.plot_window, 'Sample Temperature', text, keys)
+        temp_field, confirm = QtWidgets.QInputDialog.getItem(
+            self.plot_window, "Sample Temperature", text, keys
+        )
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
             return str(temp_field), temp_field in keys
 
     def _update_recoil_lines(self):
-        """ Updates the recoil overplots lines when intensity type changes """
-        lines = {self.plot_window.action_hydrogen: [1, True, ''],
-                 self.plot_window.action_deuterium: [2, True, ''],
-                 self.plot_window.action_helium: [4, True, ''],
-                 self.plot_window.action_arbitrary_nuclei: [self._arb_nuclei_rmm, True, '']}
+        """Updates the recoil overplots lines when intensity type changes"""
+        lines = {
+            self.plot_window.action_hydrogen: [1, True, ""],
+            self.plot_window.action_deuterium: [2, True, ""],
+            self.plot_window.action_helium: [4, True, ""],
+            self.plot_window.action_arbitrary_nuclei: [self._arb_nuclei_rmm, True, ""],
+        }
         _update_overplot_lines(self._slice_plotter_presenter, self.ws_name, lines)
 
     def _update_lines(self):
-        """ Updates the powder/recoil overplots lines when intensity type changes """
+        """Updates the powder/recoil overplots lines when intensity type changes"""
         self._update_recoil_lines()
         _update_powder_lines(self, self._slice_plotter_presenter)
         self.update_legend()
@@ -479,7 +596,9 @@ class SlicePlot(IPlot):
 
     @colorbar_label.setter
     def colorbar_label(self, value):
-        self._canvas.figure.get_axes()[1].set_ylabel(value, labelpad=20, rotation=270, picker=5)
+        self._canvas.figure.get_axes()[1].set_ylabel(
+            value, labelpad=20, rotation=270, picker=5
+        )
 
     @property
     def colorbar_label_size(self):
@@ -503,7 +622,9 @@ class SlicePlot(IPlot):
 
     @colorbar_range_font_size.setter
     def colorbar_range_font_size(self, value):
-        self._canvas.figure.get_axes()[1].tick_params(axis='y', which='both', labelsize=value)
+        self._canvas.figure.get_axes()[1].tick_params(
+            axis="y", which="both", labelsize=value
+        )
 
     @property
     def colorbar_log(self):

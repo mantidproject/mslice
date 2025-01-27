@@ -1,13 +1,21 @@
 import numpy as np
 
-from mslice.views.cut_plotter import plot_cut_impl, draw_interactive_cut, cut_figure_exists, get_current_plot
+from mslice.views.cut_plotter import (
+    plot_cut_impl,
+    draw_interactive_cut,
+    cut_figure_exists,
+    get_current_plot,
+)
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
-from mslice.plotting.plot_window.overplot_interface import remove_line, plot_overplot_line
+from mslice.plotting.plot_window.overplot_interface import (
+    remove_line,
+    plot_overplot_line,
+)
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.workspacemanager.workspace_provider import add_workspace
@@ -21,7 +29,9 @@ BRAGG_SIZE_ON_AXES = 0.15
 
 class CutPlotterPresenter(PresenterUtility):
     _current_icut = None  # static variable, as only one icut can be open at any time.
-    _prepared_cut_for_cache = None  # static variable, used and reset to None upon plotting of a cut
+    _prepared_cut_for_cache = (
+        None  # static variable, used and reset to None upon plotting of a cut
+    )
     # needs to be static as icut design means that icut does not have access to correct CPP on first plot
 
     def __init__(self):
@@ -42,12 +52,27 @@ class CutPlotterPresenter(PresenterUtility):
         else:
             self._plot_cut(workspace, cut, plot_over)
 
-    def _plot_cut(self, workspace, cut, plot_over, store=True, update_main=True,
-                  intensity_correction=IntensityType.SCATTERING_FUNCTION, final_plot=True):
+    def _plot_cut(
+        self,
+        workspace,
+        cut,
+        plot_over,
+        store=True,
+        update_main=True,
+        intensity_correction=IntensityType.SCATTERING_FUNCTION,
+        final_plot=True,
+    ):
         cut_axis = cut.cut_axis
         integration_axis = cut.integration_axis
         if not cut.cut_ws:
-            cut.cut_ws = compute_cut(workspace, cut_axis, integration_axis, cut.norm_to_one, cut.algorithm, store)
+            cut.cut_ws = compute_cut(
+                workspace,
+                cut_axis,
+                integration_axis,
+                cut.norm_to_one,
+                cut.algorithm,
+                store,
+            )
             self.prepare_cut_for_cache(cut)
         if intensity_correction == IntensityType.SCATTERING_FUNCTION:
             cut_ws = cut.cut_ws
@@ -56,11 +81,25 @@ class CutPlotterPresenter(PresenterUtility):
             cut_ws = cut.get_intensity_corrected_ws(intensity_correction)
             intensity_range = cut.get_corrected_intensity_range(intensity_correction)
         ws_label_name = workspace.parent if workspace.parent else workspace.name
-        legend = generate_legend(ws_label_name, integration_axis.units, integration_axis.start, integration_axis.end)
-        en_conversion = self._main_presenter.is_energy_conversion_allowed() if self._main_presenter else True
+        legend = generate_legend(
+            ws_label_name,
+            integration_axis.units,
+            integration_axis.start,
+            integration_axis.end,
+        )
+        en_conversion = (
+            self._main_presenter.is_energy_conversion_allowed()
+            if self._main_presenter
+            else True
+        )
         plot_cut_impl(cut_ws, intensity_range, plot_over, legend, en_conversion)
         current_plot_intensity = self.get_current_plot_intensity()
-        if final_plot and plot_over and current_plot_intensity and not intensity_correction == current_plot_intensity:
+        if (
+            final_plot
+            and plot_over
+            and current_plot_intensity
+            and not intensity_correction == current_plot_intensity
+        ):
             self.apply_intensity_correction_after_plot_over(current_plot_intensity)
         if update_main:
             self.set_is_icut(False)
@@ -80,7 +119,10 @@ class CutPlotterPresenter(PresenterUtility):
         """This function handles the width parameter."""
         integration_start = cut.integration_axis.start
         integration_end = cut.integration_axis.end
-        cut_start, cut_end = integration_start, min(integration_start + cut.width, integration_end)
+        cut_start, cut_end = (
+            integration_start,
+            min(integration_start + cut.width, integration_end),
+        )
         while cut_start != cut_end:
             cut.integration_axis.start = cut_start
             cut.integration_axis.end = cut_end
@@ -122,11 +164,26 @@ class CutPlotterPresenter(PresenterUtility):
 
     @staticmethod
     def _cut_is_equal(cached_cut, cut):
-        cached_cut_params = [cached_cut.cut_axis, cached_cut.integration_axis, cached_cut.intensity_start,
-                             cached_cut.intensity_end, cached_cut.norm_to_one, cached_cut.width, cached_cut.algorithm,
-                             cached_cut.cut_ws]
-        cut_params = [cut.cut_axis, cut.integration_axis, cut.intensity_start, cut.intensity_end,
-                      cut.norm_to_one, cut.width, cut.algorithm, cut.cut_ws]
+        cached_cut_params = [
+            cached_cut.cut_axis,
+            cached_cut.integration_axis,
+            cached_cut.intensity_start,
+            cached_cut.intensity_end,
+            cached_cut.norm_to_one,
+            cached_cut.width,
+            cached_cut.algorithm,
+            cached_cut.cut_ws,
+        ]
+        cut_params = [
+            cut.cut_axis,
+            cut.integration_axis,
+            cut.intensity_start,
+            cut.intensity_end,
+            cut.norm_to_one,
+            cut.width,
+            cut.algorithm,
+            cut.cut_ws,
+        ]
         if cached_cut_params == cut_params:
             return True
         else:
@@ -140,7 +197,13 @@ class CutPlotterPresenter(PresenterUtility):
         return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
 
     def save_cut_to_workspace(self, workspace, cut):
-        cut_ws = compute_cut(workspace, cut.cut_axis, cut.integration_axis, cut.norm_to_one, cut.algorithm)
+        cut_ws = compute_cut(
+            workspace,
+            cut.cut_axis,
+            cut.integration_axis,
+            cut.norm_to_one,
+            cut.algorithm,
+        )
         self._main_presenter.update_displayed_workspaces()
         export_workspace_to_ads(cut_ws)
 
@@ -150,14 +213,25 @@ class CutPlotterPresenter(PresenterUtility):
             self.plot_cut_from_workspace(workspace_name, plot_over)
             plot_over = True  # plot over if multiple workspaces selected
 
-    def plot_cut_from_workspace(self, workspace, plot_over=False, intensity_range=(None, None)):
+    def plot_cut_from_workspace(
+        self, workspace, plot_over=False, intensity_range=(None, None)
+    ):
         workspace = get_workspace_handle(workspace)
-        lines = plot_cut_impl(workspace, intensity_range=intensity_range, plot_over=plot_over)
+        lines = plot_cut_impl(
+            workspace, intensity_range=intensity_range, plot_over=plot_over
+        )
         self.set_is_icut(False)
         return lines
 
     def plot_interactive_cut(self, workspace, cut, store, intensity_correction):
-        self._plot_cut(workspace, cut, False, store, update_main=False, intensity_correction=intensity_correction)
+        self._plot_cut(
+            workspace,
+            cut,
+            False,
+            store,
+            update_main=False,
+            intensity_correction=intensity_correction,
+        )
         draw_interactive_cut(workspace)
         self.set_icut_cut(cut)
 
@@ -183,10 +257,22 @@ class CutPlotterPresenter(PresenterUtility):
             total_steps = np.log10(y2 / y1) + 1
 
         adj_factor = total_steps * portion_of_axes / 2
-        return np.resize(np.array([10 ** adj_factor, 10 ** (-adj_factor), np.nan]), size) * datum
+        return (
+            np.resize(np.array([10**adj_factor, 10 ** (-adj_factor), np.nan]), size)
+            * datum
+        )
 
-    def add_overplot_line(self, workspace_name, key, recoil, cif=None, e_is_logarithmic=None, datum=0,
-                          intensity_correction=IntensityType.SCATTERING_FUNCTION, **kwargs):
+    def add_overplot_line(
+        self,
+        workspace_name,
+        key,
+        recoil,
+        cif=None,
+        e_is_logarithmic=None,
+        datum=0,
+        intensity_correction=IntensityType.SCATTERING_FUNCTION,
+        **kwargs,
+    ):
         cache = self._cut_cache_dict[plt.gca()][0]
         if cache.rotated:
             warnings.warn("No Bragg peak found as cut has no |Q| dimension.")
@@ -196,7 +282,7 @@ class CutPlotterPresenter(PresenterUtility):
             workspace_name = ws_handle.parent
         except KeyError:
             # Workspace is interactively generated and is not in the workspace list
-            workspace_name = workspace_name.split('(')[0][:-4]
+            workspace_name = workspace_name.split("(")[0][:-4]
 
         # Get 10% of the maximum signal
         scale_fac = self._get_overall_max_signal(intensity_correction) / 10
@@ -209,7 +295,9 @@ class CutPlotterPresenter(PresenterUtility):
             else:
                 y = self._get_log_bragg_y_coords(len(y), BRAGG_SIZE_ON_AXES, datum)
 
-            self._overplot_cache[key] = plot_overplot_line(x, y, key, recoil, cache, **kwargs)
+            self._overplot_cache[key] = plot_overplot_line(
+                x, y, key, recoil, cache, **kwargs
+            )
         except (ValueError, IndexError):
             warnings.warn("No Bragg peak found.")
 
@@ -252,12 +340,19 @@ class CutPlotterPresenter(PresenterUtility):
         self._temp_cut_cache = list(cut_cache)
         for cached_cut in self._temp_cut_cache:
             workspace = get_workspace_handle(cached_cut.workspace_name)
-            self._plot_cut(workspace, cached_cut, plot_over=plot_over, intensity_correction=intensity_correction)
+            self._plot_cut(
+                workspace,
+                cached_cut,
+                plot_over=plot_over,
+                intensity_correction=intensity_correction,
+            )
             plot_over = True
         self._temp_cut_cache = []
 
     def show_scattering_function(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], IntensityType.SCATTERING_FUNCTION)
+        self._show_intensity(
+            self._cut_cache_dict[axes], IntensityType.SCATTERING_FUNCTION
+        )
 
     def show_dynamical_susceptibility(self, axes):
         self._show_intensity(self._cut_cache_dict[axes], IntensityType.CHI)
@@ -298,7 +393,10 @@ class CutPlotterPresenter(PresenterUtility):
         temperature_dict = {}
         cuts_with_no_temp = []
         for cut in self._cut_cache_dict[axes]:
-            if cut.raw_sample_temp and cut.parent_ws_name not in temperature_dict.keys():
+            if (
+                cut.raw_sample_temp
+                and cut.parent_ws_name not in temperature_dict.keys()
+            ):
                 temperature_dict[cut.parent_ws_name] = cut.sample_temp
             elif not cut.raw_sample_temp:
                 cuts_with_no_temp.append(cut)
@@ -354,9 +452,23 @@ class CutPlotterPresenter(PresenterUtility):
 
     def _cache_intensity_correction_methods(self):
         cat = plt.CATEGORY_CUT
-        IntensityCache.cache_method(cat, IntensityType.SCATTERING_FUNCTION, self.show_scattering_function.__name__)
-        IntensityCache.cache_method(cat, IntensityType.CHI, self.show_dynamical_susceptibility.__name__)
-        IntensityCache.cache_method(cat, IntensityType.CHI_MAGNETIC, self.show_dynamical_susceptibility_magnetic.__name__)
-        IntensityCache.cache_method(cat, IntensityType.D2SIGMA, self.show_d2sigma.__name__)
-        IntensityCache.cache_method(cat, IntensityType.SYMMETRISED, self.show_symmetrised.__name__)
+        IntensityCache.cache_method(
+            cat,
+            IntensityType.SCATTERING_FUNCTION,
+            self.show_scattering_function.__name__,
+        )
+        IntensityCache.cache_method(
+            cat, IntensityType.CHI, self.show_dynamical_susceptibility.__name__
+        )
+        IntensityCache.cache_method(
+            cat,
+            IntensityType.CHI_MAGNETIC,
+            self.show_dynamical_susceptibility_magnetic.__name__,
+        )
+        IntensityCache.cache_method(
+            cat, IntensityType.D2SIGMA, self.show_d2sigma.__name__
+        )
+        IntensityCache.cache_method(
+            cat, IntensityType.SYMMETRISED, self.show_symmetrised.__name__
+        )
         IntensityCache.cache_method(cat, IntensityType.GDOS, self.show_gdos.__name__)

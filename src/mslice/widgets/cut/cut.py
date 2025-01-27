@@ -1,5 +1,5 @@
-"""A widget for cut calculations
-"""
+"""A widget for cut calculations"""
+
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
@@ -21,19 +21,20 @@ from .command import Command
 # Classes and functions
 # -----------------------------------------------------------------------------
 
+
 class CutWidget(CutView, QWidget):
-    warning_occurred = Signal('QString')
-    error_occurred = Signal('QString')
+    warning_occurred = Signal("QString")
+    error_occurred = Signal("QString")
     busy = Signal(bool)
-    _name_to_index = {'Rebin': 0, 'Integration': 1}
+    _name_to_index = {"Rebin": 0, "Integration": 1}
 
     def __init__(self, parent=None, *args, **kwargs):
         QWidget.__init__(self, parent, *args, **kwargs)
-        load_ui(__file__, 'cut.ui', self)
+        load_ui(__file__, "cut.ui", self)
         self._command_lookup = {
             self.btnCutPlot: Command.Plot,
             self.btnCutPlotOver: Command.PlotOver,
-            self.btnCutSaveToWorkbench: Command.SaveToWorkspace
+            self.btnCutSaveToWorkbench: Command.SaveToWorkspace,
         }
         for button in self._command_lookup.keys():
             button.clicked.connect(self._btn_clicked)
@@ -43,10 +44,10 @@ class CutWidget(CutView, QWidget):
         self.lneCutStep.editingFinished.connect(self._step_edited)
         self.enable_integration_axis(False)
         self.set_validators()
-        self._en = EnergyUnits('meV')
-        self._en_default = 'meV'
-        self._cut_alg_default = 'Rebin'
-        self.set_cut_algorithm('Rebin')
+        self._en = EnergyUnits("meV")
+        self._en_default = "meV"
+        self._cut_alg_default = "Rebin"
+        self.set_cut_algorithm("Rebin")
         self.cmbCutEUnits.currentIndexChanged.connect(self._changed_unit)
         self.cmbCutAlg.currentIndexChanged.connect(self.cut_algorithm_changed)
 
@@ -63,29 +64,33 @@ class CutWidget(CutView, QWidget):
                 value = float(self.lneCutStep.text())
             except ValueError:
                 value = 0.0
-                self.display_error('Invalid cut step parameter. Using default.')
+                self.display_error("Invalid cut step parameter. Using default.")
             if value == 0.0:
-                self.lneCutStep.setText('%.5f' % (self.get_minimum_step()))
-                self.display_error('Setting step size to default.')
-            elif value < (self.get_minimum_step() / 100.):
-                self.display_error('Step size too small!')
+                self.lneCutStep.setText("%.5f" % (self.get_minimum_step()))
+                self.display_error("Setting step size to default.")
+            elif value < (self.get_minimum_step() / 100.0):
+                self.display_error("Step size too small!")
                 return False
         return True
 
     def _changed_unit(self):
         new_unit = self.get_energy_units()
-        if self._en.factor_to(new_unit) != 1.:
-            if 'DeltaE' in self.get_cut_axis():
-                cut_start, cut_end, cut_step = self._en.convert_to(new_unit,
-                                                                   self.get_cut_axis_start(),
-                                                                   self.get_cut_axis_end(),
-                                                                   self.get_cut_axis_step())
+        if self._en.factor_to(new_unit) != 1.0:
+            if "DeltaE" in self.get_cut_axis():
+                cut_start, cut_end, cut_step = self._en.convert_to(
+                    new_unit,
+                    self.get_cut_axis_start(),
+                    self.get_cut_axis_end(),
+                    self.get_cut_axis_step(),
+                )
                 self.populate_cut_params(cut_start, cut_end, cut_step)
-            elif 'DeltaE' in self.get_integration_axis():
-                int_start, int_end, int_width = self._en.convert_to(new_unit,
-                                                                    self.get_integration_start(),
-                                                                    self.get_integration_end(),
-                                                                    self.get_integration_width())
+            elif "DeltaE" in self.get_integration_axis():
+                int_start, int_end, int_width = self._en.convert_to(
+                    new_unit,
+                    self.get_integration_start(),
+                    self.get_integration_end(),
+                    self.get_integration_width(),
+                )
                 self.populate_integration_params(int_start, int_end)
                 self.lneCutIntegrationWidth.setText(int_width)
         self._en = EnergyUnits(new_unit)
@@ -171,7 +176,11 @@ class CutWidget(CutView, QWidget):
         self.cmbCutAlg.setCurrentIndex(self._name_to_index[algo])
 
     def set_cut_axis(self, axis_name):
-        index = [ind for ind in range(self.cmbCutAxis.count()) if str(self.cmbCutAxis.itemText(ind)) == axis_name]
+        index = [
+            ind
+            for ind in range(self.cmbCutAxis.count())
+            if str(self.cmbCutAxis.itemText(ind)) == axis_name
+        ]
         if index:
             self.cmbCutAxis.blockSignals(True)
             self.cmbCutAxis.setCurrentIndex(index[0])
@@ -183,7 +192,7 @@ class CutWidget(CutView, QWidget):
 
     def get_minimum_step(self):
         # Returns the minimum step size in the current energy unit if cut axis is DeltaE
-        if 'DeltaE' in self.get_cut_axis():
+        if "DeltaE" in self.get_cut_axis():
             return self._minimumStep * self._en.factor_from_meV()
         else:
             return self._minimumStep
@@ -218,7 +227,7 @@ class CutWidget(CutView, QWidget):
             self.lneCutIntegrationEnd.setText(integration_end)
 
     def clear_input_fields(self, **kwargs):
-        if 'keep_axes' not in kwargs or not kwargs['keep_axes']:
+        if "keep_axes" not in kwargs or not kwargs["keep_axes"]:
             self.populate_cut_axis_options([])
         self.populate_cut_params("", "", "")
         self.populate_integration_params("", "")
@@ -229,11 +238,13 @@ class CutWidget(CutView, QWidget):
 
     def is_fields_cleared(self):
         current_fields = self.get_input_fields()
-        cleared_fields = {'cut_parameters': ['', '', ''],
-                          'integration_range': ['', ''],
-                          'integration_width': '',
-                          'normtounity': False,
-                          'cut_algorithm_index': ''}
+        cleared_fields = {
+            "cut_parameters": ["", "", ""],
+            "integration_range": ["", ""],
+            "integration_width": "",
+            "normtounity": False,
+            "cut_algorithm_index": "",
+        }
         for k in cleared_fields:
             if current_fields[k] != cleared_fields[k]:
                 return False
@@ -241,26 +252,38 @@ class CutWidget(CutView, QWidget):
 
     def populate_input_fields(self, saved_input):
         self.cmbCutEUnits.blockSignals(True)
-        self.populate_cut_params(*saved_input['cut_parameters'])
-        self.populate_integration_params(*saved_input['integration_range'])
-        self.lneCutIntegrationWidth.setText(saved_input['integration_width'])
-        self.rdoCutNormToOne.setChecked(saved_input['normtounity'])
-        self.cmbCutAlg.setCurrentIndex(saved_input['cut_algorithm_index'])
-        self.cmbCutEUnits.setCurrentIndex(EnergyUnits.get_index(saved_input['energy_unit']))
-        self._en = EnergyUnits(saved_input['energy_unit'])
+        self.populate_cut_params(*saved_input["cut_parameters"])
+        self.populate_integration_params(*saved_input["integration_range"])
+        self.lneCutIntegrationWidth.setText(saved_input["integration_width"])
+        self.rdoCutNormToOne.setChecked(saved_input["normtounity"])
+        self.cmbCutAlg.setCurrentIndex(saved_input["cut_algorithm_index"])
+        self.cmbCutEUnits.setCurrentIndex(
+            EnergyUnits.get_index(saved_input["energy_unit"])
+        )
+        self._en = EnergyUnits(saved_input["energy_unit"])
         self.cmbCutEUnits.blockSignals(False)
 
     def get_input_fields(self):
         saved_input = dict()
-        saved_input['axes'] = [str(self.cmbCutAxis.itemText(ind)) for ind in range(self.cmbCutAxis.count())]
-        cut_params = (self.get_cut_axis_start(), self.get_cut_axis_end(), self.get_cut_axis_step())
-        int_params = (self.get_integration_start(), self.get_integration_end(), self.get_integration_width())
-        saved_input['cut_parameters'] = list(cut_params)
-        saved_input['integration_range'] = list(int_params)[:2]
-        saved_input['integration_width'] = list(int_params)[2]
-        saved_input['normtounity'] = self.get_intensity_is_norm_to_one()
-        saved_input['cut_algorithm_index'] = self.get_cut_algorithm()
-        saved_input['energy_unit'] = self.get_energy_units()
+        saved_input["axes"] = [
+            str(self.cmbCutAxis.itemText(ind)) for ind in range(self.cmbCutAxis.count())
+        ]
+        cut_params = (
+            self.get_cut_axis_start(),
+            self.get_cut_axis_end(),
+            self.get_cut_axis_step(),
+        )
+        int_params = (
+            self.get_integration_start(),
+            self.get_integration_end(),
+            self.get_integration_width(),
+        )
+        saved_input["cut_parameters"] = list(cut_params)
+        saved_input["integration_range"] = list(int_params)[:2]
+        saved_input["integration_width"] = list(int_params)[2]
+        saved_input["normtounity"] = self.get_intensity_is_norm_to_one()
+        saved_input["cut_algorithm_index"] = self.get_cut_algorithm()
+        saved_input["energy_unit"] = self.get_energy_units()
         return saved_input
 
     def enable(self):
@@ -320,9 +343,15 @@ class CutWidget(CutView, QWidget):
         self.btnCutPlotOver.setEnabled(True)
 
     def set_validators(self):
-        line_edits = [self.lneCutStart, self.lneCutEnd, self.lneCutIntegrationStart,
-                      self.lneCutIntegrationEnd, self.lneCutIntegrationWidth, self.lneEditCutIntensityStart,
-                      self.lneCutIntensityEnd]
+        line_edits = [
+            self.lneCutStart,
+            self.lneCutEnd,
+            self.lneCutIntegrationStart,
+            self.lneCutIntegrationEnd,
+            self.lneCutIntegrationWidth,
+            self.lneEditCutIntensityStart,
+            self.lneCutIntensityEnd,
+        ]
 
         double_validator = double_validator_without_separator()
         for line_edit in line_edits:

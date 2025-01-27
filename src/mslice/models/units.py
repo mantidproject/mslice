@@ -9,14 +9,14 @@ import numpy as np
 
 def _scale_string_or_float(value, scale):
     try:
-        return '{:.5f}'.format(float(value) * scale)
+        return "{:.5f}".format(float(value) * scale)
     except (ValueError, TypeError):
         return value
 
 
 def get_sample_temperature_from_string(string):
     if string is not None and string.strip():
-        if string.endswith('K'):
+        if string.endswith("K"):
             string = string[:-1]
         try:
             sample_temp = float(string)
@@ -27,14 +27,12 @@ def get_sample_temperature_from_string(string):
 
 
 class EnergyUnits(object):
-
-    _available_units = ['meV', 'cm-1']
-    _label_latex = {'meV': 'meV', 'cm-1': 'cm$^{-1}$'}
-    _name_to_index = {'meV': 0, 'cm-1': 1, 'DeltaE': 0, 'DeltaE_inWavenumber': 1}
+    _available_units = ["meV", "cm-1"]
+    _label_latex = {"meV": "meV", "cm-1": "cm$^{-1}$"}
+    _name_to_index = {"meV": 0, "cm-1": 1, "DeltaE": 0, "DeltaE_inWavenumber": 1}
     # The following is a conversion matrix between the different units e_to = m[from][to] * e_from
     # E.g. meV = m[1][0] * cm; and cm = m[0][1] * meV
-    _conversion_factors = [[1.,    8.065544],
-                           [1./8.065544, 1.]]
+    _conversion_factors = [[1.0, 8.065544], [1.0 / 8.065544, 1.0]]
 
     def __init__(self, unit_name):
         if unit_name not in self._name_to_index.keys():
@@ -52,10 +50,16 @@ class EnergyUnits(object):
         return self._conversion_factors[self._index][0]
 
     def from_meV(self, *args):
-        return (_scale_string_or_float(x, self._conversion_factors[0][self._index]) for x in args)
+        return (
+            _scale_string_or_float(x, self._conversion_factors[0][self._index])
+            for x in args
+        )
 
     def to_meV(self, *args):
-        return (_scale_string_or_float(x, self._conversion_factors[self._index][0]) for x in args)
+        return (
+            _scale_string_or_float(x, self._conversion_factors[self._index][0])
+            for x in args
+        )
 
     def factor_from(self, unit_from):
         try:
@@ -76,7 +80,7 @@ class EnergyUnits(object):
         return (_scale_string_or_float(x, self.factor_to(unit_to)) for x in args)
 
     def label(self):
-        return 'Energy Transfer (' + self._label_latex[self._unit] + ')'
+        return "Energy Transfer (" + self._label_latex[self._unit] + ")"
 
     @classmethod
     def get_index(cls, unit_name):
@@ -91,7 +95,7 @@ class EnergyUnits(object):
 
 
 def convert_energy_to_meV(y, energy_axis_units):
-    if 'meV' not in energy_axis_units:
+    if "meV" not in energy_axis_units:
         return np.array(y) * EnergyUnits(energy_axis_units).factor_from_meV()
     else:
         return y

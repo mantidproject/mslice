@@ -57,7 +57,9 @@ class MainPresenter(MainPresenterInterface):
         if isinstance(getattr(client, "workspace_selection_changed", None), Callable):
             self._selected_workspace_listener.append(client)
         else:
-            raise TypeError("The client trying to subscribe does not implement the method 'workspace_selection_changed'")
+            raise TypeError(
+                "The client trying to subscribe does not implement the method 'workspace_selection_changed'"
+            )
 
     def register_workspace_selector(self, workspace_selector):
         self._workspace_presenter = workspace_selector

@@ -8,14 +8,17 @@ from mantid.simpleapi import AddSampleLog, _create_algorithm_function
 
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_algorithm import Cut
-from mslice.models.cut.cut_functions import compute_cut, is_cuttable, output_workspace_name
+from mslice.models.cut.cut_functions import (
+    compute_cut,
+    is_cuttable,
+    output_workspace_name,
+)
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 from tests.testhelpers.workspace_creator import create_pixel_workspace
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 
 
 class CutFunctionsTest(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.workspace_name = "TestWorkspaceName"
@@ -25,11 +28,28 @@ class CutFunctionsTest(TestCase):
         cls.e_axis = Axis("DeltaE", -10, 15, 1)
         cls.q_axis = Axis("|Q|", 0.1, 3.1, 0.1)
 
-        cls.test_ws = CreateSampleWorkspace(OutputWorkspace=cls.workspace_name, NumBanks=1, BankPixelWidth=5, XMin=0.1,
-                                            XMax=3.1, BinWidth=0.1, XUnit="DeltaE")
-        AddSampleLog(workspace=cls.test_ws.raw_ws, LogName="Ei", LogText="3.", LogType="Number", StoreInADS=False)
+        cls.test_ws = CreateSampleWorkspace(
+            OutputWorkspace=cls.workspace_name,
+            NumBanks=1,
+            BankPixelWidth=5,
+            XMin=0.1,
+            XMax=3.1,
+            BinWidth=0.1,
+            XUnit="DeltaE",
+        )
+        AddSampleLog(
+            workspace=cls.test_ws.raw_ws,
+            LogName="Ei",
+            LogText="3.",
+            LogType="Number",
+            StoreInADS=False,
+        )
 
-        sim_scattering_data = np.arange(cls.integration_start, cls.integration_end, 0.002).reshape(30, 25).transpose()
+        sim_scattering_data = (
+            np.arange(cls.integration_start, cls.integration_end, 0.002)
+            .reshape(30, 25)
+            .transpose()
+        )
         for i in range(cls.test_ws.raw_ws.getNumberHistograms()):
             cls.test_ws.raw_ws.setY(i, sim_scattering_data[i])
         cls.test_ws.e_mode = "Direct"
@@ -44,17 +64,25 @@ class CutFunctionsTest(TestCase):
         AnalysisDataService.clear(True)
 
     def test_that_output_workspace_name_returns_the_expected_result(self):
-        self.assertEqual(output_workspace_name(self.workspace_name, self.integration_start, self.integration_end),
-                         "TestWorkspaceName_cut(0.000,1.500)")
+        self.assertEqual(
+            output_workspace_name(
+                self.workspace_name, self.integration_start, self.integration_end
+            ),
+            "TestWorkspaceName_cut(0.000,1.500)",
+        )
 
-    def test_that_output_workspace_name_will_round_the_integration_start_and_end_to_three_decimals(self):
-        self.assertEqual(output_workspace_name(self.workspace_name, 1.23456, 5.67891),
-                         "TestWorkspaceName_cut(1.235,5.679)")
+    def test_that_output_workspace_name_will_round_the_integration_start_and_end_to_three_decimals(
+        self,
+    ):
+        self.assertEqual(
+            output_workspace_name(self.workspace_name, 1.23456, 5.67891),
+            "TestWorkspaceName_cut(1.235,5.679)",
+        )
 
-    @patch('mslice.models.cut.cut_functions.mantid_algorithms')
+    @patch("mslice.models.cut.cut_functions.mantid_algorithms")
     def test_compute_cut_returns_the_expected_result(self, alg_mock):
         AlgorithmFactory.subscribe(Cut)
-        alg_mock.Cut = wrap_algorithm(_create_algorithm_function('Cut', 1, Cut()))
+        alg_mock.Cut = wrap_algorithm(_create_algorithm_function("Cut", 1, Cut()))
 
         cut = compute_cut(self.test_ws, self.q_axis, self.e_axis, False)
 

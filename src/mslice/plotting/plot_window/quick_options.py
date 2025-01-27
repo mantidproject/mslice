@@ -7,7 +7,6 @@ from qtpy.QtCore import Signal
 
 
 class QuickOptions(QtWidgets.QDialog):
-
     ok_clicked = Signal()
 
     def __init__(self, parent=None):
@@ -21,12 +20,13 @@ class QuickOptions(QtWidgets.QDialog):
         self.button_row.addWidget(self.cancel_button)
         self.ok_button.clicked.connect(self.accept)
         self.cancel_button.clicked.connect(self.reject)
-        self.keep_open = QtWidgets.QCheckBox('Keep open')
+        self.keep_open = QtWidgets.QCheckBox("Keep open")
 
 
 class QuickAxisOptions(QuickOptions):
-
-    def __init__(self, parent, target, existing_values, font_size, grid, log, redraw_signal):
+    def __init__(
+        self, parent, target, existing_values, font_size, grid, log, redraw_signal
+    ):
         super(QuickAxisOptions, self).__init__(parent)
         self.setWindowTitle("Edit " + target)
         self.log = log
@@ -101,7 +101,6 @@ class QuickAxisOptions(QuickOptions):
 
 
 class QuickLabelOptions(QuickOptions):
-
     ok_clicked = Signal()
     cancel_clicked = Signal()
 
@@ -142,7 +141,6 @@ class QuickLabelOptions(QuickOptions):
 
 
 class QuickLineOptions(QuickOptions):
-
     ok_clicked = Signal()
     cancel_clicked = Signal()
 

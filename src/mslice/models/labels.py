@@ -2,15 +2,15 @@
 
 from mslice.models.units import EnergyUnits
 
-CUT_INTENSITY_LABEL = 'Signal/#Events'
-recoil_labels = {1: 'Hydrogen', 2: 'Deuterium', 4: 'Helium'}
+CUT_INTENSITY_LABEL = "Signal/#Events"
+recoil_labels = {1: "Hydrogen", 2: "Deuterium", 4: "Helium"}
 
 # unit labels for projections
-MOD_Q_LABEL = '|Q|'
-THETA_LABEL = '2Theta'
-DELTA_E_LABEL = 'DeltaE'
-TWOTHETA_UNITS = ('Degrees', '2Theta')
-MOMENTUM_UNITS = ('MomentumTransfer', '|Q|', 'Angstrom^-1')
+MOD_Q_LABEL = "|Q|"
+THETA_LABEL = "2Theta"
+DELTA_E_LABEL = "DeltaE"
+TWOTHETA_UNITS = ("Degrees", "2Theta")
+MOMENTUM_UNITS = ("MomentumTransfer", "|Q|", "Angstrom^-1")
 
 
 def is_twotheta(unit):
@@ -44,27 +44,36 @@ def get_recoil_key(label):
 
 
 def get_display_name(axis):
-    if 'DeltaE' in axis.units:
+    if "DeltaE" in axis.units:
         return EnergyUnits(axis.e_unit).label()
     elif is_momentum(axis.units):
         # Matplotlib 1.3 doesn't handle LaTeX very well. Sometimes no legend appears if we use LaTeX
-        return r'$|Q|$ ($\mathrm{\AA}^{-1}$)'
+        return r"$|Q|$ ($\mathrm{\AA}^{-1}$)"
     elif is_twotheta(axis.units):
-        return r'Scattering Angle 2$\theta$ ($^{\circ}$)'
+        return r"Scattering Angle 2$\theta$ ($^{\circ}$)"
     else:
         return axis.units
 
 
 def generate_legend(workspace_name, integrated_dim, integration_start, integration_end):
-    mappings = {'DeltaE': 'E', 'MomentumTransfer': '|Q|', 'Degrees': r'2$\theta$'}
-    integrated_dim = mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
-    return workspace_name + " " + "%.2f" % integration_start + "<" + integrated_dim + "<" + \
-        "%.2f" % integration_end
+    mappings = {"DeltaE": "E", "MomentumTransfer": "|Q|", "Degrees": r"2$\theta$"}
+    integrated_dim = (
+        mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
+    )
+    return (
+        workspace_name
+        + " "
+        + "%.2f" % integration_start
+        + "<"
+        + integrated_dim
+        + "<"
+        + "%.2f" % integration_end
+    )
 
 
 def get_recoil_label(key) -> str:
     if key in recoil_labels:
         label = recoil_labels[key]
     else:
-        label = 'Relative mass ' + str(key)
+        label = "Relative mass " + str(key)
     return label

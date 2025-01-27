@@ -1,12 +1,17 @@
 from qtpy import QtGui, QtWidgets
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.scripting.helperfunctions import add_plot_statements, replace_ws_special_chars
+from mslice.scripting.helperfunctions import (
+    add_plot_statements,
+    replace_ws_special_chars,
+)
 from mslice.app.presenters import get_cut_plotter_presenter
 
 
-def generate_script(ws_name, filename=None, plot_handler=None, window=None, clipboard=False):
+def generate_script(
+    ws_name, filename=None, plot_handler=None, window=None, clipboard=False
+):
     if filename is None and not clipboard:
-        path = QtWidgets.QFileDialog.getSaveFileName(window, 'Save File')
+        path = QtWidgets.QFileDialog.getSaveFileName(window, "Save File")
         if isinstance(path, tuple):
             path = path[0]
         if not path:
@@ -20,18 +25,19 @@ def generate_script(ws_name, filename=None, plot_handler=None, window=None, clip
     script_lines = add_plot_statements(script_lines, plot_handler, ax)
     if clipboard:
         cb = QtGui.QGuiApplication.clipboard()
-        cb.setText(''.join(script_lines), mode=cb.Clipboard)
+        cb.setText("".join(script_lines), mode=cb.Clipboard)
     else:
-        with open(filename, 'w') as generated_script:
+        with open(filename, "w") as generated_script:
             generated_script.writelines(script_lines)
 
 
 def preprocess_lines(ws_name, plot_handler, ax):
     from mslice.plotting.plot_window.cut_plot import CutPlot
+
     script_lines = []
     if isinstance(plot_handler, CutPlot):
         cache_list = get_cut_plotter_presenter()._cut_cache_dict[ax]
-        ws_list = {}    # use a dict to ensure unique workspaces
+        ws_list = {}  # use a dict to ensure unique workspaces
         for workspace_name in [cut.parent_ws_name for cut in cache_list]:
             ws_list[get_workspace_handle(workspace_name).raw_ws] = workspace_name
         for ws, workspace_name in list(ws_list.items()):
@@ -53,8 +59,8 @@ def generate_script_lines(raw_ws, workspace_name):
     prev_algo = alg_history[-1]
     for idx, algorithm in reversed(list(enumerate(alg_history[:-1]))):
         new_algo = algorithm
-        if 'Save' in new_algo.name() and 'Load' in prev_algo.name():
-            alg_history = alg_history[idx+1:]
+        if "Save" in new_algo.name() and "Load" in prev_algo.name():
+            alg_history = alg_history[idx + 1 :]
             break
         else:
             prev_algo = new_algo
@@ -62,7 +68,7 @@ def generate_script_lines(raw_ws, workspace_name):
     for algorithm in alg_history:
         alg_name = algorithm.name()
         kwargs, output_ws = get_algorithm_kwargs(algorithm, existing_ws_refs)
-        if (output_ws is not None and output_ws != ws_name):
+        if output_ws is not None and output_ws != ws_name:
             lines += [f"{output_ws} = mc.{alg_name}({kwargs})\n"]
             existing_ws_refs.append(output_ws)
         else:
@@ -102,9 +108,16 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
                 elif prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
                     continue
             elif algorithm.name() == "MakeProjection":
-                if prop.name() == "Limits" or prop.name() == "OutputWorkspace" or prop.name() == "ProjectionType":
+                if (
+                    prop.name() == "Limits"
+                    or prop.name() == "OutputWorkspace"
+                    or prop.name() == "ProjectionType"
+                ):
                     continue
-            if isinstance(pval, str) and replace_ws_special_chars(pval) in existing_ws_refs:
+            if (
+                isinstance(pval, str)
+                and replace_ws_special_chars(pval) in existing_ws_refs
+            ):
                 arguments += [f"{prop.name()}={replace_ws_special_chars(pval)}"]
             elif isinstance(prop.value(), str):
                 arguments += [f"{prop.name()}='{pval}'"]

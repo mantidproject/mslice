@@ -11,7 +11,6 @@ from mantidqt.icons import get_icon
 
 
 class PlotOptionsDialog(QtWidgets.QDialog):
-
     titleEdited = Signal()
     xLabelEdited = Signal()
     yLabelEdited = Signal()
@@ -27,7 +26,7 @@ class PlotOptionsDialog(QtWidgets.QDialog):
 
     def __init__(self, parent, redraw_signal=None):
         QtWidgets.QDialog.__init__(self, parent)
-        load_ui(__file__, 'plot_options.ui', self)
+        load_ui(__file__, "plot_options.ui", self)
 
         self.sclUpFntSz.setIcon(get_icon("mdi.arrow-up"))
         self.sclDownFntSz.setIcon(get_icon("mdi.arrow-down"))
@@ -62,10 +61,10 @@ class PlotOptionsDialog(QtWidgets.QDialog):
 
         self.redraw_signal = redraw_signal
 
-        self.allFntSzBuffer = ''
+        self.allFntSzBuffer = ""
 
     def _font_sizes_changed(self):
-        if self.allFntSzBuffer == '':
+        if self.allFntSzBuffer == "":
             self.allFontSizeFromEmptyToValue.emit()
         self.allFntSzBuffer = str(self.allFntSz.text())
 
@@ -179,7 +178,6 @@ class PlotOptionsDialog(QtWidgets.QDialog):
 
 
 class SlicePlotOptions(PlotOptionsDialog):
-
     cRangeEdited = Signal()
     cLogEdited = Signal()
 
@@ -227,7 +225,6 @@ class SlicePlotOptions(PlotOptionsDialog):
 
 
 class CutPlotOptions(PlotOptionsDialog):
-
     xLogEdited = Signal()
     yLogEdited = Signal()
     showLegendsEdited = Signal()
@@ -245,8 +242,12 @@ class CutPlotOptions(PlotOptionsDialog):
 
     def set_line_options(self, line_options):
         for line_option in line_options:
-            line_widget = LegendAndLineOptionsSetter(line_option, self.color_validator, self.show_legends,
-                                                     self.remove_line_widget)
+            line_widget = LegendAndLineOptionsSetter(
+                line_option,
+                self.color_validator,
+                self.show_legends,
+                self.remove_line_widget,
+            )
             self.verticalLayout_legend.addWidget(line_widget)
             self._line_widgets.append(line_widget)
 
@@ -254,7 +255,16 @@ class CutPlotOptions(PlotOptionsDialog):
         all_line_options = []
         for line_widget in self._line_widgets:
             line_options = {}
-            for option in ['shown', 'color', 'style', 'width', 'marker', 'legend', 'label', 'error_bar']:
+            for option in [
+                "shown",
+                "color",
+                "style",
+                "width",
+                "marker",
+                "legend",
+                "label",
+                "error_bar",
+            ]:
                 line_options[option] = getattr(line_widget, option)
             all_line_options.append(line_options)
         return all_line_options
@@ -280,7 +290,9 @@ class CutPlotOptions(PlotOptionsDialog):
 
     def disable_show_legend(self):
         for line_widget in self._line_widgets:
-            line_widget.show_legend_line_specific.setEnabled(self.chkShowLegends.isChecked())
+            line_widget.show_legend_line_specific.setEnabled(
+                self.chkShowLegends.isChecked()
+            )
 
     @property
     def x_log(self):
@@ -311,51 +323,82 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     """This is a widget that has various legend and line controls for each line of a plot"""
 
     # dictionaries used to convert from matplotlib arguments to UI selection and vice versa
-    styles = {'-': 'Solid', '--': 'Dashed', '-.': 'Dashdot', ':': 'Dotted', 'None': 'None'}
+    styles = {
+        "-": "Solid",
+        "--": "Dashed",
+        "-.": "Dashdot",
+        ":": "Dotted",
+        "None": "None",
+    }
 
-    markers = {'o': 'Circle', ',': 'Pixel', '.': 'Point', 'v': 'Triangle down', '^': 'Triangle up',
-                    '<': 'Triangle_left', '>': 'Triangle right', '1': 'Arrow down', '2': 'Arrow up',
-                    '3': 'Arrow left', '4': 'Arrow right', '8': 'Octagon', 's': 'Square', 'p': 'Pentagon',
-                    '*': 'Star', 'h': 'Hexagon 1', 'H': 'Hexagon 2', '+': 'Plus', 'x': 'X', 'D': 'Diamond',
-                    'd': 'Diamond (thin)', '|': 'Vertical line', '_': 'Horizontal line', 'None': 'None'}
+    markers = {
+        "o": "Circle",
+        ",": "Pixel",
+        ".": "Point",
+        "v": "Triangle down",
+        "^": "Triangle up",
+        "<": "Triangle_left",
+        ">": "Triangle right",
+        "1": "Arrow down",
+        "2": "Arrow up",
+        "3": "Arrow left",
+        "4": "Arrow right",
+        "8": "Octagon",
+        "s": "Square",
+        "p": "Pentagon",
+        "*": "Star",
+        "h": "Hexagon 1",
+        "H": "Hexagon 2",
+        "+": "Plus",
+        "x": "X",
+        "D": "Diamond",
+        "d": "Diamond (thin)",
+        "|": "Vertical line",
+        "_": "Horizontal line",
+        "None": "None",
+    }
 
     inverse_styles = {v: k for k, v in styles.items()}
     inverse_markers = {v: k for k, v in markers.items()}
 
-    def __init__(self, line_options, color_validator, show_legends, remove_line_callback=None):
+    def __init__(
+        self, line_options, color_validator, show_legends, remove_line_callback=None
+    ):
         super(LegendAndLineOptionsSetter, self).__init__()
 
         self._deletion_callback = remove_line_callback
 
         self.legend_text_label = QtWidgets.QLabel("Plot")
         self.legendText = QtWidgets.QLineEdit(self)
-        self.legendText.setText(line_options['label'])
+        self.legendText.setText(line_options["label"])
         self.color_validator = color_validator
 
         self.color_label = QtWidgets.QLabel(self)
         self.color_label.setText("Color:")
         self.line_color = QtWidgets.QComboBox(self)
         self.line_color.addItems(named_cycle_colors())
-        color_index = self.line_color.findText(color_to_name(line_options['color']))
+        color_index = self.line_color.findText(color_to_name(line_options["color"]))
         if color_index != -1:
             self.line_color.setCurrentIndex(color_index)
         else:
-            self.line_color.addItem(color_to_name(line_options['color']))
-            self.line_color.setCurrentIndex(self.line_color.count()-1)
+            self.line_color.addItem(color_to_name(line_options["color"]))
+            self.line_color.setCurrentIndex(self.line_color.count() - 1)
         self.previous_color = self.line_color.currentIndex()
 
         self.style_label = QtWidgets.QLabel(self)
         self.style_label.setText("Style:")
         self.line_style = QtWidgets.QComboBox(self)
         self.line_style.addItems(list(self.styles.values()))
-        chosen_style_as_string = self.styles[line_options['style']]
-        self.line_style.setCurrentIndex(self.line_style.findText(chosen_style_as_string))
+        chosen_style_as_string = self.styles[line_options["style"]]
+        self.line_style.setCurrentIndex(
+            self.line_style.findText(chosen_style_as_string)
+        )
 
         self.width_label = QtWidgets.QLabel(self)
         self.width_label.setText("Width:")
         self.line_width = QtWidgets.QComboBox(self)
         self.line_width.addItems([str(x) for x in np_arange(1, 10.5, 0.5)])
-        self.line_width.setCurrentIndex(self.line_width.findText(line_options['width']))
+        self.line_width.setCurrentIndex(self.line_width.findText(line_options["width"]))
 
         self.marker_label = QtWidgets.QLabel(self)
         self.marker_label.setText("Marker:")
@@ -363,8 +406,10 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         markers = list(self.markers.values())
         markers.sort()
         self.line_marker.addItems(markers)
-        chosen_marker_as_string = self.markers[line_options['marker']]
-        self.line_marker.setCurrentIndex(self.line_marker.findText(chosen_marker_as_string))
+        chosen_marker_as_string = self.markers[line_options["marker"]]
+        self.line_marker.setCurrentIndex(
+            self.line_marker.findText(chosen_marker_as_string)
+        )
 
         layout = QtWidgets.QVBoxLayout(self)
         row1 = QtWidgets.QHBoxLayout()
@@ -387,10 +432,10 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         row5 = QtWidgets.QHBoxLayout()
         layout.addLayout(row5)
 
-        if line_options['error_bar'] is not None:
+        if line_options["error_bar"] is not None:
             self.error_bar_checkbox = QtWidgets.QCheckBox("Show Error Bars")
-            self.error_bar_checkbox.setChecked(line_options['error_bar'])
-            self.error_bar_checkbox.setEnabled(line_options['shown'])
+            self.error_bar_checkbox.setChecked(line_options["error_bar"])
+            self.error_bar_checkbox.setEnabled(line_options["shown"])
 
             row4 = QtWidgets.QHBoxLayout()
             layout.addLayout(row4)
@@ -398,29 +443,33 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         else:
             self.error_bar_checkbox = None
 
-        if line_options['shown'] is not None and line_options['legend'] is not None:
+        if line_options["shown"] is not None and line_options["legend"] is not None:
             self.show_line = QtWidgets.QCheckBox("Show Line")
-            self.show_line.setChecked(line_options['shown'])
+            self.show_line.setChecked(line_options["shown"])
 
             self.show_legend_line_specific = QtWidgets.QCheckBox("Show Legend")
-            self.show_legend_line_specific.setChecked(line_options['legend'])
+            self.show_legend_line_specific.setChecked(line_options["legend"])
 
             if show_legends:
-                self.show_legend_line_specific.setEnabled(line_options['shown'])
+                self.show_legend_line_specific.setEnabled(line_options["shown"])
             else:
                 self.show_legend_line_specific.setEnabled(show_legends)
 
             row5.addWidget(self.show_line)
             row4.addWidget(self.show_legend_line_specific)
 
-            self.show_line.stateChanged.connect(lambda state: self.show_line_changed(state))
+            self.show_line.stateChanged.connect(
+                lambda state: self.show_line_changed(state)
+            )
         else:
             self.show_line = None
             self.show_legend_line_specific = None
 
         # for quick options the color validator and the delete button is not used
         if self.color_validator is not None:
-            self.line_color.currentIndexChanged.connect(lambda selected: self.color_valid(selected))
+            self.line_color.currentIndexChanged.connect(
+                lambda selected: self.color_valid(selected)
+            )
             self.delete_button = QtWidgets.QPushButton("Delete Line", self)
             row5.addWidget(self.delete_button)
             self.delete_button.clicked.connect(self.deletion_callback)

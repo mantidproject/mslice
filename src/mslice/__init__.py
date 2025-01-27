@@ -7,5 +7,5 @@ on Mantid (http://www.mantidproject.org).
 """
 
 version_info = (2, 10, 1)
-__version__ = '.'.join(map(str, version_info))
-__project_url__ = 'https://github.com/mantidproject/mslice'
+__version__ = ".".join(map(str, version_info))
+__project_url__ = "https://github.com/mantidproject/mslice"

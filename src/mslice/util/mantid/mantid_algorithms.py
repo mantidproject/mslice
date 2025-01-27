@@ -10,11 +10,13 @@ algorithms = AlgorithmFactory.getRegisteredAlgorithms(False)
 for algorithm, versions in algorithms.items():
     try:
         globals()[algorithm] = wrap_algorithm(globals()[algorithm])
-    except KeyError:   # Possibly a user defined algorithm
+    except KeyError:  # Possibly a user defined algorithm
         try:
             alg_obj = AlgorithmManager.createUnmanaged(algorithm, max(versions))
             alg_obj.initialize()
         except Exception:
             pass
         else:
-            globals()[algorithm] = wrap_algorithm(_create_algorithm_function(algorithm, max(versions), alg_obj))
+            globals()[algorithm] = wrap_algorithm(
+                _create_algorithm_function(algorithm, max(versions), alg_obj)
+            )

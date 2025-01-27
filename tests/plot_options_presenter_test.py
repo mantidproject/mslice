@@ -1,6 +1,9 @@
 from mock import MagicMock, PropertyMock, Mock, ANY
 import unittest
-from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter, SlicePlotOptionsPresenter
+from mslice.presenters.plot_options_presenter import (
+    CutPlotOptionsPresenter,
+    SlicePlotOptionsPresenter,
+)
 
 
 class PlotOptionsPresenterTest(unittest.TestCase):
@@ -9,35 +12,33 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.model = MagicMock()
 
     def test_change_title(self):
-
         mock_view_title = PropertyMock()
         type(self.view).title = mock_view_title
 
-        mock_model_title = PropertyMock(return_value='Title 0')
+        mock_model_title = PropertyMock(return_value="Title 0")
         type(self.model).title = mock_model_title
 
         # title passed model -> view
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
 
         mock_model_title.assert_called_once_with()
-        mock_view_title.assert_called_once_with('Title 0')
+        mock_view_title.assert_called_once_with("Title 0")
 
         # title passed view -> model
         mock_view_title.reset_mock()
         mock_model_title.reset_mock()
-        mock_view_title.return_value = 'Title 1'
-        self.presenter._value_modified('title')
+        mock_view_title.return_value = "Title 1"
+        self.presenter._value_modified("title")
         self.presenter.get_new_config()
 
         mock_view_title.assert_called_once_with()
-        mock_model_title.assert_called_once_with('Title 1')
+        mock_model_title.assert_called_once_with("Title 1")
 
     def test_change_axis(self):
-
         view_x_label_mock = PropertyMock()
         view_y_label_mock = PropertyMock()
-        model_x_label_mock = PropertyMock(return_value='x0')
-        model_y_label_mock = PropertyMock(return_value='y0')
+        model_x_label_mock = PropertyMock(return_value="x0")
+        model_y_label_mock = PropertyMock(return_value="y0")
 
         type(self.view).x_label = view_x_label_mock
         type(self.view).y_label = view_y_label_mock
@@ -48,8 +49,8 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.presenter = SlicePlotOptionsPresenter(self.view, self.model)
         model_x_label_mock.assert_called_once_with()
         model_y_label_mock.assert_called_once_with()
-        view_x_label_mock.assert_called_once_with('x0')
-        view_y_label_mock.assert_called_once_with('y0')
+        view_x_label_mock.assert_called_once_with("x0")
+        view_y_label_mock.assert_called_once_with("y0")
 
         # labels passed view -> model
         model_x_label_mock.reset_mock()
@@ -57,19 +58,18 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         view_x_label_mock.reset_mock()
         view_y_label_mock.reset_mock()
 
-        view_x_label_mock.return_value = 'x1'
-        view_y_label_mock.return_value = 'y1'
-        self.presenter._value_modified('x_label')
-        self.presenter._value_modified('y_label')
+        view_x_label_mock.return_value = "x1"
+        view_y_label_mock.return_value = "y1"
+        self.presenter._value_modified("x_label")
+        self.presenter._value_modified("y_label")
         self.presenter.get_new_config()
 
         view_x_label_mock.assert_called_once_with()
         view_y_label_mock.assert_called_once_with()
-        model_x_label_mock.assert_called_once_with('x1')
-        model_y_label_mock.assert_called_once_with('y1')
+        model_x_label_mock.assert_called_once_with("x1")
+        model_y_label_mock.assert_called_once_with("y1")
 
     def test_change_grid(self):
-
         view_x_grid_mock = PropertyMock()
         view_y_grid_mock = PropertyMock()
         model_x_grid_mock = PropertyMock(return_value=False)
@@ -95,8 +95,8 @@ class PlotOptionsPresenterTest(unittest.TestCase):
 
         view_x_grid_mock.return_value = True
         view_y_grid_mock.return_value = True
-        self.presenter._value_modified('x_grid')
-        self.presenter._value_modified('y_grid')
+        self.presenter._value_modified("x_grid")
+        self.presenter._value_modified("y_grid")
         self.presenter.get_new_config()
 
         view_x_grid_mock.assert_called_once_with()
@@ -105,7 +105,6 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         model_y_grid_mock.assert_called_once_with(True)
 
     def test_change_xrange(self):
-
         view_x_range_mock = PropertyMock()
         type(self.view).x_range = view_x_range_mock
 
@@ -121,7 +120,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         # passed view -> model through slice presenter
         model_x_range_mock.reset_mock()
         view_x_range_mock.return_value = (2, 10)
-        self.presenter1._value_modified('x_range')
+        self.presenter1._value_modified("x_range")
         self.presenter1.get_new_config()
         model_x_range_mock.assert_called_once_with((2, 10))
 
@@ -129,7 +128,7 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         model_x_range_mock.reset_mock()
         view_x_range_mock.return_value = (3, 11)
         self.presenter2 = CutPlotOptionsPresenter(self.view, self.model)
-        self.presenter2._value_modified('x_range')
+        self.presenter2._value_modified("x_range")
         self.presenter2.get_new_config()
         model_x_range_mock.assert_called_with((3, 11))
 
@@ -178,16 +177,24 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         # view -> model
         view_x_log_mock.return_value = False
         view_y_log_mock.return_value = True
-        self.presenter._value_modified('x_log')
-        self.presenter._value_modified('y_log')
+        self.presenter._value_modified("x_log")
+        self.presenter._value_modified("y_log")
         self.presenter.get_new_config()
         model_x_log_mock.assert_called_with(False)
         model_y_log_mock.assert_called_with(True)
 
     def test_line_options(self):
         #  model -> view
-        line_options = [{'color': 'k', 'style': '-', 'width': '10', 'marker': '*', 'error_bars': True}]
-        legends = {'label': 'legend1', 'visible': True}
+        line_options = [
+            {
+                "color": "k",
+                "style": "-",
+                "width": "10",
+                "marker": "*",
+                "error_bars": True,
+            }
+        ]
+        legends = {"label": "legend1", "visible": True}
         line_data = list(zip(legends, line_options))
         self.model.get_all_line_options = Mock(return_value=line_data)
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
@@ -196,8 +203,16 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         self.view.set_line_options.assert_called_once_with(line_data)
 
         #  view -> model
-        line_options2 = [{'color': 'b', 'style': '-', 'width': '10', 'marker': 'o', 'error_bars': False}]
-        legends2 = {'label': 'legend1', 'visible': False}
+        line_options2 = [
+            {
+                "color": "b",
+                "style": "-",
+                "width": "10",
+                "marker": "o",
+                "error_bars": False,
+            }
+        ]
+        legends2 = {"label": "legend1", "visible": False}
         line_data2 = list(zip(legends2, line_options2))
 
         self.view.get_line_options = Mock(return_value=line_data2)
@@ -221,8 +236,13 @@ class PlotOptionsPresenterTest(unittest.TestCase):
         type(self.view).all_fonts_size = view_all_fonts_size
 
         self.presenter = CutPlotOptionsPresenter(self.view, self.model)
-        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
-                        'x_label_size': 12, 'y_label_size': 11}
+        fonts_config = {
+            "title_size": 15,
+            "x_range_font_size": 14,
+            "y_range_font_size": 13,
+            "x_label_size": 12,
+            "y_label_size": 11,
+        }
         self.presenter._default_font_sizes_config = fonts_config
 
         # view -> model
@@ -231,6 +251,13 @@ class PlotOptionsPresenterTest(unittest.TestCase):
 
         view_all_fonts_size.assert_called_once_with()
 
-        fonts_updated = {'title_size': 20, 'x_range_font_size': 20, 'y_range_font_size': 20,
-                         'x_label_size': 20, 'y_label_size': 20}
-        model_all_fonts_size.assert_any_call(fonts_updated)   # Not latest call due to copy() methods
+        fonts_updated = {
+            "title_size": 20,
+            "x_range_font_size": 20,
+            "y_range_font_size": 20,
+            "x_label_size": 20,
+            "y_label_size": 20,
+        }
+        model_all_fonts_size.assert_any_call(
+            fonts_updated
+        )  # Not latest call due to copy() methods

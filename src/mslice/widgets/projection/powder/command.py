@@ -1,5 +1,4 @@
-"""Defines enumerated values for operations in this package
-"""
+"""Defines enumerated values for operations in this package"""
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------

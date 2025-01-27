@@ -20,11 +20,13 @@ def create_slice_figure(workspace_name, presenter):
 def _show_plot(slice_cache, workspace):
     cur_fig = plt.gcf()
     cur_fig.clf()
-    ax = cur_fig.add_subplot(111, projection='mslice')
+    ax = cur_fig.add_subplot(111, projection="mslice")
     image = ax.pcolormesh(workspace, cmap=slice_cache.colourmap, norm=slice_cache.norm)
 
     cb = plt.colorbar(image, ax=ax)
-    cb.set_label('Intensity (arb. units)', labelpad=20, rotation=270, picker=PICKER_TOL_PTS)
+    cb.set_label(
+        "Intensity (arb. units)", labelpad=20, rotation=270, picker=PICKER_TOL_PTS
+    )
 
     plt_handler = cur_fig.canvas.manager.plot_handler
 

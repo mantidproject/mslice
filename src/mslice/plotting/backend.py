@@ -11,7 +11,7 @@ def get_canvas_and_toolbar_cls():
     :return: A 2-tuple of (FigureCanvas, NavigationToolbar)
     """
     backend = get_backend_module()
-    return getattr(backend, 'FigureCanvas'), getattr(backend, 'NavigationToolbar2QT')
+    return getattr(backend, "FigureCanvas"), getattr(backend, "NavigationToolbar2QT")
 
 
 def get_backend_module():
@@ -21,4 +21,6 @@ def get_backend_module():
     :return: A reference to the appropriate backend module
     """
     # Pick the relevant QtAgg one for the version we are running
-    return importlib.import_module('matplotlib.backends.backend_qt{}agg'.format(QT_VERSION[0]))
+    return importlib.import_module(
+        "matplotlib.backends.backend_qt{}agg".format(QT_VERSION[0])
+    )

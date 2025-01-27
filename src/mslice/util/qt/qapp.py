@@ -6,7 +6,10 @@
 from functools import wraps
 
 # make these available in this module for the rest of codebase
-from mantidqt.utils.qt.qappthreadcall import QAppThreadCall, force_method_calls_to_qapp_thread  # noqa: F401
+from mantidqt.utils.qt.qappthreadcall import (
+    QAppThreadCall,
+    force_method_calls_to_qapp_thread,
+)  # noqa: F401
 
 from qtpy.QtWidgets import QApplication
 
@@ -20,6 +23,7 @@ def call_in_qapp_thread(func):
     :param func: The function to decorate
     :return The wrapped function
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         return QAppThreadCall(func)(*args, **kwargs)
@@ -36,7 +40,7 @@ def create_qapp_if_required():
     if qApp is None:
         instance = QApplication.instance()
         if instance is None:
-            instance = QApplication(['mslice'])
+            instance = QApplication(["mslice"])
             instance.lastWindowClosed.connect(instance.quit)
         qApp = instance
     return qApp

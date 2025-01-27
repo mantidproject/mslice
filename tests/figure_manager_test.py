@@ -5,8 +5,12 @@ from unittest.mock import call
 from mslice.plotting.globalfiguremanager import GlobalFigureManager, set_category
 
 # Class/function locations for mock
-PLOTFIGUREMANAGER_CLS = 'mslice.plotting.plot_window.plot_figure_manager.PlotFigureManagerQT'
-FORCE_METHOD_CALLS_TO_QAPP_THREAD = 'mslice.plotting.plot_window.plot_figure_manager.force_method_calls_to_qapp_thread'
+PLOTFIGUREMANAGER_CLS = (
+    "mslice.plotting.plot_window.plot_figure_manager.PlotFigureManagerQT"
+)
+FORCE_METHOD_CALLS_TO_QAPP_THREAD = (
+    "mslice.plotting.plot_window.plot_figure_manager.force_method_calls_to_qapp_thread"
+)
 
 
 @mock.patch(PLOTFIGUREMANAGER_CLS, autospec=True)
@@ -19,8 +23,7 @@ class CurrentFigureTest(unittest.TestCase):
         GlobalFigureManager.notify_observers = mock.Mock()
         # The getattr_static call in the real implementation does not play well
         # with mocks
-        self.mock_force_qapp = mock.patch(
-            FORCE_METHOD_CALLS_TO_QAPP_THREAD).start()
+        self.mock_force_qapp = mock.patch(FORCE_METHOD_CALLS_TO_QAPP_THREAD).start()
         # make it a noop
         self.mock_force_qapp.side_effect = lambda arg: arg
 
@@ -32,15 +35,16 @@ class CurrentFigureTest(unittest.TestCase):
         mock_figure_class.side_effect = mock_figures
 
         GlobalFigureManager.get_figure_number()
-        self.assertTrue(1 in GlobalFigureManager.all_figure_numbers()
-                        )  # Check that a new figure with number=1 was created
-        self.assertRaises(KeyError, GlobalFigureManager.get_category,
-                          1)  # Check that figure has no category
         self.assertTrue(
-            GlobalFigureManager.get_active_figure() == mock_figures[0])
+            1 in GlobalFigureManager.all_figure_numbers()
+        )  # Check that a new figure with number=1 was created
+        self.assertRaises(
+            KeyError, GlobalFigureManager.get_category, 1
+        )  # Check that figure has no category
+        self.assertTrue(GlobalFigureManager.get_active_figure() == mock_figures[0])
 
     def test_create_multiple_unclassified_figures(self, mock_figure_class):
-        """Test that n calls to GlobalFigureManager create n unclassified _figures numbered 1 to n """
+        """Test that n calls to GlobalFigureManager create n unclassified _figures numbered 1 to n"""
         n = 10  # number of unclassfied _figures to be created
         mock_figures = [mock.Mock() for i in range(n)]
         mock_figure_class.side_effect = mock_figures
@@ -48,19 +52,22 @@ class CurrentFigureTest(unittest.TestCase):
         for i in range(n):
             GlobalFigureManager.get_figure_number()  # Create a new figure
         for i in range(1, n + 1):
-            self.assertTrue(i in GlobalFigureManager.all_figure_numbers(
-            ))  # Check that a new figure with number=i was created
-            self.assertRaises(KeyError, GlobalFigureManager.get_category,
-                              i)  # Check that figure has no category
+            self.assertTrue(
+                i in GlobalFigureManager.all_figure_numbers()
+            )  # Check that a new figure with number=i was created
+            self.assertRaises(
+                KeyError, GlobalFigureManager.get_category, i
+            )  # Check that figure has no category
 
     def test_create_single_categorised_figure(self, mock_figure_class):
         mock_figures = [mock.Mock()]
         mock_figure_class.side_effect = mock_figures
-        category = '1d'
+        category = "1d"
         # The following line is equivalent to applying the decorator setcategory with the parameter category
         # to function GlobalFigureManager.get_active_figure
         categorised_get_active_figure = set_category(category)(
-            GlobalFigureManager.get_active_figure)
+            GlobalFigureManager.get_active_figure
+        )
         fig = categorised_get_active_figure()
         # Assert Figure object came from right place
         self.assertTrue(fig == mock_figures[0])
@@ -69,33 +76,35 @@ class CurrentFigureTest(unittest.TestCase):
         self.assertTrue(GlobalFigureManager.get_active_figure() == mock_figures[0])
 
     def test_create_categorised_figure_then_uncategorised_figure(
-            self, mock_figure_class):
+        self, mock_figure_class
+    ):
         mock_figures = [mock.Mock(), mock.Mock()]
         mock_figure_class.side_effect = mock_figures
-        category = '1d'
+        category = "1d"
         categorised_get_active_figure = set_category(category)(
-            GlobalFigureManager.get_active_figure)
+            GlobalFigureManager.get_active_figure
+        )
 
         fig1 = categorised_get_active_figure()
         fig2 = GlobalFigureManager.get_figure_number()
         fig1_number = GlobalFigureManager.number_of_figure(fig1)
         fig2_number = GlobalFigureManager.number_of_figure(fig2)
         self.assertTrue(GlobalFigureManager.get_active_figure() == fig2)
-        self.assertTrue(
-            GlobalFigureManager.get_category(fig1_number) == category)
-        self.assertRaises(KeyError, GlobalFigureManager.get_category,
-                          fig2_number)
+        self.assertTrue(GlobalFigureManager.get_category(fig1_number) == category)
+        self.assertRaises(KeyError, GlobalFigureManager.get_category, fig2_number)
         self.assertTrue(fig1_number == 1 and fig2_number == 2)
 
     def test_category_switching(self, mock_figure_class):
         mock_figures = [mock.Mock(), mock.Mock()]
         mock_figure_class.side_effect = mock_figures
-        cat1 = '1d'
-        cat2 = '2d'
+        cat1 = "1d"
+        cat2 = "2d"
         cat1_get_active_figure = set_category(cat1)(
-            GlobalFigureManager.get_active_figure)
+            GlobalFigureManager.get_active_figure
+        )
         cat2_get_active_figure = set_category(cat2)(
-            GlobalFigureManager.get_active_figure)
+            GlobalFigureManager.get_active_figure
+        )
         # test is an arbitrary method just to make sure the correct figures are returned
         cat1_get_active_figure().test(1)
         cat2_get_active_figure().test(2)
@@ -150,27 +159,27 @@ class CurrentFigureTest(unittest.TestCase):
         mock_figures = [mock.Mock(), mock.Mock(), mock.Mock()]
         fig1_mock_manager = mock.Mock()
         # This manager is used to compare the relative order of calls of two differebc functions
-        fig1_mock_manager.attach_mock(mock_figures[0].flag_as_kept,
-                                      'fig1_kept')
-        fig1_mock_manager.attach_mock(mock_figures[0].flag_as_current,
-                                      'fig1_current')
+        fig1_mock_manager.attach_mock(mock_figures[0].flag_as_kept, "fig1_kept")
+        fig1_mock_manager.attach_mock(mock_figures[0].flag_as_current, "fig1_current")
         mock_figure_class.side_effect = mock_figures
-        cat1 = '1d'
-        cat2 = '2d'
+        cat1 = "1d"
+        cat2 = "2d"
         cat1_get_active_figure = set_category(cat1)(
-            GlobalFigureManager.get_active_figure)
+            GlobalFigureManager.get_active_figure
+        )
         cat2_get_active_figure = set_category(cat2)(
-            GlobalFigureManager.get_active_figure)
+            GlobalFigureManager.get_active_figure
+        )
 
         # test is an arbitrary method just to make sure the correct figures are returned
 
         cat1_get_active_figure().test(1)  # create a figure of category 1
         cat2_get_active_figure().test(2)  # create a figure of category 2
-        GlobalFigureManager.set_figure_as_kept(
-            2)  # now there is no active figure
+        GlobalFigureManager.set_figure_as_kept(2)  # now there is no active figure
 
         GlobalFigureManager.get_active_figure().test(
-            3)  # create an uncategorized figure
+            3
+        )  # create an uncategorized figure
         cat1_get_active_figure().test(
             4
         )  # the previously uncategorized figure should now be categorized as cat1
@@ -180,8 +189,7 @@ class CurrentFigureTest(unittest.TestCase):
         mock_figures[2].test.assert_has_calls([call(3), call(4)])
 
         # assert final status of fig1 is kept
-        self.assertTrue(
-            fig1_mock_manager.mock_calls[-1] == call.fig1_kept())
+        self.assertTrue(fig1_mock_manager.mock_calls[-1] == call.fig1_kept())
         self.assertTrue(GlobalFigureManager._active_figure == 3)
 
     def test_make_current_with_single_category(self, mock_figure_class):
@@ -190,21 +198,18 @@ class CurrentFigureTest(unittest.TestCase):
         mock_managers = [mock.Mock(), mock.Mock()]
 
         for i in range(len(mock_figures)):
-            mock_managers[i].attach_mock(mock_figures[i].flag_as_kept,
-                                         'fig_kept')
-            mock_managers[i].attach_mock(mock_figures[i].flag_as_current,
-                                         'fig_current')
+            mock_managers[i].attach_mock(mock_figures[i].flag_as_kept, "fig_kept")
+            mock_managers[i].attach_mock(mock_figures[i].flag_as_current, "fig_current")
         mock_figure_class.side_effect = mock_figures
-        cat1 = '1d'
+        cat1 = "1d"
         cat1_get_active_figure = set_category(cat1)(
-            GlobalFigureManager.get_active_figure)
+            GlobalFigureManager.get_active_figure
+        )
         # test is an arbitrary method just to make sure the correct figures are returned
 
         cat1_get_active_figure().test(1)  # create a figure of category 1
-        GlobalFigureManager.set_figure_as_kept(
-            1)  # now there is no active figure
-        cat1_get_active_figure().test(
-            2)  # this command should go to a new figure
+        GlobalFigureManager.set_figure_as_kept(1)  # now there is no active figure
+        cat1_get_active_figure().test(2)  # this command should go to a new figure
 
         # assert fig1 now displays kept
         self.assertTrue(mock_managers[0].mock_calls[-1] == call.fig_kept())

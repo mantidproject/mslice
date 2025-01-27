@@ -11,12 +11,17 @@ class WorkspaceOperatorMixin(object):
         return self * -1
 
     def __pow__(self, exponent):
-        return self.rewrap(PowerMD(InputWorkspace=self._raw_ws, OutputWorkspace="_",
-                                   Exponent=exponent, StoreInADS=False))
+        return self.rewrap(
+            PowerMD(
+                InputWorkspace=self._raw_ws,
+                OutputWorkspace="_",
+                Exponent=exponent,
+                StoreInADS=False,
+            )
+        )
 
 
 class WorkspaceMixin(object):
-
     def get_coordinates(self):
         """
         Gets dimensions and bins of a workspace.
@@ -26,7 +31,9 @@ class WorkspaceMixin(object):
         coords = {}
         for i in range(self._raw_ws.getNumDims()):
             dim = self._raw_ws.getDimension(i)
-            coords[dim.name] = np.linspace(dim.getMinimum(), dim.getMaximum(), dim.getNBins())
+            coords[dim.name] = np.linspace(
+                dim.getMinimum(), dim.getMaximum(), dim.getNBins()
+            )
         return coords
 
     def get_signal(self):
@@ -57,26 +64,32 @@ class WorkspaceMixin(object):
         signal = self.get_signal()
         error = self.get_error()
         new_ws = CloneWorkspace(InputWorkspace=self._raw_ws, StoreInADS=False)
-        array_size_error = RuntimeError("List or array must have same number of elements as an axis of the workspace")
-        new_signal = apply_with_corrected_shape(operator, signal, other, array_size_error)
+        array_size_error = RuntimeError(
+            "List or array must have same number of elements as an axis of the workspace"
+        )
+        new_signal = apply_with_corrected_shape(
+            operator, signal, other, array_size_error
+        )
         self._set_signal_raw(new_ws, new_signal)
 
         if operator == op.mul or operator == op.truediv:
-            new_error = apply_with_corrected_shape(operator, error, other, array_size_error)
+            new_error = apply_with_corrected_shape(
+                operator, error, other, array_size_error
+            )
             self._set_error_raw(new_ws, new_error)
         return new_ws
 
     def get_saved_cut_parameters(self, axis=None):
         try:
             if axis is None:
-                axis = self._cut_params['previous_axis']
+                axis = self._cut_params["previous_axis"]
             return self._cut_params[axis], axis
         except KeyError:
             return None, None
 
     def set_saved_cut_parameters(self, axis, params):
         self._cut_params[axis] = params
-        self._cut_params['previous_axis'] = axis
+        self._cut_params["previous_axis"] = axis
 
     def is_axis_saved(self, axis):
         return True if axis in self._cut_params else False

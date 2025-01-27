@@ -13,8 +13,14 @@ from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 class IntensityCorrectionUtilTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
-                     IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        cls.enums = [
+            IntensityType.SCATTERING_FUNCTION,
+            IntensityType.CHI,
+            IntensityType.CHI_MAGNETIC,
+            IntensityType.SYMMETRISED,
+            IntensityType.D2SIGMA,
+            IntensityType.GDOS,
+        ]
 
     def test_enum_conversion(self):
         descs = [IntensityCache.get_desc_from_type(e) for e in self.enums]
@@ -52,32 +58,72 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
     def test_methods_cached_by_cut_plotter_presenter(self):
         IntensityCache._IntensityCache__method_dict_slice = {}
         presenter = CutPlotterPresenter()
-        enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
-                 IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        enums = [
+            IntensityType.SCATTERING_FUNCTION,
+            IntensityType.CHI,
+            IntensityType.CHI_MAGNETIC,
+            IntensityType.SYMMETRISED,
+            IntensityType.D2SIGMA,
+            IntensityType.GDOS,
+        ]
         methods = [IntensityCache.get_method(CATEGORY_CUT, e) for e in enums]
         for method in methods:
             self.assertTrue(hasattr(presenter, method))
 
-    @patch('mslice.plotting.plot_window.plot_window.add_action')
-    @patch('mslice.plotting.plot_window.plot_window.PlotWindow.setup_ui')
-    @patch('mslice.plotting.plot_window.plot_window.PlotWindow._PlotWindow__inherit')
-    def test_actions_cached_by_cut_plotter_presenter(self, mock_inherit, mock_setup_ui, mock_add_action):
+    @patch("mslice.plotting.plot_window.plot_window.add_action")
+    @patch("mslice.plotting.plot_window.plot_window.PlotWindow.setup_ui")
+    @patch("mslice.plotting.plot_window.plot_window.PlotWindow._PlotWindow__inherit")
+    def test_actions_cached_by_cut_plotter_presenter(
+        self, mock_inherit, mock_setup_ui, mock_add_action
+    ):
         IntensityCache._IntensityCache__action_dict = {}
         plot_window = PlotWindow(MagicMock())
         plot_window.add_intensity_actions(MagicMock())
-        enums = [IntensityType.SCATTERING_FUNCTION, IntensityType.CHI, IntensityType.CHI_MAGNETIC,
-                 IntensityType.SYMMETRISED, IntensityType.D2SIGMA, IntensityType.GDOS]
+        enums = [
+            IntensityType.SCATTERING_FUNCTION,
+            IntensityType.CHI,
+            IntensityType.CHI_MAGNETIC,
+            IntensityType.SYMMETRISED,
+            IntensityType.D2SIGMA,
+            IntensityType.GDOS,
+        ]
         actions = [IntensityCache.get_action(e) for e in enums]
         for action in actions:
             self.assertTrue(hasattr(plot_window, action))
         mock_setup_ui.assert_called_once()
 
     @staticmethod
-    def _create_slice(workspace=None, colourmap=None, norm=None, sample_temp=None,
-                      q_axis=None, e_axis=None, rotated=None):
+    def _create_slice(
+        workspace=None,
+        colourmap=None,
+        norm=None,
+        sample_temp=None,
+        q_axis=None,
+        e_axis=None,
+        rotated=None,
+    ):
         return Slice(workspace, colourmap, norm, sample_temp, q_axis, e_axis, rotated)
 
     @staticmethod
-    def _create_cut(q_axis=Axis("|Q|", 0.1, 3.1, 0.1), e_axis=Axis("DeltaE", -10, 15, 1), intensity_start=0,
-                    intensity_end=100, norm_to_one=False, width=None, algorithm='Rebin', sample_temp=None, e_fixed=None):
-        return Cut(e_axis, q_axis, intensity_start, intensity_end, norm_to_one, width, algorithm, sample_temp, e_fixed)
+    def _create_cut(
+        q_axis=Axis("|Q|", 0.1, 3.1, 0.1),
+        e_axis=Axis("DeltaE", -10, 15, 1),
+        intensity_start=0,
+        intensity_end=100,
+        norm_to_one=False,
+        width=None,
+        algorithm="Rebin",
+        sample_temp=None,
+        e_fixed=None,
+    ):
+        return Cut(
+            e_axis,
+            q_axis,
+            intensity_start,
+            intensity_end,
+            norm_to_one,
+            width,
+            algorithm,
+            sample_temp,
+            e_fixed,
+        )

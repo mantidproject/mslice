@@ -2,10 +2,12 @@ import warnings
 from mslice.util.mantid import in_mantid
 
 # Ignore Jupyter/IPython deprecation warnings that we can't do anything about
-warnings.filterwarnings('ignore', category=DeprecationWarning, module='IPython.*')
-warnings.filterwarnings('ignore', category=DeprecationWarning, module='ipykernel.*')
-warnings.filterwarnings('ignore', category=DeprecationWarning, module='jupyter_client.*')
-warnings.filterwarnings('ignore', category=DeprecationWarning, module='qtconsole.*')
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="IPython.*")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="ipykernel.*")
+warnings.filterwarnings(
+    "ignore", category=DeprecationWarning, module="jupyter_client.*"
+)
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="qtconsole.*")
 del warnings
 
 try:
@@ -18,8 +20,7 @@ except ImportError:
 
 
 class IPythonWidget(RichIPythonWidget):
-    """ Extends IPython's qt widget to include setting up and in-process kernel
-    """
+    """Extends IPython's qt widget to include setting up and in-process kernel"""
 
     def __init__(self, *args, **kw):
         super(IPythonWidget, self).__init__(*args, **kw)
@@ -28,7 +29,7 @@ class IPythonWidget(RichIPythonWidget):
         kernel_manager = QtInProcessKernelManager()
         kernel_manager.start_kernel()
         kernel = kernel_manager.kernel
-        kernel.gui = 'qt'
+        kernel.gui = "qt"
 
         kernel_client = kernel_manager.client()
         kernel_client.start_channels()
@@ -36,12 +37,14 @@ class IPythonWidget(RichIPythonWidget):
         self.kernel_manager = kernel_manager
         self.kernel_client = kernel_client
         if not in_mantid():
-            self.execute('from mslice.util.mantid.mantid_algorithms import *', hidden=True)
-            self.execute('from mslice.cli import *', hidden=True)
+            self.execute(
+                "from mslice.util.mantid.mantid_algorithms import *", hidden=True
+            )
+            self.execute("from mslice.cli import *", hidden=True)
         else:
-            self.execute('import mslice.cli as mc')
+            self.execute("import mslice.cli as mc")
 
     def cleanup(self):
         if in_mantid():
-            self.execute('cls')
-            self.execute('import mslice.cli as mc')
+            self.execute("cls")
+            self.execute("import mslice.cli as mc")

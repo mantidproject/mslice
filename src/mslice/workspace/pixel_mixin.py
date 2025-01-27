@@ -3,7 +3,6 @@ from mantid.simpleapi import BinMD
 
 
 class PixelMixin(object):
-
     def get_histo_ws(self):
         """Converts _raw_ws from MDEventWorkspace to MDHistoWorkspace using BinMD, and caches result in _histo_ws"""
         if self._histo_ws is None:
@@ -11,14 +10,28 @@ class PixelMixin(object):
             for x in range(6):
                 try:
                     dim = self._raw_ws.getDimension(x)
-                    dim_info = dim.name + ',' + str(dim.getMinimum()) + ',' + str(dim.getMaximum()) + ',' + str(100)
+                    dim_info = (
+                        dim.name
+                        + ","
+                        + str(dim.getMinimum())
+                        + ","
+                        + str(dim.getMaximum())
+                        + ","
+                        + str(100)
+                    )
                 except RuntimeError:
                     dim_info = None
                 dim_values.append(dim_info)
-            histo_workspace = BinMD(InputWorkspace=self._raw_ws, OutputWorkspace=str(self),
-                                    AlignedDim0=dim_values[0], AlignedDim1=dim_values[1],
-                                    AlignedDim2=dim_values[2], AlignedDim3=dim_values[3],
-                                    AlignedDim4=dim_values[4], AlignedDim5=dim_values[5])
+            histo_workspace = BinMD(
+                InputWorkspace=self._raw_ws,
+                OutputWorkspace=str(self),
+                AlignedDim0=dim_values[0],
+                AlignedDim1=dim_values[1],
+                AlignedDim2=dim_values[2],
+                AlignedDim3=dim_values[3],
+                AlignedDim4=dim_values[4],
+                AlignedDim5=dim_values[5],
+            )
             self._histo_ws = HistogramWorkspace(histo_workspace, self.name)
         return self._histo_ws
 
@@ -41,7 +54,9 @@ class PixelMixin(object):
         Note this wraps the result in HistogramWorkspace object, which is then passed
          to PixelWorkspace constructor in Workspace._binary_op.
         """
-        return HistogramWorkspace(self.get_histo_ws()._binary_op_array(operator, other), self.name)
+        return HistogramWorkspace(
+            self.get_histo_ws()._binary_op_array(operator, other), self.name
+        )
 
     def __pow__(self, other):
         return self.rewrap(self.get_histo_ws().__pow__(other))

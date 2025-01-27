@@ -33,14 +33,16 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
             elif command == Command.U2Changed:
                 self._axis_changed(2)
             else:
-                raise ValueError("Powder Projection Presenter received an unrecognised command")
+                raise ValueError(
+                    "Powder Projection Presenter received an unrecognised command"
+                )
 
     def _calculate_powder_projection(self):
         selected_workspaces = self._get_main_presenter().get_selected_workspaces()
         axis1 = self._powder_view.get_powder_u1()
         axis2 = self._powder_view.get_powder_u2()
         if axis1 == axis2:
-            raise ValueError('equal axis')
+            raise ValueError("equal axis")
         if not selected_workspaces:
             self._powder_view.display_message_box("No workspace is selected")
             return
@@ -50,7 +52,9 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         self.after_projection(outws)
 
     def calc_projection(self, workspace, axis1, axis2, quiet=False):
-        proj_ws = self._projection_calculator.calculate_projection(workspace, axis1, axis2)
+        proj_ws = self._projection_calculator.calculate_projection(
+            workspace, axis1, axis2
+        )
         if not quiet:
             self.after_projection([proj_ws])
         return proj_ws
@@ -77,7 +81,10 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
             new_index = (name_to_index[axes[other_axis]] + 1) % num_items
             axes_set[other_axis](self._available_axes[new_index])
         # Assuming DeltaE is always the last axes option.
-        if axes[curr_axis] != self._available_axes[-1] and axes[other_axis] != self._available_axes[-1]:
+        if (
+            axes[curr_axis] != self._available_axes[-1]
+            and axes[other_axis] != self._available_axes[-1]
+        ):
             axes_set[other_axis](self._available_axes[-1])
 
     def workspace_selection_changed(self):

@@ -1,12 +1,14 @@
-"""A widget for defining projections for powders
-"""
+"""A widget for defining projections for powders"""
+
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget, QMessageBox
 
-from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
+from mslice.models.projection.powder.mantid_projection_calculator import (
+    MantidProjectionCalculator,
+)
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.util.qt import load_ui
 from mslice.views.interfaces.powder_projection_view import PowderView
@@ -21,12 +23,12 @@ from .command import Command
 class PowderWidget(PowderView, QWidget):
     """This widget is not usable without a main window which implements mainview"""
 
-    error_occurred = Signal('QString')
+    error_occurred = Signal("QString")
     busy = Signal(bool)
 
     def __init__(self, parent=None, *args, **kwargs):
         QWidget.__init__(self, parent, *args, **kwargs)
-        load_ui(__file__, 'powder.ui', self)
+        load_ui(__file__, "powder.ui", self)
         self.btnPowderCalculateProjection.clicked.connect(self._btn_clicked)
         self._presenter = PowderProjectionPresenter(self, MantidProjectionCalculator())
         self.cmbPowderU1.currentIndexChanged.connect(self._u1_changed)
@@ -94,6 +96,6 @@ class PowderWidget(PowderView, QWidget):
 
     def display_message_box(self, message):
         msg_box = QMessageBox()
-        msg_box.setWindowTitle('Powder Projection Error')
+        msg_box.setWindowTitle("Powder Projection Error")
         msg_box.setText(message)
         msg_box.exec_()

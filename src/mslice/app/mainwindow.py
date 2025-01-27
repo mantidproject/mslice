@@ -27,34 +27,36 @@ WARNING_STATUS_STYLESHEET = "color: orange;"
 
 
 class MainWindow(MainView, QMainWindow):
-
     def __init__(self, in_mantid=False):
         QMainWindow.__init__(self)
-        load_ui(__file__, 'mainwindow.ui', self)
+        load_ui(__file__, "mainwindow.ui", self)
         self.init_ui()
 
         self.tabs = [self.wgtSlice, self.wgtCut, self.wgtPowder]
-        self.tabs_to_show = {TAB_2D: [TAB_POWDER],
-                             TAB_EVENT: [TAB_SLICE, TAB_CUT],
-                             TAB_HISTO: [],
-                             TAB_NONPSD: [TAB_SLICE, TAB_CUT]}
+        self.tabs_to_show = {
+            TAB_2D: [TAB_POWDER],
+            TAB_EVENT: [TAB_SLICE, TAB_CUT],
+            TAB_HISTO: [],
+            TAB_NONPSD: [TAB_SLICE, TAB_CUT],
+        }
 
-        self.buttons_to_enable = {TAB_2D: [self.btnAdd, self.btnSubtract, self.composeFrame],
-                                  TAB_EVENT: [self.btnMerge],
-                                  TAB_HISTO: [self.btnPlot, self.btnOverplot],
-                                  TAB_NONPSD: [self.btnAdd, self.btnSubtract, self.composeFrame]}
+        self.buttons_to_enable = {
+            TAB_2D: [self.btnAdd, self.btnSubtract, self.composeFrame],
+            TAB_EVENT: [self.btnMerge],
+            TAB_HISTO: [self.btnPlot, self.btnOverplot],
+            TAB_NONPSD: [self.btnAdd, self.btnSubtract, self.composeFrame],
+        }
         if in_mantid:
             self.buttons_to_enable[TAB_HISTO] += [self.btnSaveToADS]
-            self.btnSaveToADS.setText('Save to Workbench')
+            self.btnSaveToADS.setText("Save to Workbench")
 
-        self.stack_to_show = {TAB_2D: 1,
-                              TAB_EVENT: 0,
-                              TAB_HISTO: 0,
-                              TAB_NONPSD: 1}
+        self.stack_to_show = {TAB_2D: 1, TAB_EVENT: 0, TAB_HISTO: 0, TAB_NONPSD: 1}
 
-        self.composeCommand = {'Compose': ws_command.ComposeWorkspace,
-                               'Scale': ws_command.Scale,
-                               'Bose': ws_command.Bose}
+        self.composeCommand = {
+            "Compose": ws_command.ComposeWorkspace,
+            "Scale": ws_command.Scale,
+            "Bose": ws_command.Bose,
+        }
 
         self.workspace_presenter = self.wgtWorkspacemanager.get_presenter()
         self.dataloader_presenter = self.data_loading.get_presenter()
@@ -67,10 +69,17 @@ class MainWindow(MainView, QMainWindow):
         self.cut_widget_presenter.set_cut_plotter_presenter(self.cut_plotter_presenter)
         self.plot_selector_presenter = self.plot_selector_view.get_presenter()
         self.plot_selector_presenter.update_plot_list()
-        self._presenter = MainPresenter(self, self.workspace_presenter, self.dataloader_presenter,
-                                        slice_widget_presenter, self.powder_presenter, self.cut_widget_presenter,
-                                        self.slice_plotter_presenter, self.cut_plotter_presenter,
-                                        self.plot_selector_presenter)
+        self._presenter = MainPresenter(
+            self,
+            self.workspace_presenter,
+            self.dataloader_presenter,
+            slice_widget_presenter,
+            self.powder_presenter,
+            self.cut_widget_presenter,
+            self.slice_plotter_presenter,
+            self.cut_plotter_presenter,
+            self.plot_selector_presenter,
+        )
 
         self.wgtWorkspacemanager.tab_changed.connect(self.ws_tab_changed)
         self.setup_save()
@@ -103,25 +112,42 @@ class MainWindow(MainView, QMainWindow):
 
         self._en_default_actions = []
         for e_unit in EnergyUnits.get_all_units():
-            action = add_action(self.menuDefault_Energy_Units, self, e_unit, checkable=True, visible=True)
+            action = add_action(
+                self.menuDefault_Energy_Units,
+                self,
+                e_unit,
+                checkable=True,
+                visible=True,
+            )
             action.triggered.connect(partial(self.set_energy_default, action))
             self._en_default_actions.append(action)
         self._en_default_actions[0].setChecked(True)
 
-        self.actionEUnitConvEnabled.triggered.connect(partial(self.set_energy_conversion, True))
-        self.actionEUnitConvDisabled.triggered.connect(partial(self.set_energy_conversion, False))
-        self._cut_algo_map = {'Rebin': self.actionCutAlgoRebin, 'Integration': self.actionCutAlgoIntegration}
-        self.actionCutAlgoRebin.triggered.connect(partial(self.set_cut_algorithm_default, 'Rebin'))
-        self.actionCutAlgoIntegration.triggered.connect(partial(self.set_cut_algorithm_default, 'Integration'))
+        self.actionEUnitConvEnabled.triggered.connect(
+            partial(self.set_energy_conversion, True)
+        )
+        self.actionEUnitConvDisabled.triggered.connect(
+            partial(self.set_energy_conversion, False)
+        )
+        self._cut_algo_map = {
+            "Rebin": self.actionCutAlgoRebin,
+            "Integration": self.actionCutAlgoIntegration,
+        }
+        self.actionCutAlgoRebin.triggered.connect(
+            partial(self.set_cut_algorithm_default, "Rebin")
+        )
+        self.actionCutAlgoIntegration.triggered.connect(
+            partial(self.set_cut_algorithm_default, "Integration")
+        )
 
         self.print_startup_notifications()
 
     def setup_save(self):
         menu = QMenu(self.btnSave)
-        menu.addAction("Nexus (*.nxs)", lambda: self.button_save('Nexus'))
-        menu.addAction("NXSPE (*.nxspe)", lambda: self.button_save('NXSPE'))
-        menu.addAction("ASCII (*.txt)", lambda: self.button_save('Ascii'))
-        menu.addAction("Matlab (*.mat)", lambda: self.button_save('Matlab'))
+        menu.addAction("Nexus (*.nxs)", lambda: self.button_save("Nexus"))
+        menu.addAction("NXSPE (*.nxspe)", lambda: self.button_save("NXSPE"))
+        menu.addAction("ASCII (*.txt)", lambda: self.button_save("Ascii"))
+        menu.addAction("Matlab (*.mat)", lambda: self.button_save("Matlab"))
         self.btnSave.setMenu(menu)
 
     def setup_compose_button(self):
@@ -130,8 +156,8 @@ class MainWindow(MainView, QMainWindow):
         self.stackLayout.addWidget(self.composeFrame)
         self.stackFrame.setLayout(self.stackLayout)
         menu = QMenu(self.btnComposeMenu)
-        menu.addAction("Scale", lambda: self.button_compose('Scale'))
-        menu.addAction("Bose", lambda: self.button_compose('Bose'))
+        menu.addAction("Scale", lambda: self.button_compose("Scale"))
+        menu.addAction("Bose", lambda: self.button_compose("Bose"))
         self.btnComposeMenu.setMenu(menu)
         self.btnComposeMenu.setMaximumWidth(10)
 
@@ -158,8 +184,15 @@ class MainWindow(MainView, QMainWindow):
     def enable_buttons(self, tab):
         """Enables correct buttons based on workspace tab"""
         self.stackLayout.setCurrentIndex(self.stack_to_show[tab])
-        variable_buttons = [self.btnAdd, self.btnSubtract, self.btnMerge, self.btnPlot, self.btnOverplot,
-                            self.btnSaveToADS, self.composeFrame]
+        variable_buttons = [
+            self.btnAdd,
+            self.btnSubtract,
+            self.btnMerge,
+            self.btnPlot,
+            self.btnOverplot,
+            self.btnSaveToADS,
+            self.composeFrame,
+        ]
         for button in variable_buttons:
             button.hide()
         for button in self.buttons_to_enable[tab]:
@@ -169,7 +202,9 @@ class MainWindow(MainView, QMainWindow):
         self.workspace_presenter.notify(ws_command.Subtract)
 
     def button_save(self, file_type):
-        self.workspace_presenter.notify(getattr(ws_command, 'SaveSelectedWorkspace' + file_type))
+        self.workspace_presenter.notify(
+            getattr(ws_command, "SaveSelectedWorkspace" + file_type)
+        )
 
     def button_add(self):
         self.workspace_presenter.notify(ws_command.Add)
@@ -195,7 +230,9 @@ class MainWindow(MainView, QMainWindow):
     def button_compose(self, value=False):
         if value:
             self.btnCompose.setText(value)
-        self.workspace_presenter.notify(self.composeCommand[str(self.btnCompose.text())])
+        self.workspace_presenter.notify(
+            self.composeCommand[str(self.btnCompose.text())]
+        )
 
     def init_ui(self):
         self.setup_ipython()
@@ -212,12 +249,12 @@ class MainWindow(MainView, QMainWindow):
         self.splitter.setSizes([500, 250])
 
     def show_warning(self, msg):
-        """Show a warning message on status bar. If msg ==""  the function will clear the displayed message """
+        """Show a warning message on status bar. If msg ==""  the function will clear the displayed message"""
         self.statusbar.setStyleSheet(WARNING_STATUS_STYLESHEET)
         self.statusbar.showMessage(msg)
 
     def show_error(self, msg):
-        """Show an error message on status bar. If msg ==""  the function will clear the displayed message """
+        """Show an error message on status bar. If msg ==""  the function will clear the displayed message"""
         self.statusbar.setStyleSheet(ERROR_STATUS_STYLESHEET)
         self.statusbar.showMessage(msg)
 
@@ -238,7 +275,9 @@ class MainWindow(MainView, QMainWindow):
         QApplication.processEvents()
 
     def get_energy_default(self):
-        return [action.text() for action in self._en_default_actions if action.isChecked()][0]
+        return [
+            action.text() for action in self._en_default_actions if action.isChecked()
+        ][0]
 
     def set_energy_default(self, this_action):
         if this_action.isChecked():
@@ -258,9 +297,13 @@ class MainWindow(MainView, QMainWindow):
 
     def set_energy_conversion(self, EnabledClicked):
         if EnabledClicked:
-            self.actionEUnitConvDisabled.setChecked(not self.actionEUnitConvEnabled.isChecked())
+            self.actionEUnitConvDisabled.setChecked(
+                not self.actionEUnitConvEnabled.isChecked()
+            )
         else:
-            self.actionEUnitConvEnabled.setChecked(not self.actionEUnitConvDisabled.isChecked())
+            self.actionEUnitConvEnabled.setChecked(
+                not self.actionEUnitConvDisabled.isChecked()
+            )
 
     def set_cut_algorithm_default(self, algo):
         for action in self._cut_algo_map.keys():
@@ -283,7 +326,7 @@ class MainWindow(MainView, QMainWindow):
         print_list = []
 
         for item in print_list:
-            for strn in item.split('\n'):
+            for strn in item.split("\n"):
                 self._console.execute(f'print("{strn}")', hidden=True)
 
     def closeEvent(self, event):

@@ -24,7 +24,7 @@ def normalize_workspace(workspace):
 
 def _num_events_normalized_array(workspace):
     assert isinstance(workspace, IMDHistoWorkspace)
-    with np.errstate(invalid='ignore'):
+    with np.errstate(invalid="ignore"):
         if workspace.displayNormalization() == MDNormalization.NoNormalization:
             data = np.array(workspace.getSignalArray())
             data[np.where(workspace.getNumEventsArray() == 0)] = np.nan

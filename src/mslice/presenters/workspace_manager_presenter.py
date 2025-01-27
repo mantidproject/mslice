@@ -3,13 +3,24 @@ from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.mslice_ads_observer import MSliceADSObserver
 from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.workspace_algorithms import (save_workspaces, export_workspace_to_ads, subtract,
-                                                                 is_pixel_workspace, combine_workspace,
-                                                                 add_workspace_runs, scale_workspaces,
-                                                                 remove_workspace_from_ads)
-from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, get_visible_workspace_names,
-                                                               get_workspace_names, get_workspace_name,
-                                                               delete_workspace, rename_workspace)
+from mslice.models.workspacemanager.workspace_algorithms import (
+    save_workspaces,
+    export_workspace_to_ads,
+    subtract,
+    is_pixel_workspace,
+    combine_workspace,
+    add_workspace_runs,
+    scale_workspaces,
+    remove_workspace_from_ads,
+)
+from mslice.models.workspacemanager.workspace_provider import (
+    get_workspace_handle,
+    get_visible_workspace_names,
+    get_workspace_names,
+    get_workspace_name,
+    delete_workspace,
+    rename_workspace,
+)
 from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
 from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
@@ -22,10 +33,18 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._main_presenter = None
         self._psd = True
         self._command_map = {
-            Command.SaveSelectedWorkspaceNexus: lambda: self._save_selected_workspace('.nxs'),
-            Command.SaveSelectedWorkspaceNXSPE: lambda: self._save_selected_workspace('.nxspe'),
-            Command.SaveSelectedWorkspaceAscii: lambda: self._save_selected_workspace('.txt'),
-            Command.SaveSelectedWorkspaceMatlab: lambda: self._save_selected_workspace('.mat'),
+            Command.SaveSelectedWorkspaceNexus: lambda: self._save_selected_workspace(
+                ".nxs"
+            ),
+            Command.SaveSelectedWorkspaceNXSPE: lambda: self._save_selected_workspace(
+                ".nxspe"
+            ),
+            Command.SaveSelectedWorkspaceAscii: lambda: self._save_selected_workspace(
+                ".txt"
+            ),
+            Command.SaveSelectedWorkspaceMatlab: lambda: self._save_selected_workspace(
+                ".mat"
+            ),
             Command.RemoveSelectedWorkspaces: self._remove_selected_workspaces,
             Command.RenameWorkspace: self._rename_workspace,
             Command.CombineWorkspace: self._combine_workspace,
@@ -33,14 +52,18 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             Command.Add: self._add_workspaces,
             Command.Subtract: self._subtract_workspace,
             Command.SaveToADS: self._save_to_ads,
-            Command.ComposeWorkspace:
-                lambda: self._workspace_manager_view._display_error('Please select a Compose action from the dropdown menu'),
+            Command.ComposeWorkspace: lambda: self._workspace_manager_view._display_error(
+                "Please select a Compose action from the dropdown menu"
+            ),
             Command.Scale: self._scale_workspace,
-            Command.Bose: lambda: self._scale_workspace(is_bose=True)}
-        self._ads_observer = MSliceADSObserver(self.delete_handle, self.clear_handle, self.rename_handle)
+            Command.Bose: lambda: self._scale_workspace(is_bose=True),
+        }
+        self._ads_observer = MSliceADSObserver(
+            self.delete_handle, self.clear_handle, self.rename_handle
+        )
 
     def register_master(self, main_presenter):
-        assert (isinstance(main_presenter, MainPresenterInterface))
+        assert isinstance(main_presenter, MainPresenterInterface)
         self._main_presenter = main_presenter
         self._main_presenter.register_workspace_selector(self)
         self.update_displayed_workspaces()
@@ -51,7 +74,11 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             if command in self._command_map.keys():
                 self._command_map[command]()
             else:
-                raise ValueError("Workspace Manager Presenter received an unrecognised command: {}".format(str(command)))
+                raise ValueError(
+                    "Workspace Manager Presenter received an unrecognised command: {}".format(
+                        str(command)
+                    )
+                )
 
     def _broadcast_selected_workspaces(self):
         self.workspace_selection_changed()
@@ -69,7 +96,12 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
 
     def workspace_selection_changed(self):
         if self._workspace_manager_view.current_tab() == TAB_2D:
-            psd = all([get_workspace_handle(ws).is_PSD for ws in self._workspace_manager_view.get_workspace_selected()])
+            psd = all(
+                [
+                    get_workspace_handle(ws).is_PSD
+                    for ws in self._workspace_manager_view.get_workspace_selected()
+                ]
+            )
             if psd and not self._psd:
                 self._workspace_manager_view.tab_changed.emit(TAB_2D)
                 self._psd = True
@@ -87,8 +119,11 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
 
         try:
-            save_directory, save_name, extension = get_save_directory(multiple_files=len(selected_workspaces) > 1,
-                                                                      save_as_image=False, default_ext=extension)
+            save_directory, save_name, extension = get_save_directory(
+                multiple_files=len(selected_workspaces) > 1,
+                save_as_image=False,
+                default_ext=extension,
+            )
         except RuntimeError as e:
             if str(e) == "dialog cancelled":
                 return
@@ -143,8 +178,10 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_select_more_than_one_workspaces()
             return
         elif len(selected_workspaces) == 1:
-            selected_workspaces.append(str(self._workspace_manager_view.add_workspace_dialog()))
-        new_workspace = selected_workspaces[0] + '_combined'
+            selected_workspaces.append(
+                str(self._workspace_manager_view.add_workspace_dialog())
+            )
+        new_workspace = selected_workspaces[0] + "_combined"
         if all([is_pixel_workspace(workspace) for workspace in selected_workspaces]):
             combine_workspace(selected_workspaces, new_workspace)
         else:
@@ -195,7 +232,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             return
         try:
             if is_bose:
-                scale_workspaces(selected_workspaces, from_temp=retvals[0], to_temp=retvals[1])
+                scale_workspaces(
+                    selected_workspaces, from_temp=retvals[0], to_temp=retvals[1]
+                )
             else:
                 scale_workspaces(selected_workspaces, scale_factor=retvals[0])
         except ValueError as e:
@@ -224,7 +263,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         This function must be called by the main presenter if any other
         presenter does any operation that changes the name or type of any existing workspace or creates or removes a
         workspace"""
-        self._workspace_manager_view.display_loaded_workspaces(get_visible_workspace_names())
+        self._workspace_manager_view.display_loaded_workspaces(
+            get_visible_workspace_names()
+        )
 
     def _clear_displayed_error(self):
         self._workspace_manager_view.clear_displayed_error()

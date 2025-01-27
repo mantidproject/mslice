@@ -1,4 +1,4 @@
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
 import unittest
 
 from mock import MagicMock
@@ -11,7 +11,6 @@ from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresen
 
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):
-
     def test_ensure_that_the_ads_observer_calls_delete_handle(self):
         presenter = WorkspaceManagerPresenter(MagicMock())
         presenter.delete_handle = MagicMock()
@@ -43,7 +42,7 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         presenter.clear_handle = MagicMock()
         self.assertTrue(isinstance(presenter._ads_observer, MSliceADSObserver))
         presenter._ads_observer = MSliceADSObserver(
-          presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
+            presenter.delete_handle, presenter.clear_handle, presenter.rename_handle
         )
 
         CreateSampleWorkspace(OutputWorkspace="ws", StoreInADS=True)
@@ -52,5 +51,5 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         presenter.clear_handle.assert_called_once()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

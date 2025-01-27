@@ -1,5 +1,3 @@
-
-
 from qtpy import QT_VERSION
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog
@@ -18,20 +16,22 @@ from . import TAB_2D, TAB_EVENT, TAB_HISTO
 class WorkspaceManagerWidget(WorkspaceView, QWidget):
     """A Widget that allows user to perform basic workspace save/load/rename/delete operations on workspaces"""
 
-    error_occurred = Signal('QString')
+    error_occurred = Signal("QString")
     tab_changed = Signal(int)
     busy = Signal(bool)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        load_ui(__file__, 'workspacemanager.ui', self)
+        load_ui(__file__, "workspacemanager.ui", self)
         self.button_mappings = {}
         self._main_window = None
         self.onscreen_workspaces = []
         self.tab = None
-        self.tab_to_list = {TAB_2D: self.listWorkspaces2D,
-                            TAB_EVENT: self.listWorkspacesEvent,
-                            TAB_HISTO: self.listWorkspacesHisto}
+        self.tab_to_list = {
+            TAB_2D: self.listWorkspaces2D,
+            TAB_EVENT: self.listWorkspacesEvent,
+            TAB_HISTO: self.listWorkspacesHisto,
+        }
         self.tabWidget.currentChanged.connect(self.tab_changed_method)
         self.listWorkspaces2D.itemSelectionChanged.connect(self.list_item_changed)
         self.listWorkspacesEvent.itemSelectionChanged.connect(self.list_item_changed)
@@ -49,7 +49,11 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         self.tab_changed.emit(tab_index)
 
     def clear_selection(self):
-        for ws_list in [self.listWorkspaces2D, self.listWorkspacesEvent, self.listWorkspacesHisto]:
+        for ws_list in [
+            self.listWorkspaces2D,
+            self.listWorkspacesEvent,
+            self.listWorkspacesHisto,
+        ]:
             ws_list.clearSelection()
 
     def current_list(self):
@@ -63,15 +67,15 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def highlight_tab(self, tab):
         tab_text = self.tabWidget.tabText(tab)
-        if not tab_text.endswith('*'):
-            self.tabWidget.setTabText(tab, tab_text + '*')
+        if not tab_text.endswith("*"):
+            self.tabWidget.setTabText(tab, tab_text + "*")
 
     def _btn_clicked(self):
         sender = self.sender()
         try:
             command = self.button_mappings[sender]
         except KeyError:
-            raise Exception('Invalid sender')
+            raise Exception("Invalid sender")
         self._presenter.notify(command)
 
     def add_workspace(self, workspace):
@@ -104,7 +108,11 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         Must be done in seperate function because items are removed by index and removing an items may alter the indexes
         of other items"""
         self.onscreen_workspaces.remove(workspace)
-        for ws_list in [self.listWorkspaces2D, self.listWorkspacesEvent, self.listWorkspacesHisto]:
+        for ws_list in [
+            self.listWorkspaces2D,
+            self.listWorkspacesEvent,
+            self.listWorkspacesHisto,
+        ]:
             for index in range(ws_list.count()):
                 if ws_list.item(index).text() == workspace:
                     ws_list.takeItem(index)
@@ -130,31 +138,33 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         if sub_input.exec_():
             return sub_input.user_input()
         else:
-            raise RuntimeError('dialog cancelled')
+            raise RuntimeError("dialog cancelled")
 
     def scale_input(self, is_bose=False):
         scale_input = ScaleInputBox(is_bose, self)
         if scale_input.exec_():
             return scale_input.user_input()
         else:
-            raise RuntimeError('dialog cancelled')
+            raise RuntimeError("dialog cancelled")
 
     def get_workspace_selected(self):
-        selected_workspaces = [str(x.text()) for x in self.current_list().selectedItems()]
+        selected_workspaces = [
+            str(x.text()) for x in self.current_list().selectedItems()
+        ]
         return selected_workspaces
 
     def set_workspace_selected(self, index):
         current_list = self.current_list()
-        if QT_VERSION.startswith('5'):
+        if QT_VERSION.startswith("5"):
             for item_index in range(current_list.count()):
                 current_list.item(item_index).setSelected(False)
-            for this_index in (index if hasattr(index, "__iter__") else [index]):
+            for this_index in index if hasattr(index, "__iter__") else [index]:
                 if this_index >= 0:
                     current_list.item(this_index).setSelected(True)
         else:
             for item_index in range(current_list.count()):
                 current_list.setItemSelected(current_list.item(item_index), False)
-            for this_index in (index if hasattr(index, "__iter__") else [index]):
+            for this_index in index if hasattr(index, "__iter__") else [index]:
                 if this_index >= 0:
                     current_list.setItemSelected(current_list.item(this_index), True)
 
@@ -167,29 +177,37 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def get_workspace_to_load_path(self):
         paths = QFileDialog.getOpenFileNames()
-        return paths[0] if isinstance(paths, tuple) else [str(filename) for filename in paths]
+        return (
+            paths[0]
+            if isinstance(paths, tuple)
+            else [str(filename) for filename in paths]
+        )
 
     def get_workspace_new_name(self):
-        name, success = QInputDialog.getText(self, "Workspace New Name", "Enter the new name for the workspace :      ")
+        name, success = QInputDialog.getText(
+            self, "Workspace New Name", "Enter the new name for the workspace :      "
+        )
         # The message above was padded with spaces to allow the whole title to show up
         if not success:
             return None  # User cancelled dialog
         return str(name)
 
     def error_select_only_one_workspace(self):
-        self._display_error('Please select only one workspace and then try again')
+        self._display_error("Please select only one workspace and then try again")
 
     def error_select_one_or_more_workspaces(self):
-        self._display_error('Please select one or more workspaces the try again')
+        self._display_error("Please select one or more workspaces the try again")
 
     def error_select_one_workspace(self):
-        self._display_error('Please select a workspace then try again')
+        self._display_error("Please select a workspace then try again")
 
     def error_select_more_than_one_workspaces(self):
-        self._display_error('Please select more than one projected workspaces then try again')
+        self._display_error(
+            "Please select more than one projected workspaces then try again"
+        )
 
     def error_invalid_save_path(self):
-        self._display_error('No files were saved')
+        self._display_error("No files were saved")
 
     def get_presenter(self):
         return self._presenter

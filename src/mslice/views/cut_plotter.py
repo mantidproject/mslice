@@ -27,20 +27,28 @@ def draw_interactive_cut(workspace):
 
 
 @plt.set_category(plt.CATEGORY_CUT)
-def plot_cut_impl(workspace, intensity_range, plot_over=False, legend=None, en_conversion=True):
+def plot_cut_impl(
+    workspace, intensity_range, plot_over=False, legend=None, en_conversion=True
+):
     cur_fig = plt.gcf()
     axes = cur_fig.axes
     if len(axes) == 0:
-        ax = cur_fig.add_subplot(111, projection='mslice')
+        ax = cur_fig.add_subplot(111, projection="mslice")
     else:
         ax = axes[0]
         if not plot_over:
             ax.cla()
 
     legend = workspace.name if legend is None else legend
-    ax.errorbar(workspace, 'o-', label=legend, picker=PICKER_TOL_PTS,
-                intensity_range=intensity_range, plot_over=plot_over,
-                en_conversion=en_conversion)
+    ax.errorbar(
+        workspace,
+        "o-",
+        label=legend,
+        picker=PICKER_TOL_PTS,
+        intensity_range=intensity_range,
+        plot_over=plot_over,
+        en_conversion=en_conversion,
+    )
     if plot_over:
         cur_fig.canvas.manager.plot_handler.ws_list.append(workspace.name)
     else:
@@ -61,7 +69,9 @@ def _create_cut():
     canvas.figure.gca().xaxis.set_visible(False)
     canvas.figure.gca().yaxis.set_visible(False)
     canvas.draw()
-    canvas.manager.set_cut_background(canvas.copy_from_bbox(plt.gcf().canvas.figure.bbox))
+    canvas.manager.set_cut_background(
+        canvas.copy_from_bbox(plt.gcf().canvas.figure.bbox)
+    )
 
     canvas.figure.gca().xaxis.set_visible(True)
     canvas.figure.gca().yaxis.set_visible(True)

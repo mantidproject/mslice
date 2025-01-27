@@ -7,7 +7,6 @@ from mslice.plotting.plot_window.cut_plot import CutPlot, _gca_sym_log_linear_th
 
 
 class CutPlotTest(unittest.TestCase):
-
     def setUp(self):
         self.plot_figure = MagicMock()
         self.plot_figure.window = MagicMock()
@@ -21,37 +20,39 @@ class CutPlotTest(unittest.TestCase):
     def test_that_is_changed_works_correctly(self):
         self.cut_plot.default_options = {}
 
-        self.cut_plot.default_options['y_grid'] = False
+        self.cut_plot.default_options["y_grid"] = False
         self.cut_plot.y_grid = False
-        self.cut_plot.default_options['x_grid'] = False
+        self.cut_plot.default_options["x_grid"] = False
         self.cut_plot.x_grid = True
 
-        self.assertEqual(self.cut_plot.is_changed('y_grid'), False)
-        self.assertEqual(self.cut_plot.is_changed('x_grid'), True)
+        self.assertEqual(self.cut_plot.is_changed("y_grid"), False)
+        self.assertEqual(self.cut_plot.is_changed("x_grid"), True)
 
     def tests_gca_sym_log_linear_threshold(self):
         self.assertEqual(_gca_sym_log_linear_threshold([np.array([20, 60, 12])]), 10)
         self.assertEqual(_gca_sym_log_linear_threshold([np.array([1, 5, 10])]), 1)
         self.assertEqual(_gca_sym_log_linear_threshold([np.array([-1, 5, -10])]), 1)
-        self.assertEqual(_gca_sym_log_linear_threshold([np.array([300, 500, 1000])]), 100)
+        self.assertEqual(
+            _gca_sym_log_linear_threshold([np.array([300, 500, 1000])]), 100
+        )
 
-    @patch.object(CutPlot, 'y_log', PropertyMock(return_value=False))
+    @patch.object(CutPlot, "y_log", PropertyMock(return_value=False))
     def test_change_x_scale_linear(self):
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
         self.cut_plot.x_log = False
-        self.axes.set_xscale.assert_called_with('linear')
-        self.axes.set_yscale.assert_called_with('linear')
+        self.axes.set_xscale.assert_called_with("linear")
+        self.axes.set_yscale.assert_called_with("linear")
 
-    @patch.object(CutPlot, 'x_log', PropertyMock(return_value=False))
+    @patch.object(CutPlot, "x_log", PropertyMock(return_value=False))
     def test_change_y_scale_linear(self):
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
         self.cut_plot.y_log = False
-        self.axes.set_xscale.assert_called_with('linear')
-        self.axes.set_yscale.assert_called_with('linear')
+        self.axes.set_xscale.assert_called_with("linear")
+        self.axes.set_yscale.assert_called_with("linear")
 
-    @patch.object(CutPlot, 'y_log', PropertyMock(return_value=False))
+    @patch.object(CutPlot, "y_log", PropertyMock(return_value=False))
     def test_change_x_scale_log(self):
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
@@ -59,11 +60,11 @@ class CutPlotTest(unittest.TestCase):
         line.get_xdata = MagicMock(return_value=np.array([20, 60, 12]))
         self.axes.get_lines = MagicMock(return_value=[line])
         self.cut_plot.x_log = True
-        self.axes.set_yscale.assert_called_with('linear')
+        self.axes.set_yscale.assert_called_with("linear")
         self.axes.set_xscale.assert_called_once()
-        self.axes.set_xscale.assert_called_once_with('symlog', linthresh=10.0)
+        self.axes.set_xscale.assert_called_once_with("symlog", linthresh=10.0)
 
-    @patch.object(CutPlot, 'x_log', PropertyMock(return_value=False))
+    @patch.object(CutPlot, "x_log", PropertyMock(return_value=False))
     def test_change_y_scale_log(self):
         self.axes.set_xscale = MagicMock()
         self.axes.set_yscale = MagicMock()
@@ -72,11 +73,11 @@ class CutPlotTest(unittest.TestCase):
         self.axes.get_lines = MagicMock(return_value=[line])
         self.cut_plot.update_bragg_peaks = MagicMock()
         self.cut_plot.y_log = True
-        self.axes.set_xscale.assert_called_with('linear')
-        self.axes.set_yscale.assert_called_once_with('symlog', linthresh=1.0)
+        self.axes.set_xscale.assert_called_with("linear")
+        self.axes.set_yscale.assert_called_once_with("symlog", linthresh=1.0)
         self.cut_plot.update_bragg_peaks.assert_called_once_with(refresh=True)
 
-    @patch('mslice.plotting.plot_window.cut_plot.quick_options')
+    @patch("mslice.plotting.plot_window.cut_plot.quick_options")
     def test_line_clicked(self, quick_options_mock):
         line = Line2D([], [])
         self.cut_plot.update_legend = MagicMock()
@@ -85,7 +86,7 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.update_legend.assert_called_once()
         self.cut_plot._canvas.draw.assert_called_once()
 
-    @patch('mslice.plotting.plot_window.cut_plot.quick_options')
+    @patch("mslice.plotting.plot_window.cut_plot.quick_options")
     def test_object_clicked(self, quick_options_mock):
         text = "some_label"
         self.cut_plot._get_line_index = MagicMock(return_value=2)
@@ -98,7 +99,9 @@ class CutPlotTest(unittest.TestCase):
 
     def test_update_legend_legends_not_shown(self):
         line = Line2D([], [])
-        self.axes.get_legend_handles_labels = MagicMock(return_value=([line], ['some_label']))
+        self.axes.get_legend_handles_labels = MagicMock(
+            return_value=([line], ["some_label"])
+        )
         self.cut_plot._legends_shown = False
         self.cut_plot.update_legend()
         self.assertTrue(self.cut_plot._legends_visible[0])
@@ -106,28 +109,35 @@ class CutPlotTest(unittest.TestCase):
 
     def test_update_legend_legends_shown(self):
         line = Line2D([], [])
-        self.axes.get_legend_handles_labels = MagicMock(return_value=([line], ['some_label']))
+        self.axes.get_legend_handles_labels = MagicMock(
+            return_value=([line], ["some_label"])
+        )
         self.cut_plot._legends_shown = True
         self.cut_plot.update_legend()
         self.assertTrue(self.cut_plot._legends_visible[0])
-        self.axes.legend.assert_called_with([line], ['some_label'], fontsize=ANY)
+        self.axes.legend.assert_called_with([line], ["some_label"], fontsize=ANY)
 
     def test_update_legend_with_line_data(self):
         line_data = [
-            {'shown': True, 'legend': 2, 'label': 'visible_line_data_label'},
-            {'shown': True, 'legend': 0, 'label': 'non_visible_line_data_label'}
+            {"shown": True, "legend": 2, "label": "visible_line_data_label"},
+            {"shown": True, "legend": 0, "label": "non_visible_line_data_label"},
         ]
         mock_line = Line2D([], [])
         another_mock_line = Line2D([], [])
 
-        self.axes.get_legend_handles_labels = MagicMock(return_value=(
-            [mock_line, another_mock_line], ['mock_label', 'another_mock_label']
-        ))
+        self.axes.get_legend_handles_labels = MagicMock(
+            return_value=(
+                [mock_line, another_mock_line],
+                ["mock_label", "another_mock_label"],
+            )
+        )
         self.cut_plot._legends_shown = True
 
         self.cut_plot.update_legend(line_data)
         self.assertEqual(self.cut_plot._legends_visible, [2, 0])
-        self.axes.legend.assert_called_with([mock_line], ['visible_line_data_label'], fontsize=ANY)
+        self.axes.legend.assert_called_with(
+            [mock_line], ["visible_line_data_label"], fontsize=ANY
+        )
 
     def test_waterfall(self):
         self.cut_plot._apply_offset = MagicMock()
@@ -143,8 +153,13 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.update_bragg_peaks.assert_called_with(refresh=True)
 
     def test_all_fonts_size(self):
-        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
-                        'x_label_size': 12, 'y_label_size': 11}
+        fonts_config = {
+            "title_size": 15,
+            "x_range_font_size": 14,
+            "y_range_font_size": 13,
+            "x_label_size": 12,
+            "y_label_size": 11,
+        }
 
         self.cut_plot.all_fonts_size = fonts_config
         self.assertEqual(self.cut_plot.title_size, 15)
@@ -154,8 +169,13 @@ class CutPlotTest(unittest.TestCase):
         self.assertEqual(self.cut_plot.y_label_size, 11)
 
     def test_increment_all_fonts(self):
-        fonts_config = {'title_size': 15, 'x_range_font_size': 14, 'y_range_font_size': 13,
-                        'x_label_size': 12, 'y_label_size': 11}
+        fonts_config = {
+            "title_size": 15,
+            "x_range_font_size": 14,
+            "y_range_font_size": 13,
+            "x_label_size": 12,
+            "y_label_size": 11,
+        }
         self.cut_plot.all_fonts_size = fonts_config
 
         self.cut_plot.increase_all_fonts()

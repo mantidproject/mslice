@@ -8,20 +8,32 @@ from mslice.workspace.pixel_workspace import PixelWorkspace
 
 
 class PixelWorkspaceTest(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):  # create (non-zero) test data
-        sim_workspace = CreateSimulationWorkspace(Instrument='MAR', BinParams=[-10, 1, 10],
-                                                  UnitX='DeltaE', OutputWorkspace='simws')
-        AddSampleLog(sim_workspace, LogName='Ei', LogText='3.', LogType='Number')
-        cls.workspace = ConvertToMD(InputWorkspace=sim_workspace, OutputWorkspace="convert_ws", QDimensions='|Q|',
-                                    dEAnalysisMode='Direct', MinValues='-10,0,0', MaxValues='10,6,500',
-                                    SplitInto='50,50')
-        cls.workspace = PixelWorkspace(cls.workspace, 'convert_ws')
+        sim_workspace = CreateSimulationWorkspace(
+            Instrument="MAR",
+            BinParams=[-10, 1, 10],
+            UnitX="DeltaE",
+            OutputWorkspace="simws",
+        )
+        AddSampleLog(sim_workspace, LogName="Ei", LogText="3.", LogType="Number")
+        cls.workspace = ConvertToMD(
+            InputWorkspace=sim_workspace,
+            OutputWorkspace="convert_ws",
+            QDimensions="|Q|",
+            dEAnalysisMode="Direct",
+            MinValues="-10,0,0",
+            MaxValues="10,6,500",
+            SplitInto="50,50",
+        )
+        cls.workspace = PixelWorkspace(cls.workspace, "convert_ws")
 
     def test_invalid_workspace(self):
-        self.assertRaisesRegex(TypeError, "PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got int",
-                               lambda: PixelWorkspace(4, "WorkspaceName"))
+        self.assertRaisesRegex(
+            TypeError,
+            "PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got int",
+            lambda: PixelWorkspace(4, "WorkspaceName"),
+        )
 
     def test_rename_workspace_which_contains_special_character(self):
         self.workspace.name = "specialcharacter)"
@@ -29,8 +41,8 @@ class PixelWorkspaceTest(unittest.TestCase):
 
     def test_get_coordinates(self):
         coords = self.workspace.get_coordinates()
-        self.assertEqual(set(coords), {'|Q|', 'DeltaE'})
-        self.assertEqual(coords['|Q|'][2], 0.20996594809147776)
+        self.assertEqual(set(coords), {"|Q|", "DeltaE"})
+        self.assertEqual(coords["|Q|"][2], 0.20996594809147776)
 
     def test_get_signal(self):
         signal = self.workspace.get_signal()
@@ -61,7 +73,7 @@ class PixelWorkspaceTest(unittest.TestCase):
         self.assertEqual(96, signal[3][52])
 
     def test_pow_workspace(self):
-        squared_workspace = self.workspace ** 2
+        squared_workspace = self.workspace**2
         signal = squared_workspace.get_signal()
         self.assertEqual(0, signal[0][0])
         self.assertEqual(144, signal[1][47])
@@ -83,8 +95,8 @@ class PixelWorkspaceTest(unittest.TestCase):
         self.assertAlmostEqual(84, result[3][52], 8)
 
     def test_attribute_propagation(self):
-        self.attr = {'axes': [1, object]}
+        self.attr = {"axes": [1, object]}
         attribute_to_log(self.attr, self.workspace.raw_ws)
-        new_workspace = PixelWorkspace(self.workspace.raw_ws, 'new')
-        assert (hasattr(new_workspace, 'axes'))
-        assert (new_workspace.axes == self.attr['axes'])
+        new_workspace = PixelWorkspace(self.workspace.raw_ws, "new")
+        assert hasattr(new_workspace, "axes")
+        assert new_workspace.axes == self.attr["axes"]

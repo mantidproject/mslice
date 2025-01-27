@@ -2,7 +2,7 @@ from qtpy.QtWidgets import QComboBox
 
 
 class ComboBox(QComboBox):
-    '''workaround for AttributeError when loading QComboBox with load_ui'''
+    """workaround for AttributeError when loading QComboBox with load_ui"""
 
     def setCurrentText(self, text):
         pass

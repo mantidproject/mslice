@@ -1,5 +1,4 @@
-"""Enumeration for operations allowed in this module
-"""
+"""Enumeration for operations allowed in this module"""
 
 
 class Command(object):

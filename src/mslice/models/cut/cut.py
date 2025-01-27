@@ -1,5 +1,9 @@
-from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma,
-                                                     compute_symmetrised, cut_compute_gdos)
+from mslice.models.intensity_correction_algs import (
+    compute_chi,
+    compute_d2sigma,
+    compute_symmetrised,
+    cut_compute_gdos,
+)
 from mslice.models.labels import are_units_equivalent, is_momentum, is_twotheta
 from mslice.util.intensity_correction import IntensityType
 
@@ -9,8 +13,18 @@ import numpy as np
 class Cut(object):
     """Groups parameters needed to cut and validates them, caches intensities"""
 
-    def __init__(self, cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one=False, width=None,
-                 algorithm='Rebin', sample_temp=None, e_fixed=None):
+    def __init__(
+        self,
+        cut_axis,
+        integration_axis,
+        intensity_start,
+        intensity_end,
+        norm_to_one=False,
+        width=None,
+        algorithm="Rebin",
+        sample_temp=None,
+        e_fixed=None,
+    ):
         self._cut_ws = None
         self.cut_axis = cut_axis
         self.integration_axis = integration_axis
@@ -84,9 +98,9 @@ class Cut(object):
             self._intensity_start = None
         else:
             try:
-                self._intensity_start = None if int_start == '' else float(int_start)
+                self._intensity_start = None if int_start == "" else float(int_start)
             except ValueError:
-                raise ValueError('Invalid intensity parameters')
+                raise ValueError("Invalid intensity parameters")
 
     @property
     def intensity_end(self):
@@ -98,9 +112,9 @@ class Cut(object):
             self._intensity_end = None
         else:
             try:
-                self._intensity_end = None if int_end == '' else float(int_end)
+                self._intensity_end = None if int_end == "" else float(int_end)
             except ValueError:
-                raise ValueError('Invalid intensity parameters')
+                raise ValueError("Invalid intensity parameters")
 
     @property
     def norm_to_one(self):
@@ -117,14 +131,18 @@ class Cut(object):
     @width.setter
     def width(self, width_str):
         if width_str is not None and width_str.strip():
-            if width_str.startswith('e') or width_str.endswith('e') or width_str.startswith('-'):
+            if (
+                width_str.startswith("e")
+                or width_str.endswith("e")
+                or width_str.startswith("-")
+            ):
                 self._width = None
             else:
                 try:
                     self._width = float(width_str)
                 except ValueError:
                     raise ValueError("Invalid width")
-        elif width_str == '':
+        elif width_str == "":
             self._width = self.end - self.start
         else:
             self._width = None
@@ -144,7 +162,9 @@ class Cut(object):
     @property
     def sample_temp(self):
         if self._sample_temp is None:
-            raise SampleTempValueError('sample temperature not found', self.workspace_name)
+            raise SampleTempValueError(
+                "sample temperature not found", self.workspace_name
+            )
         return self._sample_temp
 
     @sample_temp.setter
@@ -156,16 +176,21 @@ class Cut(object):
         if self._chi is None:
             self._chi = compute_chi(self._cut_ws, self.sample_temp, self.e_axis)
             self._chi.intensity_corrected = True
-            self._corrected_intensity_range_cache[IntensityType.CHI] = self._get_intensity_range_from_ws(self._chi)
+            self._corrected_intensity_range_cache[IntensityType.CHI] = (
+                self._get_intensity_range_from_ws(self._chi)
+            )
         return self._chi
 
     @property
     def chi_magnetic(self):
         if self._chi_magnetic is None:
-            self._chi_magnetic = compute_chi(self._cut_ws, self.sample_temp, self.e_axis, True)
+            self._chi_magnetic = compute_chi(
+                self._cut_ws, self.sample_temp, self.e_axis, True
+            )
             self._chi_magnetic.intensity_corrected = True
-            self._corrected_intensity_range_cache[IntensityType.CHI_MAGNETIC] = \
+            self._corrected_intensity_range_cache[IntensityType.CHI_MAGNETIC] = (
                 self._get_intensity_range_from_ws(self._chi_magnetic)
+            )
         return self._chi_magnetic
 
     @property
@@ -173,25 +198,40 @@ class Cut(object):
         if self._d2sigma is None:
             self._d2sigma = compute_d2sigma(self._cut_ws, self.e_axis, self._e_fixed)
             self._d2sigma.intensity_corrected = True
-            self._corrected_intensity_range_cache[IntensityType.D2SIGMA] = self._get_intensity_range_from_ws(self._d2sigma)
+            self._corrected_intensity_range_cache[IntensityType.D2SIGMA] = (
+                self._get_intensity_range_from_ws(self._d2sigma)
+            )
         return self._d2sigma
 
     @property
     def symmetrised(self):
         if self._symmetrised is None:
-            self._symmetrised = compute_symmetrised(self._cut_ws, self.sample_temp, self.e_axis, self.rotated)
+            self._symmetrised = compute_symmetrised(
+                self._cut_ws, self.sample_temp, self.e_axis, self.rotated
+            )
             self._symmetrised.intensity_corrected = True
-            self._corrected_intensity_range_cache[IntensityType.SYMMETRISED] = \
+            self._corrected_intensity_range_cache[IntensityType.SYMMETRISED] = (
                 self._get_intensity_range_from_ws(self._symmetrised)
+            )
         return self._symmetrised
 
     @property
     def gdos(self):
         if self._gdos is None:
-            self._gdos = cut_compute_gdos(self._cut_ws, self.sample_temp, self.q_axis, self.e_axis, self.rotated,
-                                          self.norm_to_one, self.algorithm, bool(self.icut))
+            self._gdos = cut_compute_gdos(
+                self._cut_ws,
+                self.sample_temp,
+                self.q_axis,
+                self.e_axis,
+                self.rotated,
+                self.norm_to_one,
+                self.algorithm,
+                bool(self.icut),
+            )
             self._gdos.intensity_corrected = True
-            self._corrected_intensity_range_cache[IntensityType.GDOS] = self._get_intensity_range_from_ws(self._gdos)
+            self._corrected_intensity_range_cache[IntensityType.GDOS] = (
+                self._get_intensity_range_from_ws(self._gdos)
+            )
         return self._gdos
 
     def get_intensity_corrected_ws(self, intensity_correction_type):
@@ -224,7 +264,10 @@ class Cut(object):
 
     def _update_cut_axis(self):
         x_dim = self._cut_ws.raw_ws.getXDimension()
-        if are_units_equivalent(self.cut_axis.units, x_dim.getUnits()) or self.cut_axis.units in x_dim.getDimensionId():
+        if (
+            are_units_equivalent(self.cut_axis.units, x_dim.getUnits())
+            or self.cut_axis.units in x_dim.getDimensionId()
+        ):
             ws_cut_axis = x_dim
         else:
             ws_cut_axis = self._cut_ws.raw_ws.getYDimension()
@@ -247,15 +290,26 @@ class Cut(object):
 
     def copy_for_cache(self):
         cut_axis, int_axis = tuple(self.cut_ws.axes)
-        cut = Cut(cut_axis, int_axis, self.intensity_start, self.intensity_end, self.norm_to_one,
-                  '', self.algorithm, self._sample_temp, self._e_fixed)
+        cut = Cut(
+            cut_axis,
+            int_axis,
+            self.intensity_start,
+            self.intensity_end,
+            self.norm_to_one,
+            "",
+            self.algorithm,
+            self._sample_temp,
+            self._e_fixed,
+        )
         cut._cut_ws = self.cut_ws
         cut.parent_ws_name = self.parent_ws_name
         return cut
 
     @property
     def rotated(self):
-        return not is_twotheta(self.cut_axis.units) and not is_momentum(self.cut_axis.units)
+        return not is_twotheta(self.cut_axis.units) and not is_momentum(
+            self.cut_axis.units
+        )
 
 
 class SampleTempValueError(ValueError):

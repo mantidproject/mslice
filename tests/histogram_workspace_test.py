@@ -3,29 +3,51 @@ import numpy as np
 from mantid.simpleapi import CreateMDHistoWorkspace
 
 from tests.workspace_test import BaseWorkspaceTest
-from mslice.models.workspacemanager.workspace_provider import add_workspace, remove_workspace
+from mslice.models.workspacemanager.workspace_provider import (
+    add_workspace,
+    remove_workspace,
+)
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
 class HistogramWorkspaceTest(BaseWorkspaceTest):
-
     @classmethod
     def setUpClass(cls):
         signal = list(range(0, 100))
         error = np.zeros(100) + 2
-        cls.workspace = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
-                                                                  SignalInput=signal, ErrorInput=error,
-                                                                  NumberOfBins='10,10', Names='Dim1,Dim2',
-                                                                  Units='U,U', OutputWorkspace='testHistoWorkspace',
-                                                                  ), 'testHistoWorkspace')
-        cls.workspace1Bin = HistogramWorkspace(CreateMDHistoWorkspace(Dimensionality=2, Extents='0,100,0,100',
-                                                                      SignalInput=signal, ErrorInput=error,
-                                                                      NumberOfBins='100,1', Names='Dim1,Dim2',
-                                                                      Units='U,U', OutputWorkspace='testHistoWorkspace1Bin',
-                                                                      ), 'testHistoWorkspace1Bin')
+        cls.workspace = HistogramWorkspace(
+            CreateMDHistoWorkspace(
+                Dimensionality=2,
+                Extents="0,100,0,100",
+                SignalInput=signal,
+                ErrorInput=error,
+                NumberOfBins="10,10",
+                Names="Dim1,Dim2",
+                Units="U,U",
+                OutputWorkspace="testHistoWorkspace",
+            ),
+            "testHistoWorkspace",
+        )
+        cls.workspace1Bin = HistogramWorkspace(
+            CreateMDHistoWorkspace(
+                Dimensionality=2,
+                Extents="0,100,0,100",
+                SignalInput=signal,
+                ErrorInput=error,
+                NumberOfBins="100,1",
+                Names="Dim1,Dim2",
+                Units="U,U",
+                OutputWorkspace="testHistoWorkspace1Bin",
+            ),
+            "testHistoWorkspace1Bin",
+        )
 
     def test_invalid_workspace(self):
-        self.assertRaisesRegex(TypeError, "HistogramWorkspace expected IMDHistoWorkspace, got int", lambda: HistogramWorkspace(4, 'name'))
+        self.assertRaisesRegex(
+            TypeError,
+            "HistogramWorkspace expected IMDHistoWorkspace, got int",
+            lambda: HistogramWorkspace(4, "name"),
+        )
 
     def test_convert_to_matrix(self):
         # workspace needs to be registered with mslice for conversion
@@ -55,7 +77,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     def test_get_coordinates(self):
         expected = np.linspace(0, 100, 10)
-        self.assertTrue((self.workspace.get_coordinates()['Dim1'] == expected).all())
+        self.assertTrue((self.workspace.get_coordinates()["Dim1"] == expected).all())
 
     def test_get_signal(self):
         self.check_signal()
@@ -87,7 +109,9 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         expected_result = ws_representative_array + list_to_add
 
         np.testing.assert_array_almost_equal(expected_result, result, 8)
-        np.testing.assert_array_almost_equal(ws_representative_array, self.workspace.get_signal(), 8)
+        np.testing.assert_array_almost_equal(
+            ws_representative_array, self.workspace.get_signal(), 8
+        )
 
     def test_add_invalid_list(self):
         invalid_list = np.linspace(0, -6, 3)
@@ -95,5 +119,5 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
 
     def test_attribute_propagation(self):
         self.set_attribute()
-        new_workspace = HistogramWorkspace(self.workspace.raw_ws, 'new')
+        new_workspace = HistogramWorkspace(self.workspace.raw_ws, "new")
         self.check_attribute_propagation(new_workspace)
