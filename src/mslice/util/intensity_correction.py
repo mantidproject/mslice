@@ -15,12 +15,14 @@ class IntensityCache:
     __action_dict = {}
     __method_dict_cut = {}
     __method_dict_slice = {}
-    __description_dict = {IntensityType.SCATTERING_FUNCTION: "scattering_function",
-                          IntensityType.CHI: "dynamical_susceptibility",
-                          IntensityType.CHI_MAGNETIC: "dynamical_susceptibility_magnetic",
-                          IntensityType.D2SIGMA: "d2sigma",
-                          IntensityType.SYMMETRISED: "symmetrised",
-                          IntensityType.GDOS: "gdos"}
+    __description_dict = {
+        IntensityType.SCATTERING_FUNCTION: "scattering_function",
+        IntensityType.CHI: "dynamical_susceptibility",
+        IntensityType.CHI_MAGNETIC: "dynamical_susceptibility_magnetic",
+        IntensityType.D2SIGMA: "d2sigma",
+        IntensityType.SYMMETRISED: "symmetrised",
+        IntensityType.GDOS: "gdos",
+    }
 
     def __init__(self):
         pass
@@ -45,8 +47,9 @@ class IntensityCache:
         if intensity_correction_type in cls.__action_dict:
             return cls.__action_dict[intensity_correction_type]
         else:
-            raise KeyError("action related to the specified intensity correction"
-                           "type not found")
+            raise KeyError(
+                "action related to the specified intensity correctiontype not found"
+            )
 
     @classmethod
     def cache_method(cls, category, intensity_correction_type, method):
@@ -65,7 +68,9 @@ class IntensityCache:
     @classmethod
     def get_intensity_type_from_desc(cls, description):
         if description in cls._IntensityCache__description_dict.values():
-            return list(cls.__description_dict.keys())[list(cls.__description_dict.values()).index(description)]
+            return list(cls.__description_dict.keys())[
+                list(cls.__description_dict.values()).index(description)
+            ]
         else:
             raise ValueError(f"Input intensity type invalid: {description}")
 

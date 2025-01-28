@@ -9,22 +9,23 @@ from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.util.qt import load_ui
 from .inputdialog import EfInputDialog
 
-MSLICE_EXTENSIONS = ['*.nxs', '*.nxspe', '*.txt', '*.xye']
+MSLICE_EXTENSIONS = ["*.nxs", "*.nxspe", "*.txt", "*.xye"]
 
 
 class DataLoaderWidget(QWidget):  # and some view interface
-
-    error_occurred = Signal('QString')
+    error_occurred = Signal("QString")
     busy = Signal(bool)
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        load_ui(__file__, 'dataloader.ui', self)
+        load_ui(__file__, "dataloader.ui", self)
 
-        self.directory = QDir(os.path.expanduser('~'))
+        self.directory = QDir(os.path.expanduser("~"))
         self._sort_column = 0
         self.reload_model()
-        self.table_view.horizontalHeader().swapSections(1, 3)  # Swap the type and date modified columns
+        self.table_view.horizontalHeader().swapSections(
+            1, 3
+        )  # Swap the type and date modified columns
         self.txtpath.setText(self.directory.absolutePath())
         self._presenter = DataLoaderPresenter(self)
         self.btnload.setEnabled(False)
@@ -46,7 +47,9 @@ class DataLoaderWidget(QWidget):  # and some view interface
             event.accept()
 
     def activated(self, file_clicked):
-        file_clicked = file_clicked.sibling(file_clicked.row(), 0)  # so clicking anywhere on row gives filename
+        file_clicked = file_clicked.sibling(
+            file_clicked.row(), 0
+        )  # so clicking anywhere on row gives filename
         if self.file_system.isDir(file_clicked):
             self.enter_dir(self.file_system.fileName(file_clicked))
         else:
@@ -77,10 +80,10 @@ class DataLoaderWidget(QWidget):  # and some view interface
         self.file_system.setNameFilterDisables(False)
         self.table_view.setModel(self.file_system)
         self.table_view.setRootIndex(self.file_system.index(self.root_path))
-        self.table_view.setColumnWidth(0, 320)    # Make name wide
+        self.table_view.setColumnWidth(0, 320)  # Make name wide
         self.table_view.setColumnWidth(1, 123)
         self.table_view.setColumnWidth(2, 123)
-        self.table_view.setColumnWidth(3, 140)    # Show date modified
+        self.table_view.setColumnWidth(3, 140)  # Show date modified
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.sort_files(self._sort_column)
 
@@ -88,9 +91,9 @@ class DataLoaderWidget(QWidget):  # and some view interface
         new_path = self.directory.absolutePath()
         try:
             rel_path = os.path.relpath(new_path, self.root_path)
-        except ValueError:   # We are in windows and user changed to another drive
-            rel_path = '..'
-        if rel_path.startswith('..'):
+        except ValueError:  # We are in windows and user changed to another drive
+            rel_path = ".."
+        if rel_path.startswith(".."):
             self.file_system.setRootPath(new_path)
             self.root_path = new_path
         self.table_view.setRootIndex(self.file_system.index(new_path))
@@ -106,10 +109,12 @@ class DataLoaderWidget(QWidget):  # and some view interface
 
     def sort_files(self, column):
         self._sort_column = column
-        self.table_view.sortByColumn(column, column % 2)  # descending order for size/modified, ascending for name/type
+        self.table_view.sortByColumn(
+            column, column % 2
+        )  # descending order for size/modified, ascending for name/type
 
     def go_to_home(self):
-        self.directory = QDir(os.path.expanduser('~'))
+        self.directory = QDir(os.path.expanduser("~"))
         self._update_from_path()
 
     def validate_selection(self):
@@ -127,34 +132,52 @@ class DataLoaderWidget(QWidget):  # and some view interface
         selected = self.table_view.selectionModel().selectedRows()
         for i in range(len(selected)):
             selected[i] = selected[i].sibling(selected[i].row(), 0)
-            selected[i] = str(os.path.join(self.directory.absolutePath(), self.file_system.fileName(selected[i])))
+            selected[i] = str(
+                os.path.join(
+                    self.directory.absolutePath(),
+                    self.file_system.fileName(selected[i]),
+                )
+            )
         return selected
 
     def get_workspace_efixed(self, workspace, hasMultipleWS=False, default_value=None):
-        Ef, applyToAll, success = EfInputDialog.getEf(workspace, hasMultipleWS, default_value)
+        Ef, applyToAll, success = EfInputDialog.getEf(
+            workspace, hasMultipleWS, default_value
+        )
         if not success:
-            raise ValueError('Fixed final energy not given')
+            raise ValueError("Fixed final energy not given")
         return Ef, applyToAll
 
     def get_presenter(self):
         return self._presenter
 
     def error_unable_to_open_file(self, filename=None):
-        self._display_error('MSlice was not able to load %s' % ('the selected file' if filename is None else filename))
+        self._display_error(
+            "MSlice was not able to load %s"
+            % ("the selected file" if filename is None else filename)
+        )
 
     def error_merge_different_file_formats(self):
-        self._display_error('Cannot merge files with different formats')
+        self._display_error("Cannot merge files with different formats")
 
     def no_workspace_has_been_loaded(self, filename=None):
         if filename is None:
-            self._display_error('No new workspaces have been loaded')
+            self._display_error("No new workspaces have been loaded")
         else:
-            self._display_error('File %s has not been loaded' % filename)
+            self._display_error("File %s has not been loaded" % filename)
 
     def confirm_overwrite_workspace(self):
-        text = 'The workspace you want to load has the same name as an existing workspace,' \
-               'Are you sure you want to overwrite it?'
-        reply = QMessageBox.question(self, 'Confirm Overwrite', text, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        text = (
+            "The workspace you want to load has the same name as an existing workspace,"
+            "Are you sure you want to overwrite it?"
+        )
+        reply = QMessageBox.question(
+            self,
+            "Confirm Overwrite",
+            text,
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
         if reply == QMessageBox.Yes:
             return True
         else:

@@ -2,7 +2,12 @@ from .base import WorkspaceBase
 from .histogram_workspace import HistogramWorkspace
 from .pixel_mixin import PixelMixin
 from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
-from .helperfunctions import attribute_from_log, attribute_to_log, delete_workspace, rename_workspace
+from .helperfunctions import (
+    attribute_from_log,
+    attribute_to_log,
+    delete_workspace,
+    rename_workspace,
+)
 from .common_workspace_properties import CommonWorkspaceProperties
 
 from mantid.api import IMDEventWorkspace
@@ -10,7 +15,13 @@ from mantid.api import IMDEventWorkspace
 import re
 
 
-class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, WorkspaceBase, CommonWorkspaceProperties):
+class PixelWorkspace(
+    PixelMixin,
+    WorkspaceOperatorMixin,
+    WorkspaceMixin,
+    WorkspaceBase,
+    CommonWorkspaceProperties,
+):
     """workspace wrapper for MDEventWorkspace. Converts to HistogramWorkspace internally."""
 
     def __init__(self, mantid_ws, name):
@@ -22,8 +33,10 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
             self._raw_ws = None
             self._histo_ws = mantid_ws
         else:
-            raise TypeError("PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got %s"
-                            % mantid_ws.__class__.__name__)
+            raise TypeError(
+                "PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got %s"
+                % mantid_ws.__class__.__name__
+            )
         CommonWorkspaceProperties.__init__(self)
         self._name = name
         self._cut_params = {}
@@ -39,10 +52,14 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
     def name(self, new_name: str):
         if self.raw_ws is not None:
             raw_name = str(self.raw_ws)
-            rename_workspace(raw_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, raw_name))
+            rename_workspace(
+                raw_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, raw_name)
+            )
         elif self._histo_ws is not None:
             histo_name = str(self._histo_ws)
-            rename_workspace(histo_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, histo_name))
+            rename_workspace(
+                histo_name, re.sub(rf"{re.escape(self.name)}\w*", new_name, histo_name)
+            )
 
         self._name = new_name
 
@@ -57,7 +74,7 @@ class PixelWorkspace(PixelMixin, WorkspaceOperatorMixin, WorkspaceMixin, Workspa
     def save_attributes(self):
         attrdict = {}
         comstr = self.raw_ws.getComment()
-        for k, v in [['comment', comstr], ['axes', self.axes]]:
+        for k, v in [["comment", comstr], ["axes", self.axes]]:
             if k:
                 attrdict[k] = v
         attribute_to_log(attrdict, self.raw_ws)

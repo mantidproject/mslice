@@ -16,6 +16,7 @@ In this case we accept that a 1->many mapping if names
 to hex values and both #00bfbf and #00ffff will return
 the string cyan
 """
+
 import re
 
 from matplotlib import rcParams
@@ -27,6 +28,8 @@ except ImportError:
 
     def to_hex(color):
         return rgb2hex(colorConverter.to_rgb(color))
+
+
 try:
     from matplotlib.colors import get_named_colors_mapping as mpl_named_colors
 except ImportError:
@@ -35,10 +38,22 @@ except ImportError:
     def mpl_named_colors():
         return cnames
 
-_BASIC_COLORS_HEX_MAPPING = {'blue': '#1f77b4', 'orange': '#ff7f0e', 'green': '#2ca02c', 'red': '#d62728',
-                             'purple': '#9467bd', 'brown': '#8c564b', 'pink': '#e377c2', 'gray': '#7f7f7f',
-                             'olive': '#bcbd22', 'cyan': '#17becf', 'yellow': '#bfbf00', 'magenta': '#bf00bf'}
-HEX_COLOR_REGEX = re.compile(r'^#(?:[0-9a-fA-F]{3}){1,2}$')
+
+_BASIC_COLORS_HEX_MAPPING = {
+    "blue": "#1f77b4",
+    "orange": "#ff7f0e",
+    "green": "#2ca02c",
+    "red": "#d62728",
+    "purple": "#9467bd",
+    "brown": "#8c564b",
+    "pink": "#e377c2",
+    "gray": "#7f7f7f",
+    "olive": "#bcbd22",
+    "cyan": "#17becf",
+    "yellow": "#bfbf00",
+    "magenta": "#bf00bf",
+}
+HEX_COLOR_REGEX = re.compile(r"^#(?:[0-9a-fA-F]{3}){1,2}$")
 
 
 def pretty_name(name):
@@ -49,7 +64,7 @@ def pretty_name(name):
     """
     try:
         colon_idx = name.index(":")
-        return name[colon_idx+1:]
+        return name[colon_idx + 1 :]
     except ValueError:
         return name
 
@@ -59,7 +74,7 @@ def named_cycle_colors():
     Retrieve a named list of colors for the current color cycle
     :return: A list of colors as human-readable strings
     """
-    axes_prop_cycler = rcParams['axes.prop_cycle']
+    axes_prop_cycler = rcParams["axes.prop_cycle"]
     try:
         keys = axes_prop_cycler.by_key()
     except AttributeError:
@@ -67,7 +82,7 @@ def named_cycle_colors():
         # and depending on a private attribute is okay here as
         # it is only for older versions that won't change
         keys = axes_prop_cycler._transpose()
-    return [color_to_name(to_hex(color)) for color in keys['color']]
+    return [color_to_name(to_hex(color)) for color in keys["color"]]
 
 
 def name_to_color(name):

@@ -19,9 +19,9 @@ class MatplotlibQTCanvas(FigureCanvas):
         self.setParent(parent)
         self.manager = manager
 
-        FigureCanvas.setSizePolicy(self,
-                                   QtWidgets.QSizePolicy.Expanding,
-                                   QtWidgets.QSizePolicy.Expanding)
+        FigureCanvas.setSizePolicy(
+            self, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
         FigureCanvas.updateGeometry(self)
 
 
@@ -68,7 +68,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.menubar = self.menuBar()
 
         # File
-        self.menu_file = QtWidgets.QMenu('File', self.menubar)
+        self.menu_file = QtWidgets.QMenu("File", self.menubar)
         self.menubar.addMenu(self.menu_file)
         self.add_file_actions(self.menu_file)
 
@@ -76,12 +76,16 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.menu_information = QtWidgets.QMenu("Information", self.menubar)
         self.menubar.addMenu(self.menu_information)
         self.menu_recoil_lines = QtWidgets.QMenu("Recoil lines", self.menu_information)
-        self.add_information_actions(self.menu_recoil_lines,
-                                     ("Hydrogen", "Deuterium", "Helium", "Arbitrary Nuclei"))
+        self.add_information_actions(
+            self.menu_recoil_lines,
+            ("Hydrogen", "Deuterium", "Helium", "Arbitrary Nuclei"),
+        )
         self.menu_information.addMenu(self.menu_recoil_lines)
         self.menu_bragg_peaks = QtWidgets.QMenu("Bragg peaks", self.menu_information)
-        self.add_information_actions(self.menu_bragg_peaks,
-                                     ("Aluminium", "Copper", "Niobium", "Tantalum", "CIF file"))
+        self.add_information_actions(
+            self.menu_bragg_peaks,
+            ("Aluminium", "Copper", "Niobium", "Tantalum", "CIF file"),
+        )
         self.menu_information.addMenu(self.menu_bragg_peaks)
 
         # intensity
@@ -96,7 +100,9 @@ class PlotWindow(QtWidgets.QMainWindow):
     def add_file_actions(self, menu):
         self.action_gen_script = add_action(menu, self, "Generate Script File")
         menu.addAction(self.action_gen_script)
-        self.action_gen_script_clipboard = add_action(menu, self, "Generate Script to Clipboard")
+        self.action_gen_script_clipboard = add_action(
+            menu, self, "Generate Script to Clipboard"
+        )
         menu.addAction(self.action_gen_script_clipboard)
 
         self.action_quit = add_action(menu, self, "Close", visible=True)
@@ -110,23 +116,35 @@ class PlotWindow(QtWidgets.QMainWindow):
             menu.addAction(action)
 
     def add_intensity_actions(self, menu):
-        self.action_sqe = add_action(menu, self, "S(Q,E)", checkable=True, checked=True, visible=True)
+        self.action_sqe = add_action(
+            menu, self, "S(Q,E)", checkable=True, checked=True, visible=True
+        )
         menu.addAction(self.action_sqe)
         IntensityCache.cache_action(IntensityType.SCATTERING_FUNCTION, "action_sqe")
 
-        self.action_chi_qe = add_action(menu, self, "Chi''(Q,E)", checkable=True, visible=True)
+        self.action_chi_qe = add_action(
+            menu, self, "Chi''(Q,E)", checkable=True, visible=True
+        )
         menu.addAction(self.action_chi_qe)
         IntensityCache.cache_action(IntensityType.CHI, "action_chi_qe")
 
-        self.action_chi_qe_magnetic = add_action(menu, self, "Chi''(Q,E) magnetic", checkable=True, visible=True)
+        self.action_chi_qe_magnetic = add_action(
+            menu, self, "Chi''(Q,E) magnetic", checkable=True, visible=True
+        )
         menu.addAction(self.action_chi_qe_magnetic)
-        IntensityCache.cache_action(IntensityType.CHI_MAGNETIC, "action_chi_qe_magnetic")
+        IntensityCache.cache_action(
+            IntensityType.CHI_MAGNETIC, "action_chi_qe_magnetic"
+        )
 
-        self.action_d2sig_dw_de = add_action(menu, self, "d2sigma/dOmega.dE", checkable=True, visible=True)
+        self.action_d2sig_dw_de = add_action(
+            menu, self, "d2sigma/dOmega.dE", checkable=True, visible=True
+        )
         menu.addAction(self.action_d2sig_dw_de)
         IntensityCache.cache_action(IntensityType.D2SIGMA, "action_d2sig_dw_de")
 
-        self.action_symmetrised_sqe = add_action(menu, self, "Symmetrised S(Q,E)", checkable=True, visible=True)
+        self.action_symmetrised_sqe = add_action(
+            menu, self, "Symmetrised S(Q,E)", checkable=True, visible=True
+        )
         menu.addAction(self.action_symmetrised_sqe)
         IntensityCache.cache_action(IntensityType.SYMMETRISED, "action_symmetrised_sqe")
 
@@ -140,36 +158,65 @@ class PlotWindow(QtWidgets.QMainWindow):
         self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolbar)
 
     def add_toolbar_actions(self, toolbar):
-        self.action_zoom_in = add_action(toolbar, self,  "Zoom In", on_triggered=self.stock_toolbar.zoom,
-                                         icon_name='mdi.magnify-plus-outline', checkable=True, visible=True)
-        self.action_zoom_out = add_action(toolbar, self,  "Zoom Out", on_triggered=self.stock_toolbar.back,
-                                          icon_name='mdi.magnify-minus-outline', checkable=False, visible=True)
-        self.action_toggle_legends = add_action(toolbar, self, "Legends", checkable=True,
-                                                checked=True)
+        self.action_zoom_in = add_action(
+            toolbar,
+            self,
+            "Zoom In",
+            on_triggered=self.stock_toolbar.zoom,
+            icon_name="mdi.magnify-plus-outline",
+            checkable=True,
+            visible=True,
+        )
+        self.action_zoom_out = add_action(
+            toolbar,
+            self,
+            "Zoom Out",
+            on_triggered=self.stock_toolbar.back,
+            icon_name="mdi.magnify-minus-outline",
+            checkable=False,
+            visible=True,
+        )
+        self.action_toggle_legends = add_action(
+            toolbar, self, "Legends", checkable=True, checked=True
+        )
         toolbar.addSeparator()
-        self.action_keep = add_action(toolbar, self,  "Keep", checkable=True, visible=True)
-        self.action_make_current = add_action(toolbar, self,  "Make Current",
-                                              checkable=True, checked=True, visible=True)
+        self.action_keep = add_action(
+            toolbar, self, "Keep", checkable=True, visible=True
+        )
+        self.action_make_current = add_action(
+            toolbar, self, "Make Current", checkable=True, checked=True, visible=True
+        )
         self.keep_make_current_group = QtWidgets.QActionGroup(self)
         self.keep_make_current_group.addAction(self.action_keep)
         self.keep_make_current_group.addAction(self.action_make_current)
         self.keep_make_current_seperator = toolbar.addSeparator()
 
-        self.action_save_image = add_action(toolbar, self, "Save Image", icon_name='mdi.content-save')
-        self.action_copy_image = add_action(toolbar, self, "Copy Image", icon_name='mdi.content-copy', visible=True)
-        self.action_print_plot = add_action(toolbar, self,  "Print", icon_name='mdi.printer', visible=True)
-        self.action_plot_options = add_action(toolbar, self, "Plot Options", icon_name='mdi.settings')
+        self.action_save_image = add_action(
+            toolbar, self, "Save Image", icon_name="mdi.content-save"
+        )
+        self.action_copy_image = add_action(
+            toolbar, self, "Copy Image", icon_name="mdi.content-copy", visible=True
+        )
+        self.action_print_plot = add_action(
+            toolbar, self, "Print", icon_name="mdi.printer", visible=True
+        )
+        self.action_plot_options = add_action(
+            toolbar, self, "Plot Options", icon_name="mdi.settings"
+        )
 
         toolbar.addSeparator()
         self.action_waterfall = add_action(toolbar, self, "Waterfall", checkable=True)
         self.add_waterfall_edit(self.toolbar)
         self.action_waterfall.triggered.connect(self.toggle_waterfall_edit)
         self.action_waterfall.changed.connect(self.toggle_waterfall_edit)
-        self.action_interactive_cuts = add_action(toolbar, self,  "Interactive Cuts", checkable=True)
+        self.action_interactive_cuts = add_action(
+            toolbar, self, "Interactive Cuts", checkable=True
+        )
         # options for interactive cuts only
-        self.action_save_cut = add_action(toolbar, self,  "Save Cut to Workspace")
-        self.action_flip_axis = add_action(toolbar, self,  "Flip Integration Axis",
-                                           icon_name='mdi.twitter-retweet')
+        self.action_save_cut = add_action(toolbar, self, "Save Cut to Workspace")
+        self.action_flip_axis = add_action(
+            toolbar, self, "Flip Integration Axis", icon_name="mdi.twitter-retweet"
+        )
 
     def add_waterfall_edit(self, parent):
         self.waterfall_x_lbl = QtWidgets.QLabel("x:", parent)
@@ -181,9 +228,13 @@ class PlotWindow(QtWidgets.QMainWindow):
         sz.setWidth(60)
         self.waterfall_x_edt.setMaximumSize(sz)
         self.waterfall_y_edt.setMaximumSize(sz)
-        self.waterfall_x_edt_validator = LineEditDoubleValidator(self.waterfall_x_edt, 0.0)
+        self.waterfall_x_edt_validator = LineEditDoubleValidator(
+            self.waterfall_x_edt, 0.0
+        )
         self.waterfall_x_edt.setValidator(self.waterfall_x_edt_validator)
-        self.waterfall_y_edt_validator = LineEditDoubleValidator(self.waterfall_y_edt, 0.0)
+        self.waterfall_y_edt_validator = LineEditDoubleValidator(
+            self.waterfall_y_edt, 0.0
+        )
         self.waterfall_y_edt.setValidator(self.waterfall_y_edt_validator)
         self.waterfall_x_lbl_act = parent.addWidget(self.waterfall_x_lbl)
         self.waterfall_x_edt_act = parent.addWidget(self.waterfall_x_edt)
@@ -244,14 +295,20 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     def uncheck_action_by_text(self, holder, item_text):
         for action in holder.actions():
-            if action.iconText() == item_text and action.isCheckable() and action.isChecked():
+            if (
+                action.iconText() == item_text
+                and action.isCheckable()
+                and action.isChecked()
+            ):
                 action.setChecked(False)
 
     @property
     def waterfall(self):
-        return (self.action_waterfall.isChecked()
-                and self.action_waterfall.isVisible()
-                and self.action_waterfall.isEnabled())
+        return (
+            self.action_waterfall.isChecked()
+            and self.action_waterfall.isVisible()
+            and self.action_waterfall.isEnabled()
+        )
 
     @waterfall.setter
     def waterfall(self, value):
@@ -283,8 +340,16 @@ def create_attribute_name(text):
     return "action_" + text.replace(" ", "_").lower()
 
 
-def add_action(holder, parent, text, on_triggered=None, icon_name=None,
-               checkable=False, checked=False, visible=False):
+def add_action(
+    holder,
+    parent,
+    text,
+    on_triggered=None,
+    icon_name=None,
+    checkable=False,
+    checked=False,
+    visible=False,
+):
     """Create a new action based on the given attributes and add it to the given
     holder"""
     action = QtWidgets.QAction(text, parent)

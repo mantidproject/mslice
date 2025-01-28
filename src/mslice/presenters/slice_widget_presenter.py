@@ -27,7 +27,7 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         self._slice_view = slice_view
         self._main_presenter = None
         self._slice_plotter_presenter = None
-        self._en_default = 'meV'
+        self._en_default = "meV"
 
     def set_slice_plotter_presenter(self, slice_plotter_presenter):
         self._slice_plotter_presenter = slice_plotter_presenter
@@ -40,14 +40,20 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
                 self._display_slice()
 
             else:
-                raise ValueError("Slice Plotter Presenter received an unrecognised command")
+                raise ValueError(
+                    "Slice Plotter Presenter received an unrecognised command"
+                )
 
     def _display_slice(self):
         try:
-            selected_workspace = validate(self._selected_workspace, self._slice_view.error_select_one_workspace)
+            selected_workspace = validate(
+                self._selected_workspace, self._slice_view.error_select_one_workspace
+            )
             x_axis = validate(self._x_axis, self._slice_view.error_invalid_x_params)
             y_axis = validate(self._y_axis, self._slice_view.error_invalid_y_params)
-            intensity_start, intensity_end = validate(self._intensity, self._slice_view.error_invalid_intensity_params)
+            intensity_start, intensity_end = validate(
+                self._intensity, self._slice_view.error_invalid_intensity_params
+            )
         except ValueError:
             return
 
@@ -58,8 +64,15 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         norm_to_one = bool(self._slice_view.get_slice_is_norm_to_one())
         colourmap = self._slice_view.get_slice_colourmap()
 
-        self._plot_slice(selected_workspace, x_axis, y_axis, intensity_start, intensity_end,
-                         norm_to_one, colourmap)
+        self._plot_slice(
+            selected_workspace,
+            x_axis,
+            y_axis,
+            intensity_start,
+            intensity_end,
+            norm_to_one,
+            colourmap,
+        )
 
     def _plot_slice(self, *args):
         try:
@@ -80,19 +93,29 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
         return selected_workspaces[0]
 
     def _x_axis(self):
-        return Axis(self._slice_view.get_slice_x_axis(), self._slice_view.get_slice_x_start(),
-                    self._slice_view.get_slice_x_end(), self._slice_view.get_slice_x_step(),
-                    self._slice_view.get_units())
+        return Axis(
+            self._slice_view.get_slice_x_axis(),
+            self._slice_view.get_slice_x_start(),
+            self._slice_view.get_slice_x_end(),
+            self._slice_view.get_slice_x_step(),
+            self._slice_view.get_units(),
+        )
 
     def _y_axis(self):
-        return Axis(self._slice_view.get_slice_y_axis(), self._slice_view.get_slice_y_start(),
-                    self._slice_view.get_slice_y_end(), self._slice_view.get_slice_y_step(),
-                    self._slice_view.get_units())
+        return Axis(
+            self._slice_view.get_slice_y_axis(),
+            self._slice_view.get_slice_y_start(),
+            self._slice_view.get_slice_y_end(),
+            self._slice_view.get_slice_y_step(),
+            self._slice_view.get_units(),
+        )
 
     def _intensity(self):
         intensity_start = self._slice_view.get_slice_intensity_start()
         intensity_end = self._slice_view.get_slice_intensity_end()
-        return self._slice_plotter_presenter.validate_intensity(intensity_start, intensity_end)
+        return self._slice_plotter_presenter.validate_intensity(
+            intensity_start, intensity_end
+        )
 
     def _smoothing(self):
         smoothing = self._slice_view.get_slice_smoothing()
@@ -117,22 +140,36 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
 
     def populate_slice_params(self):
         try:
-            workspace_selection = get_workspace_handle(self._get_main_presenter().get_selected_workspaces()[0])
-            x_min, x_max, x_step = get_axis_range(workspace_selection, self._slice_view.get_slice_x_axis())
-            y_min, y_max, y_step = get_axis_range(workspace_selection, self._slice_view.get_slice_y_axis())
+            workspace_selection = get_workspace_handle(
+                self._get_main_presenter().get_selected_workspaces()[0]
+            )
+            x_min, x_max, x_step = get_axis_range(
+                workspace_selection, self._slice_view.get_slice_x_axis()
+            )
+            y_min, y_max, y_step = get_axis_range(
+                workspace_selection, self._slice_view.get_slice_y_axis()
+            )
         except (KeyError, RuntimeError, IndexError):
             self._slice_view.clear_input_fields()
             self._slice_view.disable()
         else:
             e_units = EnergyUnits(self._slice_view.get_units())
-            if e_units.factor_from_meV() != 1.:
-                if 'DeltaE' in self._slice_view.get_slice_x_axis():
-                    x_min, x_max, x_step = (float(v) for v in e_units.from_meV(x_min, x_max, x_step))
+            if e_units.factor_from_meV() != 1.0:
+                if "DeltaE" in self._slice_view.get_slice_x_axis():
+                    x_min, x_max, x_step = (
+                        float(v) for v in e_units.from_meV(x_min, x_max, x_step)
+                    )
                 else:
-                    y_min, y_max, y_step = (float(v) for v in e_units.from_meV(y_min, y_max, y_step))
+                    y_min, y_max, y_step = (
+                        float(v) for v in e_units.from_meV(y_min, y_max, y_step)
+                    )
             self._slice_view.enable()
-            self._slice_view.populate_slice_x_params(*["%.5f" % x for x in (x_min, x_max, x_step)])
-            self._slice_view.populate_slice_y_params(*["%.5f" % x for x in (y_min, y_max, y_step)])
+            self._slice_view.populate_slice_x_params(
+                *["%.5f" % x for x in (x_min, x_max, x_step)]
+            )
+            self._slice_view.populate_slice_y_params(
+                *["%.5f" % x for x in (y_min, y_max, y_step)]
+            )
 
     def update_workspaces(self):
         self._main_presenter.update_displayed_workspaces()

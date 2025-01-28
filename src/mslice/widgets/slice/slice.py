@@ -1,5 +1,5 @@
-"""A widget for defining slice calculations
-"""
+"""A widget for defining slice calculations"""
+
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
@@ -18,8 +18,9 @@ from .command import Command
 # Classes and functions
 # -----------------------------------------------------------------------------
 
+
 class SliceWidget(SliceView, QWidget):
-    error_occurred = Signal('QString')
+    error_occurred = Signal("QString")
     busy = Signal(bool)
 
     def __init__(self, parent=None, *args, **kwargs):
@@ -27,26 +28,36 @@ class SliceWidget(SliceView, QWidget):
 
         The main window must implement MainView"""
         QWidget.__init__(self, parent, *args, **kwargs)
-        load_ui(__file__, 'slice.ui', self)
+        load_ui(__file__, "slice.ui", self)
         self.btnSliceDisplay.clicked.connect(self._btn_clicked)
         self.display_errors_to_statusbar = True
         self._presenter = SliceWidgetPresenter(self)
         # Each time the fields are populated, set a minimum step size
         self._minimumStep = {}
-        self.lneSliceXStep.editingFinished.connect(lambda: self._step_edited('x', self.lneSliceXStep))
-        self.lneSliceYStep.editingFinished.connect(lambda: self._step_edited('y', self.lneSliceYStep))
-        self.cmbSliceXAxis.currentIndexChanged.connect(lambda ind: self._change_axes(1, ind))
-        self.cmbSliceYAxis.currentIndexChanged.connect(lambda ind: self._change_axes(2, ind))
+        self.lneSliceXStep.editingFinished.connect(
+            lambda: self._step_edited("x", self.lneSliceXStep)
+        )
+        self.lneSliceYStep.editingFinished.connect(
+            lambda: self._step_edited("y", self.lneSliceYStep)
+        )
+        self.cmbSliceXAxis.currentIndexChanged.connect(
+            lambda ind: self._change_axes(1, ind)
+        )
+        self.cmbSliceYAxis.currentIndexChanged.connect(
+            lambda ind: self._change_axes(2, ind)
+        )
         self.cmbSliceUnits.currentIndexChanged.connect(self._change_unit)
         self.set_validators()
-        self._old_en = EnergyUnits('meV')
-        self._en_default = 'meV'
+        self._old_en = EnergyUnits("meV")
+        self._en_default = "meV"
 
     def get_presenter(self):
         return self._presenter
 
     def _btn_clicked(self):
-        if self._step_edited('x', self.lneSliceXStep) and self._step_edited('y', self.lneSliceXStep):
+        if self._step_edited("x", self.lneSliceXStep) and self._step_edited(
+            "y", self.lneSliceXStep
+        ):
             self._presenter.notify(Command.DisplaySlice)
 
     def _step_edited(self, idx, lineEdit):
@@ -56,12 +67,12 @@ class SliceWidget(SliceView, QWidget):
                 value = float(lineEdit.text())
             except ValueError:
                 value = 0
-                self._display_error('Invalid step parameter. Using default value.')
+                self._display_error("Invalid step parameter. Using default value.")
             if value == 0:
                 lineEdit.setText(str(self._minimumStep[idx]))
-                self._display_error('Setting step size to default.')
-            elif value < (self._minimumStep[idx] / 100.):
-                self._display_error('Step size too small!')
+                self._display_error("Setting step size to default.")
+            elif value < (self._minimumStep[idx] / 100.0):
+                self._display_error("Step size too small!")
                 return False
         return True
 
@@ -75,27 +86,44 @@ class SliceWidget(SliceView, QWidget):
             return
         axes = [self.cmbSliceXAxis.currentText(), self.cmbSliceYAxis.currentText()]
         index = [self.cmbSliceXAxis.currentIndex(), self.cmbSliceYAxis.currentIndex()]
-        axes_set = [self.cmbSliceXAxis.setCurrentIndex, self.cmbSliceYAxis.setCurrentIndex]
+        axes_set = [
+            self.cmbSliceXAxis.setCurrentIndex,
+            self.cmbSliceYAxis.setCurrentIndex,
+        ]
         if axes[curr_axis] == axes[other_axis]:
             new_index = (index[other_axis] + 1) % num_items
             axes_set[other_axis](new_index)
-        if 'DeltaE' not in axes:
-            iDeltaE = [[id for id in range(cmb.count()) if 'DeltaE' in str(cmb.itemText(id))]
-                       for cmb in [self.cmbSliceXAxis, self.cmbSliceYAxis]]
+        if "DeltaE" not in axes:
+            iDeltaE = [
+                [id for id in range(cmb.count()) if "DeltaE" in str(cmb.itemText(id))]
+                for cmb in [self.cmbSliceXAxis, self.cmbSliceYAxis]
+            ]
             if len(iDeltaE[other_axis]) > 0:
                 axes_set[other_axis](iDeltaE[other_axis][0])
         self._presenter.populate_slice_params()
 
     def _change_unit(self):
         new_unit = self.get_units()
-        if self._old_en.factor_to(new_unit) != 1.:
-            if 'DeltaE' in self.get_slice_x_axis():
-                x_start, x_end, x_step = self.get_slice_x_start(), self.get_slice_x_end(), self.get_slice_x_step()
-                x_start, x_end, x_step = self._old_en.convert_to(new_unit, x_start, x_end, x_step)
+        if self._old_en.factor_to(new_unit) != 1.0:
+            if "DeltaE" in self.get_slice_x_axis():
+                x_start, x_end, x_step = (
+                    self.get_slice_x_start(),
+                    self.get_slice_x_end(),
+                    self.get_slice_x_step(),
+                )
+                x_start, x_end, x_step = self._old_en.convert_to(
+                    new_unit, x_start, x_end, x_step
+                )
                 self.populate_slice_x_params(x_start, x_end, x_step)
-            elif 'DeltaE' in self.get_slice_y_axis():
-                y_start, y_end, y_step = self.get_slice_y_start(), self.get_slice_y_end(), self.get_slice_y_step()
-                y_start, y_end, y_step = self._old_en.convert_to(new_unit, y_start, y_end, y_step)
+            elif "DeltaE" in self.get_slice_y_axis():
+                y_start, y_end, y_step = (
+                    self.get_slice_y_start(),
+                    self.get_slice_y_end(),
+                    self.get_slice_y_step(),
+                )
+                y_start, y_end, y_step = self._old_en.convert_to(
+                    new_unit, y_start, y_end, y_step
+                )
                 self.populate_slice_y_params(y_start, y_end, y_step)
         self._old_en = EnergyUnits(new_unit)
 
@@ -163,28 +191,28 @@ class SliceWidget(SliceView, QWidget):
             self.cmbSliceYAxis.addItem(option)
 
     def error_select_one_workspace(self):
-        self._display_error('Please select a workspace to slice')
+        self._display_error("Please select a workspace to slice")
 
     def error_invalid_x_params(self):
-        self._display_error('Invalid parameters for the x axis of the slice')
+        self._display_error("Invalid parameters for the x axis of the slice")
 
     def error_invalid_intensity_params(self):
-        self._display_error('Invalid parameters for the intensity of the slice')
+        self._display_error("Invalid parameters for the intensity of the slice")
 
     def error_invalid_plot_parameters(self):
-        self._display_error('Invalid parameters for the slice')
+        self._display_error("Invalid parameters for the slice")
 
     def error_invalid_smoothing_params(self):
-        self._display_error('Invalid value for smoothing')
+        self._display_error("Invalid value for smoothing")
 
     def error_invalid_y_units(self):
-        self._display_error('Invalid selection of the y axis')
+        self._display_error("Invalid selection of the y axis")
 
     def error_invalid_y_params(self):
-        self._display_error('Invalid parameters for the y axis of the slice')
+        self._display_error("Invalid parameters for the y axis of the slice")
 
     def error_invalid_x_units(self):
-        self._display_error('Invalid selection of the x axis')
+        self._display_error("Invalid selection of the x axis")
 
     def error(self, string):
         self._display_error(string)
@@ -194,14 +222,14 @@ class SliceWidget(SliceView, QWidget):
         self.lneSliceXEnd.setText(x_end)
         self.lneSliceXStep.setText(x_step)
         if x_step:
-            self._minimumStep['x'] = float(x_step)
+            self._minimumStep["x"] = float(x_step)
 
     def populate_slice_y_params(self, y_start, y_end, y_step):
         self.lneSliceYStart.setText(y_start)
         self.lneSliceYEnd.setText(y_end)
         self.lneSliceYStep.setText(y_step)
         if y_step:
-            self._minimumStep['y'] = float(y_step)
+            self._minimumStep["y"] = float(y_step)
 
     def clear_input_fields(self):
         self.populate_slice_x_options([])
@@ -247,8 +275,16 @@ class SliceWidget(SliceView, QWidget):
         self.cmbSliceUnits.setEnabled(True)
 
     def set_validators(self):
-        line_edits = [self.lneSliceXStart, self.lneSliceXEnd, self.lneSliceXStep, self.lneSliceYStart,
-                      self.lneSliceYEnd, self.lneSliceYStep, self.lneSliceIntensityStart, self.lneSliceIntensityEnd]
+        line_edits = [
+            self.lneSliceXStart,
+            self.lneSliceXEnd,
+            self.lneSliceXStep,
+            self.lneSliceYStart,
+            self.lneSliceYEnd,
+            self.lneSliceYStep,
+            self.lneSliceIntensityStart,
+            self.lneSliceIntensityEnd,
+        ]
 
         double_validator = double_validator_without_separator()
         for line_edit in line_edits:

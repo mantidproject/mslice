@@ -1,6 +1,7 @@
 """Package defining top-level MSlice application
 and entry points.
 """
+
 import sys
 
 import mslice.util.mantid.init_mantid  # noqa: F401
@@ -19,11 +20,11 @@ def is_gui():
 
 
 def main():
-    """Start the application.
-    """
+    """Start the application."""
     qapp_ref = create_qapp_if_required()
     import matplotlib as mpl
-    mpl.use('Qt{}Agg'.format(QT_VERSION[0]))
+
+    mpl.use("Qt{}Agg".format(QT_VERSION[0]))
     show_gui()
     return qapp_ref.exec_()
 
@@ -36,9 +37,10 @@ def show_gui():
     global MAIN_WINDOW
     if MAIN_WINDOW is None:
         from mslice.app.mainwindow import MainWindow
+
         MAIN_WINDOW = MainWindow(in_mantid())
 
-    if 'workbench' in sys.modules:
+    if "workbench" in sys.modules:
         from workbench.config import get_window_config
 
         # Ensures any change to workbench Floating/Ontop window setting is propagated to MSlice.

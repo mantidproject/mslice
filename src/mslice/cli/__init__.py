@@ -4,8 +4,14 @@ from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
 from mslice.cli.helperfunctions import is_cut, is_hs_workspace
 from ._mslice_commands import *  # noqa: F401, F403
-from mslice.cli.helperfunctions import (_check_workspace_name, _check_workspace_type, _get_workspace_type, _get_overplot_key,
-                                        _update_overplot_checklist, _update_legend)
+from mslice.cli.helperfunctions import (
+    _check_workspace_name,
+    _check_workspace_type,
+    _get_workspace_type,
+    _get_overplot_key,
+    _update_overplot_checklist,
+    _update_legend,
+)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.util.qt.qapp import call_in_qapp_thread
@@ -18,10 +24,11 @@ del show  # noqa: F821
 
 # MSlice Matplotlib Projection
 class MSliceAxes(Axes):
-    name = 'mslice'
+    name = "mslice"
 
     def errorbar(self, *args, **kwargs):
         from mslice.cli.plotfunctions import errorbar
+
         if is_cut(*args):
             return errorbar(self, *args, **kwargs)
         if not is_hs_workspace(*args):
@@ -29,6 +36,7 @@ class MSliceAxes(Axes):
 
     def pcolormesh(self, *args, **kwargs):
         from mslice.cli.plotfunctions import pcolormesh
+
         if hasattr(args[0], "is_slice") and args[0].is_slice:
             return pcolormesh(self, *args, **kwargs)
         else:
@@ -36,6 +44,7 @@ class MSliceAxes(Axes):
 
     def recoil(self, workspace, element=None, rmm=None, **kwargs):
         from mslice.app.presenters import get_slice_plotter_presenter
+
         _check_workspace_name(workspace)
         workspace = get_workspace_handle(workspace)
         _check_workspace_type(workspace, HistogramWorkspace)
@@ -46,41 +55,52 @@ class MSliceAxes(Axes):
             plot_handler = GlobalFigureManager.get_active_figure().plot_handler
             plot_handler._arb_nuclei_rmm = rmm
 
-        get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=True, cif=None, **kwargs)
+        get_slice_plotter_presenter().add_overplot_line(
+            workspace.name, key, recoil=True, cif=None, **kwargs
+        )
 
         _update_overplot_checklist(key)
         _update_legend()
 
     def bragg(self, workspace, element=None, cif=None, **kwargs):
-        from mslice.app.presenters import get_cut_plotter_presenter, get_slice_plotter_presenter
+        from mslice.app.presenters import (
+            get_cut_plotter_presenter,
+            get_slice_plotter_presenter,
+        )
+
         _check_workspace_name(workspace)
         workspace = get_workspace_handle(workspace)
 
         key = _get_overplot_key(element, rmm=None)
 
         ws_type = _get_workspace_type(workspace)
-        if ws_type == 'HistogramWorkspace':
-            get_cut_plotter_presenter().add_overplot_line(workspace.name, key, recoil=True, cif=None, **kwargs)
-        elif ws_type == 'MatrixWorkspace':
-            get_slice_plotter_presenter().add_overplot_line(workspace.name, key, recoil=False, cif=cif, **kwargs)
+        if ws_type == "HistogramWorkspace":
+            get_cut_plotter_presenter().add_overplot_line(
+                workspace.name, key, recoil=True, cif=None, **kwargs
+            )
+        elif ws_type == "MatrixWorkspace":
+            get_slice_plotter_presenter().add_overplot_line(
+                workspace.name, key, recoil=False, cif=cif, **kwargs
+            )
 
         _update_overplot_checklist(key)
         _update_legend()
 
-    def grid(self, b=None, which='major', axis='both', **kwargs):
+    def grid(self, b=None, which="major", axis="both", **kwargs):
         Axes.grid(self, b, which, axis, **kwargs)
 
         plot_handler = GlobalFigureManager.get_active_figure().plot_handler
         if plot_handler is not None and not is_gui():
-            if axis == 'x':
+            if axis == "x":
                 plot_handler.manager._xgrid = b
-            elif axis == 'y':
+            elif axis == "y":
                 plot_handler.manager._ygrid = b
 
     @call_in_qapp_thread
     def set_waterfall(self, isWaterfall=True, x_offset=None, y_offset=None):
-        """ Change the plot to/from a waterfall """
+        """Change the plot to/from a waterfall"""
         from mslice.plotting.plot_window.cut_plot import CutPlot
+
         plot_handler = GlobalFigureManager.get_active_figure().plot_handler
         if isinstance(plot_handler, CutPlot):
             plot_handler.waterfall = isWaterfall
@@ -90,7 +110,7 @@ class MSliceAxes(Axes):
                 plot_handler.waterfall_y = y_offset
             plot_handler.toggle_waterfall()
         else:
-            raise RuntimeError('Waterfall plots may only be applied to cuts')
+            raise RuntimeError("Waterfall plots may only be applied to cuts")
 
 
 register_projection(MSliceAxes)

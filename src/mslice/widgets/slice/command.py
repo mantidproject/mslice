@@ -1,5 +1,4 @@
-"""Defines enumerated values for operations available in the slice package
-"""
+"""Defines enumerated values for operations available in the slice package"""
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------

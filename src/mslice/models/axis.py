@@ -5,7 +5,7 @@ STEP_TOLERANCE = 1e-5
 
 
 class Axis(object):
-    def __init__(self, units, start, end, step, e_unit='meV'):
+    def __init__(self, units, start, end, step, e_unit="meV"):
         self.units = units
         self.start = float(start)
         self.end = float(end)
@@ -13,16 +13,32 @@ class Axis(object):
         self.e_unit = e_unit
 
     def to_dict(self):
-        return {'start': self.start, 'end': self.end, 'step': self.step, 'units': self.units, 'e_unit': self.e_unit}
+        return {
+            "start": self.start,
+            "end": self.end,
+            "step": self.step,
+            "units": self.units,
+            "e_unit": self.e_unit,
+        }
 
     def __str__(self):
-        return "{},{},{},{}{}".format(self.units, self.start, self.end, self.step,
-                                      ",{}".format(self.e_unit) if self.not_meV else "")
+        return "{},{},{},{}{}".format(
+            self.units,
+            self.start,
+            self.end,
+            self.step,
+            ",{}".format(self.e_unit) if self.not_meV else "",
+        )
 
     def __eq__(self, other):
         # This is required for Unit testing
-        return self.units == other.units and self.start == other.start and self.end == other.end \
-            and self.step == other.step and isinstance(other, Axis)
+        return (
+            self.units == other.units
+            and self.start == other.start
+            and self.end == other.end
+            and self.step == other.step
+            and isinstance(other, Axis)
+        )
 
     def __repr__(self):
         info = (self.units, self.start, self.end, self.step)
@@ -43,11 +59,17 @@ class Axis(object):
         try:
             self._start = float(value)
         except ValueError:
-            if str(value) == '':
-                raise ValueError("Invalid axis parameter on {}: Start value required!".format(self.units))
+            if str(value) == "":
+                raise ValueError(
+                    "Invalid axis parameter on {}: Start value required!".format(
+                        self.units
+                    )
+                )
             else:
-                raise ValueError("Invalid axis parameter on {}: "
-                                 "Start value {} is not a valid float!".format(self.units, value))
+                raise ValueError(
+                    "Invalid axis parameter on {}: "
+                    "Start value {} is not a valid float!".format(self.units, value)
+                )
 
     @property
     def end(self):
@@ -58,14 +80,22 @@ class Axis(object):
         try:
             end_float = float(value)
         except ValueError:
-            if str(value) == '':
-                raise ValueError("Invalid axis parameter on {}: End value required!".format(self.units))
+            if str(value) == "":
+                raise ValueError(
+                    "Invalid axis parameter on {}: End value required!".format(
+                        self.units
+                    )
+                )
             else:
-                raise ValueError("Invalid axis parameter on {}: "
-                                 "End value {} is not a valid float!".format(self.units, value))
+                raise ValueError(
+                    "Invalid axis parameter on {}: "
+                    "End value {} is not a valid float!".format(self.units, value)
+                )
         if end_float <= self.start:
-            raise ValueError("Invalid axis parameter on {}: End value must be greater"
-                             " than start value!".format(self.units))
+            raise ValueError(
+                "Invalid axis parameter on {}: End value must be greater"
+                " than start value!".format(self.units)
+            )
         self._end = end_float
 
     @property
@@ -77,7 +107,11 @@ class Axis(object):
         try:
             self._step = float(value)
         except ValueError:
-            raise ValueError("Invalid axis parameter on {}: Step {} is not a valid float!".format(self.units, value))
+            raise ValueError(
+                "Invalid axis parameter on {}: Step {} is not a valid float!".format(
+                    self.units, value
+                )
+            )
 
     @property
     def start_meV(self):
@@ -103,13 +137,21 @@ class Axis(object):
         old_e_unit = self.e_unit
         self._e_unit = str(value).strip()
         new_e_unit = EnergyUnits(self._e_unit)
-        self.scale = new_e_unit.factor_to_meV() if ('DeltaE' in self.units) else 1.
-        if old_e_unit is not None and 'DeltaE' in self.units and old_e_unit != self._e_unit:
+        self.scale = new_e_unit.factor_to_meV() if ("DeltaE" in self.units) else 1.0
+        if (
+            old_e_unit is not None
+            and "DeltaE" in self.units
+            and old_e_unit != self._e_unit
+        ):
             # This means the axes had a different previous e_unit set so (start, end, step) should be rescaled
-            self.start, self.step, self.end = new_e_unit.convert_from(old_e_unit, self.start, self.step, self.end)
+            self.start, self.step, self.end = new_e_unit.convert_from(
+                old_e_unit, self.start, self.step, self.end
+            )
 
     def validate_step_against_workspace(self, workspace) -> str:
         x_step = get_axis_step(workspace, self.units)
         if self.step < x_step - STEP_TOLERANCE:
-            return f"The {self.units} step provided ({self.step:.4f}) is smaller than the data step in " \
-                   f"the workspace ({x_step:.4f}). Please provide a larger {self.units} step."
+            return (
+                f"The {self.units} step provided ({self.step:.4f}) is smaller than the data step in "
+                f"the workspace ({x_step:.4f}). Please provide a larger {self.units} step."
+            )

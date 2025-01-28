@@ -2,9 +2,8 @@ from .interfaces.main_presenter import MainPresenterInterface
 
 
 class PresenterUtility(object):
-
     def register_master(self, main_presenter):
-        assert (isinstance(main_presenter, MainPresenterInterface))
+        assert isinstance(main_presenter, MainPresenterInterface)
         self._main_presenter = main_presenter
         self._main_presenter.subscribe_to_workspace_selection_monitor(self)
         self._main_presenter.subscribe_to_energy_default_monitor(self)

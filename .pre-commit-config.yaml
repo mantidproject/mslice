@@ -16,10 +16,15 @@ repos:
       - id: check-added-large-files
         args: ['--maxkb=4096']
 
-  - repo: https://github.com/PyCQA/flake8.git
-    rev: 7.1.1
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.9.3
     hooks:
-      - id: flake8
-      # Have to manually copy this from the .flake8 as flake8 will just ignore the config if the file is passed
-        exclude: docs/source/conf.py|src/mslice/plotting/pyplot.p|tools/boilerplate.py
-        args: ['--max-complexity=14', '--max-line-length=140']
+      # Run the linter.
+      - id: ruff
+        types_or: [ python, pyi ]
+        args: [ --fix, --exit-non-zero-on-fix, --extend-ignore, F401 ]
+        exclude: src/mslice/plotting/pyplot.py
+      # Run the formatter.
+      - id: ruff-format
+        types_or: [ python, pyi ]

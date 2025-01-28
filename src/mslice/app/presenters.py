@@ -4,7 +4,9 @@ from mslice.cli.views.cli_data_loader import CLIDataLoaderWidget
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.cli.views.cli_powder import CLIPowderWidget
-from mslice.models.projection.powder.mantid_projection_calculator import MantidProjectionCalculator
+from mslice.models.projection.powder.mantid_projection_calculator import (
+    MantidProjectionCalculator,
+)
 from . import is_gui
 from mslice import app
 
@@ -12,7 +14,9 @@ from mslice import app
 cli_cut_plotter_presenter = CutPlotterPresenter()
 cli_slice_plotter_presenter = SlicePlotterPresenter()
 cli_dataloader_presenter = DataLoaderPresenter(CLIDataLoaderWidget())
-cli_powder_presenter = PowderProjectionPresenter(CLIPowderWidget(), MantidProjectionCalculator())
+cli_powder_presenter = PowderProjectionPresenter(
+    CLIPowderWidget(), MantidProjectionCalculator()
+)
 
 
 def get_dataloader_presenter():

@@ -4,11 +4,13 @@ from unittest import TestCase
 from mantid.api import AnalysisDataService
 
 from mslice.models.cut.cut_normalisation import normalize_workspace
-from tests.testhelpers.workspace_creator import create_md_histo_workspace, create_workspace
+from tests.testhelpers.workspace_creator import (
+    create_md_histo_workspace,
+    create_workspace,
+)
 
 
 class CutNormalisationTest(TestCase):
-
     def setUp(self):
         self.non_md_histo_ws = create_workspace("non_md_histo_ws")
         self.md_histo_ws = create_md_histo_workspace(2, "md_histo_ws")

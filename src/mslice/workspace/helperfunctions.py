@@ -7,11 +7,11 @@ from mantid.simpleapi import DeleteWorkspace, RenameWorkspace
 def _attribute_from_string(ws, comstr):
     if comstr:
         try:
-            attrdict = pickle.loads(codecs.decode(comstr.encode(), 'base64'))
+            attrdict = pickle.loads(codecs.decode(comstr.encode(), "base64"))
         except ValueError:
             pass
         else:
-            for (k, v) in list(attrdict.items()):
+            for k, v in list(attrdict.items()):
                 if hasattr(ws, k):
                     setattr(ws, k, v)
 
@@ -35,7 +35,7 @@ def attribute_from_log(ws, raw_ws):
             attribute_from_comment(ws, raw_ws)
             return
     try:
-        comstr = runinfo.getProperty('MSlice').value
+        comstr = runinfo.getProperty("MSlice").value
     except RuntimeError:
         return
     else:
@@ -49,12 +49,12 @@ def attribute_to_comment(attrdict, raw_ws, append=False):
         except AttributeError:
             pass
         else:
-            prevdict = pickle.loads(codecs.decode(comstr.encode(), 'base64'))
-            for (k, v) in list(prevdict.items()):
+            prevdict = pickle.loads(codecs.decode(comstr.encode(), "base64"))
+            for k, v in list(prevdict.items()):
                 if k not in attrdict:
                     attrdict[k] = v
     try:
-        raw_ws.setComment(str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()))
+        raw_ws.setComment(str(codecs.encode(pickle.dumps(attrdict), "base64").decode()))
     except AttributeError:
         pass
 
@@ -69,23 +69,35 @@ def attribute_to_log(attrdict, raw_ws, append=False):
             attribute_to_comment(attrdict, raw_ws, append)
             return
     if not append:
-        runinfo.addProperty('MSlice', str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()), True)
+        runinfo.addProperty(
+            "MSlice",
+            str(codecs.encode(pickle.dumps(attrdict), "base64").decode()),
+            True,
+        )
     else:
         try:
-            comstr = runinfo.getProperty('MSlice').value
+            comstr = runinfo.getProperty("MSlice").value
         except RuntimeError:
             pass
         else:
-            prevdict = pickle.loads(codecs.decode(comstr.encode(), 'base64'))
-            for (k, v) in list(prevdict.items()):
+            prevdict = pickle.loads(codecs.decode(comstr.encode(), "base64"))
+            for k, v in list(prevdict.items()):
                 if k not in attrdict:
                     attrdict[k] = v
-        runinfo.addProperty('MSlice', str(codecs.encode(pickle.dumps(attrdict), 'base64').decode()), True)
+        runinfo.addProperty(
+            "MSlice",
+            str(codecs.encode(pickle.dumps(attrdict), "base64").decode()),
+            True,
+        )
 
 
 def delete_workspace(workspace, ws):
     try:
-        if hasattr(workspace, str(ws)) and ws is not None and ws.name().endswith('_HIDDEN'):
+        if (
+            hasattr(workspace, str(ws))
+            and ws is not None
+            and ws.name().endswith("_HIDDEN")
+        ):
             DeleteWorkspace(ws)
             ws = None
     except RuntimeError:
@@ -102,10 +114,15 @@ def rename_workspace(old_name: str, new_name: str) -> None:
 
 
 class WrapWorkspaceAttribute(object):
-
     def __init__(self, workspace):
-        self.workspace = workspace if (hasattr(workspace, 'save_attributes')
-                                       and hasattr(workspace, 'remove_saved_attributes')) else None
+        self.workspace = (
+            workspace
+            if (
+                hasattr(workspace, "save_attributes")
+                and hasattr(workspace, "remove_saved_attributes")
+            )
+            else None
+        )
 
     def __enter__(self):
         if self.workspace:

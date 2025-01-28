@@ -23,7 +23,7 @@ class CutWidgetPresenter(PresenterUtility):
         self._previous_cut = None
         self._previous_axis = None
         self._minimumStep = dict()
-        self._en_default = 'meV'
+        self._en_default = "meV"
 
     def set_cut_plotter_presenter(self, cut_plotter_presenter):
         self._cut_plotter_presenter = cut_plotter_presenter
@@ -59,9 +59,13 @@ class CutWidgetPresenter(PresenterUtility):
         for workspace in selected_workspaces:
             try:
                 workspace = get_workspace_handle(workspace)
-                cut = Cut(*(params + (None, workspace.e_fixed)))  # add non-parsed cut params
+                cut = Cut(
+                    *(params + (None, workspace.e_fixed))
+                )  # add non-parsed cut params
                 cut.parent_ws_name = workspace.name
-                message = self._cut_plotter_presenter.run_cut(workspace, cut, plot_over=plot_over, save_only=save_only)
+                message = self._cut_plotter_presenter.run_cut(
+                    workspace, cut, plot_over=plot_over, save_only=save_only
+                )
                 if message is not None:
                     self._cut_view.display_warning(message)
             except RuntimeError as e:
@@ -81,28 +85,50 @@ class CutWidgetPresenter(PresenterUtility):
         except ValueError:
             step = self._cut_view.get_minimum_step()
             if step is not None:
-                self._cut_view.populate_cut_params(self._cut_view.get_cut_axis_start(),
-                                                   self._cut_view.get_cut_axis_end(),
-                                                   "%0.5f" % step)
-                self._cut_view.display_error("Invalid cut step parameter, using default.")
+                self._cut_view.populate_cut_params(
+                    self._cut_view.get_cut_axis_start(),
+                    self._cut_view.get_cut_axis_end(),
+                    "%0.5f" % step,
+                )
+                self._cut_view.display_error(
+                    "Invalid cut step parameter, using default."
+                )
                 warnings.warn("Invalid cut step, using default value")
 
     def _parse_input(self):
         """Gets values entered by user. Validation is performed by the CutCache object."""
         e_units = self._cut_view.get_energy_units()
-        cut_axis = Axis(self._cut_view.get_cut_axis(), self._cut_view.get_cut_axis_start(),
-                        self._cut_view.get_cut_axis_end(), self._cut_view.get_cut_axis_step(), e_units)
+        cut_axis = Axis(
+            self._cut_view.get_cut_axis(),
+            self._cut_view.get_cut_axis_start(),
+            self._cut_view.get_cut_axis_end(),
+            self._cut_view.get_cut_axis_step(),
+            e_units,
+        )
 
-        integration_axis = Axis(self._cut_view.get_integration_axis(), self._cut_view.get_integration_start(),
-                                self._cut_view.get_integration_end(), 0., e_units)
+        integration_axis = Axis(
+            self._cut_view.get_integration_axis(),
+            self._cut_view.get_integration_start(),
+            self._cut_view.get_integration_end(),
+            0.0,
+            e_units,
+        )
 
         intensity_start = self._cut_view.get_intensity_start()
         intensity_end = self._cut_view.get_intensity_end()
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
         width = self._cut_view.get_integration_width()
-        algo = ['Rebin', 'Integration'][self._cut_view.get_cut_algorithm()]
-        return cut_axis, integration_axis, intensity_start, intensity_end, norm_to_one, width, algo
+        algo = ["Rebin", "Integration"][self._cut_view.get_cut_algorithm()]
+        return (
+            cut_axis,
+            integration_axis,
+            intensity_start,
+            intensity_end,
+            norm_to_one,
+            width,
+            algo,
+        )
 
     def _set_minimum_step(self, workspace, axis):
         """Gets axes limits and then sets the minimumStep dictionary with those values"""
@@ -117,27 +143,34 @@ class CutWidgetPresenter(PresenterUtility):
         if self._previous_cut is not None and self._previous_axis is not None:
             if not self._cut_view.is_fields_cleared():
                 previous_cut_workspace = get_workspace_handle(self._previous_cut)
-                previous_cut_workspace.set_saved_cut_parameters(self._previous_axis, self._cut_view.get_input_fields())
+                previous_cut_workspace.set_saved_cut_parameters(
+                    self._previous_axis, self._cut_view.get_input_fields()
+                )
             else:
                 self._previous_cut = None
                 self._previous_axis = None
         workspace_selection = self._main_presenter.get_selected_workspaces()
-        if len(workspace_selection) == 0 or not all([is_cuttable(ws) for ws in workspace_selection]):
+        if len(workspace_selection) == 0 or not all(
+            [is_cuttable(ws) for ws in workspace_selection]
+        ):
             self._cut_view.clear_input_fields()
             self._cut_view.disable()
             self._previous_cut = None
             self._previous_axis = None
         else:
-            non_psd = all([not get_workspace_handle(ws).is_PSD for ws in workspace_selection])
+            non_psd = all(
+                [not get_workspace_handle(ws).is_PSD for ws in workspace_selection]
+            )
             self._cut_view.enable_integration_axis(non_psd)
             self._populate_fields_using_workspace(workspace_selection[0])
 
     def _populate_fields_using_workspace(self, workspace_name, plotting=False):
-
         workspace = get_workspace_handle(workspace_name)
         axes = get_available_axes(workspace_name)
 
-        chosen_axis, saved_parameters = self._get_axis_to_populate_fields(workspace, axes)
+        chosen_axis, saved_parameters = self._get_axis_to_populate_fields(
+            workspace, axes
+        )
 
         self._cut_view.clear_input_fields()
         self._cut_view.populate_cut_axis_options(axes)
@@ -157,7 +190,9 @@ class CutWidgetPresenter(PresenterUtility):
         #   2. If the user has looked at this cut _and_ this axis before, use that
         #   3. Otherwise use the first available axis
 
-        prev_cut_par = self._get_current_axis_parameters_if_chosen(workspace, available_axes)
+        prev_cut_par = self._get_current_axis_parameters_if_chosen(
+            workspace, available_axes
+        )
         if prev_cut_par:
             chosen_axis = self._cut_view.get_cut_axis()
             saved_parameters = prev_cut_par
@@ -174,28 +209,38 @@ class CutWidgetPresenter(PresenterUtility):
     def _get_current_axis_parameters_if_chosen(self, workspace, available_axes):
         if self._previous_cut is not None:
             previous_cut_workspace = get_workspace_handle(self._previous_cut)
-            prev_cut_par, _ = previous_cut_workspace.get_saved_cut_parameters(self._previous_axis)
-            if available_axes == prev_cut_par['axes'] and not workspace.is_axis_saved(self._previous_axis):
+            prev_cut_par, _ = previous_cut_workspace.get_saved_cut_parameters(
+                self._previous_axis
+            )
+            if available_axes == prev_cut_par["axes"] and not workspace.is_axis_saved(
+                self._previous_axis
+            ):
                 return prev_cut_par
         return False
 
     def update_integration_axis(self):
-        workspace = get_workspace_handle(self._main_presenter.get_selected_workspaces()[0])
+        workspace = get_workspace_handle(
+            self._main_presenter.get_selected_workspaces()[0]
+        )
         axes = get_available_axes(workspace)
-        if self._cut_view.get_cut_axis() == 'DeltaE':
-            axes.remove('DeltaE')
+        if self._cut_view.get_cut_axis() == "DeltaE":
+            axes.remove("DeltaE")
             self._cut_view.populate_integration_axis_options(axes)
         else:
-            self._cut_view.populate_integration_axis_options(['DeltaE'])
+            self._cut_view.populate_integration_axis_options(["DeltaE"])
 
     def _cut_axis_changed(self):
         previous_cut_workspace = get_workspace_handle(self._previous_cut)
         if self._previous_axis is not None and not self._cut_view.is_fields_cleared():
-            previous_cut_workspace.set_saved_cut_parameters(self._previous_axis, self._cut_view.get_input_fields())
+            previous_cut_workspace.set_saved_cut_parameters(
+                self._previous_axis, self._cut_view.get_input_fields()
+            )
         self._cut_view.clear_input_fields(keep_axes=True)
         if self._previous_cut is not None:
             self._previous_axis = self._cut_view.get_cut_axis()
-            saved_parameters, _ = previous_cut_workspace.get_saved_cut_parameters(self._previous_axis)
+            saved_parameters, _ = previous_cut_workspace.get_saved_cut_parameters(
+                self._previous_axis
+            )
             if saved_parameters is not None:
                 self._cut_view.populate_input_fields(saved_parameters)
         min_step = self._minimumStep[self._cut_view.get_cut_axis()]

@@ -1,11 +1,17 @@
-from mslice.models.intensity_correction_algs import (compute_chi, compute_d2sigma, slice_compute_gdos,
-                                                     compute_symmetrised)
+from mslice.models.intensity_correction_algs import (
+    compute_chi,
+    compute_d2sigma,
+    slice_compute_gdos,
+    compute_symmetrised,
+)
 
 
 class Slice:
     """class that caches intensities and parameters for a single workspace"""
 
-    def __init__(self, slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated=False):
+    def __init__(
+        self, slice, colourmap, norm, sample_temp, q_axis, e_axis, rotated=False
+    ):
         """
         :param slice: output workspace of Slice algorithm
         :param colourmap: default colourmap to use
@@ -33,7 +39,7 @@ class Slice:
     @property
     def sample_temp(self):
         if self._sample_temp is None:
-            raise ValueError('sample temperature not found')
+            raise ValueError("sample temperature not found")
         return self._sample_temp
 
     @sample_temp.setter
@@ -43,29 +49,48 @@ class Slice:
     @property
     def chi(self):
         if self._chi is None:
-            self._chi = compute_chi(self.scattering_function, self.sample_temp, self.energy_axis)
+            self._chi = compute_chi(
+                self.scattering_function, self.sample_temp, self.energy_axis
+            )
         return self._chi
 
     @property
     def chi_magnetic(self):
         if self._chi_magnetic is None:
-            self._chi_magnetic = compute_chi(self.scattering_function, self.sample_temp, self.energy_axis, True)
+            self._chi_magnetic = compute_chi(
+                self.scattering_function, self.sample_temp, self.energy_axis, True
+            )
         return self._chi_magnetic
 
     @property
     def d2sigma(self):
         if self._d2sigma is None:
-            self._d2sigma = compute_d2sigma(self.scattering_function, self.energy_axis, self.scattering_function.e_fixed)
+            self._d2sigma = compute_d2sigma(
+                self.scattering_function,
+                self.energy_axis,
+                self.scattering_function.e_fixed,
+            )
         return self._d2sigma
 
     @property
     def symmetrised(self):
         if self._symmetrised is None:
-            self._symmetrised = compute_symmetrised(self.scattering_function, self.sample_temp, self.energy_axis, self.rotated)
+            self._symmetrised = compute_symmetrised(
+                self.scattering_function,
+                self.sample_temp,
+                self.energy_axis,
+                self.rotated,
+            )
         return self._symmetrised
 
     @property
     def gdos(self):
         if self._gdos is None:
-            self._gdos = slice_compute_gdos(self.scattering_function, self.sample_temp, self.momentum_axis, self.energy_axis, self.rotated)
+            self._gdos = slice_compute_gdos(
+                self.scattering_function,
+                self.sample_temp,
+                self.momentum_axis,
+                self.energy_axis,
+                self.rotated,
+            )
         return self._gdos

@@ -4,14 +4,14 @@ _loaded_workspaces = {}
 
 
 def get_workspace_handle(workspace_name):
-    """"Return handle to workspace given workspace_name_as_string"""
+    """ "Return handle to workspace given workspace_name_as_string"""
     # if passed a workspace handle return the handle
     if isinstance(workspace_name, Workspace):
         return workspace_name
     try:
         return _loaded_workspaces[workspace_name]
     except KeyError:
-        raise KeyError('workspace %s could not be found.' % workspace_name)
+        raise KeyError("workspace %s could not be found." % workspace_name)
 
 
 def add_workspace(workspace, name):
@@ -37,7 +37,7 @@ def rename_workspace(workspace, new_name):
 
 
 def get_visible_workspace_names():
-    return [key for key in _loaded_workspaces.keys() if key[:2] != '__']
+    return [key for key in _loaded_workspaces.keys() if key[:2] != "__"]
 
 
 def get_workspace_names():

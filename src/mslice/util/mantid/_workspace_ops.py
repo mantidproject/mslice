@@ -14,7 +14,7 @@ _binary_operator_map = {
     "GreaterThan": operator.gt,
     "Or": operator.or_,
     "And": operator.and_,
-    "Xor": operator.xor
+    "Xor": operator.xor,
 }
 
 
@@ -41,20 +41,29 @@ def _binary_op(self, other, algorithm, result_info, inplace, reverse):
         other = np.asarray(other)
     if isinstance(other, self.__class__):
         if _check_dimensions(self, other):
-            inner_res = _do_binary_operation(algorithm, self._raw_ws, other._raw_ws, result_info, inplace, reverse)
+            inner_res = _do_binary_operation(
+                algorithm, self._raw_ws, other._raw_ws, result_info, inplace, reverse
+            )
         else:
-            raise RuntimeError("workspaces must have same dimensionality for binary operations (+, -, *, /)")
+            raise RuntimeError(
+                "workspaces must have same dimensionality for binary operations (+, -, *, /)"
+            )
     elif isinstance(other, np.ndarray):
         inner_res = self._binary_op_array(_binary_operator_map[algorithm], other)
     else:
-        inner_res = _do_binary_operation(algorithm, self._raw_ws, other, result_info, inplace, reverse)
+        inner_res = _do_binary_operation(
+            algorithm, self._raw_ws, other, result_info, inplace, reverse
+        )
     return self.rewrap(inner_res)
 
 
 def _check_dimensions(self, workspace_to_check):
     """check if a workspace has the same number of bins as self for each dimension"""
     for i in range(self._raw_ws.getNumDims()):
-        if self._raw_ws.getDimension(i).getNBins() != workspace_to_check._raw_ws.getDimension(i).getNBins():
+        if (
+            self._raw_ws.getDimension(i).getNBins()
+            != workspace_to_check._raw_ws.getDimension(i).getNBins()
+        ):
             return False
     return True
 
@@ -65,7 +74,10 @@ def _attach_binary_operators():
             result_info = lhs_info()
             # Replace output workspace name with a unique temporary name hidden in ADS
             if result_info[0] > 0:
-                result_info = (result_info[0], ('__MSLTMP' + str(uuid4())[:8],) + result_info[1][1:])
+                result_info = (
+                    result_info[0],
+                    ("__MSLTMP" + str(uuid4())[:8],) + result_info[1][1:],
+                )
             return _binary_op(self, other, algorithm, result_info, inplace, reverse)
 
         op_wrapper.__name__ = attr
@@ -80,11 +92,11 @@ def _attach_binary_operators():
         "GreaterThan": "__gt__",
         "Or": "__or__",
         "And": "__and__",
-        "Xor": "__xor__"
+        "Xor": "__xor__",
     }
 
     for alg, attributes in operations.items():
         if isinstance(attributes, str):
             attributes = [attributes]
         for attr in attributes:
-            add_operator_func(attr, alg, attr.startswith('__i'), attr.startswith('__r'))
+            add_operator_func(attr, alg, attr.startswith("__i"), attr.startswith("__r"))

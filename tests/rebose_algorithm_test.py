@@ -6,10 +6,9 @@ from mslice.util.mantid.mantid_algorithms import Rebose
 
 
 class RebinAlgorithmTest(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
-        cls.test_workspace = create_workspace('test_workspace')
+        cls.test_workspace = create_workspace("test_workspace")
 
     @classmethod
     def tearDownClass(cls) -> None:

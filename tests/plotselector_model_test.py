@@ -13,7 +13,6 @@ from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
 
 
 class PlotSelectorModelTest(unittest.TestCase):
-
     def side_effect_manager(self, plot_number):
         if plot_number == 42:
             return self.figure_manager
@@ -29,7 +28,9 @@ class PlotSelectorModelTest(unittest.TestCase):
 
         self.global_figure_manager = mock.Mock()
         self.global_figure_manager.add_observer = mock.Mock()
-        self.global_figure_manager.get_figure_by_number = mock.Mock(side_effect=self.side_effect_manager)
+        self.global_figure_manager.get_figure_by_number = mock.Mock(
+            side_effect=self.side_effect_manager
+        )
         self.global_figure_manager.destroy = mock.Mock()
 
         self.model = PlotSelectorModel(self.presenter, self.global_figure_manager)
@@ -134,8 +135,10 @@ class PlotSelectorModelTest(unittest.TestCase):
 
     def test_export_plot_calls_savefig_on_figure(self):
         self.model.export_plot(42, "/home/Documents/Figure1.pdf")
-        self.figure_manager.canvas.figure.savefig.assert_called_once_with("/home/Documents/Figure1.pdf")
+        self.figure_manager.canvas.figure.savefig.assert_called_once_with(
+            "/home/Documents/Figure1.pdf"
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

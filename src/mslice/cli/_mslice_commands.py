@@ -1,8 +1,12 @@
 """Defines the additional mslice commands on top of the standard matplotlib plotting commands"""
+
 import os.path as ospath
 
 import matplotlib as mpl
-from mslice.models.workspacemanager.workspace_provider import (get_workspace_handle, rename_workspace)
+from mslice.models.workspacemanager.workspace_provider import (
+    get_workspace_handle,
+    rename_workspace,
+)
 from mslice.models.workspacemanager.file_io import save_ascii, save_matlab, save_nexus
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.workspacemanager.workspace_algorithms import rebose_single
@@ -11,8 +15,13 @@ from mslice.models.labels import is_momentum, is_twotheta
 import mslice.app as app
 from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.cli.helperfunctions import (_string_to_integration_axis, _process_axis, _check_workspace_name,
-                                        _check_workspace_type, _correct_intensity)
+from mslice.cli.helperfunctions import (
+    _string_to_integration_axis,
+    _process_axis,
+    _check_workspace_name,
+    _check_workspace_type,
+    _correct_intensity,
+)
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from mslice.workspace.histogram_workspace import HistogramWorkspace
@@ -44,7 +53,7 @@ def Show():
         # IPython versions >= 0.10 tack the _needmain
         # attribute onto pyplot.show, and always set
         # it to False, when in %pylab mode.
-        ipython_pylab = ipython_pylab and mpl.get_backend() != 'WebAgg'
+        ipython_pylab = ipython_pylab and mpl.get_backend() != "WebAgg"
         # TODO: The above is a hack to get the WebAgg backend
         # working with ipython's `%pylab` mode until proper
         # integration is implemented.
@@ -56,12 +65,11 @@ def Show():
     if ipython_pylab:
         return
 
-    if not mpl.is_interactive() or mpl.get_backend() == 'WebAgg':
+    if not mpl.is_interactive() or mpl.get_backend() == "WebAgg":
         QAppThreadCall(mainloop)()
 
 
 def Load(Filename, OutputWorkspace=None):
-
     """
     Load a workspace from a file.
 
@@ -71,56 +79,59 @@ def Load(Filename, OutputWorkspace=None):
     from mslice.app.presenters import get_dataloader_presenter
 
     if not isinstance(Filename, str):
-        raise RuntimeError('path given to load must be a string')
+        raise RuntimeError("path given to load must be a string")
     merge = False
     if not ospath.exists(Filename):
-        if all([ospath.exists(f) for f in Filename.split('+')]):
+        if all([ospath.exists(f) for f in Filename.split("+")]):
             merge = True
         else:
-            raise RuntimeError('could not find the path %s' % Filename)
+            raise RuntimeError("could not find the path %s" % Filename)
 
     get_dataloader_presenter().load_workspace([Filename], merge, force_overwrite=-1)
     name = ospath.splitext(ospath.basename(Filename))[0]
     if OutputWorkspace is not None:
         old_name = ospath.splitext(ospath.basename(Filename))[0]
         if merge:
-            old_name = old_name + '_merged'
+            old_name = old_name + "_merged"
         name = rename_workspace(workspace=old_name, new_name=OutputWorkspace).name
 
     return get_workspace_handle(name)
 
 
-def SaveData(InputWorkspace, Path, format='ascii'):
+def SaveData(InputWorkspace, Path, format="ascii"):
     if isinstance(InputWorkspace, str):
         _check_workspace_name(InputWorkspace)
         workspace = get_workspace_handle(InputWorkspace)
     else:
         workspace = InputWorkspace
-    save_fun = {'ascii': save_ascii, 'matlab': save_matlab, 'nexus': save_nexus}
+    save_fun = {"ascii": save_ascii, "matlab": save_matlab, "nexus": save_nexus}
     save_fun[format](workspace, Path)
 
 
 def SaveAscii(InputWorkspace, Path):
-    SaveData(InputWorkspace, Path, format='ascii')
+    SaveData(InputWorkspace, Path, format="ascii")
 
 
 def SaveMatlab(InputWorkspace, Path):
-    SaveData(InputWorkspace, Path, format='matlab')
+    SaveData(InputWorkspace, Path, format="matlab")
 
 
 def SaveNexus(InputWorkspace, Path):
-    SaveData(InputWorkspace, Path, format='nexus')
+    SaveData(InputWorkspace, Path, format="nexus")
 
 
 def GenerateScript(InputWorkspace, filename):
     from mslice.scripting import generate_script
+
     _check_workspace_name(InputWorkspace)
     workspace_name = get_workspace_handle(InputWorkspace).name[2:]
     plot_handler = GlobalFigureManager.get_active_figure().plot_handler
-    generate_script(ws_name=workspace_name, filename=filename, plot_handler=plot_handler)
+    generate_script(
+        ws_name=workspace_name, filename=filename, plot_handler=plot_handler
+    )
 
 
-def MakeProjection(InputWorkspace, Axis1, Axis2, Units='meV'):
+def MakeProjection(InputWorkspace, Axis1, Axis2, Units="meV"):
     """
     Calculate projections of workspace
 
@@ -155,17 +166,27 @@ def Slice(InputWorkspace, Axis1=None, Axis2=None, NormToOne=False):
     :return:
     """
     from mslice.app.presenters import get_slice_plotter_presenter
+
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, PixelWorkspace)
     x_axis = _process_axis(Axis1, 0, workspace)
     y_axis = _process_axis(Axis2, 1 if workspace.is_PSD else 2, workspace)
 
-    return get_slice_plotter_presenter().create_slice(workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP)
+    return get_slice_plotter_presenter().create_slice(
+        workspace, x_axis, y_axis, None, None, NormToOne, DEFAULT_CMAP
+    )
 
 
-def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Algorithm='Rebin',
-        IntensityCorrection=False, SampleTemperature=None):
+def Cut(
+    InputWorkspace,
+    CutAxis=None,
+    IntegrationAxis=None,
+    NormToOne=False,
+    Algorithm="Rebin",
+    IntensityCorrection=False,
+    SampleTemperature=None,
+):
     """
     Cuts workspace.
     :param InputWorkspace: Workspace to cut. The parameter can be either a python
@@ -194,22 +215,41 @@ def Cut(InputWorkspace, CutAxis=None, IntegrationAxis=None, NormToOne=False, Alg
     workspace = get_workspace_handle(InputWorkspace)
     _check_workspace_type(workspace, PixelWorkspace)
     cut_axis = _process_axis(CutAxis, 0, workspace)
-    integration_axis = _process_axis(IntegrationAxis, 1 if workspace.is_PSD else 2,
-                                     workspace, string_function=_string_to_integration_axis)
-    cut = compute_cut(workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True)
+    integration_axis = _process_axis(
+        IntegrationAxis,
+        1 if workspace.is_PSD else 2,
+        workspace,
+        string_function=_string_to_integration_axis,
+    )
+    cut = compute_cut(
+        workspace, cut_axis, integration_axis, NormToOne, Algorithm, store=True
+    )
 
     rotated = not is_twotheta(cut_axis.units) and not is_momentum(cut_axis.units)
     e_axis = cut_axis if rotated else integration_axis
     q_axis = integration_axis if rotated else cut_axis
-    intensity_correction = 'scattering_function' if IntensityCorrection is False else IntensityCorrection
-    cut = _correct_intensity(cut, intensity_correction, e_axis, q_axis, NormToOne, Algorithm, rotated, SampleTemperature)
+    intensity_correction = (
+        "scattering_function" if IntensityCorrection is False else IntensityCorrection
+    )
+    cut = _correct_intensity(
+        cut,
+        intensity_correction,
+        e_axis,
+        q_axis,
+        NormToOne,
+        Algorithm,
+        rotated,
+        SampleTemperature,
+    )
 
     get_cut_plotter_presenter().update_main_window()
 
     return cut
 
 
-def Rebose(InputWorkspace, CurrentTemperature=300, TargetTemperature=5, OutputWorkspace=None):
+def Rebose(
+    InputWorkspace, CurrentTemperature=300, TargetTemperature=5, OutputWorkspace=None
+):
     """
     Rescales a workspace by the Bose temperature factor from one temperature to another
     :param InputWorkspace: Workspace to rescale. The parameter can be either a python
@@ -222,14 +262,18 @@ def Rebose(InputWorkspace, CurrentTemperature=300, TargetTemperature=5, OutputWo
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, MSliceWorkspace):
         raise RuntimeError("Incorrect workspace type.")
-    scaled = rebose_single(workspace, from_temp=float(CurrentTemperature), to_temp=float(TargetTemperature))
+    scaled = rebose_single(
+        workspace, from_temp=float(CurrentTemperature), to_temp=float(TargetTemperature)
+    )
     if OutputWorkspace is not None:
         rename_workspace(scaled, OutputWorkspace)
 
     return scaled
 
 
-def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAULT_CMAP):
+def PlotSlice(
+    InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAULT_CMAP
+):
     """
     Creates mslice standard matplotlib plot of a slice workspace.
 
@@ -246,9 +290,14 @@ def PlotSlice(InputWorkspace, IntensityStart="", IntensityEnd="", Colormap=DEFAU
 
     # slice cache needed from main slice plotter presenter
     from mslice.app.presenters import cli_slice_plotter_presenter
+
     if is_gui():
-        cli_slice_plotter_presenter._slice_cache = app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
-    cli_slice_plotter_presenter.change_intensity(workspace.name, IntensityStart, IntensityEnd)
+        cli_slice_plotter_presenter._slice_cache = (
+            app.MAIN_WINDOW.slice_plotter_presenter._slice_cache
+        )
+    cli_slice_plotter_presenter.change_intensity(
+        workspace.name, IntensityStart, IntensityEnd
+    )
     cli_slice_plotter_presenter.change_colourmap(workspace.name, Colormap)
     cli_slice_plotter_presenter.plot_from_cache(workspace)
 
@@ -276,8 +325,10 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     else:
         intensity_range = (IntensityStart, IntensityEnd)
     from mslice.app.presenters import cli_cut_plotter_presenter
-    cli_cut_plotter_presenter.plot_cut_from_workspace(workspace, intensity_range=intensity_range,
-                                                      plot_over=PlotOver)
+
+    cli_cut_plotter_presenter.plot_cut_from_workspace(
+        workspace, intensity_range=intensity_range, plot_over=PlotOver
+    )
 
     return GlobalFigureManager._active_figure
 
@@ -297,77 +348,83 @@ def ConvertToChi(figure_number):
     :return:
     """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
+
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_chi_qe.trigger()
     else:
-        print('This function cannot be used on a Cut')
+        print("This function cannot be used on a Cut")
 
 
 def ConvertToChiMag(figure_number):
     """
-        Converts to the magnetic dynamical susceptibility Chi''(Q,E magnetic on Slice Plot
-        :param figure_number: The slice plot figure number returned when the plot was made.
-        :return:
-        """
+    Converts to the magnetic dynamical susceptibility Chi''(Q,E magnetic on Slice Plot
+    :param figure_number: The slice plot figure number returned when the plot was made.
+    :return:
+    """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
+
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_chi_qe_magnetic.trigger()
     else:
-        print('This function cannot be used on a Cut')
+        print("This function cannot be used on a Cut")
 
 
 def ConvertToCrossSection(figure_number):
     """
-        Converts to the double differential cross-section d2sigma/dOmega.dE  on Slice Plot
-        :param figure_number: The slice plot figure number returned when the plot was made.
-        :return:
-        """
+    Converts to the double differential cross-section d2sigma/dOmega.dE  on Slice Plot
+    :param figure_number: The slice plot figure number returned when the plot was made.
+    :return:
+    """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
+
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_d2sig_dw_de.trigger()
     else:
-        print('This function cannot be used on a Cut')
+        print("This function cannot be used on a Cut")
 
 
 def SymmetriseSQE(figure_number):
     """
-        Converts to the double differential cross-section d2sigma/dOmega.dE  on Slice Plot
-        :param figure_number: The slice plot figure number returned when the plot was made.
-        :return:
-        """
+    Converts to the double differential cross-section d2sigma/dOmega.dE  on Slice Plot
+    :param figure_number: The slice plot figure number returned when the plot was made.
+    :return:
+    """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
+
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_symmetrised_sqe.trigger()
     else:
-        print('This function cannot be used on a Cut')
+        print("This function cannot be used on a Cut")
 
 
 def ConvertToGDOS(figure_number):
     """
-        Converts to symmetrised S(Q,E) (w.r.t. energy using temperature Boltzmann factor) on Slice Plot
-        :param figure_number: The slice plot figure number returned when the plot was made.
-        :return:
-        """
+    Converts to symmetrised S(Q,E) (w.r.t. energy using temperature Boltzmann factor) on Slice Plot
+    :param figure_number: The slice plot figure number returned when the plot was made.
+    :return:
+    """
     from mslice.plotting.plot_window.slice_plot import SlicePlot
+
     plot_handler = GlobalFigureManager.get_figure_by_number(figure_number).plot_handler
     if isinstance(plot_handler, SlicePlot):
         plot_handler.plot_window.action_gdos.trigger()
     else:
-        print('This function cannot be used on a Cut')
+        print("This function cannot be used on a Cut")
 
 
 def AddWorkspaceToDisplay(workspace, workspace_name):
     """
-        Add a workspace to the workspace list in the GUI
-        :param workspace: The workspace to add.
-        :param workspace_name: The workspace name.
-        :return:
-        """
+    Add a workspace to the workspace list in the GUI
+    :param workspace: The workspace to add.
+    :param workspace_name: The workspace name.
+    :return:
+    """
     from mslice.models.workspacemanager.workspace_provider import add_workspace
     from mslice.app.presenters import get_slice_plotter_presenter
+
     add_workspace(workspace, workspace_name)
     get_slice_plotter_presenter().update_displayed_workspaces()

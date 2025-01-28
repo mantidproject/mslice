@@ -26,6 +26,7 @@ be added to the category of the command
 
 Currently there are only two categories ('1d' and '2d') hard coded into the manager.
 """
+
 # system imports
 from functools import wraps
 
@@ -96,11 +97,12 @@ class GlobalFigureManager(object):
           list of *managers*, with active one at the end
 
     """
+
     # if there is a current figure it should be both current and active
     _active_category = None
     _category_current_figures = {
         CATEGORY_CUT: None,
-        CATEGORY_SLICE: None
+        CATEGORY_SLICE: None,
     }  # Current_figures receive decorated commands
     _figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
     _unclassified_figures = []
@@ -166,8 +168,14 @@ class GlobalFigureManager(object):
     @classmethod
     def destroy_fig(cls, fig):
         """*fig* is a Figure instance"""
-        num = next((manager.num for manager in cls._figures.values()
-                    if manager.canvas.figure == fig), None)
+        num = next(
+            (
+                manager.num
+                for manager in cls._figures.values()
+                if manager.canvas.figure == fig
+            ),
+            None,
+        )
         if num is not None:
             cls.destroy(num)
 
@@ -176,13 +184,11 @@ class GlobalFigureManager(object):
         # this is need to ensure that gc is available in corner cases
         # where modules are being torn down after install with easy_install
         import gc  # noqa
+
         for manager in list(cls._figures.values()):
             manager.destroy()
         cls._active_figure = None
-        cls._category_current_figures = {
-            CATEGORY_CUT: None,
-            CATEGORY_SLICE: None
-        }
+        cls._category_current_figures = {CATEGORY_CUT: None, CATEGORY_SLICE: None}
         cls._activeQue = []
         cls._figures.clear()
         cls.observers = []
@@ -260,17 +266,19 @@ class GlobalFigureManager(object):
         num_figure_managers = len(cls._activeQue)
 
         for index in range(num_figure_managers):
-            last_shown_order_dict[cls._activeQue[index].num] = num_figure_managers - index
+            last_shown_order_dict[cls._activeQue[index].num] = (
+                num_figure_managers - index
+            )
 
         return last_shown_order_dict
 
     @classmethod
     def reset(cls):
-        """Reset all class variables to initial state. This function exists for testing purposes """
+        """Reset all class variables to initial state. This function exists for testing purposes"""
         cls._active_category = None
         cls._category_current_figures = {
             CATEGORY_CUT: None,
-            CATEGORY_SLICE: None
+            CATEGORY_SLICE: None,
         }  # Current _figures are overplotted
         cls._figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
         cls._unclassified_figures = []
@@ -281,13 +289,15 @@ class GlobalFigureManager(object):
     def _new_figure(cls, num=None):
         # local import to avoid circular dependency in figure_manager_test.py
         # mock.patch can't patch a class where the module has already been imported
-        from mslice.plotting.plot_window.plot_figure_manager import new_plot_figure_manager
+        from mslice.plotting.plot_window.plot_figure_manager import (
+            new_plot_figure_manager,
+        )
+
         if num is None:
             num = 1
-            while any([
-                    num == existing_fig_num
-                    for existing_fig_num in cls._figures.keys()
-            ]):
+            while any(
+                [num == existing_fig_num for existing_fig_num in cls._figures.keys()]
+            ):
                 num += 1
         new_fig = new_plot_figure_manager(num, GlobalFigureManager)
         cls._figures[num] = new_fig
@@ -319,18 +329,17 @@ class GlobalFigureManager(object):
     def get_active_figure(cls):
         if cls._active_category:
             if cls._active_figure in cls._unclassified_figures:
-                cls.assign_figure_to_category(cls._active_figure,
-                                              cls._active_category,
-                                              make_current=True)
+                cls.assign_figure_to_category(
+                    cls._active_figure, cls._active_category, make_current=True
+                )
             elif cls._category_current_figures[cls._active_category] is None:
                 _, num = cls._new_figure()
-                cls.assign_figure_to_category(num,
-                                              cls._active_category,
-                                              make_current=True)
+                cls.assign_figure_to_category(
+                    num, cls._active_category, make_current=True
+                )
                 cls._active_figure = num
             else:
-                cls._active_figure = cls._category_current_figures[
-                    cls._active_category]
+                cls._active_figure = cls._category_current_figures[cls._active_category]
         else:
             if cls._active_figure is None:
                 fig, num = cls._new_figure()
@@ -345,13 +354,13 @@ class GlobalFigureManager(object):
     @classmethod
     def activate_category(cls, category):
         """Sets the active category to the supplied argument. Do not call this function directly, instead use supplied
-        decorator below 'activate_category' """
+        decorator below 'activate_category'"""
         cls._active_category = category
 
     @classmethod
     def deactivate_category(cls):
-        """ Unsets the active category. Do not call this function directly, instead use supplied decorator
-        below 'activate_category' """
+        """Unsets the active category. Do not call this function directly, instead use supplied decorator
+        below 'activate_category'"""
         cls._active_category = None
 
     @classmethod
@@ -390,8 +399,8 @@ class GlobalFigureManager(object):
             del cls._figures[num]
         except KeyError:
             raise KeyError(
-                'The key "%s" does not exist. The figure cannot be closed' %
-                num)
+                'The key "%s" does not exist. The figure cannot be closed' % num
+            )
 
     @classmethod
     def get_category(cls, num):
@@ -401,8 +410,9 @@ class GlobalFigureManager(object):
                 figure_category = category
                 break
         else:
-            raise KeyError("Figure no. %i was not found in any category " %
-                           num if num else 0)
+            raise KeyError(
+                "Figure no. %i was not found in any category " % num if num else 0
+            )
             # in-line if handles the case num is None
         return figure_category
 
@@ -462,7 +472,6 @@ class GlobalFigureManager(object):
 
         for category in broadcast_list:
             for figure_number in cls._figures_by_category[category]:
-
                 if cls._category_current_figures[category] == figure_number:
                     cls._figures[figure_number].flag_as_current()
 
@@ -512,7 +521,7 @@ class GlobalFigureManager(object):
         for key, value in list(cls._figures.items()):
             if value == fig:
                 return key
-        raise ValueError('Figure %s was not recognised' % fig)
+        raise ValueError("Figure %s was not recognised" % fig)
 
     # ---------------------- Observer methods ---------------------
     # This is currently very simple as the only observer is

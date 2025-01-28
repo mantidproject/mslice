@@ -1,4 +1,3 @@
-
 class CommonWorkspaceProperties:
     """Class to ensure consistency of mslice specific workspace properties across mslice
     to allow for error free propagation. Not necessarily implemented for all workspace types"""

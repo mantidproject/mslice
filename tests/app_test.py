@@ -9,11 +9,10 @@ qapp = None
 
 
 class AppTests(unittest.TestCase):
-
     def setUp(self):
         global qapp
         if qapp is None:
-            qapp = QtWidgets.QApplication([' '])
+            qapp = QtWidgets.QApplication([" "])
 
     def tearDown(self):
         GlobalFigureManager.destroy_all()
@@ -27,7 +26,7 @@ class AppTests(unittest.TestCase):
 
     def test_mainwindow(self):
         """Test the MainWindow initialises correctly"""
-        with patch.object(MainWindow, 'setup_ipython'):
+        with patch.object(MainWindow, "setup_ipython"):
             window = MainWindow()
             window.setAttribute(Qt.WA_DeleteOnClose, True)
             QTimer.singleShot(0, window.close)

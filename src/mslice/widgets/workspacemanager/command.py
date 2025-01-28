@@ -1,5 +1,4 @@
-"""Defines enumerated values for operations available in the workspace manager.
-"""
+"""Defines enumerated values for operations available in the workspace manager."""
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
