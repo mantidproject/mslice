@@ -1,6 +1,7 @@
 name: mslice-env
 channels:
   - conda-forge
+  - nodefaults
   - mantid
   - mantid/label/nightly
 dependencies:
