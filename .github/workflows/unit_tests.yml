@@ -22,6 +22,7 @@ jobs:
           activate-environment: mslice-env
           environment-file: environment.yml
           auto-activate-base: false
+          conda-remove-defaults: "true"
 
       - name: Install Mantid
         run: |
