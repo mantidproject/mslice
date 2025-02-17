@@ -103,6 +103,11 @@ def save_ascii(workspace, path):
 
 
 def save_matlab(workspace, path):
+    loader_name = get_workspace_handle(workspace).loader_name()
+    if loader_name is not None and loader_name == "LoadNXSPE":
+        raise RuntimeError(
+            "An NXSPE file cannot be saved as matlab - metadata may be lost."
+        )
     labels = {}
     if isinstance(workspace, HistogramWorkspace):
         if workspace.is_slice:
