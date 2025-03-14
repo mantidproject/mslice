@@ -271,6 +271,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view.clear_displayed_error()
 
     def delete_handle(self, workspace):
+        if workspace.startswith("__MSL"):
+            workspace = workspace[5:]
         delete_workspace(workspace)
         self.update_displayed_workspaces()
 
