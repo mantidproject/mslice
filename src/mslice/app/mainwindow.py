@@ -41,10 +41,10 @@ class MainWindow(MainView, QMainWindow):
         }
 
         self.buttons_to_enable = {
-            TAB_2D: [self.btnAdd, self.btnSubtract, self.composeFrame],
+            TAB_2D: [self.btnAdd, self.btnSubtract, self.btnCompose],
             TAB_EVENT: [self.btnMerge],
             TAB_HISTO: [self.btnPlot, self.btnOverplot],
-            TAB_NONPSD: [self.btnAdd, self.btnSubtract, self.composeFrame],
+            TAB_NONPSD: [self.btnAdd, self.btnSubtract, self.btnCompose],
         }
         if in_mantid:
             self.buttons_to_enable[TAB_HISTO] += [self.btnSaveToADS]
@@ -151,15 +151,10 @@ class MainWindow(MainView, QMainWindow):
         self.btnSave.setMenu(menu)
 
     def setup_compose_button(self):
-        self.stackLayout = QStackedLayout(self.stackFrame)
-        self.stackLayout.addWidget(self.btnSaveToADS)
-        self.stackLayout.addWidget(self.composeFrame)
-        self.stackFrame.setLayout(self.stackLayout)
-        menu = QMenu(self.btnComposeMenu)
+        menu = QMenu(self.btnCompose)
         menu.addAction("Scale", lambda: self.button_compose("Scale"))
         menu.addAction("Bose", lambda: self.button_compose("Bose"))
-        self.btnComposeMenu.setMenu(menu)
-        self.btnComposeMenu.setMaximumWidth(10)
+        self.btnCompose.setMenu(menu)
 
     def change_main_tab(self, tab):
         self.tabWidget.setCurrentIndex(tab)
@@ -183,7 +178,6 @@ class MainWindow(MainView, QMainWindow):
 
     def enable_buttons(self, tab):
         """Enables correct buttons based on workspace tab"""
-        self.stackLayout.setCurrentIndex(self.stack_to_show[tab])
         variable_buttons = [
             self.btnAdd,
             self.btnSubtract,
@@ -191,7 +185,7 @@ class MainWindow(MainView, QMainWindow):
             self.btnPlot,
             self.btnOverplot,
             self.btnSaveToADS,
-            self.composeFrame,
+            self.btnCompose,
         ]
         for button in variable_buttons:
             button.hide()
@@ -227,12 +221,8 @@ class MainWindow(MainView, QMainWindow):
     def button_savetoads(self):
         self.workspace_presenter.notify(ws_command.SaveToADS)
 
-    def button_compose(self, value=False):
-        if value:
-            self.btnCompose.setText(value)
-        self.workspace_presenter.notify(
-            self.composeCommand[str(self.btnCompose.text())]
-        )
+    def button_compose(self, compose_type):
+        self.workspace_presenter.notify(self.composeCommand[str(compose_type)])
 
     def init_ui(self):
         self.setup_ipython()
