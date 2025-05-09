@@ -143,7 +143,7 @@ class Cut(object):
                 except ValueError:
                     raise ValueError("Invalid width")
         elif width_str == "":
-            self._width = self.end - self.start
+            self._width = round(self.end - self.start, 8)
         else:
             self._width = None
 
