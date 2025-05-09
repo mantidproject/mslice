@@ -142,8 +142,6 @@ class Cut(object):
                     self._width = float(width_str)
                 except ValueError:
                     raise ValueError("Invalid width")
-        elif width_str == "":
-            self._width = self.end - self.start
         else:
             self._width = None
 
