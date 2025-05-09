@@ -146,6 +146,8 @@ class CutWidget(CutView, QWidget):
         return str(self.lneCutIntegrationEnd.text())
 
     def get_integration_width(self):
+        if self.lneCutIntegrationWidth.text() == "":
+            return None
         return str(self.lneCutIntegrationWidth.text())
 
     def get_intensity_start(self):
