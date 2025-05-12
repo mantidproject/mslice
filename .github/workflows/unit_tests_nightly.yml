@@ -20,6 +20,7 @@ jobs:
         with:
           miniforge-version: latest
           channels: conda-forge, mantid
+          conda-remove-defaults: "true"
           activate-environment: mslice-env
           environment-file: environment.yml
           auto-activate-base: false
