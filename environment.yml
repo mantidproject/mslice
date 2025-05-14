@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - mantid
   - mantid/label/nightly
+  - nodefaults
 dependencies:
   - coverage
   - coveralls
