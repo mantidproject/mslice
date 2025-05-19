@@ -5,7 +5,7 @@ from mock import patch
 from mslice.app.mainwindow import MainWindow
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
-qapp = None
+qapp = QtWidgets.QApplication.instance()
 
 
 class AppTests(unittest.TestCase):
@@ -18,8 +18,8 @@ class AppTests(unittest.TestCase):
         GlobalFigureManager.destroy_all()
 
         # Required to sendPostedEvents twice to ensure the MainWindow is deleted
-        # qapp.sendPostedEvents()
-        # qapp.sendPostedEvents()
+        qapp.sendPostedEvents()
+        qapp.sendPostedEvents()
 
         # There should be no widgets hanging around after the MainWindow is closed
         self.assertEqual(0, len(QtWidgets.QApplication.topLevelWidgets()))
