@@ -129,6 +129,5 @@ def remove_from_ads(workspacename):
     if AnalysisDataService.Instance().doesExist(hiddenworkspace):
         AnalysisDataService.Instance().remove(hiddenworkspace)
     hiddenworkspace = "__MSL" + workspacename + "_HIDDEN"
-    print(AnalysisDataService.Instance().getObjectNames())
     if AnalysisDataService.Instance().doesExist(hiddenworkspace):
         AnalysisDataService.Instance().remove(hiddenworkspace)
