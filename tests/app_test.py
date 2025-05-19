@@ -10,7 +10,6 @@ qapp = None
 
 class AppTests(unittest.TestCase):
     def setUp(self):
-        export QT_DEBUG_PLUGINS=1
         global qapp
         if qapp is None:
             qapp = QtWidgets.QApplication([" "])
