@@ -14,15 +14,15 @@ class AppTests(unittest.TestCase):
         if qapp is None:
             qapp = QtWidgets.QApplication([" "])
 
-    # def tearDown(self):
-        # GlobalFigureManager.destroy_all()
+    def tearDown(self):
+        GlobalFigureManager.destroy_all()
 
         # Required to sendPostedEvents twice to ensure the MainWindow is deleted
         # qapp.sendPostedEvents()
         # qapp.sendPostedEvents()
 
         # There should be no widgets hanging around after the MainWindow is closed
-        # self.assertEqual(0, len(QtWidgets.QApplication.topLevelWidgets()))
+        self.assertEqual(0, len(QtWidgets.QApplication.topLevelWidgets()))
 
     def test_mainwindow(self):
         """Test the MainWindow initialises correctly"""
