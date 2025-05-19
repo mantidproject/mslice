@@ -270,14 +270,12 @@ def _get_slice_mdhisto_xye(histo_ws):
 
 
 def _output_data_to_ascii(output_path, out_data, header):
-    try : 
+    try:
         np.savetxt(
             _to_absolute_path(str(output_path)), out_data, fmt="%12.9e", header=header
-        )  
-    except OSError as e:    
-        raise RuntimeError(
-            f"Error occurred: {e}"
         )
+    except OSError as e:
+        raise RuntimeError(f"Error occurred: {e}")
 
 
 def _to_absolute_path(filepath: str) -> str:
