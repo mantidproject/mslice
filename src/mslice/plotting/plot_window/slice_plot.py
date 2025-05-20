@@ -521,7 +521,7 @@ class SlicePlot(IPlot):
         self._canvas.draw()
 
     def toggle_interactive_cuts(self, store=True):
-        self.toggle_icut_button(store)
+        self.toggle_icut_button(True)
         self.toggle_icut()
 
     def toggle_icut_button(self, store=True):

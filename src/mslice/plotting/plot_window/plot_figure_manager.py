@@ -25,7 +25,7 @@ def release_active_interactive_cuts_on_slice_plots() -> None:
             action_icuts = plot_handler.plot_window.action_interactive_cuts
             if not action_icuts.isChecked():
                 continue
-            plot_handler.toggle_interactive_cuts()
+            plot_handler.toggle_interactive_cuts(True)
             action_icuts.setChecked(False)
 
 
