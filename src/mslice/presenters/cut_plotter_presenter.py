@@ -9,7 +9,10 @@ from mslice.views.cut_plotter import (
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import (
+    add_workspace,
+    get_workspace_handle,
+)
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.plotting.plot_window.overplot_interface import (
@@ -18,7 +21,6 @@ from mslice.plotting.plot_window.overplot_interface import (
 )
 from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
-from mslice.models.workspacemanager.workspace_provider import add_workspace
 from mslice.models.axis import Axis
 from mslice.util.intensity_correction import IntensityType, IntensityCache
 import warnings
@@ -350,24 +352,40 @@ class CutPlotterPresenter(PresenterUtility):
         self._temp_cut_cache = []
 
     def show_scattering_function(self, axes):
-        self._show_intensity(
-            self._cut_cache_dict[axes], IntensityType.SCATTERING_FUNCTION
-        )
+        for key, value in self._cut_cache_dict.items():
+            if key == axes:
+                self._show_intensity(value, IntensityType.SCATTERING_FUNCTION)
+                break
 
     def show_dynamical_susceptibility(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], IntensityType.CHI)
+        for key, value in self._cut_cache_dict.items():
+            if key == axes:
+                self._show_intensity(value, IntensityType.CHI)
+                break
 
     def show_dynamical_susceptibility_magnetic(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], IntensityType.CHI_MAGNETIC)
+        for key, value in self._cut_cache_dict.items():
+            if key == axes:
+                self._show_intensity(value, IntensityType.CHI_MAGNETIC)
+                break
 
     def show_d2sigma(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], IntensityType.D2SIGMA)
+        for key, value in self._cut_cache_dict.items():
+            if key == axes:
+                self._show_intensity(value, IntensityType.D2SIGMA)
+                break
 
     def show_symmetrised(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], IntensityType.SYMMETRISED)
+        for key, value in self._cut_cache_dict.items():
+            if key == axes:
+                self._show_intensity(value, IntensityType.SYMMETRISED)
+                break
 
     def show_gdos(self, axes):
-        self._show_intensity(self._cut_cache_dict[axes], IntensityType.GDOS)
+        for key, value in self._cut_cache_dict.items():
+            if key == axes:
+                self._show_intensity(value, IntensityType.GDOS)
+                break
 
     def set_sample_temperature(self, axes, ws_name, temp):
         cut_dict = {}
