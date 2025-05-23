@@ -520,11 +520,11 @@ class SlicePlot(IPlot):
         self.update_legend()
         self._canvas.draw()
 
-    def toggle_interactive_cuts(self, store=True):
-        self.toggle_icut_button(True)
+    def toggle_interactive_cuts(self):
+        self.toggle_icut_button()
         self.toggle_icut()
 
-    def toggle_icut_button(self, store=True):
+    def toggle_icut_button(self):
         if not self.icut:
             self.manager.picking_connected(False)
             if self.plot_window.action_zoom_in.isChecked():
@@ -545,7 +545,7 @@ class SlicePlot(IPlot):
             self.plot_window.action_flip_axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
             self.icut.set_icut_intensity_category(self.intensity_type)
-            self.icut.store_icut_cut_upon_toggle_and_reset(store)
+            self.icut.store_icut_cut_upon_toggle_and_reset(True)
             self.plot_window.menu_intensity.setDisabled(False)
 
     def toggle_icut(self):

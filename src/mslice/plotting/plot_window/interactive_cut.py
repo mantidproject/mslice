@@ -160,7 +160,7 @@ class InteractiveCut(object):
         self.plot_cut(*self.rect.extents)
 
     def window_closing(self):
-        self.slice_plot.toggle_interactive_cuts(False)
+        self.slice_plot.toggle_interactive_cuts()
         self.slice_plot.plot_window.action_interactive_cuts.setChecked(False)
 
     def refresh_rect_selector(self, ax):
