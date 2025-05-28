@@ -6,6 +6,7 @@ from mslice.views.cut_plotter import (
     cut_figure_exists,
     get_current_plot,
 )
+from mslice.models.cut.cut import SampleTempValueError
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
@@ -316,6 +317,13 @@ class CutPlotterPresenter(PresenterUtility):
     def _get_overall_max_signal(self, intensity_correction):
         overall_max_signal = 0
         for cut in self._cut_cache_dict[plt.gca()]:
+            try:
+                cut.sample_temp
+            except SampleTempValueError:
+                try:
+                    self.propagate_sample_temperatures_throughout_cache(plt.gca())
+                except RuntimeError:
+                    continue
             ws = cut.get_intensity_corrected_ws(intensity_correction)
             max_cut_signal = np.nanmax(ws.get_signal())
             if max_cut_signal > overall_max_signal:
