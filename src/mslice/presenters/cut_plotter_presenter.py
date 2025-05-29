@@ -282,7 +282,10 @@ class CutPlotterPresenter(PresenterUtility):
             return
         try:
             ws_handle = get_workspace_handle(workspace_name)
-            workspace_name = ws_handle.parent
+            if not ws_handle.parent:
+                workspace_name = workspace_name.split("(")[0][:-4]
+            else:
+                workspace_name = ws_handle.parent
         except KeyError:
             # Workspace is interactively generated and is not in the workspace list
             workspace_name = workspace_name.split("(")[0][:-4]
