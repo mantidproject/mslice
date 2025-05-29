@@ -339,6 +339,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.populate_presenter_cache_dict(ax)
         cut_1, cut_2, cut_3 = self.cut_plotter_presenter._cut_cache_dict[ax]
         cut_1.sample_temp = 120
+        mock_plot_gca.return_value = ax
         self.cut_plotter_presenter._get_overall_max_signal(
             IntensityType.SCATTERING_FUNCTION
         )
