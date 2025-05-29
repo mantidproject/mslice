@@ -60,7 +60,7 @@ def toggle_overplot_line(
             )
         except:  # noqa: E722
             warnings.warn("No Bragg peak found as cut has no |Q| dimension.")
-            return;
+            return
     else:
         plotter_presenter.hide_overplot_line(plot_handler.ws_name, key)
 
