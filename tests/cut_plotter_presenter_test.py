@@ -334,6 +334,17 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(cut_2.sample_temp, 120)
         self.assertEqual(cut_3._sample_temp, None)
 
+    def test_missing_sample_temperature(self):
+        ax = mock.MagicMock()
+        self.populate_presenter_cache_dict(ax)
+        cut_1, cut_2 = self.cut_plotter_presenter._cut_cache_dict[ax]
+        cut_1.sample_temp = 120
+        self.cut_plotter_presenter._get_overall_max_signal(
+            IntensityType.SCATTERING_FUNCTION
+        )
+        self.assertEqual(cut_1.sample_temp, 120)
+        self.assertEqual(cut_2.sample_temp, 120)
+
     @mock.patch("mslice.presenters.cut_plotter_presenter.plt.gca")
     def test_get_overall_q_axis(self, mock_plot_gca):
         ax = mock.MagicMock()
