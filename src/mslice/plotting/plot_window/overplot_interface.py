@@ -1,6 +1,7 @@
 from qtpy.QtWidgets import QFileDialog
 
 import os.path as path
+import warnings
 
 from mslice.models.labels import get_recoil_label
 import mslice.plotting.pyplot as plt
@@ -47,15 +48,19 @@ def toggle_overplot_line(
     )
 
     if checked:
-        plotter_presenter.add_overplot_line(
-            plot_handler.ws_name,
-            key,
-            recoil,
-            cif_file,
-            plot_handler.y_log,
-            plot_handler._get_overplot_datum(),
-            plot_handler.intensity_type,
-        )
+        try:
+            plotter_presenter.add_overplot_line(
+                plot_handler.ws_name,
+                key,
+                recoil,
+                cif_file,
+                plot_handler.y_log,
+                plot_handler._get_overplot_datum(),
+                plot_handler.intensity_type,
+            )
+        except:  # noqa: E722
+            warnings.warn("No Bragg peak found as cut has no |Q| dimension.")
+            return
     else:
         plotter_presenter.hide_overplot_line(plot_handler.ws_name, key)
 
