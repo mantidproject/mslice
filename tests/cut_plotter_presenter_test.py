@@ -337,7 +337,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
     def test_missing_sample_temperature(self):
         ax = mock.MagicMock()
         self.populate_presenter_cache_dict(ax)
-        cut_1, cut_2 = self.cut_plotter_presenter._cut_cache_dict[ax]
+        cut_1, cut_2, cut_3 = self.cut_plotter_presenter._cut_cache_dict[ax]
         cut_1.sample_temp = 120
         self.cut_plotter_presenter._get_overall_max_signal(
             IntensityType.SCATTERING_FUNCTION
