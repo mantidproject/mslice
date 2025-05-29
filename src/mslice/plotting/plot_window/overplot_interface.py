@@ -58,7 +58,7 @@ def toggle_overplot_line(
                 plot_handler._get_overplot_datum(),
                 plot_handler.intensity_type,
             )
-        except:
+        except:  # noqa: E722
             warnings.warn("No Bragg peak found as cut has no |Q| dimension.")
             return;
     else:
