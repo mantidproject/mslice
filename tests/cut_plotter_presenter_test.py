@@ -334,6 +334,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(cut_2.sample_temp, 120)
         self.assertEqual(cut_3._sample_temp, None)
 
+    @mock.patch("mslice.presenters.cut_plotter_presenter.plt.gca")
     def test_missing_sample_temperature(self):
         ax = mock.MagicMock()
         self.populate_presenter_cache_dict(ax)
