@@ -339,6 +339,9 @@ class CutPlotterPresenterTest(unittest.TestCase):
         ax = mock.MagicMock()
         self.populate_presenter_cache_dict(ax)
         cut_1, cut_2, cut_3 = self.cut_plotter_presenter._cut_cache_dict[ax]
+        cut_1._cut_ws.get_signal.return_value = 25.0
+        cut_2._cut_ws.get_signal.return_value = 50.0
+        cut_3._cut_ws.get_signal.return_value = 100.0
         cut_1.sample_temp = 120
         mock_plot_gca.return_value = ax
         self.cut_plotter_presenter._get_overall_max_signal(
