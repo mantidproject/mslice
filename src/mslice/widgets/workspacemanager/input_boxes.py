@@ -61,5 +61,5 @@ class ScaleInputBox(QDialog):
             try:
                 v2_value = float(v2)
             except ValueError:
-                pass                
+                pass
         return v1_value, v2_value
