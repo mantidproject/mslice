@@ -50,4 +50,12 @@ class ScaleInputBox(QDialog):
     def user_input(self):
         v1 = self.edit1.text()
         v2 = self.edit2.text()
-        return float(v1) if v1 else None, float(v2) if v2 else None
+        try:
+            v1_value = float(v1) if v1 else None
+        except ValueError:
+            v1_value = None
+        try:
+            v2_value = float(v2) if v1 else None
+        except ValueError:
+            v2_value = None
+        return v1_value, v2_value
