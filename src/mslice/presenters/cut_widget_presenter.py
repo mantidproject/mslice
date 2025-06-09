@@ -113,17 +113,21 @@ class CutWidgetPresenter(PresenterUtility):
             0.0,
             e_units,
         )
-
+        
+        int_start = self._cut_view.get_intensity_start()
         try:
-            intensity_start = float(self._cut_view.get_intensity_start())
+            intensity_start = float(int_start) if int_start else None
         except ValueError:
-            intensity_start = None
+            self._cut_view.display_warning("Invalid intensity start parameter")
             warnings.warn("Invalid intensity start parameter")
+            intensity_start = None
+        int_end = self._cut_view.get_intensity_end()
         try:
-            intensity_end = float(self._cut_view.get_intensity_end())
+            intensity_end = float(int_end) if int_end else None
         except ValueError:
-            intensity_end = None
+            self._cut_view.display_warning("Invalid intensity end parameter")
             warnings.warn("Invalid intensity end parameter")
+            intensity_end = None
 
         norm_to_one = bool(self._cut_view.get_intensity_is_norm_to_one())
         width = self._cut_view.get_integration_width()
