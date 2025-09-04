@@ -1,3 +1,5 @@
+from typing import Optional
+
 from matplotlib.colors import Normalize
 
 from mslice.models.slice.slice_functions import compute_slice, compute_recoil_line
@@ -20,9 +22,12 @@ from mslice.presenters.presenter_utility import PresenterUtility
 
 
 class SlicePlotterPresenter(PresenterUtility):
+    _cached_temp: Optional[float | str]
+
     def __init__(self):
         self._main_presenter = None
         self._slice_cache = {}
+        self._cached_temp = None
 
     def plot_slice(
         self,
@@ -164,8 +169,15 @@ class SlicePlotterPresenter(PresenterUtility):
             raise ValueError()
         return intensity_start, intensity_end
 
-    def set_sample_temperature(self, workspace_name, temp):
+    def set_sample_temperature(self, workspace_name, temp, temp_value_raw=None):
         self._slice_cache[workspace_name].sample_temp = temp
+        self._cached_temp = temp_value_raw
+
+    def get_cached_sample_temp(self) -> float:
+        return self._cached_temp
+
+    def set_cached_sample_temp(self, value: float):
+        self._cached_temp = value
 
     def workspace_selection_changed(self):
         pass
