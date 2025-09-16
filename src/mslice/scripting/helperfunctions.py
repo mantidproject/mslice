@@ -274,7 +274,6 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
                 cut_end = integration_end
             index += 1
         cut.reset_integration_axis(cut.start, cut.end)
-    print(script_lines)
     return return_ws_vars
 
 

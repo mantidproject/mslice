@@ -544,6 +544,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             "1",
         )
         cut_0.parent_ws_name = "ws_0"
+        cut_0.width = 0.5
 
         cut_2 = Cut(
             Axis("|Q|", "1", "3", "1"),
@@ -568,7 +569,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
                 0,
                 "ws_0",
                 cuts[0].cut_axis,
-                "DeltaE,-1.0,0.0,0.0",
+                "DeltaE,-1.0,-0.5,0.0",
                 cuts[0].norm_to_one,
                 False,
                 None,
@@ -582,7 +583,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
                 1,
                 "ws_0",
                 cuts[0].cut_axis,
-                "DeltaE,0.0,1.0,0.0",
+                "DeltaE,-0.5,0.0,0.0",
                 cuts[0].norm_to_one,
                 False,
                 None,
