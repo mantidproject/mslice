@@ -254,7 +254,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
                 f"IntensityCorrection={intensity_correction_arg}, SampleTemperature={cut.raw_sample_temp})\n"
             )
             return_ws_vars.append(cut_ws)
-            print(cut_ws)
+            
             plot_over = False if index == 0 else True
             if intensity_range != (None, None):
                 script_lines.append(
@@ -274,7 +274,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
                 cut_end = integration_end
             index += 1
         cut.reset_integration_axis(cut.start, cut.end)
-
+    print(script_lines)
     return return_ws_vars
 
 
