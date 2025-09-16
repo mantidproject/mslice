@@ -130,7 +130,7 @@ class CutPlotterPresenter(PresenterUtility):
         while cut_start != cut_end:
             cut.integration_axis.start = cut_start
             cut.integration_axis.end = cut_end
-            final_plot = True if cut.width is not None and cut_start + cut.width == integration_end else False
+            final_plot = True if cut_start + cut.width == integration_end else False
             self._plot_cut(workspace, cut, plot_over, final_plot=final_plot)
             cut_start = cut_end
             if cut.width is not None:
