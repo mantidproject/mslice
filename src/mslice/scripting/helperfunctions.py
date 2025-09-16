@@ -221,7 +221,6 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
         integration_start = cut.integration_axis.start
         integration_end = cut.integration_axis.end
         cut_start = integration_start
-        print(len(errorbars))
         if cut.width is not None:
             cut_end = min(integration_start + cut.width, integration_end)
         else:
@@ -270,13 +269,10 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
 
             cut_start = cut_end
             if cut.width is not None:
-                cut_end = min(integration_start + cut.width, integration_end)
+                cut_end = min(cut_end + cut.width, integration_end)
             else:
                 cut_end = integration_end
             index += 1
-            print("new int")
-            print(cut_start)
-            print(cut_end)
             
         cut.reset_integration_axis(cut.start, cut.end)
     return return_ws_vars
