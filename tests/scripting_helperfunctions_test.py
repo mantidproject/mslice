@@ -561,7 +561,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         ret_val = add_cut_lines_with_width(
             errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION
         )
-        print(ret_val)
+
         self.assertIn(
             'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
             "SampleTemperature={})\n".format(
