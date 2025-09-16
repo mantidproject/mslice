@@ -544,7 +544,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             "1",
         )
         cut_0.parent_ws_name = "ws_0"
-        cut_0.width = 0.5
+        cut_0.width = "0.5"
 
         cut_2 = Cut(
             Axis("|Q|", "1", "3", "1"),
