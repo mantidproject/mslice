@@ -535,6 +535,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
                 label="error_label_{}".format(i),
             )
         errorbars = plt.gca().containers
+        print(errorbars)
         cut_0 = Cut(
             Axis("|Q|", "1", "3", "1"),
             Axis("DeltaE", "-1", "1", "0"),
