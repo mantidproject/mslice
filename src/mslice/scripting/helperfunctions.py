@@ -221,7 +221,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
         integration_start = cut.integration_axis.start
         integration_end = cut.integration_axis.end
         cut_start = integration_start
-        print(cut.width)
+
         if cut.width is not None:
             cut_end = min(integration_start + cut.width, integration_end)
         else:
@@ -231,6 +231,8 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
         algo_str = "" if "Rebin" in cut.algorithm else f', Algorithm="{cut.algorithm}"'
 
         while cut_start != cut_end and index < len(errorbars):
+            print(cut_start)
+            print(cut_end)
             cut.integration_axis.start = cut_start
             cut.integration_axis.end = cut_end
             cut_axis = str(cut.cut_axis)
