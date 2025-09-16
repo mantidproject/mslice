@@ -220,10 +220,11 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
     for cut in cuts:
         integration_start = cut.integration_axis.start
         integration_end = cut.integration_axis.end
-        cut_start, cut_end = (
-            integration_start,
-            min(integration_start + cut.width, integration_end),
-        )
+        cut_start = integration_start
+        if cut.width is not None:
+            cut_end = min(integration_start + cut.width, integration_end)
+        else:
+            cut_end = integration_end
         intensity_range = (cut.intensity_start, cut.intensity_end)
         norm_to_one = cut.norm_to_one
         algo_str = "" if "Rebin" in cut.algorithm else f', Algorithm="{cut.algorithm}"'
@@ -265,7 +266,11 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
                     f"lw={width}, plot_over={plot_over})\n\n"
                 )
 
-            cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
+            cut_start = cut_end
+            if cut.width is not None:
+                cut_end = min(integration_start + cut.width, integration_end)
+            else:
+                cut_end = integration_end
             index += 1
         cut.reset_integration_axis(cut.start, cut.end)
     return return_ws_vars
