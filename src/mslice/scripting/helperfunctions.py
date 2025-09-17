@@ -1,4 +1,5 @@
 from datetime import datetime
+from mslice.models.alg_workspace_ops import get_range_end
 from mslice.models.labels import get_recoil_key
 from mslice.util.intensity_correction import IntensityType, IntensityCache
 import re
@@ -220,10 +221,8 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
     for cut in cuts:
         integration_start = cut.integration_axis.start
         integration_end = cut.integration_axis.end
-        cut_start, cut_end = (
-            integration_start,
-            min(integration_start + cut.width, integration_end),
-        )
+        cut_start = integration_start
+        cut_end = get_range_end(integration_start, integration_end, cut.width)
         intensity_range = (cut.intensity_start, cut.intensity_end)
         norm_to_one = cut.norm_to_one
         algo_str = "" if "Rebin" in cut.algorithm else f', Algorithm="{cut.algorithm}"'
@@ -253,6 +252,7 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
                 f"IntensityCorrection={intensity_correction_arg}, SampleTemperature={cut.raw_sample_temp})\n"
             )
             return_ws_vars.append(cut_ws)
+
             plot_over = False if index == 0 else True
             if intensity_range != (None, None):
                 script_lines.append(
@@ -265,7 +265,8 @@ def add_cut_lines_with_width(errorbars, script_lines, cuts, intensity_correction
                     f"lw={width}, plot_over={plot_over})\n\n"
                 )
 
-            cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
+            cut_start = cut_end
+            cut_end = get_range_end(cut_end, integration_end, cut.width)
             index += 1
         cut.reset_integration_axis(cut.start, cut.end)
     return return_ws_vars

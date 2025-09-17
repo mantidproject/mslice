@@ -14,6 +14,10 @@ def get_number_of_steps(axis):
     return int(np.ceil(step_num))
 
 
+def get_range_end(start, end, width):
+    return min(start + width, end) if width is not None else end
+
+
 def get_axis_range(workspace, dimension_name):
     workspace = get_workspace_handle(workspace)
     return tuple(workspace.limits[dimension_name])

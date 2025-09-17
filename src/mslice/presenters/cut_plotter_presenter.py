@@ -6,6 +6,7 @@ from mslice.views.cut_plotter import (
     cut_figure_exists,
     get_current_plot,
 )
+from mslice.models.alg_workspace_ops import get_range_end
 from mslice.models.cut.cut import SampleTempValueError
 from mslice.models.cut.cut_functions import compute_cut
 from mslice.models.labels import generate_legend
@@ -122,16 +123,15 @@ class CutPlotterPresenter(PresenterUtility):
         """This function handles the width parameter."""
         integration_start = cut.integration_axis.start
         integration_end = cut.integration_axis.end
-        cut_start, cut_end = (
-            integration_start,
-            min(integration_start + cut.width, integration_end),
-        )
+        cut_start = integration_start
+        cut_end = get_range_end(integration_start, integration_end, cut.width)
         while cut_start != cut_end:
             cut.integration_axis.start = cut_start
             cut.integration_axis.end = cut_end
             final_plot = True if cut_start + cut.width == integration_end else False
             self._plot_cut(workspace, cut, plot_over, final_plot=final_plot)
-            cut_start, cut_end = cut_end, min(cut_end + cut.width, integration_end)
+            cut_start = cut_end
+            cut_end = get_range_end(cut_end, integration_end, cut.width)
             cut.cut_ws = None
             # The first plot will respect which button the user pressed. The rest will over plot
             plot_over = True
