@@ -627,7 +627,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             ),
             script_lines,
         )
-        
+
         self.assertEqual(["cut_ws_0", "cut_ws_1", "cut_ws_2"], ret_val)
 
     def test_show_or_hide_containers_in_script(self):
