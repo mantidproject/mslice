@@ -64,6 +64,7 @@ class HistogramWorkspace(
             Scale,
             ConvertToDistribution,
         )
+
         if len(self.raw_ws.getNonIntegratedDimensions()) == 0:
             raise TypeError("Workspace has only one bin.")
         ws_conv = ConvertMDHistoToMatrixWorkspace(
