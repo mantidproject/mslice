@@ -28,13 +28,39 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
             ),
             "testHistoWorkspace",
         )
-        cls.workspace1Bin = HistogramWorkspace(
+        cls.workspace1D = HistogramWorkspace(
             CreateMDHistoWorkspace(
                 Dimensionality=2,
                 Extents="0,100,0,100",
                 SignalInput=signal,
                 ErrorInput=error,
                 NumberOfBins="100,1",
+                Names="Dim1,Dim2",
+                Units="U,U",
+                OutputWorkspace="testHistoWorkspace1D",
+            ),
+            "testHistoWorkspace1D",
+        )
+        cls.workspace1D_rev = HistogramWorkspace(
+            CreateMDHistoWorkspace(
+                Dimensionality=2,
+                Extents="-0.5,100.5,-0.5,100.5",
+                SignalInput=signal,
+                ErrorInput=error,
+                NumberOfBins="1,100",
+                Names="Dim1,Dim2",
+                Units="U,U",
+                OutputWorkspace="testHistoWorkspace1D_rev",
+            ),
+            "testHistoWorkspace1D_rev",
+        )
+        cls.workspace1Bin = HistogramWorkspace(
+            CreateMDHistoWorkspace(
+                Dimensionality=2,
+                Extents="-0.5,100.5,-0.5,100.5",
+                SignalInput=[0],
+                ErrorInput=[0],
+                NumberOfBins="1,1",
                 Names="Dim1,Dim2",
                 Units="U,U",
                 OutputWorkspace="testHistoWorkspace1Bin",
@@ -52,6 +78,33 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
     def test_convert_to_matrix(self):
         # workspace needs to be registered with mslice for conversion
         try:
+            add_workspace(self.workspace1D, self.workspace1D.name)
+            matrix_ws = self.workspace1D.convert_to_matrix()
+
+            self.assertEqual(1, matrix_ws.raw_ws.getNumberHistograms())
+            self.assertEqual(100, matrix_ws.raw_ws.blocksize())
+            np.testing.assert_allclose(np.arange(0, 100)*100/99,matrix_ws.raw_ws.readY(0))
+        finally:
+            # remove mslice tracking
+            remove_workspace(self.workspace1D)
+
+    def test_convert_to_matrix2(self):
+        # workspace needs to be registered with mslice for conversion
+        try:
+            add_workspace(self.workspace1D_rev, self.workspace1D_rev.name)
+            matrix_ws = self.workspace1D_rev.convert_to_matrix()
+
+            self.assertEqual(1, matrix_ws.raw_ws.getNumberHistograms())
+            self.assertEqual(100, matrix_ws.raw_ws.blocksize())
+            np.testing.assert_allclose(np.arange(0, 100)*100/99,matrix_ws.raw_ws.readY(0), rtol=1e-5)
+        finally:
+            # remove mslice tracking
+            remove_workspace(self.workspace1D_rev)
+
+
+    def test_convert_to_matrix_1d(self):
+        # workspace needs to be registered with mslice for conversion
+        try:
             add_workspace(self.workspace, self.workspace.name)
             matrix_ws = self.workspace.convert_to_matrix()
 
@@ -60,6 +113,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         finally:
             # remove mslice tracking
             remove_workspace(self.workspace)
+
 
     def test_convert_to_matrix_fail(self):
         # workspace needs to be registered with mslice for conversion
