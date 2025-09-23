@@ -29,6 +29,8 @@ from mslice.models.intensity_correction_algs import sample_temperature
 
 from typing import Callable
 
+from plotting.plot_window.cachable_input_dialog import QCacheableInputDialog
+
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
 DEFAULT_FONT_SIZE_STEP = 1
@@ -451,13 +453,11 @@ class SlicePlot(IPlot):
     ) -> bool:
         try:
             slice_plotter_method(self.ws_name)
-        except (
-            ValueError
-        ):  # sample temperature not yet set, get it and reattempt method
+        except ValueError:  # sample temperature not yet set, get it and reattempt method
             # First, try to get it from the temperature cache:
             cached_temp_log = self._slice_plotter_presenter.get_cached_sample_temp()
             if cached_temp_log is not None:
-                self._handle_temperature_input(cached_temp_log, True)
+                self._handle_temperature_input(cached_temp_log, True, False)
                 return True
             if self._set_sample_temperature(previous):
                 slice_plotter_method(self.ws_name)
@@ -467,15 +467,15 @@ class SlicePlot(IPlot):
 
     def _set_sample_temperature(self, previous: QtWidgets.QAction) -> bool:
         try:
-            temp_value_raw, field = self.ask_sample_temperature_field(str(self.ws_name))
-            temperature_found = self._handle_temperature_input(temp_value_raw, field)
+            temp_value_raw, field, is_cached = self.ask_sample_temperature_field(str(self.ws_name))
+            temperature_found = self._handle_temperature_input(temp_value_raw, field, is_cached)
         except RuntimeError:  # if cancel is clicked, go back to previous selection
             temperature_found = False
         if not temperature_found:
             self.set_intensity(previous)
         return temperature_found
 
-    def _handle_temperature_input(self, temp_value_raw: str, field: bool) -> bool:
+    def _handle_temperature_input(self, temp_value_raw: str, field: bool, is_cached: bool) -> bool:
         if field:
             temp_value = sample_temperature(self.ws_name, [temp_value_raw])
         else:
@@ -490,23 +490,21 @@ class SlicePlot(IPlot):
 
         self.default_options["temp"] = temp_value
         self.temp = temp_value
-        self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value, temp_value_raw)
+        self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value, temp_value_raw, is_cached)
         return True
 
-    def ask_sample_temperature_field(self, ws_name: str) -> str:
+    def ask_sample_temperature_field(self, ws_name: str) -> tuple[str, bool, bool]:
         text = "Sample temperature not found. Select the sample temperature field or enter a value in Kelvin:"
         ws = get_workspace_handle(ws_name)
         try:
             keys = ws.raw_ws.run().keys()
         except AttributeError:
             keys = ws.raw_ws.getExperimentInfo(0).run().keys()
-        temp_field, confirm = QtWidgets.QInputDialog.getItem(
-            self.plot_window, "Sample Temperature", text, keys
-        )
+        temp_field, is_cached, confirm = QCacheableInputDialog.ask_for_input(self.plot_window, "Sample Temperature", text, keys)
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
-            return str(temp_field), temp_field in keys
+            return str(temp_field), temp_field in keys, is_cached
 
     def _update_recoil_lines(self):
         """Updates the recoil overplots lines when intensity type changes"""
