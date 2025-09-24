@@ -459,9 +459,14 @@ class SlicePlot(IPlot):
             slice_plotter_method(self.ws_name)
         except ValueError:  # sample temperature not yet set, get it and reattempt method
             # First, try to get it from the temperature cache:
-            cached_temp_log = self._slice_plotter_presenter.get_cached_sample_temp()
+            cached_temp_pack = self._slice_plotter_presenter.get_cached_sample_temp()
+            if cached_temp_pack is not None:
+                cached_temp_log, is_field = cached_temp_pack
+            else:
+                cached_temp_log = None
+                is_field = None
             if cached_temp_log is not None:
-                self._handle_temperature_input(cached_temp_log, True, False)
+                self._handle_temperature_input(cached_temp_log, is_field, False)
                 return True
             if self._set_sample_temperature(previous):
                 slice_plotter_method(self.ws_name)
@@ -500,7 +505,7 @@ class SlicePlot(IPlot):
 
         self.default_options["temp"] = temp_value
         self.temp = temp_value
-        self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value, temp_value_raw, is_cached)
+        self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value, temp_value_raw, is_cached, field)
         return True
 
     def ask_sample_temperature_field(self, ws_name: str) -> tuple[str, bool, bool]:
