@@ -69,6 +69,7 @@ class SlicePlot(IPlot):
             "colorbar_label_size",
             "colorbar_range_font_size",
         ]
+        self.plot_window.set_manual_temp_log_enabled(False)
 
     def save_default_options(self):
         self.default_options = {
@@ -426,12 +427,14 @@ class SlicePlot(IPlot):
             cbar_range = self.colorbar_range
             title = self.title
             if temp_dependent:
+                self.plot_window.set_manual_temp_log_enabled(True)
                 if not self._run_temp_dependent(slice_plotter_method, previous):
                     self.manager.reset_current_figure_as_previous(
                         last_active_figure_number, disable_make_current_after_plot
                     )
                     return
             else:
+                self.plot_window.set_manual_temp_log_enabled(False)
                 slice_plotter_method(self.ws_name)
             self.update_canvas(cbar_range, cbar_log, title)
         else:

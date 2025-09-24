@@ -298,6 +298,9 @@ class PlotWindow(QtWidgets.QMainWindow):
         except AttributeError:
             pass
 
+    def set_manual_temp_log_enabled(self, enabled: bool):
+        self.action_set_temp_log.setEnabled(enabled)
+
     def uncheck_action_by_text(self, holder, item_text):
         for action in holder.actions():
             if (
