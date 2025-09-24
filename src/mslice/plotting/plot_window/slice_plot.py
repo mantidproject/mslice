@@ -165,6 +165,7 @@ class SlicePlot(IPlot):
                 True,
             )
         )
+        plot_window.action_set_temp_log.triggered.connect(self._get_prev_and_set_sample_temperature)
 
         plot_window.action_hydrogen.triggered.connect(
             partial(toggle_overplot_line, self, self._slice_plotter_presenter, 1, True)
@@ -464,6 +465,12 @@ class SlicePlot(IPlot):
             else:  # failed to get sample temperature
                 return False
         return True
+
+    def _get_prev_and_set_sample_temperature(self) -> bool:
+        """
+        Helper for the sake of simplifying the call for changing the temp via the menu.
+        """
+        return self._set_sample_temperature(self.selected_intensity())
 
     def _set_sample_temperature(self, previous: QtWidgets.QAction) -> bool:
         try:
