@@ -19,6 +19,7 @@ class SlicePlotTest(unittest.TestCase):
         canvas.figure.gca = MagicMock(return_value=self.axes)
         self.plot_figure.window.canvas = canvas
         self.slice_plotter = MagicMock()
+        self.slice_plotter.get_cached_sample_temp.return_value = ("test_log", True)
 
         self.slice_plot = SlicePlot(self.plot_figure, self.slice_plotter, "workspace")
         self.slice_plot.manager.report_as_current_and_return_previous_status.return_value = (
@@ -67,7 +68,8 @@ class SlicePlotTest(unittest.TestCase):
         self.assertEqual(type(norm_set), colors.Normalize)
         image.set_clim.assert_called_once_with((0, 15))
 
-    def test_lines_redrawn_on_intensity_change(self):
+    @patch("mslice.plotting.plot_window.slice_plot.SlicePlot._handle_temperature_input")
+    def test_lines_redrawn_on_intensity_change(self, mock_handle_temperature_input):
         self.slice_plot.save_default_options()
         toggle_overplot_line(
             self.slice_plot,
@@ -82,14 +84,17 @@ class SlicePlotTest(unittest.TestCase):
         self.slice_plotter.show_dynamical_susceptibility.__name__ = (
             "show_dynamical_susceptibility"
         )
+        self.slice_plotter.show_dynamical_susceptibility.side_effect = ValueError()
         self.slice_plot.show_intensity_plot(
             self.plot_figure.action_chi_qe,
             self.slice_plotter.show_dynamical_susceptibility,
             True,
         )
-
+        self.assertTrue(self.slice_plot.plot_window.action_set_temp_log.enabled)
         self.assertTrue(self.slice_plot.plot_window.action_helium.checked)
         self.slice_plotter.add_overplot_line.assert_any_call("workspace", 4, True, "")
+        mock_handle_temperature_input.assert_called_with("test_log", True, False)
+
 
     @patch("mslice.plotting.plot_window.slice_plot.QtWidgets.QInputDialog.getInt")
     def test_arbitrary_recoil_line(self, qt_get_int_mock):
