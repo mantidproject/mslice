@@ -301,6 +301,9 @@ class PlotWindow(QtWidgets.QMainWindow):
     def set_manual_temp_log_enabled(self, enabled: bool):
         self.action_set_temp_log.setEnabled(enabled)
 
+    def set_manual_temp_log_visible(self, visible: bool):
+        self.action_set_temp_log.setVisible(visible)
+
     def uncheck_action_by_text(self, holder, item_text):
         for action in holder.actions():
             if (

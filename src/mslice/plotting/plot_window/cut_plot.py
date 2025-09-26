@@ -76,6 +76,7 @@ class CutPlot(IPlot):
             "x_label_size",
             "y_label_size",
         ]
+        self.plot_window.set_manual_temp_log_visible(False)
 
     def save_default_options(self):
         self.default_options = {

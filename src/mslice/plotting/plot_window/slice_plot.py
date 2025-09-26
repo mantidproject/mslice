@@ -234,6 +234,7 @@ class SlicePlot(IPlot):
         plot_window.action_d2sig_dw_de.triggered.disconnect()
         plot_window.action_symmetrised_sqe.triggered.disconnect()
         plot_window.action_gdos.triggered.disconnect()
+        plot_window.action_set_temp_log.triggered.disconnect()
         plot_window.action_hydrogen.triggered.disconnect()
         plot_window.action_deuterium.triggered.disconnect()
         plot_window.action_helium.triggered.disconnect()
