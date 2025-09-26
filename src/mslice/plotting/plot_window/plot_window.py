@@ -152,6 +152,13 @@ class PlotWindow(QtWidgets.QMainWindow):
         menu.addAction(self.action_gdos)
         IntensityCache.cache_action(IntensityType.GDOS, "action_gdos")
 
+        menu.addSeparator()
+
+        self.action_set_temp_log = add_action(
+            menu, self, "Set Temperature Log", checkable=False, visible=True
+        )
+        menu.addAction(self.action_set_temp_log)
+
     def create_toolbar(self):
         self.toolbar = QtWidgets.QToolBar()
         self.add_toolbar_actions(self.toolbar)
@@ -292,6 +299,12 @@ class PlotWindow(QtWidgets.QMainWindow):
             getattr(self, create_attribute_name(key)).setChecked(False)
         except AttributeError:
             pass
+
+    def set_manual_temp_log_enabled(self, enabled: bool):
+        self.action_set_temp_log.setEnabled(enabled)
+
+    def set_manual_temp_log_visible(self, visible: bool):
+        self.action_set_temp_log.setVisible(visible)
 
     def uncheck_action_by_text(self, holder, item_text):
         for action in holder.actions():

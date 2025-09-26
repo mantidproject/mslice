@@ -102,3 +102,13 @@ class SlicePlotterPresenterTest(unittest.TestCase):
         slice_presenter.hide_overplot_line("workspace", key)
         self.assertTrue(key not in cache_mock.overplot_lines)
         remove_line_mock.assert_called_once_with("line")
+
+    def test_set_sample_temperature(self):
+        slice_presenter = SlicePlotterPresenter()
+        slice_presenter._slice_cache["test"] = mock.MagicMock()
+        slice_presenter.set_sample_temperature(
+            "test", 104, "test_temp", is_cached=False
+        )
+        self.assertIsNone(slice_presenter._cached_temp)
+        slice_presenter.set_sample_temperature("test", 104, "test_temp", is_cached=True)
+        self.assertEqual(slice_presenter._cached_temp, ("test_temp", True))
