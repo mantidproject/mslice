@@ -12,6 +12,7 @@ from mslice.models.units import get_sample_temperature_from_string
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.plotting.plot_window.cachable_input_dialog import QCacheableInputDialog
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
 from mslice.plotting.plot_window.plot_options import SlicePlotOptions
@@ -28,8 +29,6 @@ from mslice.util.intensity_correction import IntensityType, IntensityCache
 from mslice.models.intensity_correction_algs import sample_temperature
 
 from typing import Callable
-
-from plotting.plot_window.cachable_input_dialog import QCacheableInputDialog
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
@@ -166,7 +165,9 @@ class SlicePlot(IPlot):
                 True,
             )
         )
-        plot_window.action_set_temp_log.triggered.connect(self._get_prev_and_set_sample_temperature)
+        plot_window.action_set_temp_log.triggered.connect(
+            self._get_prev_and_set_sample_temperature
+        )
 
         plot_window.action_hydrogen.triggered.connect(
             partial(toggle_overplot_line, self, self._slice_plotter_presenter, 1, True)
@@ -458,7 +459,9 @@ class SlicePlot(IPlot):
     ) -> bool:
         try:
             slice_plotter_method(self.ws_name)
-        except ValueError:  # sample temperature not yet set, get it and reattempt method
+        except (
+            ValueError
+        ):  # sample temperature not yet set, get it and reattempt method
             # First, try to get it from the temperature cache:
             cached_temp_pack = self._slice_plotter_presenter.get_cached_sample_temp()
             if cached_temp_pack is not None:
@@ -483,15 +486,21 @@ class SlicePlot(IPlot):
 
     def _set_sample_temperature(self, previous: QtWidgets.QAction) -> bool:
         try:
-            temp_value_raw, field, is_cached = self.ask_sample_temperature_field(str(self.ws_name))
-            temperature_found = self._handle_temperature_input(temp_value_raw, field, is_cached)
+            temp_value_raw, field, is_cached = self.ask_sample_temperature_field(
+                str(self.ws_name)
+            )
+            temperature_found = self._handle_temperature_input(
+                temp_value_raw, field, is_cached
+            )
         except RuntimeError:  # if cancel is clicked, go back to previous selection
             temperature_found = False
         if not temperature_found:
             self.set_intensity(previous)
         return temperature_found
 
-    def _handle_temperature_input(self, temp_value_raw: str, field: bool, is_cached: bool) -> bool:
+    def _handle_temperature_input(
+        self, temp_value_raw: str, field: bool, is_cached: bool
+    ) -> bool:
         if field:
             temp_value = sample_temperature(self.ws_name, [temp_value_raw])
         else:
@@ -506,7 +515,9 @@ class SlicePlot(IPlot):
 
         self.default_options["temp"] = temp_value
         self.temp = temp_value
-        self._slice_plotter_presenter.set_sample_temperature(self.ws_name, temp_value, temp_value_raw, is_cached, field)
+        self._slice_plotter_presenter.set_sample_temperature(
+            self.ws_name, temp_value, temp_value_raw, is_cached, field
+        )
         return True
 
     def ask_sample_temperature_field(self, ws_name: str) -> tuple[str, bool, bool]:
@@ -516,7 +527,9 @@ class SlicePlot(IPlot):
             keys = ws.raw_ws.run().keys()
         except AttributeError:
             keys = ws.raw_ws.getExperimentInfo(0).run().keys()
-        temp_field, is_cached, confirm = QCacheableInputDialog.ask_for_input(self.plot_window, "Sample Temperature", text, keys)
+        temp_field, is_cached, confirm = QCacheableInputDialog.ask_for_input(
+            self.plot_window, "Sample Temperature", text, keys
+        )
         if not confirm:
             raise RuntimeError("sample_temperature_dialog cancelled")
         else:
