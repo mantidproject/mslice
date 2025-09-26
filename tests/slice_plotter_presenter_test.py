@@ -106,7 +106,9 @@ class SlicePlotterPresenterTest(unittest.TestCase):
     def test_set_sample_temperature(self):
         slice_presenter = SlicePlotterPresenter()
         slice_presenter._slice_cache["test"] = mock.MagicMock()
-        slice_presenter.set_sample_temperature("test", 104, "test_temp", is_cached=False)
+        slice_presenter.set_sample_temperature(
+            "test", 104, "test_temp", is_cached=False
+        )
         self.assertIsNone(slice_presenter._cached_temp)
         slice_presenter.set_sample_temperature("test", 104, "test_temp", is_cached=True)
         self.assertEqual(slice_presenter._cached_temp, ("test_temp", True))

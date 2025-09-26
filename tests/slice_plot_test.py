@@ -95,7 +95,6 @@ class SlicePlotTest(unittest.TestCase):
         self.slice_plotter.add_overplot_line.assert_any_call("workspace", 4, True, "")
         mock_handle_temperature_input.assert_called_with("test_log", True, False)
 
-
     @patch("mslice.plotting.plot_window.slice_plot.QtWidgets.QInputDialog.getInt")
     def test_arbitrary_recoil_line(self, qt_get_int_mock):
         qt_get_int_mock.return_value = (5, True)

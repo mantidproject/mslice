@@ -22,7 +22,6 @@ from mslice.presenters.presenter_utility import PresenterUtility
 
 
 class SlicePlotterPresenter(PresenterUtility):
-
     def __init__(self):
         self._main_presenter = None
         self._slice_cache = {}
@@ -168,7 +167,9 @@ class SlicePlotterPresenter(PresenterUtility):
             raise ValueError()
         return intensity_start, intensity_end
 
-    def set_sample_temperature(self, workspace_name, temp, temp_value_raw=None, is_cached=False, is_field=True):
+    def set_sample_temperature(
+        self, workspace_name, temp, temp_value_raw=None, is_cached=False, is_field=True
+    ):
         self._slice_cache[workspace_name].sample_temp = temp
         if is_cached:
             self.set_cached_sample_temp((temp_value_raw, is_field))

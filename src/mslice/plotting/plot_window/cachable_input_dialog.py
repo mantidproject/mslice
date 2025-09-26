@@ -1,6 +1,16 @@
-from PyQt5.QtWidgets import QComboBox, QFormLayout, QLabel, QPushButton, QWidget, QSpacerItem, QSizePolicy, QVBoxLayout, \
-    QHBoxLayout
+from PyQt5.QtWidgets import (
+    QComboBox,
+    QFormLayout,
+    QLabel,
+    QPushButton,
+    QWidget,
+    QSpacerItem,
+    QSizePolicy,
+    QVBoxLayout,
+    QHBoxLayout,
+)
 from qtpy.QtWidgets import QDialog, QCheckBox
+
 
 class QCacheableInputDialog(QDialog):
     """
@@ -41,7 +51,9 @@ class QCacheableInputDialog(QDialog):
         return self.combo.currentText(), self.cache_checkbox.isChecked()
 
     @staticmethod
-    def ask_for_input(parent: QWidget, title: str, label_text: str, options: list) -> tuple[str, bool, bool]:
+    def ask_for_input(
+        parent: QWidget, title: str, label_text: str, options: list
+    ) -> tuple[str, bool, bool]:
         """
         :param parent: Parent QWidget.
         :param title: Dialog title.

@@ -154,7 +154,9 @@ class PlotWindow(QtWidgets.QMainWindow):
 
         menu.addSeparator()
 
-        self.action_set_temp_log = add_action(menu, self, "Set Temperature Log", checkable=False, visible=True)
+        self.action_set_temp_log = add_action(
+            menu, self, "Set Temperature Log", checkable=False, visible=True
+        )
         menu.addAction(self.action_set_temp_log)
 
     def create_toolbar(self):
