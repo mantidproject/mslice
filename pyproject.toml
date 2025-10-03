@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mslice"
 #dynamic = ["version"]
-verions = "2.12.dev64"
+version = "2.12.dev64"
 authors = [
   { name="The Mantid Project", email="mantid-help@mantidproject.org" },
 ]
