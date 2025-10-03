@@ -6,7 +6,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mslice"
-dynamic = ["version"]
+#dynamic = ["version"]
+verions = "2.12.dev64"
 authors = [
   { name="The Mantid Project", email="mantid-help@mantidproject.org" },
 ]
@@ -90,17 +91,17 @@ omit = [
 fail_under = 85
 show_missing = true
 
-[tool.versioningit.vcs]
-method = "git"
-default-tag = "0.0.0"
+# [tool.versioningit.vcs]
+# method = "git"
+# default-tag = "0.0.0"
 
-[tool.versioningit.next-version]
-method = "minor"
+# [tool.versioningit.next-version]
+# method = "minor"
 
-[tool.versioningit.format]
-distance = "{base_version}.dev{distance}"
-dirty = "{base_version}+uncommitted"
-distance-dirty = "{base_version}.dev{distance}+uncommitted"
+# [tool.versioningit.format]
+# distance = "{base_version}.dev{distance}"
+# dirty = "{base_version}+uncommitted"
+# distance-dirty = "{base_version}.dev{distance}+uncommitted"
 
-[tool.versioningit.write]
-file = "src/mslice/__init__.py"
+# [tool.versioningit.write]
+# file = "src/mslice/__init__.py"

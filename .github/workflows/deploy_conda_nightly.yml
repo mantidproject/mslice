@@ -26,7 +26,7 @@ jobs:
           echo "recentCommits=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo false || echo true)" >> $GITHUB_ENV
 
       - name: Setup Miniconda
-        if: ${{ env.recentCommits == 'true'}}
+        #if: ${{ env.recentCommits == 'true'}}
         uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
