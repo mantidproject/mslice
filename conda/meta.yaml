@@ -3,10 +3,10 @@
   # {% set version_number = '_' + version_number if version_number != '0' else '' %}
 
   # {% set version = version_tag + version_number %}
-{% set version = "2.12.dev64" %}
+
 package:
   name: mslice
-  version: {{ version }}
+  version: "2.12.dev64" # {{ version }}
 
 source:
   git_url: ../
