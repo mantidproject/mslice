@@ -32,6 +32,7 @@ runs:
   - name: Build package
     shell: bash -l {0}
     run: |
+      conda init
       conda activate build-env
       conda config --set anaconda_upload yes
       conda mambabuild --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
