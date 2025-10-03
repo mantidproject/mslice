@@ -37,7 +37,7 @@ jobs:
           auto-activate-base: false
 
       - name: Build MSlice nightly conda package
-        if: ${{ env.recentCommits == 'true'}}
+        #if: ${{ env.recentCommits == 'true'}}
         uses: ./.github/actions/publish-package
         with:
           label: nightly
