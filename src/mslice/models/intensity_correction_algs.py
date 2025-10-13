@@ -5,7 +5,7 @@ from scipy import constants
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.workspace.pixel_workspace import PixelWorkspace, HistogramWorkspace
-from mslice.models.units import EnergyUnits, get_sample_temperature_from_string
+from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.axis import Axis
 from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace
 from mslice.models.slice.slice_functions import compute_slice
@@ -102,15 +102,12 @@ def generate_modification_array(multiplier, up_to_index, signal):
 
 
 def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
-    print("3")
-    print(q_axis)
-    print(e_axis)
     x_units = e_axis.units if rotated else q_axis.units
+    x_units_scale = e_axis.scale if rotated else q_axis.scale
+    if "DeltaE" in x_units and x_units_scale != 1.0:
+        scattering_data = scattering_data*x_units_scale
     
-    print("4")
     x_dim, y_dim = _get_slice_dimensions(scattering_data, x_units)
-    print(x_dim.getUnits())
-    print(y_dim.getUnits())
     x_dim_shape_index = (
         0 if x_dim.name == scattering_data._raw_ws.getXDimension().name else 1
     )
@@ -122,8 +119,6 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
         if isinstance(scattering_data, HistogramWorkspace)
         else scattering_data.get_signal().transpose()
     )
-    print("scattering signal")
-    print(signal)
     n_bins_energy = (
         signal.shape[x_dim_shape_index] if rotated else signal.shape[y_dim_shape_index]
     )
@@ -139,6 +134,7 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     gdos = scattering_data / momentum_transfer
     gdos *= energy
     gdos *= 1 - boltzmann_dist
+    
     return gdos
 
 
@@ -188,11 +184,11 @@ def _cut_compute_gdos(
     is_icut,
 ):
     parent_ws = get_workspace_handle(scattering_data.parent)
-
     # Take a slice from parent_ws with bins to match cut, then gdos correct
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(
         parent_ws, q_axis, e_axis, is_icut
     )
+    
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         parent_ws,
         sample_temp,
@@ -342,17 +338,13 @@ def _reduce_bins_along_int_axis(
     slice_x, slice_y = _get_slice_dimensions(slice_gdos, cut_axis.units)
     x_dim = slice_x if cut_slice_alignment else slice_y
     y_dim = slice_y if cut_slice_alignment else slice_x
-    print("dims")
     extents = (
         f"{y_dim.getMinimum()},{y_dim.getMaximum()},"
         f"{x_dim.getMinimum()},{x_dim.getMaximum()}"
     )
     no_of_bins = f"{signal.shape[cut_axis_id]},{signal.shape[int_axis_id]}"
     names = f"{x_dim.name},{y_dim.name}"
-    #units = f"{x_dim.getUnits()},{y_dim.getUnits()}"
-    units = f"{int_axis.e_unit},{y_dim.getUnits()}"
-    print(units)
-    print(int_axis)
+    units = f"{x_dim.getUnits()},{y_dim.getUnits()}"
 
     new_ws = CreateMDHistoWorkspace(
         OutputWorkspace=output_name,
@@ -374,22 +366,18 @@ def _reduce_bins_along_int_axis(
 def _reduce_bins_and_return_signal_error(
     slice_gdos, algorithm, cut_axis, int_axis, cut_axis_id
 ):
-    scale = 1
-    if 'DeltaE' in cut_axis.units and 'cm-1' in cut_axis.e_unit :
-        new_e_unit = EnergyUnits(cut_axis.e_unit)
-        scale = new_e_unit.factor_to_meV()
     ax1 = f"{cut_axis.start}, {cut_axis.step}, {cut_axis.end}"
     ax2 = f"{int_axis.start}, {int_axis.end - int_axis.start}, {int_axis.end}"
+
     if cut_axis_id == 0:
         ws_out = _cut_nonPSD_general(ax1, ax2, slice_gdos.raw_ws, algorithm)
     else:
         ws_out = _cut_nonPSD_general(ax2, ax1, slice_gdos.raw_ws, algorithm)
     signal = ws_out.extractY()
-    error = ws_out.extractE()
-    print("signal")
-    print(signal)
-    print("error")
-    print(error)
+    if "DeltaE" in cut_axis.units and cut_axis.scale != 1.0:
+        error = np.sqrt(np.nansum(slice_gdos.get_variance(), cut_axis_id, keepdims=True))
+    else:
+        error = ws_out.extractE()
         
     return signal, error
 
