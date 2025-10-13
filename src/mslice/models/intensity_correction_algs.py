@@ -105,8 +105,8 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     x_units = e_axis.units if rotated else q_axis.units
     x_units_scale = e_axis.scale if rotated else q_axis.scale
     if "DeltaE" in x_units and x_units_scale != 1.0:
-        scattering_data = scattering_data*x_units_scale
-    
+        scattering_data = scattering_data * x_units_scale
+
     x_dim, y_dim = _get_slice_dimensions(scattering_data, x_units)
     x_dim_shape_index = (
         0 if x_dim.name == scattering_data._raw_ws.getXDimension().name else 1
@@ -134,7 +134,7 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     gdos = scattering_data / momentum_transfer
     gdos *= energy
     gdos *= 1 - boltzmann_dist
-    
+
     return gdos
 
 
@@ -188,7 +188,7 @@ def _cut_compute_gdos(
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(
         parent_ws, q_axis, e_axis, is_icut
     )
-    
+
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         parent_ws,
         sample_temp,
@@ -375,10 +375,12 @@ def _reduce_bins_and_return_signal_error(
         ws_out = _cut_nonPSD_general(ax2, ax1, slice_gdos.raw_ws, algorithm)
     signal = ws_out.extractY()
     if "DeltaE" in cut_axis.units and cut_axis.scale != 1.0:
-        error = np.sqrt(np.nansum(slice_gdos.get_variance(), cut_axis_id, keepdims=True))
+        error = np.sqrt(
+            np.nansum(slice_gdos.get_variance(), cut_axis_id, keepdims=True)
+        )
     else:
         error = ws_out.extractE()
-        
+
     return signal, error
 
 
