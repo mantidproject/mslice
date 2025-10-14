@@ -23,6 +23,7 @@ runs:
     run: |
       conda config --set always_yes yes --set changeps1 no
       conda create -n build-env
+      conda init
       conda activate build-env
       mamba install -c conda-forge mamba conda-build anaconda-client conda-verify boa
       conda config --add channels mantid/label/nightly
