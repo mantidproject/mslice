@@ -1,6 +1,6 @@
 name: Deploy MSlice nightly
 
-on: 
+on:
   workflow_run:
     workflows: ["MSlice nightly build"]
     branches: [main]
