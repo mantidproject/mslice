@@ -4,7 +4,7 @@
   
   {% set version_parts = version_tag.split('.') %}
   {% set new_minor = version_parts[1]|int + 1 %}
-  {% set bumped_version = version_parts[0] ~ '.' ~ new_minor ~ '.' ~ version_parts[2] %}
+  {% set bumped_version = version_parts[0] ~ '.' ~ new_minor %}
 
   {% set version = bumped_version + version_number if version_number != '0' else version_tag %}
 
