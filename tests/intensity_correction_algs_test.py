@@ -244,6 +244,8 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
             1,
             True,
             "test_ws",
+            "meV",
+            1.0
         )
 
     @patch("mslice.models.intensity_correction_algs._cut_compute_gdos")
@@ -351,6 +353,8 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
             int(rotated),
             True,
             "test",
+            "meV",
+            1.0,
         )
 
         createMDHistoWorkspace_mock.assert_called_once()

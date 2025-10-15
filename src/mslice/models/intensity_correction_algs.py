@@ -237,7 +237,6 @@ def _cut_compute_gdos_pixel(
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(
         pixel_ws, q_axis, e_axis, is_icut
     )
-    rebin_slice_e_axis.e_unit = "meV"  # GDOS calculations only work for meV units
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         pixel_ws,
         sample_temp,
