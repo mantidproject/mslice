@@ -185,7 +185,7 @@ def _cut_compute_gdos(
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(
         parent_ws, q_axis, e_axis, is_icut
     )
-    rebin_slice_e_axis.e_unit = 'meV' # GDOS calculations only work for meV units
+    rebin_slice_e_axis.e_unit = "meV"  # GDOS calculations only work for meV units
 
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         parent_ws,
@@ -237,7 +237,7 @@ def _cut_compute_gdos_pixel(
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(
         pixel_ws, q_axis, e_axis, is_icut
     )
-    rebin_slice_e_axis.e_unit = 'meV' # GDOS calculations only work for meV units
+    rebin_slice_e_axis.e_unit = "meV"  # GDOS calculations only work for meV units
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         pixel_ws,
         sample_temp,
@@ -343,7 +343,9 @@ def _reduce_bins_along_int_axis(
     slice_x, slice_y = _get_slice_dimensions(slice_gdos, cut_axis.units)
     x_dim = slice_x if cut_slice_alignment else slice_y
     y_dim = slice_y if cut_slice_alignment else slice_x
-    x_scale, y_scale = (e_scale if d.getUnits() == 'meV' else 1.0 for d in (x_dim, y_dim))
+    x_scale, y_scale = (
+        e_scale if d.getUnits() == "meV" else 1.0 for d in (x_dim, y_dim)
+    )
     extents = (
         f"{y_dim.getMinimum() / y_scale},{y_dim.getMaximum() / y_scale},"
         f"{x_dim.getMinimum() / x_scale},{x_dim.getMaximum() / x_scale}"
@@ -365,7 +367,7 @@ def _reduce_bins_along_int_axis(
     )
 
     int_axis.step = 0
-    if cut_axis.units == 'DeltaE':
+    if cut_axis.units == "DeltaE":
         cut_axis.e_unit = orig_e_unit
     new_ws.axes = (cut_axis, int_axis)
     return new_ws
