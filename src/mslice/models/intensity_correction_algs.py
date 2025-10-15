@@ -103,9 +103,6 @@ def generate_modification_array(multiplier, up_to_index, signal):
 
 def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     x_units = e_axis.units if rotated else q_axis.units
-    x_units_scale = e_axis.scale if rotated else q_axis.scale
-    if "DeltaE" in x_units and x_units_scale != 1.0:
-        scattering_data = scattering_data * x_units_scale
 
     x_dim, y_dim = _get_slice_dimensions(scattering_data, x_units)
     x_dim_shape_index = (
@@ -188,6 +185,7 @@ def _cut_compute_gdos(
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(
         parent_ws, q_axis, e_axis, is_icut
     )
+    rebin_slice_e_axis.e_unit = 'meV' # GDOS calculations only work for meV units
 
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         parent_ws,
@@ -209,6 +207,8 @@ def _cut_compute_gdos(
         cut_axis_id,
         True,
         scattering_data.name,
+        e_axis.e_unit,
+        e_axis.scale,
     )
 
 
@@ -237,6 +237,7 @@ def _cut_compute_gdos_pixel(
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(
         pixel_ws, q_axis, e_axis, is_icut
     )
+    rebin_slice_e_axis.e_unit = 'meV' # GDOS calculations only work for meV units
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         pixel_ws,
         sample_temp,
@@ -258,6 +259,8 @@ def _cut_compute_gdos_pixel(
         cut_axis_id,
         cut_slice_alignment,
         scattering_data.name,
+        e_axis.e_unit,
+        e_axis.scale,
     )
 
 
@@ -324,6 +327,8 @@ def _reduce_bins_along_int_axis(
     cut_axis_id,
     cut_slice_alignment,
     output_name,
+    orig_e_unit,
+    e_scale,
 ):
     if isinstance(slice_gdos, HistogramWorkspace):
         signal, error = _reduce_bins_and_return_signal_error_PSD(
@@ -338,9 +343,10 @@ def _reduce_bins_along_int_axis(
     slice_x, slice_y = _get_slice_dimensions(slice_gdos, cut_axis.units)
     x_dim = slice_x if cut_slice_alignment else slice_y
     y_dim = slice_y if cut_slice_alignment else slice_x
+    x_scale, y_scale = (e_scale if d.getUnits() == 'meV' else 1.0 for d in (x_dim, y_dim))
     extents = (
-        f"{y_dim.getMinimum()},{y_dim.getMaximum()},"
-        f"{x_dim.getMinimum()},{x_dim.getMaximum()}"
+        f"{y_dim.getMinimum() / y_scale},{y_dim.getMaximum() / y_scale},"
+        f"{x_dim.getMinimum() / x_scale},{x_dim.getMaximum() / x_scale}"
     )
     no_of_bins = f"{signal.shape[cut_axis_id]},{signal.shape[int_axis_id]}"
     names = f"{x_dim.name},{y_dim.name}"
@@ -359,6 +365,8 @@ def _reduce_bins_along_int_axis(
     )
 
     int_axis.step = 0
+    if cut_axis.units == 'DeltaE':
+        cut_axis.e_unit = orig_e_unit
     new_ws.axes = (cut_axis, int_axis)
     return new_ws
 
@@ -374,12 +382,7 @@ def _reduce_bins_and_return_signal_error(
     else:
         ws_out = _cut_nonPSD_general(ax2, ax1, slice_gdos.raw_ws, algorithm)
     signal = ws_out.extractY()
-    if "DeltaE" in cut_axis.units and cut_axis.scale != 1.0:
-        error = np.sqrt(
-            np.nansum(slice_gdos.get_variance(), cut_axis_id, keepdims=True)
-        )
-    else:
-        error = ws_out.extractE()
+    error = ws_out.extractE()
 
     return signal, error
 
