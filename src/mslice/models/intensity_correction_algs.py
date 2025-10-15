@@ -103,7 +103,6 @@ def generate_modification_array(multiplier, up_to_index, signal):
 
 def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     x_units = e_axis.units if rotated else q_axis.units
-
     x_dim, y_dim = _get_slice_dimensions(scattering_data, x_units)
     x_dim_shape_index = (
         0 if x_dim.name == scattering_data._raw_ws.getXDimension().name else 1
@@ -131,7 +130,6 @@ def slice_compute_gdos(scattering_data, sample_temp, q_axis, e_axis, rotated):
     gdos = scattering_data / momentum_transfer
     gdos *= energy
     gdos *= 1 - boltzmann_dist
-
     return gdos
 
 
@@ -186,7 +184,6 @@ def _cut_compute_gdos(
         parent_ws, q_axis, e_axis, is_icut
     )
     rebin_slice_e_axis.e_unit = "meV"  # GDOS calculations only work for meV units
-
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         parent_ws,
         sample_temp,
@@ -377,14 +374,12 @@ def _reduce_bins_and_return_signal_error(
 ):
     ax1 = f"{cut_axis.start}, {cut_axis.step}, {cut_axis.end}"
     ax2 = f"{int_axis.start}, {int_axis.end - int_axis.start}, {int_axis.end}"
-
     if cut_axis_id == 0:
         ws_out = _cut_nonPSD_general(ax1, ax2, slice_gdos.raw_ws, algorithm)
     else:
         ws_out = _cut_nonPSD_general(ax2, ax1, slice_gdos.raw_ws, algorithm)
     signal = ws_out.extractY()
     error = ws_out.extractE()
-
     return signal, error
 
 
