@@ -245,7 +245,7 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
             True,
             "test_ws",
             "meV",
-            1.0
+            1.0,
         )
 
     @patch("mslice.models.intensity_correction_algs._cut_compute_gdos")
