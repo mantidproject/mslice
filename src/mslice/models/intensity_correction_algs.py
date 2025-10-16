@@ -179,11 +179,11 @@ def _cut_compute_gdos(
     is_icut,
 ):
     parent_ws = get_workspace_handle(scattering_data.parent)
-
     # Take a slice from parent_ws with bins to match cut, then gdos correct
     rebin_slice_q_axis, rebin_slice_e_axis = _get_rebin_slice_q_and_e_axis(
         parent_ws, q_axis, e_axis, is_icut
     )
+    rebin_slice_e_axis.e_unit = "meV"  # GDOS calculations only work for meV units
     rebin_slice_gdos = _rebin_slice_and_gdos_correct(
         parent_ws,
         sample_temp,
@@ -204,6 +204,8 @@ def _cut_compute_gdos(
         cut_axis_id,
         True,
         scattering_data.name,
+        e_axis.e_unit,
+        e_axis.scale,
     )
 
 
@@ -253,6 +255,8 @@ def _cut_compute_gdos_pixel(
         cut_axis_id,
         cut_slice_alignment,
         scattering_data.name,
+        e_axis.e_unit,
+        e_axis.scale,
     )
 
 
@@ -319,6 +323,8 @@ def _reduce_bins_along_int_axis(
     cut_axis_id,
     cut_slice_alignment,
     output_name,
+    orig_e_unit,
+    e_scale,
 ):
     if isinstance(slice_gdos, HistogramWorkspace):
         signal, error = _reduce_bins_and_return_signal_error_PSD(
@@ -333,9 +339,12 @@ def _reduce_bins_along_int_axis(
     slice_x, slice_y = _get_slice_dimensions(slice_gdos, cut_axis.units)
     x_dim = slice_x if cut_slice_alignment else slice_y
     y_dim = slice_y if cut_slice_alignment else slice_x
+    x_scale, y_scale = (
+        e_scale if d.getUnits() == "meV" else 1.0 for d in (x_dim, y_dim)
+    )
     extents = (
-        f"{y_dim.getMinimum()},{y_dim.getMaximum()},"
-        f"{x_dim.getMinimum()},{x_dim.getMaximum()}"
+        f"{y_dim.getMinimum() / y_scale},{y_dim.getMaximum() / y_scale},"
+        f"{x_dim.getMinimum() / x_scale},{x_dim.getMaximum() / x_scale}"
     )
     no_of_bins = f"{signal.shape[cut_axis_id]},{signal.shape[int_axis_id]}"
     names = f"{x_dim.name},{y_dim.name}"
@@ -354,6 +363,8 @@ def _reduce_bins_along_int_axis(
     )
 
     int_axis.step = 0
+    if cut_axis.units == "DeltaE":
+        cut_axis.e_unit = orig_e_unit
     new_ws.axes = (cut_axis, int_axis)
     return new_ws
 
