@@ -1,6 +1,6 @@
   {% set version_tag = environ.get('GIT_DESCRIBE_TAG', '0.0.0') %}
   {% set version_number = environ.get('GIT_DESCRIBE_NUMBER', '0') | string %}
-  {% set is_dev = '1' if version_number != '0' else '0'
+  {% set is_dev = '1' if version_number != '0' else '0' %}
   {% set version_number = '.dev' + version_number if is_dev != '0' else '' %}
 
   {% set version_parts = version_tag.split('.') %}
