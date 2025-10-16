@@ -1,12 +1,13 @@
   {% set version_tag = environ.get('GIT_DESCRIBE_TAG', '0.0.0') %}
   {% set version_number = environ.get('GIT_DESCRIBE_NUMBER', '0') | string %}
-  {% set version_number = '.dev' + version_number if version_number != '0' else '' %}
+  {% set is_dev = '1' if version_number != '0' else '0' %}
+  {% set version_number = '.dev' + version_number if is_dev != '0' else '' %}
 
   {% set version_parts = version_tag.split('.') %}
   {% set new_minor = version_parts[1]|int + 1 %}
   {% set bumped_version = version_parts[0] ~ '.' ~ new_minor %}
 
-  {% set version = bumped_version + version_number if version_number != '0' else version_tag %}
+  {% set version = bumped_version + version_number if is_dev != '0' else version_tag %}
 
 package:
   name: mslice
