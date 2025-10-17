@@ -41,8 +41,8 @@ jobs:
           environment-file: environment.yml
           auto-activate-base: false
 
-      - name: Build MSlice nightly conda package
-        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
+      # - name: Build MSlice nightly conda package
+        # if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
         # uses: ./.github/actions/publish-package
         # with:
           # label: nightly
