@@ -25,6 +25,9 @@ jobs:
       - name: Check for changes since last build
         run: |
           echo "recentCommits=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo false || echo true)" >> $GITHUB_ENV
+          
+      - name: Check whether the HEAD is tagged
+        run: |      
           echo "headTagged=$(test -z $(git describe --exact-match --tags) && echo false || echo true)" >> $GITHUB_ENV
 
       - name: Setup Miniconda
