@@ -44,7 +44,11 @@ class Slice:
 
     @sample_temp.setter
     def sample_temp(self, value):
-        self._sample_temp = value
+        try:
+            self._sample_temp = float(value)
+        except (TypeError, ValueError):
+            self._sample_temp = None
+            raise
 
     @property
     def chi(self):
