@@ -49,12 +49,17 @@ You will also need to edit the run configurations:
 - If you're developing on Windows, the Python interpreter used must be the one shipped with the Mantid installation `MantidInstall/bin/python.exe`.
 - If you're developing on Ubuntu, set the Python Interpreter path to `/usr/bin/python3.6`
 
+
 You can now also develop MSlice using a Mantid conda environment.
 First install Mantid using `conda env create -f mslice-developer.yml`,
 then add this interpreter by going to the `File->Settings` in PyCharm, then `Project: mslice -> Python Interpreter`,
 click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.10 (mantidnightly)`.
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
 Specify `start_mslice.py` as the startup script.
+
+If mslice doesn't launch, you may have to mark `src` folder as `Sources Root` on Pycharm
+
+![example pycharm folder_configuration](src/mslice/images/pycharm_source_folder.png)
 
 Optionally, you can also install pre-commit locally to ensure formatting issues are resolved when committing:
 
