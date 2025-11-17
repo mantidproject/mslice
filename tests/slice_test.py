@@ -24,12 +24,24 @@ class SliceTest(unittest.TestCase):
     def test_sample_temp_raises_error_for_unconvertible_type(self):
         test_temp = "not_convertible"
         test_slice = self._create_slice()
-        self.assertRaises(ValueError, Slice.sample_temp.fset, test_slice, test_temp)
+        self.assertRaisesRegex(
+            ValueError,
+            "could not convert string to float",
+            Slice.sample_temp.fset,
+            test_slice,
+            test_temp,
+        )
 
     def test_sample_temp_raises_error_for_wrong_type(self):
         test_temp = None
         test_slice = self._create_slice()
-        self.assertRaises(TypeError, Slice.sample_temp.fset, test_slice, test_temp)
+        self.assertRaisesRegex(
+            TypeError,
+            "argument must be a string or a real number",
+            Slice.sample_temp.fset,
+            test_slice,
+            test_temp,
+        )
 
     @patch("mslice.models.slice.slice.compute_chi")
     def test_chi_computes_if_none(self, compute_chi_fn):
