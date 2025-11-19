@@ -112,3 +112,6 @@ ENV/
 
 # vscode files
 .vscode/
+
+# Mac OS X Finder
+.DS_Store

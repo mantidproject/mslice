@@ -15,6 +15,34 @@ class SliceTest(unittest.TestCase):
         test_slice.sample_temp = test_temp
         self.assertEqual(test_slice.sample_temp, test_temp)
 
+    def test_sample_can_convert_some_strings_to_float(self):
+        test_temp = "5.0"
+        test_slice = self._create_slice()
+        test_slice.sample_temp = test_temp
+        self.assertEqual(test_slice.sample_temp, 5.0)
+
+    def test_sample_temp_raises_error_for_unconvertible_type(self):
+        test_temp = "not_convertible"
+        test_slice = self._create_slice()
+        self.assertRaisesRegex(
+            ValueError,
+            "could not convert string to float",
+            Slice.sample_temp.fset,
+            test_slice,
+            test_temp,
+        )
+
+    def test_sample_temp_raises_error_for_wrong_type(self):
+        test_temp = None
+        test_slice = self._create_slice()
+        self.assertRaisesRegex(
+            TypeError,
+            "argument must be a string or a real number",
+            Slice.sample_temp.fset,
+            test_slice,
+            test_temp,
+        )
+
     @patch("mslice.models.slice.slice.compute_chi")
     def test_chi_computes_if_none(self, compute_chi_fn):
         test_output_workspace = MagicMock()
