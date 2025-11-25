@@ -144,6 +144,22 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         )
 
     @patch("mslice.presenters.workspace_manager_presenter.get_save_directory")
+    def test_save_PixelWorkspace_as_matlab(self, save_dir_mock):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        # save a PixelWorkspace in matlab format raises error
+        path_to_save_to = r"A:\file\path"
+        workspace_to_save = "ws1"
+        self.view.get_workspace_selected = mock.Mock(return_value=[workspace_to_save])
+        self.view._display_error = mock.Mock()
+        save_dir_mock.return_value = (path_to_save_to, workspace_to_save, ".mat")
+
+        self.presenter.notify(Command.SaveSelectedWorkspaceMatlab)
+
+        self.view._display_error.assert_called_once_with(
+            "Only cuts and slices can be saved as Matlab."
+        )
+
+    @patch("mslice.presenters.workspace_manager_presenter.get_save_directory")
     @patch("mslice.presenters.workspace_manager_presenter.save_workspaces")
     def test_save_workspace_multiple_selected(self, save_ws_mock, save_dir_mock):
         self.presenter = WorkspaceManagerPresenter(self.view)
