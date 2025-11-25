@@ -115,7 +115,7 @@ def save_matlab(workspace, path):
             x, y, e = _get_md_histo_xye(workspace.raw_ws)
             labels = {"x": get_display_name(workspace.axes[0])}
     else:
-        if not hasattr(workspace.raw_ws, 'extractX'):
+        if not hasattr(workspace.raw_ws, "extractX"):
             raise RuntimeError("Only cuts and slices can be saved as Matlab.")
 
         if workspace.is_slice:

@@ -155,8 +155,9 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
 
         self.presenter.notify(Command.SaveSelectedWorkspaceMatlab)
 
-        self.view._display_error.assert_called_once_with("Only cuts and slices can be saved as Matlab.")
-
+        self.view._display_error.assert_called_once_with(
+            "Only cuts and slices can be saved as Matlab."
+        )
 
     @patch("mslice.presenters.workspace_manager_presenter.get_save_directory")
     @patch("mslice.presenters.workspace_manager_presenter.save_workspaces")
