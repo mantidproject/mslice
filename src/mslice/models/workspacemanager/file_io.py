@@ -103,11 +103,6 @@ def save_ascii(workspace, path):
 
 
 def save_matlab(workspace, path):
-    loader_name = get_workspace_handle(workspace).loader_name()
-    if loader_name is not None and loader_name == "LoadNXSPE":
-        raise RuntimeError(
-            "An NXSPE file cannot be saved as matlab - metadata may be lost."
-        )
     labels = {}
     if isinstance(workspace, HistogramWorkspace):
         if workspace.is_slice:
@@ -120,6 +115,9 @@ def save_matlab(workspace, path):
             x, y, e = _get_md_histo_xye(workspace.raw_ws)
             labels = {"x": get_display_name(workspace.axes[0])}
     else:
+        if not hasattr(workspace.raw_ws, "extractX"):
+            raise RuntimeError("Only cuts and slices can be saved as Matlab.")
+
         if workspace.is_slice:
             x = []
             for dim in [workspace.raw_ws.getDimension(i) for i in range(2)]:
