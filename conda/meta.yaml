@@ -39,7 +39,6 @@ requirements:
   - numpy
   - pre-commit
   - pyqt
-  - qtawesome
   - qtconsole
   - qtpy
   - setuptools

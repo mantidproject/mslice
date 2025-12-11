@@ -23,7 +23,6 @@ dependencies = [
     "ipython",
     "numpy",
     "matplotlib>=3.9.2",
-    "qtawesome",
     "pre-commit",
     "qtpy",
 ]
