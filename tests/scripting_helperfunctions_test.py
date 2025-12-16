@@ -327,12 +327,16 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_plot_options.assert_called_once_with(script_lines, plot_handler)
 
         self.assertIn(
-            "ax.set_xscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(plot_handler.x_range[0]),
-            script_lines
+            "ax.set_xscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
+                plot_handler.x_range[0]
+            ),
+            script_lines,
         )
         self.assertIn(
-            "ax.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(0.001),
-            script_lines
+            "ax.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
+                0.001
+            ),
+            script_lines,
         )
         self.assertEqual(["test_ws_var"], ret_val)
 
