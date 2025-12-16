@@ -309,6 +309,11 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
     ):
         plot_handler = gfm.get_active_figure().plot_handler
         plot_handler.add_mock_spec(CutPlot)
+        plot_handler.is_changed("x_log").return_value = True
+        plot_handler.is_changed("y_log").return_value = True
+        plot_handler.x_range = [2.001, 56.453]
+        plot_handler.y_range = [-0.153, 3.5]
+
         script_lines = []
 
         fig = mock.MagicMock()
@@ -322,16 +327,12 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_plot_options.assert_called_once_with(script_lines, plot_handler)
 
         self.assertIn(
-            "ax.set_xscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
-                plot_handler.x_axis_min
-            ),
-            script_lines,
+            "ax.set_xscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(plot_handler.x_range[0]),
+            script_lines
         )
         self.assertIn(
-            "ax.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
-                plot_handler.y_axis_min
-            ),
-            script_lines,
+            "ax.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(0.001),
+            script_lines
         )
         self.assertEqual(["test_ws_var"], ret_val)
 

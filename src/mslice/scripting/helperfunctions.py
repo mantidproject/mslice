@@ -160,13 +160,13 @@ def add_cut_plot_statements(script_lines, plot_handler, ax):
     if plot_handler.is_changed("x_log"):
         script_lines.append(
             f"ax.set_xscale('symlog', "
-            f"linthresh=pow(10, np.floor(np.log10({plot_handler.x_axis_min}))))\n"
+            f"linthresh=pow(10, np.floor(np.log10({plot_handler.x_range[0] if plot_handler.x_range[0] > 0 else 0.001}))))\n"
         )
 
     if plot_handler.is_changed("y_log"):
         script_lines.append(
             f"ax.set_yscale('symlog', "
-            f"linthresh=pow(10, np.floor(np.log10({plot_handler.y_axis_min}))))\n"
+            f"linthresh=pow(10, np.floor(np.log10({plot_handler.y_range[0] if plot_handler.y_range[0] > 0 else 0.001}))))\n"
         )
     return return_ws_vars
 
