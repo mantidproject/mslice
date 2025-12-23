@@ -53,7 +53,7 @@ You will also need to edit the run configurations:
 You can now also develop MSlice using a Mantid conda environment.
 First install Mantid using `conda env create -f mslice-developer.yml`,
 then add this interpreter by going to the `File->Settings` in PyCharm, then `Project: mslice -> Python Interpreter`,
-click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.10 (mantidnightly)`.
+click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.11 (mantidnightly)`.
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
 Specify `start_mslice.py` as the startup script.
 
@@ -89,6 +89,19 @@ To check the coverage of all the tests in MSlice, you can run the following comm
 coverage run -m pytest
 coverage report
 ```
+
+### Using Mslice on a Mantid Development Environment
+
+If you are developing for Mantid on a local environment, ``mantid`` and ``mantidqt`` are installed as local packages, if you
+want to install the latest nightly ``mslice`` as a conda package, use the command: ``mamba install -c mantid/label/nightly mslice --no-deps`` on your ``mantid-developer`` environment. This avoids
+installing Mantid as a dependency of the ``mslice`` package.
+
+Aditionally, a local ``mslice`` branch can be launched from ``mantid`` by setting the system path of the ``mslice`` source folder
+as an environment variable before starting ``mantid``.
+
+- On ``Clion/PyCharm`` run/debug configurations, set the ``PYTHONPATH`` on the `Environment Variables` line edit as: ``PYTHONPATH=/path/to/mslice/src/:$PYTHONPATH$``
+- On ``VSCode`` launch configurations in ``launch.json``, set the field ``"env":{"PYTHONPATH":"/path/to/mslice/src/:$PYTHONPATH$"}"`` for a Python launch/debug configuration, or the field ``"environment":[
+                {"name":"PYTHONPATH", "value":"/path/to/mslice/src/:$PYTHONPATH$"}]``, for a C++ launch/debug configuration.
 
 ### Nightly conda build
 

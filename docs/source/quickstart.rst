@@ -8,20 +8,24 @@ MSlice is included in the Mantid distribution so the easiest way to start it is 
 
 .. image:: images/quickstart/mantid_interfaces_menu.png
 
-The version of *MSlice* distributed with Mantid is the last stable version. For conda installs starting from *MantidWorkbench* version 6.14, MSlice is
-made an optional dependency of *MantidWorkbench*. This enables users to selectively install the MSlice version within the conda environment
-where *MantidWorkbench* is set up. For standalone installs of *MantidWorkbench*, the last stable version of MSlice is included.
-For versions of *MantidWorkbench* prior to 6.12., it is possible to replace MSlice with the latest development version on `GitHub`.
-To get this version, please download this `zip <https://github.com/mantidproject/mslice/archive/main.zip>`_ and extract it to a
-folder on your computer. You can then copy the ``mslice`` subfolder (the folder containing a file called ``__init__.py``) to the
-``scripts/ExternalInterfaces/`` folder of *Mantid*, which will make the new version accessible from *MantidWorkbench*.
+The version of MSlice distributed with Mantid is the last stable version, this is included within the Mantid standalone distribution.
 
-Alternatively, MSlice is available as a conda package via anaconda.org on the `mantid channel <https://anaconda.org/mantid/mslice>`_.
-To install the released conda package do ``mamba install -c mantid mslice``.
-To install the latest nightly conda package do ``mamba install -c mantid/label/nightly mslice``. The nightly conda package includes
-all recent changes of the development version up to and including the day before and is only created when all tests have run
-successfully.
-In both cases MSlice can be started by typing ``mslice`` on the command line after activating your conda environment.
+For conda installations of *Mantid* and *MantidWorkbench* starting from version *6.14*, MSlice is an optional dependency and will not be
+available by default from Mantid, so it must be installed as a separate conda package.
+MSlice is available as a conda package via anaconda.org on the `mantid channel <https://anaconda.org/mantid/mslice>`_.
+
+- To install the released conda package, run the command ``mamba install -c mantid mslice``.
+- To install the latest nightly conda package, run the command ``mamba install -c mantid/label/nightly mslice``. The nightly conda package includes
+  all recent changes of the development version up to and including the day before and is only created when all tests have run successfully.
+
+This assumes you have installed conda using ``Miniforge``, otherwise try substituting ``mamba`` for ``conda`` on the previous commands.
+
+In all cases MSlice can be started by typing ``mslice`` on the command line after activating your conda environment.
+
+For versions of MantidWorkbench up to 6.11.*, Mslice can be plugged in by copying the ``mslice`` subfolder (the folder ``mslice/src/``) to the
+``scripts/ExternalInterfaces/`` folder of ``Mantid``, which will make the copied version accessible from ``MantidWorkbench``. It is possible to use the latest version of MSlice found on GitHub.
+To get this version, please download this `zip <https://github.com/mantidproject/mslice/archive/main.zip>`_ and extract it to a
+folder on your computer.
 
 When you are using MSlice as an interface in *MantidWorkbench*, the **File** menu allows changing the font size of the GUI via the
 ``General`` tab in ``Settings``. Please note that the font size change is only applied after a restart of Mantid. Use ``Ctrl++`` to
