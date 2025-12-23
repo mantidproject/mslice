@@ -15,7 +15,7 @@ available by default from Mantid, so it must be installed as a separate conda pa
 MSlice is available as a conda package via anaconda.org on the `mantid channel <https://anaconda.org/mantid/mslice>`_.
 
 - To install the released conda package, run the command ``mamba install -c mantid mslice``.
-- To install the latest nightly conda package, run the command ``mamba install -c mantid/label/nightly mslice``.The nightly conda package includes
+- To install the latest nightly conda package, run the command ``mamba install -c mantid/label/nightly mslice``. The nightly conda package includes
   all recent changes of the development version up to and including the day before and is only created when all tests have run successfully.
 
 This assumes you have installed conda using ``Miniforge``, otherwise try substituting ``mamba`` for ``conda`` on the previous commands.
