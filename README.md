@@ -93,11 +93,11 @@ coverage report
 ### Using Mslice on a Mantid Development Environment
 
 If you are developing for Mantid on a local environment, ``mantid`` and ``mantidqt`` are installed as local packages, if you
-want to install the latest nightly ``Mslice`` as a conda package, use the command: ``mamba install -c mantid/label/nightly mslice --no-deps`` on your ``mantid-developer`` environment. This avoids
-installing Mantid as a dependency of the ``Mslice`` package.
+want to install the latest nightly ``mslice`` as a conda package, use the command: ``mamba install -c mantid/label/nightly mslice --no-deps`` on your ``mantid-developer`` environment. This avoids
+installing Mantid as a dependency of the ``mslice`` package.
 
-Aditionally, a local ``Mslice`` branch can be launched from ``Mantid`` by setting the system path of the ``Mslice`` source folder
-as an environment variable before starting ``Mantid``.
+Aditionally, a local ``mslice`` branch can be launched from ``mantid`` by setting the system path of the ``mslice`` source folder
+as an environment variable before starting ``mantid``.
 
 - On ``Clion/PyCharm`` run/debug configurations, set the ``PYTHONPATH`` on the `Environment Variables` line edit as: ``PYTHONPATH=/path/to/mslice/src/:$PYTHONPATH$``
 - On ``VSCode`` launch configurations in ``launch.json``, set the field ``"env":{"PYTHONPATH":"/path/to/mslice/src/:$PYTHONPATH$"}"`` for a Python launch/debug configuration, or the field ``"environment":[
