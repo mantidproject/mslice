@@ -22,7 +22,7 @@ This assumes you have installed conda using ``Miniforge``, otherwise try substit
 
 In all cases MSlice can be started by typing ``mslice`` on the command line after activating your conda environment.
 
-For versions of MantidWorkbench up to 6.11., Mslice can be plugged in by copying the ``mslice`` subfolder (the folder ``mslice/src/``) to the
+For versions of MantidWorkbench up to 6.11.*, Mslice can be plugged in by copying the ``mslice`` subfolder (the folder ``mslice/src/``) to the
 ``scripts/ExternalInterfaces/`` folder of ``Mantid``, which will make the copied version accessible from ``MantidWorkbench``. It is possible to use the latest version of MSlice found on GitHub.
 To get this version, please download this `zip <https://github.com/mantidproject/mslice/archive/main.zip>`_ and extract it to a
 folder on your computer.
