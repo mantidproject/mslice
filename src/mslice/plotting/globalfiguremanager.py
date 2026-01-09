@@ -517,6 +517,15 @@ class GlobalFigureManager(object):
         return list(cls._figures.values())
 
     @classmethod
+    def get_plotted_windows_dict(cls):
+        """Return all PlotWindows against workspace names as a dictionary"""
+        plotted_windows = {}
+        for plot_fig_man in cls.all_figures():
+            if plot_fig_man.has_plot_handler():
+                plotted_windows[plot_fig_man.plot_handler.ws_name] = plot_fig_man.plot_handler.plot_window
+        return plotted_windows
+
+    @classmethod
     def number_of_figure(cls, fig):
         for key, value in list(cls._figures.items()):
             if value == fig:
