@@ -1,7 +1,7 @@
 import unittest
 
 import mock
-from mock import call, patch
+from mock import call, patch, MagicMock
 import numpy as np
 
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
@@ -17,6 +17,8 @@ from mslice.util.mantid.mantid_algorithms import (
     ConvertToMD,
     CloneWorkspace,
 )
+from mslice.plotting.plot_window.plot_window import PlotWindow
+from mslice.models.workspacemanager.workspace_provider import add_workspace
 
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):
@@ -214,38 +216,87 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.error_invalid_save_path.assert_called_once()
         save_ws_mock.assert_not_called()
 
+    @patch("mslice.plotting.globalfiguremanager.GlobalFigureManager.get_plotted_windows_dict")
     @patch("mslice.presenters.workspace_manager_presenter.delete_workspace")
-    def test_remove_workspace(self, delete_ws_mock):
+    def test_remove_workspace(self, delete_ws_mock, mock_get_plotted_windows_dict):
         self.presenter = WorkspaceManagerPresenter(self.view)
         # Create a workspace that reports a single selected workspace on calls to get_workspace_selected
-        workspace_to_be_removed = CloneWorkspace(
-            self.m_workspace.raw_ws, OutputWorkspace="file1"
+        name_of_ws_to_be_removed = "workspace1"
+        ws_to_be_removed = CloneWorkspace(
+            self.m_workspace.raw_ws, OutputWorkspace=name_of_ws_to_be_removed
         )
-        self.view.get_workspace_selected = mock.Mock(
-            return_value=[workspace_to_be_removed]
-        )
+        add_workspace(ws_to_be_removed, name_of_ws_to_be_removed)
+        self.view.get_workspace_selected = mock.Mock(return_value=[name_of_ws_to_be_removed])
+        mock_window = MagicMock(spec=PlotWindow)
+        mock_get_plotted_windows_dict.return_value = {name_of_ws_to_be_removed : [mock_window]}
 
         self.presenter.notify(Command.RemoveSelectedWorkspaces)
+
         self.view.get_workspace_selected.assert_called_once_with()
-        delete_calls = [call(workspace_to_be_removed)]
+        delete_calls = [call(name_of_ws_to_be_removed)]
         delete_ws_mock.assert_has_calls(delete_calls)
         self.assertTrue(self.view.display_loaded_workspaces.called)
+        mock_get_plotted_windows_dict.assert_called_once()
+        mock_window.close.assert_called_once()
 
+    @patch("mslice.plotting.globalfiguremanager.GlobalFigureManager.get_plotted_windows_dict")
     @patch("mslice.presenters.workspace_manager_presenter.delete_workspace")
-    def test_remove_multiple_workspaces(self, delete_ws_mock):
+    def test_remove_multiple_workspaces(self, delete_ws_mock, mock_get_plotted_windows_dict):
         self.presenter = WorkspaceManagerPresenter(self.view)
-        # Create a view that reports 3 selected workspaces on calls to get_workspace_selected
-        workspace1 = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace="file1")
-        workspace2 = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace="file2")
+        # Create a view that reports 2 selected workspaces on calls to get_workspace_selected
+        sel_ws_1_name = "workspace1"
+        sel_ws_2_name = "workspace2"
+        workspace1 = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace=sel_ws_1_name)
+        workspace2 = CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace=sel_ws_2_name)
+        add_workspace(workspace1, sel_ws_1_name)
+        add_workspace(workspace2, sel_ws_2_name)
         self.view.get_workspace_selected = mock.Mock(
-            return_value=[workspace1, workspace2]
+            return_value=[sel_ws_1_name, sel_ws_2_name]
         )
+        mock_window_1 = MagicMock(spec=PlotWindow)
+        mock_window_2 = MagicMock(spec=PlotWindow)
+        mock_get_plotted_windows_dict.return_value = {
+            sel_ws_1_name: [mock_window_1],
+            sel_ws_2_name: [mock_window_2]
+        }
 
         self.presenter.notify(Command.RemoveSelectedWorkspaces)
         self.view.get_workspace_selected.assert_called_once_with()
-        delete_calls = [call(workspace1), call(workspace2)]
+        delete_calls = [call(sel_ws_1_name), call(sel_ws_2_name)]
         delete_ws_mock.assert_has_calls(delete_calls, any_order=True)
         self.assertTrue(self.view.display_loaded_workspaces.called)
+        mock_window_1.close.assert_called_once()
+        mock_window_2.close.assert_called_once()
+
+    @patch("mslice.plotting.globalfiguremanager.GlobalFigureManager.get_plotted_windows_dict")
+    @patch("mslice.presenters.workspace_manager_presenter.delete_workspace")
+    def test_remove_multiple_workspaces_not_plotted(self, delete_ws_mock, mock_get_plotted_windows_dict):
+        self.presenter = WorkspaceManagerPresenter(self.view)
+        # Create a view that reports 3 selected workspaces on calls to get_workspace_selected
+        selected_ws_names = ["workspace1", "workspace2", "workspace3"]
+        workspace_instances = [
+            CloneWorkspace(self.m_workspace.raw_ws, OutputWorkspace=selected_ws_names[i]) for i in range(3)
+        ]
+        for i in range(3):
+            add_workspace(workspace_instances[i], selected_ws_names[i])
+        self.view.get_workspace_selected = mock.Mock(
+            return_value=[*selected_ws_names]
+        )
+        # Assume only workspace1 and workspace3 are plotted at the moment
+        mock_window_1 = MagicMock(spec=PlotWindow)
+        mock_window_3 = MagicMock(spec=PlotWindow)
+        mock_get_plotted_windows_dict.return_value = {
+            selected_ws_names[0]: [mock_window_1],
+            selected_ws_names[2]: [mock_window_3]
+        }
+
+        self.presenter.notify(Command.RemoveSelectedWorkspaces)
+        self.view.get_workspace_selected.assert_called_once_with()
+        delete_calls = [call(selected_ws_names[i]) for i in range(3)]
+        delete_ws_mock.assert_has_calls(delete_calls, any_order=True)
+        self.assertTrue(self.view.display_loaded_workspaces.called)
+        mock_window_1.close.assert_called_once()
+        mock_window_3.close.assert_called_once()
 
     @patch("mslice.presenters.workspace_manager_presenter.delete_workspace")
     def test_remove_workspace_non_selected_prompt_user(self, delete_ws_mock):

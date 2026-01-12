@@ -158,7 +158,9 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             delete_workspace(workspace)
             self.update_displayed_workspaces()
             if workspace in plotted_windows:
-                plotted_windows[workspace].close()
+                for plt_window in plotted_windows[workspace]:
+                    plt_window.close()
+
 
     def _rename_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()

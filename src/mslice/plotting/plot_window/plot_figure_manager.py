@@ -425,7 +425,6 @@ class PlotFigureManagerQT(QtCore.QObject):
         if disable_make_current:
             self.disable_make_current()
 
-
 def new_plot_figure_manager(num, global_manager):
     def _new_plot_figure_manager(num, global_manager):
         """Create a new figure manager instance for the given figure.
