@@ -522,7 +522,9 @@ class GlobalFigureManager(object):
         plotted_windows = {}
         for plot_fig_man in cls.all_figures():
             if plot_fig_man.has_plot_handler():
-                plotted_windows[plot_fig_man.plot_handler.ws_name] = plot_fig_man.plot_handler.plot_window
+                plotted_windows[plot_fig_man.plot_handler.ws_name] = (
+                    plot_fig_man.plot_handler.plot_window
+                )
         return plotted_windows
 
     @classmethod

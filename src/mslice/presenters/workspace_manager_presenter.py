@@ -26,6 +26,7 @@ from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
+
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def __init__(self, workspace_view):
         # TODO add validation checks
