@@ -26,7 +26,9 @@ be added to the category of the command
 
 Currently there are only two categories ('1d' and '2d') hard coded into the manager.
 """
+
 from collections import defaultdict
+
 # system imports
 from functools import wraps
 
@@ -523,7 +525,9 @@ class GlobalFigureManager(object):
         plotted_windows = defaultdict(list)
         for plot_fig_man in cls.all_figures():
             if plot_fig_man.has_plot_handler():
-                plotted_windows[plot_fig_man.plot_handler.ws_name].append(plot_fig_man.plot_handler.plot_window)
+                plotted_windows[plot_fig_man.plot_handler.ws_name].append(
+                    plot_fig_man.plot_handler.plot_window
+                )
         return plotted_windows
 
     @classmethod

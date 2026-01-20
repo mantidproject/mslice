@@ -26,6 +26,7 @@ from .interfaces.main_presenter import MainPresenterInterface
 from .validation_decorators import require_main_presenter
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
+
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def __init__(self, workspace_view):
         # TODO add validation checks
@@ -160,7 +161,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             if workspace in plotted_windows:
                 for plt_window in plotted_windows[workspace]:
                     plt_window.close()
-
 
     def _rename_workspace(self):
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
