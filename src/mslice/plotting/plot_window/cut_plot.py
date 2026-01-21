@@ -382,6 +382,12 @@ class CutPlot(IPlot):
         if is_icut:  # disconnect quick options if icut
             self.manager.button_pressed_connected(False)
             self.manager.picking_connected(False)
+            self.plot_window.menu_intensity.setDisabled(is_icut)
+        else:
+            if self._cut_plotter_presenter.is_workspace_saved(self.ws_name):
+                self.plot_window.menu_intensity.setDisabled(False)
+            else:
+                self.plot_window.menu_intensity.setDisabled(True)
 
         self.plot_window.action_save_cut.setVisible(is_icut)
         self.plot_window.action_plot_options.setVisible(not is_icut)
@@ -392,7 +398,6 @@ class CutPlot(IPlot):
         self.plot_window.action_gen_script.setVisible(not is_icut)
         self.plot_window.action_gen_script_clipboard.setVisible(not is_icut)
         self.plot_window.action_waterfall.setVisible(not is_icut)
-        self.plot_window.menu_intensity.setDisabled(is_icut)
 
         self.plot_window.showNormal()
         self.plot_window.activateWindow()
