@@ -706,10 +706,15 @@ class CutPlot(IPlot):
         except RuntimeError:  # if cancel is clicked, go back to previous selection
             self._set_intensity_to_previous(previous_type)
             return False
+
         if not temperature_cached and field:
-            self._cut_plotter_presenter.set_sample_temperature_by_field(
-                ax, temp_value_raw, err.ws_name
-            )
+            try:
+                self._cut_plotter_presenter.set_sample_temperature_by_field(
+                    ax, temp_value_raw, err.ws_name
+                )
+            except (TypeError, ValueError):
+                self._set_intensity_to_previous(previous_type)
+                return False
         elif not temperature_cached:
             temp_value = get_sample_temperature_from_string(temp_value_raw)
             if temp_value is not None:
