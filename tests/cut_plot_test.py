@@ -15,7 +15,9 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plotter_manager = MagicMock()
         self.axes = MagicMock()
         self.canvas.figure.gca = MagicMock(return_value=self.axes)
-        self.cut_plot = CutPlot(self.plot_figure_manager, self.cut_plotter_manager, "workspace")
+        self.cut_plot = CutPlot(
+            self.plot_figure_manager, self.cut_plotter_manager, "workspace"
+        )
 
     def test_that_is_changed_works_correctly(self):
         self.cut_plot.default_options = {}
@@ -189,20 +191,30 @@ class CutPlotTest(unittest.TestCase):
         self.cut_plot.plot_window.reset_mock()
         self.cut_plot.set_is_icut(True)
 
-        self.cut_plot.plot_window.menu_intensity.setDisabled.assert_called_once_with(True)
+        self.cut_plot.plot_window.menu_intensity.setDisabled.assert_called_once_with(
+            True
+        )
 
     def test_set_is_icut_false_when_workspace_is_saved(self):
         self.cut_plot.plot_window.reset_mock()
         self.cut_plot._cut_plotter_presenter.is_workspace_saved.return_value = True
         self.cut_plot.set_is_icut(False)
 
-        self.cut_plot._cut_plotter_presenter.is_workspace_saved.assert_called_once_with(self.cut_plot.ws_name)
-        self.cut_plot.plot_window.menu_intensity.setDisabled.assert_called_once_with(False)
+        self.cut_plot._cut_plotter_presenter.is_workspace_saved.assert_called_once_with(
+            self.cut_plot.ws_name
+        )
+        self.cut_plot.plot_window.menu_intensity.setDisabled.assert_called_once_with(
+            False
+        )
 
     def test_set_is_icut_false_when_workspace_is_not_saved(self):
         self.cut_plot.plot_window.reset_mock()
         self.cut_plot._cut_plotter_presenter.is_workspace_saved.return_value = False
         self.cut_plot.set_is_icut(False)
 
-        self.cut_plot._cut_plotter_presenter.is_workspace_saved.assert_called_once_with(self.cut_plot.ws_name)
-        self.cut_plot.plot_window.menu_intensity.setDisabled.assert_called_once_with(True)
+        self.cut_plot._cut_plotter_presenter.is_workspace_saved.assert_called_once_with(
+            self.cut_plot.ws_name
+        )
+        self.cut_plot.plot_window.menu_intensity.setDisabled.assert_called_once_with(
+            True
+        )

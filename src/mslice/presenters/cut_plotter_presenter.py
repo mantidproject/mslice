@@ -14,7 +14,7 @@ from mslice.models.workspacemanager.workspace_algorithms import export_workspace
 from mslice.models.workspacemanager.workspace_provider import (
     add_workspace,
     get_workspace_handle,
-    workspace_exists
+    workspace_exists,
 )
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
