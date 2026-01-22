@@ -25,6 +25,7 @@ from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.axis import Axis
 from mslice.util.intensity_correction import IntensityType, IntensityCache
+from mslice.util.mantid.algorithm_wrapper import remove_from_ads
 import warnings
 from sys import float_info
 
@@ -41,6 +42,7 @@ class CutPlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._interactive_cut_cache = None
+        self._interactive_prev = None
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
         self._temp_cut_cache = []
         self._overplot_cache = {}
@@ -235,6 +237,10 @@ class CutPlotterPresenter(PresenterUtility):
             update_main=False,
             intensity_correction=intensity_correction,
         )
+        raw_name = cut._cut_ws.raw_ws.name()
+        if self._interactive_prev is not None and self._interactive_prev != raw_name:
+            remove_from_ads(self._interactive_prev)
+        self._interactive_prev = raw_name
         draw_interactive_cut(workspace)
         self.set_icut_cut(cut)
 
