@@ -239,7 +239,10 @@ class CutPlotterPresenter(PresenterUtility):
         )
         if cut._cut_ws is not None:
             raw_name = cut._cut_ws.raw_ws.name()
-            if self._interactive_prev is not None and self._interactive_prev != raw_name:
+            if (
+                self._interactive_prev is not None
+                and self._interactive_prev != raw_name
+            ):
                 remove_from_ads(self._interactive_prev)
             self._interactive_prev = raw_name
         draw_interactive_cut(workspace)
