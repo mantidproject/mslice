@@ -149,6 +149,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             export_workspace_to_ads(workspace)
 
     def _remove_selected_workspaces(self):
+        if len(self._workspaces_to_removed_from_ads) > 0:
+            self.remove_pending_remove_workspaces_from_ads()
         selected_workspaces = self._workspace_manager_view.get_workspace_selected()
         if not selected_workspaces:
             self._workspace_manager_view.error_select_one_or_more_workspaces()
@@ -156,7 +158,10 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         plotted_windows = GlobalFigureManager.get_plotted_windows_dict()
         for workspace in selected_workspaces:
             ws = get_workspace_handle(workspace)
-            self._workspaces_to_removed_from_ads.add(ws.name)
+            if workspace in plotted_windows:
+                self._workspaces_to_removed_from_ads.add(ws.name)
+            else:
+                remove_workspace_from_ads(ws.name)
             delete_workspace(workspace)
             self.update_displayed_workspaces()
             if workspace in plotted_windows:
@@ -297,3 +302,4 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def remove_pending_remove_workspaces_from_ads(self):
         for ws in self._workspaces_to_removed_from_ads:
             remove_workspace_from_ads(ws)
+        self._workspaces_to_removed_from_ads.clear()
