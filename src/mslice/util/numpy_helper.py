@@ -17,6 +17,10 @@ def apply_with_corrected_shape(method, shape_array, array, exception):
             array = array[:, np.newaxis]
         if array.shape[1] == 1:
             array = np.transpose(array)
+        if shape_array.shape[0] == (array.shape[0] - 1):
+            array = array[1:]
+        if array.shape[0] == (shape_array.shape[0] - 1):
+            shape_array = shape_array[1:]
         if (
             shape_array.shape[0] in array.shape and shape_array.shape[0] != 1
         ):  # array matches the wrong (leftmost) axis
