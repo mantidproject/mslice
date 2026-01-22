@@ -458,8 +458,13 @@ class CutPlotterPresenter(PresenterUtility):
     def store_icut_cut(self):
         cut = CutPlotterPresenter.get_icut_cut()
         if cut:
-            if cut.cut_ws.name in self._main_presenter._workspace_presenter._workspaces_to_removed_from_ads:
-                self._main_presenter._workspace_presenter._workspaces_to_removed_from_ads.remove(cut.cut_ws.name)
+            if (
+                cut.cut_ws.name
+                in self._main_presenter._workspace_presenter._workspaces_to_removed_from_ads
+            ):
+                self._main_presenter._workspace_presenter._workspaces_to_removed_from_ads.remove(
+                    cut.cut_ws.name
+                )
             add_workspace(cut.cut_ws, cut.workspace_name)
 
     @staticmethod

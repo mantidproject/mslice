@@ -17,7 +17,7 @@ def get_workspace_handle(workspace_name):
 
 def add_workspace(workspace, name):
     raw_name = workspace.raw_ws.name()
-    if raw_name.endswith('_HIDDEN'):
+    if raw_name.endswith("_HIDDEN"):
         RenameWorkspace(workspace.raw_ws, OutputWorkspace=raw_name[:-7])
     _loaded_workspaces[name] = workspace
 
