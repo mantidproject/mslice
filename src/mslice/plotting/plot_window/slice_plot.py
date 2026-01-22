@@ -577,7 +577,7 @@ class SlicePlot(IPlot):
             self.plot_window.action_flip_axis.setVisible(False)
             self._canvas.setCursor(Qt.ArrowCursor)
             self.icut.set_icut_intensity_category(self.intensity_type)
-            self.icut.store_icut_cut_upon_toggle_and_reset(False)
+            self.icut.store_icut_cut_upon_toggle_and_reset(True)
             self.plot_window.menu_intensity.setDisabled(False)
 
     def toggle_icut(self):
@@ -815,3 +815,6 @@ class SlicePlot(IPlot):
     def decrease_all_fonts(self):
         for p in self.plot_fonts_properties:
             setattr(self, p, getattr(self, p) - DEFAULT_FONT_SIZE_STEP)
+
+    def window_close_complete(self):
+        self._slice_plotter_presenter.window_close_complete()

@@ -182,3 +182,6 @@ class SlicePlotterPresenter(PresenterUtility):
 
     def workspace_selection_changed(self):
         pass
+
+    def window_close_complete(self):
+        self._main_presenter._workspace_presenter.remove_workspaces_from_ads()

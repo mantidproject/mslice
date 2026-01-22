@@ -968,3 +968,6 @@ class CutPlot(IPlot):
     def decrease_all_fonts(self):
         for p in self.plot_fonts_properties:
             setattr(self, p, getattr(self, p) - DEFAULT_FONT_SIZE_STEP)
+
+    def window_close_complete(self):
+        self._cut_plotter_presenter.window_close_complete()
