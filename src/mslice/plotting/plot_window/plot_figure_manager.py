@@ -80,7 +80,8 @@ class PlotFigureManagerQT(QtCore.QObject):
 
     def destroy(self):
         self.window.close()
-        self.plot_handler.window_close_complete()
+        if self.plot_handler is not None:
+            self.plot_handler.window_close_complete()
 
     def resize(self, width, height):
         self.window.resize(width, height)
