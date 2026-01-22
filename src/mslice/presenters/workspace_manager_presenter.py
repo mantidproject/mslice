@@ -156,10 +156,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         plotted_windows = GlobalFigureManager.get_plotted_windows_dict()
         for workspace in selected_workspaces:
             ws = get_workspace_handle(workspace)
-            # remove_workspace_from_ads(ws.name)
-
             self._workspaces_to_removed_from_ads.add(ws.name)
-
             delete_workspace(workspace)
             self.update_displayed_workspaces()
             if workspace in plotted_windows:
@@ -297,6 +294,6 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             rename_workspace(workspace, new_name)
             self.update_displayed_workspaces()
 
-    def remove_workspaces_from_ads(self):
+    def remove_pending_remove_workspaces_from_ads(self):
         for ws in self._workspaces_to_removed_from_ads:
             remove_workspace_from_ads(ws)
