@@ -455,10 +455,16 @@ class CutPlotterPresenter(PresenterUtility):
     def get_icut_cut():
         return CutPlotterPresenter._current_icut
 
-    @staticmethod
-    def store_icut_cut():
+    def store_icut_cut(self):
         cut = CutPlotterPresenter.get_icut_cut()
         if cut:
+            if (
+                cut.cut_ws.name
+                in self._main_presenter._workspace_presenter._workspaces_to_removed_from_ads
+            ):
+                self._main_presenter._workspace_presenter._workspaces_to_removed_from_ads.remove(
+                    cut.cut_ws.name
+                )
             add_workspace(cut.cut_ws, cut.workspace_name)
 
     @staticmethod
@@ -501,3 +507,7 @@ class CutPlotterPresenter(PresenterUtility):
             cat, IntensityType.SYMMETRISED, self.show_symmetrised.__name__
         )
         IntensityCache.cache_method(cat, IntensityType.GDOS, self.show_gdos.__name__)
+
+    def window_close_complete(self):
+        if self._main_presenter:
+            self._main_presenter.remove_pending_remove_workspaces_from_ads()

@@ -85,3 +85,7 @@ class MainPresenter(MainPresenterInterface):
 
     def get_cut_algorithm(self):
         return self._mainView.get_cut_algorithm()
+
+    def remove_pending_remove_workspaces_from_ads(self):
+        if self._workspace_presenter:
+            self._workspace_presenter.remove_pending_remove_workspaces_from_ads()
