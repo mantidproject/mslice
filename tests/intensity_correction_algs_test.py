@@ -209,8 +209,8 @@ class IntensityCorrectionAlgsTest(unittest.TestCase):
         ws_handle_mock.return_value = parent_workspace
 
         get_slice_axis_mock.side_effect = lambda a, b, c: b
-        compute_slice_mock.side_effect = (
-            lambda a, b, c, d, store_in_ADS: _tag_and_return_mock(a)
+        compute_slice_mock.side_effect = lambda a, b, c, d, store_in_ADS: (
+            _tag_and_return_mock(a)
         )
         slice_compute_gdos_mock.side_effect = lambda a, b, c, d, e: slice_compute_gdos(
             a, b, c, d, e
