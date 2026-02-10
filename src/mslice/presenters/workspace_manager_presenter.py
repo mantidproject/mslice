@@ -53,8 +53,10 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             Command.Add: self._add_workspaces,
             Command.Subtract: self._subtract_workspace,
             Command.SaveToADS: self._save_to_ads,
-            Command.ComposeWorkspace: lambda: self._workspace_manager_view._display_error(
-                "Please select a Compose action from the dropdown menu"
+            Command.ComposeWorkspace: lambda: (
+                self._workspace_manager_view._display_error(
+                    "Please select a Compose action from the dropdown menu"
+                )
             ),
             Command.Scale: self._scale_workspace,
             Command.Bose: lambda: self._scale_workspace(is_bose=True),
