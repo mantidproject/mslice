@@ -14,6 +14,7 @@ from mslice.models.workspacemanager.workspace_algorithms import export_workspace
 from mslice.models.workspacemanager.workspace_provider import (
     add_workspace,
     get_workspace_handle,
+    workspace_exists
 )
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -27,6 +28,7 @@ from mslice.models.axis import Axis
 from mslice.util.intensity_correction import IntensityType, IntensityCache
 import warnings
 from sys import float_info
+from mslice.util.mantid.algorithm_wrapper import remove_from_ads
 
 BRAGG_SIZE_ON_AXES = 0.15
 
@@ -41,6 +43,7 @@ class CutPlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._interactive_cut_cache = None
+        self._interactive_ws_names = None
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
         self._temp_cut_cache = []
         self._overplot_cache = {}
@@ -235,6 +238,12 @@ class CutPlotterPresenter(PresenterUtility):
             update_main=False,
             intensity_correction=intensity_correction,
         )
+        if cut.cut_ws is not None:
+            raw_name_in_ads = cut.workspace_raw_name
+            if self._interactive_ws_names is not None and self._interactive_ws_names[0] != raw_name_in_ads:
+                if not workspace_exists(self._interactive_ws_names[1]):
+                    remove_from_ads(self._interactive_ws_names[0])
+            self._interactive_ws_names = (raw_name_in_ads, cut.workspace_name)
         draw_interactive_cut(workspace)
         self.set_icut_cut(cut)
 
