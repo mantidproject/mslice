@@ -305,3 +305,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         for ws in self._workspaces_to_removed_from_ads:
             remove_workspace_from_ads(ws)
         self._workspaces_to_removed_from_ads.clear()
+
+    @property
+    def workspaces_to_removed_from_ads(self):
+        return self._workspaces_to_removed_from_ads

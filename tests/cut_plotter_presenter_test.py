@@ -239,6 +239,26 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.assertEqual(1, plot_cut_mock.call_count)
         self.assertEqual(1, draw_interact_mock.call_count)
 
+    @mock.patch("mslice.presenters.cut_plotter_presenter.remove_from_ads")
+    @mock.patch("mslice.presenters.cut_plotter_presenter.workspace_exists")
+    @mock.patch("mslice.presenters.cut_plotter_presenter.CutPlotterPresenter._plot_cut")
+    @mock.patch("mslice.presenters.cut_plotter_presenter.draw_interactive_cut")
+    def test_plot_interactive_cut_removes_hidden_ads_workspaces(
+            self, draw_interact_mock, plot_cut_mock, ws_exist_mock, remove_from_ads_mock
+    ):
+        cut = mock.MagicMock()
+        cut.cut_ws = mock.MagicMock()
+        cut.workspace_raw_name = "__MSLWorkspace_cut(5.264,6.001)_HIDDEN"
+        cut.workspace_name = "Workspace_cut(5.264, 6.001)"
+        ws_exist_mock.return_value = True
+        current_interactive_ws_name_pair = ("__previous_cut(1.264,3.001)_HIDDEN", "__previous_cut(1.264,3.001)")
+        self.cut_plotter_presenter.interactive_ws_names = current_interactive_ws_name_pair
+        self.cut_plotter_presenter.plot_interactive_cut("workspace", cut, False, False)
+
+        remove_from_ads_mock.assert_called_once_with(current_interactive_ws_name_pair[0])
+        self.assertEqual(self.cut_plotter_presenter.interactive_ws_names, (cut.workspace_raw_name, cut.workspace_name))
+
+
     @mock.patch("mslice.presenters.cut_plotter_presenter.cut_figure_exists")
     def test_set_is_icut(self, cut_figure_exists):
         cut_figure_exists.return_value = True
