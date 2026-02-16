@@ -93,9 +93,13 @@ class InteractiveCut(object):
             self._cut_plotter_presenter.set_is_icut(True)
             if self._is_initial_cut_plotter_presenter:
                 # First time we've plotted a 1D cut - get the true CutPlotterPresenter
-                interactive_hidden_ws_names = self._cut_plotter_presenter.interactive_ws_names
+                interactive_hidden_ws_names = (
+                    self._cut_plotter_presenter.interactive_ws_names
+                )
                 self._cut_plotter_presenter = GlobalFigureManager.get_active_figure().plot_handler._cut_plotter_presenter
-                self._cut_plotter_presenter.interactive_ws_names = interactive_hidden_ws_names
+                self._cut_plotter_presenter.interactive_ws_names = (
+                    interactive_hidden_ws_names
+                )
 
                 self._is_initial_cut_plotter_presenter = False
                 GlobalFigureManager.disable_make_current()
