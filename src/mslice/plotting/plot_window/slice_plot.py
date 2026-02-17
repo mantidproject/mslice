@@ -326,11 +326,15 @@ class SlicePlot(IPlot):
             norm = colors.Normalize(vmin, vmax)
 
         label = self.colorbar_label
+        label_size = self.colorbar_label_size
+        range_font_size = self.colorbar_range_font_size
         colormesh.colorbar.remove()
         colormesh.set_clim((vmin, vmax))
         colormesh.set_norm(norm)
         self._canvas.figure.colorbar(colormesh)
         self.colorbar_label = label
+        self.colorbar_label_size = label_size
+        self.colorbar_range_font_size = range_font_size
 
     def get_line_options(self, target):
         line_options = {
