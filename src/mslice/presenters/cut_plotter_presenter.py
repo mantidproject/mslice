@@ -14,6 +14,7 @@ from mslice.models.workspacemanager.workspace_algorithms import export_workspace
 from mslice.models.workspacemanager.workspace_provider import (
     add_workspace,
     get_workspace_handle,
+    workspace_exists,
 )
 import mslice.plotting.pyplot as plt
 from mslice.presenters.presenter_utility import PresenterUtility
@@ -27,6 +28,7 @@ from mslice.models.axis import Axis
 from mslice.util.intensity_correction import IntensityType, IntensityCache
 import warnings
 from sys import float_info
+from mslice.util.mantid.algorithm_wrapper import remove_from_ads
 
 BRAGG_SIZE_ON_AXES = 0.15
 
@@ -41,6 +43,7 @@ class CutPlotterPresenter(PresenterUtility):
     def __init__(self):
         self._main_presenter = None
         self._interactive_cut_cache = None
+        self._interactive_ws_names = None  # Tracks the name pair of hidden workspace in ADS and workspace in mslice
         self._cut_cache_dict = {}  # Dict of list of currently displayed cuts index by axes
         self._temp_cut_cache = []
         self._overplot_cache = {}
@@ -96,6 +99,7 @@ class CutPlotterPresenter(PresenterUtility):
             if self._main_presenter
             else True
         )
+
         plot_cut_impl(cut_ws, intensity_range, plot_over, legend, en_conversion)
         current_plot_intensity = self.get_current_plot_intensity()
         if (
@@ -235,8 +239,23 @@ class CutPlotterPresenter(PresenterUtility):
             update_main=False,
             intensity_correction=intensity_correction,
         )
+        self._remove_hidden_workspace_from_ads(cut)
         draw_interactive_cut(workspace)
         self.set_icut_cut(cut)
+
+    def _remove_hidden_workspace_from_ads(self, cut):
+        """Removes the _HIDDEN workspace from ADS that is related to the previous interactive cut"""
+        if cut.cut_ws is not None:
+            raw_name_in_ads = cut.workspace_raw_name
+            if (
+                self._interactive_ws_names is not None
+                and self._interactive_ws_names[0] != raw_name_in_ads
+            ):
+                if not workspace_exists(
+                    self._interactive_ws_names[1]
+                ) or self._interactive_ws_names[0].endswith("_HIDDEN"):
+                    remove_from_ads(self._interactive_ws_names[0])
+            self._interactive_ws_names = (raw_name_in_ads, cut.workspace_name)
 
     def hide_overplot_line(self, workspace, key):
         cache = self._overplot_cache
@@ -460,9 +479,9 @@ class CutPlotterPresenter(PresenterUtility):
         if cut:
             if (
                 cut.cut_ws.name
-                in self._main_presenter._workspace_presenter._workspaces_to_removed_from_ads
+                in self._main_presenter._workspace_presenter.workspaces_to_removed_from_ads
             ):
-                self._main_presenter._workspace_presenter._workspaces_to_removed_from_ads.remove(
+                self._main_presenter._workspace_presenter.workspaces_to_removed_from_ads.remove(
                     cut.cut_ws.name
                 )
             add_workspace(cut.cut_ws, cut.workspace_name)
@@ -511,3 +530,15 @@ class CutPlotterPresenter(PresenterUtility):
     def window_close_complete(self):
         if self._main_presenter:
             self._main_presenter.remove_pending_remove_workspaces_from_ads()
+
+    @property
+    def interactive_ws_names(self):
+        return self._interactive_ws_names
+
+    @interactive_ws_names.setter
+    def interactive_ws_names(self, interactive_ws_names_pair):
+        if len(interactive_ws_names_pair) != 2:
+            raise ValueError(
+                "The interactive workspaces name pair need to have two values to map from ADS to MSlice"
+            )
+        self._interactive_ws_names = interactive_ws_names_pair
