@@ -12,6 +12,7 @@ from mslice.util.mantid.mantid_algorithms import (
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.models.axis import Axis
 from mslice.models.labels import get_display_name
+from mslice.plotting.plot_window.quick_options import QuickError
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.helperfunctions import WrapWorkspaceAttribute
 
@@ -87,6 +88,10 @@ def save_nxspe(workspace, path):
         raise RuntimeError(
             "A Nexus cannot be saved as an NXSPE file - metadata may be lost."
         )
+
+    if len(workspace.axes) == 2:
+        _validate_nxspe_save(workspace=workspace)
+        return
 
     with WrapWorkspaceAttribute(workspace):
         SaveNXSPE(InputWorkspace=workspace, Filename=path)
@@ -281,3 +286,23 @@ def _to_absolute_path(filepath: str) -> str:
     if os.path.isabs(filepath):
         return filepath
     return os.path.join(ConfigService.getString("defaultsave.directory"), filepath)
+
+
+def _validate_nxspe_save(workspace):
+    """Validates if the nxspe file can be saved."""
+    q_check = np.allclose(
+        [workspace.axes[0].start, workspace.axes[0].end],
+        [workspace.limits["|Q|"][0], workspace.limits["|Q|"][1]],
+        atol=1e-4,
+        rtol=0,
+    )
+    e_check = np.allclose(
+        [workspace.axes[1].start, workspace.axes[1].end],
+        [workspace.limits["DeltaE"][0], workspace.limits["DeltaE"][1]],
+        atol=1e-4,
+        rtol=0,
+    )
+    if not (q_check and e_check):
+        QuickError(
+            "Cannot save a NXSPE file because the workspace limits and the axis limits don't match."
+        )
