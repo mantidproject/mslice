@@ -13,6 +13,7 @@ from mslice.models.workspacemanager.file_io import (
     _save_slice_to_ascii,
     get_save_directory,
     _to_absolute_path,
+    _validate_nxspe_save,
 )
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
@@ -142,3 +143,39 @@ class FileIOTest(unittest.TestCase):
         self.assertEqual(
             join(default_save_directory, rel_path), _to_absolute_path(rel_path)
         )
+
+    @patch("mslice.models.workspacemanager.file_io.QuickError")
+    def test_validate_nxspe_save(self, mock_quick_error):
+        cases = [
+            (0, 1, 0.2, 1, 0, 2, 0, 2),
+            (0, 1, 0, 0.8, 0, 2, 0, 2),
+            (0, 1, 0, 1, 0, 2, 0.3, 2),
+            (0, 1, 0, 1, 0, 2, 0, 1.5),
+            (0, 1, 0.2, 0.8, 0, 2, 0, 2),
+            (0, 1, 0, 1, 0, 2, 0.3, 1.5),
+            (0, 1, 0.2, 0.8, 0, 2, 0.3, 1.5),
+            (0, 1, 0.00011, 1, 0, 2, 0, 2),
+        ]
+
+        for (
+            limit_Q_start,
+            limit_Q_end,
+            axes_Q_start,
+            axes_Q_end,
+            limit_deltaE_start,
+            limit_deltaE_end,
+            axes_deltaE_start,
+            axes_deltaE_end,
+        ) in cases:
+            with self.subTest():
+                ws = MagicMock()
+                ws.axes = [
+                    Axis("Q", axes_Q_start, axes_Q_end, 0.2),
+                    Axis("DeltaE", axes_deltaE_start, axes_deltaE_end, 0.1),
+                ]
+                ws.limits = {
+                    "|Q|": [limit_Q_start, limit_Q_end],
+                    "DeltaE": [limit_deltaE_start, limit_deltaE_end],
+                }
+                _validate_nxspe_save(ws)
+        self.assertEqual(mock_quick_error.call_count, 8)
