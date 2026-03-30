@@ -22,7 +22,7 @@ classifiers = [
 dependencies = [
     "ipython",
     "numpy",
-    "matplotlib>=3.9.2",
+    "matplotlib>=3.10.0",
     "pre-commit",
     "qtpy",
 ]
