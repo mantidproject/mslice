@@ -273,7 +273,7 @@ class PlotWindow(QtWidgets.QMainWindow):
 
     def create_status_bar(self):
         self.statusbar = QtWidgets.QStatusBar(self)
-        self.stock_toolbar.message.connect(self.statusbar.showMessage)
+        self.stock_toolbar.set_message = self.statusbar.showMessage
         self.setStatusBar(self.statusbar)
 
     def flag_as_kept(self):
