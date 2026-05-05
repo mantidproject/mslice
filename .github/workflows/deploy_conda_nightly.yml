@@ -47,3 +47,53 @@ jobs:
         with:
           label: nightly
           token: ${{ secrets.ANACONDA_API_TOKEN }}
+
+      - name: Remove old nightly packages
+        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
+        env:
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+          ORGANIZATION: "mantid"
+          PACKAGE_NAME: "mslice"
+          LABEL: "nightly"
+          KEEP: "5"
+          DRY_RUN: "true"
+        run: |
+          ANACONDA_URL="https://api.anaconda.org/package/${ORGANIZATION}/${PACKAGE_NAME}"
+          RAW_RESULT=$(curl --max-time 5.5 -s ${ANACONDA_URL})
+          if [ -z "${RAW_RESULT}" ]; then
+            echo "Curl returned empty result"
+            exit 1
+          fi
+
+          FILES_TO_REMOVE=$(echo "${RAW_RESULT}" \
+            | jq -r '
+              [.files[] | select(.labels | index("'"${LABEL}"'"))]
+              | group_by(.version)
+              | map({
+                  version: .[0].version,
+                  upload_time: (map(.upload_time) | max),
+                  files: [.[].full_name]
+                })
+              | sort_by(.upload_time)
+              | reverse
+              | .['${KEEP}':]
+              | .[].files[]
+            ')
+
+          echo "dry-run=${DRY_RUN}"
+          num_removed=0
+          if [ -z "${FILES_TO_REMOVE}" ]; then
+            echo "No old files to remove from ${LABEL}"
+          else
+            echo "Removing old ${LABEL} files"
+            for FILE in ${FILES_TO_REMOVE}; do
+              echo "Removing ${FILE}"
+              if [ "${DRY_RUN}" = "false" ]; then
+                anaconda -t ${ANACONDA_TOKEN} remove --force "${FILE}"
+              fi
+              num_removed=$((num_removed+1))
+            done
+          fi
+          echo "num_removed=${num_removed}"
+
+
