@@ -25,7 +25,8 @@ runs:
       conda create -n build-env
       conda init
       conda activate build-env
-      mamba install -c conda-forge mamba conda-build anaconda-client conda-verify boa
+      mamba install -c conda-forge mamba conda-build anaconda-client conda-verify conda-libmamba-solver
+      conda config --set solver libmamba
       conda config --add channels mantid/label/nightly
       conda config --add channels mantid
 
@@ -34,5 +35,5 @@ runs:
     run: |
       conda activate build-env
       conda config --set anaconda_upload yes
-      conda mambabuild --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
+      conda build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
       grep "Upload complete" upload.log
