@@ -99,8 +99,8 @@ method = "minor"
 
 [tool.versioningit.format]
 distance = "{base_version}.dev{distance}"
-dirty = "{base_version}+uncommitted"
-distance-dirty = "{base_version}.dev{distance}+uncommitted"
+dirty = "{base_version}.dev0"
+distance-dirty = "{base_version}.dev{distance}"
 
 [tool.versioningit.write]
 file = "src/mslice/__init__.py"
