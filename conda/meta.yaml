@@ -20,24 +20,19 @@ build:
 
 requirements:
   build:
-    - python {{ python }}
-    - qtpy
-    - setuptools {{ setuptools }}
-    - versioningit
+  - setuptools {{ setuptools }}
+  - versioningit
 
   run:
   - python
-  - pip
   - mantid
   - mantidqt
   - ipython
   - matplotlib
   - numpy
-  - pre-commit
   - pyqt
   - qtconsole
   - qtpy
-  - setuptools
 
 test:
   imports:
