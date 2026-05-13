@@ -1,4 +1,5 @@
 name: Build and upload conda package
+description: Build and upload conda package
 
 inputs:
   repository:
@@ -13,18 +14,18 @@ inputs:
     description: 'Anaconda API Token'
     required: true
 
-description: Build and upload conda package
 runs:
   using: "composite"
+  steps:
 
-- name: Build package
-  shell: bash -l {0}
-  run: |
-    conda config --set solver libmamba
-    mamba install -y -c conda-forge conda-build anaconda-client
-    conda build -c mantid/label/nightly -c mantid \
-#      --user ${{ inputs.repository }} \
-#      --token ${{ inputs.token }} \
-#      --label ${{ inputs.label }} \
-      $GITHUB_WORKSPACE/conda |& tee upload.log
-    grep "Upload complete" upload.log
+    - name: Build package
+      shell: bash -l {0}
+      run: |
+        conda config --set solver libmamba
+        mamba install -y -c conda-forge conda-build anaconda-client
+        conda build -c mantid/label/nightly -c mantid \
+    #      --user ${{ inputs.repository }} \
+    #      --token ${{ inputs.token }} \
+    #      --label ${{ inputs.label }} \
+          $GITHUB_WORKSPACE/conda |& tee upload.log
+        grep "Upload complete" upload.log
