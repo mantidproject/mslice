@@ -25,7 +25,7 @@ runs:
       shell: bash -l {0}
       run: |
         conda config --set solver libmamba
-        conda build \
+        conda-build \
           -c mantid/label/nightly \
           -c mantid \
           $GITHUB_WORKSPACE/conda
