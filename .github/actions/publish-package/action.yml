@@ -22,9 +22,12 @@ runs:
       run: |
         conda config --set solver libmamba
         mamba install -y -c conda-forge conda-build anaconda-client
-        conda build -c mantid/label/nightly -c mantid \
-    #      --user ${{ inputs.repository }} \
-    #      --token ${{ inputs.token }} \
-    #      --label ${{ inputs.label }} \
-          $GITHUB_WORKSPACE/conda #|& tee upload.log
-    #    grep "Upload complete" upload.log
+        conda build \
+          -c mantid/label/nightly \
+          -c mantid \
+          $GITHUB_WORKSPACE/conda
+        #  --user ${{ inputs.repository }} \
+        #  --token ${{ inputs.token }} \
+        #  --label ${{ inputs.label }} \
+        # |& tee upload.log
+        # grep "Upload complete" upload.log
