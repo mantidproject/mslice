@@ -30,6 +30,6 @@ runs:
   - name: Build package
     shell: bash -l {0}
     run: |
-      conda config --set anaconda_upload yes
+      conda config --set anaconda_upload no
       conda build --user ${{ inputs.repository }} --token ${{ inputs.token }} --label ${{ inputs.label }} $GITHUB_WORKSPACE/conda |& tee upload.log
       grep "Upload complete" upload.log
