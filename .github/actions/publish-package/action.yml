@@ -28,4 +28,4 @@ runs:
     #      --token ${{ inputs.token }} \
     #      --label ${{ inputs.label }} \
           $GITHUB_WORKSPACE/conda |& tee upload.log
-        grep "Upload complete" upload.log
+    #    grep "Upload complete" upload.log
