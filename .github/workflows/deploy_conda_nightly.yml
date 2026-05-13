@@ -1,11 +1,11 @@
 name: Deploy MSlice nightly
 
-on: push
-#  workflow_run:
-#    workflows: ["MSlice nightly build"]
-#    branches: [main]
-#    types:
-#      - completed
+on:
+  workflow_run:
+    workflows: ["MSlice nightly build"]
+    branches: [main]
+    types:
+      - completed
 
 jobs:
   build_conda_and_upload:
@@ -19,8 +19,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-#          tags: true
-#          ref: main
+          tags: true
+          ref: main
 
       - name: Check for changes since last build
         run: |
@@ -31,7 +31,7 @@ jobs:
           echo "headTagged=$(test -z $(git describe --exact-match --tags) && echo false || echo true)" >> $GITHUB_ENV
 
       - name: Setup Miniconda
-#        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
+        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
         uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
@@ -42,14 +42,14 @@ jobs:
           auto-activate-base: false
 
       - name: Build MSlice nightly conda package
-#        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
+        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
         uses: ./.github/actions/publish-package
         with:
           label: nightly
           token: ${{ secrets.ANACONDA_API_TOKEN }}
 
       - name: Remove old nightly packages
-#        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
+        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
         env:
           ANACONDA_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
           ORGANIZATION: "mantid"

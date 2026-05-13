@@ -29,8 +29,8 @@ runs:
           -c mantid/label/nightly \
           -c mantid \
           $GITHUB_WORKSPACE/conda
-        #  --user ${{ inputs.repository }} \
-        #  --token ${{ inputs.token }} \
-        #  --label ${{ inputs.label }} \
-        # |& tee upload.log
-        # grep "Upload complete" upload.log
+          --user ${{ inputs.repository }} \
+          --token ${{ inputs.token }} \
+          --label ${{ inputs.label }} \
+         |& tee upload.log
+         grep "Upload complete" upload.log
