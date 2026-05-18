@@ -285,12 +285,13 @@ def scale_workspaces(workspaces, scale_factor=None, from_temp=None, to_temp=None
             propagate_properties(ws, result)
 
 
-def save_workspaces(workspaces, path, save_name, extension):
+def save_workspaces(workspaces, path, save_name, extension, parent=None):
     """
     :param workspaces: list of workspaces to save
     :param path: directory to save to
     :param save_name: name to save the file as (plus file extension). Pass none to use workspace name
     :param extension: file extension (such as .txt)
+    :param parent: parent widget for dialogs raised during save validation
     """
     if extension == ".nxs":
         save_method = save_nexus
@@ -316,7 +317,9 @@ def save_workspaces(workspaces, path, save_name, extension):
         if len(save_names) != len(workspaces):
             save_names = [None] * len(workspaces)
     for workspace, save_name_single in zip(workspaces, save_names):
-        _save_single_ws(workspace, save_name_single, save_method, path, extension)
+        _save_single_ws(
+            workspace, save_name_single, save_method, path, extension, parent=parent
+        )
 
 
 def export_workspace_to_ads(workspace):
@@ -334,12 +337,12 @@ def remove_workspace_from_ads(workspacename):
     remove_from_ads(workspacename)
 
 
-def _save_single_ws(workspace, save_name, save_method, path, extension):
+def _save_single_ws(workspace, save_name, save_method, path, extension, parent=None):
     save_as = save_name if save_name is not None else str(workspace) + extension
     full_path = os.path.join(str(path), save_as)
     if isinstance(workspace, str):
         workspace = get_workspace_handle(workspace)
-    save_method(workspace, full_path)
+    save_method(workspace, full_path, parent=parent)
 
 
 def get_axis_from_dimension(workspace, id):
