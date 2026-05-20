@@ -1,6 +1,5 @@
 [build-system]
-requires = ["setuptools == 75.1.0",
-            "wheel",
+requires = ["setuptools >=80.9.0,<81",
             "versioningit",]
 build-backend = "setuptools.build_meta"
 
@@ -13,9 +12,10 @@ authors = [
 description = "Visualise and slice data from Mantid"
 readme = "README.md"
 requires-python = ">=3.12"
+license = { text = "GPL-3.0-or-later" }
 classifiers = [
     "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
 ]
@@ -23,23 +23,24 @@ dependencies = [
     "ipython",
     "numpy",
     "matplotlib>=3.10.0",
-    "pre-commit",
     "qtpy",
 ]
 
 [project.optional-dependencies]
-tests_require = [
+tests = [
     "coverage",
-    "mock>=2.0",
     "pytest",
+]
+dev = [
+    "pre-commit",
 ]
 
 [project.urls]
 "Homepage" = "https://mantidproject.github.io/mslice/"
 "Bug Tracker" = "https://github.com/mantidproject/mslice/issues"
 
-[project.entry-points]
-console_scripts = { mslice = "mslice.app:main" }
+[project.scripts]
+mslice = "mslice.app:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -98,8 +99,8 @@ method = "minor"
 
 [tool.versioningit.format]
 distance = "{base_version}.dev{distance}"
-dirty = "{base_version}+uncommitted"
-distance-dirty = "{base_version}.dev{distance}+uncommitted"
+dirty = "{base_version}.dev0"
+distance-dirty = "{base_version}.dev{distance}"
 
 [tool.versioningit.write]
 file = "src/mslice/__init__.py"
