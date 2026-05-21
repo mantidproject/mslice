@@ -67,7 +67,7 @@ jobs:
 
           FILES_TO_REMOVE=$(echo "${RAW_RESULT}" \
             | jq -r '
-              [.files[] | select((.labels | index("'"${LABEL}"'")) and (.labels | index("mains") | not))]
+              [.files[] | select((.labels | index("'"${LABEL}"'")) and (.labels | index("main") | not))]
               | group_by(.version)
               | map({
                   version: .[0].version,
