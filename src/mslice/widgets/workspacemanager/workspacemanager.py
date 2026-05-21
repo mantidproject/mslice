@@ -124,7 +124,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         for i in range(current_list.count()):
             item = current_list.item(i).text()
             items.append(item)
-        dialog = QInputDialog()
+        dialog = QInputDialog(self)
         dialog.setWindowTitle("Add Workspace")
         dialog.setLabelText("Choose a workspace to add:")
         dialog.setOptions(QInputDialog.UseListViewForComboBoxItems)
@@ -176,7 +176,7 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         return -1
 
     def get_workspace_to_load_path(self):
-        paths = QFileDialog.getOpenFileNames()
+        paths = QFileDialog.getOpenFileNames(self)
         return (
             paths[0]
             if isinstance(paths, tuple)

@@ -127,6 +127,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 multiple_files=len(selected_workspaces) > 1,
                 save_as_image=False,
                 default_ext=extension,
+                parent=self._workspace_manager_view,
             )
         except RuntimeError as e:
             if str(e) == "dialog cancelled":
@@ -138,7 +139,13 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             self._workspace_manager_view.error_invalid_save_path()
             return
         try:
-            save_workspaces(selected_workspaces, save_directory, save_name, extension)
+            save_workspaces(
+                selected_workspaces,
+                save_directory,
+                save_name,
+                extension,
+                parent=self._workspace_manager_view,
+            )
         except RuntimeError as e:
             self._workspace_manager_view._display_error(str(e))
 

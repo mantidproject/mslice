@@ -193,7 +193,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         printer = QtPrintSupport.QPrinter()
         printer.setResolution(300)
         printer.setOrientation(QtPrintSupport.QPrinter.Landscape)
-        print_dialog = QtPrintSupport.QPrintDialog(printer)
+        print_dialog = QtPrintSupport.QPrintDialog(printer, self.window)
         if print_dialog.exec_():
             pixmap_image = QtWidgets.QWidget.grab(self.canvas)
             page_size = printer.pageRect()
@@ -216,7 +216,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         return resolution
 
     def save_plot(self):
-        file_path, save_name, ext = get_save_directory(save_as_image=True)
+        file_path, save_name, ext = get_save_directory(
+            save_as_image=True, parent=self.window
+        )
         if file_path is None:
             return
         if hasattr(self.plot_handler, "ws_list"):
@@ -227,7 +229,7 @@ class PlotFigureManagerQT(QtCore.QObject):
             else:
                 workspaces = [self.plot_handler.ws_name]
         try:
-            save_workspaces(workspaces, file_path, save_name, ext)
+            save_workspaces(workspaces, file_path, save_name, ext, parent=self.window)
         except RuntimeError as e:
             if str(e) == "unrecognised file extension":
                 supported_image_types = list(
@@ -255,7 +257,7 @@ class PlotFigureManagerQT(QtCore.QObject):
                 raise RuntimeError(e)
         except KeyError:  # Could be case of interactive cuts when the workspace has not been saved yet
             workspace = self.plot_handler.save_icut()
-            save_workspaces([workspace], file_path, save_name, ext)
+            save_workspaces([workspace], file_path, save_name, ext, parent=self.window)
 
     def save_image(self, path, resolution=300):
         self.canvas.figure.savefig(path, dpi=resolution)
@@ -277,7 +279,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         )
 
     def error_box(self, message):
-        error_box = QtWidgets.QMessageBox()
+        error_box = QtWidgets.QMessageBox(self.window)
         error_box.setWindowTitle("Error")
         error_box.setIcon(QtWidgets.QMessageBox.Warning)
         error_box.setText(message)

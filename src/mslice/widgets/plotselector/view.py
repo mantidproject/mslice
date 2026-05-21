@@ -641,7 +641,10 @@ class PlotSelectorView(QWidget):
         """
         # Returns a tuple containing the filename and extension
         absolute_path = QFileDialog.getSaveFileName(
-            caption="Select filename for exported plot", filter="*{}".format(extension)
+            self,
+            "Select filename for exported plot",
+            "",
+            "*{}".format(extension),
         )
         return absolute_path[0]
 
@@ -654,7 +657,7 @@ class PlotSelectorView(QWidget):
         # in the directory on Linux, but using the non-native dialog
         # is not very pleasant on Windows or Mac
         directory = QFileDialog.getExistingDirectory(
-            caption="Select folder for exported plots"
+            self, "Select folder for exported plots"
         )
         return directory
 
