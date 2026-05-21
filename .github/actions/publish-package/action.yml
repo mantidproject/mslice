@@ -28,7 +28,7 @@ runs:
         conda-build \
           -c mantid/label/nightly \
           -c mantid \
-          $GITHUB_WORKSPACE/conda
+          $GITHUB_WORKSPACE/conda \
           --user ${{ inputs.repository }} \
           --token ${{ inputs.token }} \
           --label ${{ inputs.label }} \
