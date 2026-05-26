@@ -16,10 +16,10 @@ jobs:
 
     steps:
       - name: Checkout MSlice
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          tags: true
+          fetch-tags: true
           ref: main
 
       - name: Check for changes since last build
