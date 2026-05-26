@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout MSlice
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3

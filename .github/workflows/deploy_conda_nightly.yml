@@ -1,12 +1,11 @@
 name: Deploy MSlice nightly
 
 on: 
-  push
-#  workflow_run: 
-#    workflows: ["MSlice nightly build"]
-#    branches: [main]
-#    types:
-#      - completed
+  workflow_run: 
+    workflows: ["MSlice nightly build"]
+    branches: [main]
+    types:
+      - completed
 
 jobs:
   build_conda_and_upload:
@@ -17,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout MSlice
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -43,7 +42,7 @@ jobs:
           auto-activate-base: false
 
       - name: Build MSlice nightly conda package
-        #if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
+        if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
         uses: ./.github/actions/publish-package
         with:
           label: nightly
