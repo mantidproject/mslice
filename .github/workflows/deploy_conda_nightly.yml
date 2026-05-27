@@ -22,6 +22,9 @@ jobs:
           fetch-tags: true
           ref: main
 
+      - name: Verify tag
+        run: git describe --tags
+
       - name: Check for changes since last build
         run: |
           echo "recentCommits=$(test -z $(git log --since="yesterday" -1 --format=%h) && echo false || echo true)" >> $GITHUB_ENV
