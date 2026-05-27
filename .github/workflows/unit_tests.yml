@@ -28,6 +28,9 @@ jobs:
         run: |
           mamba install -c mantid/label/nightly mantid mantidqt
 
+      - name: Verify tag
+        run: git describe --tags
+
       - name: Run Tests and Coverage
         run: |
           xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum coverage run -m pytest
