@@ -11,6 +11,7 @@ package:
 
 source:
   git_url: ../
+  git_rev: main
 
 build:
   noarch: python
