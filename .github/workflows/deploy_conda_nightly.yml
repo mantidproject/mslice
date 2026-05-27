@@ -32,14 +32,13 @@ jobs:
 
       - name: Setup Miniconda
         if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4.0.1
         with:
           miniforge-version: latest
           channels: conda-forge, mantid
           conda-remove-defaults: "true"
           activate-environment: mslice-env
           environment-file: environment.yml
-          auto-activate-base: false
 
       - name: Build MSlice nightly conda package
         if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
