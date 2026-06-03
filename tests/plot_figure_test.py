@@ -52,7 +52,10 @@ class PlotFigureTest(unittest.TestCase):
             get_slice_cache.return_value = slice_cache
             get_handle.return_value = workspace
             fg.save_plot()
-            save_nexus.assert_called_once_with(workspace, file_name[1])
+            get_save_dir.assert_called_once_with(save_as_image=True, parent=fg.window)
+            save_nexus.assert_called_once_with(
+                workspace, file_name[1], parent=fg.window
+            )
             get_slice_cache.assert_called_once()
 
     def test_save_slice_matlab_gdos(self):
@@ -81,5 +84,8 @@ class PlotFigureTest(unittest.TestCase):
             get_handle.return_value = workspace
             fg.plot_handler.intensity_type = IntensityType.GDOS
             fg.save_plot()
-            save_matlab.assert_called_once_with(workspace, file_name[1])
+            get_save_dir.assert_called_once_with(save_as_image=True, parent=fg.window)
+            save_matlab.assert_called_once_with(
+                workspace, file_name[1], parent=fg.window
+            )
             get_slice_cache.assert_called_once()

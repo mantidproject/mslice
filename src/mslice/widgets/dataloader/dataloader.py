@@ -142,7 +142,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
 
     def get_workspace_efixed(self, workspace, hasMultipleWS=False, default_value=None):
         Ef, applyToAll, success = EfInputDialog.getEf(
-            workspace, hasMultipleWS, default_value
+            workspace, hasMultipleWS, default_value, parent=self
         )
         if not success:
             raise ValueError("Fixed final energy not given")
