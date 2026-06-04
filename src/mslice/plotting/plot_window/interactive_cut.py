@@ -174,7 +174,7 @@ class InteractiveCut(object):
     def window_closing(self):
         if not workspace_exists(self._ws_title):
             # Workspace has been removed (e.g. ADS cleared); skip storing the cut
-            # workspace so we don't access an invalidated Mantid workspace proxy.
+            # workspace .
             self.store_icut_cut_upon_toggle_and_reset(store=False)
         self.slice_plot.toggle_interactive_cuts()
         self.slice_plot.plot_window.action_interactive_cuts.setChecked(False)

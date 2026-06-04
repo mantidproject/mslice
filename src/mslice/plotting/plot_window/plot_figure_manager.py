@@ -30,7 +30,7 @@ def release_active_interactive_cuts_on_slice_plots() -> None:
 
 
 def disable_icut_buttons_for_missing_workspaces() -> None:
-    """Disable icut toolbar buttons on slice plots whose backing workspace no longer exists."""
+    """Disable icut toolbar buttons on slice plots whose underlying workspace no longer exists."""
     from mslice.models.workspacemanager.workspace_provider import workspace_exists
 
     for each_figure in GlobalFigureManager.all_figures():
