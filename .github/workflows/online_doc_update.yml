@@ -15,11 +15,11 @@ jobs:
         sudo apt-get install texlive-latex-base texlive-latex-recommended \
             texlive-fonts-recommended texlive-latex-extra dvipng
     - id: deployment
-      uses: sphinx-notes/pages@v3.6
+      uses: sphinx-notes/pages@v3
       with:
         publish: false
         documentation_path: ./docs/source
-    - uses: peaceiris/actions-gh-pages@v4.1
+    - uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ${{ steps.deployment.outputs.artifact }}
