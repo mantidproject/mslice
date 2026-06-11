@@ -1,5 +1,7 @@
 from .busy import show_busy
-from mslice.plotting.plot_window.plot_figure_manager import disable_icut_buttons_for_missing_workspaces
+from mslice.plotting.plot_window.plot_figure_manager import (
+    disable_icut_buttons_for_missing_workspaces,
+)
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.mslice_ads_observer import MSliceADSObserver

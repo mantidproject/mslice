@@ -5,7 +5,10 @@ from mslice.models.cut.cut import Cut
 from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.units import EnergyUnits
 from mslice.models.workspacemanager.workspace_algorithms import get_limits
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
+from mslice.models.workspacemanager.workspace_provider import (
+    get_workspace_handle,
+    workspace_exists,
+)
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.plotting.pyplot import GlobalFigureManager
 

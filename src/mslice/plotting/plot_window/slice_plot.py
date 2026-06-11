@@ -11,7 +11,10 @@ from mslice.models.colors import to_hex, name_to_color
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle, workspace_exists
+from mslice.models.workspacemanager.workspace_provider import (
+    get_workspace_handle,
+    workspace_exists,
+)
 from mslice.plotting.plot_window.cachable_input_dialog import QCacheableInputDialog
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
