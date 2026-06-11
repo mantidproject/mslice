@@ -1,4 +1,7 @@
 from .busy import show_busy
+from mslice.plotting.plot_window.plot_figure_manager import (
+    disable_icut_buttons_for_missing_workspaces,
+)
 from mslice.widgets.workspacemanager.command import Command
 from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.mslice_ads_observer import MSliceADSObserver
@@ -288,11 +291,13 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
             workspace = workspace[5:]
         delete_workspace(workspace)
         self.update_displayed_workspaces()
+        disable_icut_buttons_for_missing_workspaces()
 
     def clear_handle(self):
         for workspace in get_workspace_names():
             delete_workspace(workspace)
         self.update_displayed_workspaces()
+        disable_icut_buttons_for_missing_workspaces()
 
     def rename_handle(self, workspace, new_name):
         if new_name is None:

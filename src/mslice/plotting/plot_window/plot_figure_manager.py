@@ -29,6 +29,19 @@ def release_active_interactive_cuts_on_slice_plots() -> None:
             action_icuts.setChecked(False)
 
 
+def disable_icut_buttons_for_missing_workspaces() -> None:
+    """Disable icut toolbar buttons on slice plots whose underlying workspace no longer exists."""
+    from mslice.models.workspacemanager.workspace_provider import workspace_exists
+
+    for each_figure in GlobalFigureManager.all_figures():
+        plot_handler = each_figure.plot_handler
+        if isinstance(plot_handler, SlicePlot) and not workspace_exists(
+            plot_handler.ws_name
+        ):
+            plot_handler.plot_window.action_save_cut.setEnabled(False)
+            plot_handler.plot_window.action_flip_axis.setEnabled(False)
+
+
 class PlotFigureManagerQT(QtCore.QObject):
     """Manage a Qt window along with the keep/make current status"""
 

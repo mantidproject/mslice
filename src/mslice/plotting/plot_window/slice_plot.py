@@ -11,7 +11,10 @@ from mslice.models.colors import to_hex, name_to_color
 from mslice.models.units import get_sample_temperature_from_string
 from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
 from mslice.presenters.quick_options_presenter import quick_options, check_latex
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import (
+    get_workspace_handle,
+    workspace_exists,
+)
 from mslice.plotting.plot_window.cachable_input_dialog import QCacheableInputDialog
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
@@ -557,6 +560,10 @@ class SlicePlot(IPlot):
         self._canvas.draw()
 
     def toggle_interactive_cuts(self):
+        if not self.icut and not workspace_exists(self.ws_name):
+            # Workspace has been removed (e.g. ADS cleared); reset the button and bail out
+            self.plot_window.action_interactive_cuts.setChecked(False)
+            return
         self.toggle_icut_button()
         self.toggle_icut()
 
@@ -571,6 +578,7 @@ class SlicePlot(IPlot):
             self.plot_window.action_keep.setEnabled(False)
             self.plot_window.action_make_current.setEnabled(False)
             self.plot_window.action_flip_axis.setVisible(True)
+            self.plot_window.action_flip_axis.setEnabled(True)
             self.plot_window.menu_intensity.setDisabled(True)
         else:
             self.manager.picking_connected(True)

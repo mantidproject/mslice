@@ -5,7 +5,10 @@ from mslice.models.cut.cut import Cut
 from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.units import EnergyUnits
 from mslice.models.workspacemanager.workspace_algorithms import get_limits
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.models.workspacemanager.workspace_provider import (
+    get_workspace_handle,
+    workspace_exists,
+)
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.plotting.pyplot import GlobalFigureManager
 
@@ -64,6 +67,8 @@ class InteractiveCut(object):
         self._rect_pos_cache = rect_pos
 
     def plot_cut(self, x1, x2, y1, y2, store=False):
+        if not workspace_exists(self._ws_title):
+            return
         if x2 > x1 and y2 > y1:
             ax, integration_start, integration_end = self.get_cut_parameters(
                 (x1, y1), (x2, y2)
@@ -104,6 +109,7 @@ class InteractiveCut(object):
                 self._is_initial_cut_plotter_presenter = False
                 GlobalFigureManager.disable_make_current()
                 self.slice_plot.plot_window.action_save_cut.setVisible(True)
+                self.slice_plot.plot_window.action_save_cut.setEnabled(True)
             self._cut_plotter_presenter.store_icut(self)
 
     def get_cut_parameters(self, pos1, pos2):
@@ -140,6 +146,8 @@ class InteractiveCut(object):
             self.rect.update()
 
     def save_cut(self):
+        if not workspace_exists(self._ws_title):
+            return
         x1, x2, y1, y2 = self.rect.extents
         self.plot_cut(x1, x2, y1, y2, store=True)
         self.update_workspaces()
@@ -167,6 +175,10 @@ class InteractiveCut(object):
         self.plot_cut(*self.rect.extents)
 
     def window_closing(self):
+        if not workspace_exists(self._ws_title):
+            # Workspace has been removed (e.g. ADS cleared); skip storing the cut
+            # workspace .
+            self.store_icut_cut_upon_toggle_and_reset(store=False)
         self.slice_plot.toggle_interactive_cuts()
         self.slice_plot.plot_window.action_interactive_cuts.setChecked(False)
 
