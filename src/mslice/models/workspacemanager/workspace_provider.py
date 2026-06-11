@@ -16,7 +16,12 @@ def get_workspace_handle(workspace_name):
 
 
 def add_workspace(workspace, name):
-    raw_name = workspace.raw_ws.name()
+    try:
+        raw_name = workspace.raw_ws.name()
+    except RuntimeError:
+        # Mantid invalidates workspace proxies when ADS is cleared (e.g. mtd.clear()).
+        # There is nothing useful to add, so bail out silently.
+        return
     if raw_name.endswith("_HIDDEN"):
         RenameWorkspace(workspace.raw_ws, OutputWorkspace=raw_name[:-7])
     _loaded_workspaces[name] = workspace
