@@ -31,7 +31,6 @@ requirements:
   - ipython
   - matplotlib
   - numpy
-  - pyqt
   - qtconsole
   - qtpy
 
