@@ -16,6 +16,8 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          fetch-tags: true
+          ref: main
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v4.0.1
