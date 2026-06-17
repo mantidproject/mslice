@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import (
+from qtpy.QtWidgets import (
     QComboBox,
     QFormLayout,
     QLabel,
@@ -8,8 +8,9 @@ from PyQt5.QtWidgets import (
     QSizePolicy,
     QVBoxLayout,
     QHBoxLayout,
+    QDialog,
+    QCheckBox,
 )
-from qtpy.QtWidgets import QDialog, QCheckBox
 
 
 class QCacheableInputDialog(QDialog):
