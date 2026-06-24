@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: mslice
-  version: '${{ version | default("0.0.0") }}'  
+  version: '${{ version | default("0.0.0") }}'
 
 package:
   name: ${{ name }}
@@ -13,7 +13,7 @@ source:
 
 build:
   noarch: python
-  script: 
+  script:
     - python -m pip install --ignore-installed .
   python:
     entry_points:
