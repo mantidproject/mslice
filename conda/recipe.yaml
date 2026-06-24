@@ -1,0 +1,47 @@
+schema_version: 1
+
+context:
+  name: mslice
+  version: '${{ version | default("0.0.0") }}'  
+
+package:
+  name: ${{ name }}
+  version: ${{ version }}
+
+source:
+  path: ../
+
+build:
+  noarch: python
+  script: 
+    - python -m pip install --ignore-installed .
+  python:
+    entry_points:
+      - mslice = mslice.app:main
+
+requirements:
+  host:
+    - python ${{ python }}
+    - pip
+    - setuptools ${{ setuptools }}
+    - versioningit
+
+  run:
+    - python ${{ python }}
+    - mantid
+    - mantidqt
+    - ipython
+    - matplotlib
+    - numpy
+    - qtconsole
+    - qtpy
+
+tests:
+  - python:
+      imports:
+        - mslice
+
+about:
+  homepage: https://github.com/mantidproject/mslice
+  license: GPL-3.0-or-later
+  summary: MSlice is a tool for visualizing cuts and slices of inelastic neutron scattering data.

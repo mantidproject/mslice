@@ -19,18 +19,25 @@ runs:
   steps:
     - name: Install build tools
       shell: bash -l {0}
-      run: mamba install -y -c conda-forge conda-build anaconda-client
+      run: mamba install -y -c conda-forge rattler-build anaconda-client versioningit
 
     - name: Build package
       shell: bash -l {0}
       run: |
-        conda config --set solver libmamba
-        conda-build \
+        rattler-build build \
+          --recipe conda/recipe.yaml \
+          -c conda-forge \
           -c mantid/label/nightly \
           -c mantid \
-          $GITHUB_WORKSPACE/conda \
-          --user ${{ inputs.repository }} \
-          --token ${{ inputs.token }} \
-          --label ${{ inputs.label }} \
-         |& tee upload.log
-         grep "Upload complete" upload.log
+          --variant "version=$(python -m versioningit)" \
+          --output-dir output
+
+    - name: Upload package to Anaconda.org
+      shell: bash -l {0}
+      env:
+        ANACONDA_API_KEY: ${{ inputs.token }}
+      run: |
+        rattler-build upload anaconda \
+          --owner ${{ inputs.repository }} \
+          --channel ${{ inputs.label }} \
+          output/**/*.conda
