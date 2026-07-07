@@ -307,7 +307,8 @@ class PlotFigureManagerQT(QtCore.QObject):
             self.plot_handler.on_newplot(plot_over, ws_name)
 
     def move_window(self, x, y):
-        center = QtWidgets.QDesktopWidget().screenGeometry().center()
+        screen = QtWidgets.QApplication.primaryScreen()
+        center = screen.geometry().center()
         self.window.move(int(center.x() - x), int(center.y() - y))
 
     def get_window_title(self):
