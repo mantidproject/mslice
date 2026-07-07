@@ -192,15 +192,27 @@ class PlotFigureManagerQT(QtCore.QObject):
         self.canvas.draw()
 
     def plot_clicked(self, event):
+        last_fignum, disable_make_curr_after = (
+            self.report_as_current_and_return_previous_status()
+        )
         if event.dblclick or event.button == 3:
             self.plot_handler.plot_clicked(event.x, event.y)
+        self.reset_current_figure_as_previous(last_fignum, disable_make_curr_after)
 
     def object_clicked(self, event):
+        last_fignum, disable_make_curr_after = (
+            self.report_as_current_and_return_previous_status()
+        )
         if event.mouseevent.dblclick or event.mouseevent.button == 3:
             self.plot_handler.object_clicked(event.artist)
+        self.reset_current_figure_as_previous(last_fignum, disable_make_curr_after)
 
     def _plot_options(self):
+        last_fignum, disable_make_curr_after = (
+            self.report_as_current_and_return_previous_status()
+        )
         self.plot_handler.plot_options()
+        self.reset_current_figure_as_previous(last_fignum, disable_make_curr_after)
 
     def print_plot(self):
         printer = QtPrintSupport.QPrinter()
