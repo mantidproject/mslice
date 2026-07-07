@@ -110,8 +110,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
     def sort_files(self, column):
         self._sort_column = column
         self.table_view.sortByColumn(
-            column,
-            Qt.DescendingOrder if column % 2 else Qt.AscendingOrder
+            column, Qt.DescendingOrder if column % 2 else Qt.AscendingOrder
         )  # descending order for size/modified, ascending for name/type
 
     def go_to_home(self):

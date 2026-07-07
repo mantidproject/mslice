@@ -18,6 +18,4 @@ def get_backend_module():
     :return: A reference to the appropriate backend module
     """
     # Pick the relevant QtAgg one for the version we are running
-    return importlib.import_module(
-        "matplotlib.backends.backend_qtagg"
-    )
+    return importlib.import_module("matplotlib.backends.backend_qtagg")

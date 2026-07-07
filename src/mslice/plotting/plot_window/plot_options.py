@@ -40,7 +40,9 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.y_max_validator = LineEditDoubleValidator(self.lneYMax, 0.0)
         self.lneYMax.setValidator(self.y_max_validator)
         two_postv_ints_regex = QRegularExpression(r"^\s*[1-9][0-9]?$")
-        self.all_fonts_size_validator = QRegularExpressionValidator(two_postv_ints_regex)
+        self.all_fonts_size_validator = QRegularExpressionValidator(
+            two_postv_ints_regex
+        )
         self.allFntSz.setValidator(self.all_fonts_size_validator)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
