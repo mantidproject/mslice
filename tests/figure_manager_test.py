@@ -127,6 +127,25 @@ class CurrentFigureTest(unittest.TestCase):
         self.assertTrue(fig1 == mock_figures[0])
         self.assertTrue(fig2 == mock_figures[1])
 
+    def test_new_figure_is_issued_when_all_figures_are_kept_and_active_figure_is_retrieved(
+        self, mock_figure_class
+    ):
+        mock_figure = [mock.Mock(), mock.Mock()]
+        mock_figure_class.side_effect = mock_figure
+
+        # GlobalFigureManager creates a new figure if all open figures are marked as kept. This can create an empty plot when trying
+        # to alter a plot and all plots are marked as kept. This is prevented by setting the figure changing its properties as current.
+        fig1 = GlobalFigureManager.get_active_figure()
+        GlobalFigureManager.set_figure_as_kept(1)
+        self.assertTrue(GlobalFigureManager._active_figure is None)
+        fig2 = GlobalFigureManager.get_active_figure()
+        self.assertTrue(fig1 != fig2)
+
+        GlobalFigureManager.set_figure_as_kept(2)
+        self.assertTrue(GlobalFigureManager._active_figure is None)
+        GlobalFigureManager.set_figure_as_current(1)
+        self.assertTrue(fig1 == GlobalFigureManager.get_active_figure())
+
     def test_close_non_existant_window_fail(self, mock_figure_class):
         mock_figures = [mock.Mock()]
         mock_figure_class.side_effect = mock_figures
