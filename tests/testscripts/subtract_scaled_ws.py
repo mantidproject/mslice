@@ -1,8 +1,14 @@
+import pathlib
 import mslice.cli as mc
 import mslice.plotting.pyplot as plt
 
+
+TEST_FILE_PATH = (
+    pathlib.Path(__file__).resolve().parents[1] / "testdata" / "MAR21335_Ei60meV.nxs"
+)
+
 MAR21335_Ei60meV = mc.Load(
-    Filename=r"tests/testdata/MAR21335_Ei60meV.nxs", OutputWorkspace="MAR21335_Ei60meV"
+    Filename=str(TEST_FILE_PATH), OutputWorkspace="MAR21335_Ei60meV"
 )
 MAR21335_Ei60meV_scaled = mc.Scale(
     InputWorkspace=MAR21335_Ei60meV, OutputWorkspace="MAR21335_Ei60meV_scaled"
