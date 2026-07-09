@@ -19,8 +19,12 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath(os.path.join("../..", "src")))
 
-# from mslice import version_info  # noqa: E402
-version_info = (2, 15, 0)
+from versioningit import get_version
+
+release_str = get_version("../..")
+
+major, minor = release_str.split(".")[:2]
+version_info = (int(major), int(minor), 0)
 
 # -- General configuration ------------------------------------------------
 

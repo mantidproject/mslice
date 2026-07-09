@@ -35,6 +35,7 @@ var/
 .installed.cfg
 *.egg
 .flake8
+output/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

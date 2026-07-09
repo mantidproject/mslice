@@ -33,7 +33,7 @@ requirements:
     - ipython
     - matplotlib
     - numpy
-    - qtconsole
+    - qtconsole-base
     - qtpy
 
 tests:

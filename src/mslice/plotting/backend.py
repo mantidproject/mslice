@@ -1,9 +1,6 @@
 # system imports
 import importlib
 
-# local imports
-from qtpy import QT_VERSION
-
 
 def get_canvas_and_toolbar_cls():
     """
@@ -21,6 +18,4 @@ def get_backend_module():
     :return: A reference to the appropriate backend module
     """
     # Pick the relevant QtAgg one for the version we are running
-    return importlib.import_module(
-        "matplotlib.backends.backend_qt{}agg".format(QT_VERSION[0])
-    )
+    return importlib.import_module("matplotlib.backends.backend_qtagg")

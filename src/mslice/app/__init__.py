@@ -6,7 +6,6 @@ import sys
 
 import mslice.util.mantid.init_mantid  # noqa: F401
 from mslice.util.mantid import in_mantid
-from qtpy import QT_VERSION
 from mslice.util.qt.qapp import create_qapp_if_required
 
 
@@ -24,7 +23,7 @@ def main():
     qapp_ref = create_qapp_if_required()
     import matplotlib as mpl
 
-    mpl.use("Qt{}Agg".format(QT_VERSION[0]))
+    mpl.use("qtagg")
     show_gui()
     return qapp_ref.exec_()
 

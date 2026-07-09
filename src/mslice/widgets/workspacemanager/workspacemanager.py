@@ -1,4 +1,3 @@
-from qtpy import QT_VERSION
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -155,18 +154,11 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
 
     def set_workspace_selected(self, index):
         current_list = self.current_list()
-        if QT_VERSION.startswith("5"):
-            for item_index in range(current_list.count()):
-                current_list.item(item_index).setSelected(False)
-            for this_index in index if hasattr(index, "__iter__") else [index]:
-                if this_index >= 0:
-                    current_list.item(this_index).setSelected(True)
-        else:
-            for item_index in range(current_list.count()):
-                current_list.setItemSelected(current_list.item(item_index), False)
-            for this_index in index if hasattr(index, "__iter__") else [index]:
-                if this_index >= 0:
-                    current_list.setItemSelected(current_list.item(this_index), True)
+        for item_index in range(current_list.count()):
+            current_list.item(item_index).setSelected(False)
+        for this_index in index if hasattr(index, "__iter__") else [index]:
+            if this_index >= 0:
+                current_list.item(this_index).setSelected(True)
 
     def get_workspace_index(self, ws_name):
         current_list = self.current_list()

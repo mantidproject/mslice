@@ -98,6 +98,6 @@ default-tag = "0.0.0"
 method = "minor"
 
 [tool.versioningit.format]
-distance = "{base_version}.dev{distance}"
-dirty = "{base_version}.dev0"
-distance-dirty = "{base_version}.dev{distance}"
+distance = "{next_version}.dev{distance}"
+dirty = "{next_version}.dev0+uncommitted"
+distance-dirty = "{next_version}.dev{distance}+uncommitted"

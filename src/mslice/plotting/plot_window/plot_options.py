@@ -4,8 +4,8 @@ import qtpy.QtWidgets as QtWidgets
 from qtpy.QtCore import Signal
 from mslice.models.colors import named_cycle_colors, color_to_name
 from mslice.util.qt import load_ui
-from qtpy.QtGui import QRegExpValidator
-from qtpy.QtCore import QRegExp
+from qtpy.QtGui import QRegularExpressionValidator
+from qtpy.QtCore import QRegularExpression
 from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
 from mantidqt.icons import get_icon
 
@@ -39,8 +39,10 @@ class PlotOptionsDialog(QtWidgets.QDialog):
         self.lneYMin.setValidator(self.y_min_validator)
         self.y_max_validator = LineEditDoubleValidator(self.lneYMax, 0.0)
         self.lneYMax.setValidator(self.y_max_validator)
-        two_postv_ints_regex = QRegExp(r"^\s*[1-9][0-9]?$")
-        self.all_fonts_size_validator = QRegExpValidator(two_postv_ints_regex)
+        two_postv_ints_regex = QRegularExpression(r"^\s*[1-9][0-9]?$")
+        self.all_fonts_size_validator = QRegularExpressionValidator(
+            two_postv_ints_regex
+        )
         self.allFntSz.setValidator(self.all_fonts_size_validator)
 
         self.lneFigureTitle.editingFinished.connect(self.titleEdited)
