@@ -67,6 +67,14 @@ Optionally, you can also install pre-commit locally to ensure formatting issues 
 pre-commit install
 ```
 
+**Develop using Pixi**
+You can now also develop MSlice using a pixi environment. This is a beta feature.
+First install pixi in your OS using the [installations instructions](https://pixi.prefix.dev/latest/installation/).
+After, cloning this repository, install the two pixi environments using `pixi install`. The development environment is called
+**mantidnightly**. Commands can be run in the environment using `pixi run -e mantidnightly <command>`.
+Use the [Pycharm integration instructions](https://pixi.prefix.dev/latest/integration/editor/jetbrains/). Pixi can also be integrated
+with other IDEs.
+
 ### Running tests
 
 To run the unit tests in the MSlice repository, you can run them from PyCharm or from the command line.
