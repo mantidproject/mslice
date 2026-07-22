@@ -1,0 +1,41 @@
+name: MSlice nightly build (Conda)
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout MSlice
+        uses: actions/checkout@v6
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v4.0.1
+        with:
+          miniforge-version: latest
+          channels: conda-forge, mantid
+          conda-remove-defaults: "true"
+          activate-environment: mslice-env
+          environment-file: environment.yml
+
+      - name: Install Mantid
+        run: |
+          mamba install -c mantid/label/nightly mantid mantidqt
+
+      - name: Run Tests and Coverage
+        run: |
+          xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum coverage run -m pytest
+
+      - name: Report Coverage and send to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN : ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: |
+          coveralls
+          coverage report

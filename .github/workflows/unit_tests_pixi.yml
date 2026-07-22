@@ -1,4 +1,4 @@
-name: MSlice unit tests
+name: MSlice unit tests (Pixi)
 
 on:
   push:

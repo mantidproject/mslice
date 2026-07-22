@@ -1,8 +1,9 @@
-name: MSlice nightly build
+name: MSlice nightly build (Pixi)
 
 on:
   schedule:
     - cron: '0 2 * * *'
+  workflow_dispatch:
 
 jobs:
   test:

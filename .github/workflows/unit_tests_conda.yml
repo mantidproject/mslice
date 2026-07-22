@@ -1,0 +1,45 @@
+name: MSlice unit tests (Conda)
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: pull-request-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout MSlice
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v4.0.1
+        with:
+          miniforge-version: latest
+          channels: conda-forge, mantid
+          conda-remove-defaults: "true"
+          activate-environment: mslice-env
+          environment-file: environment.yml
+
+      - name: Install Mantid
+        run: |
+          mamba install -c mantid/label/nightly mantid mantidqt
+
+      - name: Run Tests and Coverage
+        run: |
+          xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum coverage run -m pytest
+
+      - name: Report Coverage
+        run: |
+          coverage report
