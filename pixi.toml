@@ -23,6 +23,7 @@ coverage = "*"
 coveralls = "*"
 mock = "*"
 pytest = "*"
+qtconsole = "*"
 
 [feature.mantidnightly]
 channels = [
