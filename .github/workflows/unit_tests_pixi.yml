@@ -7,7 +7,7 @@ on:
       - main
 
 concurrency:
-  group: pull-request-${{ github.event.pull_request.number }}
+  group: pull-request-${{ github.event.pull_request.number }}-pixi
   cancel-in-progress: true
 
 jobs:
