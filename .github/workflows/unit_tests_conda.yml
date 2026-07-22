@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   test:
+    if: github.repository_owner == 'mantidproject'
     runs-on: ubuntu-latest
     defaults:
       run:
