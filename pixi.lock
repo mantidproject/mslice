@@ -569,6 +569,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/qhull-2020.2-h420ef59_5.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/qscintilla2-2.14.1-py312h14105d7_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/qt-main-5.15.15-he8aa932_8.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/qtconsole-5.7.2-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/qtconsole-base-5.7.2-pyha770c72_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/qtpy-2.4.3-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/quickbayes-1.0.2-pyhd8ed1ab_0.conda
@@ -789,6 +790,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/qscintilla2-2.14.1-py312hca0710b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qt-main-5.15.15-hc95f6a6_8.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qt6-main-6.11.1-pl5321hfcac499_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/qtconsole-5.7.2-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/qtconsole-base-5.7.2-pyha770c72_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/qtpy-2.4.3-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/quickbayes-1.0.2-pyhd8ed1ab_0.conda

@@ -31,11 +31,19 @@ channels = [
     "mantid/label/nightly",
 ]
 
+[feature.mantidnightly.target.linux-64.dependencies]
+qtconsole-base = "*"
+
+[feature.mantidnightly.target.win-64.dependencies]
+qtconsole = "*"
+
+[feature.mantidnightly.target.osx-arm64.dependencies]
+qtconsole = "*"
+
 [feature.mantidnightly.dependencies]
 mantid = "*"
 mantidqt = "*"
 pre-commit = "*"
-qtconsole-base = "*"
 
 [feature.mantidnightly.tasks]
 test = """
