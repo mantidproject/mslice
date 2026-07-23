@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: push-on-main-doc-build
+  cancel-in-progress: true
+
 jobs:
   pages:
     runs-on: ubuntu-latest
