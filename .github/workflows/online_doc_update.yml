@@ -4,13 +4,9 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
 
 concurrency:
-  group: pull-request-${{ github.event.pull_request.number }}-doc-build
+  group: push-on-main-doc-build
   cancel-in-progress: true
 
 jobs:
