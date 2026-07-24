@@ -31,21 +31,13 @@ channels = [
     "mantid/label/nightly",
 ]
 
-[feature.mantidnightly.target.linux-64.dependencies]
-qtconsole-base = "*"
-
-[feature.mantidnightly.target.win-64.dependencies]
-qtconsole = "*"
-
-[feature.mantidnightly.target.osx-arm64.dependencies]
-qtconsole = "*"
-
 [feature.mantidnightly.dependencies]
 mantid = "*"
 mantidqt = "*"
 pre-commit = "*"
+qtconsole-base = "*"
 
-[feature.mantidnightly.tasks]
+[feature.mslice-env.tasks]
 test = """
 xvfb-run --server-args='-screen 0 640x480x24' --auto-servernum \
 coverage run -m pytest

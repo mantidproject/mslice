@@ -7,7 +7,7 @@ channels:
 dependencies:
   - mantid
   - mantidqt
-  - qtconsole
+  - qtconsole-base
   - coverage
   - mock
   - pre-commit
