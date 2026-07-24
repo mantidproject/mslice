@@ -40,4 +40,4 @@ coverage report
 [environments]
 mslice-env = ["mslice"] # Equivalent to environment.yml
 mslice-env-test = ["mslice", "mantid", "test"]
-mantidnightly = ["mantid", "developer"] # Equivalent to mslice-developer.yml
+mslice-developer = ["mantid", "developer"] # Equivalent to mslice-developer.yml
