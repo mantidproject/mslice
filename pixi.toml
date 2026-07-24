@@ -19,6 +19,8 @@ channels = [
 ]
 
 [feature.mslice-env.dependencies]
+mantid = "*"
+mantidqt = "*"
 pyqt = "*"
 qtpy = "*"
 ipython = "*"
