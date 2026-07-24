@@ -1,8 +1,10 @@
 [workspace]
 name = "mslice"
-channels = ["conda-forge"]
-# when editing local copy of mslice-env and mantidnightly, will need to temporarily remove
-# the platforms that you aren't working on
+channels = [
+    "conda-forge",
+    "mantid",
+    "mantid/label/nightly",
+]
 platforms = ["linux-64", "win-64", "osx-arm64"]
 
 [dependencies]
@@ -10,36 +12,22 @@ python = "3.12.*"
 coverage = "*"
 mock = "*"
 pytest = "*"
+qtconsole-base = "*"
 
-[feature.mslice-env]
-channels = [
-    "conda-forge",
-    "mantid",
-    "mantid/label/nightly",
-]
-
-[feature.mslice-env.dependencies]
-mantid = "*"
-mantidqt = "*"
+[feature.mslice.dependencies]
 pyqt = "*"
 qtpy = "*"
 ipython = "*"
 coveralls = "*"
-qtconsole = "*"
 
-[feature.mantidnightly]
-channels = [
-    "conda-forge",
-    "mantid/label/nightly",
-]
-
-[feature.mantidnightly.dependencies]
+[feature.mantid.dependencies]
 mantid = "*"
 mantidqt = "*"
-pre-commit = "*"
-qtconsole-base = "*"
 
-[feature.mslice-env.tasks]
+[feature.developer.dependencies]
+pre-commit = "*"
+
+[feature.test.tasks]
 test = """
 xvfb-run --server-args='-screen 0 640x480x24' --auto-servernum \
 coverage run -m pytest
@@ -50,8 +38,6 @@ coverage report
 """
 
 [environments]
-# Equivalent to environment.yml
-mslice-env = ["mslice-env"]
-
-# Equivalent to mslice-developer.yml
-mantidnightly = ["mantidnightly"]
+mslice-env = ["mslice"] # Equivalent to environment.yml
+mslice-env-test = ["mslice", "mantid", "test"]
+mantidnightly = ["mantid", "developer"] # Equivalent to mslice-developer.yml

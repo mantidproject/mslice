@@ -1,4 +1,4 @@
-name: MSlice nightly build (Conda)
+name: MSlice nightly build
 
 on:
   schedule:
