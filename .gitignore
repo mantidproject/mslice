@@ -103,6 +103,8 @@ ENV/
 # Data files
 *.nxs
 *.nxspe
+# Keep this tracked test file so the conda build tree stays clean (mantidproject/mslice#1210):
+!tests/testdata/MAR21335_Ei60meV.nxs
 
 # Diff files
 *.diff
