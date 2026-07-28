@@ -299,7 +299,7 @@ class QuickLabelTest(unittest.TestCase):
         quick_label_options_view.return_value = self.view
         type(self.view).label = PropertyMock(return_value="$\a$")
         _set_label_options(self.view, self.target)
-        assert quickerror.called
+        quickerror.assert_called_once_with("Invalid LaTeX in label string", self.view)
         assert not self.target.set_text.called
 
 

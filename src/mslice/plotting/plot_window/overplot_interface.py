@@ -75,7 +75,7 @@ def toggle_overplot_line(
 
 def cif_file_powder_line(plot_handler, plotter_presenter, checked):
     if checked:
-        cif_path = QFileDialog().getOpenFileName(
+        cif_path = QFileDialog.getOpenFileName(
             plot_handler.plot_window, "Open CIF file", "/home", "Files (*.cif)"
         )
         cif_path = str(cif_path[0]) if isinstance(cif_path, tuple) else str(cif_path)

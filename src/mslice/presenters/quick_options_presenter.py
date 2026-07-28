@@ -91,7 +91,7 @@ def _set_label(view, target):
     if check_latex(label):
         target.set_text(label)
     else:
-        QuickError("Invalid LaTeX in label string")
+        QuickError("Invalid LaTeX in label string", view)
 
 
 def _set_font_size(view, target):

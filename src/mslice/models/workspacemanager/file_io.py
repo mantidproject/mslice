@@ -20,19 +20,22 @@ import numpy as np
 from scipy.io import savemat
 
 
-def get_save_directory(multiple_files=False, save_as_image=False, default_ext=None):
+def get_save_directory(
+    multiple_files=False, save_as_image=False, default_ext=None, parent=None
+):
     """
     Show file dialog so user can choose where to save.
     :param multiple_files: boolean - whether more than one file is being saved
     :param save_as_image: boolean - whether to allow saving as a .png/pdf
     :param default_ext: file extension that is selected by default
+    :param parent: parent widget for the save dialog
     :return: path to save directory, name to save the file as, file format extension
     :raises: RuntimeError if dialog is cancelled
     """
     if multiple_files:
-        return QFileDialog.getExistingDirectory(), None, default_ext
+        return QFileDialog.getExistingDirectory(parent), None, default_ext
     else:
-        file_dialog = QFileDialog()
+        file_dialog = QFileDialog(parent)
         file_dialog.setAcceptMode(QFileDialog.AcceptSave)
 
         filter = "Nexus (*.nxs);; NXSPE (*.nxspe);; Ascii (*.txt);; Matlab (*.mat)"
@@ -63,7 +66,7 @@ def get_save_directory(multiple_files=False, save_as_image=False, default_ext=No
             return None, None, None
 
 
-def save_nexus(workspace, path):
+def save_nexus(workspace, path, parent=None):
     if isinstance(workspace, HistogramWorkspace):
         _save_histogram_workspace(workspace, path)
         return
@@ -78,7 +81,7 @@ def save_nexus(workspace, path):
         SaveNexus(InputWorkspace=workspace, Filename=path)
 
 
-def save_nxspe(workspace, path):
+def save_nxspe(workspace, path, parent=None):
     if isinstance(workspace, HistogramWorkspace):
         _save_histogram_workspace(workspace, path)
         return
@@ -90,14 +93,14 @@ def save_nxspe(workspace, path):
         )
 
     if len(workspace.axes) == 2:
-        _validate_nxspe_save(workspace=workspace)
+        _validate_nxspe_save(workspace=workspace, parent=parent)
         return
 
     with WrapWorkspaceAttribute(workspace):
         SaveNXSPE(InputWorkspace=workspace, Filename=path)
 
 
-def save_ascii(workspace, path):
+def save_ascii(workspace, path, parent=None):
     if workspace.is_slice:
         _save_slice_to_ascii(workspace, path)
     else:
@@ -107,7 +110,7 @@ def save_ascii(workspace, path):
             SaveAscii(InputWorkspace=workspace, Filename=path, WriteSpectrumID=False)
 
 
-def save_matlab(workspace, path):
+def save_matlab(workspace, path, parent=None):
     labels = {}
     if isinstance(workspace, HistogramWorkspace):
         if workspace.is_slice:
@@ -288,7 +291,7 @@ def _to_absolute_path(filepath: str) -> str:
     return os.path.join(ConfigService.getString("defaultsave.directory"), filepath)
 
 
-def _validate_nxspe_save(workspace):
+def _validate_nxspe_save(workspace, parent=None):
     """Validates if the nxspe file can be saved."""
     q_check = np.allclose(
         [workspace.axes[0].start, workspace.axes[0].end],
@@ -304,5 +307,6 @@ def _validate_nxspe_save(workspace):
     )
     if not (q_check and e_check):
         QuickError(
-            "Cannot save a NXSPE file because the workspace limits and the axis limits don't match."
+            "Cannot save a NXSPE file because the workspace limits and the axis limits don't match.",
+            parent=parent,
         )

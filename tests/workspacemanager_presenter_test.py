@@ -81,10 +81,17 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(
-            multiple_files=False, save_as_image=False, default_ext=".nxs"
+            multiple_files=False,
+            save_as_image=False,
+            default_ext=".nxs",
+            parent=self.view,
         )
         save_ws_mock.assert_called_once_with(
-            [workspace_to_save], path_to_save_to, "file1", ".nxs"
+            [workspace_to_save],
+            path_to_save_to,
+            "file1",
+            ".nxs",
+            parent=self.view,
         )
 
         # Test save failure
@@ -118,11 +125,18 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         save_dir_mock.return_value = (path_to_save_to, workspace_to_save, ".txt")
         self.presenter.notify(Command.SaveSelectedWorkspaceAscii)
         save_dir_mock.assert_called_once_with(
-            multiple_files=False, save_as_image=False, default_ext=".txt"
+            multiple_files=False,
+            save_as_image=False,
+            default_ext=".txt",
+            parent=self.view,
         )
         self.view.get_workspace_selected.assert_called_once_with()
         save_ws_mock.assert_called_once_with(
-            [workspace_to_save], path_to_save_to, "file1", ".txt"
+            [workspace_to_save],
+            path_to_save_to,
+            "file1",
+            ".txt",
+            parent=self.view,
         )
 
     @patch("mslice.presenters.workspace_manager_presenter.get_save_directory")
@@ -139,10 +153,17 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.SaveSelectedWorkspaceMatlab)
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(
-            multiple_files=False, save_as_image=False, default_ext=".mat"
+            multiple_files=False,
+            save_as_image=False,
+            default_ext=".mat",
+            parent=self.view,
         )
         save_ws_mock.assert_called_once_with(
-            [workspace_to_save], path_to_save_to, "file1", ".mat"
+            [workspace_to_save],
+            path_to_save_to,
+            "file1",
+            ".mat",
+            parent=self.view,
         )
 
     @patch("mslice.presenters.workspace_manager_presenter.get_save_directory")
@@ -174,10 +195,13 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.presenter.notify(Command.SaveSelectedWorkspaceNexus)
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(
-            multiple_files=True, save_as_image=False, default_ext=".nxs"
+            multiple_files=True,
+            save_as_image=False,
+            default_ext=".nxs",
+            parent=self.view,
         )
         save_ws_mock.assert_called_with(
-            ["file1", "file2"], path_to_save_to, None, ".nxs"
+            ["file1", "file2"], path_to_save_to, None, ".nxs", parent=self.view
         )
 
     @patch("mslice.presenters.workspace_manager_presenter.get_save_directory")
@@ -211,7 +235,10 @@ class WorkspaceManagerPresenterTest(unittest.TestCase):
         self.view.get_workspace_selected.assert_called_once_with()
         self.view.get_workspace_selected.assert_called_once_with()
         save_dir_mock.assert_called_once_with(
-            multiple_files=False, save_as_image=False, default_ext=".nxs"
+            multiple_files=False,
+            save_as_image=False,
+            default_ext=".nxs",
+            parent=self.view,
         )
         self.view.error_invalid_save_path.assert_called_once()
         save_ws_mock.assert_not_called()

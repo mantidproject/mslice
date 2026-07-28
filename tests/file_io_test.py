@@ -27,10 +27,14 @@ class FileIOTest(unittest.TestCase):
 
     @patch("mslice.models.workspacemanager.file_io.QFileDialog")
     def test_save_directory_default(self, file_dialog_mock):
+        parent = Mock()
         file_dialog_mock.return_value = self.mock_dialog
         self.mock_dialog.selectedFilter.return_value = "Nexus (*.nxs)"
 
-        directory, file_name, extension = get_save_directory(default_ext=".nxs")
+        directory, file_name, extension = get_save_directory(
+            default_ext=".nxs", parent=parent
+        )
+        file_dialog_mock.assert_called_once_with(parent)
         self.mock_dialog.setNameFilter.assert_called_once_with(
             "Nexus (*.nxs);; NXSPE (*.nxspe);; Ascii (*.txt);; Matlab (*.mat)"
         )
@@ -56,11 +60,13 @@ class FileIOTest(unittest.TestCase):
 
     @patch("mslice.models.workspacemanager.file_io.QFileDialog")
     def test_save_directory_multiple(self, file_dialog_mock):
+        parent = Mock()
         file_dialog_mock.getExistingDirectory = Mock(return_value=self.path)
 
         directory, file_name, extension = get_save_directory(
-            multiple_files=True, default_ext=".nxs"
+            multiple_files=True, default_ext=".nxs", parent=parent
         )
+        file_dialog_mock.getExistingDirectory.assert_called_once_with(parent)
         self.assertEqual(directory, self.path)
         self.assertEqual(file_name, None)
         self.assertEqual(extension, ".nxs")
@@ -177,5 +183,5 @@ class FileIOTest(unittest.TestCase):
                     "|Q|": [limit_Q_start, limit_Q_end],
                     "DeltaE": [limit_deltaE_start, limit_deltaE_end],
                 }
-                _validate_nxspe_save(ws)
+                _validate_nxspe_save(ws, parent=None)
         self.assertEqual(mock_quick_error.call_count, 8)
