@@ -36,7 +36,7 @@ def errorbar(axes, workspace, *args, **kwargs):
     _check_workspace_name(workspace)
     workspace = get_workspace_handle(workspace)
     if not isinstance(workspace, HistogramWorkspace):
-        raise RuntimeError("Incorrect workspace type.")
+        raise TypeError("Incorrect workspace type.")
 
     presenter = get_cut_plotter_presenter()
 
@@ -48,7 +48,7 @@ def errorbar(axes, workspace, *args, **kwargs):
     label = workspace.name if label is None else label
     en_conversion_allowed = kwargs.pop("en_conversion", True)
 
-    cut_axis, int_axis = tuple(workspace.axes)
+    cut_axis, _ = tuple(workspace.axes)
     # Checks that current cut has consistent units with previous
     if plot_over:
         cached_cuts = presenter.get_cache(axes)
@@ -70,7 +70,7 @@ def errorbar(axes, workspace, *args, **kwargs):
                         f"Wrong energy unit for cut. Expected {cached_cuts[0].cut_axis.e_unit}, got {cut_axis.e_unit}"
                     )
 
-    axesfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
+    axesfunctions.errorbar(axes, workspace.raw_ws, *args, label=label, **kwargs)
 
     axes.autoscale()
     if intensity_min is not None or intensity_max is not None:
@@ -168,7 +168,7 @@ def pcolormesh(axes, workspace, *args, **kwargs):
         plot_handler.intensity = True
         plot_handler.intensity_type = intensity_type
         plot_handler.temp = temperature
-        plot_handler.temp_dependent = True if temperature is not None else False
+        plot_handler.temp_dependent = temperature is not None
         plot_handler._slice_plotter_presenter._slice_cache[
             plot_handler.ws_name
         ].colourmap = kwargs.get("cmap")

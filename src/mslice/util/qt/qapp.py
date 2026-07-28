@@ -46,5 +46,4 @@ def create_qapp_if_required():
 
 
 def mainloop():
-    global qApp
     qApp.exec_()

@@ -421,7 +421,7 @@ def sample_temperature(ws_name, sample_temp_fields):
             sample_temp = ws.getExperimentInfo(0).run().getLogData(field_name).value
     if isinstance(sample_temp, str):
         sample_temp = get_sample_temperature_from_string(sample_temp)
-    elif isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
+    elif isinstance(sample_temp, (np.ndarray, list)):
         sample_temp = np.mean(sample_temp)
     else:
         float(sample_temp)
@@ -429,7 +429,4 @@ def sample_temperature(ws_name, sample_temp_fields):
 
 
 def _is_momentum_or_two_theta(units):
-    if is_momentum(units) or is_twotheta(units):
-        return True
-    else:
-        return False
+    return is_momentum(units) or is_twotheta(units)

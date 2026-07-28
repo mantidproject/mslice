@@ -113,7 +113,7 @@ class MSliceAxes(Axes):
                 plot_handler.waterfall_y = y_offset
             plot_handler.toggle_waterfall()
         else:
-            raise RuntimeError("Waterfall plots may only be applied to cuts")
+            raise TypeError("Waterfall plots may only be applied to cuts")
 
 
 register_projection(MSliceAxes)

@@ -262,23 +262,21 @@ class SlicePlot(IPlot):
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
-        if bounds["x_label"] < y < bounds["title"]:
-            if bounds["y_label"] < x < bounds["colorbar_label"]:
-                if y < bounds["x_range"]:
-                    quick_options(
-                        "x_range", self, redraw_signal=self.plot_window.redraw
-                    )
-                elif x < bounds["y_range"]:
-                    quick_options(
-                        "y_range", self, redraw_signal=self.plot_window.redraw
-                    )
-                elif x > bounds["colorbar_range"]:
-                    quick_options(
-                        "colorbar_range",
-                        self,
-                        self.colorbar_log,
-                        redraw_signal=self.plot_window.redraw,
-                    )
+        if (
+            bounds["x_label"] < y < bounds["title"]
+            and bounds["y_label"] < x < bounds["colorbar_label"]
+        ):
+            if y < bounds["x_range"]:
+                quick_options("x_range", self, redraw_signal=self.plot_window.redraw)
+            elif x < bounds["y_range"]:
+                quick_options("y_range", self, redraw_signal=self.plot_window.redraw)
+            elif x > bounds["colorbar_range"]:
+                quick_options(
+                    "colorbar_range",
+                    self,
+                    self.colorbar_log,
+                    redraw_signal=self.plot_window.redraw,
+                )
 
     def object_clicked(self, target):
         if isinstance(target, Legend):
@@ -815,8 +813,8 @@ class SlicePlot(IPlot):
 
     @all_fonts_size.setter
     def all_fonts_size(self, values: dict):
-        for key in values:
-            setattr(self, key, values[key])
+        for key, value in values.items():
+            setattr(self, key, value)
 
     def increase_all_fonts(self):
         for p in self.plot_fonts_properties:

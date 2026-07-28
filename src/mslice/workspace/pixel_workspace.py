@@ -34,8 +34,7 @@ class PixelWorkspace(
             self._histo_ws = mantid_ws
         else:
             raise TypeError(
-                "PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got %s"
-                % mantid_ws.__class__.__name__
+                f"PixelWorkspace expected IMDEventWorkspace or HistogramWorkspace, got {type(mantid_ws).__name__}"
             )
         CommonWorkspaceProperties.__init__(self)
         self._name = name

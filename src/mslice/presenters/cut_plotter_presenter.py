@@ -107,7 +107,7 @@ class CutPlotterPresenter(PresenterUtility):
             final_plot
             and plot_over
             and current_plot_intensity
-            and not intensity_correction == current_plot_intensity
+            and intensity_correction != current_plot_intensity
         ):
             self.apply_intensity_correction_after_plot_over(current_plot_intensity)
         if update_main:
@@ -133,7 +133,7 @@ class CutPlotterPresenter(PresenterUtility):
         while cut_start != cut_end:
             cut.integration_axis.start = cut_start
             cut.integration_axis.end = cut_end
-            final_plot = True if cut_start + cut.width == integration_end else False
+            final_plot = cut_start + cut.width == integration_end
             self._plot_cut(workspace, cut, plot_over, final_plot=final_plot)
             cut_start = cut_end
             cut_end = get_range_end(cut_end, integration_end, cut.width)
@@ -148,7 +148,7 @@ class CutPlotterPresenter(PresenterUtility):
         # If plot over is True you want to save all plotted cuts for use by the cli
         if cut.intensity_corrected:
             return
-        if ax not in self._cut_cache_dict.keys():
+        if ax not in self._cut_cache_dict:
             self._cut_cache_dict[ax] = []
         if len(self._cut_cache_dict[ax]) == 0:
             self._cut_cache_dict[ax].append(cut)
@@ -192,17 +192,14 @@ class CutPlotterPresenter(PresenterUtility):
             cut.algorithm,
             cut.cut_ws,
         ]
-        if cached_cut_params == cut_params:
-            return True
-        else:
-            return False
+        return cached_cut_params == cut_params
 
     def remove_cut_from_cache_by_index(self, ax, index):
         del self._cut_cache_dict[ax][index]
         return len(self._cut_cache_dict[ax])
 
     def get_cache(self, ax):
-        return self._cut_cache_dict[ax] if ax in self._cut_cache_dict.keys() else None
+        return self._cut_cache_dict.get(ax)
 
     def save_cut_to_workspace(self, workspace, cut):
         cut_ws = compute_cut(
@@ -251,11 +248,12 @@ class CutPlotterPresenter(PresenterUtility):
             if (
                 self._interactive_ws_names is not None
                 and self._interactive_ws_names[0] != raw_name_in_ads
+                and (
+                    not workspace_exists(self._interactive_ws_names[1])
+                    or self._interactive_ws_names[0].endswith("_HIDDEN")
+                )
             ):
-                if not workspace_exists(
-                    self._interactive_ws_names[1]
-                ) or self._interactive_ws_names[0].endswith("_HIDDEN"):
-                    remove_from_ads(self._interactive_ws_names[0])
+                remove_from_ads(self._interactive_ws_names[0])
             self._interactive_ws_names = (raw_name_in_ads, cut.workspace_name)
 
     def hide_overplot_line(self, workspace, key):
@@ -339,7 +337,7 @@ class CutPlotterPresenter(PresenterUtility):
         overall_max_signal = 0
         for cut in self._cut_cache_dict[plt.gca()]:
             try:
-                cut.sample_temp
+                _ = cut.sample_temp
             except SampleTempValueError:
                 try:
                     self.propagate_sample_temperatures_throughout_cache(plt.gca())
@@ -439,10 +437,7 @@ class CutPlotterPresenter(PresenterUtility):
         temperature_dict = {}
         cuts_with_no_temp = []
         for cut in self._cut_cache_dict[axes]:
-            if (
-                cut.raw_sample_temp
-                and cut.parent_ws_name not in temperature_dict
-            ):
+            if cut.raw_sample_temp and cut.parent_ws_name not in temperature_dict:
                 temperature_dict[cut.parent_ws_name] = cut.sample_temp
             elif not cut.raw_sample_temp:
                 cuts_with_no_temp.append(cut)
@@ -453,10 +448,7 @@ class CutPlotterPresenter(PresenterUtility):
                     cut.sample_temp = temperature_dict[cut.parent_ws_name]
                     cuts_with_no_temp.remove(cut)
 
-        if len(cuts_with_no_temp) == 0:
-            return True
-        else:
-            return False
+        return len(cuts_with_no_temp) == 0
 
     def set_sample_temperature_by_field(self, axes, field, workspace_name):
         temp = sample_temperature(workspace_name, [field])

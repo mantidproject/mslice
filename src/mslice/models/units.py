@@ -4,6 +4,8 @@ At present only the energy units "meV" ("DeltaE") and "cm-1" ("DeltaE_inWavenumb
 are defined, but they are separated into a module for possible future expansion.
 """
 
+from typing import ClassVar
+
 import numpy as np
 
 
@@ -26,15 +28,23 @@ def get_sample_temperature_from_string(string):
 
 
 class EnergyUnits:
-    _available_units = ["meV", "cm-1"]
-    _label_latex = {"meV": "meV", "cm-1": "cm$^{-1}$"}
-    _name_to_index = {"meV": 0, "cm-1": 1, "DeltaE": 0, "DeltaE_inWavenumber": 1}
+    _available_units: ClassVar[list] = ["meV", "cm-1"]
+    _label_latex: ClassVar[dict[str, str]] = {"meV": "meV", "cm-1": "cm$^{-1}$"}
+    _name_to_index: ClassVar[dict[str, int]] = {
+        "meV": 0,
+        "cm-1": 1,
+        "DeltaE": 0,
+        "DeltaE_inWavenumber": 1,
+    }
     # The following is a conversion matrix between the different units e_to = m[from][to] * e_from
     # E.g. meV = m[1][0] * cm; and cm = m[0][1] * meV
-    _conversion_factors = [[1.0, 8.065544], [1.0 / 8.065544, 1.0]]
+    _conversion_factors: ClassVar[list[float]] = [
+        [1.0, 8.065544],
+        [1.0 / 8.065544, 1.0],
+    ]
 
     def __init__(self, unit_name):
-        if unit_name not in self._name_to_index.keys():
+        if unit_name not in self._name_to_index:
             raise ValueError(f"Unrecognised energy unit '{unit_name}'")
         self._unit = unit_name
         self._index = self._name_to_index[self._unit]

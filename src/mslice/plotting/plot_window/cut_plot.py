@@ -489,11 +489,9 @@ class CutPlot(IPlot):
                 container = self._lines[line]
             except KeyError:
                 return -1
-        i = 0
-        for c in self._canvas.figure.gca().containers:
+        for i, c in enumerate(self._canvas.figure.gca().containers):
             if container == c:
                 return i
-            i += 1
 
     def calc_figure_boundaries(self):
         fig_x, fig_y = self._canvas.figure.get_size_inches() * self._canvas.figure.dpi
@@ -594,10 +592,9 @@ class CutPlot(IPlot):
             if cached_lines not in all_lines:
                 self._waterfall_cache.pop(cached_lines)
         for line in all_lines:
-            if isinstance(line, Line2D):
-                if line not in self._waterfall_cache:
-                    self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
-                    new_line = True
+            if isinstance(line, Line2D) and line not in self._waterfall_cache:
+                self._waterfall_cache[line] = [line.get_xdata(), line.get_ydata()]
+                new_line = True
         if new_line and num_lines > 1 and self.plot_window.waterfall:
             self.update_waterfall()
 
@@ -955,8 +952,8 @@ class CutPlot(IPlot):
 
     @all_fonts_size.setter
     def all_fonts_size(self, values: dict):
-        for key in values:
-            setattr(self, key, values[key])
+        for key, value in values.items():
+            setattr(self, key, value)
 
     def increase_all_fonts(self):
         for p in self.plot_fonts_properties:

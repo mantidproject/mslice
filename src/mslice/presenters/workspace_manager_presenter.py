@@ -79,7 +79,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def notify(self, command):
         self._clear_displayed_error()
         with show_busy(self._workspace_manager_view):
-            if command in self._command_map.keys():
+            if command in self._command_map:
                 self._command_map[command]()
             else:
                 raise ValueError(
@@ -103,10 +103,8 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
     def workspace_selection_changed(self):
         if self._workspace_manager_view.current_tab() == TAB_2D:
             psd = all(
-                [
-                    get_workspace_handle(ws).is_PSD
-                    for ws in self._workspace_manager_view.get_workspace_selected()
-                ]
+                get_workspace_handle(ws).is_PSD
+                for ws in self._workspace_manager_view.get_workspace_selected()
             )
             if psd and not self._psd:
                 self._workspace_manager_view.tab_changed.emit(TAB_2D)
@@ -197,7 +195,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 str(self._workspace_manager_view.add_workspace_dialog())
             )
         new_workspace = selected_workspaces[0] + "_combined"
-        if all([is_pixel_workspace(workspace) for workspace in selected_workspaces]):
+        if all(is_pixel_workspace(workspace) for workspace in selected_workspaces):
             combine_workspace(selected_workspaces, new_workspace)
         else:
             self._workspace_manager_view.error_select_more_than_one_workspaces()

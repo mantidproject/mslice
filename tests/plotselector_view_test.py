@@ -57,9 +57,7 @@ class PlotSelectorWidgetTest(unittest.TestCase):
         return "_" + plot_name
 
     def se_is_shown_by_filter(self, plot_number):
-        if plot_number == 0:
-            return True
-        return False
+        return plot_number == 0
 
     def click_to_select_by_row_number(self, row_number):
         widget = self.view.table_widget.cellWidget(row_number, Column.Name)

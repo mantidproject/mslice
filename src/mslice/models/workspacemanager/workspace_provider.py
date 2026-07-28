@@ -13,7 +13,7 @@ def get_workspace_handle(workspace_name):
     try:
         return _loaded_workspaces[workspace_name]
     except KeyError:
-        raise KeyError("workspace %s could not be found." % workspace_name)
+        raise KeyError(f"workspace {workspace_name} could not be found.")
 
 
 def add_workspace(workspace, name):

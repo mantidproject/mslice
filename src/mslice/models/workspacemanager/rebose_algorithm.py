@@ -32,7 +32,7 @@ class Rebose(PythonAlgorithm):
     def PyExec(self):
         workspace = self.getProperty("InputWorkspace").value
         if not isinstance(workspace, Workspace2D):
-            raise RuntimeError("Invalid workspace type - must be Workspace2D")
+            raise TypeError("Invalid workspace type - must be Workspace2D")
         from_temp = self.getProperty("CurrentTemperature").value
         to_temp = self.getProperty("TargetTemperature").value
         y = workspace.extractY()

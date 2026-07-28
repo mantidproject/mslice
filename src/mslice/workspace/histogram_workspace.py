@@ -28,8 +28,7 @@ class HistogramWorkspace(
             self._raw_ws = mantid_ws
         else:
             raise TypeError(
-                "HistogramWorkspace expected IMDHistoWorkspace, got %s"
-                % mantid_ws.__class__.__name__
+                f"HistogramWorkspace expected IMDHistoWorkspace, got {mantid_ws.__class__.__name__}"
             )
         CommonWorkspaceProperties.__init__(self)
         self._name = name

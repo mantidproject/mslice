@@ -108,13 +108,12 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
                     continue
                 elif prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
                     continue
-            elif algorithm.name() == "MakeProjection":
-                if (
-                    prop.name() == "Limits"
-                    or prop.name() == "OutputWorkspace"
-                    or prop.name() == "ProjectionType"
-                ):
-                    continue
+            elif algorithm.name() == "MakeProjection" and prop.name() in {
+                "Limits",
+                "OutputWorkspace",
+                "ProjectionType",
+            }:
+                continue
             if (
                 isinstance(pval, str)
                 and replace_ws_special_chars(pval) in existing_ws_refs

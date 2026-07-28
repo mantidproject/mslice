@@ -23,7 +23,7 @@ class CutWidgetPresenter(PresenterUtility):
         self._cut_view.disable()
         self._previous_cut = None
         self._previous_axis = None
-        self._minimumStep = dict()
+        self._minimumStep = {}
         self._en_default = "meV"
 
     def set_cut_plotter_presenter(self, cut_plotter_presenter):
@@ -89,7 +89,7 @@ class CutWidgetPresenter(PresenterUtility):
                 self._cut_view.populate_cut_params(
                     self._cut_view.get_cut_axis_start(),
                     self._cut_view.get_cut_axis_end(),
-                    "%0.5f" % step,
+                    f"{step:.5f}",
                 )
                 self._cut_view.display_error(
                     "Invalid cut step parameter, using default."
@@ -160,7 +160,7 @@ class CutWidgetPresenter(PresenterUtility):
                 self._previous_axis = None
         workspace_selection = self._main_presenter.get_selected_workspaces()
         if len(workspace_selection) == 0 or not all(
-            [is_cuttable(ws) for ws in workspace_selection]
+            is_cuttable(ws) for ws in workspace_selection
         ):
             self._cut_view.clear_input_fields()
             self._cut_view.disable()
@@ -168,7 +168,7 @@ class CutWidgetPresenter(PresenterUtility):
             self._previous_axis = None
         else:
             non_psd = all(
-                [not get_workspace_handle(ws).is_PSD for ws in workspace_selection]
+                not get_workspace_handle(ws).is_PSD for ws in workspace_selection
             )
             self._cut_view.enable_integration_axis(non_psd)
             self._populate_fields_using_workspace(workspace_selection[0])

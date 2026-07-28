@@ -93,7 +93,7 @@ class WorkspaceMixin:
         self._cut_params["previous_axis"] = axis
 
     def is_axis_saved(self, axis):
-        return True if axis in self._cut_params else False
+        return axis in self._cut_params
 
     def loader_name(self) -> str:
         """

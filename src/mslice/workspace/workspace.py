@@ -23,8 +23,7 @@ class Workspace(
             self._raw_ws = mantid_ws
         else:
             raise TypeError(
-                "Workspace expected matrixWorkspace, got %s"
-                % mantid_ws.__class__.__name__
+                f"Workspace expected matrixWorkspace, got {mantid_ws.__class__.__name__}"
             )
         CommonWorkspaceProperties.__init__(self)
         self._name = name

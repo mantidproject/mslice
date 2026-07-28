@@ -123,11 +123,11 @@ class Slice(PythonAlgorithm):
     def dimension_index(self, workspace, axis):
         try:
             return workspace.getDimensionIndexByName(axis.units)
-        except RuntimeError as e:
+        except RuntimeError:
             if axis.units == "2Theta":
                 return workspace.getDimensionIndexByName("Degrees")
             else:
-                raise e
+                raise
 
     def _compute_slice_nonPSD(self, workspace, x_axis, y_axis, e_mode, norm_to_one):
         axes = [x_axis, y_axis]
@@ -138,15 +138,15 @@ class Slice(PythonAlgorithm):
         else:
             raise RuntimeError("Cannot calculate slices without an energy axis")
         q_axis = (e_axis + 1) % 2
-        ebin = "%f, %f, %f" % (
-            axes[e_axis].start_meV,
-            axes[e_axis].step_meV,
-            axes[e_axis].end_meV,
+        ebin = (
+            f"{axes[e_axis].start_meV:f}, "
+            f"{axes[e_axis].step_meV:f}, "
+            f"{axes[e_axis].end_meV:f}"
         )
-        qbin = "%f, %f, %f" % (
-            axes[q_axis].start_meV,
-            axes[q_axis].step_meV,
-            axes[q_axis].end_meV,
+        qbin = (
+            f"{axes[q_axis].start_meV:f}, "
+            f"{axes[q_axis].step_meV:f}, "
+            f"{axes[q_axis].end_meV:f}"
         )
         if axes[q_axis].units == "|Q|":
             if "Indirect" in e_mode and workspace.run().hasProperty("Efix"):
@@ -178,6 +178,6 @@ class Slice(PythonAlgorithm):
             )
         else:
             raise RuntimeError(
-                "axis %s not recognised, must be '|Q|' or '2Theta'" % axes[q_axis].units
+                f"axis {axes[q_axis].units} not recognised, must be '|Q|' or '2Theta'"
             )
         return thisslice

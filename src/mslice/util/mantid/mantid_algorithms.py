@@ -15,7 +15,7 @@ for algorithm, versions in algorithms.items():
         try:
             alg_obj = AlgorithmManager.createUnmanaged(algorithm, max(versions))
             alg_obj.initialize()
-        except Exception:
+        except Exception:  # noqa: S110
             pass
         else:
             globals()[algorithm] = wrap_algorithm(

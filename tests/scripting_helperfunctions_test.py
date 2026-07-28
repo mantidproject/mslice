@@ -174,9 +174,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             f"cb.ax.yaxis.set_tick_params(labelsize={plot_handler.colorbar_range_font_size})\n",
             script_lines,
         )
-        self.assertIn(
-            f"mesh.set_norm(colors.LogNorm({0.001}, {30}))\n", script_lines
-        )
+        self.assertIn(f"mesh.set_norm(colors.LogNorm({0.001}, {30}))\n", script_lines)
         add_plot.assert_called_once_with(script_lines, plot_handler)
 
     @mock.patch("mslice.cli._mslice_commands.GlobalFigureManager")
@@ -373,12 +371,8 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             f"ax.set_xlabel(r'{plot_handler.x_label}', fontsize={plot_handler.x_label_size})\n",
             script_lines,
         )
-        self.assertIn(
-            f"ax.grid({plot_handler.y_grid}, axis='y')\n", script_lines
-        )
-        self.assertIn(
-            f"ax.grid({plot_handler.x_grid}, axis='x')\n", script_lines
-        )
+        self.assertIn(f"ax.grid({plot_handler.y_grid}, axis='y')\n", script_lines)
+        self.assertIn(f"ax.grid({plot_handler.x_grid}, axis='x')\n", script_lines)
         self.assertIn(
             "ax.set_ylim(bottom={}, top={})\n".format(*plot_handler.y_range),
             script_lines,

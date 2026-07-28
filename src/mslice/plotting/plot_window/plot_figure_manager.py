@@ -259,8 +259,8 @@ class PlotFigureManagerQT(QtCore.QObject):
                 supported_image_types = list(
                     self.window.canvas.get_supported_filetypes().keys()
                 )
-                if not any([ext.endswith(ft) for ft in supported_image_types]):
-                    if ext.endswith("jpg") or ext.endswith("jpeg"):
+                if not any(ext.endswith(ft) for ft in supported_image_types):
+                    if ext.endswith(("jpg", "jpeg")):
                         resolution = self._get_resolution()
                         self._save_jpeg_via_qt(resolution, file_path, save_name)
                     else:

@@ -54,7 +54,7 @@ class SliceTest(unittest.TestCase):
             sample_temp=test_sample_temp,
             e_axis=test_energy_axis,
         )
-        test_slice.chi
+        _ = test_slice.chi
         compute_chi_fn.assert_called_once_with(
             test_output_workspace, test_sample_temp, test_energy_axis
         )
@@ -76,7 +76,7 @@ class SliceTest(unittest.TestCase):
             sample_temp=test_sample_temp,
             e_axis=test_energy_axis,
         )
-        test_slice.chi_magnetic
+        _ = test_slice.chi_magnetic
         compute_chi_fn.assert_called_once_with(
             test_output_workspace, test_sample_temp, test_energy_axis, True
         )
@@ -96,7 +96,7 @@ class SliceTest(unittest.TestCase):
         test_slice = self._create_slice(
             workspace=test_output_workspace, e_axis=test_energy_axis
         )
-        test_slice.d2sigma
+        _ = test_slice.d2sigma
         compute_d2sigma_fn.assert_called_once_with(
             test_output_workspace, test_energy_axis, test_output_workspace.e_fixed
         )
@@ -120,7 +120,7 @@ class SliceTest(unittest.TestCase):
             q_axis=test_momentum_axis,
             e_axis=test_energy_axis,
         )
-        test_slice.symmetrised
+        _ = test_slice.symmetrised
         compute_symmetrised_fn.assert_called_once_with(
             test_output_workspace, test_sample_temp, test_energy_axis, None
         )
@@ -142,7 +142,7 @@ class SliceTest(unittest.TestCase):
             sample_temp=test_sample_temp,
             e_axis=test_energy_axis,
         )
-        test_slice.gdos
+        _ = test_slice.gdos
         compute_gdos_fn.assert_called_once_with(
             test_output_workspace, test_sample_temp, None, test_energy_axis, None
         )

@@ -164,7 +164,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
         if filename is None:
             self._display_error("No new workspaces have been loaded")
         else:
-            self._display_error("File %s has not been loaded" % filename)
+            self._display_error(f"File {filename} has not been loaded")
 
     def confirm_overwrite_workspace(self):
         text = (
@@ -178,10 +178,7 @@ class DataLoaderWidget(QWidget):  # and some view interface
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No,
         )
-        if reply == QMessageBox.Yes:
-            return True
-        else:
-            return False
+        return reply == QMessageBox.Yes
 
     def show_busy(self, is_busy):
         self.busy.emit(is_busy)

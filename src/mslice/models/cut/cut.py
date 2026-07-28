@@ -131,11 +131,7 @@ class Cut:
     @width.setter
     def width(self, width_str):
         if width_str is not None and width_str.strip():
-            if (
-                width_str.startswith("e")
-                or width_str.endswith("e")
-                or width_str.startswith("-")
-            ):
+            if width_str.startswith(("e", "-")) or width_str.endswith("e"):
                 self._width = None
             else:
                 try:

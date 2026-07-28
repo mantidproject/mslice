@@ -16,9 +16,9 @@ from .validation_decorators import require_main_presenter
 def validate(field_method, error_method):
     try:
         return field_method()
-    except ValueError as e:
+    except ValueError:
         error_method()
-        raise e
+        raise
 
 
 class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
@@ -84,7 +84,7 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
             # will break if matplotlib change exception error message
             if str(e) != "minvalue must be less than or equal to maxvalue":
-                raise e
+                raise
             self._slice_view.error_invalid_intensity_params()
 
     def _selected_workspace(self):
@@ -166,10 +166,10 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
                     )
             self._slice_view.enable()
             self._slice_view.populate_slice_x_params(
-                *["%.5f" % x for x in (x_min, x_max, x_step)]
+                *(f"{x:.5f}" for x in (x_min, x_max, x_step))
             )
             self._slice_view.populate_slice_y_params(
-                *["%.5f" % x for x in (y_min, y_max, y_step)]
+                *(f"{y:.5f}" for y in (y_min, y_max, y_step))
             )
 
     def update_workspaces(self):

@@ -327,7 +327,7 @@ class PlotSelectorPresenter(PresenterUtility, PlotSelectorPresenterInterface):
         """
         absolute_path = self.view.get_file_name_for_saving(extension)
 
-        if not absolute_path[-4:] == extension:
+        if absolute_path[-4:] != extension:
             absolute_path += extension
 
         try:

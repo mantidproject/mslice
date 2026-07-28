@@ -16,7 +16,7 @@ def _parse_ws_names(args, kwargs):
     if input_workspace:
         kwargs["InputWorkspace"] = _name_or_wrapper_to_workspace(input_workspace)
     elif len(args) > 0:
-        if isinstance(args[0], MsliceWorkspace) or isinstance(args[0], str):
+        if isinstance(args[0], (MsliceWorkspace, str)):
             input_workspace = get_workspace_handle(args[0])
         args = (_name_or_wrapper_to_workspace(args[0]),) + args[1:]
 
@@ -24,19 +24,22 @@ def _parse_ws_names(args, kwargs):
     if "OutputWorkspace" in kwargs:
         output_name = kwargs.pop("OutputWorkspace")
 
-    for key in kwargs.keys():
+    for key in kwargs:
         if input_workspace is None and "LHS" in key:
             input_workspace = get_workspace_handle(kwargs[key])
-        if "Input" not in key and "Output" not in key:
-            if isinstance(kwargs[key], MsliceWorkspace):
-                kwargs[key] = _name_or_wrapper_to_workspace(kwargs[key])
+        if (
+            "Input" not in key
+            and "Output" not in key
+            and isinstance(kwargs[key], MsliceWorkspace)
+        ):
+            kwargs[key] = _name_or_wrapper_to_workspace(kwargs[key])
 
     return input_workspace, output_name, args, kwargs
 
 
 def _alg_has_outputws(wrapped_alg):
     alg = AlgorithmManager.create(wrapped_alg.__name__)
-    return any(["OutputWorkspace" in prop.name for prop in alg.getProperties()])
+    return any("OutputWorkspace" in prop.name for prop in alg.getProperties())
 
 
 def wrap_algorithm(algorithm):
@@ -57,7 +60,7 @@ def wrap_algorithm(algorithm):
                 _name_or_wrapper_to_workspace(arg) for arg in kwargs["InputWorkspaces"]
             ]
 
-        for ky in [k for k in kwargs.keys() if "Workspace" in k]:
+        for ky in [k for k in kwargs if "Workspace" in k]:
             if isinstance(kwargs[ky], str) and "__MSL" not in kwargs[ky]:
                 kwargs[ky] = _name_or_wrapper_to_workspace(kwargs[ky])
 

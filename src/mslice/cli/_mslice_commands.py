@@ -80,13 +80,13 @@ def Load(Filename, OutputWorkspace=None):
     from mslice.app.presenters import get_dataloader_presenter
 
     if not isinstance(Filename, str):
-        raise RuntimeError("path given to load must be a string")
+        raise TypeError("path given to load must be a string")
     merge = False
     if not ospath.exists(Filename):
-        if all([ospath.exists(f) for f in Filename.split("+")]):
+        if all(ospath.exists(f) for f in Filename.split("+")):
             merge = True
         else:
-            raise RuntimeError("could not find the path %s" % Filename)
+            raise RuntimeError(f"could not find the path {Filename}")
 
     get_dataloader_presenter().load_workspace([Filename], merge, force_overwrite=-1)
     name = ospath.splitext(ospath.basename(Filename))[0]
@@ -262,7 +262,7 @@ def Rebose(
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, MSliceWorkspace):
-        raise RuntimeError("Incorrect workspace type.")
+        raise TypeError("Incorrect workspace type.")
     scaled = rebose_single(
         workspace, from_temp=float(CurrentTemperature), to_temp=float(TargetTemperature)
     )
@@ -319,7 +319,7 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, HistogramWorkspace):
-        raise RuntimeError("Incorrect workspace type.")
+        raise TypeError("Incorrect workspace type.")
 
     if IntensityStart == 0 and IntensityEnd == 0:
         intensity_range = (None, None)

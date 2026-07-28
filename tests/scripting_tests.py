@@ -150,8 +150,8 @@ class ScriptingTest(unittest.TestCase):
         self.assertIn(mock.call(load_alg, []), get_alg_kwargs.call_args_list)
         self.assertIn(mock.call(make_projection_alg, []), get_alg_kwargs.call_args_list)
 
-        make_projection_kwargs, output_ws = get_alg_kwargs(make_projection_alg, ws_name)
-        load_kwargs, output_ws = get_alg_kwargs(load_alg, ws_name)
+        make_projection_kwargs, _ = get_alg_kwargs(make_projection_alg, ws_name)
+        load_kwargs, _ = get_alg_kwargs(load_alg, ws_name)
 
         self.assertIn(
             f"ws_{ws_name} = mc.{load_alg.name()}({load_kwargs})\n",
@@ -186,7 +186,7 @@ class ScriptingTest(unittest.TestCase):
         self.assertIn(mock.call(load_alg, []), get_alg_kwargs.call_args_list)
         self.assertEqual(get_alg_kwargs.call_count, 2)
 
-        load_kwargs, output_ws = get_alg_kwargs(load_alg, ws_name)
+        load_kwargs, _ = get_alg_kwargs(load_alg, ws_name)
         self.assertIn(
             f"ws_{ws_name} = mc.{load_alg.name()}({load_kwargs})\n",
             script_lines,
@@ -202,7 +202,7 @@ class ScriptingTest(unittest.TestCase):
 
         load_alg.getProperties.return_value = [load_alg_prop_filename]
 
-        arguments, output_ws = get_algorithm_kwargs(load_alg, [])
+        arguments, _ = get_algorithm_kwargs(load_alg, [])
 
         self.assertIn(
             "{}='{}'".format("Filename", load_alg_prop_filename.value()), arguments
@@ -227,7 +227,7 @@ class ScriptingTest(unittest.TestCase):
             make_proj_alg_prop_input_ws,
         ]
 
-        args, output_ws = get_algorithm_kwargs(make_proj_alg, ["workspace_name"])
+        args, _ = get_algorithm_kwargs(make_proj_alg, ["workspace_name"])
 
         self.assertNotIn(
             "{}='{}'".format("OutputWorkspace", make_proj_alg_prop_output_ws.value()),
@@ -248,7 +248,7 @@ class ScriptingTest(unittest.TestCase):
 
         make_proj_alg.getProperties.return_value = [make_proj_alg_prop]
 
-        args, output_ws = get_algorithm_kwargs(make_proj_alg, "workspace_name")
+        args, _ = get_algorithm_kwargs(make_proj_alg, "workspace_name")
 
         self.assertIn("{}='{}'".format("SomeProp", "string"), args)
 
@@ -265,7 +265,7 @@ class ScriptingTest(unittest.TestCase):
 
         make_proj_alg.getProperties.return_value = [make_proj_alg_prop]
 
-        args, output_ws = get_algorithm_kwargs(make_proj_alg, "workspace_name")
+        args, _ = get_algorithm_kwargs(make_proj_alg, "workspace_name")
 
         self.assertIn("{}={}".format("SomeProp", 12), args)
 
@@ -282,7 +282,7 @@ class ScriptingTest(unittest.TestCase):
 
         some_alg.getProperties.return_value = [some_alg_prop]
 
-        args, output_ws = get_algorithm_kwargs(some_alg, "workspace_name")
+        args, _ = get_algorithm_kwargs(some_alg, "workspace_name")
 
         self.assertIn("{}={}".format("SomeProp", 12), args)
 
@@ -299,7 +299,7 @@ class ScriptingTest(unittest.TestCase):
 
         some_alg.getProperties.return_value = [some_alg_prop]
 
-        args, output_ws = get_algorithm_kwargs(some_alg, "workspace_name")
+        args, _ = get_algorithm_kwargs(some_alg, "workspace_name")
 
         self.assertIn("{}='{}'".format("SomeProp", "string"), args)
 

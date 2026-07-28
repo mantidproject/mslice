@@ -28,6 +28,7 @@ _overplot_keys = {
     "Arbitrary Nuclei": "Arbitrary Nuclei",
     "CIF file": "CIF file",
 }
+logger = logging.getLogger(__name__)
 
 
 def _update_legend():
@@ -105,15 +106,15 @@ def _process_axis(
             return axis
         validation_error = axis.validate_step_against_workspace(input_workspace)
         if validation_error:
-            logging.warning(validation_error)
+            logger.warning(validation_error)
     elif axis in available_axes:
         range = get_axis_range(input_workspace, axis)
         range = list(map(float, range))
         axis = Axis(units=axis, start=range[0], end=range[1], step=range[2])
     else:
         raise RuntimeError(
-            "Axis '%s' not recognised. Workspace has these axes: %s "
-            % (axis, ", ".join(available_axes))
+            f"Axis '{axis}' not recognised. "
+            f"Workspace has these axes: {', '.join(available_axes)}"
         )
     return axis
 
@@ -124,7 +125,7 @@ def _check_workspace_name(workspace):
     if not isinstance(workspace, str):
         raise TypeError("InputWorkspace must be a workspace or a workspace name")
     if not workspace_exists(workspace):
-        raise TypeError("InputWorkspace %s could not be found." % workspace)
+        raise TypeError(f"InputWorkspace {workspace} could not be found.")
 
 
 def _check_workspace_type(workspace, correct_type):
@@ -165,7 +166,7 @@ def is_cut(*args):
     """
     Checks if args[0] is a HistogramWorkspace and if the bin number matches
     """
-    if (
+    return (
         isinstance(args[0], HistogramWorkspace)
         and sum(
             [
@@ -174,10 +175,7 @@ def is_cut(*args):
             ]
         )
         == 1
-    ):
-        return True
-    else:
-        return False
+    )
 
 
 def is_hs_workspace(*args):

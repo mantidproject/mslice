@@ -265,9 +265,9 @@ class MainWindow(MainView, QMainWindow):
         QApplication.processEvents()
 
     def get_energy_default(self):
-        return [
+        return next(
             action.text() for action in self._en_default_actions if action.isChecked()
-        ][0]
+        )
 
     def set_energy_default(self, this_action):
         if this_action.isChecked():
@@ -296,7 +296,7 @@ class MainWindow(MainView, QMainWindow):
             )
 
     def set_cut_algorithm_default(self, algo):
-        for action in self._cut_algo_map.keys():
+        for action in self._cut_algo_map:
             if algo not in action:
                 self._cut_algo_map[action].setChecked(False)
         self._presenter.set_cut_algorithm_default(algo)

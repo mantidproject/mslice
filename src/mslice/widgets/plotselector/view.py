@@ -315,7 +315,7 @@ class PlotSelectorView(QWidget):
         :param plot_number: The unique number in GlobalFigureManager
         """
         with QMutexLocker(self.mutex):
-            row, widget = self._get_row_and_widget_from_plot_number(plot_number)
+            row, _ = self._get_row_and_widget_from_plot_number(plot_number)
             self.table_widget.removeRow(row)
 
     def set_active_font(self, plot_number, is_active):
@@ -346,7 +346,7 @@ class PlotSelectorView(QWidget):
         plots
         :return: A list of strings with the plot numbers
         """
-        selected = set(index.row() for index in self.table_widget.selectedIndexes())
+        selected = {index.row() for index in self.table_widget.selectedIndexes()}
         selected_plots = []
         for row in selected:
             if not self.table_widget.isRowHidden(row):
@@ -459,7 +459,7 @@ class PlotSelectorView(QWidget):
             return
 
         with QMutexLocker(self.mutex):
-            row, widget = self._get_row_and_widget_from_plot_number(plot_number)
+            _, widget = self._get_row_and_widget_from_plot_number(plot_number)
         widget.toggle_plot_name_editable(True)
 
     # ----------------------- Plot Sorting --------------------------

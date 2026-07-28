@@ -56,9 +56,7 @@ class PlotOptionsPresenter:
 
 class SlicePlotOptionsPresenter(PlotOptionsPresenter):
     def __init__(self, plot_options_dialog, slice_handler):
-        super().__init__(
-            plot_options_dialog, slice_handler
-        )
+        super().__init__(plot_options_dialog, slice_handler)
 
         self._color_config = {
             "c_range": self._model.colorbar_range,

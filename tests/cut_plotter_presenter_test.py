@@ -53,7 +53,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.cut_plotter_presenter._cut_cache_dict[ax] = [cut_1, cut_2, cut_3]
 
     def _workspace_handle_side_effect(self, workspace_name):
-        key = list(self.cut_plotter_presenter._cut_cache_dict.keys())[0]
+        key = next(iter(self.cut_plotter_presenter._cut_cache_dict))
         for cut in self.cut_plotter_presenter._cut_cache_dict[key]:
             if cut.workspace_name == workspace_name:
                 return cut.cut_ws
