@@ -1,13 +1,14 @@
-from mantid.api import PythonAlgorithm, WorkspaceProperty, IMDEventWorkspace
-from mantid.kernel import Direction, StringMandatoryValidator, PropertyManagerProperty
+from mantid.api import IMDEventWorkspace, PythonAlgorithm, WorkspaceProperty
+from mantid.kernel import Direction, PropertyManagerProperty, StringMandatoryValidator
 from mantid.simpleapi import (
     BinMD,
-    Rebin2D,
     ConvertSpectrumAxis,
+    Rebin2D,
+    ScaleX,
     SofQW3,
     TransformMD,
-    ScaleX,
 )
+
 from mslice.models.alg_workspace_ops import get_number_of_steps
 from mslice.models.axis import Axis
 from mslice.models.units import EnergyUnits

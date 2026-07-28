@@ -1,28 +1,30 @@
 import unittest
 from unittest import mock
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.lines import Line2D
+
+from mslice.models.axis import Axis
+from mslice.models.cut.cut import Cut
+from mslice.plotting.plot_window.cut_plot import CutPlot
+from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.scripting.helperfunctions import (
-    header,
-    add_header,
-    add_plot_statements,
-    add_slice_plot_statements,
     COMMON_PACKAGES,
     MPL_COLORS_IMPORT,
     NUMPY_IMPORT,
-    add_overplot_statements,
-    add_cut_plot_statements,
     add_cut_lines,
     add_cut_lines_with_width,
+    add_cut_plot_statements,
+    add_header,
+    add_overplot_statements,
     add_plot_options,
+    add_plot_statements,
+    add_slice_plot_statements,
+    header,
     hide_lines,
 )
-from mslice.plotting.plot_window.cut_plot import CutPlot
-from mslice.plotting.plot_window.slice_plot import SlicePlot
-from matplotlib.lines import Line2D
-import matplotlib.pyplot as plt
-import numpy as np
-from mslice.models.cut.cut import Cut
-from mslice.models.axis import Axis
-from mslice.util.intensity_correction import IntensityType, IntensityCache
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 
 
 class ScriptingHelperFunctionsTest(unittest.TestCase):
@@ -160,26 +162,20 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             script_lines,
         )
         self.assertIn(
-            'mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}", temperature={})\n'.format(
-                cache[plot_handler.ws_name].colourmap, intensity, plot_handler.temp
-            ),
+            f'mesh = ax.pcolormesh(slice_ws, cmap="{cache[plot_handler.ws_name].colourmap}", intensity="{intensity}", temperature={plot_handler.temp})\n',
             script_lines,
         )
         self.assertIn("cb = plt.colorbar(mesh, ax=ax)\n", script_lines)
         self.assertIn(
-            "cb.set_label('{}', labelpad=20, rotation=270, picker=5, fontsize={})\n".format(
-                plot_handler.colorbar_label, plot_handler.colorbar_label_size
-            ),
+            f"cb.set_label('{plot_handler.colorbar_label}', labelpad=20, rotation=270, picker=5, fontsize={plot_handler.colorbar_label_size})\n",
             script_lines,
         )
         self.assertIn(
-            "cb.ax.yaxis.set_tick_params(labelsize={})\n".format(
-                plot_handler.colorbar_range_font_size
-            ),
+            f"cb.ax.yaxis.set_tick_params(labelsize={plot_handler.colorbar_range_font_size})\n",
             script_lines,
         )
         self.assertIn(
-            "mesh.set_norm(colors.LogNorm({}, {}))\n".format(0.001, 30), script_lines
+            f"mesh.set_norm(colors.LogNorm({0.001}, {30}))\n", script_lines
         )
         add_plot.assert_called_once_with(script_lines, plot_handler)
 
@@ -196,9 +192,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         cache = plot_handler._slice_plotter_presenter._slice_cache
 
         self.assertIn(
-            'mesh = ax.pcolormesh(slice_ws, cmap="{}")\n'.format(
-                cache[plot_handler.ws_name].colourmap
-            ),
+            f'mesh = ax.pcolormesh(slice_ws, cmap="{cache[plot_handler.ws_name].colourmap}")\n',
             script_lines,
         )
 
@@ -217,9 +211,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         intensity = IntensityCache.get_desc_from_type(plot_handler.intensity_type)
 
         self.assertIn(
-            'mesh = ax.pcolormesh(slice_ws, cmap="{}", intensity="{}")\n'.format(
-                cache[plot_handler.ws_name].colourmap, intensity
-            ),
+            f'mesh = ax.pcolormesh(slice_ws, cmap="{cache[plot_handler.ws_name].colourmap}", intensity="{intensity}")\n',
             script_lines,
         )
 
@@ -327,15 +319,11 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_plot_options.assert_called_once_with(script_lines, plot_handler)
 
         self.assertIn(
-            "ax.set_xscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
-                plot_handler.x_range[0]
-            ),
+            f"ax.set_xscale('symlog', linthresh=pow(10, np.floor(np.log10({plot_handler.x_range[0]}))))\n",
             script_lines,
         )
         self.assertIn(
-            "ax.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10({}))))\n".format(
-                0.001
-            ),
+            f"ax.set_yscale('symlog', linthresh=pow(10, np.floor(np.log10({0.001}))))\n",
             script_lines,
         )
         self.assertEqual(["test_ws_var"], ret_val)
@@ -374,28 +362,22 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_plot_options(script_lines, plot_handler)
 
         self.assertIn(
-            "ax.set_title('{}', fontsize={})\n".format(
-                plot_handler.title, plot_handler.title_size
-            ),
+            f"ax.set_title('{plot_handler.title}', fontsize={plot_handler.title_size})\n",
             script_lines,
         )
         self.assertIn(
-            "ax.set_ylabel(r'{}', fontsize={})\n".format(
-                plot_handler.y_label, plot_handler.y_label_size
-            ),
+            f"ax.set_ylabel(r'{plot_handler.y_label}', fontsize={plot_handler.y_label_size})\n",
             script_lines,
         )
         self.assertIn(
-            "ax.set_xlabel(r'{}', fontsize={})\n".format(
-                plot_handler.x_label, plot_handler.x_label_size
-            ),
+            f"ax.set_xlabel(r'{plot_handler.x_label}', fontsize={plot_handler.x_label_size})\n",
             script_lines,
         )
         self.assertIn(
-            "ax.grid({}, axis='y')\n".format(plot_handler.y_grid), script_lines
+            f"ax.grid({plot_handler.y_grid}, axis='y')\n", script_lines
         )
         self.assertIn(
-            "ax.grid({}, axis='x')\n".format(plot_handler.x_grid), script_lines
+            f"ax.grid({plot_handler.x_grid}, axis='x')\n", script_lines
         )
         self.assertIn(
             "ax.set_ylim(bottom={}, top={})\n".format(*plot_handler.y_range),
@@ -406,15 +388,11 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
             script_lines,
         )
         self.assertIn(
-            "ax.yaxis.set_tick_params(labelsize={})\n".format(
-                plot_handler.y_range_font_size
-            ),
+            f"ax.yaxis.set_tick_params(labelsize={plot_handler.y_range_font_size})\n",
             script_lines,
         )
         self.assertIn(
-            "ax.xaxis.set_tick_params(labelsize={})\n".format(
-                plot_handler.x_range_font_size
-            ),
+            f"ax.xaxis.set_tick_params(labelsize={plot_handler.x_range_font_size})\n",
             script_lines,
         )
 
@@ -431,9 +409,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         add_plot_options(script_lines, plot_handler)
 
         self.assertIn(
-            "ax.set_title('{}', fontsize={})\n".format(
-                plot_handler.title, plot_handler.title_size
-            ),
+            f"ax.set_title('{plot_handler.title}', fontsize={plot_handler.title_size})\n",
             script_lines,
         )
 
@@ -466,7 +442,6 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
         ret_val = add_cut_lines_with_width(
             errorbars, script_lines, cuts, IntensityType.SCATTERING_FUNCTION
         )
-        pass
 
         self.assertIn(
             'cut_ws_{} = mc.Cut(ws_{}, CutAxis="{}", IntegrationAxis="{}", NormToOne={}, IntensityCorrection={}, '
@@ -537,7 +512,7 @@ class ScriptingHelperFunctionsTest(unittest.TestCase):
                 linestyle="-",
                 linewidth=1.5,
                 color="blue",
-                label="error_label_{}".format(i),
+                label=f"error_label_{i}",
             )
         errorbars = plt.gca().containers
         cut_0 = Cut(

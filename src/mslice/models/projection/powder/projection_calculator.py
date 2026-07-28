@@ -1,7 +1,7 @@
 import abc
 
 
-class ProjectionCalculator(object):
+class ProjectionCalculator:
     @abc.abstractmethod
     def available_axes(self):
         pass

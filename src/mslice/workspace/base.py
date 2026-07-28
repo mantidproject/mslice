@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class WorkspaceBase(object):
+class WorkspaceBase:
     __metaclass__ = ABCMeta
 
     @abstractmethod

@@ -1,33 +1,34 @@
-from .busy import show_busy
-from mslice.plotting.plot_window.plot_figure_manager import (
-    disable_icut_buttons_for_missing_workspaces,
-)
-from mslice.widgets.workspacemanager.command import Command
-from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.models.mslice_ads_observer import MSliceADSObserver
 from mslice.models.workspacemanager.file_io import get_save_directory
 from mslice.models.workspacemanager.workspace_algorithms import (
-    save_workspaces,
-    export_workspace_to_ads,
-    subtract,
-    is_pixel_workspace,
-    combine_workspace,
     add_workspace_runs,
-    scale_workspaces,
+    combine_workspace,
+    export_workspace_to_ads,
+    is_pixel_workspace,
     remove_workspace_from_ads,
+    save_workspaces,
+    scale_workspaces,
+    subtract,
 )
 from mslice.models.workspacemanager.workspace_provider import (
-    get_workspace_handle,
-    get_visible_workspace_names,
-    get_workspace_names,
-    get_workspace_name,
     delete_workspace,
+    get_visible_workspace_names,
+    get_workspace_handle,
+    get_workspace_name,
+    get_workspace_names,
     rename_workspace,
 )
-from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
-from .interfaces.main_presenter import MainPresenterInterface
-from .validation_decorators import require_main_presenter
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.plotting.plot_window.plot_figure_manager import (
+    disable_icut_buttons_for_missing_workspaces,
+)
+from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
+from mslice.widgets.workspacemanager.command import Command
+
+from .busy import show_busy
+from .interfaces.main_presenter import MainPresenterInterface
+from .interfaces.workspace_manager_presenter import WorkspaceManagerPresenterInterface
+from .validation_decorators import require_main_presenter
 
 
 class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
@@ -82,9 +83,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
                 self._command_map[command]()
             else:
                 raise ValueError(
-                    "Workspace Manager Presenter received an unrecognised command: {}".format(
-                        str(command)
-                    )
+                    f"Workspace Manager Presenter received an unrecognised command: {command!s}"
                 )
 
     def _broadcast_selected_workspaces(self):
@@ -287,8 +286,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         self._workspace_manager_view.clear_displayed_error()
 
     def delete_handle(self, workspace):
-        if workspace.startswith("__MSL"):
-            workspace = workspace[5:]
+        workspace = workspace.removeprefix("__MSL")
         delete_workspace(workspace)
         self.update_displayed_workspaces()
         disable_icut_buttons_for_missing_workspaces()

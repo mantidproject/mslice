@@ -1,6 +1,5 @@
 from matplotlib.legend import Legend
 
-
 if hasattr(Legend, "set_draggable"):
     SET_DRAGGABLE_METHOD = "set_draggable"
 else:

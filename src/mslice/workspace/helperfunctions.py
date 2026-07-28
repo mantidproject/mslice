@@ -1,5 +1,5 @@
-import pickle
 import codecs
+import pickle
 
 from mantid.simpleapi import DeleteWorkspace, RenameWorkspace
 
@@ -113,7 +113,7 @@ def rename_workspace(old_name: str, new_name: str) -> None:
         RenameWorkspace(InputWorkspace=old_name, OutputWorkspace=new_name)
 
 
-class WrapWorkspaceAttribute(object):
+class WrapWorkspaceAttribute:
     def __init__(self, workspace):
         self.workspace = (
             workspace

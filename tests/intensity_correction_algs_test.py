@@ -1,28 +1,29 @@
-from mock import patch, MagicMock, call
-import numpy as np
 import unittest
 from copy import copy
+from unittest.mock import MagicMock, call, patch
+
+import numpy as np
+from mantid.simpleapi import AddSampleLog
 
 from mslice.models.axis import Axis
 from mslice.models.intensity_correction_algs import (
-    compute_boltzmann_dist,
-    compute_chi,
-    compute_d2sigma,
-    compute_symmetrised,
-    sample_temperature,
-    cut_compute_gdos,
-    slice_compute_gdos,
     _cut_compute_gdos,
     _cut_compute_gdos_pixel,
     _get_slice_axis,
     _reduce_bins_along_int_axis,
+    compute_boltzmann_dist,
+    compute_chi,
+    compute_d2sigma,
+    compute_symmetrised,
+    cut_compute_gdos,
+    sample_temperature,
+    slice_compute_gdos,
 )
 from mslice.util.mantid.mantid_algorithms import (
-    CreateSampleWorkspace,
     CreateMDHistoWorkspace,
+    CreateSampleWorkspace,
 )
 from mslice.workspace.pixel_workspace import PixelWorkspace
-from mantid.simpleapi import AddSampleLog
 
 
 def _invert_axes(matrix):

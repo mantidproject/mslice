@@ -1,11 +1,11 @@
 from uuid import uuid4
 
+from mantid.api import AlgorithmManager, AnalysisDataService, Workspace
+
 from mslice.models.workspacemanager.workspace_provider import (
     add_workspace,
     get_workspace_handle,
 )
-from mantid.api import AnalysisDataService, AlgorithmManager, Workspace
-
 from mslice.workspace import wrap_workspace
 from mslice.workspace.base import WorkspaceBase as MsliceWorkspace
 from mslice.workspace.workspace import Workspace as MsliceWorkspace2D

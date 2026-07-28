@@ -1,18 +1,20 @@
 import unittest
-import mock
+from unittest import mock
+
 import numpy as np
-from mslice.workspace import wrap_workspace
 from mantid.simpleapi import AddSampleLog, CreateSampleWorkspace
-from mslice.plotting.plot_window.cut_plot import CutPlot
-from mslice.models.cut.cut import Cut
+
 from mslice.models.axis import Axis
+from mslice.models.cut.cut import Cut
 from mslice.models.workspacemanager.workspace_provider import add_workspace
+from mslice.plotting.plot_window.cut_plot import CutPlot
 from mslice.scripting import (
-    preprocess_lines,
+    generate_script,
     generate_script_lines,
     get_algorithm_kwargs,
-    generate_script,
+    preprocess_lines,
 )
+from mslice.workspace import wrap_workspace
 from tests.testhelpers.fake_objects import FakeClipboard, FakeFile
 
 
@@ -152,13 +154,11 @@ class ScriptingTest(unittest.TestCase):
         load_kwargs, output_ws = get_alg_kwargs(load_alg, ws_name)
 
         self.assertIn(
-            "ws_{} = mc.{}({})\n".format(ws_name, load_alg.name(), load_kwargs),
+            f"ws_{ws_name} = mc.{load_alg.name()}({load_kwargs})\n",
             script_lines,
         )
         self.assertIn(
-            "ws_{} = mc.{}({})\n".format(
-                ws_name, make_projection_alg.name(), make_projection_kwargs
-            ),
+            f"ws_{ws_name} = mc.{make_projection_alg.name()}({make_projection_kwargs})\n",
             script_lines,
         )
 
@@ -188,7 +188,7 @@ class ScriptingTest(unittest.TestCase):
 
         load_kwargs, output_ws = get_alg_kwargs(load_alg, ws_name)
         self.assertIn(
-            "ws_{} = mc.{}({})\n".format(ws_name, load_alg.name(), load_kwargs),
+            f"ws_{ws_name} = mc.{load_alg.name()}({load_kwargs})\n",
             script_lines,
         )
 

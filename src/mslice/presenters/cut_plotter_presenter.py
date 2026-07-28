@@ -1,34 +1,35 @@
+import warnings
+from sys import float_info
+
 import numpy as np
 
-from mslice.views.cut_plotter import (
-    plot_cut_impl,
-    draw_interactive_cut,
-    cut_figure_exists,
-    get_current_plot,
-)
+import mslice.plotting.pyplot as plt
 from mslice.models.alg_workspace_ops import get_range_end
+from mslice.models.axis import Axis
 from mslice.models.cut.cut import SampleTempValueError
 from mslice.models.cut.cut_functions import compute_cut
+from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.labels import generate_legend
+from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.workspacemanager.workspace_algorithms import export_workspace_to_ads
 from mslice.models.workspacemanager.workspace_provider import (
     add_workspace,
     get_workspace_handle,
     workspace_exists,
 )
-import mslice.plotting.pyplot as plt
-from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.plotting.plot_window.overplot_interface import (
-    remove_line,
     plot_overplot_line,
+    remove_line,
 )
-from mslice.models.powder.powder_functions import compute_powder_line
-from mslice.models.intensity_correction_algs import sample_temperature
-from mslice.models.axis import Axis
-from mslice.util.intensity_correction import IntensityType, IntensityCache
-import warnings
-from sys import float_info
+from mslice.presenters.presenter_utility import PresenterUtility
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 from mslice.util.mantid.algorithm_wrapper import remove_from_ads
+from mslice.views.cut_plotter import (
+    cut_figure_exists,
+    draw_interactive_cut,
+    get_current_plot,
+    plot_cut_impl,
+)
 
 BRAGG_SIZE_ON_AXES = 0.15
 
@@ -330,10 +331,8 @@ class CutPlotterPresenter(PresenterUtility):
         min_q = float_info.max
         max_q = -min_q
         for cut in self._cut_cache_dict[plt.gca()]:
-            if cut.q_axis.end > max_q:
-                max_q = cut.q_axis.end
-            if cut.q_axis.start < min_q:
-                min_q = cut.q_axis.start
+            max_q = max(max_q, cut.q_axis.end)
+            min_q = min(min_q, cut.q_axis.start)
         return Axis(cut.q_axis.units, min_q, max_q, cut.q_axis.step, cut.q_axis.e_unit)
 
     def _get_overall_max_signal(self, intensity_correction):
@@ -348,8 +347,7 @@ class CutPlotterPresenter(PresenterUtility):
                     continue
             ws = cut.get_intensity_corrected_ws(intensity_correction)
             max_cut_signal = np.nanmax(ws.get_signal())
-            if max_cut_signal > overall_max_signal:
-                overall_max_signal = max_cut_signal
+            overall_max_signal = max(overall_max_signal, max_cut_signal)
         return overall_max_signal
 
     def set_is_icut(self, is_icut):
@@ -423,7 +421,7 @@ class CutPlotterPresenter(PresenterUtility):
         for cut in self._cut_cache_dict[axes]:
             if ws_name == cut.workspace_name:
                 parent_ws_name = cut.parent_ws_name
-            if cut.parent_ws_name not in cut_dict.keys():
+            if cut.parent_ws_name not in cut_dict:
                 cut_dict[cut.parent_ws_name] = [cut]
             else:
                 cut_dict[cut.parent_ws_name].append(cut)
@@ -443,7 +441,7 @@ class CutPlotterPresenter(PresenterUtility):
         for cut in self._cut_cache_dict[axes]:
             if (
                 cut.raw_sample_temp
-                and cut.parent_ws_name not in temperature_dict.keys()
+                and cut.parent_ws_name not in temperature_dict
             ):
                 temperature_dict[cut.parent_ws_name] = cut.sample_temp
             elif not cut.raw_sample_temp:
@@ -451,7 +449,7 @@ class CutPlotterPresenter(PresenterUtility):
 
         if len(temperature_dict) > 0:
             for cut in list(cuts_with_no_temp):
-                if cut.parent_ws_name in temperature_dict.keys():
+                if cut.parent_ws_name in temperature_dict:
                     cut.sample_temp = temperature_dict[cut.parent_ws_name]
                     cuts_with_no_temp.remove(cut)
 

@@ -1,7 +1,7 @@
 import pathlib
+
 import mslice.cli as mc
 import mslice.plotting.pyplot as plt
-
 
 TEST_FILE_PATH = (
     pathlib.Path(__file__).resolve().parents[1] / "testdata" / "MAR21335_Ei60meV.nxs"

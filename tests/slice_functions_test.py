@@ -1,25 +1,25 @@
-from mock import patch, MagicMock
-import numpy as np
 import unittest
+from unittest.mock import MagicMock, patch
 
+import numpy as np
 from mantid.api import AlgorithmFactory
 from mantid.simpleapi import (
     AddSampleLog,
-    _create_algorithm_function,
     AnalysisDataService,
+    _create_algorithm_function,
 )
 
 from mslice.models.axis import Axis
+from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.models.slice.slice_functions import (
-    compute_slice,
     compute_recoil_line,
+    compute_slice,
     is_sliceable,
 )
-from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
+from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from tests.testhelpers.workspace_creator import create_pixel_workspace
-from mslice.models.powder.powder_functions import compute_powder_line
 
 
 class SliceFunctionsTest(unittest.TestCase):

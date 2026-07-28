@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class IPlot(object):
+class IPlot:
     __metaclass__ = ABCMeta
 
     @abstractmethod

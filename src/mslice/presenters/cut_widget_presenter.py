@@ -1,15 +1,16 @@
-from mslice.models.cut.cut import Cut
-from .busy import show_busy
+import warnings
+
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
+from mslice.models.cut.cut import Cut
 from mslice.models.cut.cut_functions import is_cuttable
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
-
 from mslice.views.interfaces.cut_view import CutView
 from mslice.widgets.cut.command import Command
+
+from .busy import show_busy
 from .validation_decorators import require_main_presenter
-import warnings
 
 
 class CutWidgetPresenter(PresenterUtility):

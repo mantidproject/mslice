@@ -27,14 +27,13 @@ be added to the category of the command
 Currently there are only two categories ('1d' and '2d') hard coded into the manager.
 """
 
+import atexit
 from collections import defaultdict
+from enum import Enum
 
 # system imports
 from functools import wraps
 
-import atexit
-
-from enum import Enum
 from .observabledictionary import DictionaryAction, ObservableDictionary
 
 # Labels for each category
@@ -50,7 +49,7 @@ class FigureAction(Enum):
     VisibilityChanged = 5
 
 
-class GlobalFigureManagerObserver(object):
+class GlobalFigureManagerObserver:
     def __init__(self, figure_manager=None):
         """
         :param figure_manager: Figure manager that will be used to notify observers.
@@ -82,10 +81,10 @@ class GlobalFigureManagerObserver(object):
             for key in self.figure_manager.figs.keys():
                 self.figure_manager.notify_observers(FigureAction.Closed, key)
         else:
-            raise ValueError("Notifying for action {} is not supported".format(action))
+            raise ValueError(f"Notifying for action {action} is not supported")
 
 
-class GlobalFigureManager(object):
+class GlobalFigureManager:
     """Static class to manage a set of numbered figures.
 
     It is never instantiated. It consists of attributes to
@@ -185,7 +184,7 @@ class GlobalFigureManager(object):
     def destroy_all(cls):
         # this is need to ensure that gc is available in corner cases
         # where modules are being torn down after install with easy_install
-        import gc  # noqa
+        import gc
 
         for manager in list(cls._figures.values()):
             manager.destroy()

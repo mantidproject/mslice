@@ -1,16 +1,16 @@
 from qtpy.QtWidgets import (
+    QCheckBox,
     QDialog,
+    QDoubleSpinBox,
     QFormLayout,
     QLabel,
-    QDoubleSpinBox,
     QPushButton,
-    QCheckBox,
 )
 
 
 class EfInputDialog(QDialog):
     def __init__(self, parent=None):
-        super(EfInputDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setWindowTitle("Indirect Ef")
         layout = QFormLayout(self)
         self.text = QLabel(self)

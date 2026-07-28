@@ -1,10 +1,10 @@
-from mslice.models.units import EnergyUnits
 from mslice.models.alg_workspace_ops import get_axis_step
+from mslice.models.units import EnergyUnits
 
 STEP_TOLERANCE = 1e-5
 
 
-class Axis(object):
+class Axis:
     def __init__(self, units, start, end, step, e_unit="meV"):
         self.units = units
         self.start = float(start)
@@ -27,7 +27,7 @@ class Axis(object):
             self.start,
             self.end,
             self.step,
-            ",{}".format(self.e_unit) if self.not_meV else "",
+            f",{self.e_unit}" if self.not_meV else "",
         )
 
     def __eq__(self, other):
@@ -61,14 +61,12 @@ class Axis(object):
         except ValueError:
             if str(value) == "":
                 raise ValueError(
-                    "Invalid axis parameter on {}: Start value required!".format(
-                        self.units
-                    )
+                    f"Invalid axis parameter on {self.units}: Start value required!"
                 )
             else:
                 raise ValueError(
-                    "Invalid axis parameter on {}: "
-                    "Start value {} is not a valid float!".format(self.units, value)
+                    f"Invalid axis parameter on {self.units}: "
+                    f"Start value {value} is not a valid float!"
                 )
 
     @property
@@ -82,19 +80,17 @@ class Axis(object):
         except ValueError:
             if str(value) == "":
                 raise ValueError(
-                    "Invalid axis parameter on {}: End value required!".format(
-                        self.units
-                    )
+                    f"Invalid axis parameter on {self.units}: End value required!"
                 )
             else:
                 raise ValueError(
-                    "Invalid axis parameter on {}: "
-                    "End value {} is not a valid float!".format(self.units, value)
+                    f"Invalid axis parameter on {self.units}: "
+                    f"End value {value} is not a valid float!"
                 )
         if end_float <= self.start:
             raise ValueError(
-                "Invalid axis parameter on {}: End value must be greater"
-                " than start value!".format(self.units)
+                f"Invalid axis parameter on {self.units}: End value must be greater"
+                " than start value!"
             )
         self._end = end_float
 
@@ -108,9 +104,7 @@ class Axis(object):
             self._step = float(value)
         except ValueError:
             raise ValueError(
-                "Invalid axis parameter on {}: Step {} is not a valid float!".format(
-                    self.units, value
-                )
+                f"Invalid axis parameter on {self.units}: Step {value} is not a valid float!"
             )
 
     @property

@@ -1,4 +1,4 @@
-class MainView(object):
+class MainView:
     def __init__(self):
         pass
 

@@ -1,7 +1,7 @@
 from functools import partial
 
 
-class PlotOptionsPresenter(object):
+class PlotOptionsPresenter:
     def __init__(self, plot_options_dialog, plot_handler):
         self._model = plot_handler
         self._view = plot_options_dialog
@@ -56,7 +56,7 @@ class PlotOptionsPresenter(object):
 
 class SlicePlotOptionsPresenter(PlotOptionsPresenter):
     def __init__(self, plot_options_dialog, slice_handler):
-        super(SlicePlotOptionsPresenter, self).__init__(
+        super().__init__(
             plot_options_dialog, slice_handler
         )
 
@@ -106,7 +106,7 @@ class SlicePlotOptionsPresenter(PlotOptionsPresenter):
 
 class CutPlotOptionsPresenter(PlotOptionsPresenter):
     def __init__(self, plot_options_dialog, cut_handler):
-        super(CutPlotOptionsPresenter, self).__init__(plot_options_dialog, cut_handler)
+        super().__init__(plot_options_dialog, cut_handler)
 
         self._view.showLegendsEdited.connect(
             partial(self._value_modified, "show_legends")
@@ -141,7 +141,7 @@ class CutPlotOptionsPresenter(PlotOptionsPresenter):
         self._model.remove_line_by_index(index)
 
     def get_new_config(self):
-        current_show_legends = getattr(self._model, "show_legends")
+        current_show_legends = self._model.show_legends
         new_show_legends = current_show_legends
 
         for key, value in list(self._modified_values.items()):

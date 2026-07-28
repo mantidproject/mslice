@@ -9,8 +9,7 @@ from functools import wraps
 from mantidqt.utils.qt.qappthreadcall import (
     QAppThreadCall,
     force_method_calls_to_qapp_thread,
-)  # noqa: F401
-
+)
 from qtpy.QtWidgets import QApplication
 
 # Global QApplication instance reference to keep it alive

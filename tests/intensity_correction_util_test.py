@@ -1,13 +1,13 @@
-from mock import patch, MagicMock
 import unittest
+from unittest.mock import MagicMock, patch
 
-from mslice.util.intensity_correction import IntensityCache, IntensityType
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.models.slice.slice import Slice
 from mslice.plotting.plot_window.plot_window import PlotWindow
-from mslice.plotting.pyplot import CATEGORY_SLICE, CATEGORY_CUT
+from mslice.plotting.pyplot import CATEGORY_CUT, CATEGORY_SLICE
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 
 
 class IntensityCorrectionUtilTest(unittest.TestCase):

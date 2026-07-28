@@ -1,21 +1,24 @@
-from mslice.app import is_gui
-from mslice.plotting.pyplot import *  # noqa: F401, F403
 from matplotlib.axes import Axes
 from matplotlib.projections import register_projection
-from mslice.cli.helperfunctions import is_cut, is_hs_workspace
-from ._mslice_commands import *  # noqa: F401, F403
+
+from mslice.app import is_gui
 from mslice.cli.helperfunctions import (
     _check_workspace_name,
     _check_workspace_type,
-    _get_workspace_type,
     _get_overplot_key,
-    _update_overplot_checklist,
+    _get_workspace_type,
     _update_legend,
+    _update_overplot_checklist,
+    is_cut,
+    is_hs_workspace,
 )
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.plotting.pyplot import *
 from mslice.util.qt.qapp import call_in_qapp_thread
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+
+from ._mslice_commands import *
 
 # This is not compatible with mslice as we use a separate
 # global figure manager see _mslice_commands.Show

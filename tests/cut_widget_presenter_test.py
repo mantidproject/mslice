@@ -1,15 +1,15 @@
-import mock
-from mock import call, patch
 import unittest
 import warnings
+from unittest import mock
+from unittest.mock import call, patch
 
-from mslice.models.axis import Axis
 from mslice.models.alg_workspace_ops import get_available_axes
+from mslice.models.axis import Axis
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
-from mslice.widgets.cut.command import Command
 from mslice.views.interfaces.cut_view import CutView
+from mslice.widgets.cut.command import Command
 
 
 class CutWidgetPresenterTest(unittest.TestCase):

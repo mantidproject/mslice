@@ -1,5 +1,6 @@
-from qtpy.uic import loadUi, loadUiType
 import os.path as osp
+
+from qtpy.uic import loadUi, loadUiType
 
 
 def load_ui(caller_filename, ui_relfilename, baseinstance=None):

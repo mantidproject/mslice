@@ -1,8 +1,9 @@
-from .histogram_workspace import HistogramWorkspace
 from mantid.simpleapi import BinMD
 
+from .histogram_workspace import HistogramWorkspace
 
-class PixelMixin(object):
+
+class PixelMixin:
     def get_histo_ws(self):
         """Converts _raw_ws from MDEventWorkspace to MDHistoWorkspace using BinMD, and caches result in _histo_ws"""
         if self._histo_ws is None:

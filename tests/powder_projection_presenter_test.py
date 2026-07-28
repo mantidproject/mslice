@@ -1,5 +1,5 @@
-import mock
 import unittest
+from unittest import mock
 
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface

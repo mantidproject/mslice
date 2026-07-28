@@ -1,5 +1,6 @@
 from enum import Enum
-from mslice.plotting.pyplot import CATEGORY_SLICE, CATEGORY_CUT
+
+from mslice.plotting.pyplot import CATEGORY_CUT, CATEGORY_SLICE
 
 
 class IntensityType(Enum):

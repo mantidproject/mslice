@@ -1,13 +1,14 @@
-from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
-from mslice.models.units import EnergyUnits
 from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice_functions import is_sliceable
+from mslice.models.units import EnergyUnits
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.interfaces.slice_view import SliceView
 from mslice.widgets.slice.command import Command
+
+from .busy import show_busy
 from .interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from .validation_decorators import require_main_presenter
 

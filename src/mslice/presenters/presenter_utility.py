@@ -1,7 +1,7 @@
 from .interfaces.main_presenter import MainPresenterInterface
 
 
-class PresenterUtility(object):
+class PresenterUtility:
     def register_master(self, main_presenter):
         assert isinstance(main_presenter, MainPresenterInterface)
         self._main_presenter = main_presenter

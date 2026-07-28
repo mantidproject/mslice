@@ -1,12 +1,10 @@
 import numpy as np
-
-from scipy import constants
-
 from mantid.geometry import (
     CrystalStructure,
-    ReflectionGenerator,
     ReflectionConditionFilter,
+    ReflectionGenerator,
 )
+from scipy import constants
 
 from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle

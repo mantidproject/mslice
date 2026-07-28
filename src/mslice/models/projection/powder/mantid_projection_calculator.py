@@ -1,7 +1,8 @@
+from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.util.mantid import mantid_algorithms
+
 from ...labels import DELTA_E_LABEL, MOD_Q_LABEL, THETA_LABEL
 
 

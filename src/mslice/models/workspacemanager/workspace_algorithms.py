@@ -9,30 +9,27 @@ import os.path
 from os.path import splitext
 
 import numpy as np
+from mantid.api import MatrixWorkspace, WorkspaceUnitValidator
 from scipy import constants
 
-import mslice.util.mantid.init_mantid  # noqa: F401
-
-from mantid.api import WorkspaceUnitValidator
-from mantid.api import MatrixWorkspace
-
+import mslice.util.mantid.init_mantid
 from mslice.models.axis import Axis
-from mslice.util.mantid.algorithm_wrapper import add_to_ads, remove_from_ads
 from mslice.models.workspacemanager.workspace_provider import (
-    get_workspace_handle,
     delete_workspace,
+    get_workspace_handle,
 )
+from mslice.util.mantid.algorithm_wrapper import add_to_ads, remove_from_ads
 from mslice.util.mantid.mantid_algorithms import (
+    ConvertUnits,
     Load,
     MergeMD,
     MergeRuns,
-    Scale,
     Minus,
-    ConvertUnits,
     Rebose,
+    Scale,
 )
-from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
 from .file_io import save_ascii, save_matlab, save_nexus, save_nxspe
@@ -205,7 +202,7 @@ def load(filename, output_workspace):
                 OutputWorkspace=workspace.name,
             )
         _processLoadedWSLimits(workspace)
-    except:  # noqa: E722
+    except:
         delete_workspace(workspace)
         raise
     return workspace
@@ -308,7 +305,7 @@ def save_workspaces(workspaces, path, save_name, extension):
         else:
             name, _ = splitext(save_name)
             save_names = [
-                "{}_{:03d}{}".format(name, idx + 1, extension)
+                f"{name}_{idx + 1:03d}{extension}"
                 for idx in range(len(workspaces))
             ]
     else:

@@ -1,8 +1,9 @@
+import re
 from datetime import datetime
+
 from mslice.models.alg_workspace_ops import get_range_end
 from mslice.models.labels import get_recoil_key
-from mslice.util.intensity_correction import IntensityType, IntensityCache
-import re
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 
 COMMON_PACKAGES = [
     "import mslice.cli as mc",
@@ -42,8 +43,8 @@ def add_header(script_lines, plot_handler):
 
 def add_plot_statements(script_lines, plot_handler, ax):
     """Adds plot statements to the script lines used to generate the python script"""
-    from mslice.plotting.plot_window.slice_plot import SlicePlot
     from mslice.plotting.plot_window.cut_plot import CutPlot
+    from mslice.plotting.plot_window.slice_plot import SlicePlot
 
     add_header(script_lines, plot_handler)
 
@@ -324,7 +325,7 @@ def add_plot_options(script_lines, plot_handler):
 
 def replace_ws_special_chars(workspace_name):
     rep = {".": "_", "(": "_", ")": "_", ",": "_"}
-    pattern = re.compile("|".join([re.escape(key) for key in rep.keys()]))
+    pattern = re.compile("|".join([re.escape(key) for key in rep]))
     new_ws_name = pattern.sub(lambda m: rep[m.group(0)], workspace_name)
     while new_ws_name[len(new_ws_name) - 1 :] == "_":
         new_ws_name = new_ws_name[: len(new_ws_name) - 1]

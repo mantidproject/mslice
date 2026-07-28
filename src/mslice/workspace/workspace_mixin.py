@@ -1,12 +1,13 @@
-import numpy as np
 import operator as op
 
+import numpy as np
 from mantid.simpleapi import CloneWorkspace, PowerMD
+
 from mslice.util.numpy_helper import apply_with_corrected_shape
 
 
 # Other operators are defined when MSlice is imported in _workspace_ops.attach_binary_operators()
-class WorkspaceOperatorMixin(object):
+class WorkspaceOperatorMixin:
     def __neg__(self):
         return self * -1
 
@@ -21,7 +22,7 @@ class WorkspaceOperatorMixin(object):
         )
 
 
-class WorkspaceMixin(object):
+class WorkspaceMixin:
     def get_coordinates(self):
         """
         Gets dimensions and bins of a workspace.

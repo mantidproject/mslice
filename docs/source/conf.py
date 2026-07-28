@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # MSlice documentation build configuration file, created by
 # sphinx-quickstart on Tue Sep 20 10:49:22 2016.

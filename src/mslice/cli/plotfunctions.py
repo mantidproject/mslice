@@ -1,25 +1,26 @@
+from mantid.plots import axesfunctions
+
 import mslice.plotting.pyplot as plt
-import mslice.app as app
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice import app
+from mslice.app import is_gui
 from mslice.cli.helperfunctions import (
-    _check_workspace_type,
     _check_workspace_name,
+    _check_workspace_type,
     _rescale_energy_cut_plot,
 )
-from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.app import is_gui
+from mslice.models.cut.cut import Cut
+from mslice.models.labels import CUT_INTENSITY_LABEL, get_display_name
+from mslice.models.workspacemanager.workspace_algorithms import get_EFixed
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.util.compat import legend_set_draggable
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 from mslice.util.mantid.mantid_algorithms import Transpose
 from mslice.util.numpy_helper import is_real_number
-from mslice.util.intensity_correction import IntensityType, IntensityCache
-from mslice.models.labels import get_display_name, CUT_INTENSITY_LABEL
-from mslice.models.cut.cut import Cut
-from mslice.models.workspacemanager.workspace_algorithms import get_EFixed
-import mantid.plots.axesfunctions as axesfunctions
-from mslice.views.slice_plotter import create_slice_figure
-from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
 from mslice.views.cut_plotter import PICKER_TOL_PTS as CUT_PICKER_TOL_PTS
-from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.views.slice_plotter import PICKER_TOL_PTS as SLICE_PICKER_TOL_PTS
+from mslice.views.slice_plotter import create_slice_figure
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
 @plt.set_category(plt.CATEGORY_CUT)
@@ -55,9 +56,7 @@ def errorbar(axes, workspace, *args, **kwargs):
             if cut_axis.units != cached_cuts[0].cut_axis.units:
                 raise RuntimeError(
                     "Cut axes not consistent with current plot. "
-                    "Expected {}, got {}".format(
-                        cached_cuts[0].cut_axis.units, cut_axis.units
-                    )
+                    f"Expected {cached_cuts[0].cut_axis.units}, got {cut_axis.units}"
                 )
             # Checks whether we should do an energy unit conversion
             if (
@@ -68,9 +67,7 @@ def errorbar(axes, workspace, *args, **kwargs):
                     _rescale_energy_cut_plot(presenter, cached_cuts, cut_axis.e_unit)
                 else:
                     raise RuntimeError(
-                        "Wrong energy unit for cut. Expected {}, got {}".format(
-                            cached_cuts[0].cut_axis.e_unit, cut_axis.e_unit
-                        )
+                        f"Wrong energy unit for cut. Expected {cached_cuts[0].cut_axis.e_unit}, got {cut_axis.e_unit}"
                     )
 
     axesfunctions.errorbar(axes, workspace.raw_ws, label=label, *args, **kwargs)
@@ -126,8 +123,8 @@ def pcolormesh(axes, workspace, *args, **kwargs):
     Same as the CLI PlotSlice but returns the relevant axes object.
     """
     from mslice.app.presenters import (
-        get_slice_plotter_presenter,
         cli_slice_plotter_presenter,
+        get_slice_plotter_presenter,
     )
 
     _check_workspace_name(workspace)

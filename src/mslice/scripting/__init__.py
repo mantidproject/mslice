@@ -1,10 +1,11 @@
 from qtpy import QtGui, QtWidgets
+
+from mslice.app.presenters import get_cut_plotter_presenter
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.scripting.helperfunctions import (
     add_plot_statements,
     replace_ws_special_chars,
 )
-from mslice.app.presenters import get_cut_plotter_presenter
 
 
 def generate_script(

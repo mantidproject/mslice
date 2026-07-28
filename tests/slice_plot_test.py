@@ -1,12 +1,12 @@
-from mock import MagicMock, patch, PropertyMock, ANY
 import unittest
+from unittest.mock import ANY, MagicMock, PropertyMock, patch
 
 from matplotlib import colors
 from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 
-from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.plotting.plot_window.overplot_interface import toggle_overplot_line
+from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.util.intensity_correction import IntensityType
 
 

@@ -4,15 +4,16 @@
 # SPDX - License - Identifier: GPL - 3.0 +
 #
 #
+import unittest
+from unittest import mock
+
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QIcon
 from qtpy.QtTest import QTest
-import unittest
 
-from unittest import mock
 from mslice.widgets.plotselector.column_info import Column
-from mslice.widgets.plotselector.view import EXPORT_TYPES, PlotSelectorView
 from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
+from mslice.widgets.plotselector.view import EXPORT_TYPES, PlotSelectorView
 
 
 class PlotSelectorWidgetTest(unittest.TestCase):

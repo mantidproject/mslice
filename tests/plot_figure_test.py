@@ -2,8 +2,8 @@ import unittest
 from unittest import mock
 from unittest.mock import patch
 
-from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
+from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.util.intensity_correction import IntensityType
 
 FORCE_METHOD_CALLS_TO_QAPP_THREAD = (

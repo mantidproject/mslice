@@ -1,4 +1,5 @@
 import unittest
+
 from mslice.models.units import EnergyUnits
 
 

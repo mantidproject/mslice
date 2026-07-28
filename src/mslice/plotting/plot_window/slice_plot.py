@@ -1,37 +1,35 @@
+from collections.abc import Callable
 from functools import partial
 
+from matplotlib import colors
+from matplotlib.legend import Legend
+from matplotlib.text import Text
 from qtpy import QtWidgets
 from qtpy.QtCore import Qt
 
-import matplotlib.colors as colors
-from matplotlib.legend import Legend
-from matplotlib.text import Text
-
-from mslice.models.colors import to_hex, name_to_color
+from mslice.models.colors import name_to_color, to_hex
+from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.units import get_sample_temperature_from_string
-from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
-from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.models.workspacemanager.workspace_provider import (
     get_workspace_handle,
     workspace_exists,
 )
 from mslice.plotting.plot_window.cachable_input_dialog import QCacheableInputDialog
-from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
-from mslice.plotting.plot_window.plot_options import SlicePlotOptions
+from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.overplot_interface import (
     _update_overplot_lines,
     _update_powder_lines,
-    toggle_overplot_line,
     cif_file_powder_line,
+    toggle_overplot_line,
 )
+from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 from mslice.plotting.pyplot import GlobalFigureManager
+from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
+from mslice.presenters.quick_options_presenter import check_latex, quick_options
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
-from mslice.util.intensity_correction import IntensityType, IntensityCache
-from mslice.models.intensity_correction_algs import sample_temperature
-
-from typing import Callable
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12

@@ -1,4 +1,4 @@
-class WorkspaceView(object):
+class WorkspaceView:
     error_occurred = None
     busy = None
 

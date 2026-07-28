@@ -3,12 +3,14 @@ Sets up mslice specific algorithms. This code executes when the module is import
 it can affect other imports.
 """
 
-from mantid.api import AlgorithmFactory
 import mantid.simpleapi as s_api
+from mantid.api import AlgorithmFactory
+
 from mslice.models.cut.cut_algorithm import Cut
 from mslice.models.projection.powder.make_projection import MakeProjection
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.models.workspacemanager.rebose_algorithm import Rebose
+
 from ._workspace_ops import _attach_binary_operators
 
 AlgorithmFactory.subscribe(MakeProjection)

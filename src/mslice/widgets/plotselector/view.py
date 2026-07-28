@@ -5,7 +5,11 @@
 #
 #
 import re
-from qtpy.QtCore import Qt, Signal, QMutex, QMutexLocker
+
+from mantidqt.icons import get_icon
+from mantidqt.utils.flowlayout import FlowLayout
+from mantidqt.utils.qt.qappthreadcall import QAppThreadCall
+from qtpy.QtCore import QMutex, QMutexLocker, Qt, Signal
 from qtpy.QtWidgets import (
     QAbstractItemView,
     QAction,
@@ -22,13 +26,10 @@ from qtpy.QtWidgets import (
     QWidget,
 )
 
-from .column_info import Column
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
 
-from mantidqt.icons import get_icon
-from mantidqt.utils.flowlayout import FlowLayout
-from mantidqt.utils.qt.qappthreadcall import QAppThreadCall
+from .column_info import Column
 
 DEBUG_MODE = False
 
@@ -56,7 +57,7 @@ class PlotSelectorView(QWidget):
         :param parent: Optional - the parent QWidget
         running as a unit test, in which case skip file dialogs
         """
-        super(PlotSelectorView, self).__init__(parent)
+        super().__init__(parent)
         if presenter is not None:
             self.presenter = presenter
         else:
@@ -149,8 +150,8 @@ class PlotSelectorView(QWidget):
         """
         row = self.table_widget.currentRow()
         widget = self.table_widget.cellWidget(row, Column.Name)
-        print("Plot number: {}".format(widget.plot_number))
-        print("Plot text: {}".format(widget.line_edit.text()))
+        print(f"Plot number: {widget.plot_number}")
+        print(f"Plot text: {widget.line_edit.text()}")
 
     def keyPressEvent(self, event):
         """
@@ -161,7 +162,7 @@ class PlotSelectorView(QWidget):
         only ever an active selection when focused on the table.
         :param event: A QKeyEvent holding the key that was pressed
         """
-        super(PlotSelectorView, self).keyPressEvent(event)
+        super().keyPressEvent(event)
         if event.key() == Qt.Key_Delete:
             self.deleteKeyPressed.emit(event.key())
 
@@ -641,7 +642,7 @@ class PlotSelectorView(QWidget):
         """
         # Returns a tuple containing the filename and extension
         absolute_path = QFileDialog.getSaveFileName(
-            caption="Select filename for exported plot", filter="*{}".format(extension)
+            caption="Select filename for exported plot", filter=f"*{extension}"
         )
         return absolute_path[0]
 
@@ -667,7 +668,7 @@ class PlotNameWidget(QWidget):
     """
 
     def __init__(self, presenter, plot_number, parent=None):
-        super(PlotNameWidget, self).__init__(parent)
+        super().__init__(parent)
 
         self.presenter = presenter
         self.plot_number = plot_number
@@ -823,7 +824,7 @@ class HumanReadableSortItem(QTableWidgetItem):
     """
 
     def __init__(self, *args, **kwargs):
-        super(HumanReadableSortItem, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.role = Qt.DisplayRole
 
     def set_data_sort_role(self, role):

@@ -14,14 +14,13 @@ this file.
 # analysis tools to parse.
 
 import ast
-from enum import Enum
 import functools
 import inspect
+import subprocess
+import sys
+from enum import Enum
 from inspect import Parameter
 from pathlib import Path
-import sys
-import subprocess
-
 
 # This line imports the installed copy of matplotlib, and not the local copy.
 import numpy as np

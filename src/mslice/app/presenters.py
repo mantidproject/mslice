@@ -1,14 +1,15 @@
-from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
-from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
+from mslice import app
 from mslice.cli.views.cli_data_loader import CLIDataLoaderWidget
-from mslice.presenters.data_loader_presenter import DataLoaderPresenter
-from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.cli.views.cli_powder import CLIPowderWidget
 from mslice.models.projection.powder.mantid_projection_calculator import (
     MantidProjectionCalculator,
 )
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
+from mslice.presenters.data_loader_presenter import DataLoaderPresenter
+from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
+from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
+
 from . import is_gui
-from mslice import app
 
 # Separate presenters for the CLI
 cli_cut_plotter_presenter = CutPlotterPresenter()

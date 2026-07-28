@@ -10,7 +10,6 @@ from qtpy.QtWidgets import QWidget
 
 from mslice.util.qt import load_ui
 
-
 # -----------------------------------------------------------------------------
 # Classes and functions
 # -----------------------------------------------------------------------------

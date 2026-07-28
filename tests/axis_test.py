@@ -1,6 +1,7 @@
 import unittest
-from mock import MagicMock, patch
-from mslice.models.axis import Axis, STEP_TOLERANCE
+from unittest.mock import MagicMock, patch
+
+from mslice.models.axis import STEP_TOLERANCE, Axis
 
 
 class AxisTest(unittest.TestCase):

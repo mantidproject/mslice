@@ -1,24 +1,24 @@
 import unittest
+from unittest import mock
+from unittest.mock import MagicMock, call, patch
 
-import mock
-from mock import call, patch, MagicMock
 import numpy as np
 
+from mslice.models.workspacemanager.workspace_provider import add_workspace
+from mslice.plotting.plot_window.plot_window import PlotWindow
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
-from mslice.views.interfaces.mainview import MainView
-from mslice.views.interfaces.workspace_view import WorkspaceView
-from mslice.widgets.workspacemanager.command import Command
-from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
 from mslice.util.mantid.mantid_algorithms import (
     AddSampleLog,
-    CreateWorkspace,
-    CreateSimulationWorkspace,
-    ConvertToMD,
     CloneWorkspace,
+    ConvertToMD,
+    CreateSimulationWorkspace,
+    CreateWorkspace,
 )
-from mslice.plotting.plot_window.plot_window import PlotWindow
-from mslice.models.workspacemanager.workspace_provider import add_workspace
+from mslice.views.interfaces.mainview import MainView
+from mslice.views.interfaces.workspace_view import WorkspaceView
+from mslice.widgets.workspacemanager import TAB_2D, TAB_NONPSD
+from mslice.widgets.workspacemanager.command import Command
 
 
 class WorkspaceManagerPresenterTest(unittest.TestCase):

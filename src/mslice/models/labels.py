@@ -26,11 +26,7 @@ def is_energy(unit):
 
 
 def are_units_equivalent(unit_lhs, unit_rhs):
-    if is_twotheta(unit_lhs) and is_twotheta(unit_rhs):
-        return True
-    elif is_momentum(unit_lhs) and is_momentum(unit_rhs):
-        return True
-    elif is_energy(unit_lhs) and is_energy(unit_rhs):
+    if is_twotheta(unit_lhs) and is_twotheta(unit_rhs) or is_momentum(unit_lhs) and is_momentum(unit_rhs) or is_energy(unit_lhs) and is_energy(unit_rhs):
         return True
     else:
         return False

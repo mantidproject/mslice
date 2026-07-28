@@ -1,13 +1,15 @@
-import numpy as np
 import operator as op
+
+import numpy as np
+from mantid.simpleapi import CloneWorkspace
+
 from mslice.util.numpy_helper import (
     apply_with_corrected_shape,
     transform_array_to_workspace,
 )
-from mantid.simpleapi import CloneWorkspace
 
 
-class HistoMixin(object):
+class HistoMixin:
     def get_signal(self):
         """Gets data values (Y axis) from the workspace as a numpy array."""
         return np.squeeze(self._raw_ws.getSignalArray().copy())

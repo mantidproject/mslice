@@ -1,18 +1,18 @@
+import re
+
+from mantid.api import IMDEventWorkspace
+
 from .base import WorkspaceBase
-from .histogram_workspace import HistogramWorkspace
-from .pixel_mixin import PixelMixin
-from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
+from .common_workspace_properties import CommonWorkspaceProperties
 from .helperfunctions import (
     attribute_from_log,
     attribute_to_log,
     delete_workspace,
     rename_workspace,
 )
-from .common_workspace_properties import CommonWorkspaceProperties
-
-from mantid.api import IMDEventWorkspace
-
-import re
+from .histogram_workspace import HistogramWorkspace
+from .pixel_mixin import PixelMixin
+from .workspace_mixin import WorkspaceMixin, WorkspaceOperatorMixin
 
 
 class PixelWorkspace(

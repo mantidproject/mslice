@@ -1,16 +1,16 @@
+import re
+
+from mantid.api import MatrixWorkspace
+
 from .base import WorkspaceBase
-from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
+from .common_workspace_properties import CommonWorkspaceProperties
 from .helperfunctions import (
     attribute_from_log,
     attribute_to_log,
     delete_workspace,
     rename_workspace,
 )
-from .common_workspace_properties import CommonWorkspaceProperties
-
-from mantid.api import MatrixWorkspace
-
-import re
+from .workspace_mixin import WorkspaceMixin, WorkspaceOperatorMixin
 
 
 class Workspace(

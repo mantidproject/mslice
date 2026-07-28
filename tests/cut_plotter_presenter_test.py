@@ -1,12 +1,14 @@
 import unittest
-import mock
+from unittest import mock
+
 import numpy as np
+
+import mslice.plotting.globalfiguremanager as gfm
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.util.intensity_correction import IntensityType
-import mslice.plotting.globalfiguremanager as gfm
 
 
 class CutPlotterPresenterTest(unittest.TestCase):

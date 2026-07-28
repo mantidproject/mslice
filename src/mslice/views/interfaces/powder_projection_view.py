@@ -1,4 +1,4 @@
-class PowderView(object):
+class PowderView:
     error_occurred = None
     busy = None
 

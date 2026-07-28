@@ -3,30 +3,31 @@
 import os.path as ospath
 
 import matplotlib as mpl
+
+from mslice import app
+from mslice.app import is_gui
+from mslice.cli.helperfunctions import (
+    _check_workspace_name,
+    _check_workspace_type,
+    _correct_intensity,
+    _process_axis,
+    _string_to_integration_axis,
+)
+from mslice.models.cmap import DEFAULT_CMAP
+from mslice.models.cut.cut_functions import compute_cut
+from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.workspacemanager.file_io import save_ascii, save_matlab, save_nexus
+from mslice.models.workspacemanager.workspace_algorithms import rebose_single
 from mslice.models.workspacemanager.workspace_provider import (
     get_workspace_handle,
     rename_workspace,
 )
-from mslice.models.workspacemanager.file_io import save_ascii, save_matlab, save_nexus
-from mslice.models.cut.cut_functions import compute_cut
-from mslice.models.workspacemanager.workspace_algorithms import rebose_single
-from mslice.models.cmap import DEFAULT_CMAP
-from mslice.models.labels import is_momentum, is_twotheta
-import mslice.app as app
-from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.cli.helperfunctions import (
-    _string_to_integration_axis,
-    _process_axis,
-    _check_workspace_name,
-    _check_workspace_type,
-    _correct_intensity,
-)
-from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.util.mantid.mantid_algorithms import *
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as MSliceWorkspace
-from mslice.util.mantid.mantid_algorithms import *  # noqa: F401, F403
 
 # -----------------------------------------------------------------------------
 # Command functions
@@ -423,8 +424,8 @@ def AddWorkspaceToDisplay(workspace, workspace_name):
     :param workspace_name: The workspace name.
     :return:
     """
-    from mslice.models.workspacemanager.workspace_provider import add_workspace
     from mslice.app.presenters import get_slice_plotter_presenter
+    from mslice.models.workspacemanager.workspace_provider import add_workspace
 
     add_workspace(workspace, workspace_name)
     get_slice_plotter_presenter().update_displayed_workspaces()

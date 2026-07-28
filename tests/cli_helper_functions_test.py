@@ -1,38 +1,39 @@
 import logging
 import unittest
+from unittest import mock
+
+import matplotlib.pyplot as plt
 import numpy as np
-from pytest import fixture
 from mantid.simpleapi import (
     AddSampleLog,
-    CreateSampleWorkspace,
-    CreateMDHistoWorkspace,
-    CreateSimulationWorkspace,
     ConvertToMD,
+    CreateMDHistoWorkspace,
+    CreateSampleWorkspace,
+    CreateSimulationWorkspace,
 )
-from unittest import mock
-from mslice.workspace import wrap_workspace
+from pytest import fixture
+
+from mslice.cli._mslice_commands import Cut
 from mslice.cli.helperfunctions import (
-    _string_to_axis,
-    _string_to_integration_axis,
-    _process_axis,
     _check_workspace_name,
     _check_workspace_type,
-    _get_workspace_type,
-    is_cut,
     _get_overplot_key,
-    _update_overplot_checklist,
+    _get_workspace_type,
+    _process_axis,
+    _string_to_axis,
+    _string_to_integration_axis,
     _update_legend,
-)
-from mslice.cli._mslice_commands import Cut
-from mslice.models.axis import Axis
-from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.workspace.workspace import Workspace as MatrixWorkspace
-import matplotlib.pyplot as plt
-from mslice.cli.helperfunctions import (
+    _update_overplot_checklist,
+    append_visible_handle,
+    append_visible_label,
+    is_cut,
     show_or_hide_a_line,
     show_or_hide_errorbars_of_a_line,
 )
-from mslice.cli.helperfunctions import append_visible_label, append_visible_handle
+from mslice.models.axis import Axis
+from mslice.workspace import wrap_workspace
+from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.workspace import Workspace as MatrixWorkspace
 
 
 class CLIHelperFunctionsTest(unittest.TestCase):
@@ -89,7 +90,7 @@ class CLIHelperFunctionsTest(unittest.TestCase):
         return workspace
 
     def create_histo_workspace(self, name):
-        signal = list(range(0, 100))
+        signal = list(range(100))
         error = np.zeros(100) + 2
         workspace = CreateMDHistoWorkspace(
             Dimensionality=2,

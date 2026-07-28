@@ -7,10 +7,11 @@
 import os
 import re
 
-from .model import PlotSelectorModel
-from .column_info import Column
-from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.presenters.interfaces.plot_selector import PlotSelectorPresenterInterface
+from mslice.presenters.presenter_utility import PresenterUtility
+
+from .column_info import Column
+from .model import PlotSelectorModel
 
 
 class PlotSelectorPresenter(PresenterUtility, PlotSelectorPresenterInterface):
@@ -380,7 +381,7 @@ class PlotSelectorPresenter(PresenterUtility, PlotSelectorPresenterInterface):
         """
         i = 1
         while True:
-            plot_name_attempt = name + " ({})".format(str(i))
+            plot_name_attempt = name + f" ({i!s})"
             if plot_name_attempt not in dictionary.values():
                 break
             i += 1

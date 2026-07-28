@@ -1,21 +1,22 @@
+import io
 import os.path
 import weakref
-import io
 
+from qtpy import QtCore, QtGui, QtPrintSupport, QtWidgets
 from qtpy.QtCore import Qt
-from qtpy import QtCore, QtGui, QtWidgets, QtPrintSupport
+
+import mslice.plotting.pyplot as plt
+from mslice.models.workspacemanager.file_io import get_save_directory
+from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
+from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.plotting.plot_window.cut_plot import CutPlot
+from mslice.plotting.plot_window.plot_window import PlotWindow
+from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.util.qt.qapp import (
     QAppThreadCall,
     create_qapp_if_required,
     force_method_calls_to_qapp_thread,
 )
-from mslice.models.workspacemanager.file_io import get_save_directory
-from mslice.models.workspacemanager.workspace_algorithms import save_workspaces
-from mslice.plotting.plot_window.plot_window import PlotWindow
-from mslice.plotting.plot_window.slice_plot import SlicePlot
-from mslice.plotting.plot_window.cut_plot import CutPlot
-import mslice.plotting.pyplot as plt
-from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
 
 def release_active_interactive_cuts_on_slice_plots() -> None:
@@ -51,7 +52,7 @@ class PlotFigureManagerQT(QtCore.QObject):
         :param number: The number of the figure
         :param current_figs: A reference to the global manager for all figures
         """
-        super(PlotFigureManagerQT, self).__init__()
+        super().__init__()
 
         self.number = number
         self._current_figs = current_figs
@@ -264,8 +265,8 @@ class PlotFigureManagerQT(QtCore.QObject):
                         self._save_jpeg_via_qt(resolution, file_path, save_name)
                     else:
                         self.error_box(
-                            "Format {} is not supported. "
-                            "(Supported formats: {})".format(ext, supported_image_types)
+                            f"Format {ext} is not supported. "
+                            f"(Supported formats: {supported_image_types})"
                         )
                 elif not save_name.endswith(".pdf"):
                     resolution = self._get_resolution()

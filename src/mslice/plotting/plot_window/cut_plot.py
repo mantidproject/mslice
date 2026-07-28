@@ -1,34 +1,31 @@
 from functools import partial
 
-from qtpy import QtWidgets
-
+import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.container import ErrorbarContainer
 from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 from matplotlib.text import Text
+from qtpy import QtWidgets
 
-import numpy as np
-
-from mslice.models.colors import to_hex, name_to_color
-from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
-from mslice.presenters.quick_options_presenter import quick_options, check_latex
-from mslice.plotting.plot_window.plot_options import CutPlotOptions
+from mslice.models.colors import name_to_color, to_hex
+from mslice.models.cut.cut import SampleTempValueError
+from mslice.models.units import get_sample_temperature_from_string
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.overplot_interface import (
-    toggle_overplot_line,
-    cif_file_powder_line,
     _update_powder_lines,
+    cif_file_powder_line,
+    toggle_overplot_line,
 )
+from mslice.plotting.plot_window.plot_options import CutPlotOptions
 from mslice.plotting.pyplot import CATEGORY_CUT
+from mslice.presenters.plot_options_presenter import CutPlotOptionsPresenter
+from mslice.presenters.quick_options_presenter import check_latex, quick_options
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 from mslice.util.numpy_helper import clean_array
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.models.units import get_sample_temperature_from_string
-from mslice.models.cut.cut import SampleTempValueError
-from mslice.util.intensity_correction import IntensityType, IntensityCache
-
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12

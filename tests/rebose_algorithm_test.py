@@ -1,8 +1,9 @@
 import unittest
 
 from mantid.api import AnalysisDataService
-from tests.testhelpers.workspace_creator import create_workspace
+
 from mslice.util.mantid.mantid_algorithms import Rebose
+from tests.testhelpers.workspace_creator import create_workspace
 
 
 class RebinAlgorithmTest(unittest.TestCase):

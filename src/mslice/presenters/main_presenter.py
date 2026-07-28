@@ -1,6 +1,8 @@
-from .interfaces.main_presenter import MainPresenterInterface
-from mantid.api import IMDHistoWorkspace, IMDEventWorkspace
 from collections.abc import Callable
+
+from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
+
+from .interfaces.main_presenter import MainPresenterInterface
 
 
 class MainPresenter(MainPresenterInterface):

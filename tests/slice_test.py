@@ -1,5 +1,5 @@
-from mock import MagicMock, patch
 import unittest
+from unittest.mock import MagicMock, patch
 
 from mslice.models.slice.slice import Slice
 

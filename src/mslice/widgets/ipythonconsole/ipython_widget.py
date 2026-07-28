@@ -1,4 +1,5 @@
 import warnings
+
 from mslice.util.mantid import in_mantid
 
 # Ignore Jupyter/IPython deprecation warnings that we can't do anything about
@@ -12,8 +13,8 @@ del warnings
 
 try:
     # Later versions of Qtconsole are part of Jupyter
-    from qtconsole.rich_jupyter_widget import RichJupyterWidget as RichIPythonWidget
     from qtconsole.inprocess import QtInProcessKernelManager
+    from qtconsole.rich_jupyter_widget import RichJupyterWidget as RichIPythonWidget
 except ImportError:
     from IPython.qt.console.rich_ipython_widget import RichIPythonWidget
     from IPython.qt.inprocess import QtInProcessKernelManager
@@ -23,7 +24,7 @@ class IPythonWidget(RichIPythonWidget):
     """Extends IPython's qt widget to include setting up and in-process kernel"""
 
     def __init__(self, *args, **kw):
-        super(IPythonWidget, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
 
         # Create an in-process kernel
         kernel_manager = QtInProcessKernelManager()

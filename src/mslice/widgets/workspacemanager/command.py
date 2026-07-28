@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------------
 
 
-class Command(object):
+class Command:
     SaveSelectedWorkspaceNexus = 1
     RemoveSelectedWorkspaces = 2
     LoadWorkspace = 3

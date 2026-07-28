@@ -1,8 +1,8 @@
 from mslice.models.intensity_correction_algs import (
     compute_chi,
     compute_d2sigma,
-    slice_compute_gdos,
     compute_symmetrised,
+    slice_compute_gdos,
 )
 
 

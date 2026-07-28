@@ -1,15 +1,15 @@
 from qtpy.QtWidgets import (
+    QCheckBox,
     QComboBox,
+    QDialog,
     QFormLayout,
+    QHBoxLayout,
     QLabel,
     QPushButton,
-    QWidget,
-    QSpacerItem,
     QSizePolicy,
+    QSpacerItem,
     QVBoxLayout,
-    QHBoxLayout,
-    QDialog,
-    QCheckBox,
+    QWidget,
 )
 
 
@@ -23,7 +23,7 @@ class QCacheableInputDialog(QDialog):
     """
 
     def __init__(self, parent=None):
-        super(QCacheableInputDialog, self).__init__(parent)
+        super().__init__(parent)
 
         layout = QVBoxLayout(self)
         form_layout = QFormLayout()

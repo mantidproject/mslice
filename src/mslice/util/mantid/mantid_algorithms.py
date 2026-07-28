@@ -1,9 +1,10 @@
 """Wraps all Mantid algorithms so they use mslice's wrapped workspaces"""
 
-from mantid.simpleapi import *  # noqa: F401, F403
-from mantid.simpleapi import _create_algorithm_function
-from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 from mantid.api import AlgorithmFactory, AlgorithmManager
+from mantid.simpleapi import *
+from mantid.simpleapi import _create_algorithm_function
+
+from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
 
 algorithms = AlgorithmFactory.getRegisteredAlgorithms(False)
 

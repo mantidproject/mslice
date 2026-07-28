@@ -9,11 +9,11 @@ from mslice.models.workspacemanager.workspace_provider import (
     get_workspace_handle,
     workspace_exists,
 )
-from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.plotting.pyplot import GlobalFigureManager
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 
 
-class InteractiveCut(object):
+class InteractiveCut:
     def __init__(self, slice_plot, canvas, ws_title):
         self.slice_plot = slice_plot
         self._canvas = canvas

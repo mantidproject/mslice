@@ -1,8 +1,7 @@
-import numpy as np
-
-from mock import patch
 from unittest import TestCase
+from unittest.mock import patch
 
+import numpy as np
 from mantid.api import AlgorithmFactory, AnalysisDataService
 from mantid.simpleapi import AddSampleLog, _create_algorithm_function
 
@@ -14,8 +13,8 @@ from mslice.models.cut.cut_functions import (
     output_workspace_name,
 )
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
-from tests.testhelpers.workspace_creator import create_pixel_workspace
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
+from tests.testhelpers.workspace_creator import create_pixel_workspace
 
 
 class CutFunctionsTest(TestCase):

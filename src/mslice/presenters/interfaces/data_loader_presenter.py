@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class DataLoaderPresenterInterface(object):
+class DataLoaderPresenterInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod

@@ -1,5 +1,6 @@
-from mock import MagicMock, PropertyMock, Mock, ANY
 import unittest
+from unittest.mock import ANY, MagicMock, Mock, PropertyMock
+
 from mslice.presenters.plot_options_presenter import (
     CutPlotOptionsPresenter,
     SlicePlotOptionsPresenter,

@@ -6,8 +6,8 @@
 #
 import os
 import unittest
-
 from unittest import mock
+
 from mslice.widgets.plotselector.column_info import Column
 from mslice.widgets.plotselector.model import PlotSelectorModel
 from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
@@ -270,7 +270,7 @@ class PlotSelectorPresenterTest(unittest.TestCase):
             self.assertEqual(
                 self.model.export_plot.mock_calls[i],
                 mock.call(
-                    i, os.path.join("/home/Documents", "Plot{}.xyz".format(i + 1))
+                    i, os.path.join("/home/Documents", f"Plot{i + 1}.xyz")
                 ),
             )
 
@@ -294,7 +294,7 @@ class PlotSelectorPresenterTest(unittest.TestCase):
             self.assertEqual(
                 self.model.export_plot.mock_calls[i],
                 mock.call(
-                    100 + i, os.path.join("/home/Documents", "Plot1 ({}).xyz".format(i))
+                    100 + i, os.path.join("/home/Documents", f"Plot1 ({i}).xyz")
                 ),
             )
 

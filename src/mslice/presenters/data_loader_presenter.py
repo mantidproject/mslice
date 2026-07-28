@@ -1,16 +1,17 @@
 import os
 
-from .busy import show_busy
-from mslice.models.workspacemanager.workspace_algorithms import load, get_limits
+from mslice.models.workspacemanager.file_io import load_from_ascii
+from mslice.models.workspacemanager.workspace_algorithms import get_limits, load
 from mslice.models.workspacemanager.workspace_provider import (
-    get_workspace_handle,
     get_visible_workspace_names,
+    get_workspace_handle,
 )
 from mslice.presenters.interfaces.data_loader_presenter import (
     DataLoaderPresenterInterface,
 )
 from mslice.presenters.presenter_utility import PresenterUtility
-from mslice.models.workspacemanager.file_io import load_from_ascii
+
+from .busy import show_busy
 
 
 def apply_fixed_final_energy_to_a_valid_workspace(
@@ -21,7 +22,6 @@ def apply_fixed_final_energy_to_a_valid_workspace(
         workspace_handle.e_fixed = fixed_final_energy
         workspace_handle.raw_ws.run().addProperty("Efix", fixed_final_energy, True)
         get_limits(workspace_name, "DeltaE")  # Necessary to process the limits
-    return None
 
 
 class DataLoaderPresenter(PresenterUtility, DataLoaderPresenterInterface):

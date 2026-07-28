@@ -5,8 +5,8 @@
 #
 #
 import unittest
-
 from unittest import mock
+
 from mslice.plotting.globalfiguremanager import FigureAction
 from mslice.widgets.plotselector.model import PlotSelectorModel
 from mslice.widgets.plotselector.presenter import PlotSelectorPresenter

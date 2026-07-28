@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class PowderProjectionPresenterInterface(object):
+class PowderProjectionPresenterInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod

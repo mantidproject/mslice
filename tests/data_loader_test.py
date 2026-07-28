@@ -1,9 +1,8 @@
-from tempfile import gettempdir
-from os.path import join
 import unittest
-
-import mock
-from mock import call, patch, PropertyMock
+from os.path import join
+from tempfile import gettempdir
+from unittest import mock
+from unittest.mock import PropertyMock, call, patch
 
 from mslice.presenters.data_loader_presenter import DataLoaderPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface

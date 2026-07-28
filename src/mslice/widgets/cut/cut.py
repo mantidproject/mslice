@@ -5,17 +5,15 @@
 # -----------------------------------------------------------------------------
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget
-from mslice.util.qt import load_ui
-from mslice.util.qt.validator_helper import double_validator_without_separator
-from mslice.util.mantid import in_mantid
-
-from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
-
-from mslice.views.interfaces.cut_view import CutView
 
 from mslice.models.units import EnergyUnits
-from .command import Command
+from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
+from mslice.util.mantid import in_mantid
+from mslice.util.qt import load_ui
+from mslice.util.qt.validator_helper import double_validator_without_separator
+from mslice.views.interfaces.cut_view import CutView
 
+from .command import Command
 
 # -----------------------------------------------------------------------------
 # Classes and functions

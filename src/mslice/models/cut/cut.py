@@ -1,3 +1,5 @@
+import numpy as np
+
 from mslice.models.intensity_correction_algs import (
     compute_chi,
     compute_d2sigma,
@@ -7,10 +9,8 @@ from mslice.models.intensity_correction_algs import (
 from mslice.models.labels import are_units_equivalent, is_momentum, is_twotheta
 from mslice.util.intensity_correction import IntensityType
 
-import numpy as np
 
-
-class Cut(object):
+class Cut:
     """Groups parameters needed to cut and validates them, caches intensities"""
 
     def __init__(

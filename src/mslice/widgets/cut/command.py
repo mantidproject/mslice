@@ -1,7 +1,7 @@
 """Enumeration for operations allowed in this module"""
 
 
-class Command(object):
+class Command:
     Plot = -999
     PlotOver = -998
     SaveToWorkspace = -997

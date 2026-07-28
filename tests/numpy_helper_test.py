@@ -1,4 +1,5 @@
 import unittest
+
 import numpy as np
 
 from mslice.util.numpy_helper import is_real_number

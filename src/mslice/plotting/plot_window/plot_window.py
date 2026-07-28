@@ -1,11 +1,10 @@
-from qtpy import QtCore, QtWidgets
-
-from matplotlib.figure import Figure
 from mantidqt.icons import get_icon
 from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
+from matplotlib.figure import Figure
+from qtpy import QtCore, QtWidgets
 
 from mslice.plotting.backend import get_canvas_and_toolbar_cls
-from mslice.util.intensity_correction import IntensityType, IntensityCache
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 
 FigureCanvas, NavigationToolbar2QT = get_canvas_and_toolbar_cls()
 
@@ -36,7 +35,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         self._first_time_show = False
 
     def __inherit(self, parent):
-        super(PlotWindow, self).__init__(parent)
+        super().__init__(parent)
 
     def closeEvent(self, _):
         self.lose_waterfall_x_edt_focus()  # lose focus so toggle_waterfall does not trigger upon close
@@ -50,7 +49,7 @@ class PlotWindow(QtWidgets.QMainWindow):
             except AttributeError:
                 pass
             self._first_time_show = True
-        super(PlotWindow, self).showEvent(evt)
+        super().showEvent(evt)
 
     def setup_ui(self, manager):
         # canvas
