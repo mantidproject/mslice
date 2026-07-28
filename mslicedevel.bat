@@ -7,14 +7,14 @@
 :: Define here the path to your conda installation and uncomment the line
 ::@set CONDAPATH=
 
-:: ActiveEnv is set to true once the conda environment mantidnightly was successfully activated
+:: ActiveEnv is set to true once the conda environment mslice-developer was successfully activated
 @set ActiveEnv=false
 
-:: With CONDAPATH set mantidnightly can be activated even when the base environment is not activated yet, for instance by doubleclicking on mslicedevel.bat
+:: With CONDAPATH set mslice-developer can be activated even when the base environment is not activated yet, for instance by doubleclicking on mslicedevel.bat
 @if defined CONDAPATH (
     goto CheckBaseEnv
 ) else if defined CONDA_DEFAULT_ENV (
-    :: Without CONDAPATH set it is still possible to activate mantidnightly when mslicedevel.bat is run from a conda prompt
+    :: Without CONDAPATH set it is still possible to activate mslice-developer when mslicedevel.bat is run from a conda prompt
     goto ActivateEnv
 ) else (
     goto NoConda
@@ -30,11 +30,11 @@
 )
 
 :ActivateEnv
-:: Activate mantidnightly
+:: Activate mslice-developer
 @if %CONDA_DEFAULT_ENV% == base (
-    call conda activate mantidnightly
+    call conda activate mslice-developer
 )
-@if %CONDA_DEFAULT_ENV% == mantidnightly (
+@if %CONDA_DEFAULT_ENV% == mslice-developer (
     @set ActiveEnv=true
     goto Conda
 ) else (
@@ -42,7 +42,7 @@
 )
 
 :NoConda
-:: This allows to start MSlice when there is no conda available or activating mantidnightly failed
+:: This allows to start MSlice when there is no conda available or activating mslice-developer failed
 @set MANTIDPATH=C:\MantidInstall\bin
 @set PYTHONPATH=%MANTIDPATH%;%THIS_DIR%src;%PYTHONPATH%
 @set QT_PLUGIN_PATH=%MANTIDPATH%\..\plugins\qt5
@@ -54,7 +54,7 @@
 
 python %THIS_DIR%scripts\start_mslice.py
 
-:: Only attempt to deactivate mantidnightly when it was successfully activated
+:: Only attempt to deactivate mslice-developer when it was successfully activated
 @if %ActiveEnv% == true call conda deactivate
 
 :End

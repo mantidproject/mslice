@@ -53,7 +53,7 @@ You will also need to edit the run configurations:
 You can now also develop MSlice using a Mantid conda environment.
 First install Mantid using `conda env create -f mslice-developer.yml`,
 then add this interpreter by going to the `File->Settings` in PyCharm, then `Project: mslice -> Python Interpreter`,
-click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.12 (mantidnightly)`.
+click the cog on the right side to add an existing interpreter and select `Conda` and `Python 3.12 (mslice-developer)`.
 Then go to `Run -> Edit Configurations` and create new configuration with this interpreter.
 Specify `start_mslice.py` as the startup script.
 
@@ -67,6 +67,14 @@ Optionally, you can also install pre-commit locally to ensure formatting issues 
 pre-commit install
 ```
 
+**Develop using Pixi**
+You can now also develop MSlice using a pixi environment. This is a beta feature.
+First install pixi in your OS using the [installations instructions](https://pixi.prefix.dev/latest/installation/).
+After, cloning this repository, install the two pixi environments using `pixi install`. The development environment is called
+**mslice-developer**. Commands can be run in the environment using `pixi run -e mslice-developer <command>`.
+Use the [Pycharm integration instructions](https://pixi.prefix.dev/latest/integration/editor/jetbrains/). Pixi can also be integrated
+with other IDEs.
+
 ### Running tests
 
 To run the unit tests in the MSlice repository, you can run them from PyCharm or from the command line.
@@ -74,7 +82,7 @@ To run the unit tests in the MSlice repository, you can run them from PyCharm or
 To run them from PyCharm, create a `pytest` configuration and specify the `Target` as `Custom`. Enter the following configuration:
 
 - `Additional Arguments` can be left empty to run all tests, or you can specify a test name.
-- `Python Interpreter` should be your `mantidnightly` python executable
+- `Python Interpreter` should be your `mslice-developer` python executable
 - `Working directory` should be the root of your Mslice repository
 
 To run them from the command line, make sure you have your conda developer environment active, and cd to the root of this repository. You can then run a test using the following command:

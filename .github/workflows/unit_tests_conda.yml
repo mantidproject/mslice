@@ -1,9 +1,18 @@
-name: MSlice unit tests
+name: MSlice unit tests (Conda)
 
-on: push
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: pull-request-${{ github.event.pull_request.number }}-conda
+  cancel-in-progress: true
 
 jobs:
   test:
+    if: github.repository_owner == 'mantidproject'
     runs-on: ubuntu-latest
     defaults:
       run:

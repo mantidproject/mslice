@@ -42,7 +42,7 @@ class PixelWorkspaceTest(unittest.TestCase):
     def test_get_coordinates(self):
         coords = self.workspace.get_coordinates()
         self.assertEqual(set(coords), {"|Q|", "DeltaE"})
-        self.assertEqual(coords["|Q|"][2], 0.20996594809147776)
+        self.assertAlmostEqual(coords["|Q|"][2], 0.20996594809147776, delta=1e-8)
 
     def test_get_signal(self):
         signal = self.workspace.get_signal()

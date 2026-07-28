@@ -8,9 +8,8 @@ dependencies:
   - coveralls
   - ipython
   - mock
-  - pip
   - pytest
   - pyqt
-  - qtconsole
+  - qtconsole-base
   - qtpy
   - python=3.12
