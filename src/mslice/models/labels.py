@@ -14,11 +14,11 @@ MOMENTUM_UNITS = ("MomentumTransfer", "|Q|", "Angstrom^-1")
 
 
 def is_twotheta(unit):
-    return any([unit in val for val in TWOTHETA_UNITS])
+    return any(unit in val for val in TWOTHETA_UNITS)
 
 
 def is_momentum(unit):
-    return any([unit in val for val in MOMENTUM_UNITS])
+    return any(unit in val for val in MOMENTUM_UNITS)
 
 
 def is_energy(unit):
@@ -26,14 +26,14 @@ def is_energy(unit):
 
 
 def are_units_equivalent(unit_lhs, unit_rhs):
-    if is_twotheta(unit_lhs) and is_twotheta(unit_rhs):
-        return True
-    elif is_momentum(unit_lhs) and is_momentum(unit_rhs):
-        return True
-    elif is_energy(unit_lhs) and is_energy(unit_rhs):
-        return True
-    else:
-        return False
+    return (
+        is_twotheta(unit_lhs)
+        and is_twotheta(unit_rhs)
+        or is_momentum(unit_lhs)
+        and is_momentum(unit_rhs)
+        or is_energy(unit_lhs)
+        and is_energy(unit_rhs)
+    )
 
 
 def get_recoil_key(label):
@@ -57,17 +57,12 @@ def get_display_name(axis):
 
 def generate_legend(workspace_name, integrated_dim, integration_start, integration_end):
     mappings = {"DeltaE": "E", "MomentumTransfer": "|Q|", "Degrees": r"2$\theta$"}
-    integrated_dim = (
-        mappings[integrated_dim] if integrated_dim in mappings else integrated_dim
-    )
+    integrated_dim = mappings.get(integrated_dim, integrated_dim)
     return (
-        workspace_name
-        + " "
-        + "%.2f" % integration_start
-        + "<"
-        + integrated_dim
-        + "<"
-        + "%.2f" % integration_end
+        f"{workspace_name} "
+        f"{integration_start:.2f}<"
+        f"{integrated_dim}<"
+        f"{integration_end:.2f}"
     )
 
 

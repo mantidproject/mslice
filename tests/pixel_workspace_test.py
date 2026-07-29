@@ -1,7 +1,7 @@
-import numpy as np
 import unittest
 
-from mantid.simpleapi import CreateSimulationWorkspace, ConvertToMD, AddSampleLog
+import numpy as np
+from mantid.simpleapi import AddSampleLog, ConvertToMD, CreateSimulationWorkspace
 
 from mslice.workspace.helperfunctions import attribute_to_log
 from mslice.workspace.pixel_workspace import PixelWorkspace

@@ -1,10 +1,11 @@
 from qtpy import QtGui, QtWidgets
+
+from mslice.app.presenters import get_cut_plotter_presenter
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.scripting.helperfunctions import (
     add_plot_statements,
     replace_ws_special_chars,
 )
-from mslice.app.presenters import get_cut_plotter_presenter
 
 
 def generate_script(
@@ -107,13 +108,12 @@ def get_algorithm_kwargs(algorithm, existing_ws_refs):
                     continue
                 elif prop.name() == "LoaderName" or prop.name() == "LoaderVersion":
                     continue
-            elif algorithm.name() == "MakeProjection":
-                if (
-                    prop.name() == "Limits"
-                    or prop.name() == "OutputWorkspace"
-                    or prop.name() == "ProjectionType"
-                ):
-                    continue
+            elif algorithm.name() == "MakeProjection" and prop.name() in {
+                "Limits",
+                "OutputWorkspace",
+                "ProjectionType",
+            }:
+                continue
             if (
                 isinstance(pval, str)
                 and replace_ws_special_chars(pval) in existing_ws_refs

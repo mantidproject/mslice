@@ -1,16 +1,16 @@
+import re
+
+from mantid.api import MatrixWorkspace
+
 from .base import WorkspaceBase
-from .workspace_mixin import WorkspaceOperatorMixin, WorkspaceMixin
+from .common_workspace_properties import CommonWorkspaceProperties
 from .helperfunctions import (
     attribute_from_log,
     attribute_to_log,
     delete_workspace,
     rename_workspace,
 )
-from .common_workspace_properties import CommonWorkspaceProperties
-
-from mantid.api import MatrixWorkspace
-
-import re
+from .workspace_mixin import WorkspaceMixin, WorkspaceOperatorMixin
 
 
 class Workspace(
@@ -23,8 +23,7 @@ class Workspace(
             self._raw_ws = mantid_ws
         else:
             raise TypeError(
-                "Workspace expected matrixWorkspace, got %s"
-                % mantid_ws.__class__.__name__
+                f"Workspace expected matrixWorkspace, got {mantid_ws.__class__.__name__}"
             )
         CommonWorkspaceProperties.__init__(self)
         self._name = name

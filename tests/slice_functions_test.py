@@ -1,25 +1,25 @@
-from mock import patch, MagicMock
-import numpy as np
 import unittest
+from unittest.mock import MagicMock, patch
 
+import numpy as np
 from mantid.api import AlgorithmFactory
 from mantid.simpleapi import (
     AddSampleLog,
-    _create_algorithm_function,
     AnalysisDataService,
+    _create_algorithm_function,
 )
 
 from mslice.models.axis import Axis
+from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.models.slice.slice_functions import (
-    compute_slice,
     compute_recoil_line,
+    compute_slice,
     is_sliceable,
 )
-from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from mslice.util.mantid.algorithm_wrapper import wrap_algorithm
+from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from tests.testhelpers.workspace_creator import create_pixel_workspace
-from mslice.models.powder.powder_functions import compute_powder_line
 
 
 class SliceFunctionsTest(unittest.TestCase):
@@ -67,7 +67,7 @@ class SliceFunctionsTest(unittest.TestCase):
     def test_recoil_line(self, ws_handle_mock):
         ws_handle_mock.return_value.e_mode = "Direct"
         ws_handle_mock.return_value.e_fixed = 20
-        x_axis, line = compute_recoil_line("ws_name", self.q_axis)
+        _, line = compute_recoil_line("ws_name", self.q_axis)
         self.assertEqual(len(line), 30)
         self.assertAlmostEqual(line[0], 0.02072, 4)
         self.assertAlmostEqual(line[10], 2.5073, 4)
@@ -77,7 +77,7 @@ class SliceFunctionsTest(unittest.TestCase):
     def test_recoil_line_mass(self, ws_handle_mock):
         ws_handle_mock.return_value.e_mode = "Direct"
         ws_handle_mock.return_value.e_fixed = 20
-        x_axis, line = compute_recoil_line("ws_name", self.q_axis, 4)
+        _, line = compute_recoil_line("ws_name", self.q_axis, 4)
         self.assertEqual(len(line), 30)
         self.assertAlmostEqual(line[0], 0.005180, 6)
         self.assertAlmostEqual(line[10], 0.626818, 6)
@@ -87,7 +87,7 @@ class SliceFunctionsTest(unittest.TestCase):
     def test_recoil_line_degrees_direct(self, ws_handle_mock):
         ws_handle_mock.return_value.e_mode = "Direct"
         ws_handle_mock.return_value.e_fixed = 20
-        x_axis, line = compute_recoil_line("ws_name", self.q_axis_degrees)
+        _, line = compute_recoil_line("ws_name", self.q_axis_degrees)
         self.assertEqual(len(line), 30)
         self.assertAlmostEqual(line[0], 0.054744, 6)
         self.assertAlmostEqual(line[10], 0.999578, 6)
@@ -97,7 +97,7 @@ class SliceFunctionsTest(unittest.TestCase):
     def test_recoil_line_degrees_indirect(self, ws_handle_mock):
         ws_handle_mock.return_value.e_mode = "Indirect"
         ws_handle_mock.return_value.e_fixed = 20
-        x_axis, line = compute_recoil_line("ws_name", self.q_axis_degrees)
+        _, line = compute_recoil_line("ws_name", self.q_axis_degrees)
         self.assertEqual(len(line), 30)
         self.assertAlmostEqual(line[0], 0.054894, 6)
         self.assertAlmostEqual(line[10], 1.052164, 6)

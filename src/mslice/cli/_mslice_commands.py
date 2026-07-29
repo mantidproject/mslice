@@ -3,30 +3,31 @@
 import os.path as ospath
 
 import matplotlib as mpl
+
+from mslice import app
+from mslice.app import is_gui
+from mslice.cli.helperfunctions import (
+    _check_workspace_name,
+    _check_workspace_type,
+    _correct_intensity,
+    _process_axis,
+    _string_to_integration_axis,
+)
+from mslice.models.cmap import DEFAULT_CMAP
+from mslice.models.cut.cut_functions import compute_cut
+from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.workspacemanager.file_io import save_ascii, save_matlab, save_nexus
+from mslice.models.workspacemanager.workspace_algorithms import rebose_single
 from mslice.models.workspacemanager.workspace_provider import (
     get_workspace_handle,
     rename_workspace,
 )
-from mslice.models.workspacemanager.file_io import save_ascii, save_matlab, save_nexus
-from mslice.models.cut.cut_functions import compute_cut
-from mslice.models.workspacemanager.workspace_algorithms import rebose_single
-from mslice.models.cmap import DEFAULT_CMAP
-from mslice.models.labels import is_momentum, is_twotheta
-import mslice.app as app
-from mslice.app import is_gui
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.cli.helperfunctions import (
-    _string_to_integration_axis,
-    _process_axis,
-    _check_workspace_name,
-    _check_workspace_type,
-    _correct_intensity,
-)
-from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.util.mantid.mantid_algorithms import *
 from mslice.util.qt.qapp import QAppThreadCall, mainloop
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace as MSliceWorkspace
-from mslice.util.mantid.mantid_algorithms import *  # noqa: F401, F403
 
 # -----------------------------------------------------------------------------
 # Command functions
@@ -79,13 +80,13 @@ def Load(Filename, OutputWorkspace=None):
     from mslice.app.presenters import get_dataloader_presenter
 
     if not isinstance(Filename, str):
-        raise RuntimeError("path given to load must be a string")
+        raise TypeError("path given to load must be a string")
     merge = False
     if not ospath.exists(Filename):
-        if all([ospath.exists(f) for f in Filename.split("+")]):
+        if all(ospath.exists(f) for f in Filename.split("+")):
             merge = True
         else:
-            raise RuntimeError("could not find the path %s" % Filename)
+            raise RuntimeError(f"could not find the path {Filename}")
 
     get_dataloader_presenter().load_workspace([Filename], merge, force_overwrite=-1)
     name = ospath.splitext(ospath.basename(Filename))[0]
@@ -261,7 +262,7 @@ def Rebose(
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, MSliceWorkspace):
-        raise RuntimeError("Incorrect workspace type.")
+        raise TypeError("Incorrect workspace type.")
     scaled = rebose_single(
         workspace, from_temp=float(CurrentTemperature), to_temp=float(TargetTemperature)
     )
@@ -318,7 +319,7 @@ def PlotCut(InputWorkspace, IntensityStart=0, IntensityEnd=0, PlotOver=False):
     _check_workspace_name(InputWorkspace)
     workspace = get_workspace_handle(InputWorkspace)
     if not isinstance(workspace, HistogramWorkspace):
-        raise RuntimeError("Incorrect workspace type.")
+        raise TypeError("Incorrect workspace type.")
 
     if IntensityStart == 0 and IntensityEnd == 0:
         intensity_range = (None, None)
@@ -423,8 +424,8 @@ def AddWorkspaceToDisplay(workspace, workspace_name):
     :param workspace_name: The workspace name.
     :return:
     """
-    from mslice.models.workspacemanager.workspace_provider import add_workspace
     from mslice.app.presenters import get_slice_plotter_presenter
+    from mslice.models.workspacemanager.workspace_provider import add_workspace
 
     add_workspace(workspace, workspace_name)
     get_slice_plotter_presenter().update_displayed_workspaces()

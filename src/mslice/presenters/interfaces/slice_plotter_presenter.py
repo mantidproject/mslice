@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class SlicePlotterPresenterInterface(object):
+class SlicePlotterPresenterInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod

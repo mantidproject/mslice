@@ -23,7 +23,10 @@ repos:
       # Run the linter.
       - id: ruff
         types_or: [ python, pyi ]
-        args: [ --fix, --exit-non-zero-on-fix, --extend-ignore, F401 ]
+        args:
+          - --fix
+          - --exit-non-zero-on-fix
+          - --extend-ignore=F401,TRY002,BLE001
         exclude: src/mslice/plotting/pyplot.py
       # Run the formatter.
       - id: ruff-format

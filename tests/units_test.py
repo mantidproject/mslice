@@ -24,7 +24,7 @@ class UnitsTest(unittest.TestCase):
         self.assertEqual(self.en_unit.index(), 1)
 
     def test_to_mev_conversion(self):
-        result = list(x for x in self.en_unit.to_meV(1.0))
+        result = list(self.en_unit.to_meV(1.0))
         self.assertAlmostEqual("0.12398", result[0], 4)
 
     def test_factor_from_with_unrecognised_unit(self):

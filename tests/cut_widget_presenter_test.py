@@ -1,15 +1,15 @@
-import mock
-from mock import call, patch
 import unittest
 import warnings
+from unittest import mock
+from unittest.mock import call, patch
 
-from mslice.models.axis import Axis
 from mslice.models.alg_workspace_ops import get_available_axes
+from mslice.models.axis import Axis
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
-from mslice.widgets.cut.command import Command
 from mslice.views.interfaces.cut_view import CutView
+from mslice.widgets.cut.command import Command
 
 
 class CutWidgetPresenterTest(unittest.TestCase):
@@ -19,7 +19,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         self.main_presenter = mock.create_autospec(MainPresenterInterface)
 
     def _create_cut(self, *args):
-        axis, processed_axis = tuple(args[0:2])
+        axis, _ = tuple(args[0:2])
         integration_start, integration_end, width = tuple(args[2:5])
         intensity_start, intensity_end, is_norm = tuple(args[5:8])
         workspace, integrated_axis, cut_algorithm = tuple(args[8:11])
@@ -111,7 +111,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         self.main_presenter.get_selected_workspaces = mock.Mock(
             return_value=[new_workspace]
         )
-        fields = dict()
+        fields = {}
         fields["axes"] = available_dimensions
         self.view.get_input_fields = mock.Mock(return_value=fields)
         self.view.is_fields_cleared = mock.Mock(return_value=False)
@@ -183,7 +183,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         get_ws_handle_mock2.return_value = ws_mock
         cut_widget_presenter.workspace_selection_changed()
         # Set up a set of input values for this cut, then simulate changing axes.
-        fields1 = dict()
+        fields1 = {}
         fields1["axes"] = "|Q|"
         fields1["cut_parameters"] = ["0", "10", "0.05"]
         fields1["integration_range"] = ["-1", "1"]
@@ -198,7 +198,7 @@ class CutWidgetPresenterTest(unittest.TestCase):
         self.view.clear_input_fields.assert_called_with(keep_axes=True)
         self.view.populate_input_fields.assert_not_called()
         # Set up a set of input values for this other cut, then simulate changing axes again.
-        fields2 = dict()
+        fields2 = {}
         fields2["axes"] = "DeltaE"
         fields2["cut_parameters"] = ["-5", "5", "0.1"]
         fields2["integration_range"] = ["2", "3"]

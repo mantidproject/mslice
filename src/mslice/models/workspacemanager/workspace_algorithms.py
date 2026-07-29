@@ -6,33 +6,31 @@ Uses mantid algorithms to perform workspace operations
 # Imports
 # -----------------------------------------------------------------------------
 import os.path
+from itertools import pairwise
 from os.path import splitext
 
 import numpy as np
+from mantid.api import MatrixWorkspace, WorkspaceUnitValidator
 from scipy import constants
 
-import mslice.util.mantid.init_mantid  # noqa: F401
-
-from mantid.api import WorkspaceUnitValidator
-from mantid.api import MatrixWorkspace
-
+import mslice.util.mantid.init_mantid
 from mslice.models.axis import Axis
-from mslice.util.mantid.algorithm_wrapper import add_to_ads, remove_from_ads
 from mslice.models.workspacemanager.workspace_provider import (
-    get_workspace_handle,
     delete_workspace,
+    get_workspace_handle,
 )
+from mslice.util.mantid.algorithm_wrapper import add_to_ads, remove_from_ads
 from mslice.util.mantid.mantid_algorithms import (
+    ConvertUnits,
     Load,
     MergeMD,
     MergeRuns,
-    Scale,
     Minus,
-    ConvertUnits,
     Rebose,
+    Scale,
 )
-from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 
 from .file_io import save_ascii, save_matlab, save_nexus, save_nxspe
@@ -161,7 +159,7 @@ def _get_theta_for_limits(ws):
         ws.raw_ws.detectorTwoTheta(ws.raw_ws.getDetector(i)) for i in range(num_hist)
     ]
     round_fac = 100
-    ws.is_PSD = not all(x < y for x, y in zip(theta, theta[1:]))
+    ws.is_PSD = not all(x < y for x, y in pairwise(theta))
     # Rounds the differences to avoid pixels with same 2theta. Implies min limit of ~0.5 degrees
     thdiff = np.diff(np.round(np.sort(theta) * round_fac) / round_fac)
     return np.array(
@@ -205,7 +203,7 @@ def load(filename, output_workspace):
                 OutputWorkspace=workspace.name,
             )
         _processLoadedWSLimits(workspace)
-    except:  # noqa: E722
+    except:
         delete_workspace(workspace)
         raise
     return workspace
@@ -308,8 +306,7 @@ def save_workspaces(workspaces, path, save_name, extension):
         else:
             name, _ = splitext(save_name)
             save_names = [
-                "{}_{:03d}{}".format(name, idx + 1, extension)
-                for idx in range(len(workspaces))
+                f"{name}_{idx + 1:03d}{extension}" for idx in range(len(workspaces))
             ]
     else:
         save_names = [save_name] if not hasattr(save_name, "__iter__") else save_name
@@ -414,9 +411,8 @@ def _get_exp_info_using(raw_ws, get_exp_info):
     prev = None
     for exp in range(raw_ws.getNumExperimentInfo()):
         exp_value = get_exp_info(exp)
-        if prev is not None:
-            if exp_value != prev:
-                raise ValueError
+        if prev is not None and exp_value != prev:
+            raise ValueError
         prev = exp_value
     return prev
 

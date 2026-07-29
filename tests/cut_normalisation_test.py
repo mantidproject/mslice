@@ -1,6 +1,6 @@
-import numpy as np
 from unittest import TestCase
 
+import numpy as np
 from mantid.api import AnalysisDataService
 
 from mslice.models.cut.cut_normalisation import normalize_workspace

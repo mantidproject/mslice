@@ -1,7 +1,5 @@
-from __future__ import absolute_import, division, print_function
 import unittest
-
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from mantid.api import AnalysisDataService
 from mantid.simpleapi import CreateSampleWorkspace, RenameWorkspace

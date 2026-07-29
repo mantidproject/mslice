@@ -14,14 +14,13 @@ this file.
 # analysis tools to parse.
 
 import ast
-from enum import Enum
 import functools
 import inspect
+import subprocess
+import sys
+from enum import Enum
 from inspect import Parameter
 from pathlib import Path
-import sys
-import subprocess
-
 
 # This line imports the installed copy of matplotlib, and not the local copy.
 import numpy as np
@@ -453,7 +452,7 @@ def build_pyplot(pyplot_path):
         pyplot_orig = pyplot_orig[: pyplot_orig.index(PYPLOT_MAGIC_HEADER) + 1]
     except IndexError as err:
         raise ValueError(
-            "The pyplot.py file *must* have the exact line: %s" % PYPLOT_MAGIC_HEADER
+            f"The pyplot.py file *must* have the exact line: {PYPLOT_MAGIC_HEADER}"
         ) from err
 
     with pyplot_path.open("w") as pyplot:

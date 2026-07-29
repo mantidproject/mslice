@@ -1,4 +1,5 @@
 from qtpy.QtWidgets import QDialog, QFormLayout, QLabel, QLineEdit, QPushButton
+
 from mslice.util.qt import load_ui
 from mslice.util.qt.validator_helper import double_validator_without_separator
 
@@ -19,7 +20,7 @@ class SubtractInputBox(QDialog):
 
 class ScaleInputBox(QDialog):
     def __init__(self, is_bose=False, parent=None):
-        super(ScaleInputBox, self).__init__(parent)
+        super().__init__(parent)
         self.setWindowTitle("Scale parameters")
         layout = QFormLayout(self)
         self.text1 = QLabel(self)

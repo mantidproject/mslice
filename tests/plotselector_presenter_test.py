@@ -6,8 +6,8 @@
 #
 import os
 import unittest
-
 from unittest import mock
+
 from mslice.widgets.plotselector.column_info import Column
 from mslice.widgets.plotselector.model import PlotSelectorModel
 from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
@@ -269,9 +269,7 @@ class PlotSelectorPresenterTest(unittest.TestCase):
         for i in range(len(self.model.export_plot.mock_calls)):
             self.assertEqual(
                 self.model.export_plot.mock_calls[i],
-                mock.call(
-                    i, os.path.join("/home/Documents", "Plot{}.xyz".format(i + 1))
-                ),
+                mock.call(i, os.path.join("/home/Documents", f"Plot{i + 1}.xyz")),
             )
 
     def test_exporting_multiple_plots_with_repeated_plot_names_generates_unique_names(
@@ -293,9 +291,7 @@ class PlotSelectorPresenterTest(unittest.TestCase):
         for i in range(1, len(self.model.export_plot.mock_calls)):
             self.assertEqual(
                 self.model.export_plot.mock_calls[i],
-                mock.call(
-                    100 + i, os.path.join("/home/Documents", "Plot1 ({}).xyz".format(i))
-                ),
+                mock.call(100 + i, os.path.join("/home/Documents", f"Plot1 ({i}).xyz")),
             )
 
     def test_exporting_multiple_plots_with_special_characters_in_file_name(self):

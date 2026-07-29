@@ -1,5 +1,7 @@
 from enum import Enum
-from mslice.plotting.pyplot import CATEGORY_SLICE, CATEGORY_CUT
+from typing import ClassVar
+
+from mslice.plotting.pyplot import CATEGORY_CUT, CATEGORY_SLICE
 
 
 class IntensityType(Enum):
@@ -12,10 +14,10 @@ class IntensityType(Enum):
 
 
 class IntensityCache:
-    __action_dict = {}
-    __method_dict_cut = {}
-    __method_dict_slice = {}
-    __description_dict = {
+    __action_dict: ClassVar[dict] = {}
+    __method_dict_cut: ClassVar[dict] = {}
+    __method_dict_slice: ClassVar[dict] = {}
+    __description_dict: ClassVar[dict[IntensityType, str]] = {
         IntensityType.SCATTERING_FUNCTION: "scattering_function",
         IntensityType.CHI: "dynamical_susceptibility",
         IntensityType.CHI_MAGNETIC: "dynamical_susceptibility_magnetic",
@@ -76,7 +78,7 @@ class IntensityCache:
 
     @classmethod
     def get_desc_from_type(cls, intensity_type):
-        if intensity_type in cls.__description_dict.keys():
+        if intensity_type in cls.__description_dict:
             return cls.__description_dict[intensity_type]
         else:
             raise ValueError(f"Input intensity type invalid: {intensity_type}")

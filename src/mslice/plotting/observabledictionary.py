@@ -22,7 +22,7 @@ class ObservableDictionary(dict):
     """
 
     def __init__(self, value):
-        super(ObservableDictionary, self).__init__(value)
+        super().__init__(value)
         self.observers = []
 
     def add_observer(self, observer):

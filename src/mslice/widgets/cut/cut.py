@@ -3,19 +3,19 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
+from typing import ClassVar
+
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget
-from mslice.util.qt import load_ui
-from mslice.util.qt.validator_helper import double_validator_without_separator
-from mslice.util.mantid import in_mantid
-
-from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
-
-from mslice.views.interfaces.cut_view import CutView
 
 from mslice.models.units import EnergyUnits
-from .command import Command
+from mslice.presenters.cut_widget_presenter import CutWidgetPresenter
+from mslice.util.mantid import in_mantid
+from mslice.util.qt import load_ui
+from mslice.util.qt.validator_helper import double_validator_without_separator
+from mslice.views.interfaces.cut_view import CutView
 
+from .command import Command
 
 # -----------------------------------------------------------------------------
 # Classes and functions
@@ -26,7 +26,7 @@ class CutWidget(CutView, QWidget):
     warning_occurred = Signal("QString")
     error_occurred = Signal("QString")
     busy = Signal(bool)
-    _name_to_index = {"Rebin": 0, "Integration": 1}
+    _name_to_index: ClassVar[dict[str, int]] = {"Rebin": 0, "Integration": 1}
 
     def __init__(self, parent=None, *args, **kwargs):
         QWidget.__init__(self, parent, *args, **kwargs)
@@ -36,7 +36,7 @@ class CutWidget(CutView, QWidget):
             self.btnCutPlotOver: Command.PlotOver,
             self.btnCutSaveToWorkbench: Command.SaveToWorkspace,
         }
-        for button in self._command_lookup.keys():
+        for button in self._command_lookup:
             button.clicked.connect(self._btn_clicked)
         self._presenter = CutWidgetPresenter(self)
         self.cmbCutAxis.currentIndexChanged.connect(self.axis_changed)
@@ -66,7 +66,7 @@ class CutWidget(CutView, QWidget):
                 value = 0.0
                 self.display_error("Invalid cut step parameter. Using default.")
             if value == 0.0:
-                self.lneCutStep.setText("%.5f" % (self.get_minimum_step()))
+                self.lneCutStep.setText(f"{self.get_minimum_step():.5f}")
                 self.display_error("Setting step size to default.")
             elif value < (self.get_minimum_step() / 100.0):
                 self.display_error("Step size too small!")
@@ -247,8 +247,8 @@ class CutWidget(CutView, QWidget):
             "normtounity": False,
             "cut_algorithm_index": "",
         }
-        for k in cleared_fields:
-            if current_fields[k] != cleared_fields[k]:
+        for k, value in cleared_fields.items():
+            if current_fields[k] != value:
                 return False
         return True
 
@@ -266,7 +266,7 @@ class CutWidget(CutView, QWidget):
         self.cmbCutEUnits.blockSignals(False)
 
     def get_input_fields(self):
-        saved_input = dict()
+        saved_input = {}
         saved_input["axes"] = [
             str(self.cmbCutAxis.itemText(ind)) for ind in range(self.cmbCutAxis.count())
         ]

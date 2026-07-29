@@ -4,7 +4,7 @@
 # Imports
 # -----------------------------------------------------------------------------
 from qtpy.QtCore import Signal
-from qtpy.QtWidgets import QWidget, QMessageBox
+from qtpy.QtWidgets import QMessageBox, QWidget
 
 from mslice.models.projection.powder.mantid_projection_calculator import (
     MantidProjectionCalculator,
@@ -12,8 +12,8 @@ from mslice.models.projection.powder.mantid_projection_calculator import (
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.util.qt import load_ui
 from mslice.views.interfaces.powder_projection_view import PowderView
-from .command import Command
 
+from .command import Command
 
 # -----------------------------------------------------------------------------
 # Classes and functions

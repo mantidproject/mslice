@@ -1,28 +1,27 @@
 import numpy as np
-
 from mantid.api import PythonAlgorithm, WorkspaceProperty
 from mantid.kernel import (
     Direction,
     PropertyManagerProperty,
-    StringMandatoryValidator,
     StringListValidator,
+    StringMandatoryValidator,
 )
 from mantid.simpleapi import (
+    AddSampleLog,
     BinMD,
     ConvertSpectrumAxis,
+    ConvertToMD,
+    CopyLogs,
     CreateMDHistoWorkspace,
+    CreateSimulationWorkspace,
+    DeleteWorkspace,
+    IntegrateMDHistoWorkspace,
+    Integration,
+    Rebin,
     Rebin2D,
     SofQW3,
     TransformMD,
-    ConvertToMD,
-    DeleteWorkspace,
-    CreateSimulationWorkspace,
-    AddSampleLog,
-    CopyLogs,
-    Integration,
-    Rebin,
     Transpose,
-    IntegrateMDHistoWorkspace,
 )
 
 from mslice.models.alg_workspace_ops import fill_in_missing_input, get_number_of_steps
@@ -30,6 +29,7 @@ from mslice.models.axis import Axis
 from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.units import EnergyUnits
 from mslice.workspace.helperfunctions import attribute_to_log
+
 from .cut_normalisation import normalize_workspace
 
 

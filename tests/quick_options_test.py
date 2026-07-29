@@ -1,23 +1,24 @@
-from mock import MagicMock, PropertyMock, Mock, patch
-from packaging import version
 import unittest
+from unittest.mock import MagicMock, Mock, PropertyMock, patch
 
-from matplotlib import text
-from matplotlib.lines import Line2D
-from matplotlib.container import ErrorbarContainer
 from matplotlib import __version__ as mpl_version
-from mslice.plotting.plot_window.slice_plot import SlicePlot
+from matplotlib import text
+from matplotlib.container import ErrorbarContainer
+from matplotlib.lines import Line2D
+from packaging import version
+
 from mslice.plotting.plot_window.cut_plot import CutPlot
-from mslice.presenters.quick_options_presenter import (
-    quick_options,
-    quick_axis_options,
-    quick_label_options,
-    _set_label_options,
-)
 from mslice.plotting.plot_window.quick_options import (
     QuickAxisOptions,
     QuickLabelOptions,
     QuickLineOptions,
+)
+from mslice.plotting.plot_window.slice_plot import SlicePlot
+from mslice.presenters.quick_options_presenter import (
+    _set_label_options,
+    quick_axis_options,
+    quick_label_options,
+    quick_options,
 )
 
 

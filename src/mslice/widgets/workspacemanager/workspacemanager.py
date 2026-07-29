@@ -1,15 +1,17 @@
 from qtpy.QtCore import Signal
-from qtpy.QtWidgets import QWidget, QListWidgetItem, QFileDialog, QInputDialog
+from qtpy.QtWidgets import QFileDialog, QInputDialog, QListWidgetItem, QWidget
+
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
 from mslice.util.qt import load_ui
 from mslice.views.interfaces.workspace_view import WorkspaceView
-from mslice.workspace.workspace import Workspace
-from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
-from .command import Command
-from .input_boxes import SubtractInputBox, ScaleInputBox
+from mslice.workspace.pixel_workspace import PixelWorkspace
+from mslice.workspace.workspace import Workspace
+
 from . import TAB_2D, TAB_EVENT, TAB_HISTO
+from .command import Command
+from .input_boxes import ScaleInputBox, SubtractInputBox
 
 
 class WorkspaceManagerWidget(WorkspaceView, QWidget):

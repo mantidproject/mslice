@@ -1,42 +1,42 @@
 import unittest
-import mock
+from unittest import mock
+
 import numpy as np
-
-from matplotlib.axes import Axes
-
 from mantid.simpleapi import (
     AddSampleLog,
-    CreateSampleWorkspace,
-    CreateMDHistoWorkspace,
-    CreateSimulationWorkspace,
     ConvertToMD,
+    CreateMDHistoWorkspace,
+    CreateSampleWorkspace,
+    CreateSimulationWorkspace,
 )
+from matplotlib.axes import Axes
+
 from mslice.cli._mslice_commands import (
-    Load,
-    MakeProjection,
-    Slice,
-    Cut,
-    PlotCut,
-    PlotSlice,
-    KeepFigure,
-    MakeCurrent,
     ConvertToChi,
     ConvertToChiMag,
     ConvertToCrossSection,
-    SymmetriseSQE,
     ConvertToGDOS,
+    Cut,
     GenerateScript,
+    KeepFigure,
+    Load,
+    MakeCurrent,
+    MakeProjection,
+    PlotCut,
+    PlotSlice,
+    Slice,
+    SymmetriseSQE,
 )
 from mslice.cli.plotfunctions import errorbar
-from mslice.plotting.plot_window.slice_plot import SlicePlot
 from mslice.models.projection.powder.mantid_projection_calculator import (
     MantidProjectionCalculator,
 )
+from mslice.plotting.plot_window.slice_plot import SlicePlot
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
+from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.presenters.powder_projection_presenter import PowderProjectionPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
-from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.views.interfaces.powder_projection_view import PowderView
-from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.workspace import wrap_workspace
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.pixel_workspace import PixelWorkspace
@@ -93,7 +93,7 @@ class CommandLineTest(unittest.TestCase):
         return workspace
 
     def create_histo_workspace(self, name):
-        signal = list(range(0, 100))
+        signal = list(range(100))
         error = np.zeros(100) + 2
         workspace = CreateMDHistoWorkspace(
             Dimensionality=2,

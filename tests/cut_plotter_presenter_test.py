@@ -1,12 +1,14 @@
 import unittest
-import mock
+from unittest import mock
+
 import numpy as np
+
+import mslice.plotting.globalfiguremanager as gfm
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.interfaces.main_presenter import MainPresenterInterface
 from mslice.util.intensity_correction import IntensityType
-import mslice.plotting.globalfiguremanager as gfm
 
 
 class CutPlotterPresenterTest(unittest.TestCase):
@@ -51,7 +53,7 @@ class CutPlotterPresenterTest(unittest.TestCase):
         self.cut_plotter_presenter._cut_cache_dict[ax] = [cut_1, cut_2, cut_3]
 
     def _workspace_handle_side_effect(self, workspace_name):
-        key = list(self.cut_plotter_presenter._cut_cache_dict.keys())[0]
+        key = next(iter(self.cut_plotter_presenter._cut_cache_dict))
         for cut in self.cut_plotter_presenter._cut_cache_dict[key]:
             if cut.workspace_name == workspace_name:
                 return cut.cut_ws

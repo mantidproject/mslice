@@ -1,13 +1,14 @@
-from .busy import show_busy
 from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
-from mslice.models.units import EnergyUnits
 from mslice.models.cmap import ALLOWED_CMAPS
 from mslice.models.slice.slice_functions import is_sliceable
+from mslice.models.units import EnergyUnits
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.interfaces.slice_view import SliceView
 from mslice.widgets.slice.command import Command
+
+from .busy import show_busy
 from .interfaces.slice_plotter_presenter import SlicePlotterPresenterInterface
 from .validation_decorators import require_main_presenter
 
@@ -15,9 +16,9 @@ from .validation_decorators import require_main_presenter
 def validate(field_method, error_method):
     try:
         return field_method()
-    except ValueError as e:
+    except ValueError:
         error_method()
-        raise e
+        raise
 
 
 class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
@@ -83,7 +84,7 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
             # This gets thrown by matplotlib if the supplied intensity_min > data_max_value or vise versa
             # will break if matplotlib change exception error message
             if str(e) != "minvalue must be less than or equal to maxvalue":
-                raise e
+                raise
             self._slice_view.error_invalid_intensity_params()
 
     def _selected_workspace(self):
@@ -165,10 +166,10 @@ class SliceWidgetPresenter(PresenterUtility, SlicePlotterPresenterInterface):
                     )
             self._slice_view.enable()
             self._slice_view.populate_slice_x_params(
-                *["%.5f" % x for x in (x_min, x_max, x_step)]
+                *(f"{x:.5f}" for x in (x_min, x_max, x_step))
             )
             self._slice_view.populate_slice_y_params(
-                *["%.5f" % x for x in (y_min, y_max, y_step)]
+                *(f"{y:.5f}" for y in (y_min, y_max, y_step))
             )
 
     def update_workspaces(self):

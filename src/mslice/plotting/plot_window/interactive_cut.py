@@ -9,11 +9,11 @@ from mslice.models.workspacemanager.workspace_provider import (
     get_workspace_handle,
     workspace_exists,
 )
-from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.plotting.pyplot import GlobalFigureManager
+from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 
 
-class InteractiveCut(object):
+class InteractiveCut:
     def __init__(self, slice_plot, canvas, ws_title):
         self.slice_plot = slice_plot
         self._canvas = canvas
@@ -56,7 +56,7 @@ class InteractiveCut(object):
             abs(erelease.y - eclick.y),
         ]
         rectangle_changed = all(
-            [abs(rect_pos[i] - self._rect_pos_cache[i]) > 0.1 for i in range(6)]
+            abs(rect_pos[i] - self._rect_pos_cache[i]) > 0.1 for i in range(6)
         )
         if rectangle_changed:
             self.horizontal = abs(erelease.x - eclick.x) > abs(erelease.y - eclick.y)
@@ -151,7 +151,7 @@ class InteractiveCut(object):
         x1, x2, y1, y2 = self.rect.extents
         self.plot_cut(x1, x2, y1, y2, store=True)
         self.update_workspaces()
-        ax, integration_start, integration_end = self.get_cut_parameters(
+        _, integration_start, integration_end = self.get_cut_parameters(
             (x1, y1), (x2, y2)
         )
         return output_workspace_name(
@@ -205,10 +205,7 @@ class InteractiveCut(object):
         self._cut_plotter_presenter.set_icut_intensity_category(intensity_type)
 
     def _drawn_rect_exists(self):
-        if not all(pos == 0 for pos in self._rect_pos_cache):
-            return True
-        else:
-            return False
+        return not all(pos == 0 for pos in self._rect_pos_cache)
 
     def refresh_current_cut(self):
         if self._drawn_rect_exists():

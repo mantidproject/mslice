@@ -1,13 +1,14 @@
-from numpy import arange as np_arange
+from typing import ClassVar
 
-import qtpy.QtWidgets as QtWidgets
-from qtpy.QtCore import Signal
-from mslice.models.colors import named_cycle_colors, color_to_name
-from mslice.util.qt import load_ui
-from qtpy.QtGui import QRegularExpressionValidator
-from qtpy.QtCore import QRegularExpression
-from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
 from mantidqt.icons import get_icon
+from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
+from numpy import arange as np_arange
+from qtpy import QtWidgets
+from qtpy.QtCore import QRegularExpression, Signal
+from qtpy.QtGui import QRegularExpressionValidator
+
+from mslice.models.colors import color_to_name, named_cycle_colors
+from mslice.util.qt import load_ui
 
 
 class PlotOptionsDialog(QtWidgets.QDialog):
@@ -184,7 +185,7 @@ class SlicePlotOptions(PlotOptionsDialog):
     cLogEdited = Signal()
 
     def __init__(self, parent, redraw_signal=None):
-        super(SlicePlotOptions, self).__init__(parent, redraw_signal=redraw_signal)
+        super().__init__(parent, redraw_signal=redraw_signal)
         self.chkXLog.hide()
         self.chkYLog.hide()
         self.cut_options.hide()
@@ -233,7 +234,7 @@ class CutPlotOptions(PlotOptionsDialog):
     removed_line = Signal(int)
 
     def __init__(self, parent, redraw_signal=None):
-        super(CutPlotOptions, self).__init__(parent, redraw_signal=redraw_signal)
+        super().__init__(parent, redraw_signal=redraw_signal)
         self._line_widgets = []
         self.groupBox_4.hide()
 
@@ -325,7 +326,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     """This is a widget that has various legend and line controls for each line of a plot"""
 
     # dictionaries used to convert from matplotlib arguments to UI selection and vice versa
-    styles = {
+    styles: ClassVar[dict[str, str]] = {
         "-": "Solid",
         "--": "Dashed",
         "-.": "Dashdot",
@@ -333,7 +334,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         "None": "None",
     }
 
-    markers = {
+    markers: ClassVar[dict[str, str]] = {
         "o": "Circle",
         ",": "Pixel",
         ".": "Point",
@@ -360,13 +361,13 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
         "None": "None",
     }
 
-    inverse_styles = {v: k for k, v in styles.items()}
-    inverse_markers = {v: k for k, v in markers.items()}
+    inverse_styles: ClassVar[dict[str, str]] = {v: k for k, v in styles.items()}
+    inverse_markers: ClassVar[dict[str, str]] = {v: k for k, v in markers.items()}
 
     def __init__(
         self, line_options, color_validator, show_legends, remove_line_callback=None
     ):
-        super(LegendAndLineOptionsSetter, self).__init__()
+        super().__init__()
 
         self._deletion_callback = remove_line_callback
 

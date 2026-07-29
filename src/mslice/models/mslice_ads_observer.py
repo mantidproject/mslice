@@ -1,5 +1,5 @@
-from functools import wraps
 import sys
+from functools import wraps
 
 from mantid.api import AnalysisDataServiceObserver
 
@@ -24,7 +24,7 @@ def _catch_exceptions(func):
 
 class MSliceADSObserver(AnalysisDataServiceObserver):
     def __init__(self, delete_callback, clear_callback, rename_callback):
-        super(MSliceADSObserver, self).__init__()
+        super().__init__()
         self.delete_callback = delete_callback
         self.clear_callback = clear_callback
         self.rename_callback = rename_callback

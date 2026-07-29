@@ -1,16 +1,15 @@
-from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
-
 from mantidqt.utils.qt.line_edit_double_validator import LineEditDoubleValidator
-
 from qtpy import QtWidgets
 from qtpy.QtCore import Signal
+
+from mslice.plotting.plot_window.plot_options import LegendAndLineOptionsSetter
 
 
 class QuickOptions(QtWidgets.QDialog):
     ok_clicked = Signal()
 
     def __init__(self, parent=None):
-        super(QuickOptions, self).__init__(parent)
+        super().__init__(parent)
         self.layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.layout)
         self.ok_button = QtWidgets.QPushButton("OK", self)
@@ -27,7 +26,7 @@ class QuickAxisOptions(QuickOptions):
     def __init__(
         self, parent, target, existing_values, font_size, grid, log, redraw_signal
     ):
-        super(QuickAxisOptions, self).__init__(parent)
+        super().__init__(parent)
         self.setWindowTitle("Edit " + target)
         self.log = log
         self.min_label = QtWidgets.QLabel("Min:")
@@ -105,7 +104,7 @@ class QuickLabelOptions(QuickOptions):
     cancel_clicked = Signal()
 
     def __init__(self, parent, label, redraw_signal):
-        super(QuickLabelOptions, self).__init__(parent)
+        super().__init__(parent)
         self.setWindowTitle("Edit " + label.get_text())
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setText(label.get_text())
@@ -145,7 +144,7 @@ class QuickLineOptions(QuickOptions):
     cancel_clicked = Signal()
 
     def __init__(self, parent, line_options, show_legends):
-        super(QuickLineOptions, self).__init__(parent)
+        super().__init__(parent)
         self.setWindowTitle("Edit line")
         self.line_widget = LegendAndLineOptionsSetter(line_options, None, show_legends)
         self.layout.addWidget(self.line_widget)

@@ -1,31 +1,33 @@
-import numpy as np
-import mock
-from mock import patch
 import unittest
+from unittest import mock
+from unittest.mock import patch
+
+import numpy as np
+from mantid.simpleapi import AddSampleLog
+
 from mslice.models.workspacemanager.workspace_algorithms import (
-    subtract,
     add_workspace_runs,
     combine_workspace,
-    propagate_properties,
     get_limits,
+    processEfixed,
+    propagate_properties,
+    subtract,
 )
 from mslice.models.workspacemanager.workspace_provider import (
-    get_workspace_handle,
-    get_visible_workspace_names,
     delete_workspace,
-    rename_workspace,
+    get_visible_workspace_names,
+    get_workspace_handle,
     get_workspace_name,
-)
-from mslice.models.workspacemanager.workspace_algorithms import processEfixed
-from mslice.util.mantid.mantid_algorithms import (
-    ConvertToMD,
-    CloneWorkspace,
-    CreateSimulationWorkspace,
+    rename_workspace,
 )
 from mslice.presenters.workspace_manager_presenter import WorkspaceManagerPresenter
-from mslice.widgets.workspacemanager.command import Command
-from mantid.simpleapi import AddSampleLog
+from mslice.util.mantid.mantid_algorithms import (
+    CloneWorkspace,
+    ConvertToMD,
+    CreateSimulationWorkspace,
+)
 from mslice.views.interfaces.workspace_view import WorkspaceView
+from mslice.widgets.workspacemanager.command import Command
 
 
 class MantidWorkspaceProviderTest(unittest.TestCase):

@@ -1,10 +1,11 @@
 from matplotlib import text
 from matplotlib.mathtext import MathTextParser
+
 from mslice.plotting.plot_window.quick_options import (
     QuickAxisOptions,
+    QuickError,
     QuickLabelOptions,
     QuickLineOptions,
-    QuickError,
 )
 
 

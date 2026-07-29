@@ -1,16 +1,17 @@
 import unittest
-import mock
+from unittest import mock
+
+from mslice.app import is_gui
 from mslice.app.presenters import (
+    cli_cut_plotter_presenter,
+    cli_dataloader_presenter,
+    cli_powder_presenter,
+    cli_slice_plotter_presenter,
     get_cut_plotter_presenter,
-    get_slice_plotter_presenter,
     get_dataloader_presenter,
     get_powder_presenter,
-    cli_dataloader_presenter,
-    cli_slice_plotter_presenter,
-    cli_powder_presenter,
-    cli_cut_plotter_presenter,
+    get_slice_plotter_presenter,
 )
-from mslice.app import is_gui
 
 
 class AppPresentersTest(unittest.TestCase):

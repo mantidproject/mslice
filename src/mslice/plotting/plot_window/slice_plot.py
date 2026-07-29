@@ -1,37 +1,35 @@
+from collections.abc import Callable
 from functools import partial
 
+from matplotlib import colors
+from matplotlib.legend import Legend
+from matplotlib.text import Text
 from qtpy import QtWidgets
 from qtpy.QtCore import Qt
 
-import matplotlib.colors as colors
-from matplotlib.legend import Legend
-from matplotlib.text import Text
-
-from mslice.models.colors import to_hex, name_to_color
+from mslice.models.colors import name_to_color, to_hex
+from mslice.models.intensity_correction_algs import sample_temperature
 from mslice.models.units import get_sample_temperature_from_string
-from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
-from mslice.presenters.quick_options_presenter import quick_options, check_latex
 from mslice.models.workspacemanager.workspace_provider import (
     get_workspace_handle,
     workspace_exists,
 )
 from mslice.plotting.plot_window.cachable_input_dialog import QCacheableInputDialog
-from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.interactive_cut import InteractiveCut
-from mslice.plotting.plot_window.plot_options import SlicePlotOptions
+from mslice.plotting.plot_window.iplot import IPlot
 from mslice.plotting.plot_window.overplot_interface import (
     _update_overplot_lines,
     _update_powder_lines,
-    toggle_overplot_line,
     cif_file_powder_line,
+    toggle_overplot_line,
 )
+from mslice.plotting.plot_window.plot_options import SlicePlotOptions
 from mslice.plotting.pyplot import GlobalFigureManager
+from mslice.presenters.plot_options_presenter import SlicePlotOptionsPresenter
+from mslice.presenters.quick_options_presenter import check_latex, quick_options
 from mslice.scripting import generate_script
 from mslice.util.compat import legend_set_draggable
-from mslice.util.intensity_correction import IntensityType, IntensityCache
-from mslice.models.intensity_correction_algs import sample_temperature
-
-from typing import Callable
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 
 DEFAULT_LABEL_SIZE = 10
 DEFAULT_TITLE_SIZE = 12
@@ -264,23 +262,21 @@ class SlicePlot(IPlot):
 
     def plot_clicked(self, x, y):
         bounds = self.calc_figure_boundaries()
-        if bounds["x_label"] < y < bounds["title"]:
-            if bounds["y_label"] < x < bounds["colorbar_label"]:
-                if y < bounds["x_range"]:
-                    quick_options(
-                        "x_range", self, redraw_signal=self.plot_window.redraw
-                    )
-                elif x < bounds["y_range"]:
-                    quick_options(
-                        "y_range", self, redraw_signal=self.plot_window.redraw
-                    )
-                elif x > bounds["colorbar_range"]:
-                    quick_options(
-                        "colorbar_range",
-                        self,
-                        self.colorbar_log,
-                        redraw_signal=self.plot_window.redraw,
-                    )
+        if (
+            bounds["x_label"] < y < bounds["title"]
+            and bounds["y_label"] < x < bounds["colorbar_label"]
+        ):
+            if y < bounds["x_range"]:
+                quick_options("x_range", self, redraw_signal=self.plot_window.redraw)
+            elif x < bounds["y_range"]:
+                quick_options("y_range", self, redraw_signal=self.plot_window.redraw)
+            elif x > bounds["colorbar_range"]:
+                quick_options(
+                    "colorbar_range",
+                    self,
+                    self.colorbar_log,
+                    redraw_signal=self.plot_window.redraw,
+                )
 
     def object_clicked(self, target):
         if isinstance(target, Legend):
@@ -817,8 +813,8 @@ class SlicePlot(IPlot):
 
     @all_fonts_size.setter
     def all_fonts_size(self, values: dict):
-        for key in values:
-            setattr(self, key, values[key])
+        for key, value in values.items():
+            setattr(self, key, value)
 
     def increase_all_fonts(self):
         for p in self.plot_fonts_properties:

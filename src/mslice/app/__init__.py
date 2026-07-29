@@ -4,10 +4,9 @@ and entry points.
 
 import sys
 
-import mslice.util.mantid.init_mantid  # noqa: F401
+import mslice.util.mantid.init_mantid
 from mslice.util.mantid import in_mantid
 from mslice.util.qt.qapp import create_qapp_if_required
-
 
 # Module-level reference to keep main window alive after show_gui has returned
 MAIN_WINDOW = None

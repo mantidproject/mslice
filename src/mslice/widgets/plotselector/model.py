@@ -7,7 +7,7 @@
 from mslice.plotting.globalfiguremanager import FigureAction
 
 
-class PlotSelectorModel(object):
+class PlotSelectorModel:
     """
     This is the model for the plot selector widget. Essentially this
     is just a wrapper to the true model - GlobalFigureManager.
@@ -97,9 +97,7 @@ class PlotSelectorModel(object):
         figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError(
-                "Error showing, could not find a plot with the number {}.".format(
-                    plot_number
-                )
+                f"Error showing, could not find a plot with the number {plot_number}."
             )
         figure_manager.show()
 
@@ -113,9 +111,7 @@ class PlotSelectorModel(object):
         figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError(
-                "Error in is_visible, could not find a plot with the number {}.".format(
-                    plot_number
-                )
+                f"Error in is_visible, could not find a plot with the number {plot_number}."
             )
 
         return figure_manager.window.isVisible()
@@ -128,9 +124,7 @@ class PlotSelectorModel(object):
         figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError(
-                "Error hiding, could not find a plot with the number {}.".format(
-                    plot_number
-                )
+                f"Error hiding, could not find a plot with the number {plot_number}."
             )
         figure_manager.window.hide()
 
@@ -145,9 +139,7 @@ class PlotSelectorModel(object):
         figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError(
-                "Error renaming, could not find a plot with the number {}.".format(
-                    plot_number
-                )
+                f"Error renaming, could not find a plot with the number {plot_number}."
             )
 
         figure_manager.set_window_title(new_name)
@@ -163,9 +155,7 @@ class PlotSelectorModel(object):
         figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError(
-                "Error closing, could not find a plot with the number {}.".format(
-                    plot_number
-                )
+                f"Error closing, could not find a plot with the number {plot_number}."
             )
 
         self.GlobalFigureManager.destroy(plot_number)
@@ -204,16 +194,12 @@ class PlotSelectorModel(object):
         figure_manager = self.GlobalFigureManager.get_figure_by_number(plot_number)
         if figure_manager is None:
             raise ValueError(
-                "Error exporting, could not find a plot with the number {}.".format(
-                    plot_number
-                )
+                f"Error exporting, could not find a plot with the number {plot_number}."
             )
 
         try:
             figure_manager.canvas.figure.savefig(save_absolute_path)
-        except IOError as e:
+        except OSError as e:
             raise ValueError(
-                "Error, could not save plot to {}.\n\nError was: {}".format(
-                    save_absolute_path, e
-                )
+                f"Error, could not save plot to {save_absolute_path}.\n\nError was: {e}"
             )

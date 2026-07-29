@@ -4,15 +4,16 @@
 # SPDX - License - Identifier: GPL - 3.0 +
 #
 #
+import unittest
+from unittest import mock
+
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QIcon
 from qtpy.QtTest import QTest
-import unittest
 
-from unittest import mock
 from mslice.widgets.plotselector.column_info import Column
-from mslice.widgets.plotselector.view import EXPORT_TYPES, PlotSelectorView
 from mslice.widgets.plotselector.presenter import PlotSelectorPresenter
+from mslice.widgets.plotselector.view import EXPORT_TYPES, PlotSelectorView
 
 
 class PlotSelectorWidgetTest(unittest.TestCase):
@@ -56,9 +57,7 @@ class PlotSelectorWidgetTest(unittest.TestCase):
         return "_" + plot_name
 
     def se_is_shown_by_filter(self, plot_number):
-        if plot_number == 0:
-            return True
-        return False
+        return plot_number == 0
 
     def click_to_select_by_row_number(self, row_number):
         widget = self.view.table_widget.cellWidget(row_number, Column.Name)

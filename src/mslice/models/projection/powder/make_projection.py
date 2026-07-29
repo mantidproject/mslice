@@ -1,18 +1,20 @@
 import uuid
+
 from mantid.api import (
-    PythonAlgorithm,
-    MatrixWorkspaceProperty,
     IMDEventWorkspaceProperty,
+    MatrixWorkspaceProperty,
+    PythonAlgorithm,
 )
-from mantid.kernel import FloatArrayProperty, Direction, StringMandatoryValidator
+from mantid.kernel import Direction, FloatArrayProperty, StringMandatoryValidator
 from mantid.simpleapi import (
-    DeleteWorkspace,
-    SliceMD,
-    PreprocessDetectorsToMD,
-    ConvertToMD,
-    SofQW3,
     ConvertSpectrumAxis,
+    ConvertToMD,
+    DeleteWorkspace,
+    PreprocessDetectorsToMD,
+    SliceMD,
+    SofQW3,
 )
+
 from ...labels import DELTA_E_LABEL, MOD_Q_LABEL, THETA_LABEL
 
 

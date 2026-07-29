@@ -1,7 +1,15 @@
 import os.path
-from qtpy.QtWidgets import QFileDialog
+
+import numpy as np
 from mantid.api import MDNormalization
 from mantid.kernel import ConfigService
+from qtpy.QtWidgets import QFileDialog
+from scipy.io import savemat
+
+from mslice.models.axis import Axis
+from mslice.models.labels import get_display_name
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.plotting.plot_window.quick_options import QuickError
 from mslice.util.mantid.mantid_algorithms import (
     CreateMDHistoWorkspace,
     SaveAscii,
@@ -9,15 +17,8 @@ from mslice.util.mantid.mantid_algorithms import (
     SaveNexus,
     SaveNXSPE,
 )
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.models.axis import Axis
-from mslice.models.labels import get_display_name
-from mslice.plotting.plot_window.quick_options import QuickError
-from mslice.workspace.histogram_workspace import HistogramWorkspace
 from mslice.workspace.helperfunctions import WrapWorkspaceAttribute
-
-import numpy as np
-from scipy.io import savemat
+from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
 def get_save_directory(multiple_files=False, save_as_image=False, default_ext=None):
@@ -131,7 +132,7 @@ def save_matlab(workspace, path):
                 )
             x = np.array(x, dtype=object)
             # We're saving a 2D RebinnedWorkspace which always has DeltaE along x
-            ix = [i for i, ax in enumerate(workspace.axes) if "DeltaE" in ax.units][0]
+            ix = next(i for i, ax in enumerate(workspace.axes) if "DeltaE" in ax.units)
             iy = 0 if ix == 1 else 1
             labels = {
                 "x": get_display_name(workspace.axes[ix]),
@@ -158,10 +159,10 @@ def _save_cut_to_ascii(workspace, output_path):
     cut_axis, integration_axis = tuple(workspace.axes)
 
     x, y, e = _get_md_histo_xye(workspace.raw_ws)
-    header = 'MSlice Cut of workspace "{}"\n'.format(workspace.parent)
-    header += "Cut axis: {}\n".format(cut_axis)
-    header += "Integration axis: {}\n".format(integration_axis)
-    header += "({}) (Signal) (Error)".format(get_display_name(cut_axis))
+    header = f'MSlice Cut of workspace "{workspace.parent}"\n'
+    header += f"Cut axis: {cut_axis}\n"
+    header += f"Integration axis: {integration_axis}\n"
+    header += f"({get_display_name(cut_axis)}) (Signal) (Error)"
     out_data = np.c_[x, y, e]
     _output_data_to_ascii(output_path, out_data, header)
 
@@ -198,13 +199,13 @@ def _save_slice_to_ascii(workspace, output_path):
         "x": get_display_name(workspace.axes[ix]),
         "y": get_display_name(workspace.axes[iy]),
     }
-    header = 'MSlice Slice of workspace "%s"' % (workspace.name)
+    header = f'MSlice Slice of workspace "{workspace.name}"'
     header += "\n({}) ({}) (Signal) (Error)".format(labels["x"], labels["y"])
     _output_data_to_ascii(output_path, out_data, header)
 
 
 def load_from_ascii(file_path, ws_name):
-    file = open(file_path, "r")
+    file = open(file_path, "r")  # noqa: SIM115
     line = file.readline()
     header = ""
     while line.startswith("#"):

@@ -1,5 +1,6 @@
-import numpy as np
 import warnings
+
+import numpy as np
 
 
 def apply_with_corrected_shape(method, shape_array, array, exception):

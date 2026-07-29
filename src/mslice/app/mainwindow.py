@@ -1,18 +1,18 @@
-from qtpy.QtWidgets import QApplication, QMainWindow, QLabel, QMenu, QStackedLayout
+from functools import partial
+
+from qtpy.QtWidgets import QApplication, QLabel, QMainWindow, QMenu, QStackedLayout
 
 from mslice.models.units import EnergyUnits
+from mslice.plotting.plot_window.plot_window import add_action
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
 from mslice.util.qt import load_ui
 from mslice.views.interfaces.mainview import MainView
+from mslice.widgets.cut.command import Command as cut_command
 from mslice.widgets.ipythonconsole.ipython_widget import IPythonWidget
 from mslice.widgets.workspacemanager import TAB_2D, TAB_EVENT, TAB_HISTO, TAB_NONPSD
 from mslice.widgets.workspacemanager.command import Command as ws_command
-from mslice.widgets.cut.command import Command as cut_command
-from mslice.plotting.plot_window.plot_window import add_action
-
-from functools import partial
 
 TAB_SLICE = 1
 TAB_CUT = 2
@@ -265,9 +265,9 @@ class MainWindow(MainView, QMainWindow):
         QApplication.processEvents()
 
     def get_energy_default(self):
-        return [
+        return next(
             action.text() for action in self._en_default_actions if action.isChecked()
-        ][0]
+        )
 
     def set_energy_default(self, this_action):
         if this_action.isChecked():
@@ -296,7 +296,7 @@ class MainWindow(MainView, QMainWindow):
             )
 
     def set_cut_algorithm_default(self, algo):
-        for action in self._cut_algo_map.keys():
+        for action in self._cut_algo_map:
             if algo not in action:
                 self._cut_algo_map[action].setChecked(False)
         self._presenter.set_cut_algorithm_default(algo)

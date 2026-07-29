@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class MainPresenterInterface(object):
+class MainPresenterInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod

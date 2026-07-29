@@ -1,18 +1,17 @@
-import numpy as np
+from math import ceil, trunc
 
+import numpy as np
 from scipy import constants
 
 from mslice.models.alg_workspace_ops import get_number_of_steps
-from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.workspace.pixel_workspace import PixelWorkspace, HistogramWorkspace
-from mslice.models.units import get_sample_temperature_from_string
 from mslice.models.axis import Axis
-from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace
-from mslice.models.slice.slice_functions import compute_slice
-from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.cut.cut_algorithm import _cut_nonPSD_general
-from math import trunc, ceil
-
+from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.slice.slice_functions import compute_slice
+from mslice.models.units import get_sample_temperature_from_string
+from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
+from mslice.util.mantid.mantid_algorithms import CreateMDHistoWorkspace
+from mslice.workspace.pixel_workspace import HistogramWorkspace, PixelWorkspace
 
 KB_MEV = constants.value("Boltzmann constant in eV/K") * 1000
 E_TO_K = (
@@ -307,8 +306,7 @@ def _get_slice_axis(pixel_limits, cut_axis, is_icut):
         )
     else:  # if not icut (user specified), retain user input unless smaller than data steps.
         step_size = cut_axis.step if cut_axis.step != 0 else pixel_limits[2]
-        if step_size < slice_step_size:
-            step_size = slice_step_size
+        step_size = max(step_size, slice_step_size)
         ret_axis = Axis(
             cut_axis.units, cut_axis.start, cut_axis.end, step_size, cut_axis.e_unit
         )
@@ -423,7 +421,7 @@ def sample_temperature(ws_name, sample_temp_fields):
             sample_temp = ws.getExperimentInfo(0).run().getLogData(field_name).value
     if isinstance(sample_temp, str):
         sample_temp = get_sample_temperature_from_string(sample_temp)
-    elif isinstance(sample_temp, np.ndarray) or isinstance(sample_temp, list):
+    elif isinstance(sample_temp, (np.ndarray, list)):
         sample_temp = np.mean(sample_temp)
     else:
         float(sample_temp)
@@ -431,7 +429,4 @@ def sample_temperature(ws_name, sample_temp_fields):
 
 
 def _is_momentum_or_two_theta(units):
-    if is_momentum(units) or is_twotheta(units):
-        return True
-    else:
-        return False
+    return is_momentum(units) or is_twotheta(units)

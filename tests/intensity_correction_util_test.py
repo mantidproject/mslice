@@ -1,13 +1,13 @@
-from mock import patch, MagicMock
 import unittest
+from unittest.mock import MagicMock, patch
 
-from mslice.util.intensity_correction import IntensityCache, IntensityType
 from mslice.models.axis import Axis
 from mslice.models.cut.cut import Cut
 from mslice.models.slice.slice import Slice
 from mslice.plotting.plot_window.plot_window import PlotWindow
-from mslice.plotting.pyplot import CATEGORY_SLICE, CATEGORY_CUT
+from mslice.plotting.pyplot import CATEGORY_CUT, CATEGORY_SLICE
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
+from mslice.util.intensity_correction import IntensityCache, IntensityType
 
 
 class IntensityCorrectionUtilTest(unittest.TestCase):
@@ -106,8 +106,8 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
 
     @staticmethod
     def _create_cut(
-        q_axis=Axis("|Q|", 0.1, 3.1, 0.1),
-        e_axis=Axis("DeltaE", -10, 15, 1),
+        q_axis=None,
+        e_axis=None,
         intensity_start=0,
         intensity_end=100,
         norm_to_one=False,
@@ -116,6 +116,10 @@ class IntensityCorrectionUtilTest(unittest.TestCase):
         sample_temp=None,
         e_fixed=None,
     ):
+        if q_axis is None:
+            q_axis = Axis("|Q|", 0.1, 3.1, 0.1)
+        if e_axis is None:
+            e_axis = Axis("DeltaE", -10, 15, 1)
         return Cut(
             e_axis,
             q_axis,

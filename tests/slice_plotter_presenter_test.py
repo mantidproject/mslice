@@ -1,5 +1,6 @@
-import mock
 import unittest
+from unittest import mock
+
 import numpy as np
 
 from mslice.models.axis import Axis

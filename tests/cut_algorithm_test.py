@@ -1,15 +1,15 @@
-import numpy as np
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+import numpy as np
 from mantid.api import AnalysisDataService
 from mantid.dataobjects import MDHistoWorkspace
 
 from mslice.models.axis import Axis
-from mslice.models.cut.cut_algorithm import compute_cut, Cut
+from mslice.models.cut.cut_algorithm import Cut, compute_cut
 from tests.testhelpers.workspace_creator import (
-    create_simulation_workspace,
     create_md_workspace,
+    create_simulation_workspace,
 )
 
 

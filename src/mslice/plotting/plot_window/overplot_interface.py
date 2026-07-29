@@ -1,10 +1,10 @@
+import warnings
+from os import path
+
 from qtpy.QtWidgets import QFileDialog
 
-import os.path as path
-import warnings
-
-from mslice.models.labels import get_recoil_label
 import mslice.plotting.pyplot as plt
+from mslice.models.labels import get_recoil_label
 
 OVERPLOT_COLORS = {
     1: "b",

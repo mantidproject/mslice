@@ -1,8 +1,9 @@
-from mock import MagicMock, PropertyMock, patch, ANY
-import numpy as np
 import unittest
+from unittest.mock import ANY, MagicMock, PropertyMock, patch
 
+import numpy as np
 from matplotlib.lines import Line2D
+
 from mslice.plotting.plot_window.cut_plot import CutPlot, _gca_sym_log_linear_threshold
 
 

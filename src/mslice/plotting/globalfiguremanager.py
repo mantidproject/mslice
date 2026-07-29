@@ -27,14 +27,14 @@ be added to the category of the command
 Currently there are only two categories ('1d' and '2d') hard coded into the manager.
 """
 
+import atexit
 from collections import defaultdict
+from enum import Enum
 
 # system imports
 from functools import wraps
+from typing import ClassVar
 
-import atexit
-
-from enum import Enum
 from .observabledictionary import DictionaryAction, ObservableDictionary
 
 # Labels for each category
@@ -50,7 +50,7 @@ class FigureAction(Enum):
     VisibilityChanged = 5
 
 
-class GlobalFigureManagerObserver(object):
+class GlobalFigureManagerObserver:
     def __init__(self, figure_manager=None):
         """
         :param figure_manager: Figure manager that will be used to notify observers.
@@ -77,15 +77,15 @@ class GlobalFigureManagerObserver(object):
             self.figure_manager.notify_observers(FigureAction.Update, key)
         elif action == DictionaryAction.Clear:
             # On Clear notify the observers to close all of the figures
-            # `figs.keys()` is safe to iterate and delete items at the same time
-            # because `keys` returns a new list, not referencing the original dict
-            for key in self.figure_manager.figs.keys():
-                self.figure_manager.notify_observers(FigureAction.Closed, key)
+            # `self.figure_manager.figs` is safe to iterate and delete items at the same time
+            # because it returns a new list, not referencing the original dict
+            for fig in self.figure_manager.figs:
+                self.figure_manager.notify_observers(FigureAction.Closed, fig)
         else:
-            raise ValueError("Notifying for action {} is not supported".format(action))
+            raise ValueError(f"Notifying for action {action} is not supported")
 
 
-class GlobalFigureManager(object):
+class GlobalFigureManager:
     """Static class to manage a set of numbered figures.
 
     It is never instantiated. It consists of attributes to
@@ -102,22 +102,25 @@ class GlobalFigureManager(object):
 
     # if there is a current figure it should be both current and active
     _active_category = None
-    _category_current_figures = {
+    _category_current_figures: ClassVar[dict] = {
         CATEGORY_CUT: None,
         CATEGORY_SLICE: None,
     }  # Current_figures receive decorated commands
-    _figures_by_category = {CATEGORY_CUT: [], CATEGORY_SLICE: []}
-    _unclassified_figures = []
+    _figures_by_category: ClassVar[dict[str, list]] = {
+        CATEGORY_CUT: [],
+        CATEGORY_SLICE: [],
+    }
+    _unclassified_figures: ClassVar[list] = []
     _active_figure = None
     _last_active_figure = None
-    _figures = {}
+    _figures: ClassVar[dict] = {}
     # If the following attribute is True, "Make Current" will be disabled for all open figures. This will be used for
     # the interactive cut window to stop other windows being made current whilst the interactive cut is active.
     _disable_make_current = False
 
-    _activeQue = []
+    _activeQue: ClassVar[list] = []
     figs = ObservableDictionary({})
-    observers = []
+    observers: ClassVar[list] = []
 
     @classmethod
     def initialiseFiguresObserver(cls):
@@ -185,7 +188,7 @@ class GlobalFigureManager(object):
     def destroy_all(cls):
         # this is need to ensure that gc is available in corner cases
         # where modules are being torn down after install with easy_install
-        import gc  # noqa
+        import gc
 
         for manager in list(cls._figures.values()):
             manager.destroy()
@@ -297,9 +300,7 @@ class GlobalFigureManager(object):
 
         if num is None:
             num = 1
-            while any(
-                [num == existing_fig_num for existing_fig_num in cls._figures.keys()]
-            ):
+            while any(num == existing_fig_num for existing_fig_num in cls._figures):
                 num += 1
         new_fig = new_plot_figure_manager(num, GlobalFigureManager)
         cls._figures[num] = new_fig
@@ -344,7 +345,7 @@ class GlobalFigureManager(object):
                 cls._active_figure = cls._category_current_figures[cls._active_category]
         else:
             if cls._active_figure is None:
-                fig, num = cls._new_figure()
+                _, num = cls._new_figure()
                 cls._active_figure = num
         cls.notify_observers(FigureAction.Renamed, cls._active_figure)
         return cls._figures[cls._active_figure]
@@ -401,7 +402,7 @@ class GlobalFigureManager(object):
             del cls._figures[num]
         except KeyError:
             raise KeyError(
-                'The key "%s" does not exist. The figure cannot be closed' % num
+                f'The key "{num}" does not exist. The figure cannot be closed'
             )
 
     @classmethod
@@ -413,7 +414,7 @@ class GlobalFigureManager(object):
                 break
         else:
             raise KeyError(
-                "Figure no. %i was not found in any category " % num if num else 0
+                f"Figure no. {num if num else 0} was not found in any category"
             )
             # in-line if handles the case num is None
         return figure_category
@@ -435,9 +436,8 @@ class GlobalFigureManager(object):
         except KeyError:
             figure_category = None
 
-        if figure_category:
-            if cls._category_current_figures[figure_category] == num:
-                cls._category_current_figures[figure_category] = None
+        if figure_category and cls._category_current_figures[figure_category] == num:
+            cls._category_current_figures[figure_category] = None
 
         cls.broadcast(figure_category)
 
@@ -472,9 +472,9 @@ class GlobalFigureManager(object):
         else:
             broadcast_list = [category]
 
-        for category in broadcast_list:
-            for figure_number in cls._figures_by_category[category]:
-                if cls._category_current_figures[category] == figure_number:
+        for broadcast in broadcast_list:
+            for figure_number in cls._figures_by_category[broadcast]:
+                if cls._category_current_figures[broadcast] == figure_number:
                     cls._figures[figure_number].flag_as_current()
 
                 else:
@@ -535,7 +535,7 @@ class GlobalFigureManager(object):
         for key, value in list(cls._figures.items()):
             if value == fig:
                 return key
-        raise ValueError("Figure %s was not recognised" % fig)
+        raise ValueError(f"Figure {fig} was not recognised")
 
     # ---------------------- Observer methods ---------------------
     # This is currently very simple as the only observer is

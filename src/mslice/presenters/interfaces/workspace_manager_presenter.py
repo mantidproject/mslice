@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class WorkspaceManagerPresenterInterface(object):
+class WorkspaceManagerPresenterInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod

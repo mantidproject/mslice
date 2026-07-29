@@ -1,12 +1,10 @@
 import numpy as np
-
-from scipy import constants
-
 from mantid.geometry import (
     CrystalStructure,
-    ReflectionGenerator,
     ReflectionConditionFilter,
+    ReflectionGenerator,
 )
+from scipy import constants
 
 from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
@@ -60,8 +58,8 @@ def compute_powder_line(ws_name, axis, element, cif_file=False):
         x0 = _compute_powder_line_degrees(ws_name, axis, element, efixed, cif_file)
     else:
         raise RuntimeError("units of axis not recognised")
-    x = sum([[xv, xv, np.nan] for xv in x0], [])
-    y = sum([[efixed / 20, -efixed / 20, np.nan] for xv in x0], [])
+    x = [value for xv in x0 for value in (xv, xv, np.nan)]
+    y = [value for _ in x0 for value in (efixed / 20, -efixed / 20, np.nan)]
     return x, y
 
 

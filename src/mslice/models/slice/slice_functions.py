@@ -1,5 +1,4 @@
 import numpy as np
-
 from mantid.api import WorkspaceUnitValidator
 from scipy import constants
 
@@ -7,7 +6,6 @@ from mslice.models.labels import is_momentum, is_twotheta
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.util.mantid import mantid_algorithms
-
 from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.workspace.workspace import Workspace
 

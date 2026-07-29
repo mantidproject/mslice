@@ -1,7 +1,8 @@
+from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.models.workspacemanager.workspace_algorithms import propagate_properties
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
-from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.util.mantid import mantid_algorithms
+
 from ...labels import DELTA_E_LABEL, MOD_Q_LABEL, THETA_LABEL
 
 
@@ -14,7 +15,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
         try:
             axes = [workspace.raw_ws.getAxis(0), workspace.raw_ws.getAxis(1)]
             if not all(
-                [ax.isSpectra() or ax.getUnit().unitID() == "DeltaE" for ax in axes]
+                ax.isSpectra() or ax.getUnit().unitID() == "DeltaE" for ax in axes
             ):
                 raise AttributeError
         except (AttributeError, IndexError):
@@ -31,7 +32,7 @@ class MantidProjectionCalculator(ProjectionCalculator):
 
         # can have Q-E or 2theta-E or their transpose.
         if axis1 != DELTA_E_LABEL and axis2 != DELTA_E_LABEL:
-            raise NotImplementedError("Must have a '%s' axis" % DELTA_E_LABEL)
+            raise NotImplementedError(f"Must have a '{DELTA_E_LABEL}' axis")
         if axis1 == MOD_Q_LABEL or axis2 == MOD_Q_LABEL:
             projection_type = "QE"
             output_workspace_name = workspace.name + (

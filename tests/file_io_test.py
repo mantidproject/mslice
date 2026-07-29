@@ -1,19 +1,20 @@
-from mock import patch, Mock, MagicMock
-import numpy as np
+import unittest
 from os.path import join
 from tempfile import gettempdir
-import unittest
-from mantid.simpleapi import CreateMDHistoWorkspace
+from unittest.mock import MagicMock, Mock, patch
+
+import numpy as np
 from mantid.kernel import ConfigService
+from mantid.simpleapi import CreateMDHistoWorkspace
 
 from mslice.models.axis import Axis
 from mslice.models.cut.cut_functions import output_workspace_name
 from mslice.models.workspacemanager.file_io import (
     _save_cut_to_ascii,
     _save_slice_to_ascii,
-    get_save_directory,
     _to_absolute_path,
     _validate_nxspe_save,
+    get_save_directory,
 )
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 

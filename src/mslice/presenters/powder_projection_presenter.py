@@ -1,8 +1,9 @@
-from .busy import show_busy
 from mslice.models.projection.powder.projection_calculator import ProjectionCalculator
 from mslice.presenters.presenter_utility import PresenterUtility
 from mslice.views.interfaces.powder_projection_view import PowderView
 from mslice.widgets.projection.powder.command import Command
+
+from .busy import show_busy
 from .interfaces.powder_projection_presenter import PowderProjectionPresenterInterface
 from .validation_decorators import require_main_presenter
 
@@ -76,7 +77,7 @@ class PowderProjectionPresenter(PresenterUtility, PowderProjectionPresenterInter
         num_items = len(self._available_axes)
         axes = [self._powder_view.get_powder_u1(), self._powder_view.get_powder_u2()]
         axes_set = [self._powder_view.set_powder_u1, self._powder_view.set_powder_u2]
-        name_to_index = dict((val, id) for id, val in enumerate(self._available_axes))
+        name_to_index = {val: index for index, val in enumerate(self._available_axes)}
         if axes[curr_axis] == axes[other_axis]:
             new_index = (name_to_index[axes[other_axis]] + 1) % num_items
             axes_set[other_axis](self._available_axes[new_index])

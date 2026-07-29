@@ -8,7 +8,7 @@ def get_canvas_and_toolbar_cls():
     :return: A 2-tuple of (FigureCanvas, NavigationToolbar)
     """
     backend = get_backend_module()
-    return getattr(backend, "FigureCanvas"), getattr(backend, "NavigationToolbar2QT")
+    return backend.FigureCanvas, backend.NavigationToolbar2QT
 
 
 def get_backend_module():

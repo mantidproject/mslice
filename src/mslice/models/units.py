@@ -4,20 +4,21 @@ At present only the energy units "meV" ("DeltaE") and "cm-1" ("DeltaE_inWavenumb
 are defined, but they are separated into a module for possible future expansion.
 """
 
+from typing import ClassVar
+
 import numpy as np
 
 
 def _scale_string_or_float(value, scale):
     try:
-        return "{:.5f}".format(float(value) * scale)
+        return f"{float(value) * scale:.5f}"
     except (ValueError, TypeError):
         return value
 
 
 def get_sample_temperature_from_string(string):
     if string is not None and string.strip():
-        if string.endswith("K"):
-            string = string[:-1]
+        string = string.removesuffix("K")
         try:
             sample_temp = float(string)
             return sample_temp
@@ -26,17 +27,25 @@ def get_sample_temperature_from_string(string):
     return None
 
 
-class EnergyUnits(object):
-    _available_units = ["meV", "cm-1"]
-    _label_latex = {"meV": "meV", "cm-1": "cm$^{-1}$"}
-    _name_to_index = {"meV": 0, "cm-1": 1, "DeltaE": 0, "DeltaE_inWavenumber": 1}
+class EnergyUnits:
+    _available_units: ClassVar[list] = ["meV", "cm-1"]
+    _label_latex: ClassVar[dict[str, str]] = {"meV": "meV", "cm-1": "cm$^{-1}$"}
+    _name_to_index: ClassVar[dict[str, int]] = {
+        "meV": 0,
+        "cm-1": 1,
+        "DeltaE": 0,
+        "DeltaE_inWavenumber": 1,
+    }
     # The following is a conversion matrix between the different units e_to = m[from][to] * e_from
     # E.g. meV = m[1][0] * cm; and cm = m[0][1] * meV
-    _conversion_factors = [[1.0, 8.065544], [1.0 / 8.065544, 1.0]]
+    _conversion_factors: ClassVar[list[float]] = [
+        [1.0, 8.065544],
+        [1.0 / 8.065544, 1.0],
+    ]
 
     def __init__(self, unit_name):
-        if unit_name not in self._name_to_index.keys():
-            raise ValueError("Unrecognised energy unit '{}'".format(unit_name))
+        if unit_name not in self._name_to_index:
+            raise ValueError(f"Unrecognised energy unit '{unit_name}'")
         self._unit = unit_name
         self._index = self._name_to_index[self._unit]
 
@@ -65,13 +74,13 @@ class EnergyUnits(object):
         try:
             return self._conversion_factors[self._name_to_index[unit_from]][self._index]
         except KeyError:
-            raise ValueError("Unrecognised energy unit '{}'".format(unit_from))
+            raise ValueError(f"Unrecognised energy unit '{unit_from}'")
 
     def factor_to(self, unit_to):
         try:
             return self._conversion_factors[self._index][self._name_to_index[unit_to]]
         except KeyError:
-            raise ValueError("Unrecognised energy unit '{}'".format(unit_to))
+            raise ValueError(f"Unrecognised energy unit '{unit_to}'")
 
     def convert_from(self, unit_from, *args):
         return (_scale_string_or_float(x, self.factor_from(unit_from)) for x in args)
@@ -87,7 +96,7 @@ class EnergyUnits(object):
         try:
             return cls._name_to_index[unit_name]
         except KeyError:
-            raise ValueError("Unrecognised energy unit '{}'".format(unit_name))
+            raise ValueError(f"Unrecognised energy unit '{unit_name}'")
 
     @classmethod
     def get_all_units(cls):

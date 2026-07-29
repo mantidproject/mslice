@@ -1,21 +1,21 @@
 import copy
 import logging
 
-from mslice.workspace.histogram_workspace import HistogramWorkspace
-from mslice.workspace.base import WorkspaceBase as Workspace
-from mslice.workspace.workspace import Workspace as MatrixWorkspace
-from mslice.models.alg_workspace_ops import get_axis_range, get_available_axes
+from mslice.models.alg_workspace_ops import get_available_axes, get_axis_range
 from mslice.models.axis import Axis
-from mslice.models.workspacemanager.workspace_provider import workspace_exists
+from mslice.models.cut.cut import SampleTempValueError
 from mslice.models.intensity_correction_algs import (
     compute_chi,
     compute_d2sigma,
     compute_symmetrised,
     cut_compute_gdos,
 )
-from mslice.models.cut.cut import SampleTempValueError
+from mslice.models.workspacemanager.workspace_provider import workspace_exists
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
-from mslice.util.intensity_correction import IntensityType, IntensityCache
+from mslice.util.intensity_correction import IntensityCache, IntensityType
+from mslice.workspace.base import WorkspaceBase as Workspace
+from mslice.workspace.histogram_workspace import HistogramWorkspace
+from mslice.workspace.workspace import Workspace as MatrixWorkspace
 
 _overplot_keys = {
     "Hydrogen": 1,
@@ -28,6 +28,7 @@ _overplot_keys = {
     "Arbitrary Nuclei": "Arbitrary Nuclei",
     "CIF file": "CIF file",
 }
+logger = logging.getLogger(__name__)
 
 
 def _update_legend():
@@ -105,15 +106,15 @@ def _process_axis(
             return axis
         validation_error = axis.validate_step_against_workspace(input_workspace)
         if validation_error:
-            logging.warning(validation_error)
+            logger.warning(validation_error)
     elif axis in available_axes:
         range = get_axis_range(input_workspace, axis)
         range = list(map(float, range))
         axis = Axis(units=axis, start=range[0], end=range[1], step=range[2])
     else:
         raise RuntimeError(
-            "Axis '%s' not recognised. Workspace has these axes: %s "
-            % (axis, ", ".join(available_axes))
+            f"Axis '{axis}' not recognised. "
+            f"Workspace has these axes: {', '.join(available_axes)}"
         )
     return axis
 
@@ -124,7 +125,7 @@ def _check_workspace_name(workspace):
     if not isinstance(workspace, str):
         raise TypeError("InputWorkspace must be a workspace or a workspace name")
     if not workspace_exists(workspace):
-        raise TypeError("InputWorkspace %s could not be found." % workspace)
+        raise TypeError(f"InputWorkspace {workspace} could not be found.")
 
 
 def _check_workspace_type(workspace, correct_type):
@@ -165,7 +166,7 @@ def is_cut(*args):
     """
     Checks if args[0] is a HistogramWorkspace and if the bin number matches
     """
-    if (
+    return (
         isinstance(args[0], HistogramWorkspace)
         and sum(
             [
@@ -174,10 +175,7 @@ def is_cut(*args):
             ]
         )
         == 1
-    ):
-        return True
-    else:
-        return False
+    )
 
 
 def is_hs_workspace(*args):
@@ -190,13 +188,11 @@ def is_hs_workspace(*args):
 def append_visible_handle(visible_handles, handles, idx: int):
     handle = handles[idx]
     visible_handles.append(handle[0])
-    return None
 
 
 def append_visible_label(visible_labels, labels, idx: int):
     label = labels[idx]
     visible_labels.append(label)
-    return None
 
 
 def append_visible_handle_and_label(
@@ -204,27 +200,23 @@ def append_visible_handle_and_label(
 ):
     append_visible_handle(visible_handles, handles, idx)
     append_visible_label(visible_labels, labels, idx)
-    return None
 
 
 def show_or_hide_errorbars_of_a_line(container, alpha: float):
     elements = container.get_children()[1:]
     for element in elements:
         element.set_alpha(alpha)
-    return None
 
 
 def show_or_hide_a_line(container, show_or_hide: bool):
     line = container.get_children()[0]
     line.set_visible(show_or_hide)
-    return None
 
 
 def hide_a_line_and_errorbars(ax, idx: int):
     container = ax.containers[idx]
     show_or_hide_a_line(container, False)
     show_or_hide_errorbars_of_a_line(container, 0.0)
-    return None
 
 
 def _correct_intensity(

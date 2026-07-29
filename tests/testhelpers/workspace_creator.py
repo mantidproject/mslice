@@ -1,5 +1,4 @@
 import numpy as np
-
 from mantid.simpleapi import (
     AddSampleLog,
     CreateMDHistoWorkspace,
@@ -7,8 +6,8 @@ from mantid.simpleapi import (
     FakeMDEventData,
 )
 
-from mslice.workspace.pixel_workspace import PixelWorkspace
 from mslice.util.mantid import mantid_algorithms
+from mslice.workspace.pixel_workspace import PixelWorkspace
 
 
 def _create_extents(n_dims: int) -> str:
@@ -83,8 +82,8 @@ def create_md_histo_workspace(n_dims: int, output_name: str):
     md_histo_ws = CreateMDHistoWorkspace(
         Dimensionality=n_dims,
         Extents=_create_extents(n_dims),
-        SignalInput=list(range(0, 100)),
-        ErrorInput=list(range(0, 100)),
+        SignalInput=list(range(100)),
+        ErrorInput=list(range(100)),
         NumberOfBins=_create_num_of_bins(n_dims),
         Names=_create_dim_names(n_dims),
         Units=_create_units(n_dims),

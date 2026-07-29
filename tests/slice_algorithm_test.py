@@ -1,15 +1,15 @@
-from mock import patch, MagicMock, call, ANY
-import numpy as np
 import unittest
+from unittest.mock import ANY, MagicMock, call, patch
 
-from mantid.simpleapi import AddSampleLog, AnalysisDataService
-from mantid.kernel import PropertyManager
+import numpy as np
 from mantid.dataobjects import MDHistoWorkspace, RebinnedOutput, Workspace2D
+from mantid.kernel import PropertyManager
+from mantid.simpleapi import AddSampleLog, AnalysisDataService
 
+from mslice.models.axis import Axis
 from mslice.models.slice.slice_algorithm import Slice
 from mslice.util.mantid.mantid_algorithms import CreateSampleWorkspace
 from tests.testhelpers.workspace_creator import create_md_workspace
-from mslice.models.axis import Axis
 
 
 class SliceAlgorithmTest(unittest.TestCase):
@@ -41,9 +41,7 @@ class SliceAlgorithmTest(unittest.TestCase):
             return 1.0
         elif args[0] == "Degrees":
             return 2.0
-        elif args[0] == "2Theta":
-            raise RuntimeError
-        elif args[0] == "error":
+        elif args[0] == "2Theta" or args[0] == "error":
             raise RuntimeError
 
     @classmethod

@@ -5,14 +5,14 @@
 # -----------------------------------------------------------------------------
 from qtpy.QtCore import Signal
 from qtpy.QtWidgets import QWidget
-from mslice.util.qt import load_ui
-from mslice.util.qt.validator_helper import double_validator_without_separator
 
 from mslice.models.units import EnergyUnits
 from mslice.presenters.slice_widget_presenter import SliceWidgetPresenter
+from mslice.util.qt import load_ui
+from mslice.util.qt.validator_helper import double_validator_without_separator
 from mslice.views.interfaces.slice_view import SliceView
-from .command import Command
 
+from .command import Command
 
 # -----------------------------------------------------------------------------
 # Classes and functions

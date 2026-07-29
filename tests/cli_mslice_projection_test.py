@@ -1,17 +1,18 @@
-import unittest
-import mock
-import numpy as np
 import pathlib
 import runpy
+import unittest
+from unittest import mock
+
+import numpy as np
 from mantid.simpleapi import AddSampleLog, CreateSampleWorkspace
 
 import mslice.cli._mslice_commands as mc
-from mslice.workspace import wrap_workspace
 import mslice.plotting.pyplot as plt
-from mslice.plotting.plot_window.cut_plot import CutPlot
-from mslice.cli.plotfunctions import pcolormesh, errorbar
 from mslice.cli.helperfunctions import _get_overplot_key
+from mslice.cli.plotfunctions import errorbar, pcolormesh
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
+from mslice.plotting.plot_window.cut_plot import CutPlot
+from mslice.workspace import wrap_workspace
 
 
 class CLIProjectionTest(unittest.TestCase):

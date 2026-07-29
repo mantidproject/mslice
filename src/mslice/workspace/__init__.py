@@ -1,7 +1,8 @@
 from mantid.api import IMDEventWorkspace, IMDHistoWorkspace
-from .workspace import Workspace as MatrixWorkspace
-from .pixel_workspace import PixelWorkspace
+
 from .histogram_workspace import HistogramWorkspace
+from .pixel_workspace import PixelWorkspace
+from .workspace import Workspace as MatrixWorkspace
 
 
 def wrap_workspace(raw_ws, name):

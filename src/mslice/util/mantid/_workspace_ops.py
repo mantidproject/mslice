@@ -1,8 +1,10 @@
 import operator
-import numpy as np
 from uuid import uuid4
+
+import numpy as np
 from mantid.api._workspaceops import _do_binary_operation
 from mantid.kernel.funcinspect import lhs_info
+
 from mslice.workspace.workspace import WorkspaceOperatorMixin
 
 _binary_operator_map = {

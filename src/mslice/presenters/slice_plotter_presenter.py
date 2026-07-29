@@ -2,23 +2,23 @@ from typing import Optional
 
 from matplotlib.colors import Normalize
 
-from mslice.models.slice.slice_functions import compute_slice, compute_recoil_line
-from mslice.models.powder.powder_functions import compute_powder_line
 from mslice.models.cmap import ALLOWED_CMAPS
-from mslice.models.slice.slice import Slice
 from mslice.models.labels import is_momentum, is_twotheta
+from mslice.models.powder.powder_functions import compute_powder_line
+from mslice.models.slice.slice import Slice
+from mslice.models.slice.slice_functions import compute_recoil_line, compute_slice
 from mslice.models.units import convert_energy_to_meV
-from mslice.views.slice_plotter import (
-    set_colorbar_label,
-    plot_cached_slice,
-    create_slice_figure,
-)
 from mslice.models.workspacemanager.workspace_provider import get_workspace_handle
 from mslice.plotting.plot_window.overplot_interface import (
     plot_overplot_line,
     remove_line,
 )
 from mslice.presenters.presenter_utility import PresenterUtility
+from mslice.views.slice_plotter import (
+    create_slice_figure,
+    plot_cached_slice,
+    set_colorbar_label,
+)
 
 
 class SlicePlotterPresenter(PresenterUtility):
@@ -66,12 +66,12 @@ class SlicePlotterPresenter(PresenterUtility):
         return slice
 
     def plot_from_cache(self, workspace):
-        ws_name = workspace.name.lstrip("__")
+        ws_name = workspace.name.removeprefix("__")
         create_slice_figure(ws_name, self)
         self.show_scattering_function(ws_name)
 
     def change_intensity(self, workspace_name, intensity_start, intensity_end):
-        workspace_name = workspace_name.lstrip("__")
+        workspace_name = workspace_name.removeprefix("__")
         intensity_start, intensity_end = self.validate_intensity(
             intensity_start, intensity_end
         )
@@ -80,7 +80,7 @@ class SlicePlotterPresenter(PresenterUtility):
 
     def change_colourmap(self, workspace_name, colourmap):
         if colourmap in ALLOWED_CMAPS:
-            workspace_name = workspace_name.lstrip("__")
+            workspace_name = workspace_name.removeprefix("__")
             self._slice_cache[workspace_name].colourmap = colourmap
         else:
             raise ValueError("colourmap not recognised")
@@ -174,10 +174,10 @@ class SlicePlotterPresenter(PresenterUtility):
         if is_cached:
             self.set_cached_sample_temp((temp_value_raw, is_field))
 
-    def get_cached_sample_temp(self) -> Optional[tuple[[float | str], bool]]:
+    def get_cached_sample_temp(self) -> tuple[[float | str], bool] | None:
         return self._cached_temp
 
-    def set_cached_sample_temp(self, value: Optional[tuple[[float | str], bool]]):
+    def set_cached_sample_temp(self, value: tuple[[float | str], bool] | None):
         self._cached_temp = value
 
     def workspace_selection_changed(self):

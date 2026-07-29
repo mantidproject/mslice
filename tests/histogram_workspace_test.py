@@ -1,19 +1,18 @@
 import numpy as np
-
 from mantid.simpleapi import CreateMDHistoWorkspace
 
-from tests.workspace_test import BaseWorkspaceTest
 from mslice.models.workspacemanager.workspace_provider import (
     add_workspace,
     remove_workspace,
 )
 from mslice.workspace.histogram_workspace import HistogramWorkspace
+from tests.workspace_test import BaseWorkspaceTest
 
 
 class HistogramWorkspaceTest(BaseWorkspaceTest):
     @classmethod
     def setUpClass(cls):
-        signal = list(range(0, 100))
+        signal = list(range(100))
         error = np.zeros(100) + 2
         cls.workspace = HistogramWorkspace(
             CreateMDHistoWorkspace(

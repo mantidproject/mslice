@@ -3,11 +3,11 @@ Defines an algorithm to rescale a workspace from one temperature to another usin
 """
 
 import numpy as np
-from scipy import constants
 from mantid.api import PythonAlgorithm, WorkspaceProperty, WorkspaceUnitValidator
-from mantid.kernel import Direction, FloatMandatoryValidator
 from mantid.dataobjects import Workspace2D
+from mantid.kernel import Direction, FloatMandatoryValidator
 from mantid.simpleapi import CloneWorkspace
+from scipy import constants
 
 # Defines some conversion factors
 KB_MEV = constants.value("Boltzmann constant in eV/K") * 1000
@@ -32,7 +32,7 @@ class Rebose(PythonAlgorithm):
     def PyExec(self):
         workspace = self.getProperty("InputWorkspace").value
         if not isinstance(workspace, Workspace2D):
-            raise RuntimeError("Invalid workspace type - must be Workspace2D")
+            raise TypeError("Invalid workspace type - must be Workspace2D")
         from_temp = self.getProperty("CurrentTemperature").value
         to_temp = self.getProperty("TargetTemperature").value
         y = workspace.extractY()

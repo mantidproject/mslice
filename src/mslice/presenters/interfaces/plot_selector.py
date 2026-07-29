@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class PlotSelectorPresenterInterface(object):
+class PlotSelectorPresenterInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod
