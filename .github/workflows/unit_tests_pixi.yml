@@ -25,15 +25,10 @@ jobs:
         uses: prefix-dev/setup-pixi@v0.9.5
         with:
           cache: true
-          environments: mslice-env-test
-
-      - name: Install Xvfb
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes xvfb
+          environments: mslice-ci
 
       - name: Run tests
-        run: pixi run -e mslice-env-test test
+        run: pixi run -e mslice-ci test
 
       - name: Report coverage
-        run: pixi run -e mslice-env-test coverage
+        run: pixi run -e mslice-ci coverage

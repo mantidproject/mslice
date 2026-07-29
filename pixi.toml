@@ -27,9 +27,12 @@ mantidqt = "*"
 [feature.developer.dependencies]
 pre-commit = "*"
 
+[feature.test]
+platforms = ["linux-64"]
+
 [feature.test.tasks]
 test = """
-xvfb-run --server-args='-screen 0 640x480x24' --auto-servernum \
+QT_QPA_PLATFORM=offscreen \
 coverage run -m pytest
 """
 coverage = """
@@ -39,5 +42,5 @@ coverage report
 
 [environments]
 mslice-env = ["mslice"] # Equivalent to environment.yml
-mslice-env-test = ["mslice", "mantid", "test"]
+mslice-ci = ["mslice", "mantid", "test"] # Only created for linux as the unit tests run only on ubuntu runners
 mslice-developer = ["mantid", "developer"] # Equivalent to mslice-developer.yml
