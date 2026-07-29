@@ -1,0 +1,48 @@
+name: Update pixi lockfiles
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 6 * * 1
+
+env:
+  UPDATE_BRANCH: 'main'
+
+jobs:
+  pixi-update-lockfile:
+    if: github.repository_owner == 'mantidproject'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.UPDATE_BRANCH }}  # start from this branch
+
+      - uses: ./.github/actions/setup-pixi
+
+      - name: Update lockfiles
+        run: |
+          set -o pipefail
+          pixi update --json | pixi exec pixi-diff-to-markdown >> diff.md
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          commit-message: Update pixi lockfile
+          title: Update pixi lockfile
+          body-path: diff.md
+          branch: update-pixi
+          base:  ${{ env.UPDATE_BRANCH }}
+          labels: |
+            pixi
+            maintenance
+            devops
+          delete-branch: true
+          add-paths: pixi.lock
