@@ -12,4 +12,4 @@ dependencies:
   - pyqt
   - qtconsole-base
   - qtpy
-  - python=3.12
+  - python=3.13
