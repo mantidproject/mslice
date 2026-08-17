@@ -15,14 +15,14 @@ pytest = "*"
 qtconsole-base = "*"
 
 [feature.mslice.dependencies]
-pyqt = "*"
+pyqt6 = ">=6.11,<7"
 qtpy = "*"
 ipython = "*"
 coveralls = "*"
 
 [feature.mantid.dependencies]
-mantid = "*"
-mantidqt = "*"
+mantid = ">=6.16.20260813"
+mantidqt = ">=6.16.20260813"
 
 [feature.developer.dependencies]
 pre-commit = "*"
