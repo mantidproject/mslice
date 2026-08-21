@@ -518,7 +518,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     def legend(self):
         if self.show_legend_line_specific is None:
             return None
-        return self.show_legend_line_specific.checkState()
+        return self.show_legend_line_specific.isChecked()
 
     @property
     def label(self):
