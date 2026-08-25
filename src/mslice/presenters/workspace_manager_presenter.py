@@ -290,6 +290,7 @@ class WorkspaceManagerPresenter(WorkspaceManagerPresenterInterface):
         disable_icut_buttons_for_missing_workspaces()
 
     def clear_handle(self):
+        self._workspace_manager_view.deselect_all()
         for workspace in get_workspace_names():
             delete_workspace(workspace)
         self.update_displayed_workspaces()
