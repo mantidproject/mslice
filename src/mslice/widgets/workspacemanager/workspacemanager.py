@@ -154,6 +154,9 @@ class WorkspaceManagerWidget(WorkspaceView, QWidget):
         ]
         return selected_workspaces
 
+    def deselect_all(self):
+        self.current_list().clearSelection()
+
     def set_workspace_selected(self, index):
         current_list = self.current_list()
         for item_index in range(current_list.count()):
