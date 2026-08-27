@@ -1,7 +1,9 @@
+import unittest
+from unittest.mock import patch
+
 from qtpy import QtWidgets
 from qtpy.QtCore import Qt, QTimer
-import unittest
-from mock import patch
+
 from mslice.app.mainwindow import MainWindow
 from mslice.plotting.globalfiguremanager import GlobalFigureManager
 
@@ -30,4 +32,3 @@ class AppTests(unittest.TestCase):
             window = MainWindow()
             window.setAttribute(Qt.WA_DeleteOnClose, True)
             QTimer.singleShot(0, window.close)
-
