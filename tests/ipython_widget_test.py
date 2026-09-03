@@ -3,9 +3,9 @@ import types
 import unittest
 from unittest import mock
 
-from qtpy.QtWidgets import QApplication
 from qtconsole.inprocess import QtInProcessKernelManager
 from qtconsole.rich_jupyter_widget import RichJupyterWidget
+from qtpy.QtWidgets import QApplication
 
 from mslice.widgets.ipythonconsole import ipython_widget
 
@@ -30,7 +30,6 @@ class _FakeWorkbenchConsole(RichJupyterWidget):
 
 
 class IPythonWidgetTest(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.app = _make_app()
