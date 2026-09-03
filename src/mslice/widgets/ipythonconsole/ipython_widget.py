@@ -24,20 +24,6 @@ def find_workbench_kernel_manager():
     """Return the kernel manager of Mantid Workbench's own IPython console dock,
     if one is already running in this process, otherwise None.
 
-    ipykernel's in-process kernel is built around a single, process-wide IPython
-    shell (``IPython.core.interactiveshell.InteractiveShell`` is a
-    ``traitlets`` ``SingletonConfigurable``). Starting a *second* in-process
-    kernel in the same process does not give MSlice an independent console:
-    every new kernel's ``__init__`` re-points that one shared shell's
-    displayhook/display-publisher at itself, so whichever console started
-    first silently stops receiving output - visibly so once the second
-    console is closed and its kernel goes away with it. This is what causes
-    MSlice's console to "cannibalize" Workbench's own console (mslice#1235).
-
-    Attaching MSlice's console as an additional frontend of Workbench's
-    existing kernel, instead of starting a competing one, avoids the clash
-    entirely and matches the shared-namespace behaviour that is already
-    intended for MSlice running inside Mantid.
     """
     try:
         from mantidqt.widgets.jupyterconsole import InProcessJupyterConsole
@@ -89,7 +75,6 @@ class IPythonWidget(RichIPythonWidget):
 
     def cleanup(self):
         if in_mantid():
-            self.execute("cls")
             self.execute("import mslice.cli as mc")
 
         # Detach this console from the kernel it was using. If it shares

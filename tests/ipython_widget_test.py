@@ -30,28 +30,6 @@ class _FakeWorkbenchConsole(RichJupyterWidget):
 
 
 class IPythonWidgetTest(unittest.TestCase):
-    """Regression tests for mslice#1235: MSlice's console must not steal
-    Mantid Workbench's in-process Jupyter kernel from underneath it.
-
-    Test methods are numbered and run in a single, deliberate order: an
-    ipykernel in-process kernel's IPython shell is process-wide global state
-    (traitlets SingletonConfigurable), so whether a fake Workbench console
-    already exists changes the behaviour under test. Numbering keeps that
-    ordering explicit rather than relying on alphabetical accident.
-
-    mantidqt.widgets.jupyterconsole.InProcessJupyterConsole is stubbed into
-    sys.modules once for the whole class (not per-test) so real MSlice
-    console/kernel objects can be created and torn down without repeatedly
-    mutating sys.modules mid-run.
-
-    RichJupyterWidget._started_channels (qtconsole's own post-connect hook)
-    is also stubbed out for the whole class: on assigning kernel_client it
-    synchronously round-trips a "history" request through the in-process
-    kernel to pre-populate readline history, which is unrelated to what is
-    under test here and, depending on the installed ipykernel/qtconsole
-    versions, is not guaranteed to complete synchronously outside a running
-    Qt event loop (observed as a raised queue.Empty in CI).
-    """
 
     @classmethod
     def setUpClass(cls):
@@ -79,6 +57,18 @@ class IPythonWidgetTest(unittest.TestCase):
         cls._started_channels_patcher.stop()
         cls._sys_modules_patcher.stop()
 
+    def _assert_cleanup_only_reimports_cli(self, widget):
+        """Assert cleanup() only ever executes the
+        "import mslice.cli as mc" re-import."""
+        with mock.patch.object(type(widget), "execute") as execute:
+            widget.cleanup()
+        calls = [
+            call.args[0] if call.args else call.kwargs.get("source")
+            for call in execute.call_args_list
+        ]
+        self.assertNotIn("cls", calls)
+        self.assertIn("import mslice.cli as mc", calls)
+
     def test_1_no_workbench_console_falls_back_to_its_own_kernel(self):
         # No Workbench console exists yet in this process.
         self.assertIsNone(ipython_widget.find_workbench_kernel_manager())
@@ -91,8 +81,8 @@ class IPythonWidgetTest(unittest.TestCase):
 
         with mock.patch.object(ipython_widget, "in_mantid", return_value=True):
             embedded_widget = ipython_widget.IPythonWidget()
-        self.assertTrue(embedded_widget._owns_kernel)
-        embedded_widget.cleanup()
+            self.assertTrue(embedded_widget._owns_kernel)
+            self._assert_cleanup_only_reimports_cli(embedded_widget)
 
     def test_2_with_workbench_console_reuses_and_detaches_cleanly(self):
         workbench_console = _FakeWorkbenchConsole()
@@ -106,20 +96,21 @@ class IPythonWidgetTest(unittest.TestCase):
         with mock.patch.object(ipython_widget, "in_mantid", return_value=True):
             mslice_console = ipython_widget.IPythonWidget()
 
-        # No competing kernel should have been created ...
-        self.assertFalse(mslice_console._owns_kernel)
-        self.assertIs(mslice_console.kernel_manager, workbench_console.kernel_manager)
-        self.assertIs(mslice_console.kernel_manager.kernel, workbench_kernel)
+            # No competing kernel should have been created ...
+            self.assertFalse(mslice_console._owns_kernel)
+            self.assertIs(
+                mslice_console.kernel_manager, workbench_console.kernel_manager
+            )
+            self.assertIs(mslice_console.kernel_manager.kernel, workbench_kernel)
 
-        # ... and MSlice's console is registered as a second frontend of the
-        # one shared kernel, not a replacement for it.
-        self.assertEqual(len(workbench_kernel.frontends), 2)
+            # ... and MSlice's console is registered as a second frontend of
+            # the one shared kernel, not a replacement for it.
+            self.assertEqual(len(workbench_kernel.frontends), 2)
 
-        mslice_console.cleanup()
+            self._assert_cleanup_only_reimports_cli(mslice_console)
 
         # Closing MSlice's console must leave Workbench's kernel, its shell,
-        # and its own frontend registration completely intact - this is the
-        # exact failure reported in mslice#1235.
+        # and its own frontend registration completely intact.
         self.assertIs(workbench_console.kernel_manager.kernel, workbench_kernel)
         self.assertEqual(len(workbench_kernel.frontends), 1)
         self.assertIs(
