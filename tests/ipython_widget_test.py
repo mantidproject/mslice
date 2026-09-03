@@ -43,11 +43,20 @@ class IPythonWidgetTest(unittest.TestCase):
     sys.modules once for the whole class (not per-test) so real MSlice
     console/kernel objects can be created and torn down without repeatedly
     mutating sys.modules mid-run.
+
+    RichJupyterWidget._started_channels (qtconsole's own post-connect hook)
+    is also stubbed out for the whole class: on assigning kernel_client it
+    synchronously round-trips a "history" request through the in-process
+    kernel to pre-populate readline history, which is unrelated to what is
+    under test here and, depending on the installed ipykernel/qtconsole
+    versions, is not guaranteed to complete synchronously outside a running
+    Qt event loop (observed as a raised queue.Empty in CI).
     """
 
     @classmethod
     def setUpClass(cls):
         cls.app = _make_app()
+
         cls._fake_module = types.ModuleType("mantidqt.widgets.jupyterconsole")
         cls._fake_module.InProcessJupyterConsole = _FakeWorkbenchConsole
         cls._sys_modules_patcher = mock.patch.dict(
@@ -60,8 +69,14 @@ class IPythonWidgetTest(unittest.TestCase):
         )
         cls._sys_modules_patcher.start()
 
+        cls._started_channels_patcher = mock.patch.object(
+            RichJupyterWidget, "_started_channels", lambda self: None
+        )
+        cls._started_channels_patcher.start()
+
     @classmethod
     def tearDownClass(cls):
+        cls._started_channels_patcher.stop()
         cls._sys_modules_patcher.stop()
 
     def test_1_no_workbench_console_falls_back_to_its_own_kernel(self):
