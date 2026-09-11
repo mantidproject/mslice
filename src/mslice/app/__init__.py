@@ -37,11 +37,6 @@ def show_gui():
         from mslice.app.mainwindow import MainWindow
 
         MAIN_WINDOW = MainWindow(in_mantid())
-    else:
-        # The window (and its console) is being reused rather than
-        # recreated, so reconnect the console to a kernel - closeEvent
-        # detached it when the window was last closed.
-        MAIN_WINDOW.resume_console()
 
     if "workbench" in sys.modules:
         from workbench.config import get_window_config

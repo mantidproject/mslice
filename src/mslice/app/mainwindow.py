@@ -7,6 +7,7 @@ from mslice.plotting.plot_window.plot_window import add_action
 from mslice.presenters.cut_plotter_presenter import CutPlotterPresenter
 from mslice.presenters.main_presenter import MainPresenter
 from mslice.presenters.slice_plotter_presenter import SlicePlotterPresenter
+from mslice.util.mantid import in_mantid
 from mslice.util.qt import load_ui
 from mslice.views.interfaces.mainview import MainView
 from mslice.widgets.cut.command import Command as cut_command
@@ -319,12 +320,12 @@ class MainWindow(MainView, QMainWindow):
             for strn in item.split("\n"):
                 self._console.execute(f'print("{strn}")', hidden=True)
 
-    def resume_console(self):
-        """Reconnect the IPython console to a kernel. Called when this window
-        is shown again after being closed - it is reused rather than
-        recreated (see show_gui()), so without this its console is left
-        permanently detached by the cleanup() in closeEvent below."""
-        self._console.resume()
-
     def closeEvent(self, event):
-        self._console.cleanup()
+        # MSlice's main window is reused rather than recreated (see
+        # show_gui()): closing it while embedded in Workbench only hides it,
+        # it may be shown again shortly after via Workbench's Interfaces
+        # menu. Only detach the console from its kernel when this really is
+        # a final exit - i.e. running standalone, where closing this, the
+        # only top-level window, ends the application.
+        if not in_mantid():
+            self._console.cleanup()
