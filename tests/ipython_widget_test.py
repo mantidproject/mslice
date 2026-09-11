@@ -119,6 +119,59 @@ class IPythonWidgetTest(unittest.TestCase):
 
         workbench_console.kernel_manager.shutdown_kernel()
 
+    def test_3_resume_reconnects_after_cleanup(self):
+        workbench_console = _FakeWorkbenchConsole()
+        workbench_kernel = workbench_console.kernel_manager.kernel
+
+        with mock.patch.object(ipython_widget, "in_mantid", return_value=True):
+            mslice_console = ipython_widget.IPythonWidget()
+            self.assertEqual(len(workbench_kernel.frontends), 2)
+
+            mslice_console.cleanup()
+            self.assertFalse(mslice_console._connected)
+            self.assertEqual(len(workbench_kernel.frontends), 1)
+
+            # resume() (called when MSlice's window is shown again after
+            # being closed) should reconnect a fresh client to the same
+            # shared kernel.
+            mslice_console.resume()
+            self.assertTrue(mslice_console._connected)
+            self.assertFalse(mslice_console._owns_kernel)
+            self.assertIs(
+                mslice_console.kernel_manager, workbench_console.kernel_manager
+            )
+            self.assertEqual(len(workbench_kernel.frontends), 2)
+
+            # resume() must be a safe no-op if the console is already
+            # connected, otherwise a spurious duplicate frontend would be
+            # registered every time MSlice's window is merely re-shown.
+            client_before = mslice_console.kernel_client
+            mslice_console.resume()
+            self.assertIs(mslice_console.kernel_client, client_before)
+            self.assertEqual(len(workbench_kernel.frontends), 2)
+
+            mslice_console.cleanup()
+
+        workbench_console.kernel_manager.shutdown_kernel()
+
+    def test_4_resume_after_cleanup_without_workbench_console_starts_new_kernel(
+        self,
+    ):
+        with mock.patch.object(ipython_widget, "in_mantid", return_value=False):
+            standalone_widget = ipython_widget.IPythonWidget()
+            old_kernel_manager = standalone_widget.kernel_manager
+
+            standalone_widget.cleanup()
+            self.assertFalse(standalone_widget._connected)
+
+            standalone_widget.resume()
+            self.assertTrue(standalone_widget._connected)
+            self.assertTrue(standalone_widget._owns_kernel)
+            self.assertIsNot(standalone_widget.kernel_manager, old_kernel_manager)
+            self.assertIsNotNone(standalone_widget.kernel_manager.kernel)
+
+            standalone_widget.cleanup()
+
 
 if __name__ == "__main__":
     unittest.main()

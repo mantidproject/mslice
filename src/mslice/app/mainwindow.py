@@ -319,5 +319,12 @@ class MainWindow(MainView, QMainWindow):
             for strn in item.split("\n"):
                 self._console.execute(f'print("{strn}")', hidden=True)
 
+    def resume_console(self):
+        """Reconnect the IPython console to a kernel. Called when this window
+        is shown again after being closed - it is reused rather than
+        recreated (see show_gui()), so without this its console is left
+        permanently detached by the cleanup() in closeEvent below."""
+        self._console.resume()
+
     def closeEvent(self, event):
         self._console.cleanup()

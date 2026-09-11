@@ -46,13 +46,22 @@ class IPythonWidget(RichIPythonWidget):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
+        self._connect_kernel()
+        self._import_mslice_namespace()
 
-        # Reuse Mantid Workbench's own console kernel if one is already running
-        # in this process, rather than starting a competing in-process kernel
-        # that would silently break it. Only fall back to creating our own
-        # kernel when running standalone, or if Workbench's console cannot be
-        # found (see find_workbench_kernel_manager for why this matters).
-        kernel_manager = find_workbench_kernel_manager() if in_mantid() else None
+    def _connect_kernel(self):
+        """Reuse Mantid Workbench's own console kernel if one is already running
+        in this process, rather than starting a competing in-process kernel
+        that would silently break it. Only fall back to creating our own
+        kernel when running standalone, or if Workbench's console cannot be
+        found (see find_workbench_kernel_manager for why this matters).
+
+        Besides __init__, this is also called by resume() to reconnect after
+        cleanup() has detached this console - e.g. when MSlice's window is
+        closed and reopened, the same window (and this console) is reused
+        rather than recreated, see MainWindow.
+        """
+        kernel_manager = find_workbench_kernel_manager()
         self._owns_kernel = kernel_manager is None
         if kernel_manager is None:
             kernel_manager = QtInProcessKernelManager()
@@ -65,6 +74,12 @@ class IPythonWidget(RichIPythonWidget):
 
         self.kernel_manager = kernel_manager
         self.kernel_client = kernel_client
+        self._connected = True
+
+    def _import_mslice_namespace(self):
+        """Populate this console's namespace with mslice's API - used on
+        first connection and again by resume() after a reconnect, since a
+        standalone console's new kernel starts with an empty namespace."""
         if not in_mantid():
             self.execute(
                 "from mslice.util.mantid.mantid_algorithms import *", hidden=True
@@ -72,6 +87,20 @@ class IPythonWidget(RichIPythonWidget):
             self.execute("from mslice.cli import *", hidden=True)
         else:
             self.execute("import mslice.cli as mc")
+
+    def resume(self):
+        """Reconnect this console to a kernel after cleanup() has detached it.
+
+        MSlice's main window is reused rather than recreated when it is
+        closed and reopened (see mainwindow.MainWindow), so without this the
+        console is left permanently detached from its kernel after the first
+        close, and stops showing any output. Safe to call even if this
+        console is already connected - it is then a no-op.
+        """
+        if self._connected:
+            return
+        self._connect_kernel()
+        self._import_mslice_namespace()
 
     def cleanup(self):
         if in_mantid():
@@ -88,3 +117,4 @@ class IPythonWidget(RichIPythonWidget):
                 kernel.frontends.remove(self.kernel_client)
         if self._owns_kernel and self.kernel_manager is not None:
             self.kernel_manager.shutdown_kernel()
+        self._connected = False
