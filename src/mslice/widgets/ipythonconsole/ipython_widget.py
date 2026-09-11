@@ -106,15 +106,16 @@ class IPythonWidget(RichIPythonWidget):
         if in_mantid():
             self.execute("import mslice.cli as mc")
 
-        # Detach this console from the kernel it was using. If it shares
-        # Workbench's own kernel, only remove this widget's own client so that
-        # Workbench's console is left running unaffected; if this console
-        # started its own kernel, shut it down entirely.
+        # Detach this console's client from the kernel it was using. If it
+        # shares Workbench's own kernel, this leaves Workbench's console
+        # running unaffected - only this widget's own frontend registration
+        # is removed. There is no need to explicitly shut down a kernel this
+        # console owns either: standalone, it dies with the process when the
+        # QApplication exits; embedded in Workbench, Workbench's own
+        # QApplication will clean it up when it eventually exits.
         if self.kernel_client is not None:
             self.kernel_client.stop_channels()
             kernel = getattr(self.kernel_manager, "kernel", None)
             if kernel is not None and self.kernel_client in kernel.frontends:
                 kernel.frontends.remove(self.kernel_client)
-        if self._owns_kernel and self.kernel_manager is not None:
-            self.kernel_manager.shutdown_kernel()
         self._connected = False
