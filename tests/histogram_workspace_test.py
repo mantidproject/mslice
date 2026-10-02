@@ -83,7 +83,7 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
             self.assertEqual(1, matrix_ws.raw_ws.getNumberHistograms())
             self.assertEqual(100, matrix_ws.raw_ws.blocksize())
             np.testing.assert_allclose(
-                np.arange(0, 100) * 100 / 99, matrix_ws.raw_ws.readY(0)
+                np.arange(0, 100) * 100 / 99, matrix_ws.raw_ws.y(0)
             )
         finally:
             # remove mslice tracking
@@ -94,11 +94,10 @@ class HistogramWorkspaceTest(BaseWorkspaceTest):
         try:
             add_workspace(self.workspace1D_rev, self.workspace1D_rev.name)
             matrix_ws = self.workspace1D_rev.convert_to_matrix()
-
             self.assertEqual(1, matrix_ws.raw_ws.getNumberHistograms())
             self.assertEqual(100, matrix_ws.raw_ws.blocksize())
             np.testing.assert_allclose(
-                np.arange(0, 100) * 100 / 99, matrix_ws.raw_ws.readY(0), rtol=1e-5
+                np.arange(0, 100) * 100 / 99, matrix_ws.raw_ws.y(0), rtol=1e-5
             )
         finally:
             # remove mslice tracking

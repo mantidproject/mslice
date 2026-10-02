@@ -92,7 +92,7 @@ class QuickAxisOptions(QuickOptions):
 
     @property
     def grid_state(self):
-        return self.grid.checkState()
+        return self.grid.isChecked()
 
     @property
     def is_kept_open(self):

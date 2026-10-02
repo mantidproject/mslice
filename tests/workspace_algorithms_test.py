@@ -39,8 +39,8 @@ class WorkspaceAlgorithmsTest(unittest.TestCase):
         )
 
         CreateWorkspace(
-            DataX=cls.indirect_workspace.raw_ws.readX(0),
-            DataY=cls.indirect_workspace.raw_ws.readY(0),
+            DataX=cls.indirect_workspace.raw_ws.x(0),
+            DataY=cls.indirect_workspace.raw_ws.y(0),
             ParentWorkspace="OSIRIS_workspace",
             UnitX="DeltaE",
             OutputWorkspace="extra_spectra_ws",
