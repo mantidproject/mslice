@@ -528,7 +528,7 @@ class LegendAndLineOptionsSetter(QtWidgets.QWidget):
     def shown(self):
         if self.show_line is None:
             return None
-        return bool(self.show_line.checkState())
+        return self.show_line.isChecked()
 
     @property
     def color(self):
