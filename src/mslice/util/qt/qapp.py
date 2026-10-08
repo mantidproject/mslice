@@ -42,8 +42,7 @@ def create_qapp_if_required():
         if instance is None:
             instance = QApplication(["mslice"])
             available_styles = QStyleFactory.keys()
-            if (sys.platform.startswith("win") and
-                    "windowsvista" in available_styles):
+            if sys.platform.startswith("win") and "windowsvista" in available_styles:
                 instance.setStyle("windowsvista")
             instance.lastWindowClosed.connect(instance.quit)
         qApp = instance
