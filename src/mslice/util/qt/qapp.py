@@ -10,7 +10,8 @@ from mantidqt.utils.qt.qappthreadcall import (
     QAppThreadCall,
     force_method_calls_to_qapp_thread,
 )
-from qtpy.QtWidgets import QApplication
+from qtpy.QtWidgets import QApplication, QStyleFactory
+import sys
 
 # Global QApplication instance reference to keep it alive
 qApp = None
@@ -40,6 +41,8 @@ def create_qapp_if_required():
         instance = QApplication.instance()
         if instance is None:
             instance = QApplication(["mslice"])
+            if sys.platform.startswith("win") and "windowsvista" in QStyleFactory.keys():
+                instance.setStyle("windowsvista")
             instance.lastWindowClosed.connect(instance.quit)
         qApp = instance
     return qApp
