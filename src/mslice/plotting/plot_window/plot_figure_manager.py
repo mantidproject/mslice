@@ -218,13 +218,15 @@ class PlotFigureManagerQT(QtCore.QObject):
     def print_plot(self):
         printer = QtPrintSupport.QPrinter()
         printer.setResolution(300)
-        printer.setOrientation(QtPrintSupport.QPrinter.Landscape)
+        printer.setPageOrientation(QtGui.QPageLayout.Orientation.Landscape)
         print_dialog = QtPrintSupport.QPrintDialog(printer)
-        if print_dialog.exec_():
+        if print_dialog.exec():
             pixmap_image = QtWidgets.QWidget.grab(self.canvas)
-            page_size = printer.pageRect()
+            page_size = printer.pageLayout().paintRectPixels(printer.resolution())
             pixmap_image = pixmap_image.scaled(
-                page_size.width(), page_size.height(), Qt.KeepAspectRatio
+                int(page_size.width()),
+                int(page_size.height()),
+                Qt.AspectRatioMode.KeepAspectRatio,
             )
             painter = QtGui.QPainter(printer)
             painter.drawPixmap(0, 0, pixmap_image)
