@@ -62,7 +62,6 @@ class FileIOTest(unittest.TestCase):
         self.assertEqual(file_name, "some_file.png")
         self.assertEqual(extension, ".png")
 
-
     @patch("mslice.models.workspacemanager.file_io.QFileDialog")
     def test_save_directory_multiple(self, file_dialog_mock):
         file_dialog_mock.return_value = self.mock_dialog

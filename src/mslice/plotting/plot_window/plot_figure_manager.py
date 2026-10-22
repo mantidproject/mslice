@@ -242,7 +242,9 @@ class PlotFigureManagerQT(QtCore.QObject):
         return resolution
 
     def save_plot(self):
-        file_path, save_name, ext = get_save_directory(save_as_image=True, parent=self.window)
+        file_path, save_name, ext = get_save_directory(
+            save_as_image=True, parent=self.window
+        )
         if file_path is None:
             return
         if hasattr(self.plot_handler, "ws_list"):

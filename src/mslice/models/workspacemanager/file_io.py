@@ -22,7 +22,6 @@ from mslice.workspace.helperfunctions import WrapWorkspaceAttribute
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
-
 def get_save_directory(
     multiple_files=False,
     save_as_image=False,
@@ -35,7 +34,11 @@ def get_save_directory(
         A tuple of (directory, filename, extension).
         If the save dialog is cancelled, returns (None, None, None).
     """
-    options = QFileDialog.Option.DontUseNativeDialog if sys.platform.startswith("linux") else QFileDialog.Option(0)
+    options = (
+        QFileDialog.Option.DontUseNativeDialog
+        if sys.platform.startswith("linux")
+        else QFileDialog.Option(0)
+    )
     if multiple_files:
         directory = QFileDialog.getExistingDirectory(parent, options=options)
         if not directory:
@@ -83,7 +86,6 @@ def get_save_directory(
     directory = os.path.dirname(path)
     filename = os.path.basename(path)
 
-
     selected_ext = filter_to_ext.get(file_dialog.selectedNameFilter())
     suffix = os.path.splitext(filename)[1]
     if suffix in ("", ".") and selected_ext:
@@ -91,6 +93,7 @@ def get_save_directory(
 
     extension = os.path.splitext(filename)[1]
     return directory, filename, extension
+
 
 def save_nexus(workspace, path):
     if isinstance(workspace, HistogramWorkspace):
