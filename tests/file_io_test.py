@@ -29,14 +29,14 @@ class FileIOTest(unittest.TestCase):
     @patch("mslice.models.workspacemanager.file_io.QFileDialog")
     def test_save_directory_default(self, file_dialog_mock):
         file_dialog_mock.return_value = self.mock_dialog
-        self.mock_dialog.selectedFilter.return_value = "Nexus (*.nxs)"
+        self.mock_dialog.selectedNameFilter.return_value = "Nexus (*.nxs)"
 
         directory, file_name, extension = get_save_directory(default_ext=".nxs")
-        self.mock_dialog.setNameFilter.assert_called_once_with(
-            "Nexus (*.nxs);; NXSPE (*.nxspe);; Ascii (*.txt);; Matlab (*.mat)"
+        self.mock_dialog.setNameFilters.assert_called_once_with(
+            ["Nexus (*.nxs)", "NXSPE (*.nxspe)", "Ascii (*.txt)", "Matlab (*.mat)"]
         )
         self.mock_dialog.selectNameFilter.assert_called_once_with("Nexus (*.nxs)")
-        self.mock_dialog.exec_.assert_called_once()
+        self.mock_dialog.exec.assert_called_once()
         self.assertEqual(directory, self.tempdir)
         self.assertEqual(file_name, "some_file.nxs")
         self.assertEqual(extension, ".nxs")
@@ -44,28 +44,38 @@ class FileIOTest(unittest.TestCase):
     @patch("mslice.models.workspacemanager.file_io.QFileDialog")
     def test_save_directory_image(self, file_dialog_mock):
         file_dialog_mock.return_value = self.mock_dialog
-        self.mock_dialog.selectedFilter.return_value = "Image (*.png)"
+        self.mock_dialog.selectedNameFilter.return_value = "Image (*.png)"
 
         directory, file_name, extension = get_save_directory(save_as_image=True)
-        self.mock_dialog.setNameFilter.assert_called_once_with(
-            "Image (*.png);; PDF (*.pdf);; Nexus (*.nxs);; NXSPE (*.nxspe);; Ascii (*.txt);; Matlab (*.mat)"
+        self.mock_dialog.setNameFilters.assert_called_once_with(
+            [
+                "Image (*.png)",
+                "PDF (*.pdf)",
+                "Nexus (*.nxs)",
+                "NXSPE (*.nxspe)",
+                "Ascii (*.txt)",
+                "Matlab (*.mat)",
+            ]
         )
-        self.mock_dialog.exec_.assert_called_once()
+        self.mock_dialog.exec.assert_called_once()
         self.assertEqual(directory, self.tempdir)
         self.assertEqual(file_name, "some_file.png")
         self.assertEqual(extension, ".png")
 
+
     @patch("mslice.models.workspacemanager.file_io.QFileDialog")
     def test_save_directory_multiple(self, file_dialog_mock):
+        file_dialog_mock.return_value = self.mock_dialog
         file_dialog_mock.getExistingDirectory = Mock(return_value=self.path)
 
         directory, file_name, extension = get_save_directory(
             multiple_files=True, default_ext=".nxs"
         )
+        file_dialog_mock.getExistingDirectory.assert_called_once()
+        self.mock_dialog.exec.assert_not_called()
         self.assertEqual(directory, self.path)
         self.assertEqual(file_name, None)
         self.assertEqual(extension, ".nxs")
-        self.mock_dialog.exec_.assert_not_called()
 
     @patch("mslice.models.workspacemanager.file_io.QFileDialog")
     def test_save_directory_double_extension(self, file_dialog_mock):
@@ -74,7 +84,7 @@ class FileIOTest(unittest.TestCase):
         self.mock_dialog.selectedFiles.return_value = [self.path]
 
         directory, file_name, extension = get_save_directory()
-        self.mock_dialog.exec_.assert_called_once()
+        self.mock_dialog.exec.assert_called_once()
         self.assertEqual(directory, self.tempdir)
         self.assertEqual(file_name, "some_file.nxs")
         self.assertEqual(extension, ".nxs")
@@ -82,9 +92,13 @@ class FileIOTest(unittest.TestCase):
     @patch("mslice.models.workspacemanager.file_io.QFileDialog")
     def test_save_directory_cancelled(self, file_dialog_mock):
         file_dialog_mock.return_value = self.mock_dialog
-        self.mock_dialog.exec_.return_value = False
+        self.mock_dialog.exec.return_value = False
+
+        result = get_save_directory()
+        self.mock_dialog.exec.assert_called_once()
         self.mock_dialog.selectedFiles.assert_not_called()
-        self.mock_dialog.selectedFilter.assert_not_called()
+        self.mock_dialog.selectedNameFilter.assert_not_called()
+        self.assertEqual(result, (None, None, None))
 
     @patch("mslice.models.workspacemanager.file_io._output_data_to_ascii")
     def test_save_cut_to_ascii(self, output_method):
