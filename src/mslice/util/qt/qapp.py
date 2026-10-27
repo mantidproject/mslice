@@ -3,6 +3,7 @@
 #     & Institut Laue - Langevin
 # SPDX - License - Identifier: GPL - 3.0 +
 #
+import sys
 from functools import wraps
 
 # make these available in this module for the rest of codebase
@@ -10,7 +11,7 @@ from mantidqt.utils.qt.qappthreadcall import (
     QAppThreadCall,
     force_method_calls_to_qapp_thread,
 )
-from qtpy.QtWidgets import QApplication
+from qtpy.QtWidgets import QApplication, QStyleFactory
 
 # Global QApplication instance reference to keep it alive
 qApp = None
@@ -40,6 +41,9 @@ def create_qapp_if_required():
         instance = QApplication.instance()
         if instance is None:
             instance = QApplication(["mslice"])
+            available_styles = QStyleFactory.keys()
+            if sys.platform.startswith("win") and "windowsvista" in available_styles:
+                instance.setStyle("windowsvista")
             instance.lastWindowClosed.connect(instance.quit)
         qApp = instance
     return qApp
