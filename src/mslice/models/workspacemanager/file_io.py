@@ -1,4 +1,5 @@
 import os.path
+import sys
 
 import numpy as np
 from mantid.api import MDNormalization
@@ -21,47 +22,77 @@ from mslice.workspace.helperfunctions import WrapWorkspaceAttribute
 from mslice.workspace.histogram_workspace import HistogramWorkspace
 
 
-def get_save_directory(multiple_files=False, save_as_image=False, default_ext=None):
+def get_save_directory(
+    multiple_files=False,
+    save_as_image=False,
+    default_ext=None,
+    parent=None,
+):
+    """Show a file dialog so the user can choose where to save.
+
+    Returns:
+        A tuple of (directory, filename, extension).
+        If the save dialog is cancelled, returns (None, None, None).
     """
-    Show file dialog so user can choose where to save.
-    :param multiple_files: boolean - whether more than one file is being saved
-    :param save_as_image: boolean - whether to allow saving as a .png/pdf
-    :param default_ext: file extension that is selected by default
-    :return: path to save directory, name to save the file as, file format extension
-    :raises: RuntimeError if dialog is cancelled
-    """
+    options = (
+        QFileDialog.Option.DontUseNativeDialog
+        if sys.platform.startswith("linux")
+        else QFileDialog.Option(0)
+    )
     if multiple_files:
-        return QFileDialog.getExistingDirectory(), None, default_ext
-    else:
-        file_dialog = QFileDialog()
-        file_dialog.setAcceptMode(QFileDialog.AcceptSave)
-
-        filter = "Nexus (*.nxs);; NXSPE (*.nxspe);; Ascii (*.txt);; Matlab (*.mat)"
-        if save_as_image:
-            filter = "Image (*.png);; PDF (*.pdf);; " + filter
-        file_dialog.setNameFilter(filter)
-
-        if default_ext:
-            ext_to_qtfilter = {
-                ".nxs": "Nexus (*.nxs)",
-                ".nxspe": "NXSPE (*.nxspe)",
-                ".txt": "Ascii (*.txt)",
-                ".mat": "Matlab (*.mat)",
-            }
-            file_dialog.selectNameFilter(ext_to_qtfilter[default_ext])
-        if file_dialog.exec_():
-            path = str(file_dialog.selectedFiles()[0])
-            filename = os.path.basename(path)
-            if "." not in filename:  # add extension unless there's one in the name
-                try:
-                    sel = file_dialog.selectedFilter()
-                except AttributeError:  # Qt5 only has selectedNameFilter
-                    sel = str(file_dialog.selectedNameFilter())
-                path += sel[-5:-1]
-            ext = path[path.rfind(".") :]
-            return os.path.dirname(path), os.path.basename(path), ext
-        else:
+        directory = QFileDialog.getExistingDirectory(parent, options=options)
+        if not directory:
             return None, None, None
+        return directory, None, default_ext
+
+    filter_specs = [
+        ("Nexus (*.nxs)", ".nxs"),
+        ("NXSPE (*.nxspe)", ".nxspe"),
+        ("Ascii (*.txt)", ".txt"),
+        ("Matlab (*.mat)", ".mat"),
+    ]
+    if save_as_image:
+        filter_specs = [
+            ("Image (*.png)", ".png"),
+            ("PDF (*.pdf)", ".pdf"),
+            *filter_specs,
+        ]
+
+    filter_to_ext = dict(filter_specs)
+    ext_to_filter = {ext.casefold(): name for name, ext in filter_specs}
+
+    # using qt native dialog as there is a bug with gtk on linux that causes crashes when changing filter value and modifying file name
+    file_dialog = QFileDialog(parent, options=options)
+    file_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
+    file_dialog.setNameFilters([name for name, _ in filter_specs])
+
+    if default_ext:
+        requested_ext = str(default_ext).casefold()
+        if not requested_ext.startswith("."):
+            requested_ext = "." + requested_ext
+        selected_filter = ext_to_filter.get(requested_ext)
+        if selected_filter is None:
+            raise ValueError(f"Unsupported default extension: {default_ext!r}")
+        file_dialog.selectNameFilter(selected_filter)
+
+    if not file_dialog.exec():
+        return None, None, None
+
+    selected_files = file_dialog.selectedFiles()
+    if not selected_files:
+        return None, None, None
+
+    path = selected_files[0]
+    directory = os.path.dirname(path)
+    filename = os.path.basename(path)
+
+    selected_ext = filter_to_ext.get(file_dialog.selectedNameFilter())
+    suffix = os.path.splitext(filename)[1]
+    if suffix in ("", ".") and selected_ext:
+        filename = filename.rstrip(".") + selected_ext
+
+    extension = os.path.splitext(filename)[1]
+    return directory, filename, extension
 
 
 def save_nexus(workspace, path):
