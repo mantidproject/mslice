@@ -117,3 +117,5 @@ class WorkspaceView:
         raise NotImplementedError(
             "This method must be implemented in a concrete view before being called"
         )
+
+	
