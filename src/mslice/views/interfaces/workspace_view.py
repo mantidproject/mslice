@@ -118,4 +118,7 @@ class WorkspaceView:
             "This method must be implemented in a concrete view before being called"
         )
 
-	
+    def deselect_all(self):
+    	raise NotImplementedError(
+            "This method must be implemented in a concrete view before being called"
+    	)
