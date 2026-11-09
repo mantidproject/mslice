@@ -40,12 +40,20 @@ test = """
 QT_QPA_PLATFORM=offscreen \
 coverage run -m pytest
 """
-coverage = """
-coveralls
-coverage report
-"""
+coverage = "coverage report"
+coveralls = "coveralls"
+
+[feature.deploy]
+platforms = ["linux-64"]
+
+[feature.deploy.dependencies]
+python = "3.13.*"
+rattler-build = "*"
+anaconda-client = "*"
+versioningit = "*"
 
 [environments]
 mslice-env = ["mslice"] # Equivalent to environment.yml
 mslice-ci = ["mslice", "mantid", "test"] # Only created for linux as the unit tests run only on ubuntu runners
 mslice-developer = ["mantid", "developer"] # Equivalent to mslice-developer.yml
+mslice-deploy = { features = ["deploy"], no-default-feature = true } # Builds and uploads the conda package, linux only

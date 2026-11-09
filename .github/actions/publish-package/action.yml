@@ -1,5 +1,5 @@
 name: Build and upload conda package
-description: Build and upload conda package
+description: Build and upload conda package using the mslice-deploy pixi environment. Requires pixi to be set up first.
 
 inputs:
   repository:
@@ -17,27 +17,25 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install build tools
-      shell: bash -l {0}
-      run: mamba install -y -c conda-forge rattler-build anaconda-client versioningit
-
     - name: Build package
-      shell: bash -l {0}
+      shell: bash
       run: |
-        rattler-build build \
+        VERSION=$(pixi run -e mslice-deploy python -m versioningit)
+        echo "Building MSlice version ${VERSION}"
+        pixi run -e mslice-deploy rattler-build build \
           --recipe conda/recipe.yaml \
           -c conda-forge \
           -c mantid/label/nightly \
           -c mantid \
-          --variant "version=$(python -m versioningit)" \
+          --variant "version=${VERSION}" \
           --output-dir output
 
     - name: Upload package to Anaconda.org
-      shell: bash -l {0}
+      shell: bash
       env:
         ANACONDA_API_KEY: ${{ inputs.token }}
       run: |
-        rattler-build upload anaconda \
+        pixi run -e mslice-deploy rattler-build upload anaconda \
           --owner ${{ inputs.repository }} \
           --channel ${{ inputs.label }} \
           output/**/*.conda
