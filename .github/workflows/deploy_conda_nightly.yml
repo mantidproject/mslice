@@ -10,13 +10,9 @@ on:
 jobs:
   build_conda_and_upload:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}
-
     steps:
       - name: Checkout MSlice
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -30,15 +26,12 @@ jobs:
         run: |
           echo "headTagged=$(test -z $(git describe --exact-match --tags) && echo false || echo true)" >> $GITHUB_ENV
 
-      - name: Setup Miniconda
+      - name: Set up Pixi
         if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
-        uses: conda-incubator/setup-miniconda@v4.0.1
+        uses: ./.github/actions/setup-pixi
         with:
-          miniforge-version: latest
-          channels: conda-forge, mantid
-          conda-remove-defaults: "true"
-          activate-environment: mslice-env
-          environment-file: environment.yml
+          run-install: true
+          environments: mslice-deploy
 
       - name: Build MSlice nightly conda package
         if: ${{ env.recentCommits == 'true' && env.headTagged == 'false'}}
@@ -88,7 +81,7 @@ jobs:
             for FILE in ${FILES_TO_REMOVE}; do
               echo "Removing ${FILE}"
               if [ "${DRY_RUN}" = "false" ]; then
-                anaconda -t ${ANACONDA_TOKEN} remove --force "${FILE}"
+                pixi run -e mslice-deploy anaconda -t ${ANACONDA_TOKEN} remove --force "${FILE}"
               fi
               num_removed=$((num_removed+1))
             done
