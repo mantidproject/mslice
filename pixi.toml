@@ -26,8 +26,9 @@ ipython = "*"
 coveralls = "*"
 
 [feature.mantid.dependencies]
-mantid = "*"
-mantidqt = "*"
+# Use the nightly builds, so that MSlice is tested against the latest Mantid
+mantid = { version = "*", channel = "mantid/label/nightly" }
+mantidqt = { version = "*", channel = "mantid/label/nightly" }
 
 [feature.developer.dependencies]
 pre-commit = "*"
@@ -53,7 +54,7 @@ anaconda-client = "*"
 versioningit = "*"
 
 [environments]
-mslice-env = ["mslice"] # Equivalent to environment.yml
+mslice-env = ["mslice"] # Runtime environment for MSlice without Mantid
 mslice-ci = ["mslice", "mantid", "test"] # Only created for linux as the unit tests run only on ubuntu runners
 mslice-developer = ["mantid", "developer"] # Equivalent to mslice-developer.yml
 mslice-deploy = { features = ["deploy"], no-default-feature = true } # Builds and uploads the conda package, linux only
