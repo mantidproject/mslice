@@ -9,34 +9,29 @@ jobs:
   test:
     if: github.repository_owner == 'mantidproject'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}
 
     steps:
       - name: Checkout MSlice
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
-      - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v4.0.1
-        with:
-          miniforge-version: latest
-          channels: conda-forge, mantid
-          conda-remove-defaults: "true"
-          activate-environment: mslice-env
-          environment-file: environment.yml
+      - name: Set up Pixi
+        uses: ./.github/actions/setup-pixi
 
-      - name: Install Mantid
-        run: |
-          mamba install -c mantid/label/nightly mantid mantidqt
+      # Ignore the lock file and resolve the environment again, so that the tests run against the latest
+      # nightly mantid and mantidqt packages. Updating only mantid and mantidqt can keep an older nightly,
+      # as the other locked dependencies can be too old for the latest nightly.
+      - name: Update environment to the latest Mantid nightly
+        run: pixi update -e mslice-ci
 
-      - name: Run Tests and Coverage
-        run: |
-          xvfb-run '--server-args=-screen 0 640x480x24' --auto-servernum coverage run -m pytest
+      - name: Show Mantid version
+        run: pixi list -e mslice-ci mantid
 
-      - name: Report Coverage and send to Coveralls
+      - name: Run tests
+        run: pixi run -e mslice-ci test
+
+      - name: Report coverage and send to Coveralls
         env:
           COVERALLS_REPO_TOKEN : ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
-          coveralls
-          coverage report
+          pixi run -e mslice-ci coveralls
+          pixi run -e mslice-ci coverage

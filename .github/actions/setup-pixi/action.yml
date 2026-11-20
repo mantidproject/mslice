@@ -13,6 +13,11 @@ inputs: # copied from prefix-dev/setup-pixi
       environment. Defaults to `false`. Requires at least pixi v0.21.0.
     required: false
     default: false
+  environments:
+    description: |
+      A whitespace-separated list of environments to install. If not specified, only the default environment is
+      installed.
+    required: false
 
 runs:
   using: "composite"
@@ -32,3 +37,4 @@ runs:
         run-install: ${{ inputs.run-install }}
         frozen: ${{ inputs.run-install }}
         activate-environment: ${{ inputs.activate-environment }}
+        environments: ${{ inputs.environments }}

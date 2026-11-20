@@ -111,8 +111,18 @@ as an environment variable before starting ``mantid``.
 - On ``VSCode`` launch configurations in ``launch.json``, set the field ``"env":{"PYTHONPATH":"/path/to/mslice/src/:$PYTHONPATH$"}"`` for a Python launch/debug configuration, or the field ``"environment":[
                 {"name":"PYTHONPATH", "value":"/path/to/mslice/src/:$PYTHONPATH$"}]``, for a C++ launch/debug configuration.
 
-### Nightly conda build
+### Nightly and release conda builds
 
-Every night the MSlice unit tests are run [automatically](https://github.com/mantidproject/mslice/actions/workflows/unit_tests_nighly.yml) using the latest nightly conda
+Every night the MSlice unit tests are run [automatically](https://github.com/mantidproject/mslice/actions/workflows/unit_tests_nightly.yml) using the latest nightly conda
 packages for mantid and mantidqt, as well as the ``main`` branch of MSlice. If the unit tests run successfully, and if changes have been made to the ``main`` MSlice branch within
 the last 24 hours, a new MSlice conda package labelled ``nightly`` is created and uploaded to the [mantid conda channel](https://anaconda.org/mantid/mslice).
+Only the five most recent nightly packages are kept on the channel.
+
+The conda package is built with [rattler-build](https://rattler-build.prefix.dev/) from the recipe in ``conda/recipe.yaml``, using the ``mslice-deploy``
+pixi environment. The same environment is used to build and upload the release package when a new MSlice release is published on GitHub.
+To build the package locally (on Linux), run:
+
+```sh
+pixi run -e mslice-deploy rattler-build build --recipe conda/recipe.yaml -c conda-forge -c mantid/label/nightly -c mantid \
+  --variant "version=$(pixi run -e mslice-deploy python -m versioningit)" --output-dir output
+```
