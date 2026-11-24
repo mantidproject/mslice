@@ -20,9 +20,9 @@ runs:
     - name: Build package
       shell: bash
       run: |
-        VERSION=$(pixi run -e mslice-deploy python -m versioningit)
+        VERSION=$(pixi run --frozen -e mslice-deploy python -m versioningit)
         echo "Building MSlice version ${VERSION}"
-        pixi run -e mslice-deploy rattler-build build \
+        pixi run --frozen -e mslice-deploy rattler-build build \
           --recipe conda/recipe.yaml \
           -c conda-forge \
           -c mantid/label/nightly \
@@ -35,7 +35,7 @@ runs:
       env:
         ANACONDA_API_KEY: ${{ inputs.token }}
       run: |
-        pixi run -e mslice-deploy rattler-build upload anaconda \
+        pixi run --frozen -e mslice-deploy rattler-build upload anaconda \
           --owner ${{ inputs.repository }} \
           --channel ${{ inputs.label }} \
           output/**/*.conda
