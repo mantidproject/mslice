@@ -1,6 +1,13 @@
 from functools import partial
 
-from qtpy.QtWidgets import QApplication, QLabel, QMainWindow, QMenu, QStackedLayout
+from qtpy.QtWidgets import (
+    QActionGroup,
+    QApplication,
+    QLabel,
+    QMainWindow,
+    QMenu,
+    QStackedLayout,
+)
 
 from mslice.models.units import EnergyUnits
 from mslice.plotting.plot_window.plot_window import add_action
@@ -111,6 +118,8 @@ class MainWindow(MainView, QMainWindow):
         self.data_loading.busy.connect(self.show_busy)
         self.action_quit.triggered.connect(self.close)
 
+        self._en_default_group = QActionGroup(self)
+        self._en_default_group.setExclusive(True)
         self._en_default_actions = []
         for e_unit in EnergyUnits.get_all_units():
             action = add_action(
@@ -120,20 +129,20 @@ class MainWindow(MainView, QMainWindow):
                 checkable=True,
                 visible=True,
             )
+            self._en_default_group.addAction(action)
             action.triggered.connect(partial(self.set_energy_default, action))
             self._en_default_actions.append(action)
         self._en_default_actions[0].setChecked(True)
 
-        self.actionEUnitConvEnabled.triggered.connect(
-            partial(self.set_energy_conversion, True)
-        )
-        self.actionEUnitConvDisabled.triggered.connect(
-            partial(self.set_energy_conversion, False)
-        )
-        self._cut_algo_map = {
-            "Rebin": self.actionCutAlgoRebin,
-            "Integration": self.actionCutAlgoIntegration,
-        }
+        self._en_conv_group = QActionGroup(self)
+        self._en_conv_group.setExclusive(True)
+        self._en_conv_group.addAction(self.actionEUnitConvEnabled)
+        self._en_conv_group.addAction(self.actionEUnitConvDisabled)
+
+        self._cut_algo_group = QActionGroup(self)
+        self._cut_algo_group.setExclusive(True)
+        self._cut_algo_group.addAction(self.actionCutAlgoIntegration)
+        self._cut_algo_group.addAction(self.actionCutAlgoRebin)
         self.actionCutAlgoRebin.triggered.connect(
             partial(self.set_cut_algorithm_default, "Rebin")
         )
@@ -271,35 +280,9 @@ class MainWindow(MainView, QMainWindow):
         )
 
     def set_energy_default(self, this_action):
-        if this_action.isChecked():
-            for action in self._en_default_actions:
-                # Only one unit can be set as default at a time
-                if action == this_action:
-                    action.setChecked(True)
-                else:
-                    action.setChecked(False)
-        else:
-            # User unchecked this action - either go back to first or set another action as default
-            if this_action == self._en_default_actions[0]:
-                self._en_default_actions[1].setChecked(True)
-            else:
-                self._en_default_actions[0].setChecked(True)
         self._presenter.set_energy_default(self.get_energy_default())
 
-    def set_energy_conversion(self, EnabledClicked):
-        if EnabledClicked:
-            self.actionEUnitConvDisabled.setChecked(
-                not self.actionEUnitConvEnabled.isChecked()
-            )
-        else:
-            self.actionEUnitConvEnabled.setChecked(
-                not self.actionEUnitConvDisabled.isChecked()
-            )
-
     def set_cut_algorithm_default(self, algo):
-        for action in self._cut_algo_map:
-            if algo not in action:
-                self._cut_algo_map[action].setChecked(False)
         self._presenter.set_cut_algorithm_default(algo)
 
     def is_energy_conversion_allowed(self):
