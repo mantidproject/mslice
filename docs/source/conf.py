@@ -20,7 +20,18 @@
 
 from versioningit import get_version
 
-release_str = get_version("../..")
+# Always show the most recent release tag (e.g. "3.0"), not the next dev version
+release_str = get_version(
+    "../..",
+    config={
+        "vcs": {"method": "git", "default-tag": "0.0.0"},
+        "format": {
+            "distance": "{base_version}",
+            "dirty": "{base_version}",
+            "distance-dirty": "{base_version}",
+        },
+    },
+)
 
 major, minor = release_str.split(".")[:2]
 version_info = (int(major), int(minor), 0)
