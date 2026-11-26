@@ -18,9 +18,13 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install texlive-latex-base texlive-latex-recommended \
             texlive-fonts-recommended texlive-latex-extra dvipng
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # full history and tags so versioningit can determine the version
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
+        checkout: false
         publish: false
         documentation_path: ./docs/source
         python_version: 3.13
